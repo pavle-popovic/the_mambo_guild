@@ -2,7 +2,6 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -21,11 +20,11 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-mambo-dark relative overflow-hidden">
+    <div className="min-h-screen bg-mambo-dark relative">
       <NavBar user={user || undefined} />
 
       {/* Full-screen background video */}
-      <div className="fixed inset-0 w-full h-full z-0">
+      <div className="fixed inset-0 w-full h-full z-0 pointer-events-none">
         <video
           autoPlay
           loop
@@ -64,10 +63,10 @@ export default function HomePage() {
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <Link
-              href="/courses"
+              href="/register"
               className="px-8 py-4 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-full transition-all shadow-lg shadow-blue-500/50 hover:shadow-blue-500/75 flex items-center justify-center gap-2 min-w-[160px]"
             >
-              Start Level 1
+              Register
             </Link>
             <Link
               href="#about"
@@ -97,35 +96,7 @@ export default function HomePage() {
       </header>
 
       <section id="about" className="relative py-40 px-6 max-w-7xl mx-auto z-10 bg-mambo-dark">
-        <div className="grid md:grid-cols-2 gap-20 items-center">
-          <div className="relative">
-            <div className="absolute -inset-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl opacity-30 blur-xl" />
-            <Image
-              src="/assets/Mambo_image_1.png"
-              alt="Dancer"
-              width={600}
-              height={400}
-              className="relative rounded-2xl shadow-2xl border border-gray-800"
-            />
-            <div className="absolute -bottom-6 -right-6 bg-gray-900 p-4 rounded-xl border border-gray-700 shadow-xl flex items-center gap-3">
-              <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-black font-bold">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path
-                    fillRule="evenodd"
-                    d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div>
-                <div className="text-xs text-gray-400 font-bold uppercase">Streak</div>
-                <div className="text-sm font-bold text-mambo-text">
-                  {user?.streak_count || 0} Days Active
-                </div>
-              </div>
-            </div>
-          </div>
-
+        <div className="max-w-4xl mx-auto">
           <div>
             <h2 className="text-4xl font-bold mb-8 text-mambo-text">
               Don&apos;t just watch.<br />
@@ -170,7 +141,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <Footer />
+      <Footer className="relative z-10" />
     </div>
   );
 }

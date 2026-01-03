@@ -5,7 +5,7 @@ class Settings:
     # Database
     DATABASE_URL: str = os.getenv(
         "DATABASE_URL",
-        "postgresql://admin:admin@localhost:5432/themamboinn"
+        "postgresql://admin:admin@127.0.0.1:5432/themamboinn"
     )
     
     # Redis

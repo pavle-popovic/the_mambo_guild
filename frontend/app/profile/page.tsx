@@ -10,7 +10,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { FaFire, FaBolt, FaMedal } from "react-icons/fa";
 
 export default function ProfilePage() {
-  const { user, loading } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
@@ -40,7 +40,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user} />
 
-      <div className="max-w-5xl mx-auto px-8 py-12">
+      <div className="max-w-5xl mx-auto px-8 py-12 pt-28">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-10 mb-16">
           <div className="relative">
             {user.avatar_url ? (
@@ -62,9 +62,20 @@ export default function ProfilePage() {
           </div>
 
           <div className="text-center md:text-left flex-1">
-            <h1 className="text-3xl font-bold mb-2 text-mambo-text">
-              {user.first_name} {user.last_name}
-            </h1>
+            <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3 mb-2">
+              <h1 className="text-3xl font-bold text-mambo-text">
+                {user.first_name} {user.last_name}
+              </h1>
+              <button
+                onClick={() => {
+                  logout();
+                  router.push("/");
+                }}
+                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-bold text-gray-300 transition shrink-0"
+              >
+                Log Out
+              </button>
+            </div>
             <p className="text-gray-400 mb-8">Mambo Engineer • Member since 2024</p>
 
             <div className="flex flex-wrap justify-center md:justify-start gap-4">

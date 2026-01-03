@@ -6,8 +6,9 @@ from models import get_db
 from models.user import User, UserRole
 from services.auth_service import decode_access_token
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/token")
-oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="api/token", auto_error=False)
+# OAuth2 scheme - token URL must match the actual endpoint
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
+oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/token", auto_error=False)
 
 
 def get_current_user(

@@ -47,12 +47,15 @@ async def get_worlds(
             
             progress_percentage = (completed_count / len(world_lessons) * 100 if world_lessons else 0)
         
+        # Convert enum to string value
+        difficulty_str = world.difficulty.value if hasattr(world.difficulty, 'value') else str(world.difficulty)
+        
         result.append(WorldResponse(
             id=str(world.id),
             title=world.title,
             description=world.description,
             image_url=world.image_url,
-            difficulty=world.difficulty,
+            difficulty=difficulty_str,
             progress_percentage=progress_percentage,
             is_locked=is_locked
         ))

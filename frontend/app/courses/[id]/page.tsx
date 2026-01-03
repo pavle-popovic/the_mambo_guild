@@ -106,7 +106,7 @@ export default function CourseDetailPage() {
     return (
       <div className="min-h-screen bg-mambo-dark">
         <NavBar user={user ? { ...user, avatar_url: user.avatar_url || undefined } : undefined} />
-        <div className="max-w-7xl mx-auto px-8 py-16">
+        <div className="max-w-7xl mx-auto px-8 py-16 pt-28">
           <div className="bg-red-900/20 border border-red-600/30 rounded-xl p-8 text-center">
             <p className="text-red-400 mb-6 text-lg">{error}</p>
             {!user && (
@@ -143,7 +143,7 @@ export default function CourseDetailPage() {
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user ? { ...user, avatar_url: user.avatar_url || undefined } : undefined} />
 
-      <div className="max-w-7xl mx-auto px-8 py-12">
+      <div className="max-w-7xl mx-auto px-8 py-12 pt-28">
         <Link
           href="/courses"
           className="text-gray-400 hover:text-mambo-text transition mb-6 inline-block"

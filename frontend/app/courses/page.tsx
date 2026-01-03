@@ -61,12 +61,12 @@ export default function CoursesPage() {
     }
 
     const filtered = courses.filter((course) => {
-      const difficultyLower = course.difficulty.toLowerCase();
+      const difficultyLower = course.difficulty?.toLowerCase() || "";
       switch (activeFilter) {
         case "beginner":
-          return difficultyLower.includes("beginner") || difficultyLower === "beginner";
+          return difficultyLower === "beginner" || difficultyLower.includes("beginner");
         case "intermediate":
-          return difficultyLower.includes("intermediate") || difficultyLower === "intermediate";
+          return difficultyLower === "intermediate" || difficultyLower.includes("intermediate");
         case "styling":
           return course.title.toLowerCase().includes("styling") || 
                  course.title.toLowerCase().includes("shines") ||
@@ -198,6 +198,7 @@ export default function CoursesPage() {
                     className={`object-cover group-hover:scale-105 transition duration-500 ${
                       course.is_locked ? "grayscale opacity-50" : ""
                     }`}
+                    style={{ objectPosition: 'center 15%' }}
                   />
                   
                   {/* Dark overlay for better text readability */}
@@ -206,13 +207,6 @@ export default function CoursesPage() {
                   {/* Course badge at bottom-left */}
                   <div className="absolute bottom-3 left-3 bg-black/80 backdrop-blur px-2 py-1 rounded text-xs font-bold text-white z-10">
                     COURSE {index + 1}
-                  </div>
-                  
-                  {/* Title superposed on image - centered, large and bold */}
-                  <div className="absolute inset-0 flex items-center justify-center z-10">
-                    <h3 className="font-bold text-2xl md:text-3xl lg:text-4xl text-white drop-shadow-2xl text-center px-4 leading-tight">
-                      {course.title}
-                    </h3>
                   </div>
                 </div>
 

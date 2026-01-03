@@ -14,7 +14,7 @@ export default function PricingPage() {
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user || undefined} />
 
-      <div className="max-w-7xl mx-auto px-8 py-20 text-center">
+      <div className="max-w-7xl mx-auto px-8 py-20 pt-28 text-center">
         <h1 className="text-5xl font-extrabold mb-6 text-mambo-text">
           Choose Your Player Mode
         </h1>

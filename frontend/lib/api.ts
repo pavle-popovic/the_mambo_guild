@@ -41,19 +41,47 @@ class ApiClient {
       headers["Authorization"] = `Bearer ${this.token}`;
     }
 
-    const response = await fetch(url, {
-      ...options,
-      headers,
-    });
+    try {
+      const response = await fetch(url, {
+        ...options,
+        headers,
+      });
 
-    if (!response.ok) {
-      const error: ApiError = await response.json().catch(() => ({
-        detail: `HTTP ${response.status}: ${response.statusText}`,
-      }));
-      throw new Error(error.detail || "API request failed");
+      if (!response.ok) {
+        let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
+        try {
+          const errorData: ApiError = await response.json();
+          errorMessage = errorData.detail || errorMessage;
+        } catch {
+          // If response is not JSON, use status text
+          const text = await response.text();
+          if (text) {
+            errorMessage = text.substring(0, 200);
+          }
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Handle empty responses
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const text = await response.text();
+        if (!text) {
+          return {} as T;
+        }
+        return JSON.parse(text);
+      }
+      
+      return {} as T;
+    } catch (error) {
+      // Network errors, CORS errors, etc.
+      if (error instanceof TypeError && error.message.includes("fetch")) {
+        throw new Error(
+          "Failed to connect to server. Please check if the backend is running."
+        );
+      }
+      throw error;
     }
-
-    return response.json();
   }
 
   // Auth endpoints
@@ -213,6 +241,162 @@ class ApiClient {
         body: JSON.stringify(data),
       }
     );
+  }
+
+  // Admin course management endpoints
+  async getAdminCourses() {
+    return this.request<Array<{
+      id: string;
+      title: string;
+      description: string | null;
+      image_url: string | null;
+      difficulty: string;
+      progress_percentage: number;
+      is_locked: boolean;
+    }>>("/api/admin/courses");
+  }
+
+  async getCourseFullDetails(courseId: string) {
+    return this.request<{
+      id: string;
+      title: string;
+      description: string | null;
+      slug: string;
+      order_index: number;
+      is_free: boolean;
+      image_url: string | null;
+      difficulty: string;
+      is_published: boolean;
+      levels: Array<{
+        id: string;
+        title: string;
+        order_index: number;
+        lessons: Array<{
+          id: string;
+          title: string;
+          description: string | null;
+          video_url: string;
+          xp_value: number;
+          order_index: number;
+          is_boss_battle: boolean;
+          duration_minutes: number | null;
+        }>;
+      }>;
+    }>(`/api/admin/courses/${courseId}/full`);
+  }
+
+  async createCourse(data: {
+    title: string;
+    description?: string;
+    slug: string;
+    order_index: number;
+    is_free?: boolean;
+    image_url?: string;
+    difficulty: string;
+    is_published?: boolean;
+  }) {
+    return this.request<{
+      id: string;
+      title: string;
+      description: string | null;
+      image_url: string | null;
+      difficulty: string;
+      progress_percentage: number;
+      is_locked: boolean;
+    }>("/api/admin/courses", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateCourse(courseId: string, data: {
+    title?: string;
+    description?: string;
+    slug?: string;
+    order_index?: number;
+    is_free?: boolean;
+    image_url?: string;
+    difficulty?: string;
+    is_published?: boolean;
+  }) {
+    return this.request<{
+      id: string;
+      title: string;
+      description: string | null;
+      image_url: string | null;
+      difficulty: string;
+      progress_percentage: number;
+      is_locked: boolean;
+    }>(`/api/admin/courses/${courseId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteCourse(courseId: string) {
+    return this.request<{ message: string }>(`/api/admin/courses/${courseId}`, {
+      method: "DELETE",
+    });
+  }
+
+  async createLevel(courseId: string, data: {
+    title: string;
+    order_index: number;
+  }) {
+    return this.request<{
+      id: string;
+      title: string;
+      order_index: number;
+    }>(`/api/admin/courses/${courseId}/levels`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async createLesson(levelId: string, data: {
+    title: string;
+    description?: string;
+    video_url: string;
+    xp_value?: number;
+    order_index: number;
+    is_boss_battle?: boolean;
+    duration_minutes?: number;
+  }) {
+    return this.request<{
+      id: string;
+      title: string;
+      order_index: number;
+      xp_value: number;
+      is_boss_battle: boolean;
+    }>(`/api/admin/levels/${levelId}/lessons`, {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateLesson(lessonId: string, data: {
+    title?: string;
+    description?: string;
+    video_url?: string;
+    xp_value?: number;
+    order_index?: number;
+    is_boss_battle?: boolean;
+    duration_minutes?: number;
+  }) {
+    return this.request<{
+      id: string;
+      title: string;
+      order_index: number;
+    }>(`/api/admin/lessons/${lessonId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteLesson(lessonId: string) {
+    return this.request<{ message: string }>(`/api/admin/lessons/${lessonId}`, {
+      method: "DELETE",
+    });
   }
 
 }

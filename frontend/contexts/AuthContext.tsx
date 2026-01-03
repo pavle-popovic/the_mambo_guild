@@ -75,7 +75,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    // Clear token from API client
     apiClient.setToken(null);
+    // Clear token from localStorage
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("auth_token");
+    }
+    // Clear user state
     setUser(null);
   };
 

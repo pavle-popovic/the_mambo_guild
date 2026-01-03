@@ -1,20 +1,15 @@
 import Link from "next/link";
-import Image from "next/image";
 
-export default function Footer() {
+interface FooterProps {
+  className?: string;
+}
+
+export default function Footer({ className = "" }: FooterProps) {
   return (
-    <footer className="border-t border-gray-800 bg-black pt-16 pb-8 mt-20">
+    <footer className={`border-t border-gray-800 bg-black pt-16 pb-8 mt-20 ${className}`}>
       <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 mb-12">
         <div className="col-span-1 md:col-span-2">
-          <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-2 mb-4">
-            <Image
-              src="/assets/Logo.png"
-              alt="The Mambo Inn"
-              width={32}
-              height={32}
-              className="h-8 w-auto logo-img"
-              style={{ mixBlendMode: "screen" }}
-            />
+          <Link href="/" className="text-xl font-bold tracking-tight mb-4 block">
             <span className="text-mambo-text">THE MAMBO INN</span>
           </Link>
           <p className="text-gray-500 max-w-sm">

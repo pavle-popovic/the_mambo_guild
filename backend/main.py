@@ -9,13 +9,14 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# CORS middleware configuration
+# CORS middleware configuration - Industry standard: Explicit origins, credentials support
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
+    expose_headers=["*"],
 )
 
 # Include routers

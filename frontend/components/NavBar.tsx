@@ -23,15 +23,7 @@ export default function NavBar({ user }: NavBarProps) {
   return (
     <nav className="fixed w-full z-50 glass-nav transition-all duration-300">
       <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-3">
-          <Image
-            src="/assets/Logo.png"
-            alt="The Mambo Inn"
-            width={32}
-            height={32}
-            className="h-8 w-auto logo-img"
-            style={{ mixBlendMode: "screen" }}
-          />
+        <Link href="/" className="text-xl font-bold tracking-tight">
           <span className="text-mambo-text">THE MAMBO INN</span>
         </Link>
 
@@ -52,10 +44,20 @@ export default function NavBar({ user }: NavBarProps) {
           >
             Courses
           </Link>
-          <Link href="#" className="hover:text-mambo-text transition">
-            The Method
+          <Link
+            href="/pricing"
+            className={`hover:text-mambo-text transition ${
+              pathname === "/pricing" ? "text-mambo-text" : ""
+            }`}
+          >
+            Pricing
           </Link>
-          <Link href="#" className="hover:text-mambo-text transition">
+          <Link
+            href="/instructors"
+            className={`hover:text-mambo-text transition ${
+              pathname === "/instructors" ? "text-mambo-text" : ""
+            }`}
+          >
             Instructors
           </Link>
         </div>
@@ -103,10 +105,10 @@ export default function NavBar({ user }: NavBarProps) {
                 Log In
               </Link>
               <Link
-                href="/courses"
+                href="/register"
                 className="px-5 py-2 bg-white text-black rounded-full text-sm font-bold hover:bg-gray-200 transition"
               >
-                Get Started
+                Register
               </Link>
             </>
           )}

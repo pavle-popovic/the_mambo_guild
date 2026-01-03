@@ -46,7 +46,7 @@ class BossSubmission(Base):
     reviewed_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
 
     # Relationships
-    user = relationship("User", back_populates="submissions", foreign_keys=[user_id])
+    user = relationship("User", foreign_keys=[user_id])  # Removed back_populates since User.submissions is viewonly
     lesson = relationship("Lesson", back_populates="submissions")
     reviewer = relationship("User", foreign_keys=[reviewed_by])
 

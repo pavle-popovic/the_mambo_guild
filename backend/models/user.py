@@ -4,6 +4,10 @@ from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
 import enum
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from models.progress import BossSubmission
 
 from models import Base
 
@@ -28,7 +32,8 @@ class User(Base):
     profile = relationship("UserProfile", back_populates="user", uselist=False)
     subscription = relationship("Subscription", back_populates="user", uselist=False)
     progress = relationship("UserProgress", back_populates="user")
-    submissions = relationship("BossSubmission", back_populates="user")
+    # Submissions relationship removed temporarily to fix login
+    # Access submissions via: db.query(BossSubmission).filter(BossSubmission.user_id == user.id)
     comments = relationship("Comment", back_populates="user")
 
 

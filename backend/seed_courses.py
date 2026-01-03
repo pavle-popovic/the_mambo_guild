@@ -5,6 +5,7 @@ Run this after initializing the database.
 import sys
 from sqlalchemy import create_engine, text
 from config import settings
+from models.course import Difficulty
 import uuid
 
 # Fix Unicode encoding for Windows
@@ -19,15 +20,12 @@ def seed_courses():
     engine = create_engine(settings.DATABASE_URL, echo=False)
     
     try:
-        with engine.connect() as conn:
+        with engine.begin() as conn:
             # Check if courses already exist
             result = conn.execute(text("SELECT id FROM worlds WHERE slug IN ('mambo-101', 'mambo-201')"))
             if result.fetchall():
                 print("Courses already exist. Skipping seed.")
                 return
-            
-            # Start transaction
-            trans = conn.begin()
         
             # Create Mambo 101 (Beginner Course)
             world_101_id = str(uuid.uuid4())
@@ -41,7 +39,7 @@ def seed_courses():
                 "slug": "mambo-101",
                 "order_index": 1,
                 "is_free": True,
-                "difficulty": "Beginner",
+                "difficulty": "BEGINNER",
                 "is_published": True
             })
             
@@ -144,7 +142,7 @@ def seed_courses():
                 "slug": "mambo-201",
                 "order_index": 2,
                 "is_free": False,
-                "difficulty": "Intermediate",
+                "difficulty": "INTERMEDIATE",
                 "is_published": True
             })
             
@@ -235,14 +233,11 @@ def seed_courses():
                     "duration_minutes": lesson_data["duration_minutes"]
                 })
             
-            trans.commit()
             print("[SUCCESS] Successfully created courses and lessons!")
             print(f"   - Mambo 101: {len(lessons_101)} lessons")
             print(f"   - Mambo 201: {len(lessons_201)} lessons")
         
     except Exception as e:
-        if 'trans' in locals():
-            trans.rollback()
         print(f"[ERROR] Error seeding courses: {e}")
         import traceback
         traceback.print_exc()
