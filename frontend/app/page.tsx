@@ -42,12 +42,12 @@ export default function HomePage() {
       <header className="relative min-h-screen flex items-center justify-center z-10 pt-20">
         <div className="text-center px-4 max-w-4xl mx-auto">
           {/* Badge */}
-          <div className="inline-block px-4 py-1.5 rounded-full border border-white/20 bg-black/30 backdrop-blur-md text-xs font-bold tracking-widest mb-8 text-white">
+          <div className="inline-block px-4 py-1.5 rounded-full border border-white/20 bg-black/30 backdrop-blur-md text-xs font-bold tracking-widest mb-8 text-white mt-16">
             ONLINE SALSA ACADEMY
           </div>
           
           {/* Main headline - stacked */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight mb-8 text-white">
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-none mb-8 text-white">
             Turn the<br />
             Dancefloor<br />
             Into Your<br />

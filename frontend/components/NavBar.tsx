@@ -23,7 +23,15 @@ export default function NavBar({ user }: NavBarProps) {
   return (
     <nav className="fixed w-full z-50 glass-nav transition-all duration-300">
       <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold tracking-tight">
+        <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-3">
+          <Image
+            src="/assets/Logo.png"
+            alt="The Mambo Inn"
+            width={48}
+            height={48}
+            className="h-12 w-auto logo-img"
+            style={{ mixBlendMode: "screen" }}
+          />
           <span className="text-mambo-text">THE MAMBO INN</span>
         </Link>
 

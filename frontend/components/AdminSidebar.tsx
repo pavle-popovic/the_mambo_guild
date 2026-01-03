@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -35,7 +36,15 @@ export default function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
 
   return (
     <aside className="w-64 bg-mambo-panel border-r border-gray-800 flex flex-col">
-      <div className="p-6">
+      <div className="p-6 flex items-center gap-3">
+        <Image
+          src="/assets/Logo.png"
+          alt="The Mambo Inn"
+          width={24}
+          height={24}
+          className="h-6 w-auto logo-img"
+          style={{ mixBlendMode: "screen" }}
+        />
         <span className="font-bold text-lg tracking-wide text-mambo-text">ADMIN</span>
       </div>
 

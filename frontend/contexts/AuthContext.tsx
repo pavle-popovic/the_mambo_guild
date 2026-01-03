@@ -36,17 +36,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // Check if user is logged in on mount
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-      apiClient.setToken(token);
-      refreshUser().finally(() => setLoading(false));
-    } else {
-      setLoading(false);
-    }
-  }, []);
-
   const refreshUser = async () => {
     try {
       const profile = await apiClient.getProfile();
@@ -57,6 +46,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       apiClient.setToken(null);
     }
   };
+
+  useEffect(() => {
+    // Check if user is logged in on mount
+    if (typeof window === "undefined") {
+      setLoading(false);
+      return;
+    }
+    
+    const token = localStorage.getItem("auth_token");
+    if (token) {
+      apiClient.setToken(token);
+      refreshUser().finally(() => setLoading(false));
+    } else {
+      setLoading(false);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const login = async (email: string, password: string) => {
     await apiClient.login(email, password);
