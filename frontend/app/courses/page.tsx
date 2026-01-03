@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 
-interface World {
+interface Course {
   id: string;
   title: string;
   description: string | null;
@@ -19,112 +19,154 @@ interface World {
   is_locked: boolean;
 }
 
+type FilterType = "all" | "beginner" | "intermediate" | "styling";
+
 export default function CoursesPage() {
   const { user } = useAuth();
-  const [worlds, setWorlds] = useState<World[]>([]);
+  const router = useRouter();
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
+  const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    loadWorlds();
+    loadCourses();
   }, []);
 
-  const loadWorlds = async () => {
+  useEffect(() => {
+    filterCourses();
+  }, [courses, activeFilter]);
+
+  const loadCourses = async () => {
     try {
-      // Try to load worlds - will work for both authenticated and unauthenticated users
-      // If unauthenticated, API might return limited data or error
+      // Load courses - works for both authenticated and unauthenticated users
       const data = await apiClient.getWorlds();
-      setWorlds(data);
+      setCourses(data);
+      setError("");
     } catch (err: any) {
-      // If error is due to authentication, show a message but don't redirect
-      if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
-        setError("Please log in to view course details");
-      } else {
-        setError(err.message || "Failed to load courses");
-      }
+      // Silently handle errors - show empty state instead
+      console.error("Failed to load courses:", err);
+      setCourses([]);
+      setError("");
     } finally {
       setLoading(false);
     }
+  };
+
+  const filterCourses = () => {
+    if (activeFilter === "all") {
+      setFilteredCourses(courses);
+      return;
+    }
+
+    const filtered = courses.filter((course) => {
+      const difficultyLower = course.difficulty.toLowerCase();
+      switch (activeFilter) {
+        case "beginner":
+          return difficultyLower.includes("beginner") || difficultyLower === "beginner";
+        case "intermediate":
+          return difficultyLower.includes("intermediate") || difficultyLower === "intermediate";
+        case "styling":
+          return course.title.toLowerCase().includes("styling") || 
+                 course.title.toLowerCase().includes("shines") ||
+                 course.description?.toLowerCase().includes("styling") ||
+                 course.description?.toLowerCase().includes("shines");
+        default:
+          return true;
+      }
+    });
+    setFilteredCourses(filtered);
+  };
+
+  const handleCourseClick = (courseId: string, isLocked: boolean) => {
+    if (isLocked) {
+      return;
+    }
+    
+    // Always navigate to course detail page - login prompt happens there when clicking lessons
+    router.push(`/courses/${courseId}`);
   };
 
   return (
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user || undefined} />
 
-      <div className="bg-mambo-panel border-b border-gray-800 py-16">
+      <div className="bg-mambo-panel border-b border-gray-800 py-16 pt-24">
         <div className="max-w-7xl mx-auto px-8">
-          <h1 className="text-4xl font-bold mb-6 text-mambo-text">Explore Worlds</h1>
+          <h1 className="text-4xl font-bold mb-6 text-mambo-text">Explore Courses</h1>
           <p className="text-gray-400 mb-10 max-w-2xl">
             Follow the path. Master the foundation before you unlock the flair.
           </p>
+          
+          {/* Filters */}
+          <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => setActiveFilter("all")}
+              className={`px-4 py-2 rounded-full text-sm font-bold transition ${
+                activeFilter === "all"
+                  ? "bg-white text-black"
+                  : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700"
+              }`}
+            >
+              All Courses
+            </button>
+            <button
+              onClick={() => setActiveFilter("beginner")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                activeFilter === "beginner"
+                  ? "bg-white text-black"
+                  : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700"
+              }`}
+            >
+              Beginner
+            </button>
+            <button
+              onClick={() => setActiveFilter("intermediate")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                activeFilter === "intermediate"
+                  ? "bg-white text-black"
+                  : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700"
+              }`}
+            >
+              Intermediate
+            </button>
+            <button
+              onClick={() => setActiveFilter("styling")}
+              className={`px-4 py-2 rounded-full text-sm font-medium transition ${
+                activeFilter === "styling"
+                  ? "bg-white text-black"
+                  : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700"
+              }`}
+            >
+              Styling & Shines
+            </button>
+          </div>
         </div>
       </div>
 
-      {!user && (
-        <div className="max-w-7xl mx-auto px-8 py-8">
-          <div className="bg-blue-900/20 border border-blue-600/30 rounded-xl p-6 mb-8">
-            <div className="flex items-start gap-4">
-              <div className="text-blue-400 text-2xl">ℹ️</div>
-              <div>
-                <h3 className="font-bold text-mambo-text mb-2">Start Your Journey</h3>
-                <p className="text-gray-300 text-sm mb-4">
-                  Browse our courses below. Create a free account to unlock lessons and track your progress.
-                </p>
-                <div className="flex gap-3">
-                  <Link
-                    href="/register"
-                    className="px-6 py-2 bg-mambo-blue hover:bg-blue-600 text-white rounded-lg font-bold text-sm transition"
-                  >
-                    Create Free Account
-                  </Link>
-                  <Link
-                    href="/login"
-                    className="px-6 py-2 border border-gray-600 hover:bg-gray-800 text-mambo-text rounded-lg font-bold text-sm transition"
-                  >
-                    Log In
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
       {loading ? (
         <div className="max-w-7xl mx-auto px-8 py-16 text-center text-gray-400">
-          Loading worlds...
-        </div>
-      ) : error ? (
-        <div className="max-w-7xl mx-auto px-8 py-16">
-          <div className="bg-red-900/20 border border-red-600/30 rounded-xl p-6 text-center">
-            <p className="text-red-400 mb-4">{error}</p>
-            {!user && (
-              <Link
-                href="/login"
-                className="inline-block px-6 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg font-bold text-sm transition"
-              >
-                Log In to Continue
-              </Link>
-            )}
-          </div>
+          Loading courses...
         </div>
       ) : (
         <div className="max-w-7xl mx-auto px-8 py-16 grid md:grid-cols-3 gap-10">
-          {worlds.length === 0 ? (
+          {filteredCourses.length === 0 ? (
             <div className="col-span-3 text-center text-gray-400 py-16">
-              No worlds available yet. Check back soon!
+              No courses found for this filter. Try a different filter.
             </div>
           ) : (
-            worlds.map((world) => (
+            filteredCourses.map((course, index) => (
               <div
-                key={world.id}
+                key={course.id}
+                onClick={() => handleCourseClick(course.id, course.is_locked)}
                 className={`bg-mambo-panel border border-gray-800 rounded-xl overflow-hidden transition ${
-                  world.is_locked
-                    ? "opacity-75 relative"
+                  course.is_locked
+                    ? "opacity-75 relative cursor-not-allowed"
                     : "hover:border-gray-600 group cursor-pointer"
                 }`}
               >
-                {world.is_locked && (
+                {course.is_locked && (
                   <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center z-10 backdrop-blur-[2px]">
                     <div className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center mb-3 border border-gray-600">
                       <svg
@@ -142,48 +184,53 @@ export default function CoursesPage() {
                       </svg>
                     </div>
                     <span className="text-xs font-bold uppercase tracking-widest text-gray-300">
-                      Complete Previous World
+                      Complete Previous Course
                     </span>
                   </div>
                 )}
 
-                <div className="h-48 relative overflow-hidden">
-                  {world.image_url ? (
-                    <Image
-                      src={world.image_url}
-                      alt={world.title}
-                      fill
-                      className="object-cover group-hover:scale-105 transition duration-500"
-                    />
-                  ) : (
-                    <Image
-                      src="/assets/Mambo_image_1.png"
-                      alt={world.title}
-                      fill
-                      className={`object-cover group-hover:scale-105 transition duration-500 ${
-                        world.is_locked ? "grayscale opacity-50" : ""
-                      }`}
-                    />
-                  )}
-                  <div className="absolute bottom-3 left-3 bg-black/80 backdrop-blur px-2 py-1 rounded text-xs font-bold text-white">
-                    {world.difficulty.toUpperCase()}
+                {/* Image section with title superposed */}
+                <div className="h-48 relative overflow-hidden bg-black">
+                  <Image
+                    src="/assets/Mambo_image_1.png"
+                    alt={course.title}
+                    fill
+                    className={`object-cover group-hover:scale-105 transition duration-500 ${
+                      course.is_locked ? "grayscale opacity-50" : ""
+                    }`}
+                  />
+                  
+                  {/* Dark overlay for better text readability */}
+                  <div className="absolute inset-0 bg-black/30" />
+                  
+                  {/* Course badge at bottom-left */}
+                  <div className="absolute bottom-3 left-3 bg-black/80 backdrop-blur px-2 py-1 rounded text-xs font-bold text-white z-10">
+                    COURSE {index + 1}
+                  </div>
+                  
+                  {/* Title superposed on image - centered, large and bold */}
+                  <div className="absolute inset-0 flex items-center justify-center z-10">
+                    <h3 className="font-bold text-2xl md:text-3xl lg:text-4xl text-white drop-shadow-2xl text-center px-4 leading-tight">
+                      {course.title}
+                    </h3>
                   </div>
                 </div>
 
-                <div className="p-6">
+                {/* Content section - matches design exactly */}
+                <div className="p-6 border-t border-white/10">
                   <div className="flex justify-between items-start mb-3">
                     <h3
                       className={`font-bold text-lg transition ${
-                        world.is_locked
+                        course.is_locked
                           ? "text-gray-500"
                           : "group-hover:text-mambo-blue text-mambo-text"
                       }`}
                     >
-                      {world.title}
+                      {course.title}
                     </h3>
-                    {!world.is_locked && (
+                    {!course.is_locked && (
                       <svg
-                        className="w-6 h-6 text-mambo-blue"
+                        className="w-6 h-6 text-mambo-blue shrink-0"
                         fill="currentColor"
                         viewBox="0 0 20 20"
                       >
@@ -196,36 +243,38 @@ export default function CoursesPage() {
                     )}
                   </div>
                   <p className="text-sm text-gray-500 mb-5 line-clamp-2">
-                    {world.description || "Master the fundamentals and build your foundation."}
+                    {course.description || "Master the fundamentals and build your foundation."}
                   </p>
 
-                  {!world.is_locked && (
+                  {!course.is_locked && (
                     <>
-                      {user && (
+                      {user && course.progress_percentage > 0 && (
                         <div className="flex items-center gap-3 text-xs font-semibold text-gray-400 mb-3">
                           <div className="flex-1 bg-gray-800 h-1.5 rounded-full overflow-hidden">
                             <div
                               className="bg-green-500 h-full transition-all"
-                              style={{ width: `${world.progress_percentage}%` }}
+                              style={{ width: `${course.progress_percentage}%` }}
                             />
                           </div>
-                          <span>{Math.round(world.progress_percentage)}%</span>
+                          <span className="text-white">{Math.round(course.progress_percentage)}%</span>
                         </div>
                       )}
                       {user ? (
-                        <Link
-                          href={`/courses/${world.id}`}
-                          className="block w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-bold text-mambo-text transition text-center"
+                        <div
+                          className="w-full py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-bold text-mambo-text transition text-center"
                         >
-                          {world.progress_percentage > 0 ? "Resume" : "Start"}
-                        </Link>
+                          {course.progress_percentage > 0 ? "Resume" : "Start"}
+                        </div>
                       ) : (
-                        <Link
-                          href="/register"
-                          className="block w-full py-2 bg-mambo-blue hover:bg-blue-600 rounded-lg text-sm font-bold text-white transition text-center"
+                        <div
+                          className="w-full py-2 bg-mambo-blue hover:bg-blue-600 rounded-lg text-sm font-bold text-white transition text-center cursor-pointer"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            window.location.href = "/register";
+                          }}
                         >
                           Get Started
-                        </Link>
+                        </div>
                       )}
                     </>
                   )}

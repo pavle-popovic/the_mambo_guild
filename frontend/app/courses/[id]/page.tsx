@@ -19,55 +19,74 @@ interface Lesson {
   order_index: number;
 }
 
-export default function WorldDetailPage() {
+export default function CourseDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { user } = useAuth();
-  const worldId = params.id as string;
+  const courseId = params.id as string;
 
   const [lessons, setLessons] = useState<Lesson[]>([]);
-  const [worldTitle, setWorldTitle] = useState("Loading...");
-  const [worldProgress, setWorldProgress] = useState(0);
+  const [courseTitle, setCourseTitle] = useState("Loading...");
+  const [courseProgress, setCourseProgress] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    loadWorld();
-  }, [worldId]);
+    loadCourse();
+  }, [courseId]);
 
-  const loadWorld = async () => {
+  const loadCourse = async () => {
     try {
       setLoading(true);
-      const worlds = await apiClient.getWorlds();
-      const world = worlds.find((w) => w.id === worldId);
+      setError("");
+      const courses = await apiClient.getWorlds();
+      const course = courses.find((c) => c.id === courseId);
       
-      if (!world) {
-        setError("World not found");
+      if (!course) {
+        setError("Course not found");
         return;
       }
 
-      setWorldTitle(world.title);
+      setCourseTitle(course.title);
       
-      // Only load lessons if user is authenticated
-      if (user) {
-        const worldLessons = await apiClient.getWorldLessons(worldId);
-        setLessons(worldLessons);
+      // Load lessons - works for both authenticated and unauthenticated users
+      try {
+        const courseLessons = await apiClient.getWorldLessons(courseId);
+        setLessons(courseLessons);
         
-        const completed = worldLessons.filter((l) => l.is_completed).length;
-        setWorldProgress((completed / worldLessons.length) * 100);
-      } else {
-        // For unauthenticated users, show a message
+        if (user) {
+          const completed = courseLessons.filter((l) => l.is_completed).length;
+          setCourseProgress((completed / courseLessons.length) * 100);
+        } else {
+          setCourseProgress(0);
+        }
+      } catch (lessonErr: any) {
+        // If lessons can't be loaded, show empty list but don't show error
+        console.error("Failed to load lessons:", lessonErr);
         setLessons([]);
-        setWorldProgress(0);
+        setCourseProgress(0);
       }
     } catch (err: any) {
-      if (err.message?.includes("401") || err.message?.includes("Unauthorized")) {
-        setError("Please log in to view lesson details");
-      } else {
-        setError(err.message || "Failed to load world");
-      }
+      console.error("Failed to load course:", err);
+      setError(err.message || "Failed to load course");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleLessonClick = (lessonId: string, isLocked: boolean) => {
+    if (isLocked && user) {
+      // If logged in and lesson is locked, don't allow access
+      return;
+    }
+    
+    if (!user) {
+      // Prompt to login when clicking on a lesson
+      if (confirm("Please log in to access this lesson. Would you like to log in now?")) {
+        router.push(`/login?redirect=/lesson/${lessonId}`);
+      }
+    } else {
+      router.push(`/lesson/${lessonId}`);
     }
   };
 
@@ -133,67 +152,32 @@ export default function WorldDetailPage() {
         </Link>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4 text-mambo-text">{worldTitle}</h1>
-          <div className="flex items-center gap-3 text-sm">
-            <div className="flex-1 bg-gray-800 h-2 rounded-full overflow-hidden max-w-md">
-              <div
-                className="bg-green-500 h-full transition-all"
-                style={{ width: `${worldProgress}%` }}
-              />
+          <h1 className="text-4xl font-bold mb-4 text-mambo-text">{courseTitle}</h1>
+          {user && courseProgress > 0 && (
+            <div className="flex items-center gap-3 text-sm">
+              <div className="flex-1 bg-gray-800 h-2 rounded-full overflow-hidden max-w-md">
+                <div
+                  className="bg-green-500 h-full transition-all"
+                  style={{ width: `${courseProgress}%` }}
+                />
+              </div>
+              <span className="text-gray-400">
+                {Math.round(courseProgress)}% Complete
+              </span>
             </div>
-            <span className="text-gray-400">
-              {Math.round(worldProgress)}% Complete
-            </span>
-          </div>
+          )}
         </div>
 
-        {!user && (
-          <div className="bg-blue-900/20 border border-blue-600/30 rounded-xl p-6 mb-8">
-            <div className="flex items-start gap-4">
-              <div className="text-blue-400 text-2xl">🔒</div>
-              <div>
-                <h3 className="font-bold text-mambo-text mb-2">Unlock This World</h3>
-                <p className="text-gray-300 text-sm mb-4">
-                  Create a free account to access lessons, track your progress, and earn XP.
-                </p>
-                <div className="flex gap-3">
-                  <Link
-                    href="/register"
-                    className="px-6 py-2 bg-mambo-blue hover:bg-blue-600 text-white rounded-lg font-bold text-sm transition"
-                  >
-                    Create Free Account
-                  </Link>
-                  <Link
-                    href="/login"
-                    className="px-6 py-2 border border-gray-600 hover:bg-gray-800 text-mambo-text rounded-lg font-bold text-sm transition"
-                  >
-                    Log In
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {lessons.length === 0 && user ? (
+        {lessons.length === 0 ? (
           <div className="text-center text-gray-400 py-16">
-            No lessons available in this world yet.
-          </div>
-        ) : lessons.length === 0 && !user ? (
-          <div className="text-center text-gray-400 py-16">
-            Please log in to view lessons.
+            No lessons available in this course yet.
           </div>
         ) : (
           <div className="grid md:grid-cols-3 gap-6">
             {lessons.map((lesson) => (
-              <Link
+              <div
                 key={lesson.id}
-                href={lesson.is_locked ? "#" : `/lesson/${lesson.id}`}
-                onClick={(e) => {
-                  if (lesson.is_locked) {
-                    e.preventDefault();
-                  }
-                }}
+                onClick={() => handleLessonClick(lesson.id, lesson.is_locked)}
                 className={`bg-mambo-panel border rounded-xl p-6 transition ${
                   lesson.is_locked
                     ? "border-gray-800 opacity-60 cursor-not-allowed"
@@ -237,19 +221,19 @@ export default function WorldDetailPage() {
               {lesson.is_completed && (
                 <div className="text-green-400 text-sm font-semibold">✓ Completed</div>
               )}
-            </Link>
+            </div>
           ))}
           </div>
         )}
 
         {user && firstLesson && !firstLesson.is_locked && (
           <div className="mt-8 text-center">
-            <Link
-              href={`/lesson/${firstLesson.id}`}
-              className="inline-block px-8 py-4 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-full transition shadow-lg shadow-blue-500/25"
+            <button
+              onClick={() => router.push(`/lesson/${firstLesson.id}`)}
+              className="px-8 py-4 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-full transition shadow-lg shadow-blue-500/25"
             >
               {firstLesson.is_completed ? "Continue Learning" : "Start First Lesson"}
-            </Link>
+            </button>
           </div>
         )}
       </div>

@@ -21,49 +21,65 @@ export default function HomePage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-mambo-dark">
+    <div className="min-h-screen bg-mambo-dark relative overflow-hidden">
       <NavBar user={user || undefined} />
 
-      <header className="relative h-screen flex items-center justify-center">
+      {/* Full-screen background video */}
+      <div className="fixed inset-0 w-full h-full z-0">
         <video
           autoPlay
           loop
           muted
           playsInline
-          className="hero-video opacity-60"
+          className="absolute top-0 left-0 w-full h-full object-cover object-center"
+          style={{ objectPosition: 'center 20%' }}
         >
           <source src="/assets/Background_video.mp4" type="video/mp4" />
         </video>
-        <div className="absolute inset-0 bg-black/40 gradient-overlay" />
+        <div className="absolute inset-0 bg-black/50" />
+      </div>
 
-        <div className="relative z-10 text-center px-4 max-w-4xl pt-20">
-          <div className="inline-block px-4 py-1 rounded-full border border-white/20 bg-black/30 backdrop-blur-md text-xs font-bold tracking-widest mb-8">
+      {/* Hero content - centered on top of video */}
+      <header className="relative min-h-screen flex items-center justify-center z-10 pt-20">
+        <div className="text-center px-4 max-w-4xl mx-auto">
+          {/* Badge */}
+          <div className="inline-block px-4 py-1.5 rounded-full border border-white/20 bg-black/30 backdrop-blur-md text-xs font-bold tracking-widest mb-8 text-white">
             ONLINE SALSA ACADEMY
           </div>
-          <h1 className="text-6xl md:text-8xl font-extrabold tracking-tight leading-tight mb-8">
-            Turn the Dancefloor<br />Into Your Playground.
+          
+          {/* Main headline - stacked */}
+          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-extrabold tracking-tight leading-tight mb-8 text-white">
+            Turn the<br />
+            Dancefloor<br />
+            Into Your<br />
+            Playground.
           </h1>
-          <p className="text-xl text-gray-200 mb-12 max-w-2xl mx-auto font-light">
-            Structured courses. Real feedback. <br />
+          
+          {/* Sub-text */}
+          <p className="text-lg sm:text-xl text-gray-200 mb-12 max-w-2xl mx-auto font-light">
+            Structured courses. Real feedback.<br />
             Stop memorizing steps—start mastering the game.
           </p>
-          <div className="flex flex-col md:flex-row justify-center gap-4">
+          
+          {/* CTA Buttons */}
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-4">
             <Link
               href="/courses"
-              className="px-8 py-4 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-full transition shadow-lg shadow-blue-500/25 flex items-center justify-center gap-2"
+              className="px-8 py-4 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-full transition-all shadow-lg shadow-blue-500/50 hover:shadow-blue-500/75 flex items-center justify-center gap-2 min-w-[160px]"
             >
               Start Level 1
             </Link>
             <Link
               href="#about"
-              className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full font-bold transition"
+              className="px-8 py-4 bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/10 rounded-full font-bold transition-all text-white min-w-[160px]"
             >
               How It Works
             </Link>
           </div>
         </div>
 
-        <div className="absolute bottom-10 animate-bounce text-gray-500">
+        {/* Scroll indicator */}
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce text-gray-400">
           <svg
             className="w-6 h-6 mx-auto"
             fill="none"
@@ -80,7 +96,7 @@ export default function HomePage() {
         </div>
       </header>
 
-      <section id="about" className="py-40 px-6 max-w-7xl mx-auto">
+      <section id="about" className="relative py-40 px-6 max-w-7xl mx-auto z-10 bg-mambo-dark">
         <div className="grid md:grid-cols-2 gap-20 items-center">
           <div className="relative">
             <div className="absolute -inset-4 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl opacity-30 blur-xl" />

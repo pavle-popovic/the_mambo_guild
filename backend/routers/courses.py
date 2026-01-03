@@ -125,10 +125,10 @@ async def get_lesson(
 @router.get("/worlds/{world_id}/lessons", response_model=List[LessonResponse])
 async def get_world_lessons(
     world_id: str,
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
-    """Get all lessons in a world with completion and lock status."""
+    """Get all lessons in a world with completion and lock status. Accessible without authentication."""
     world = db.query(World).filter(World.id == world_id).first()
     if not world:
         raise HTTPException(status_code=404, detail="World not found")
@@ -136,16 +136,18 @@ async def get_world_lessons(
     lessons = []
     for level in world.levels:
         for lesson in level.lessons:
-            # Check completion
-            progress = db.query(UserProgress).filter(
-                UserProgress.user_id == current_user.id,
-                UserProgress.lesson_id == lesson.id
-            ).first()
-            is_completed = progress.is_completed if progress else False
+            # Check completion (only if user is authenticated)
+            is_completed = False
+            if current_user:
+                progress = db.query(UserProgress).filter(
+                    UserProgress.user_id == current_user.id,
+                    UserProgress.lesson_id == lesson.id
+                ).first()
+                is_completed = progress.is_completed if progress else False
             
-            # Check lock status
+            # Check lock status (only if user is authenticated, otherwise all lessons appear unlocked for viewing)
             is_locked = False
-            if lesson.order_index > 1:
+            if current_user and lesson.order_index > 1:
                 prev_lesson = db.query(Lesson).filter(
                     Lesson.level_id == lesson.level_id,
                     Lesson.order_index == lesson.order_index - 1
