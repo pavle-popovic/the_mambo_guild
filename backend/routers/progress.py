@@ -19,7 +19,7 @@ async def complete_lesson(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Mark lesson as complete and award XP."""
+    """Mark lesson as complete and award XP. No prerequisites - users can complete any lesson."""
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
@@ -33,23 +33,7 @@ async def complete_lesson(
     if existing_progress and existing_progress.is_completed:
         raise HTTPException(status_code=400, detail="Lesson already completed")
     
-    # Check prerequisites
-    if lesson.order_index > 1:
-        prev_lesson = db.query(Lesson).filter(
-            Lesson.level_id == lesson.level_id,
-            Lesson.order_index == lesson.order_index - 1
-        ).first()
-        if prev_lesson:
-            prev_progress = db.query(UserProgress).filter(
-                UserProgress.user_id == current_user.id,
-                UserProgress.lesson_id == prev_lesson.id,
-                UserProgress.is_completed == True
-            ).first()
-            if not prev_progress:
-                raise HTTPException(
-                    status_code=403,
-                    detail="Previous lesson must be completed first"
-                )
+    # No prerequisite checks - users can complete any lesson immediately
     
     # Create or update progress
     if existing_progress:

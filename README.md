@@ -30,7 +30,7 @@ The Mambo Inn is a full-stack LMS platform designed for structured dance learnin
 - Pydantic for validation
 
 **Infrastructure:**
-- Docker & Docker Compose
+- Docker & Docker Compose (Recommended)
 - PostgreSQL Database
 - Redis Cache
 
@@ -49,7 +49,13 @@ The Mambo Inn is a full-stack LMS platform designed for structured dance learnin
 │   ├── components/     # React components
 │   ├── contexts/       # React Context providers
 │   └── lib/            # Utilities and API client
-├── docker-compose.yml   # Database and Redis setup
+├── docker-compose.yml   # Docker orchestration (all services)
+├── backend/
+│   └── Dockerfile      # Backend container configuration
+├── frontend/
+│   └── Dockerfile      # Frontend container configuration
+├── env.example         # Environment variables template
+├── DOCKER_SETUP.md     # Docker setup guide
 └── README.md           # This file
 ```
 
@@ -57,17 +63,61 @@ The Mambo Inn is a full-stack LMS platform designed for structured dance learnin
 
 ### Prerequisites
 
-- Node.js 18+
-- Python 3.11+
-- Docker & Docker Compose
+- **Docker & Docker Compose** (Recommended) - Everything runs in containers
+- OR Node.js 18+ and Python 3.11+ for manual setup
 
-### 1. Start Database
+### Option 1: Docker (Recommended) ⭐
+
+The easiest way to run the entire application stack:
 
 ```bash
+# 1. Copy environment file
+cp env.example .env
+
+# 2. Start all services (database, backend, frontend)
 docker-compose up -d
+
+# 3. Initialize database tables
+docker-compose exec backend python database.py
+
+# 4. Access the application
+# Frontend: http://localhost:3000
+# Backend API: http://localhost:8000
+# API Docs: http://localhost:8000/docs
 ```
 
-### 2. Setup Backend
+**That's it!** All services are now running in Docker containers with proper networking.
+
+#### Docker Commands
+
+```bash
+# View logs
+docker-compose logs -f
+
+# Stop all services
+docker-compose down
+
+# Restart a specific service
+docker-compose restart backend
+
+# Execute commands in containers
+docker-compose exec backend python create_admin.py
+docker-compose exec backend sh  # Shell access
+```
+
+See [DOCKER_SETUP.md](./DOCKER_SETUP.md) for detailed Docker documentation.
+
+### Option 2: Manual Setup (Development)
+
+If you prefer to run services manually outside Docker:
+
+#### 1. Start Database & Redis
+
+```bash
+docker-compose up -d postgres redis
+```
+
+#### 2. Setup Backend
 
 ```bash
 cd backend
@@ -79,7 +129,7 @@ uvicorn main:app --reload
 
 Backend will run on `http://localhost:8000`
 
-### 3. Setup Frontend
+#### 3. Setup Frontend
 
 ```bash
 cd frontend
@@ -99,6 +149,14 @@ Once the backend is running, visit:
 
 ### Backend Tests
 
+**With Docker:**
+```bash
+docker-compose exec backend python test_backend.py
+docker-compose exec backend python test_backend_comprehensive.py
+docker-compose exec backend python test_all_apis.py
+```
+
+**Manual Setup:**
 ```bash
 cd backend
 python test_backend.py              # Unit tests
@@ -108,6 +166,12 @@ python test_all_apis.py             # Full API test suite
 
 ### Frontend Tests
 
+**With Docker:**
+```bash
+docker-compose exec frontend npm run build
+```
+
+**Manual Setup:**
 ```bash
 cd frontend
 npm run build  # Build test
@@ -158,7 +222,24 @@ The platform uses JWT (JSON Web Tokens) for authentication. Tokens are stored in
 
 ### Environment Variables
 
-Create `.env` files as needed:
+#### Docker Setup (Recommended)
+
+Create a `.env` file in the project root (copy from `env.example`):
+
+```bash
+cp env.example .env
+```
+
+The `.env` file supports all services. Key variables:
+- `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` - Database credentials
+- `SECRET_KEY` - JWT secret (change for production!)
+- `REDIS_HOST`, `REDIS_PORT` - Redis configuration
+- `NEXT_PUBLIC_API_URL` - Frontend API endpoint
+- `CORS_ORIGINS` - Allowed CORS origins
+
+**Note**: When using Docker, `DATABASE_URL` is automatically configured to use the `postgres` service name.
+
+#### Manual Setup
 
 **Backend** (`backend/.env`):
 ```
@@ -173,6 +254,16 @@ REDIS_PORT=6379
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
+### Docker vs Manual Setup
+
+| Feature | Docker | Manual |
+|---------|--------|--------|
+| **Setup Time** | ⚡ ~2 minutes | ⏱️ ~10-15 minutes |
+| **Database Connection** | ✅ Automatic (service names) | ⚠️ Requires localhost config |
+| **Isolation** | ✅ Complete | ❌ Conflicts possible |
+| **Reproducibility** | ✅ Same everywhere | ⚠️ Environment dependent |
+| **Production Ready** | ✅ Yes | ❌ Requires additional setup |
+
 ## 📄 License
 
 This project is proprietary.
@@ -181,7 +272,14 @@ This project is proprietary.
 
 - Initial development by Pavle Popovic
 
+## 📚 Additional Documentation
+
+- **[DOCKER_SETUP.md](./DOCKER_SETUP.md)** - Complete Docker setup and usage guide
+- **[DOCKER_IMPLEMENTATION_SUMMARY.md](./DOCKER_IMPLEMENTATION_SUMMARY.md)** - Docker implementation details
+- **[API_TESTING_GUIDE.md](./API_TESTING_GUIDE.md)** - API testing instructions
+
 ## 🔗 Links
 
 - Repository: https://github.com/pavle-popovic/the_mambo_inn
 - API Documentation: http://localhost:8000/docs (when running)
+- Docker Hub: Services built locally from Dockerfiles

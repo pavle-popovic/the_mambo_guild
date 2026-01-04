@@ -30,8 +30,8 @@ export default function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
       label: "Grading Queue",
       badge: pendingCount,
     },
-    { href: "#", icon: FaUsers, label: "Students" },
-    { href: "#", icon: FaCog, label: "Settings" },
+    { href: "/admin/students", icon: FaUsers, label: "Students" },
+    { href: "/admin/settings", icon: FaCog, label: "Settings" },
   ];
 
   return (

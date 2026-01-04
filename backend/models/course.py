@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Integer, Boolean, Text, DateTime, ForeignKey, Enum as SQLEnum
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
@@ -41,7 +41,11 @@ class Level(Base):
 
     # Relationships
     world = relationship("World", back_populates="levels")
-    lessons = relationship("Lesson", back_populates="level", order_by="Lesson.order_index")
+    lessons = relationship(
+        "Lesson", 
+        back_populates="level", 
+        order_by="Lesson.week_number, Lesson.day_number, Lesson.order_index"
+    )
 
 
 class Lesson(Base):
@@ -56,6 +60,17 @@ class Lesson(Base):
     order_index = Column(Integer, nullable=False)
     is_boss_battle = Column(Boolean, default=False, nullable=False)
     duration_minutes = Column(Integer, nullable=True)
+    
+    # Week/Day sorting fields
+    week_number = Column(Integer, nullable=True, index=True)
+    day_number = Column(Integer, nullable=True, index=True)
+    
+    # Rich content storage (JSONB for better querying)
+    content_json = Column(JSONB, nullable=True)
+    
+    # Mux video integration
+    mux_playback_id = Column(String, nullable=True)
+    mux_asset_id = Column(String, nullable=True)
 
     # Relationships
     level = relationship("Level", back_populates="lessons")

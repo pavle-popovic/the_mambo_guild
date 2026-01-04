@@ -156,6 +156,11 @@ class ApiClient {
         is_locked: boolean;
         is_boss_battle: boolean;
         order_index: number;
+        week_number: number | null;
+        day_number: number | null;
+        content_json: any | null;
+        mux_playback_id: string | null;
+        mux_asset_id: string | null;
       }>
     >(`/api/courses/worlds/${worldId}/lessons`);
   }
@@ -170,7 +175,23 @@ class ApiClient {
       next_lesson_id: string | null;
       prev_lesson_id: string | null;
       comments: Array<any>;
+      week_number: number | null;
+      day_number: number | null;
+      content_json: any | null;
+      mux_playback_id: string | null;
+      mux_asset_id: string | null;
     }>(`/api/courses/lessons/${lessonId}`);
+  }
+
+  async createMuxUploadUrl(lessonId?: string, filename?: string) {
+    return this.request<{
+      upload_id: string;
+      upload_url: string;
+      status: string;
+    }>("/api/mux/upload-url", {
+      method: "POST",
+      body: JSON.stringify({ lesson_id: lessonId, filename }),
+    });
   }
 
   // Progress endpoints
@@ -216,6 +237,24 @@ class ApiClient {
       total_submissions: number;
       pending_submissions: number;
     }>("/api/admin/stats");
+  }
+
+  async getStudents(search?: string, skip: number = 0, limit: number = 100) {
+    const params = new URLSearchParams();
+    if (search) params.append("search", search);
+    params.append("skip", skip.toString());
+    params.append("limit", limit.toString());
+    return this.request<Array<{
+      id: string;
+      email: string;
+      first_name: string;
+      last_name: string;
+      xp: number;
+      level: number;
+      streak_count: number;
+      created_at: string;
+      role: string;
+    }>>(`/api/admin/students?${params.toString()}`);
   }
 
   async getPendingSubmissions() {
@@ -361,6 +400,9 @@ class ApiClient {
     order_index: number;
     is_boss_battle?: boolean;
     duration_minutes?: number;
+    week_number?: number | null;
+    day_number?: number | null;
+    content_json?: any | null;
   }) {
     return this.request<{
       id: string;
@@ -382,6 +424,9 @@ class ApiClient {
     order_index?: number;
     is_boss_battle?: boolean;
     duration_minutes?: number;
+    week_number?: number | null;
+    day_number?: number | null;
+    content_json?: any | null;
   }) {
     return this.request<{
       id: string;

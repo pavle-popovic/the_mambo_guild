@@ -17,6 +17,8 @@ interface Lesson {
   is_locked: boolean;
   is_boss_battle: boolean;
   order_index: number;
+  week_number: number | null;
+  day_number: number | null;
 }
 
 export default function CourseDetailPage() {
@@ -173,57 +175,166 @@ export default function CourseDetailPage() {
             No lessons available in this course yet.
           </div>
         ) : (
-          <div className="grid md:grid-cols-3 gap-6">
-            {lessons.map((lesson) => (
-              <div
-                key={lesson.id}
-                onClick={() => handleLessonClick(lesson.id, lesson.is_locked)}
-                className={`bg-mambo-panel border rounded-xl p-6 transition ${
-                  lesson.is_locked
-                    ? "border-gray-800 opacity-60 cursor-not-allowed"
-                    : "border-gray-800 hover:border-gray-600 cursor-pointer"
-                }`}
-              >
-              <div className="flex items-start justify-between mb-4">
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
-                    lesson.is_boss_battle
-                      ? "bg-red-600 text-white"
-                      : lesson.is_completed
-                      ? "bg-green-500 text-black"
-                      : lesson.is_locked
-                      ? "bg-gray-800 text-gray-500 border border-gray-700"
-                      : "bg-mambo-blue text-white"
-                  }`}
-                >
-                  {lesson.is_boss_battle ? "⚔️" : lesson.order_index}
-                </div>
-                {lesson.is_locked && (
-                  <svg
-                    className="w-5 h-5 text-gray-600"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                    />
-                  </svg>
+          (() => {
+            // Group lessons by week and day
+            const groupedLessons: { [key: string]: Lesson[] } = {};
+            const ungroupedLessons: Lesson[] = [];
+            
+            lessons.forEach((lesson) => {
+              if (lesson.week_number !== null && lesson.week_number !== undefined &&
+                  lesson.day_number !== null && lesson.day_number !== undefined) {
+                const key = `week-${lesson.week_number}-day-${lesson.day_number}`;
+                if (!groupedLessons[key]) {
+                  groupedLessons[key] = [];
+                }
+                groupedLessons[key].push(lesson);
+              } else {
+                ungroupedLessons.push(lesson);
+              }
+            });
+            
+            // Sort groups by week/day
+            const sortedGroups = Object.entries(groupedLessons).sort(([keyA], [keyB]) => {
+              const [, weekA, , dayA] = keyA.split('-');
+              const [, weekB, , dayB] = keyB.split('-');
+              const weekDiff = parseInt(weekA) - parseInt(weekB);
+              return weekDiff !== 0 ? weekDiff : parseInt(dayA) - parseInt(dayB);
+            });
+
+            return (
+              <div className="space-y-8">
+                {/* Grouped Lessons by Week/Day */}
+                {sortedGroups.map(([key, groupLessons]) => {
+                  const [, week, , day] = key.split('-');
+                  return (
+                    <div key={key} className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <h2 className="text-xl font-bold text-mambo-text">
+                          Week {week} • Day {day}
+                        </h2>
+                        <div className="flex-1 h-px bg-gray-800" />
+                        <span className="text-sm text-gray-500">
+                          {groupLessons.length} {groupLessons.length === 1 ? 'lesson' : 'lessons'}
+                        </span>
+                      </div>
+                      <div className="grid md:grid-cols-3 gap-6">
+                        {groupLessons.map((lesson) => (
+                          <div
+                            key={lesson.id}
+                            onClick={() => handleLessonClick(lesson.id, lesson.is_locked)}
+                            className={`bg-mambo-panel border rounded-xl p-6 transition ${
+                              lesson.is_locked
+                                ? "border-gray-800 opacity-60 cursor-not-allowed"
+                                : "border-gray-800 hover:border-gray-600 cursor-pointer"
+                            }`}
+                          >
+                            <div className="flex items-start justify-between mb-4">
+                              <div
+                                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                                  lesson.is_boss_battle
+                                    ? "bg-red-600 text-white"
+                                    : lesson.is_completed
+                                    ? "bg-green-500 text-black"
+                                    : lesson.is_locked
+                                    ? "bg-gray-800 text-gray-500 border border-gray-700"
+                                    : "bg-mambo-blue text-white"
+                                }`}
+                              >
+                                {lesson.is_boss_battle ? "⚔️" : lesson.order_index}
+                              </div>
+                              {lesson.is_locked && (
+                                <svg
+                                  className="w-5 h-5 text-gray-600"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth={2}
+                                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                  />
+                                </svg>
+                              )}
+                            </div>
+                            <h3 className="font-bold text-lg mb-2 text-mambo-text">{lesson.title}</h3>
+                            <p className="text-sm text-gray-500 mb-4">
+                              {lesson.xp_value} XP {lesson.is_boss_battle && "• Boss Battle"}
+                            </p>
+                            {lesson.is_completed && (
+                              <div className="text-green-400 text-sm font-semibold">✓ Completed</div>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+
+                {/* Ungrouped Lessons */}
+                {ungroupedLessons.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-3">
+                      <h2 className="text-xl font-bold text-gray-500">Other Lessons</h2>
+                      <div className="flex-1 h-px bg-gray-800" />
+                    </div>
+                    <div className="grid md:grid-cols-3 gap-6">
+                      {ungroupedLessons.map((lesson) => (
+                        <div
+                          key={lesson.id}
+                          onClick={() => handleLessonClick(lesson.id, lesson.is_locked)}
+                          className={`bg-mambo-panel border rounded-xl p-6 transition ${
+                            lesson.is_locked
+                              ? "border-gray-800 opacity-60 cursor-not-allowed"
+                              : "border-gray-800 hover:border-gray-600 cursor-pointer"
+                          }`}
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div
+                              className={`w-10 h-10 rounded-full flex items-center justify-center font-bold ${
+                                lesson.is_boss_battle
+                                  ? "bg-red-600 text-white"
+                                  : lesson.is_completed
+                                  ? "bg-green-500 text-black"
+                                  : lesson.is_locked
+                                  ? "bg-gray-800 text-gray-500 border border-gray-700"
+                                  : "bg-mambo-blue text-white"
+                              }`}
+                            >
+                              {lesson.is_boss_battle ? "⚔️" : lesson.order_index}
+                            </div>
+                            {lesson.is_locked && (
+                              <svg
+                                className="w-5 h-5 text-gray-600"
+                                fill="none"
+                                stroke="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  strokeWidth={2}
+                                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                                />
+                              </svg>
+                            )}
+                          </div>
+                          <h3 className="font-bold text-lg mb-2 text-mambo-text">{lesson.title}</h3>
+                          <p className="text-sm text-gray-500 mb-4">
+                            {lesson.xp_value} XP {lesson.is_boss_battle && "• Boss Battle"}
+                          </p>
+                          {lesson.is_completed && (
+                            <div className="text-green-400 text-sm font-semibold">✓ Completed</div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
-              <h3 className="font-bold text-lg mb-2 text-mambo-text">{lesson.title}</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                {lesson.xp_value} XP {lesson.is_boss_battle && "• Boss Battle"}
-              </p>
-              {lesson.is_completed && (
-                <div className="text-green-400 text-sm font-semibold">✓ Completed</div>
-              )}
-            </div>
-          ))}
-          </div>
+            );
+          })()
         )}
 
         {user && firstLesson && !firstLesson.is_locked && (

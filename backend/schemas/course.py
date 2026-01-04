@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict, Any
 from datetime import datetime
 
 
@@ -26,6 +26,11 @@ class LessonResponse(BaseModel):
     is_locked: bool
     is_boss_battle: bool
     order_index: int
+    week_number: Optional[int] = None
+    day_number: Optional[int] = None
+    content_json: Optional[Dict[str, Any]] = None
+    mux_playback_id: Optional[str] = None
+    mux_asset_id: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -51,6 +56,11 @@ class LessonDetailResponse(BaseModel):
     next_lesson_id: Optional[str] = None
     prev_lesson_id: Optional[str] = None
     comments: List[CommentResponse] = []
+    week_number: Optional[int] = None
+    day_number: Optional[int] = None
+    content_json: Optional[Dict[str, Any]] = None
+    mux_playback_id: Optional[str] = None
+    mux_asset_id: Optional[str] = None
 
     class Config:
         from_attributes = True

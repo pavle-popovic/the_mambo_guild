@@ -6,6 +6,7 @@ import sys
 from sqlalchemy import create_engine, text
 from config import settings
 from services.auth_service import get_password_hash
+from models.user import UserRole, CurrentLevelTag
 import uuid
 from datetime import datetime
 
@@ -43,7 +44,7 @@ def create_admin_user():
                 "id": str(admin_id),
                 "email": "admin@themamboinn.com",
                 "hashed_password": hashed_password,
-                "role": "admin",
+                "role": "ADMIN",  # Database enum uses uppercase
                 "created_at": now,
                 "updated_at": now
             })
@@ -51,17 +52,18 @@ def create_admin_user():
             # Create admin profile
             profile_id = uuid.uuid4()
             conn.execute(text("""
-                INSERT INTO user_profiles (id, user_id, first_name, last_name, current_level_tag, xp, level, streak_count)
-                VALUES (:id, :user_id, :first_name, :last_name, :current_level_tag, :xp, :level, :streak_count)
+                INSERT INTO user_profiles (id, user_id, first_name, last_name, current_level_tag, xp, level, streak_count, badges)
+                VALUES (:id, :user_id, :first_name, :last_name, :current_level_tag, :xp, :level, :streak_count, :badges)
             """), {
                 "id": str(profile_id),
                 "user_id": str(admin_id),
                 "first_name": "Admin",
                 "last_name": "User",
-                "current_level_tag": "Advanced",
+                "current_level_tag": "ADVANCED",  # Database enum uses uppercase
                 "xp": 0,
                 "level": 1,
-                "streak_count": 0
+                "streak_count": 0,
+                "badges": "[]"
             })
             
             # Create subscription (PRO tier for admin)
@@ -72,8 +74,8 @@ def create_admin_user():
             """), {
                 "id": str(subscription_id),
                 "user_id": str(admin_id),
-                "tier": "pro",
-                "status": "active"
+                "tier": "PERFORMER",
+                "status": "ACTIVE"
             })
             
             print("✅ Admin user created successfully!")

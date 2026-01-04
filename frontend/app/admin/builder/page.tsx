@@ -5,8 +5,10 @@ import { useRouter, useSearchParams } from "next/navigation";
 import AdminSidebar from "@/components/AdminSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
-import { FaArrowLeft, FaPen, FaTrash, FaPlus, FaGripVertical, FaSave } from "react-icons/fa";
+import { FaArrowLeft, FaPen, FaTrash, FaPlus, FaGripVertical, FaSave, FaEdit } from "react-icons/fa";
 import Image from "next/image";
+import LessonContentEditor from "@/components/LessonContentEditor";
+import MuxUploader from "@/components/MuxUploader";
 
 interface Lesson {
   id: string;
@@ -17,6 +19,11 @@ interface Lesson {
   order_index: number;
   is_boss_battle: boolean;
   duration_minutes: number | null;
+  week_number: number | null;
+  day_number: number | null;
+  content_json: any | null;
+  mux_playback_id: string | null;
+  mux_asset_id: string | null;
 }
 
 interface Level {
@@ -49,6 +56,7 @@ export default function AdminBuilderPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [editingContentFor, setEditingContentFor] = useState<string | null>(null);
 
   // Form state
   const [worldTitle, setWorldTitle] = useState("");
@@ -133,6 +141,9 @@ export default function AdminBuilderPage() {
         order_index: courseData?.levels.find(l => l.id === levelId)?.lessons.length || 0,
         xp_value: 50,
         is_boss_battle: false,
+        week_number: null,
+        day_number: null,
+        content_json: null,
       });
       await loadCourse();
     } catch (err: any) {
@@ -140,6 +151,115 @@ export default function AdminBuilderPage() {
       alert(err.message || "Failed to create lesson");
     }
   };
+
+  const renderLessonItem = (lesson: Lesson) => (
+    <>
+      <div className="flex items-center gap-4 flex-1">
+        <FaGripVertical className="text-gray-600 cursor-move" />
+        <div className="flex-1">
+          <input
+            type="text"
+            value={lesson.title}
+            onChange={(e) =>
+              handleUpdateLesson(lesson.id, { title: e.target.value })
+            }
+            className="bg-transparent border-none text-mambo-text-light font-bold w-full focus:outline-none"
+          />
+          <div className="flex items-center gap-3 mt-2">
+            <div className="text-xs text-gray-500">
+              {lesson.xp_value} XP • {lesson.duration_minutes || "N/A"} min
+              {lesson.is_boss_battle && (
+                <span className="ml-2 text-red-400">BOSS BATTLE</span>
+              )}
+            </div>
+            <div className="flex items-center gap-2">
+              <label className="text-xs text-gray-500">Week:</label>
+              <input
+                type="number"
+                min="1"
+                value={lesson.week_number || ""}
+                onChange={(e) => {
+                  const val = e.target.value === "" ? null : parseInt(e.target.value);
+                  handleUpdateLesson(lesson.id, { week_number: val });
+                }}
+                className="w-16 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-mambo-text-light focus:border-blue-600 outline-none"
+                placeholder="—"
+              />
+              <label className="text-xs text-gray-500">Day:</label>
+              <input
+                type="number"
+                min="1"
+                value={lesson.day_number || ""}
+                onChange={(e) => {
+                  const val = e.target.value === "" ? null : parseInt(e.target.value);
+                  handleUpdateLesson(lesson.id, { day_number: val });
+                }}
+                className="w-16 bg-gray-900 border border-gray-700 rounded px-2 py-1 text-xs text-mambo-text-light focus:border-blue-600 outline-none"
+                placeholder="—"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-2">
+        <button
+          onClick={() => setEditingContentFor(lesson.id)}
+          className="text-gray-400 hover:text-blue-400"
+          title="Edit content"
+        >
+          <FaEdit />
+        </button>
+        <button
+          onClick={() => {
+            const newUrl = prompt("Enter video URL:", lesson.video_url);
+            if (newUrl) {
+              handleUpdateLesson(lesson.id, { video_url: newUrl });
+            }
+          }}
+          className="text-gray-400 hover:text-mambo-blue"
+          title="Edit video URL"
+        >
+          <FaPen />
+        </button>
+        <button
+          onClick={() => {
+            // Toggle Mux uploader visibility
+            const uploader = document.getElementById(`mux-uploader-${lesson.id}`);
+            if (uploader) {
+              uploader.style.display = uploader.style.display === "none" ? "block" : "none";
+            }
+          }}
+          className="text-gray-400 hover:text-purple-400"
+          title="Upload to Mux"
+        >
+          📹
+        </button>
+        <button
+          onClick={() => handleDeleteLesson(lesson.id)}
+          className="text-gray-400 hover:text-red-400"
+          title="Delete lesson"
+        >
+          <FaTrash />
+        </button>
+      </div>
+      {/* Mux Uploader - Hidden by default */}
+      <div id={`mux-uploader-${lesson.id}`} className="hidden mt-4 ml-4 p-4 bg-gray-800 rounded-lg w-full">
+        <MuxUploader
+          lessonId={lesson.id}
+          currentPlaybackId={lesson.mux_playback_id || undefined}
+          onUploadComplete={async (playbackId, assetId) => {
+            await handleUpdateLesson(lesson.id, {
+              mux_playback_id: playbackId,
+              mux_asset_id: assetId,
+            });
+            // Hide uploader after successful upload
+            const uploader = document.getElementById(`mux-uploader-${lesson.id}`);
+            if (uploader) uploader.style.display = "none";
+          }}
+        />
+      </div>
+    </>
+  );
 
   const handleUpdateLesson = async (lessonId: string, updates: Partial<Lesson>) => {
     try {
@@ -320,56 +440,104 @@ export default function AdminBuilderPage() {
               </div>
 
               <div className="space-y-3">
-                {level.lessons.map((lesson) => (
+                {(() => {
+                  // Group lessons by week and day
+                  const groupedLessons: { [key: string]: Lesson[] } = {};
+                  const ungroupedLessons: Lesson[] = [];
+                  
+                  level.lessons.forEach((lesson) => {
+                    if (lesson.week_number !== null && lesson.week_number !== undefined &&
+                        lesson.day_number !== null && lesson.day_number !== undefined) {
+                      const key = `week-${lesson.week_number}-day-${lesson.day_number}`;
+                      if (!groupedLessons[key]) {
+                        groupedLessons[key] = [];
+                      }
+                      groupedLessons[key].push(lesson);
+                    } else {
+                      ungroupedLessons.push(lesson);
+                    }
+                  });
+                  
+                  // Sort groups by week/day
+                  const sortedGroups = Object.entries(groupedLessons).sort(([keyA], [keyB]) => {
+                    const [, weekA, , dayA] = keyA.split('-');
+                    const [, weekB, , dayB] = keyB.split('-');
+                    const weekDiff = parseInt(weekA) - parseInt(weekB);
+                    return weekDiff !== 0 ? weekDiff : parseInt(dayA) - parseInt(dayB);
+                  });
+                  
+                  return (
+                    <>
+                      {sortedGroups.map(([key, lessons]) => {
+                        const [, week, , day] = key.split('-');
+                        return (
+                          <div key={key} className="mb-4">
+                            <div className="flex items-center gap-2 mb-2 px-2">
+                              <span className="text-xs font-bold text-blue-400 uppercase">
+                                Week {week} • Day {day}
+                              </span>
+                            </div>
+                            {lessons.map((lesson) => (
                   <div
                     key={lesson.id}
-                    className="bg-black border border-gray-700 rounded-lg p-4 flex items-center justify-between"
-                  >
-                    <div className="flex items-center gap-4 flex-1">
-                      <FaGripVertical className="text-gray-600 cursor-move" />
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={lesson.title}
-                          onChange={(e) =>
-                            handleUpdateLesson(lesson.id, { title: e.target.value })
-                          }
-                          className="bg-transparent border-none text-mambo-text-light font-bold w-full focus:outline-none"
-                        />
-                        <div className="text-xs text-gray-500 mt-1">
-                          {lesson.xp_value} XP • {lesson.duration_minutes || "N/A"} min
-                          {lesson.is_boss_battle && (
-                            <span className="ml-2 text-red-400">BOSS BATTLE</span>
-                          )}
+                                className="bg-black border border-gray-700 rounded-lg p-4 flex items-center justify-between ml-4 mb-2"
+                              >
+                                {renderLessonItem(lesson)}
                         </div>
+                            ))}
                       </div>
+                        );
+                      })}
+                      {ungroupedLessons.length > 0 && (
+                        <div className="mb-4">
+                          <div className="flex items-center gap-2 mb-2 px-2">
+                            <span className="text-xs font-bold text-gray-500 uppercase">
+                              Ungrouped Lessons
+                            </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <button
-                        onClick={() => {
-                          const newUrl = prompt("Enter video URL:", lesson.video_url);
-                          if (newUrl) {
-                            handleUpdateLesson(lesson.id, { video_url: newUrl });
-                          }
-                        }}
-                        className="text-gray-400 hover:text-mambo-blue"
-                      >
-                        <FaPen />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteLesson(lesson.id)}
-                        className="text-gray-400 hover:text-red-400"
-                      >
-                        <FaTrash />
-                      </button>
-                    </div>
+                          {ungroupedLessons.map((lesson) => (
+                            <div
+                              key={lesson.id}
+                              className="bg-black border border-gray-700 rounded-lg p-4 flex items-center justify-between ml-4 mb-2"
+                            >
+                              {renderLessonItem(lesson)}
                   </div>
                 ))}
+                        </div>
+                      )}
+                    </>
+                  );
+                })()}
               </div>
             </div>
           ))}
         </div>
       </main>
+
+      {/* Content Editor Modal */}
+      {editingContentFor && courseData && (() => {
+        const lesson = courseData.levels
+          .flatMap(l => l.lessons)
+          .find(l => l.id === editingContentFor);
+        
+        if (!lesson) return null;
+
+        return (
+          <LessonContentEditor
+            contentJson={lesson.content_json}
+            onSave={async (content) => {
+              try {
+                await handleUpdateLesson(editingContentFor, { content_json: content });
+                setEditingContentFor(null);
+              } catch (err: any) {
+                console.error("Failed to save content:", err);
+                alert(err.message || "Failed to save content");
+              }
+            }}
+            onClose={() => setEditingContentFor(null)}
+          />
+        );
+      })()}
     </div>
   );
 }

@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from typing import List, Optional
+from pydantic import BaseModel
+from datetime import datetime
 from models import get_db
-from models.user import User
+from models.user import User, UserProfile
 from models.progress import BossSubmission, SubmissionStatus
 from models.course import World, Level, Lesson
 from schemas.submissions import SubmissionResponse, GradeSubmissionRequest
@@ -88,4 +90,59 @@ async def get_admin_stats(
         "total_submissions": total_submissions,
         "pending_submissions": pending_submissions
     }
+
+
+class StudentResponse(BaseModel):
+    id: str
+    email: str
+    first_name: str
+    last_name: str
+    xp: int
+    level: int
+    streak_count: int
+    created_at: datetime
+    role: str
+    
+    class Config:
+        from_attributes = True
+
+
+@router.get("/students", response_model=List[StudentResponse])
+async def get_all_students(
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db),
+    skip: int = 0,
+    limit: int = 100,
+    search: Optional[str] = None
+):
+    """Get all enrolled students with their profile information."""
+    query = db.query(User).join(UserProfile)
+    
+    # Optional search by name or email
+    if search:
+        search_filter = f"%{search}%"
+        query = query.filter(
+            (User.email.ilike(search_filter)) |
+            (UserProfile.first_name.ilike(search_filter)) |
+            (UserProfile.last_name.ilike(search_filter))
+        )
+    
+    users = query.order_by(User.created_at.desc()).offset(skip).limit(limit).all()
+    
+    result = []
+    for user in users:
+        if user.profile:
+            result.append(StudentResponse(
+                id=str(user.id),
+                email=user.email,
+                first_name=user.profile.first_name,
+                last_name=user.profile.last_name,
+                xp=user.profile.xp,
+                level=user.profile.level,
+                streak_count=user.profile.streak_count,
+                created_at=user.created_at,
+                role=user.role.value if hasattr(user.role, 'value') else str(user.role)
+            ))
+    
+    return result
 

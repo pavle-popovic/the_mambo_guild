@@ -7,6 +7,9 @@ import Image from "next/image";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import QuestLogSidebar from "@/components/QuestLogSidebar";
+import RichContentRenderer from "@/components/RichContentRenderer";
+import VideoPlayer from "@/components/VideoPlayer";
+import MuxVideoPlayer from "@/components/MuxVideoPlayer";
 import { FaCheck, FaPlay, FaLock } from "react-icons/fa";
 
 interface Lesson {
@@ -17,6 +20,11 @@ interface Lesson {
   xp_value: number;
   next_lesson_id: string | null;
   prev_lesson_id: string | null;
+  week_number: number | null;
+  day_number: number | null;
+  content_json: any | null;
+  mux_playback_id: string | null;
+  mux_asset_id: string | null;
 }
 
 interface WorldLesson {
@@ -179,43 +187,59 @@ export default function LessonPage() {
 
       <div className="flex flex-1 overflow-hidden">
         <main className="flex-1 overflow-y-auto bg-black relative flex flex-col">
-          <div className="w-full aspect-video bg-gray-900 relative group">
-            {!videoPlaying ? (
-              <>
-                <Image
-                  src="/assets/Mambo_image_1.png"
-                  alt="Video thumbnail"
-                  fill
-                  className="object-cover opacity-50"
-                />
-                <button
-                  onClick={() => setVideoPlaying(true)}
-                  className="absolute inset-0 flex items-center justify-center"
-                >
-                  <div className="w-20 h-20 bg-mambo-blue/90 hover:bg-mambo-blue rounded-full flex items-center justify-center backdrop-blur-sm transition hover:scale-110 shadow-lg shadow-blue-500/50">
-                    <FaPlay className="text-2xl ml-1 text-white" />
-                  </div>
-                </button>
-              </>
-            ) : (
-              <video
-                controls
-                autoPlay
-                className="w-full h-full"
-                src={lesson.video_url}
+          {/* Video Player - Use Mux if available, otherwise fallback to video_url */}
+          {lesson.mux_playback_id ? (
+            <div className="w-full aspect-video">
+              <MuxVideoPlayer 
+                playbackId={lesson.mux_playback_id} 
+                onEnded={() => setVideoPlaying(false)} 
+                autoPlay={true}
               />
-            )}
-            <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-800">
-              <div className="h-full bg-mambo-blue w-1/3 relative">
-                <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow" />
+            </div>
+          ) : lesson.video_url ? (
+            <div className="w-full aspect-video bg-gray-900 relative group">
+              {!videoPlaying ? (
+                <>
+                  <Image
+                    src="/assets/Mambo_image_1.png"
+                    alt="Video thumbnail"
+                    fill
+                    className="object-cover opacity-50"
+                  />
+                  <button
+                    onClick={() => setVideoPlaying(true)}
+                    className="absolute inset-0 flex items-center justify-center"
+                  >
+                    <div className="w-20 h-20 bg-mambo-blue/90 hover:bg-mambo-blue rounded-full flex items-center justify-center backdrop-blur-sm transition hover:scale-110 shadow-lg shadow-blue-500/50">
+                      <FaPlay className="text-2xl ml-1 text-white" />
+                    </div>
+                  </button>
+                </>
+              ) : (
+                <video
+                  controls
+                  autoPlay
+                  className="w-full h-full"
+                  src={lesson.video_url}
+                />
+              )}
+              <div className="absolute bottom-0 left-0 w-full h-1 bg-gray-800">
+                <div className="h-full bg-mambo-blue w-1/3 relative">
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow" />
+                </div>
               </div>
             </div>
-          </div>
+          ) : null}
 
           <div className="max-w-4xl mx-auto w-full px-8 py-10">
             <div className="flex justify-between items-start mb-8">
               <div>
                 <h2 className="text-2xl font-bold mb-2 text-mambo-text">{lesson.title}</h2>
+                {lesson.week_number && lesson.day_number && (
+                  <p className="text-blue-400 text-sm mb-2 font-medium">
+                    Week {lesson.week_number} • Day {lesson.day_number}
+                  </p>
+                )}
                 <p className="text-gray-400 text-sm">
                   {lesson.description || "Master the fundamentals"}
                 </p>
@@ -240,41 +264,50 @@ export default function LessonPage() {
               )}
             </div>
 
-            <div className="border-b border-gray-800 mb-8">
-              <div className="flex gap-8">
-                <button
-                  onClick={() => setActiveTab("description")}
-                  className={`pb-3 border-b-2 font-bold text-sm transition ${
-                    activeTab === "description"
-                      ? "border-mambo-text text-mambo-text"
-                      : "border-transparent text-gray-400 hover:text-mambo-text"
-                  }`}
-                >
-                  Description
-                </button>
-                <button
-                  onClick={() => setActiveTab("discussion")}
-                  className={`pb-3 border-b-2 font-bold text-sm transition ${
-                    activeTab === "discussion"
-                      ? "border-mambo-text text-mambo-text"
-                      : "border-transparent text-gray-400 hover:text-mambo-text"
-                  }`}
-                >
-                  Discussion
-                </button>
+            {/* Rich Content */}
+            {lesson.content_json && lesson.content_json.blocks && lesson.content_json.blocks.length > 0 ? (
+              <div className="mb-8">
+                <RichContentRenderer contentJson={lesson.content_json} />
               </div>
-            </div>
+            ) : (
+              <>
+                <div className="border-b border-gray-800 mb-8">
+                  <div className="flex gap-8">
+                    <button
+                      onClick={() => setActiveTab("description")}
+                      className={`pb-3 border-b-2 font-bold text-sm transition ${
+                        activeTab === "description"
+                          ? "border-mambo-text text-mambo-text"
+                          : "border-transparent text-gray-400 hover:text-mambo-text"
+                      }`}
+                    >
+                      Description
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("discussion")}
+                      className={`pb-3 border-b-2 font-bold text-sm transition ${
+                        activeTab === "discussion"
+                          ? "border-mambo-text text-mambo-text"
+                          : "border-transparent text-gray-400 hover:text-mambo-text"
+                      }`}
+                    >
+                      Discussion
+                    </button>
+                  </div>
+                </div>
 
-            {activeTab === "description" && (
-              <div className="prose prose-invert prose-sm text-gray-300">
-                <p>{lesson.description || "No description available."}</p>
-              </div>
-            )}
+                {activeTab === "description" && (
+                  <div className="prose prose-invert prose-sm text-gray-300">
+                    <p>{lesson.description || "No description available."}</p>
+                  </div>
+                )}
 
-            {activeTab === "discussion" && (
-              <div className="text-gray-400">
-                Discussion feature coming soon!
-              </div>
+                {activeTab === "discussion" && (
+                  <div className="text-gray-400">
+                    Discussion feature coming soon!
+                  </div>
+                )}
+              </>
             )}
           </div>
         </main>

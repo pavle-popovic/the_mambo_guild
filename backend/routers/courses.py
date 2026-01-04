@@ -69,38 +69,18 @@ async def get_lesson(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get lesson details with lock status based on prerequisites."""
+    """Get lesson details. No prerequisites - users can access any lesson immediately."""
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
     
-    # Check if previous lesson is completed
-    is_locked = False
-    if lesson.order_index > 1:
-        # Get previous lesson in same level
-        prev_lesson = db.query(Lesson).filter(
-            Lesson.level_id == lesson.level_id,
-            Lesson.order_index == lesson.order_index - 1
-        ).first()
-        
-        if prev_lesson:
-            progress = db.query(UserProgress).filter(
-                UserProgress.user_id == current_user.id,
-                UserProgress.lesson_id == prev_lesson.id,
-                UserProgress.is_completed == True
-            ).first()
-            is_locked = not progress
-    
-    # Check subscription for non-free worlds
+    # Check subscription for non-free worlds (paywall logic remains)
     level = db.query(Level).filter(Level.id == lesson.level_id).first()
     world = db.query(World).filter(World.id == level.world_id).first() if level else None
     if world and not world.is_free:
         subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
         if not subscription or subscription.status != SubscriptionStatus.ACTIVE:
             raise HTTPException(status_code=403, detail="Subscription required")
-    
-    if is_locked:
-        raise HTTPException(status_code=403, detail="Previous lesson must be completed")
     
     # Get next and previous lesson IDs
     next_lesson = db.query(Lesson).filter(
@@ -121,7 +101,12 @@ async def get_lesson(
         xp_value=lesson.xp_value,
         next_lesson_id=str(next_lesson.id) if next_lesson else None,
         prev_lesson_id=str(prev_lesson.id) if prev_lesson else None,
-        comments=[]  # TODO: Implement comments
+        comments=[],  # TODO: Implement comments
+        week_number=lesson.week_number,
+        day_number=lesson.day_number,
+        content_json=lesson.content_json,
+        mux_playback_id=lesson.mux_playback_id,
+        mux_asset_id=lesson.mux_asset_id
     )
 
 
@@ -131,7 +116,7 @@ async def get_world_lessons(
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
-    """Get all lessons in a world with completion and lock status. Accessible without authentication."""
+    """Get all lessons in a world. No prerequisites - all lessons are accessible. Accessible without authentication."""
     world = db.query(World).filter(World.id == world_id).first()
     if not world:
         raise HTTPException(status_code=404, detail="World not found")
@@ -148,21 +133,7 @@ async def get_world_lessons(
                 ).first()
                 is_completed = progress.is_completed if progress else False
             
-            # Check lock status (only if user is authenticated, otherwise all lessons appear unlocked for viewing)
-            is_locked = False
-            if current_user and lesson.order_index > 1:
-                prev_lesson = db.query(Lesson).filter(
-                    Lesson.level_id == lesson.level_id,
-                    Lesson.order_index == lesson.order_index - 1
-                ).first()
-                if prev_lesson:
-                    prev_progress = db.query(UserProgress).filter(
-                        UserProgress.user_id == current_user.id,
-                        UserProgress.lesson_id == prev_lesson.id,
-                        UserProgress.is_completed == True
-                    ).first()
-                    is_locked = not prev_progress
-            
+            # All lessons are unlocked (no prerequisites)
             lessons.append(LessonResponse(
                 id=str(lesson.id),
                 title=lesson.title,
@@ -170,10 +141,14 @@ async def get_world_lessons(
                 video_url=lesson.video_url,
                 xp_value=lesson.xp_value,
                 is_completed=is_completed,
-                is_locked=is_locked,
+                is_locked=False,  # Always false - no prerequisites
                 is_boss_battle=lesson.is_boss_battle,
-                order_index=lesson.order_index
+                order_index=lesson.order_index,
+                week_number=lesson.week_number,
+                day_number=lesson.day_number,
+                content_json=lesson.content_json,
+                mux_playback_id=lesson.mux_playback_id,
+                mux_asset_id=lesson.mux_asset_id
             ))
     
     return lessons
-

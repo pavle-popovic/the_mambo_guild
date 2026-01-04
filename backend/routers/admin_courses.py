@@ -4,7 +4,7 @@ Inspired by professional platforms like Steezy and Brenda Liew Online.
 """
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from pydantic import BaseModel
 from models import get_db
 from models.user import User
@@ -53,6 +53,9 @@ class LessonCreateRequest(BaseModel):
     order_index: int
     is_boss_battle: bool = False
     duration_minutes: Optional[int] = None
+    week_number: Optional[int] = None
+    day_number: Optional[int] = None
+    content_json: Optional[Dict[str, Any]] = None
 
 
 class LessonUpdateRequest(BaseModel):
@@ -63,6 +66,11 @@ class LessonUpdateRequest(BaseModel):
     order_index: Optional[int] = None
     is_boss_battle: Optional[bool] = None
     duration_minutes: Optional[int] = None
+    week_number: Optional[int] = None
+    day_number: Optional[int] = None
+    content_json: Optional[Dict[str, Any]] = None
+    mux_playback_id: Optional[str] = None
+    mux_asset_id: Optional[str] = None
 
 
 @router.get("/courses", response_model=List[WorldResponse])
@@ -261,7 +269,12 @@ async def create_lesson(
         xp_value=lesson_data.xp_value,
         order_index=lesson_data.order_index,
         is_boss_battle=lesson_data.is_boss_battle,
-        duration_minutes=lesson_data.duration_minutes
+        duration_minutes=lesson_data.duration_minutes,
+        week_number=lesson_data.week_number,
+        day_number=lesson_data.day_number,
+        content_json=lesson_data.content_json,
+        mux_playback_id=lesson_data.mux_playback_id,
+        mux_asset_id=lesson_data.mux_asset_id
     )
     
     db.add(lesson)
@@ -303,6 +316,16 @@ async def update_lesson(
         lesson.is_boss_battle = lesson_data.is_boss_battle
     if lesson_data.duration_minutes is not None:
         lesson.duration_minutes = lesson_data.duration_minutes
+    if lesson_data.week_number is not None:
+        lesson.week_number = lesson_data.week_number
+    if lesson_data.day_number is not None:
+        lesson.day_number = lesson_data.day_number
+    if lesson_data.content_json is not None:
+        lesson.content_json = lesson_data.content_json
+    if lesson_data.mux_playback_id is not None:
+        lesson.mux_playback_id = lesson_data.mux_playback_id
+    if lesson_data.mux_asset_id is not None:
+        lesson.mux_asset_id = lesson_data.mux_asset_id
     
     db.commit()
     db.refresh(lesson)
@@ -356,7 +379,10 @@ async def get_course_full_details(
                 "xp_value": lesson.xp_value,
                 "order_index": lesson.order_index,
                 "is_boss_battle": lesson.is_boss_battle,
-                "duration_minutes": lesson.duration_minutes
+                "duration_minutes": lesson.duration_minutes,
+                "week_number": lesson.week_number,
+                "day_number": lesson.day_number,
+                "content_json": lesson.content_json
             })
         
         levels_data.append({

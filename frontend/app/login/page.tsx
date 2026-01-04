@@ -1,9 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -12,9 +11,20 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [redirectPath, setRedirectPath] = useState("/courses");
   const { login } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    // Get redirect parameter from URL safely
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect");
+      if (redirect) {
+        setRedirectPath(redirect);
+      }
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,8 +34,7 @@ export default function LoginPage() {
     try {
       await login(email, password);
       // Redirect to the specified page or default to /courses
-      const redirect = searchParams.get("redirect") || "/courses";
-      router.push(redirect);
+      router.push(redirectPath);
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");
     } finally {
