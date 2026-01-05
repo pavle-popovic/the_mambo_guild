@@ -306,43 +306,29 @@ export default function LessonPage() {
           </div>
 
           {user && (
-            <div className="flex items-center gap-6">
-              <div className="hidden md:flex items-center gap-3 bg-black/40 rounded-full px-3 py-1 border border-white/5">
-                <div className="bars flex items-end gap-[2px] h-3">
-                  <div className="w-[2px] bg-mambo-blue h-full animate-pulse"></div>
-                  <div className="w-[2px] bg-mambo-blue h-2 animate-pulse delay-75"></div>
-                  <div className="w-[2px] bg-mambo-blue h-full animate-pulse delay-150"></div>
-                </div>
-                <span className="text-xs font-mono text-gray-400">Now Playing: Mambo Inn Theme</span>
-                <button className="text-xs text-gray-400 hover:text-white cursor-pointer">
-                  🔊
-                </button>
+            <div className="flex items-center gap-3">
+              <div className="text-right hidden sm:block">
+                <div className="text-[10px] font-bold text-mambo-gold uppercase tracking-wider">XP Boost Active</div>
+                <div className="text-xs font-bold text-white">Level {user.level} • {user.xp.toLocaleString()} XP</div>
               </div>
-
-              <div className="flex items-center gap-3">
-                <div className="text-right hidden sm:block">
-                  <div className="text-[10px] font-bold text-mambo-gold uppercase tracking-wider">XP Boost Active</div>
-                  <div className="text-xs font-bold text-white">Level {user.level} • {user.xp.toLocaleString()} XP</div>
+              <Link href="/profile">
+                <div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden border border-mambo-gold/50 relative flex items-center justify-center">
+                  {user.avatar_url ? (
+                    <Image
+                      src={user.avatar_url}
+                      alt={`${user.first_name} ${user.last_name}`}
+                      width={40}
+                      height={40}
+                      className="w-full h-full object-cover rounded-full"
+                    />
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-mambo-blue to-purple-600 flex items-center justify-center text-white text-xs font-bold">
+                      {user.first_name[0]?.toUpperCase() || "U"}
+                    </div>
+                  )}
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-mambo-panel"></div>
                 </div>
-                <Link href="/profile">
-                  <div className="w-9 h-9 rounded-full bg-gray-700 overflow-hidden border border-mambo-gold/50 relative">
-                    {user.avatar_url ? (
-                      <Image
-                        src={user.avatar_url}
-                        alt={`${user.first_name} ${user.last_name}`}
-                        width={36}
-                        height={36}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-mambo-blue flex items-center justify-center text-white text-xs font-bold">
-                        {user.first_name[0]?.toUpperCase() || "U"}
-                      </div>
-                    )}
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-mambo-panel"></div>
-                  </div>
-                </Link>
-              </div>
+              </Link>
             </div>
           )}
         </div>

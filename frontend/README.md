@@ -6,12 +6,14 @@ Next.js 15 frontend application for The Mambo Inn Learning Management System.
 
 - **Next.js 15.1.5**: React framework with App Router
 - **TypeScript**: Type-safe development
-- **Tailwind CSS 4**: Utility-first CSS framework
+- **Tailwind CSS 4**: Utility-first CSS framework with custom dark theme
+- **Framer Motion 12.23.26**: Smooth animations and page transitions
 - **React Icons**: Icon library
 - **react-markdown**: Markdown rendering with GitHub Flavored Markdown support
 - **@mux/mux-player-react**: Official Mux video player component
 - **@mux/mux-uploader-react**: Official Mux video uploader component
 - **Axios**: HTTP client for API communication
+- **clsx & tailwind-merge**: Utility functions for className management
 
 ## 📦 Dependencies
 
@@ -27,6 +29,8 @@ See `package.json` for complete dependency list. Key packages:
 - `axios`: ^1.13.2
 - `framer-motion`: ^12.23.26
 - `react-icons`: ^5.5.0
+- `clsx`: ^2.1.1
+- `tailwind-merge`: ^3.4.0
 
 ## 🏗️ Project Structure
 
@@ -49,17 +53,20 @@ frontend/
 ├── components/              # React components
 │   ├── common/              # Reusable components
 │   │   └── ImageUploader.tsx # R2 image upload component
+│   ├── ui/                  # UI primitives
+│   │   └── motion.tsx       # Framer Motion animation components
 │   ├── MuxUploader.tsx      # Mux video upload component
 │   ├── MuxVideoPlayer.tsx   # Mux video player component
 │   ├── AuthPromptModal.tsx  # Login/subscribe modals
 │   ├── SuccessNotification.tsx # Completion animations
-│   ├── NavBar.tsx           # Navigation bar
+│   ├── NavBar.tsx           # Navigation bar with animations
 │   ├── Footer.tsx           # Footer component
 │   └── QuestLogSidebar.tsx  # Lesson sidebar
 ├── contexts/                # React contexts
 │   └── AuthContext.tsx      # Authentication context
 ├── lib/                     # Utilities
-│   └── api.ts              # API client
+│   ├── api.ts              # API client
+│   └── utils.ts            # Utility functions (cn for className merging)
 └── public/                  # Static assets
     └── assets/             # Images, audio files
 ```
@@ -196,13 +203,20 @@ The application is fully responsive:
 - Touch-friendly interactions
 - Adaptive layouts
 
-## 🎨 Styling
+## 🎨 Styling & Animations
 
-- Tailwind CSS utility classes
-- Custom color palette (mambo-blue, mambo-gold, etc.)
-- Dark theme throughout
-- Consistent spacing and typography
-- Smooth transitions and animations
+- Tailwind CSS utility classes with custom dark theme
+- Custom color palette (mambo-blue, mambo-gold, mambo-panel, etc.)
+- Dark mode throughout with club-like studio aesthetic
+- Editorial-style typography with improved spacing
+- Framer Motion animations:
+  - Page transitions (fade in/out)
+  - Hover effects on cards and buttons
+  - Stagger animations for lists
+  - Interactive button feedback
+- Glass/neon effects on buttons and cards
+- Gradient backgrounds and shadows
+- Smooth transitions throughout
 
 ## 🔐 Authentication
 

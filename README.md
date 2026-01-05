@@ -19,11 +19,13 @@ A comprehensive, gamified learning management system built with Next.js, FastAPI
 - **Settings**: Platform configuration and management
 
 ### User Experience
-- **Course Discovery**: Browse courses with progress tracking
+- **Course Discovery**: Browse courses with progress tracking and smooth animations
 - **Lesson Player**: Immersive lesson viewing with video, markdown content, and quizzes
 - **Progress Tracking**: Visual progress indicators and completion tracking
 - **Success Animations**: Engaging completion notifications with audio feedback
 - **Responsive Design**: Mobile-friendly interface with dark theme
+- **Smooth Animations**: Page transitions, hover effects, and interactive elements powered by Framer Motion
+- **Premium UI**: Glass/neon effects, gradient buttons, and polished typography
 
 ### Technical Features
 - **Real-time Updates**: Auto-save functionality, live status updates
@@ -37,12 +39,14 @@ A comprehensive, gamified learning management system built with Next.js, FastAPI
 ### Frontend
 - **Next.js 15.1.5**: React framework with App Router
 - **TypeScript**: Type-safe development
-- **Tailwind CSS**: Utility-first styling
+- **Tailwind CSS 4**: Utility-first styling with custom dark theme
+- **Framer Motion 12.23.26**: Smooth animations and page transitions
 - **React Icons**: Icon library
 - **react-markdown**: Markdown rendering with GFM support
 - **@mux/mux-player-react**: Official Mux video player
 - **@mux/mux-uploader-react**: Official Mux video uploader
 - **Axios**: HTTP client for API calls
+- **clsx & tailwind-merge**: Utility functions for className management
 
 ### Backend
 - **FastAPI 0.104.1**: Modern Python web framework
@@ -248,16 +252,22 @@ The application includes comprehensive error handling and validation:
 ## 📝 Recent Updates
 
 ### Latest Features
-- ✅ Profile picture upload with hover overlay
-- ✅ Course and lesson thumbnail management
-- ✅ Beautiful auth/subscribe prompt modals
-- ✅ "Become A Member" messaging for locked courses
-- ✅ Auto-save in lesson editor
-- ✅ Success animations with audio feedback
-- ✅ Extended session duration (1 week)
-- ✅ Full Mux integration with official SDKs
-- ✅ Cloudflare R2 image upload pipeline
-- ✅ Hierarchical curriculum builder (Week/Day/Lesson)
+- ✅ **Premium UI Transformation**: Complete visual overhaul with Framer Motion animations
+- ✅ **Motion System**: Reusable animation components (HoverCard, FadeIn, Clickable, StaggerContainer)
+- ✅ **Page Transitions**: Smooth fade transitions between pages
+- ✅ **Gamified Interactivity**: Glass/neon button effects, hover animations, and interactive cards
+- ✅ **Enhanced Typography**: Editorial-style headings with improved spacing and readability
+- ✅ **Profile picture upload** with hover overlay
+- ✅ **Course and lesson thumbnail management**
+- ✅ **Beautiful auth/subscribe prompt modals**
+- ✅ **"Become A Member" messaging** for locked courses
+- ✅ **Auto-save in lesson editor**
+- ✅ **Success animations** with audio feedback
+- ✅ **Extended session duration** (1 week)
+- ✅ **Full Mux integration** with official SDKs
+- ✅ **Cloudflare R2 image upload pipeline**
+- ✅ **Hierarchical curriculum builder** (Week/Day/Lesson)
+- ✅ **Background music control** (disabled on lesson/admin pages)
 
 ## 🤝 Contributing
 

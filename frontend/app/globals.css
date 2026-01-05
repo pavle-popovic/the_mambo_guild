@@ -21,6 +21,15 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   color: #fafaf5;
+  letter-spacing: -0.02em;
+}
+
+h1 {
+  letter-spacing: -0.03em;
+}
+
+h2 {
+  letter-spacing: -0.02em;
 }
 
 /* Glass navigation effect */

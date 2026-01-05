@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { FaUpload, FaTimes, FaImage } from "react-icons/fa";
+import { FaUpload } from "react-icons/fa";
 import Image from "next/image";
 import { apiClient } from "@/lib/api";
 
@@ -96,13 +96,6 @@ export default function ImageUploader({
     }
   };
 
-  const handleRemove = () => {
-    onUploadComplete(null); // Clear the URL
-    if (onImageRemoved) {
-      onImageRemoved();
-    }
-  };
-
   const handleClick = () => {
     fileInputRef.current?.click();
   };
@@ -125,7 +118,7 @@ export default function ImageUploader({
           type="button"
           onClick={handleClick}
           disabled={uploading}
-          className="w-full border-2 border-dashed border-gray-700 hover:border-mambo-blue rounded-lg p-4 text-center transition disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+          className="w-full border-2 border-dashed border-gray-700 hover:border-mambo-blue/50 rounded-lg p-6 text-center transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center hover:bg-mambo-panel/30"
         >
           <input
             ref={fileInputRef}
@@ -141,28 +134,13 @@ export default function ImageUploader({
             </div>
           ) : (
             <div className="flex flex-col items-center gap-1.5">
-              <FaUpload className="w-5 h-5 text-gray-500" />
-              <span className="text-xs font-medium text-gray-400">
+              <FaUpload className="w-5 h-5 text-gray-400" />
+              <span className="text-xs font-medium text-gray-300">
                 {currentImageUrl ? "Replace" : "Upload"} {label?.toLowerCase() || "image"}
-              </span>
-              <span className="text-xs text-gray-500">
-                JPG, PNG, WebP (5MB max)
               </span>
             </div>
           )}
         </button>
-
-        {/* Remove Button (when image exists) */}
-        {currentImageUrl && !uploading && (
-          <button
-            type="button"
-            onClick={handleRemove}
-            className="w-full bg-red-900/30 hover:bg-red-900/50 text-red-400 py-1.5 px-3 rounded-lg text-xs font-medium transition flex items-center justify-center gap-1.5 border border-red-800"
-          >
-            <FaTimes className="w-3 h-3" />
-            Remove Image
-          </button>
-        )}
 
         {/* Error Message */}
         {error && (

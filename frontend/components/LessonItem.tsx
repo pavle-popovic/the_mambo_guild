@@ -1,4 +1,8 @@
+"use client";
+
 import React from 'react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 interface LessonResponse {
     id: string;
@@ -13,29 +17,38 @@ interface LessonItemProps {
 }
 
 const LessonItem: React.FC<LessonItemProps> = ({ lesson, isActive }) => {
-    const itemClasses = `p-3 rounded-lg cursor-pointer flex gap-3 items-center transition ${
-        isActive
-            ? 'bg-blue-900/20 border border-blue-500/30'
-            : 'hover:bg-gray-800 border border-transparent' // Inactive state, transparent border to maintain size
-    }`;
-
-    const iconContainerClasses = `w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold text-white ${
-        isActive ? 'bg-mambo-blue' : 'bg-gray-700' // Using bg-gray-700 for inactive icon as seen in QuestLogSidebar
-    }`;
-
-    const titleClasses = `text-sm font-bold ${isActive ? 'text-blue-200' : 'text-gray-400'}`; // Using text-gray-400 for inactive title
-    const detailsClasses = `text-[10px] ${isActive ? 'text-blue-400' : 'text-gray-500'}`; // Using text-gray-500 for inactive details
-
     return (
-        <div className={itemClasses}>
-            <div className={iconContainerClasses}>
+        <motion.div
+            whileHover={{ x: 4 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+            className={cn(
+                "p-4 rounded-lg cursor-pointer flex gap-3 items-center transition-all duration-300",
+                isActive
+                    ? 'bg-blue-900/20 border border-blue-500/30 shadow-md shadow-blue-500/10'
+                    : 'hover:bg-gray-800/50 border border-transparent hover:border-gray-700'
+            )}
+        >
+            <div className={cn(
+                "w-7 h-7 rounded-full flex items-center justify-center text-[10px] font-bold text-white transition-all duration-300",
+                isActive ? 'bg-gradient-to-br from-mambo-blue to-blue-600' : 'bg-gray-700'
+            )}>
                 <i className="fa-solid fa-play"></i>
             </div>
             <div className="flex-1">
-                <div className={titleClasses}>{lesson.title}</div>
-                <div className={detailsClasses}>{lesson.duration} • {lesson.xp}</div>
+                <div className={cn(
+                    "text-sm font-bold tracking-tight",
+                    isActive ? 'text-blue-200' : 'text-gray-300'
+                )}>
+                    {lesson.title}
+                </div>
+                <div className={cn(
+                    "text-xs mt-0.5",
+                    isActive ? 'text-blue-400' : 'text-gray-500'
+                )}>
+                    {lesson.duration} • {lesson.xp}
+                </div>
             </div>
-        </div>
+        </motion.div>
     );
 };
 
