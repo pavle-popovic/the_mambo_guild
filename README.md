@@ -198,7 +198,8 @@ node test_setup.js  # Setup verification
 
 ### Admin Features
 - ✅ Admin Dashboard
-- ✅ Course Builder with Drag-and-Drop UI
+- ✅ Course Builder with Week/Day Hierarchy
+- ✅ Hierarchical Curriculum Management (Add/Remove Weeks, Days, Lessons)
 - ✅ Lesson Editor with Auto-Save (Real-time sync)
 - ✅ Video Upload & Management (Mux Integration)
 - ✅ Rich Content Creation (Markdown, Images, Quizzes)
@@ -320,16 +321,28 @@ This project is proprietary.
 The admin course builder provides a comprehensive interface for managing courses:
 
 - **Course Management**: Create, edit, and delete courses
+- **Hierarchical Curriculum Structure**:
+  - Week/Day organization matching the student view
+  - Add/Remove Weeks, Days, and Lessons via intuitive buttons
+  - Visual hierarchy with proper indentation
+  - Lessons displayed as formatted cards
 - **Lesson Editor**: 
   - Auto-save functionality (saves changes automatically after 2 seconds)
   - Rich content editor (Markdown support)
   - Video upload via Mux
   - Quiz creation
-  - Week/Day organization
+  - Week/Day automatically assigned based on hierarchy context
 - **Real-time Sync**: Changes in the editor are automatically reflected in the student view
 - **Preview**: Preview lessons before publishing
 
 ## 🔄 Recent Updates
+
+### Curriculum Builder Improvements
+- **Hierarchical Structure**: Week/Day organization matching student view
+- **Easy Management**: Add/Remove buttons for Weeks, Days, and Lessons
+- **Visual Consistency**: Same layout and styling as student course view
+- **Context-Aware Creation**: Lessons automatically get correct Week/Day when created
+- **Card-Based Layout**: Lessons displayed as formatted cards with hover actions
 
 ### Auto-Save Feature
 - Lessons auto-save after 2 seconds of inactivity

@@ -93,10 +93,12 @@ frontend/
 
 ### Admin Features
 - Dashboard with statistics
-- Course builder with drag-and-drop UI
+- Course builder with **Week/Day hierarchy** matching student view
+- Hierarchical curriculum management (Add/Remove Weeks, Days, Lessons)
 - Lesson editor with **auto-save** (real-time sync)
 - Video upload and management (Mux integration)
 - Rich content creation (Markdown, quizzes)
+- Context-aware lesson creation (Week/Day auto-assigned)
 - Grading queue for boss battles
 - Student management
 - Settings page
