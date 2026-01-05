@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { FaLock, FaCheck, FaPlay, FaSkull } from "react-icons/fa";
 import Link from "next/link";
 
@@ -29,48 +30,57 @@ export default function QuestLogSidebar({
   worldTitle,
   worldProgress,
 }: QuestLogSidebarProps) {
-  const completedCount = lessons.filter((l) => l.is_completed).length;
-  const progressPercentage = lessons.length > 0 ? (completedCount / lessons.length) * 100 : 0;
+  // Memoize completed count calculation
+  const { completedCount, progressPercentage } = useMemo(() => {
+    const completed = lessons.filter((l) => l.is_completed).length;
+    const progress = lessons.length > 0 ? (completed / lessons.length) * 100 : 0;
+    return { completedCount: completed, progressPercentage: progress };
+  }, [lessons]);
 
-  // Sort lessons by week_number, day_number, and order_index (matching course builder order)
-  const sortedLessons = [...lessons].sort((a, b) => {
-    const weekA = a.week_number ?? 0;
-    const weekB = b.week_number ?? 0;
-    if (weekA !== weekB) return weekA - weekB;
-    
-    const dayA = a.day_number ?? 0;
-    const dayB = b.day_number ?? 0;
-    if (dayA !== dayB) return dayA - dayB;
-    
-    return a.order_index - b.order_index;
-  });
-
-  // Group lessons by week and day
-  const weekGroups: { [week: number]: { [day: number]: Lesson[] } } = {};
-  const ungroupedLessons: Lesson[] = [];
-  
-  sortedLessons.forEach((lesson) => {
-    if (lesson.week_number !== null && lesson.week_number !== undefined &&
-        lesson.day_number !== null && lesson.day_number !== undefined) {
-      const week = lesson.week_number;
-      const day = lesson.day_number;
+  // Memoize sorted lessons - only recalculate when lessons array changes
+  const sortedLessons = useMemo(() => {
+    return [...lessons].sort((a, b) => {
+      const weekA = a.week_number ?? 0;
+      const weekB = b.week_number ?? 0;
+      if (weekA !== weekB) return weekA - weekB;
       
-      if (!weekGroups[week]) {
-        weekGroups[week] = {};
-      }
-      if (!weekGroups[week][day]) {
-        weekGroups[week][day] = [];
-      }
-      weekGroups[week][day].push(lesson);
-    } else {
-      ungroupedLessons.push(lesson);
-    }
-  });
+      const dayA = a.day_number ?? 0;
+      const dayB = b.day_number ?? 0;
+      if (dayA !== dayB) return dayA - dayB;
+      
+      return a.order_index - b.order_index;
+    });
+  }, [lessons]);
 
-  // Sort weeks and days
-  const sortedWeeks = Object.keys(weekGroups)
-    .map(Number)
-    .sort((a, b) => a - b);
+  // Memoize grouping logic - only recalculate when sortedLessons changes
+  const { weekGroups, ungroupedLessons, sortedWeeks } = useMemo(() => {
+    const groups: { [week: number]: { [day: number]: Lesson[] } } = {};
+    const ungrouped: Lesson[] = [];
+    
+    sortedLessons.forEach((lesson) => {
+      if (lesson.week_number !== null && lesson.week_number !== undefined &&
+          lesson.day_number !== null && lesson.day_number !== undefined) {
+        const week = lesson.week_number;
+        const day = lesson.day_number;
+        
+        if (!groups[week]) {
+          groups[week] = {};
+        }
+        if (!groups[week][day]) {
+          groups[week][day] = [];
+        }
+        groups[week][day].push(lesson);
+      } else {
+        ungrouped.push(lesson);
+      }
+    });
+
+    const weeks = Object.keys(groups)
+      .map(Number)
+      .sort((a, b) => a - b);
+    
+    return { weekGroups: groups, ungroupedLessons: ungrouped, sortedWeeks: weeks };
+  }, [sortedLessons]);
 
   return (
     <aside className="w-80 bg-mambo-panel border-l border-gray-800 flex-none hidden lg:flex flex-col z-10 shadow-2xl">

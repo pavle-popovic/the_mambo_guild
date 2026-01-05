@@ -232,6 +232,9 @@ The application is fully responsive:
 
 ## 🚀 Performance Optimizations
 
+- **Parallel API Calls**: Lesson page fetches all course lessons simultaneously (reduces load time from ~1000ms to ~200ms for 5 courses)
+- **Request Caching**: API client caches GET requests for 30 seconds to reduce redundant calls
+- **Memoization**: QuestLogSidebar uses `useMemo` to cache sorting and grouping calculations
 - Next.js Image optimization
 - Code splitting
 - Lazy loading

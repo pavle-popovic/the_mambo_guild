@@ -106,16 +106,21 @@ export default function LessonPage() {
         duration_minutes: (lessonData as any).duration_minutes ?? null,
       });
 
-      // Find the world this lesson belongs to and get its lessons
-      for (const world of worldsData) {
-        const lessons = await apiClient.getWorldLessons(world.id);
-        const foundLesson = lessons.find((l) => l.id === lessonId);
+      // Fetch all lessons in parallel instead of sequentially
+      const lessonPromises = worldsData.map(world => 
+        apiClient.getWorldLessons(world.id)
+      );
+      const allLessonsArrays = await Promise.all(lessonPromises);
+
+      // Find the lesson in the parallel results
+      for (let i = 0; i < allLessonsArrays.length; i++) {
+        const foundLesson = allLessonsArrays[i].find((l) => l.id === lessonId);
         if (foundLesson) {
-          setWorldTitle(world.title);
-          setCourseTitle(world.title);
-          setWorldLessons(lessons);
-          const completed = lessons.filter((l) => l.is_completed).length;
-          setWorldProgress((completed / lessons.length) * 100);
+          setWorldTitle(worldsData[i].title);
+          setCourseTitle(worldsData[i].title);
+          setWorldLessons(allLessonsArrays[i]);
+          const completed = allLessonsArrays[i].filter((l) => l.is_completed).length;
+          setWorldProgress((completed / allLessonsArrays[i].length) * 100);
           
           // Check if the lesson is locked (subscription required)
           if (foundLesson.is_locked && user) {

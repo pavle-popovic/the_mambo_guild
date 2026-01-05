@@ -7,15 +7,52 @@ export interface ApiError {
   detail: string;
 }
 
+interface CacheEntry {
+  data: any;
+  timestamp: number;
+}
+
 class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
+  private cache: Map<string, CacheEntry> = new Map();
+  private readonly CACHE_TTL = 30000; // 30 seconds cache
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
     if (typeof window !== "undefined") {
       this.token = localStorage.getItem("auth_token");
     }
+  }
+
+  private getCacheKey(endpoint: string, options: RequestInit): string {
+    // Create cache key from endpoint and method
+    const method = options.method || "GET";
+    return `${method}:${endpoint}`;
+  }
+
+  private getCached<T>(cacheKey: string): T | null {
+    const cached = this.cache.get(cacheKey);
+    if (!cached) return null;
+    
+    // Check if cache is still valid
+    if (Date.now() - cached.timestamp > this.CACHE_TTL) {
+      this.cache.delete(cacheKey);
+      return null;
+    }
+    
+    return cached.data as T;
+  }
+
+  private setCache<T>(cacheKey: string, data: T): void {
+    this.cache.set(cacheKey, {
+      data,
+      timestamp: Date.now(),
+    });
+  }
+
+  clearCache(): void {
+    this.cache.clear();
   }
 
   setToken(token: string | null) {
@@ -25,6 +62,8 @@ class ApiClient {
     } else if (typeof window !== "undefined") {
       localStorage.removeItem("auth_token");
     }
+    // Clear cache when token changes (user logged in/out)
+    this.clearCache();
   }
 
   private async request<T>(
@@ -36,6 +75,18 @@ class ApiClient {
       const storedToken = localStorage.getItem("auth_token");
       if (storedToken !== this.token) {
         this.token = storedToken;
+      }
+    }
+
+    // Skip cache for non-GET requests or if cache is disabled
+    const method = options.method || "GET";
+    const shouldCache = method === "GET" && !options.headers?.["X-No-Cache"];
+    
+    if (shouldCache) {
+      const cacheKey = this.getCacheKey(endpoint, options);
+      const cached = this.getCached<T>(cacheKey);
+      if (cached !== null) {
+        return cached;
       }
     }
 
@@ -96,15 +147,26 @@ class ApiClient {
 
       // Handle empty responses
       const contentType = response.headers.get("content-type");
+      let data: T;
+      
       if (contentType && contentType.includes("application/json")) {
         const text = await response.text();
         if (!text) {
-          return {} as T;
+          data = {} as T;
+        } else {
+          data = JSON.parse(text);
         }
-        return JSON.parse(text);
+      } else {
+        data = {} as T;
+      }
+
+      // Cache successful GET responses
+      if (shouldCache) {
+        const cacheKey = this.getCacheKey(endpoint, options);
+        this.setCache(cacheKey, data);
       }
       
-      return {} as T;
+      return data;
     } catch (error) {
       // Network errors, CORS errors, etc.
       if (error instanceof TypeError && error.message.includes("fetch")) {
