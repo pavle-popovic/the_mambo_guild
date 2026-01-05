@@ -24,6 +24,7 @@ class World(Base):
     order_index = Column(Integer, nullable=False)
     is_free = Column(Boolean, default=False, nullable=False)
     image_url = Column(String, nullable=True)
+    thumbnail_url = Column(String, nullable=True)
     difficulty = Column(SQLEnum(Difficulty), nullable=False)
     is_published = Column(Boolean, default=False, nullable=False)
 
@@ -71,6 +72,9 @@ class Lesson(Base):
     # Mux video integration
     mux_playback_id = Column(String, nullable=True)
     mux_asset_id = Column(String, nullable=True)
+    
+    # Thumbnail image
+    thumbnail_url = Column(String, nullable=True)
 
     # Relationships
     level = relationship("Level", back_populates="lessons")

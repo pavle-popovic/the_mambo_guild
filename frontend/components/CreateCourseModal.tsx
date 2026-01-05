@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { FaTimes } from "react-icons/fa";
+import ImageUploader from "@/components/common/ImageUploader";
 
 interface CreateCourseModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ interface CreateCourseModalProps {
     is_free: boolean;
     is_published: boolean;
     image_url?: string;
+    thumbnail_url?: string;
   }) => Promise<void>;
   defaultOrderIndex: number;
 }
@@ -32,6 +34,7 @@ export default function CreateCourseModal({
   const [isFree, setIsFree] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [isCreating, setIsCreating] = useState(false);
   const [error, setError] = useState("");
 
@@ -72,6 +75,7 @@ export default function CreateCourseModal({
         is_free: isFree,
         is_published: isPublished,
         image_url: imageUrl.trim() || undefined,
+        thumbnail_url: thumbnailUrl || undefined,
       });
       
       // Reset form
@@ -82,6 +86,7 @@ export default function CreateCourseModal({
       setIsFree(false);
       setIsPublished(false);
       setImageUrl("");
+      setThumbnailUrl("");
       onClose();
     } catch (err: any) {
       setError(err.message || "Failed to create course");
@@ -99,6 +104,7 @@ export default function CreateCourseModal({
       setIsFree(false);
       setIsPublished(false);
       setImageUrl("");
+      setThumbnailUrl("");
       setError("");
       onClose();
     }
@@ -203,20 +209,17 @@ export default function CreateCourseModal({
               </select>
             </div>
 
-            {/* Image URL */}
-            <div>
-              <label className="block text-sm font-bold text-mambo-text mb-2">
-                Image URL (Optional)
-              </label>
-              <input
-                type="url"
-                value={imageUrl}
-                onChange={(e) => setImageUrl(e.target.value)}
-                placeholder="https://example.com/image.jpg"
-                disabled={isCreating}
-                className="w-full bg-gray-900 border border-gray-700 rounded-lg px-4 py-3 text-mambo-text-light focus:border-mambo-blue focus:outline-none disabled:opacity-50"
-              />
-            </div>
+          </div>
+
+          {/* Thumbnail Upload */}
+          <div className="max-w-md">
+            <ImageUploader
+              currentImageUrl={thumbnailUrl}
+              onUploadComplete={setThumbnailUrl}
+              folder="thumbnails"
+              aspectRatio="video"
+              label="Course Thumbnail (Optional)"
+            />
           </div>
 
           {/* Checkboxes */}

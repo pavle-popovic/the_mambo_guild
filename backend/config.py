@@ -31,6 +31,13 @@ class Settings:
     MUX_TOKEN_ID: Optional[str] = os.getenv("MUX_TOKEN_ID")
     MUX_TOKEN_SECRET: Optional[str] = os.getenv("MUX_TOKEN_SECRET")
     MUX_WEBHOOK_SECRET: Optional[str] = os.getenv("MUX_WEBHOOK_SECRET")
+    
+    # Cloudflare R2 Configuration (S3-compatible)
+    AWS_ACCESS_KEY_ID: Optional[str] = os.getenv("AWS_ACCESS_KEY_ID")
+    AWS_SECRET_ACCESS_KEY: Optional[str] = os.getenv("AWS_SECRET_ACCESS_KEY")
+    AWS_ENDPOINT_URL: Optional[str] = os.getenv("AWS_ENDPOINT_URL")
+    AWS_BUCKET_NAME: Optional[str] = os.getenv("AWS_BUCKET_NAME")
+    R2_PUBLIC_DOMAIN: Optional[str] = os.getenv("R2_PUBLIC_DOMAIN")
 
 settings = Settings()
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -8,10 +8,12 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { FaFire, FaBolt, FaMedal } from "react-icons/fa";
+import { apiClient } from "@/lib/api";
 
 export default function ProfilePage() {
-  const { user, loading, logout } = useAuth();
+  const { user, loading, logout, refreshUser } = useAuth();
   const router = useRouter();
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -36,29 +38,120 @@ export default function ProfilePage() {
   const nextLevelXP = Math.pow(user.level + 1, 2) * 100;
   const xpProgress = ((user.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100;
 
+  const handleAvatarUpload = async (url: string | null) => {
+    setUploadingAvatar(true);
+    try {
+      await apiClient.updateProfile({ avatar_url: url || null });
+      await refreshUser();
+    } catch (error) {
+      console.error("Failed to update avatar:", error);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
+  const handleAvatarRemove = async () => {
+    setUploadingAvatar(true);
+    try {
+      await apiClient.updateProfile({ avatar_url: null });
+      await refreshUser();
+    } catch (error) {
+      console.error("Failed to remove avatar:", error);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user} />
 
       <div className="max-w-5xl mx-auto px-8 py-12 pt-28">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-10 mb-16">
-          <div className="relative">
-            {user.avatar_url ? (
-              <Image
-                src={user.avatar_url}
-                alt={`${user.first_name} ${user.last_name}`}
-                width={128}
-                height={128}
-                className="w-32 h-32 rounded-full border-4 border-mambo-panel shadow-2xl"
-              />
-            ) : (
-              <div className="w-32 h-32 rounded-full border-4 border-mambo-panel shadow-2xl bg-mambo-blue flex items-center justify-center text-white text-4xl font-bold">
-                {user.first_name[0].toUpperCase()}
+          <div className="flex flex-col items-center gap-4">
+            <div className="relative group cursor-pointer">
+              {user.avatar_url ? (
+                <div className="w-32 h-32 rounded-full shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
+                  <Image
+                    src={user.avatar_url}
+                    alt={`${user.first_name} ${user.last_name}`}
+                    width={128}
+                    height={128}
+                    className="w-full h-full object-cover object-center"
+                  />
+                </div>
+              ) : (
+                <div className="w-32 h-32 rounded-full shadow-2xl bg-mambo-blue flex items-center justify-center text-white text-4xl font-bold transition-transform group-hover:scale-105">
+                  {user.first_name[0].toUpperCase()}
+                </div>
+              )}
+              {/* Level badge - green and visible */}
+              <div className="absolute bottom-1 right-1 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full border-2 border-white shadow-lg z-10">
+                Lvl {user.level}
               </div>
-            )}
-            <div className="absolute bottom-1 right-1 bg-mambo-gold text-black text-xs font-bold px-2 py-1 rounded-full border border-black">
-              Lvl {user.level}
+              {/* Hover overlay with upload functionality */}
+              <div className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center z-20">
+                <div className="text-white text-sm font-semibold mb-1">Replace profile picture</div>
+                <div className="text-white/80 text-xs">JPG, PNG, WebP (5MB max)</div>
+              </div>
+              {/* Hidden file input */}
+              <input
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-30"
+                onChange={async (e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  
+                  // Check file size (5MB max)
+                  if (file.size > 5 * 1024 * 1024) {
+                    alert("File size must be less than 5MB");
+                    return;
+                  }
+                  
+                  setUploadingAvatar(true);
+                  try {
+                    // Get presigned URL
+                    const { upload_url, public_url } = await apiClient.getPresignedUploadUrl(
+                      file.type,
+                      "avatars"
+                    );
+                    
+                    // Upload to R2
+                    await fetch(upload_url, {
+                      method: "PUT",
+                      body: file,
+                      headers: {
+                        "Content-Type": file.type,
+                      },
+                    });
+                    
+                    // Update profile immediately
+                    await apiClient.updateProfile({ avatar_url: public_url });
+                    // Refresh user data to update the UI
+                    await refreshUser();
+                  } catch (error) {
+                    console.error("Failed to upload avatar:", error);
+                    alert("Failed to upload image. Please try again.");
+                  } finally {
+                    setUploadingAvatar(false);
+                    // Reset input
+                    e.target.value = "";
+                  }
+                }}
+                disabled={uploadingAvatar}
+              />
             </div>
+            {/* Remove image button */}
+            {user.avatar_url && (
+              <button
+                onClick={handleAvatarRemove}
+                disabled={uploadingAvatar}
+                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Remove Image
+              </button>
+            )}
           </div>
 
           <div className="text-center md:text-left flex-1">

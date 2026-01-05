@@ -1,378 +1,268 @@
-# The Mambo Inn - LMS Platform
+# The Mambo Inn - Learning Management System
 
-A complete Learning Management System (LMS) platform for dance instruction with gamification features.
+A comprehensive, gamified learning management system built with Next.js, FastAPI, PostgreSQL, and Docker. Features video streaming with Mux, image uploads with Cloudflare R2, and a modern, engaging user interface.
 
-## 🎯 Overview
+## 🚀 Features
 
-The Mambo Inn is a full-stack LMS platform designed for structured dance learning. It features:
-- **Gamification**: XP system, levels, streaks, and achievements
-- **Course Structure**: Worlds → Levels → Lessons hierarchy
-- **Progress Tracking**: Lock/unlock system for sequential learning
-- **Boss Battles**: Video submission and instructor feedback
-- **Admin Dashboard**: Course management and submission grading
+### Core Functionality
+- **User Authentication & Authorization**: JWT-based auth with extended sessions (1 week)
+- **Gamification**: XP system, levels, streaks, and leaderboards
+- **Course Management**: Hierarchical course structure (Weeks → Days → Lessons)
+- **Video Streaming**: Mux integration for high-quality video upload and playback
+- **Rich Content**: Markdown support for lesson notes, quizzes, and interactive content
+- **Image Management**: Direct upload to Cloudflare R2 for avatars, course thumbnails, and lesson thumbnails
 
-## 🏗️ Architecture
+### Admin Dashboard
+- **Course Builder**: Drag-and-drop curriculum organization with Week/Day/Lesson hierarchy
+- **Lesson Editor**: Rich content editor with auto-save, video upload, and markdown support
+- **Student Management**: View all enrolled students with real-time data
+- **Settings**: Platform configuration and management
 
-### Tech Stack
+### User Experience
+- **Course Discovery**: Browse courses with progress tracking
+- **Lesson Player**: Immersive lesson viewing with video, markdown content, and quizzes
+- **Progress Tracking**: Visual progress indicators and completion tracking
+- **Success Animations**: Engaging completion notifications with audio feedback
+- **Responsive Design**: Mobile-friendly interface with dark theme
 
-**Frontend:**
-- Next.js 16 (App Router)
-- TypeScript
-- Tailwind CSS
-- React Context for state management
-- Axios for API calls
-- @mux/mux-player-react for video playback
-- react-markdown for Markdown rendering
+### Technical Features
+- **Real-time Updates**: Auto-save functionality, live status updates
+- **Direct Uploads**: Presigned URLs for secure, direct client-side uploads
+- **Webhook Integration**: Mux webhooks for automatic video processing updates
+- **Image Optimization**: Next.js Image component with remote pattern support
+- **State Management**: Optimized React state management with minimal re-renders
 
-**Backend:**
-- FastAPI (Python)
-- SQLAlchemy (PostgreSQL)
-- Redis (Caching & Leaderboards)
-- JWT Authentication (1-week token expiration)
-- Pydantic for validation
-- Mux Python SDK for video processing
-- Webhook support for Mux events
+## 🛠️ Tech Stack
 
-**Infrastructure:**
-- Docker & Docker Compose (Recommended)
-- PostgreSQL Database
-- Redis Cache
-- Mux Video API (Video upload, processing, and streaming)
+### Frontend
+- **Next.js 15.1.5**: React framework with App Router
+- **TypeScript**: Type-safe development
+- **Tailwind CSS**: Utility-first styling
+- **React Icons**: Icon library
+- **react-markdown**: Markdown rendering with GFM support
+- **@mux/mux-player-react**: Official Mux video player
+- **@mux/mux-uploader-react**: Official Mux video uploader
+- **Axios**: HTTP client for API calls
+
+### Backend
+- **FastAPI 0.104.1**: Modern Python web framework
+- **SQLAlchemy 2.0.23**: ORM for database operations
+- **PostgreSQL**: Primary database with JSONB support
+- **Redis 5.0.1**: Caching and session management
+- **JWT**: Authentication tokens
+- **mux-python 5.1.0**: Mux API integration
+- **boto3 1.34.0**: AWS SDK for Cloudflare R2 (S3-compatible)
+
+### Infrastructure
+- **Docker & Docker Compose**: Containerized development and deployment
+- **Cloudflare R2**: Object storage for images
+- **Mux**: Video hosting and streaming
 
 ## 📁 Project Structure
 
 ```
-.
-├── backend/              # FastAPI backend
-│   ├── models/          # SQLAlchemy models
-│   ├── schemas/         # Pydantic schemas
-│   ├── routers/         # API route handlers
-│   ├── services/        # Business logic
-│   └── main.py         # FastAPI app entry point
-├── frontend/            # Next.js frontend
-│   ├── app/            # Next.js pages (App Router)
-│   ├── components/     # React components
-│   ├── contexts/       # React Context providers
-│   └── lib/            # Utilities and API client
-├── docker-compose.yml   # Docker orchestration (all services)
-├── backend/
-│   └── Dockerfile      # Backend container configuration
-├── frontend/
-│   └── Dockerfile      # Frontend container configuration
-├── env.example         # Environment variables template
-├── DOCKER_SETUP.md     # Docker setup guide
-└── README.md           # This file
+salsa_lab_v2/
+├── frontend/                 # Next.js frontend application
+│   ├── app/                  # Next.js App Router pages
+│   │   ├── admin/           # Admin dashboard pages
+│   │   ├── courses/         # Course listing and detail pages
+│   │   ├── lesson/          # Lesson viewing page
+│   │   ├── profile/         # User profile page
+│   │   └── pricing/         # Pricing/subscription page
+│   ├── components/          # React components
+│   │   ├── common/         # Reusable components (ImageUploader)
+│   │   ├── MuxUploader.tsx # Video upload component
+│   │   ├── MuxVideoPlayer.tsx # Video player component
+│   │   ├── AuthPromptModal.tsx # Login/subscribe prompts
+│   │   └── SuccessNotification.tsx # Completion animations
+│   └── lib/                # Utilities and API client
+├── backend/                 # FastAPI backend application
+│   ├── routers/            # API route handlers
+│   │   ├── auth.py         # Authentication endpoints
+│   │   ├── courses.py      # Course/lesson endpoints
+│   │   ├── admin_courses.py # Admin course management
+│   │   ├── users.py        # User profile endpoints
+│   │   ├── uploads.py      # Image upload presigned URLs
+│   │   └── mux.py          # Mux webhook and upload endpoints
+│   ├── models/             # SQLAlchemy database models
+│   ├── schemas/            # Pydantic validation schemas
+│   ├── services/           # Business logic services
+│   │   ├── storage_service.py # R2/S3 storage service
+│   │   └── mux_service.py  # Mux API service
+│   └── requirements.txt    # Python dependencies
+└── docker-compose.yml      # Docker orchestration
+
 ```
 
-## 🚀 Quick Start
+## 🚀 Getting Started
 
 ### Prerequisites
-
-- **Docker & Docker Compose** (Recommended) - Everything runs in containers
-- OR Node.js 18+ and Python 3.11+ for manual setup
-
-### Option 1: Docker (Recommended) ⭐
-
-The easiest way to run the entire application stack:
-
-```bash
-# 1. Copy environment file
-cp env.example .env
-
-# 2. Start all services (database, backend, frontend)
-docker-compose up -d
-
-# 3. Initialize database tables
-docker-compose exec backend python database.py
-
-# 4. Access the application
-# Frontend: http://localhost:3000
-# Backend API: http://localhost:8000
-# API Docs: http://localhost:8000/docs
-```
-
-**That's it!** All services are now running in Docker containers with proper networking.
-
-#### Docker Commands
-
-```bash
-# View logs
-docker-compose logs -f
-
-# Stop all services
-docker-compose down
-
-# Restart a specific service
-docker-compose restart backend
-
-# Execute commands in containers
-docker-compose exec backend python create_admin.py
-docker-compose exec backend sh  # Shell access
-```
-
-See [DOCKER_SETUP.md](./DOCKER_SETUP.md) for detailed Docker documentation.
-
-### Option 2: Manual Setup (Development)
-
-If you prefer to run services manually outside Docker:
-
-#### 1. Start Database & Redis
-
-```bash
-docker-compose up -d postgres redis
-```
-
-#### 2. Setup Backend
-
-```bash
-cd backend
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn main:app --reload
-```
-
-Backend will run on `http://localhost:8000`
-
-#### 3. Setup Frontend
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend will run on `http://localhost:3000`
-
-## 📚 API Documentation
-
-Once the backend is running, visit:
-- API Docs: `http://localhost:8000/docs`
-- Alternative Docs: `http://localhost:8000/redoc`
-
-## 🧪 Testing
-
-### Backend Tests
-
-**With Docker:**
-```bash
-docker-compose exec backend python test_backend.py
-docker-compose exec backend python test_backend_comprehensive.py
-docker-compose exec backend python test_all_apis.py
-```
-
-**Manual Setup:**
-```bash
-cd backend
-python test_backend.py              # Unit tests
-python test_backend_comprehensive.py # API integration tests
-python test_all_apis.py             # Full API test suite
-```
-
-### Frontend Tests
-
-**With Docker:**
-```bash
-docker-compose exec frontend npm run build
-```
-
-**Manual Setup:**
-```bash
-cd frontend
-npm run build  # Build test
-node test_setup.js  # Setup verification
-```
-
-## 📝 Features
-
-### User Features
-- ✅ User Registration & Login (JWT with 1-week expiration)
-- ✅ Course Browsing (Public)
-- ✅ Lesson Progression with Week/Day sorting
-- ✅ XP & Level System with animated success notifications
-- ✅ Streak Tracking
-- ✅ Boss Battle Submissions
-- ✅ Profile Dashboard
-- ✅ Rich Content Lessons (Markdown, Videos, Quizzes)
-- ✅ Video Playback via Mux (HLS streaming)
-- ✅ Engaging completion animations with audio feedback
-
-### Admin Features
-- ✅ Admin Dashboard
-- ✅ Course Builder with Week/Day Hierarchy
-- ✅ Hierarchical Curriculum Management (Add/Remove Weeks, Days, Lessons)
-- ✅ Lesson Editor with Auto-Save (Real-time sync)
-- ✅ Video Upload & Management (Mux Integration)
-- ✅ Rich Content Creation (Markdown, Images, Quizzes)
-- ✅ Submission Grading
-- ✅ Student Management
-- ✅ Settings Page
-
-## 🔐 Authentication
-
-The platform uses JWT (JSON Web Tokens) for authentication. Tokens are stored in localStorage on the frontend and sent with each API request.
-
-## 📊 Database Schema
-
-### Key Models
-- **User**: Authentication and basic info
-- **UserProfile**: XP, level, streak, avatar
-- **World (Course)**: Course container
-- **Level**: Course sub-section
-- **Lesson**: Individual learning unit with rich content support
-  - `week_number`, `day_number`: For sorting and organization
-  - `content_json`: JSONB field for rich content (notes, quiz)
-  - `mux_playback_id`, `mux_asset_id`: Video integration
-- **UserProgress**: Lesson completion tracking
-- **BossSubmission**: Video submission for boss battles
-- **Subscription**: User subscription tiers
-
-## 🎮 Gamification
-
-- **XP System**: Earn XP by completing lessons
-- **Level Formula**: `Level = floor(sqrt(XP / 100))`
-- **Streak System**: Daily login streaks
-- **Lock System**: Sequential lesson unlocking
-- **Quest Log**: Sidebar tracking of progress and upcoming lessons
-
-## 🎥 Video Features (Mux Integration)
-
-The platform uses **Mux** for professional video hosting and streaming:
-
-- **Video Upload**: Direct upload to Mux from admin lesson editor
-- **Auto-Processing**: Videos are automatically transcoded and optimized
-- **HLS Streaming**: Adaptive bitrate streaming for optimal playback
-- **Status Tracking**: Real-time upload and processing status
-- **Webhook Integration**: Automatic lesson updates when videos are ready
-- **Video Management**: Delete videos with automatic cleanup
-
-### Mux Setup
-
-1. Get your Mux credentials from https://dashboard.mux.com
-2. Add to `.env`:
-   ```
-   MUX_TOKEN_ID=your_token_id
-   MUX_TOKEN_SECRET=your_token_secret
-   MUX_WEBHOOK_SECRET=your_webhook_secret
-   ```
-3. Configure webhook in Mux dashboard pointing to: `https://your-domain.com/api/mux/webhook`
-4. Webhook verifies signatures automatically for security
-
-See `env.example` for all Mux-related environment variables.
-
-## 🛠️ Development
+- Docker and Docker Compose
+- Git
 
 ### Environment Variables
 
-#### Docker Setup (Recommended)
-
-Create a `.env` file in the project root (copy from `env.example`):
+Copy `env.example` to `.env` and fill in the required values:
 
 ```bash
-cp env.example .env
-```
+# Database
+DATABASE_URL=postgresql://user:password@db:5432/mambo_db
 
-The `.env` file supports all services. Key variables:
-- `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` - Database credentials
-- `SECRET_KEY` - JWT secret (change for production!)
-- `JWT_EXPIRATION_DAYS=7` - JWT token expiration (default: 7 days)
-- `REDIS_HOST`, `REDIS_PORT` - Redis configuration
-- `NEXT_PUBLIC_API_URL` - Frontend API endpoint
-- `CORS_ORIGINS` - Allowed CORS origins
-- `MUX_TOKEN_ID`, `MUX_TOKEN_SECRET` - Mux API credentials
-- `MUX_WEBHOOK_SECRET` - Mux webhook signature verification
+# JWT
+SECRET_KEY=your-secret-key
+JWT_ALGORITHM=HS256
+JWT_EXPIRATION_DAYS=7
 
-**Note**: When using Docker, `DATABASE_URL` is automatically configured to use the `postgres` service name.
+# Mux
+MUX_TOKEN_ID=your-mux-token-id
+MUX_TOKEN_SECRET=your-mux-token-secret
+MUX_WEBHOOK_SECRET=your-webhook-secret
 
-#### Manual Setup
+# Cloudflare R2 (S3-compatible)
+AWS_ACCESS_KEY_ID=your-r2-access-key
+AWS_SECRET_ACCESS_KEY=your-r2-secret-key
+AWS_ENDPOINT_URL=https://your-account-id.r2.cloudflarestorage.com
+AWS_BUCKET_NAME=your-bucket-name
+R2_PUBLIC_DOMAIN=https://pub-xyz.r2.dev
 
-**Backend** (`backend/.env`):
-```
-DATABASE_URL=postgresql://admin:admin@localhost:5432/themamboinn
-SECRET_KEY=your-secret-key-here
-REDIS_HOST=localhost
-REDIS_PORT=6379
-```
+# Redis
+REDIS_URL=redis://redis:6379
 
-**Frontend** (`frontend/.env.local`):
-```
+# API
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-### Docker vs Manual Setup
+### Installation
 
-| Feature | Docker | Manual |
-|---------|--------|--------|
-| **Setup Time** | ⚡ ~2 minutes | ⏱️ ~10-15 minutes |
-| **Database Connection** | ✅ Automatic (service names) | ⚠️ Requires localhost config |
-| **Isolation** | ✅ Complete | ❌ Conflicts possible |
-| **Reproducibility** | ✅ Same everywhere | ⚠️ Environment dependent |
-| **Production Ready** | ✅ Yes | ❌ Requires additional setup |
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd salsa_lab_v2
+```
+
+2. Set up environment variables:
+```bash
+cp env.example .env
+# Edit .env with your values
+```
+
+3. Start the application:
+```bash
+docker-compose up -d
+```
+
+4. Access the application:
+- Frontend: http://localhost:3000
+- Backend API: http://localhost:8000
+- API Docs: http://localhost:8000/docs
+
+### Initial Setup
+
+1. **Database Migration**: The database schema is automatically created on first run.
+
+2. **Mux Webhook Configuration**:
+   - Go to your Mux dashboard → Settings → Webhooks
+   - Add webhook URL: `https://your-domain.com/api/mux/webhook`
+   - Set webhook secret to match `MUX_WEBHOOK_SECRET` in `.env`
+
+3. **Cloudflare R2 CORS Configuration**:
+   - Configure CORS on your R2 bucket to allow direct browser uploads
+   - See `R2_CORS_SETUP.md` for detailed instructions
+
+## 📚 Key Features Documentation
+
+### Course Builder
+The admin course builder allows creating courses with a hierarchical structure:
+- **Weeks**: Top-level organization
+- **Days**: Sub-organization within weeks
+- **Lessons**: Individual learning units within days
+
+Lessons support:
+- Rich markdown content
+- Video uploads via Mux
+- Interactive quizzes
+- Thumbnail images
+- XP values and boss battles
+
+### Video Upload Pipeline
+1. Admin uploads video in lesson editor
+2. Frontend requests presigned upload URL from backend
+3. Video uploads directly to Mux via `@mux/mux-uploader-react`
+4. Mux processes video and sends webhook to backend
+5. Backend updates lesson with `mux_playback_id` and `mux_asset_id`
+6. Frontend polls for completion and displays video when ready
+
+### Image Upload Pipeline
+1. User/admin selects image (avatar, course thumbnail, lesson thumbnail)
+2. Frontend requests presigned URL from `/api/uploads/presigned-url`
+3. Image uploads directly to Cloudflare R2 via PUT request
+4. Backend returns public URL
+5. Frontend updates UI immediately without page refresh
+
+### Authentication Flow
+- JWT tokens stored in localStorage
+- Extended session duration (7 days)
+- Automatic token refresh
+- Protected routes with auth checks
+- Role-based access control (admin/user)
+
+## 🔧 Development
+
+### Running in Development Mode
+
+```bash
+# Start all services
+docker-compose up
+
+# View logs
+docker-compose logs -f frontend
+docker-compose logs -f backend
+
+# Rebuild after dependency changes
+docker-compose build frontend
+docker-compose build backend
+```
+
+### Adding New Dependencies
+
+**Frontend:**
+```bash
+docker-compose exec frontend npm install <package>
+```
+
+**Backend:**
+```bash
+# Add to requirements.txt, then:
+docker-compose build backend
+docker-compose up -d backend
+```
+
+## 🧪 Testing
+
+The application includes comprehensive error handling and validation:
+- Frontend form validation
+- Backend Pydantic schema validation
+- Database constraint validation
+- API error responses
+
+## 📝 Recent Updates
+
+### Latest Features
+- ✅ Profile picture upload with hover overlay
+- ✅ Course and lesson thumbnail management
+- ✅ Beautiful auth/subscribe prompt modals
+- ✅ "Become A Member" messaging for locked courses
+- ✅ Auto-save in lesson editor
+- ✅ Success animations with audio feedback
+- ✅ Extended session duration (1 week)
+- ✅ Full Mux integration with official SDKs
+- ✅ Cloudflare R2 image upload pipeline
+- ✅ Hierarchical curriculum builder (Week/Day/Lesson)
+
+## 🤝 Contributing
+
+This is a private project. For questions or issues, please contact the development team.
 
 ## 📄 License
 
-This project is proprietary.
-
-## 👥 Contributors
-
-- Initial development by Pavle Popovic
-
-## 🎨 Admin Course Builder
-
-The admin course builder provides a comprehensive interface for managing courses:
-
-- **Course Management**: Create, edit, and delete courses
-- **Hierarchical Curriculum Structure**:
-  - Week/Day organization matching the student view
-  - Add/Remove Weeks, Days, and Lessons via intuitive buttons
-  - Visual hierarchy with proper indentation
-  - Lessons displayed as formatted cards
-- **Lesson Editor**: 
-  - Auto-save functionality (saves changes automatically after 2 seconds)
-  - Rich content editor (Markdown support)
-  - Video upload via Mux
-  - Quiz creation
-  - Week/Day automatically assigned based on hierarchy context
-- **Real-time Sync**: Changes in the editor are automatically reflected in the student view
-- **Preview**: Preview lessons before publishing
-
-## 🔄 Recent Updates
-
-### Curriculum Builder Improvements
-- **Hierarchical Structure**: Week/Day organization matching student view
-- **Easy Management**: Add/Remove buttons for Weeks, Days, and Lessons
-- **Visual Consistency**: Same layout and styling as student course view
-- **Context-Aware Creation**: Lessons automatically get correct Week/Day when created
-- **Card-Based Layout**: Lessons displayed as formatted cards with hover actions
-
-### Auto-Save Feature
-- Lessons auto-save after 2 seconds of inactivity
-- No manual "Save" button needed for existing lessons
-- Changes sync automatically to the database
-- Optimized to prevent refresh loops and performance issues
-
-### Video Integration (Mux)
-- Professional video hosting and streaming
-- Direct upload from admin interface
-- Automatic processing and transcoding
-- Real-time status updates
-- Webhook-based synchronization
-
-### Authentication Improvements
-- Extended session timeout to 7 days
-- Persistent login across sessions
-- Automatic token refresh
-
-### UI/UX Enhancements
-- Music disabled on lesson pages for better video experience
-- Improved lesson editor with better form management
-- Enhanced markdown rendering in lesson content
-- Responsive design improvements
-- Success notifications with animations and audio feedback
-- Engaging lesson completion experience
-
-## 🔗 Links
-
-- Repository: https://github.com/pavle-popovic/the_mambo_inn
-- API Documentation: http://localhost:8000/docs (when running)
-- Docker Hub: Services built locally from Dockerfiles
+Proprietary - All rights reserved

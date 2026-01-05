@@ -31,6 +31,7 @@ class UserProfileResponse(BaseModel):
     tier: str
     role: str
     avatar_url: Optional[str] = None
+    current_level_tag: Optional[str] = None
 
     class Config:
         from_attributes = True

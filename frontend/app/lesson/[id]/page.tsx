@@ -8,6 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import QuestLogSidebar from "@/components/QuestLogSidebar";
 import MuxVideoPlayer from "@/components/MuxVideoPlayer";
+import SuccessNotification from "@/components/SuccessNotification";
+import AuthPromptModal from "@/components/AuthPromptModal";
 import { FaCheck, FaPlay, FaLock, FaBolt, FaArrowRight, FaClipboardList, FaCheckCircle } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -62,6 +64,15 @@ export default function LessonPage() {
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<{ [questionId: string]: number }>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [successData, setSuccessData] = useState<{
+    xpGained: number;
+    leveledUp: boolean;
+    newLevel?: number;
+  } | null>(null);
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [courseTitle, setCourseTitle] = useState("");
 
   useEffect(() => {
     // Wait for auth to finish loading before making any decisions
@@ -70,9 +81,9 @@ export default function LessonPage() {
     }
     
     // After auth has loaded, check if user exists
-    // If no user exists at this point, redirect to login
+    // If no user exists at this point, show login modal
     if (!user) {
-      router.push("/login");
+      setShowAuthModal(true);
       return;
     }
     
@@ -99,9 +110,17 @@ export default function LessonPage() {
         const foundLesson = lessons.find((l) => l.id === lessonId);
         if (foundLesson) {
           setWorldTitle(world.title);
+          setCourseTitle(world.title);
           setWorldLessons(lessons);
           const completed = lessons.filter((l) => l.is_completed).length;
           setWorldProgress((completed / lessons.length) * 100);
+          
+          // Check if the lesson is locked (subscription required)
+          if (foundLesson.is_locked && user) {
+            setShowSubscribeModal(true);
+            setLoading(false);
+            return;
+          }
           break;
         }
       }
@@ -120,23 +139,24 @@ export default function LessonPage() {
       const result = await apiClient.completeLesson(lessonId);
       await refreshUser();
       
-      // Show success message
-      alert(
-        `Lesson completed! +${result.xp_gained} XP${
-          result.leveled_up ? ` - Level Up! You're now level ${result.new_level}` : ""
-        }`
-      );
+      // Show success notification
+      setSuccessData({
+        xpGained: result.xp_gained,
+        leveledUp: result.leveled_up || false,
+        newLevel: result.new_level,
+      });
+      setShowSuccess(true);
 
       // Reload lesson data
       await loadLesson();
 
-      // Navigate to next lesson if available
+      // Navigate to next lesson if available (after notification closes)
       if (result.leveled_up || lesson.next_lesson_id) {
         setTimeout(() => {
           if (lesson.next_lesson_id) {
             router.push(`/lesson/${lesson.next_lesson_id}`);
           }
-        }, 2000);
+        }, 3500); // Wait for notification to close
       }
     } catch (err: any) {
       alert(err.message || "Failed to complete lesson");
@@ -181,9 +201,23 @@ export default function LessonPage() {
 
   if (error || !lesson) {
     return (
-      <div className="min-h-screen bg-mambo-dark flex items-center justify-center">
-        <div className="text-red-400">{error || "Lesson not found"}</div>
-      </div>
+      <>
+        {showSuccess && successData && (
+          <SuccessNotification
+            isOpen={showSuccess}
+            onClose={() => {
+              setShowSuccess(false);
+              setSuccessData(null);
+            }}
+            xpGained={successData.xpGained}
+            leveledUp={successData.leveledUp}
+            newLevel={successData.newLevel}
+          />
+        )}
+        <div className="min-h-screen bg-mambo-dark flex items-center justify-center">
+          <div className="text-red-400">{error || "Lesson not found"}</div>
+        </div>
+      </>
     );
   }
 
@@ -209,8 +243,48 @@ export default function LessonPage() {
      lesson.video_url.startsWith("http")) // Must be a valid HTTP(S) URL
   );
 
+  // Don't render lesson content if showing auth/subscribe modals
+  if (showAuthModal || showSubscribeModal) {
+    return (
+      <>
+        <AuthPromptModal
+          isOpen={showAuthModal}
+          onClose={() => {
+            setShowAuthModal(false);
+            router.push("/courses");
+          }}
+          type="login"
+        />
+        <AuthPromptModal
+          isOpen={showSubscribeModal}
+          onClose={() => {
+            setShowSubscribeModal(false);
+            router.push("/courses");
+          }}
+          type="subscribe"
+          courseTitle={courseTitle}
+        />
+      </>
+    );
+  }
+
   return (
-    <div className="h-screen flex flex-col overflow-hidden bg-mambo-dark text-mambo-cream font-sans">
+    <>
+      {/* Success Notification */}
+      {showSuccess && successData && (
+        <SuccessNotification
+          isOpen={showSuccess}
+          onClose={() => {
+            setShowSuccess(false);
+            setSuccessData(null);
+          }}
+          xpGained={successData.xpGained}
+          leveledUp={successData.leveledUp}
+          newLevel={successData.newLevel}
+        />
+      )}
+
+      <div className="h-screen flex flex-col overflow-hidden bg-mambo-dark text-mambo-cream font-sans">
       {/* Navigation Bar */}
       <nav className="border-b border-gray-800 bg-mambo-panel flex-none z-20">
         <div className="px-6 py-3 flex justify-between items-center">
@@ -625,5 +699,6 @@ export default function LessonPage() {
         }
       `}</style>
     </div>
+    </>
   );
 }

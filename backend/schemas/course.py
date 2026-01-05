@@ -8,6 +8,7 @@ class WorldResponse(BaseModel):
     title: str
     description: Optional[str]
     image_url: Optional[str]
+    thumbnail_url: Optional[str] = None
     difficulty: str
     progress_percentage: float
     is_locked: bool
@@ -32,6 +33,7 @@ class LessonResponse(BaseModel):
     mux_playback_id: Optional[str] = None
     mux_asset_id: Optional[str] = None
     duration_minutes: Optional[int] = None
+    thumbnail_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -62,6 +64,7 @@ class LessonDetailResponse(BaseModel):
     content_json: Optional[Dict[str, Any]] = None
     mux_playback_id: Optional[str] = None
     mux_asset_id: Optional[str] = None
+    thumbnail_url: Optional[str] = None
 
     class Config:
         from_attributes = True

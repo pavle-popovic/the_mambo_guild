@@ -12,13 +12,12 @@ interface LessonEditorModalProps {
     description?: string;
     video_url: string;
     xp_value: number;
-    week_number: number | null;
-    day_number: number | null;
     is_boss_battle: boolean;
     duration_minutes?: number | null;
     content_json?: any;
     mux_playback_id?: string | null;
     mux_asset_id?: string | null;
+    thumbnail_url?: string | null;
   }) => Promise<void>;
   lesson?: {
     id: string;
@@ -33,6 +32,7 @@ interface LessonEditorModalProps {
     content_json: any | null;
     mux_playback_id: string | null;
     mux_asset_id: string | null;
+    thumbnail_url?: string | null;
   } | null;
   onRefreshLesson?: () => Promise<void>; // Optional callback to refresh lesson data
 }
@@ -55,8 +55,6 @@ export default function LessonEditorModal({
   const [description, setDescription] = useState("");
   const [videoUrl, setVideoUrl] = useState("");
   const [xpValue, setXpValue] = useState(50);
-  const [weekNumber, setWeekNumber] = useState<string>("");
-  const [dayNumber, setDayNumber] = useState<string>("");
   const [isBossBattle, setIsBossBattle] = useState(false);
   const [isFreePreview, setIsFreePreview] = useState(false);
   const [durationMinutes, setDurationMinutes] = useState<string>("");
@@ -64,6 +62,7 @@ export default function LessonEditorModal({
   const [quizQuestions, setQuizQuestions] = useState<QuizQuestion[]>([]);
   const [muxPlaybackId, setMuxPlaybackId] = useState<string | null>(null);
   const [muxAssetId, setMuxAssetId] = useState<string | null>(null);
+  const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   
@@ -129,12 +128,11 @@ export default function LessonEditorModal({
         setDescription(lesson.description || "");
         setVideoUrl(lesson.video_url || "");
         setXpValue(lesson.xp_value);
-        setWeekNumber(lesson.week_number?.toString() || "");
-        setDayNumber(lesson.day_number?.toString() || "");
         setIsBossBattle(lesson.is_boss_battle);
         setDurationMinutes(lesson.duration_minutes?.toString() || "");
         setMuxPlaybackId(lesson.mux_playback_id);
         setMuxAssetId(lesson.mux_asset_id);
+        setThumbnailUrl((lesson as any).thumbnail_url || null);
         
         // Parse content_json for lesson notes and quiz
         if (lesson.content_json) {
@@ -173,8 +171,6 @@ export default function LessonEditorModal({
         setDescription("");
         setVideoUrl("");
         setXpValue(50);
-        setWeekNumber("");
-        setDayNumber("");
         setIsBossBattle(false);
         setIsFreePreview(false);
         setDurationMinutes("");
@@ -221,7 +217,7 @@ export default function LessonEditorModal({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, description, videoUrl, xpValue, weekNumber, dayNumber, isBossBattle, durationMinutes, lessonNotes, quizQuestions, lesson?.id]);
+  }, [title, description, videoUrl, xpValue, isBossBattle, durationMinutes, lessonNotes, quizQuestions, lesson?.id]);
 
   const addQuizQuestion = () => {
     setQuizQuestions([
@@ -294,11 +290,10 @@ export default function LessonEditorModal({
       description: description.trim() || undefined,
       video_url: finalVideoUrl,
       xp_value: xpValue,
-      week_number: weekNumber ? parseInt(weekNumber) : null,
-      day_number: dayNumber ? parseInt(dayNumber) : null,
       is_boss_battle: isBossBattle,
       duration_minutes: durationMinutes ? parseInt(durationMinutes) : null,
       content_json: Object.keys(contentJson).length > 0 ? contentJson : undefined,
+      thumbnail_url: thumbnailUrl || null,
       // DO NOT send mux_playback_id or mux_asset_id - webhook manages these
       delete_video: false, // Only set to true when explicitly deleting
     };
@@ -384,7 +379,7 @@ export default function LessonEditorModal({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, description, videoUrl, xpValue, weekNumber, dayNumber, isBossBattle, durationMinutes, lessonNotes, quizQuestionsString, lesson?.id]);
+  }, [title, description, videoUrl, xpValue, isBossBattle, durationMinutes, lessonNotes, quizQuestionsString, lesson?.id]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) {
@@ -584,6 +579,7 @@ export default function LessonEditorModal({
                       <p className="text-sm text-gray-500 mt-1">Save the lesson first, then upload video</p>
                     </div>
                   ) : null}
+
                 </div>
 
                 {/* Lesson Notes */}
@@ -757,32 +753,6 @@ export default function LessonEditorModal({
                         disabled={isSaving}
                         className="w-full bg-black border border-gray-700 rounded-lg p-3 text-gray-400 focus:border-mambo-blue outline-none text-sm font-mono disabled:opacity-50"
                       />
-                    </div>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Week</label>
-                        <input
-                          type="number"
-                          value={weekNumber}
-                          onChange={(e) => setWeekNumber(e.target.value)}
-                          min="1"
-                          placeholder="—"
-                          disabled={isSaving}
-                          className="w-full bg-black border border-gray-700 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue outline-none disabled:opacity-50"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-xs font-bold text-gray-500 uppercase mb-2">Day</label>
-                        <input
-                          type="number"
-                          value={dayNumber}
-                          onChange={(e) => setDayNumber(e.target.value)}
-                          min="1"
-                          placeholder="—"
-                          disabled={isSaving}
-                          className="w-full bg-black border border-gray-700 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue outline-none disabled:opacity-50"
-                        />
-                      </div>
                     </div>
                     <div className="flex items-center justify-between pt-2">
                       <span className="text-sm font-bold text-gray-300">Is Free Preview?</span>

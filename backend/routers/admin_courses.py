@@ -23,6 +23,7 @@ class WorldCreateRequest(BaseModel):
     order_index: int
     is_free: bool = False
     image_url: Optional[str] = None
+    thumbnail_url: Optional[str] = None
     difficulty: str  # "BEGINNER", "INTERMEDIATE", "ADVANCED"
     is_published: bool = False
 
@@ -34,6 +35,7 @@ class WorldUpdateRequest(BaseModel):
     order_index: Optional[int] = None
     is_free: Optional[bool] = None
     image_url: Optional[str] = None
+    thumbnail_url: Optional[str] = None
     difficulty: Optional[str] = None
     is_published: Optional[bool] = None
 
@@ -58,6 +60,7 @@ class LessonCreateRequest(BaseModel):
     content_json: Optional[Dict[str, Any]] = None
     mux_playback_id: Optional[str] = None
     mux_asset_id: Optional[str] = None
+    thumbnail_url: Optional[str] = None
 
 
 class LessonUpdateRequest(BaseModel):
@@ -74,6 +77,7 @@ class LessonUpdateRequest(BaseModel):
     mux_playback_id: Optional[str] = None
     mux_asset_id: Optional[str] = None
     delete_video: Optional[bool] = False  # Flag to explicitly delete video (clears Mux IDs)
+    thumbnail_url: Optional[str] = None
 
 
 @router.get("/courses", response_model=List[WorldResponse])
@@ -92,6 +96,7 @@ async def get_all_courses_admin(
             title=world.title,
             description=world.description,
             image_url=world.image_url,
+            thumbnail_url=world.thumbnail_url,
             difficulty=difficulty_str,
             progress_percentage=0.0,
             is_locked=False
@@ -126,6 +131,7 @@ async def create_course(
         order_index=course_data.order_index,
         is_free=course_data.is_free,
         image_url=course_data.image_url,
+        thumbnail_url=course_data.thumbnail_url,
         difficulty=difficulty_enum,
         is_published=course_data.is_published
     )
@@ -140,6 +146,7 @@ async def create_course(
         title=world.title,
         description=world.description,
         image_url=world.image_url,
+        thumbnail_url=world.thumbnail_url,
         difficulty=difficulty_str,
         progress_percentage=0.0,
         is_locked=False
@@ -175,6 +182,8 @@ async def update_course(
         world.is_free = course_data.is_free
     if course_data.image_url is not None:
         world.image_url = course_data.image_url
+    if course_data.thumbnail_url is not None:
+        world.thumbnail_url = course_data.thumbnail_url
     if course_data.difficulty is not None:
         try:
             world.difficulty = Difficulty[course_data.difficulty.upper()]
@@ -192,6 +201,7 @@ async def update_course(
         title=world.title,
         description=world.description,
         image_url=world.image_url,
+        thumbnail_url=world.thumbnail_url,
         difficulty=difficulty_str,
         progress_percentage=0.0,
         is_locked=False
@@ -277,7 +287,8 @@ async def create_lesson(
         day_number=lesson_data.day_number,
         content_json=lesson_data.content_json,
         mux_playback_id=lesson_data.mux_playback_id,
-        mux_asset_id=lesson_data.mux_asset_id
+        mux_asset_id=lesson_data.mux_asset_id,
+        thumbnail_url=lesson_data.thumbnail_url
     )
     
     db.add(lesson)
@@ -325,6 +336,8 @@ async def update_lesson(
         lesson.day_number = lesson_data.day_number
     if lesson_data.content_json is not None:
         lesson.content_json = lesson_data.content_json
+    if lesson_data.thumbnail_url is not None:
+        lesson.thumbnail_url = lesson_data.thumbnail_url
     
     # Mux fields are managed by the Webhook (source of truth)
     # Only allow clearing them if explicitly requested via delete_video flag
@@ -391,7 +404,10 @@ async def get_course_full_details(
                 "duration_minutes": lesson.duration_minutes,
                 "week_number": lesson.week_number,
                 "day_number": lesson.day_number,
-                "content_json": lesson.content_json
+                "content_json": lesson.content_json,
+                "thumbnail_url": lesson.thumbnail_url,
+                "mux_playback_id": lesson.mux_playback_id,
+                "mux_asset_id": lesson.mux_asset_id
             })
         
         levels_data.append({
@@ -409,6 +425,7 @@ async def get_course_full_details(
         "order_index": world.order_index,
         "is_free": world.is_free,
         "image_url": world.image_url,
+        "thumbnail_url": world.thumbnail_url,
         "difficulty": difficulty_str,
         "is_published": world.is_published,
         "levels": levels_data

@@ -247,6 +247,34 @@ class ApiClient {
     });
   }
 
+  // Image upload endpoints (R2 presigned URLs)
+  async getPresignedUploadUrl(fileType: string, folder: "avatars" | "thumbnails") {
+    return this.request<{
+      upload_url: string;
+      public_url: string;
+    }>("/api/uploads/presigned-url", {
+      method: "POST",
+      body: JSON.stringify({ file_type: fileType, folder }),
+    });
+  }
+
+  async updateProfile(data: { avatar_url?: string }) {
+    return this.request<{
+      id: string;
+      first_name: string;
+      last_name: string;
+      xp: number;
+      level: number;
+      streak_count: number;
+      tier: string;
+      role: string;
+      avatar_url: string | null;
+    }>("/api/users/me", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  }
+
   async checkMuxAssetExists(assetId: string) {
     return this.request<{
       exists: boolean;
@@ -364,6 +392,7 @@ class ApiClient {
       order_index: number;
       is_free: boolean;
       image_url: string | null;
+      thumbnail_url?: string | null;
       difficulty: string;
       is_published: boolean;
       levels: Array<{
@@ -379,6 +408,7 @@ class ApiClient {
           order_index: number;
           is_boss_battle: boolean;
           duration_minutes: number | null;
+          thumbnail_url?: string | null;
         }>;
       }>;
     }>(`/api/admin/courses/${courseId}/full`);
@@ -391,6 +421,7 @@ class ApiClient {
     order_index: number;
     is_free?: boolean;
     image_url?: string;
+    thumbnail_url?: string;
     difficulty: string;
     is_published?: boolean;
   }) {
@@ -415,6 +446,7 @@ class ApiClient {
     order_index?: number;
     is_free?: boolean;
     image_url?: string;
+    thumbnail_url?: string;
     difficulty?: string;
     is_published?: boolean;
   }) {
@@ -496,6 +528,7 @@ class ApiClient {
     day_number?: number | null;
     content_json?: any | null;
     delete_video?: boolean; // Flag to explicitly delete video (clears Mux IDs)
+    thumbnail_url?: string | null;
   }) {
     return this.request<{
       id: string;

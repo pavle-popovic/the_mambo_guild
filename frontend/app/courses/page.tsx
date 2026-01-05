@@ -14,6 +14,7 @@ interface Course {
   title: string;
   description: string | null;
   image_url: string | null;
+  thumbnail_url: string | null;
   difficulty: string;
   progress_percentage: number;
   is_locked: boolean;
@@ -183,23 +184,41 @@ export default function CoursesPage() {
                         />
                       </svg>
                     </div>
-                    <span className="text-xs font-bold uppercase tracking-widest text-gray-300">
-                      Complete Previous Course
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-300 mb-4">
+                      Become A Member
                     </span>
+                    <Link
+                      href="/pricing"
+                      onClick={(e) => e.stopPropagation()}
+                      className="px-6 py-2 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold rounded-lg transition text-sm"
+                    >
+                      View Pricing
+                    </Link>
                   </div>
                 )}
 
                 {/* Image section with title superposed */}
                 <div className="h-48 relative overflow-hidden bg-black">
-                  <Image
-                    src="/assets/Mambo_image_1.png"
-                    alt={course.title}
-                    fill
-                    className={`object-cover group-hover:scale-105 transition duration-500 ${
-                      course.is_locked ? "grayscale opacity-50" : ""
-                    }`}
-                    style={{ objectPosition: 'center 15%' }}
-                  />
+                  {(course.thumbnail_url || course.image_url) ? (
+                    <Image
+                      src={course.thumbnail_url || course.image_url || ""}
+                      alt={course.title}
+                      fill
+                      className={`object-cover group-hover:scale-105 transition duration-500 ${
+                        course.is_locked ? "grayscale opacity-50" : ""
+                      }`}
+                    />
+                  ) : (
+                    <Image
+                      src="/assets/Mambo_image_1.png"
+                      alt={course.title}
+                      fill
+                      className={`object-cover group-hover:scale-105 transition duration-500 ${
+                        course.is_locked ? "grayscale opacity-50" : ""
+                      }`}
+                      style={{ objectPosition: 'center 15%' }}
+                    />
+                  )}
                   
                   {/* Dark overlay for better text readability */}
                   <div className="absolute inset-0 bg-black/30" />

@@ -1,140 +1,222 @@
-# The Mambo Inn - Frontend
+# Frontend - The Mambo Inn LMS
 
-Next.js frontend application for The Mambo Inn LMS platform.
+Next.js 15 frontend application for The Mambo Inn Learning Management System.
 
-## Tech Stack
+## 🚀 Tech Stack
 
-- **Next.js 16** (App Router)
-- **TypeScript**
-- **Tailwind CSS**
-- **Axios** (via fetch API)
-- **@mux/mux-player-react** - Video playback
-- **react-markdown** - Markdown rendering
-- **React Icons** (for icons)
+- **Next.js 15.1.5**: React framework with App Router
+- **TypeScript**: Type-safe development
+- **Tailwind CSS 4**: Utility-first CSS framework
+- **React Icons**: Icon library
+- **react-markdown**: Markdown rendering with GitHub Flavored Markdown support
+- **@mux/mux-player-react**: Official Mux video player component
+- **@mux/mux-uploader-react**: Official Mux video uploader component
+- **Axios**: HTTP client for API communication
 
-## Getting Started
+## 📦 Dependencies
 
-### Prerequisites
+See `package.json` for complete dependency list. Key packages:
 
-- Node.js 18+ and npm
-- Backend API running on `http://localhost:8000`
-- PostgreSQL and Redis running (via docker-compose)
+- `next`: 15.1.5
+- `react`: ^18.3.1
+- `react-dom`: ^18.3.1
+- `react-markdown`: ^10.1.0
+- `remark-gfm`: ^4.0.1
+- `@mux/mux-player-react`: ^3.10.2
+- `@mux/mux-uploader-react`: ^1.4.1
+- `axios`: ^1.13.2
+- `framer-motion`: ^12.23.26
+- `react-icons`: ^5.5.0
 
-### Installation
-
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Create `.env.local` file:
-   ```bash
-   NEXT_PUBLIC_API_URL=http://localhost:8000
-   ```
-
-3. Start the development server:
-   ```bash
-   npm run dev
-   ```
-
-4. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
-## Project Structure
+## 🏗️ Project Structure
 
 ```
 frontend/
-├── app/                    # Next.js App Router pages
-│   ├── page.tsx           # Home page
-│   ├── login/             # Login page
-│   ├── register/           # Registration page
-│   ├── courses/           # Courses listing
-│   ├── lesson/[id]/       # Lesson player
-│   ├── profile/           # User profile
-│   ├── pricing/           # Pricing page
-│   └── admin/             # Admin pages
-├── components/            # Reusable React components
-│   ├── NavBar.tsx
-│   ├── Footer.tsx
-│   ├── GlobalAudioPlayer.tsx
-│   ├── QuestLogSidebar.tsx
-│   ├── AdminSidebar.tsx
-│   ├── LessonEditorModal.tsx  # Admin lesson editor with auto-save
-│   ├── MuxUploader.tsx        # Video upload component
-│   ├── MuxVideoPlayer.tsx     # Video player component
-│   └── MarkdownRenderer.tsx   # Markdown content renderer
-├── contexts/              # React Context providers
-│   └── AuthContext.tsx    # Authentication state
-├── lib/                   # Utility functions
-│   └── api.ts             # API client
-└── public/               # Static assets
-    └── assets/            # Images, videos, audio
+├── app/                      # Next.js App Router
+│   ├── admin/               # Admin dashboard
+│   │   ├── builder/         # Course builder page
+│   │   ├── students/        # Student management
+│   │   └── settings/        # Admin settings
+│   ├── courses/             # Course pages
+│   │   ├── page.tsx         # Course listing
+│   │   └── [id]/            # Course detail page
+│   ├── lesson/              # Lesson viewing
+│   │   └── [id]/            # Individual lesson page
+│   ├── profile/             # User profile
+│   ├── pricing/             # Pricing/subscription
+│   ├── login/               # Login page
+│   └── register/            # Registration page
+├── components/              # React components
+│   ├── common/              # Reusable components
+│   │   └── ImageUploader.tsx # R2 image upload component
+│   ├── MuxUploader.tsx      # Mux video upload component
+│   ├── MuxVideoPlayer.tsx   # Mux video player component
+│   ├── AuthPromptModal.tsx  # Login/subscribe modals
+│   ├── SuccessNotification.tsx # Completion animations
+│   ├── NavBar.tsx           # Navigation bar
+│   ├── Footer.tsx           # Footer component
+│   └── QuestLogSidebar.tsx  # Lesson sidebar
+├── contexts/                # React contexts
+│   └── AuthContext.tsx      # Authentication context
+├── lib/                     # Utilities
+│   └── api.ts              # API client
+└── public/                  # Static assets
+    └── assets/             # Images, audio files
 ```
 
-## Features
+## 🎨 Key Features
 
-### Authentication
-- User registration with level selection
-- Login with JWT tokens
-- Persistent sessions via localStorage
-- Protected routes
+### Components
 
-### Course System
-- World-based course structure
-- Lesson progression with locking
-- Video player integration
-- XP rewards on completion with animated success notifications
+**MuxUploader**: Handles video uploads to Mux
+- Direct upload using `@mux/mux-uploader-react`
+- Status tracking (uploading, processing, live, error)
+- Automatic polling for video processing completion
+- Delete video functionality
+
+**MuxVideoPlayer**: Displays Mux videos
+- Uses `@mux/mux-player-react` for playback
+- Handles video completion tracking
+- Custom styling with brand colors
+
+**ImageUploader**: Direct image uploads to Cloudflare R2
+- Presigned URL workflow
 - Progress tracking
-- Engaging completion animations with audio feedback
+- Error handling
+- Used for avatars, course thumbnails, lesson thumbnails
 
-### Gamification
-- XP system with level calculation
-- Streak tracking
-- Badge system (UI ready)
-- Leaderboard (UI ready)
+**AuthPromptModal**: Beautiful authentication prompts
+- Login modal with register option
+- Subscribe modal for locked content
+- Gradient styling and smooth animations
 
-### Admin Features
-- Dashboard with statistics
-- Course builder with **Week/Day hierarchy** matching student view
-- Hierarchical curriculum management (Add/Remove Weeks, Days, Lessons)
-- Lesson editor with **auto-save** (real-time sync)
-- Video upload and management (Mux integration)
-- Rich content creation (Markdown, quizzes)
-- Context-aware lesson creation (Week/Day auto-assigned)
-- Grading queue for boss battles
-- Student management
-- Settings page
+**SuccessNotification**: Completion animations
+- XP gained display
+- Level-up notifications
+- Audio feedback
+- Auto-dismiss after 3 seconds
 
-### Video Features
-- Video upload via Mux from admin interface
-- HLS streaming with adaptive bitrate
-- Real-time upload and processing status
-- Video management (upload, delete)
+### Pages
 
-### Recent Updates
-- **Auto-Save**: Lesson editor auto-saves after 2 seconds of inactivity
-- **Real-time Sync**: Changes in editor automatically sync to database
-- **Music Control**: Background music disabled on lesson pages
-- **Extended Sessions**: JWT tokens expire after 7 days (persistent login)
-- **Markdown Support**: Rich markdown rendering in lesson content
+**Admin Builder** (`/admin/builder`):
+- Course creation and management
+- Hierarchical curriculum builder (Week/Day/Lesson)
+- Lesson editor with auto-save
+- Thumbnail management
+- Video upload integration
 
-## API Integration
+**Course Listing** (`/courses`):
+- Browse all available courses
+- Progress tracking
+- Locked course indicators with "Become A Member" messaging
+- Direct links to pricing page
 
-All API calls are handled through `lib/api.ts`. The API client:
-- Automatically includes JWT tokens
-- Handles errors gracefully
-- Stores tokens in localStorage
+**Course Detail** (`/courses/[id]`):
+- Lesson list organized by Week/Day
+- Progress indicators
+- Lesson thumbnails
+- Completion tracking
 
-## Environment Variables
+**Lesson Page** (`/lesson/[id]`):
+- Video player (Mux)
+- Markdown content rendering
+- Interactive quizzes
+- Discussion section
+- Completion tracking
 
-- `NEXT_PUBLIC_API_URL` - Backend API URL (default: http://localhost:8000)
+**Profile Page** (`/profile`):
+- User information display
+- Profile picture upload (hover overlay)
+- Level and XP display
+- Progress tracking
 
-## Building for Production
+## 🔧 Development
+
+### Running Locally
 
 ```bash
+# Install dependencies
+npm install
+
+# Run development server
+npm run dev
+
+# Build for production
 npm run build
+
+# Start production server
 npm start
 ```
 
-## Testing
+### Environment Variables
 
-See `test_frontend.md` for comprehensive testing guide.
+Required in `.env.local`:
+```
+NEXT_PUBLIC_API_URL=http://localhost:8000
+```
+
+### Key Configuration
+
+**next.config.ts**:
+- Remote image patterns for R2 and Mux domains
+- Image optimization settings
+
+## 🎯 Key Features Implementation
+
+### Auto-Save
+The lesson editor implements debounced auto-save:
+- 2-second debounce delay
+- Prevents unnecessary API calls
+- Preserves user edits during save operations
+- Visual "Saving..." indicator
+
+### State Management
+- React Context for authentication
+- Local state for component-specific data
+- Optimized re-renders with proper dependency arrays
+- State updates without page refreshes
+
+### Image Handling
+- Next.js Image component for optimization
+- Remote pattern configuration for external domains
+- Fallback handling (R2 thumbnail → Mux thumbnail → gradient)
+- Circular cropping for avatars
+
+### Video Handling
+- Mux SDK integration
+- Webhook-based status updates
+- Polling for processing completion
+- Error handling and retry logic
+
+## 📱 Responsive Design
+
+The application is fully responsive:
+- Mobile-first approach
+- Breakpoints: sm, md, lg, xl
+- Touch-friendly interactions
+- Adaptive layouts
+
+## 🎨 Styling
+
+- Tailwind CSS utility classes
+- Custom color palette (mambo-blue, mambo-gold, etc.)
+- Dark theme throughout
+- Consistent spacing and typography
+- Smooth transitions and animations
+
+## 🔐 Authentication
+
+- JWT token storage in localStorage
+- Automatic token refresh
+- Protected routes
+- Role-based access (admin/user)
+- Extended session duration (7 days)
+
+## 🚀 Performance Optimizations
+
+- Next.js Image optimization
+- Code splitting
+- Lazy loading
+- Debounced auto-save
+- Efficient state updates
+- Minimal re-renders

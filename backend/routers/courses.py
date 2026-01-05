@@ -55,6 +55,7 @@ async def get_worlds(
             title=world.title,
             description=world.description,
             image_url=world.image_url,
+            thumbnail_url=world.thumbnail_url,
             difficulty=difficulty_str,
             progress_percentage=progress_percentage,
             is_locked=is_locked
@@ -149,7 +150,8 @@ async def get_world_lessons(
                 content_json=lesson.content_json,
                 mux_playback_id=lesson.mux_playback_id,
                 mux_asset_id=lesson.mux_asset_id,
-                duration_minutes=lesson.duration_minutes
+                duration_minutes=lesson.duration_minutes,
+                thumbnail_url=lesson.thumbnail_url
             ))
     
     return lessons
