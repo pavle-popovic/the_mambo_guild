@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import GlobalAudioPlayer from "@/components/GlobalAudioPlayer";
 import { AuthProvider } from "@/contexts/AuthContext";
@@ -8,6 +8,12 @@ const inter = Inter({
   subsets: ["latin"],
   weight: ["300", "400", "600", "800"],
   variable: "--font-inter",
+});
+
+const playfair = Playfair_Display({
+  subsets: ["latin"],
+  weight: ["700"],
+  variable: "--font-playfair",
 });
 
 export const metadata: Metadata = {
@@ -22,7 +28,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} font-sans antialiased bg-mambo-dark`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-mambo-dark`}>
         <AuthProvider>
           {children}
           <GlobalAudioPlayer />

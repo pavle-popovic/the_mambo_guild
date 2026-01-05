@@ -31,6 +31,14 @@ class ApiClient {
     endpoint: string,
     options: RequestInit = {}
   ): Promise<T> {
+    // Always check localStorage for token (in case it was updated in another tab)
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("auth_token");
+      if (storedToken !== this.token) {
+        this.token = storedToken;
+      }
+    }
+
     const url = `${this.baseUrl}${endpoint}`;
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
@@ -48,15 +56,39 @@ class ApiClient {
       });
 
       if (!response.ok) {
+        // If unauthorized (401), clear token as it's invalid/expired
+        if (response.status === 401) {
+          this.setToken(null);
+          // Only redirect to login if we're not already on the login page
+          if (typeof window !== "undefined" && !window.location.pathname.includes("/login")) {
+            // Don't redirect automatically, let the app handle it through AuthContext
+          }
+        }
+
         let errorMessage = `HTTP ${response.status}: ${response.statusText}`;
         try {
           const errorData: ApiError = await response.json();
-          errorMessage = errorData.detail || errorMessage;
+          // Handle case where detail might be an object or string
+          if (errorData.detail) {
+            if (typeof errorData.detail === 'string') {
+              errorMessage = errorData.detail;
+            } else if (typeof errorData.detail === 'object') {
+              errorMessage = JSON.stringify(errorData.detail);
+            } else {
+              errorMessage = String(errorData.detail);
+            }
+          } else if (errorData.message) {
+            errorMessage = typeof errorData.message === 'string' ? errorData.message : String(errorData.message);
+          }
         } catch {
           // If response is not JSON, use status text
-          const text = await response.text();
-          if (text) {
-            errorMessage = text.substring(0, 200);
+          try {
+            const text = await response.text();
+            if (text) {
+              errorMessage = text.substring(0, 200);
+            }
+          } catch {
+            // If we can't read the text either, use the default message
           }
         }
         throw new Error(errorMessage);
@@ -161,6 +193,7 @@ class ApiClient {
         content_json: any | null;
         mux_playback_id: string | null;
         mux_asset_id: string | null;
+        duration_minutes: number | null;
       }>
     >(`/api/courses/worlds/${worldId}/lessons`);
   }
@@ -192,6 +225,33 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify({ lesson_id: lessonId, filename }),
     });
+  }
+
+  async checkMuxUploadStatus(lessonId: string) {
+    return this.request<{
+      status: "ready" | "processing" | "error";
+      playback_id?: string;
+      asset_id?: string;
+      message: string;
+    }>(`/api/mux/check-upload-status?lesson_id=${lessonId}`, {
+      method: "POST",
+    });
+  }
+
+  async deleteMuxAsset(assetId: string) {
+    return this.request<{
+      status: "success" | "error";
+      message: string;
+    }>(`/api/mux/asset/${assetId}`, {
+      method: "DELETE",
+    });
+  }
+
+  async checkMuxAssetExists(assetId: string) {
+    return this.request<{
+      exists: boolean;
+      asset_id: string;
+    }>(`/api/mux/asset/${assetId}/exists`);
   }
 
   // Progress endpoints
@@ -388,7 +448,10 @@ class ApiClient {
       order_index: number;
     }>(`/api/admin/courses/${courseId}/levels`, {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        world_id: courseId,
+      }),
     });
   }
 
@@ -403,6 +466,8 @@ class ApiClient {
     week_number?: number | null;
     day_number?: number | null;
     content_json?: any | null;
+    mux_playback_id?: string | null;
+    mux_asset_id?: string | null;
   }) {
     return this.request<{
       id: string;
@@ -412,7 +477,10 @@ class ApiClient {
       is_boss_battle: boolean;
     }>(`/api/admin/levels/${levelId}/lessons`, {
       method: "POST",
-      body: JSON.stringify(data),
+      body: JSON.stringify({
+        ...data,
+        level_id: levelId,
+      }),
     });
   }
 
@@ -427,6 +495,7 @@ class ApiClient {
     week_number?: number | null;
     day_number?: number | null;
     content_json?: any | null;
+    delete_video?: boolean; // Flag to explicitly delete video (clears Mux IDs)
   }) {
     return this.request<{
       id: string;

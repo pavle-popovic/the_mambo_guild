@@ -1,7 +1,11 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
 from routers import api_router
+from routers.mux import mux_webhook_handler
 from config import settings
+from models import get_db
+from sqlalchemy.orm import Session
+from typing import Optional
 
 app = FastAPI(
     title="Salsa Lab API",
@@ -21,6 +25,19 @@ app.add_middleware(
 
 # Include routers
 app.include_router(api_router, prefix="/api")
+
+# Add webhook endpoint at /api/webhook for Mux (also available at /api/mux/webhook)
+@app.post("/api/webhook")
+async def mux_webhook_alias(
+    request: Request,
+    db: Session = Depends(get_db),
+    mux_signature: Optional[str] = Header(None, alias="Mux-Signature")
+):
+    """
+    Alias for Mux webhook endpoint.
+    Mux webhooks can be configured to POST to /api/webhook or /api/mux/webhook
+    """
+    return await mux_webhook_handler(request, db, mux_signature)
 
 
 @app.get("/")

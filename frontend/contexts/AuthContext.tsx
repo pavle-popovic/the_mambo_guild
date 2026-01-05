@@ -54,13 +54,43 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return;
     }
     
-    const token = localStorage.getItem("auth_token");
-    if (token) {
-      apiClient.setToken(token);
-      refreshUser().finally(() => setLoading(false));
-    } else {
+    const checkAuth = async () => {
+      const token = localStorage.getItem("auth_token");
+      if (token) {
+        apiClient.setToken(token);
+        try {
+          await refreshUser();
+        } catch (error) {
+          // If token is invalid, clear it
+          console.error("Token validation failed:", error);
+          localStorage.removeItem("auth_token");
+          apiClient.setToken(null);
+          setUser(null);
+        }
+      }
       setLoading(false);
-    }
+    };
+    
+    checkAuth();
+    
+    // Listen for storage changes (e.g., login in another tab)
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === "auth_token") {
+        if (e.newValue) {
+          apiClient.setToken(e.newValue);
+          refreshUser();
+        } else {
+          apiClient.setToken(null);
+          setUser(null);
+        }
+      }
+    };
+    
+    window.addEventListener("storage", handleStorageChange);
+    
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

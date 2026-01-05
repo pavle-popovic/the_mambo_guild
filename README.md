@@ -21,18 +21,23 @@ The Mambo Inn is a full-stack LMS platform designed for structured dance learnin
 - Tailwind CSS
 - React Context for state management
 - Axios for API calls
+- @mux/mux-player-react for video playback
+- react-markdown for Markdown rendering
 
 **Backend:**
 - FastAPI (Python)
 - SQLAlchemy (PostgreSQL)
 - Redis (Caching & Leaderboards)
-- JWT Authentication
+- JWT Authentication (1-week token expiration)
 - Pydantic for validation
+- Mux Python SDK for video processing
+- Webhook support for Mux events
 
 **Infrastructure:**
 - Docker & Docker Compose (Recommended)
 - PostgreSQL Database
 - Redis Cache
+- Mux Video API (Video upload, processing, and streaming)
 
 ## 📁 Project Structure
 
@@ -181,19 +186,25 @@ node test_setup.js  # Setup verification
 ## 📝 Features
 
 ### User Features
-- ✅ User Registration & Login
+- ✅ User Registration & Login (JWT with 1-week expiration)
 - ✅ Course Browsing (Public)
-- ✅ Lesson Progression
+- ✅ Lesson Progression with Week/Day sorting
 - ✅ XP & Level System
 - ✅ Streak Tracking
 - ✅ Boss Battle Submissions
 - ✅ Profile Dashboard
+- ✅ Rich Content Lessons (Markdown, Videos, Quizzes)
+- ✅ Video Playback via Mux (HLS streaming)
 
 ### Admin Features
 - ✅ Admin Dashboard
+- ✅ Course Builder with Drag-and-Drop UI
+- ✅ Lesson Editor with Auto-Save (Real-time sync)
+- ✅ Video Upload & Management (Mux Integration)
+- ✅ Rich Content Creation (Markdown, Images, Quizzes)
 - ✅ Submission Grading
-- ✅ Course Builder
-- ✅ User Management
+- ✅ Student Management
+- ✅ Settings Page
 
 ## 🔐 Authentication
 
@@ -204,9 +215,12 @@ The platform uses JWT (JSON Web Tokens) for authentication. Tokens are stored in
 ### Key Models
 - **User**: Authentication and basic info
 - **UserProfile**: XP, level, streak, avatar
-- **World**: Course container
-- **Level**: World sub-section
-- **Lesson**: Individual learning unit
+- **World (Course)**: Course container
+- **Level**: Course sub-section
+- **Lesson**: Individual learning unit with rich content support
+  - `week_number`, `day_number`: For sorting and organization
+  - `content_json`: JSONB field for rich content (notes, quiz)
+  - `mux_playback_id`, `mux_asset_id`: Video integration
 - **UserProgress**: Lesson completion tracking
 - **BossSubmission**: Video submission for boss battles
 - **Subscription**: User subscription tiers
@@ -217,6 +231,32 @@ The platform uses JWT (JSON Web Tokens) for authentication. Tokens are stored in
 - **Level Formula**: `Level = floor(sqrt(XP / 100))`
 - **Streak System**: Daily login streaks
 - **Lock System**: Sequential lesson unlocking
+- **Quest Log**: Sidebar tracking of progress and upcoming lessons
+
+## 🎥 Video Features (Mux Integration)
+
+The platform uses **Mux** for professional video hosting and streaming:
+
+- **Video Upload**: Direct upload to Mux from admin lesson editor
+- **Auto-Processing**: Videos are automatically transcoded and optimized
+- **HLS Streaming**: Adaptive bitrate streaming for optimal playback
+- **Status Tracking**: Real-time upload and processing status
+- **Webhook Integration**: Automatic lesson updates when videos are ready
+- **Video Management**: Delete videos with automatic cleanup
+
+### Mux Setup
+
+1. Get your Mux credentials from https://dashboard.mux.com
+2. Add to `.env`:
+   ```
+   MUX_TOKEN_ID=your_token_id
+   MUX_TOKEN_SECRET=your_token_secret
+   MUX_WEBHOOK_SECRET=your_webhook_secret
+   ```
+3. Configure webhook in Mux dashboard pointing to: `https://your-domain.com/api/mux/webhook`
+4. Webhook verifies signatures automatically for security
+
+See `env.example` for all Mux-related environment variables.
 
 ## 🛠️ Development
 
@@ -233,9 +273,12 @@ cp env.example .env
 The `.env` file supports all services. Key variables:
 - `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB` - Database credentials
 - `SECRET_KEY` - JWT secret (change for production!)
+- `JWT_EXPIRATION_DAYS=7` - JWT token expiration (default: 7 days)
 - `REDIS_HOST`, `REDIS_PORT` - Redis configuration
 - `NEXT_PUBLIC_API_URL` - Frontend API endpoint
 - `CORS_ORIGINS` - Allowed CORS origins
+- `MUX_TOKEN_ID`, `MUX_TOKEN_SECRET` - Mux API credentials
+- `MUX_WEBHOOK_SECRET` - Mux webhook signature verification
 
 **Note**: When using Docker, `DATABASE_URL` is automatically configured to use the `postgres` service name.
 
@@ -272,11 +315,45 @@ This project is proprietary.
 
 - Initial development by Pavle Popovic
 
-## 📚 Additional Documentation
+## 🎨 Admin Course Builder
 
-- **[DOCKER_SETUP.md](./DOCKER_SETUP.md)** - Complete Docker setup and usage guide
-- **[DOCKER_IMPLEMENTATION_SUMMARY.md](./DOCKER_IMPLEMENTATION_SUMMARY.md)** - Docker implementation details
-- **[API_TESTING_GUIDE.md](./API_TESTING_GUIDE.md)** - API testing instructions
+The admin course builder provides a comprehensive interface for managing courses:
+
+- **Course Management**: Create, edit, and delete courses
+- **Lesson Editor**: 
+  - Auto-save functionality (saves changes automatically after 2 seconds)
+  - Rich content editor (Markdown support)
+  - Video upload via Mux
+  - Quiz creation
+  - Week/Day organization
+- **Real-time Sync**: Changes in the editor are automatically reflected in the student view
+- **Preview**: Preview lessons before publishing
+
+## 🔄 Recent Updates
+
+### Auto-Save Feature
+- Lessons auto-save after 2 seconds of inactivity
+- No manual "Save" button needed for existing lessons
+- Changes sync automatically to the database
+- Optimized to prevent refresh loops and performance issues
+
+### Video Integration (Mux)
+- Professional video hosting and streaming
+- Direct upload from admin interface
+- Automatic processing and transcoding
+- Real-time status updates
+- Webhook-based synchronization
+
+### Authentication Improvements
+- Extended session timeout to 7 days
+- Persistent login across sessions
+- Automatic token refresh
+
+### UI/UX Enhancements
+- Music disabled on lesson pages for better video experience
+- Improved lesson editor with better form management
+- Enhanced markdown rendering in lesson content
+- Responsive design improvements
 
 ## 🔗 Links
 

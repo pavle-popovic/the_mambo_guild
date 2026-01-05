@@ -31,6 +31,7 @@ class LessonResponse(BaseModel):
     content_json: Optional[Dict[str, Any]] = None
     mux_playback_id: Optional[str] = None
     mux_asset_id: Optional[str] = None
+    duration_minutes: Optional[int] = None
 
     class Config:
         from_attributes = True

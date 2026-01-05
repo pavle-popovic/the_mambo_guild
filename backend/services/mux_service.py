@@ -3,19 +3,31 @@ Mux service for video upload and playback URL generation.
 """
 import logging
 from typing import Dict, Optional
-from mux_python import Configuration, ApiException, DirectUploadsApi
+from mux_python import Configuration, ApiClient, ApiException, DirectUploadsApi
 from mux_python.models import CreateUploadRequest
 from config import settings
 
 logger = logging.getLogger(__name__)
 
-# Configure Mux API client
-configuration = Configuration()
-if settings.MUX_TOKEN_ID and settings.MUX_TOKEN_SECRET:
-    configuration.username = settings.MUX_TOKEN_ID
-    configuration.password = settings.MUX_TOKEN_SECRET
 
-direct_uploads_api = DirectUploadsApi(configuration)
+def _get_mux_configuration() -> Configuration:
+    """
+    Create and return a properly configured Mux Configuration object.
+    """
+    configuration = Configuration(
+        username=settings.MUX_TOKEN_ID,
+        password=settings.MUX_TOKEN_SECRET
+    )
+    return configuration
+
+
+def _get_direct_uploads_api() -> DirectUploadsApi:
+    """
+    Create and return a DirectUploadsApi instance with proper configuration.
+    """
+    configuration = _get_mux_configuration()
+    api_client = ApiClient(configuration)
+    return DirectUploadsApi(api_client)
 
 
 def create_direct_upload(filename: Optional[str] = None, test: bool = False, passthrough: Optional[str] = None) -> Dict:
@@ -44,6 +56,8 @@ def create_direct_upload(filename: Optional[str] = None, test: bool = False, pas
             cors_origin="*"  # Allow uploads from any origin (can be restricted in production)
         )
         
+        # Create API instance for this request
+        direct_uploads_api = _get_direct_uploads_api()
         upload_response = direct_uploads_api.create_direct_upload(create_upload_request)
         
         return {

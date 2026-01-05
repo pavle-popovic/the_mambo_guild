@@ -18,7 +18,8 @@ class Settings:
     # JWT
     SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
     ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
+    # Token expires in 1 week (7 days * 24 hours * 60 minutes)
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
     
     # CORS
     CORS_ORIGINS: list = os.getenv(
@@ -29,6 +30,7 @@ class Settings:
     # Mux Configuration
     MUX_TOKEN_ID: Optional[str] = os.getenv("MUX_TOKEN_ID")
     MUX_TOKEN_SECRET: Optional[str] = os.getenv("MUX_TOKEN_SECRET")
+    MUX_WEBHOOK_SECRET: Optional[str] = os.getenv("MUX_WEBHOOK_SECRET")
 
 settings = Settings()
 

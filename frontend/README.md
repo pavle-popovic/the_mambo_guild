@@ -8,9 +8,9 @@ Next.js frontend application for The Mambo Inn LMS platform.
 - **TypeScript**
 - **Tailwind CSS**
 - **Axios** (via fetch API)
-- **Framer Motion** (for animations)
+- **@mux/mux-player-react** - Video playback
+- **react-markdown** - Markdown rendering
 - **React Icons** (for icons)
-- **AOS** (Animate On Scroll)
 
 ## Getting Started
 
@@ -57,7 +57,11 @@ frontend/
 │   ├── Footer.tsx
 │   ├── GlobalAudioPlayer.tsx
 │   ├── QuestLogSidebar.tsx
-│   └── AdminSidebar.tsx
+│   ├── AdminSidebar.tsx
+│   ├── LessonEditorModal.tsx  # Admin lesson editor with auto-save
+│   ├── MuxUploader.tsx        # Video upload component
+│   ├── MuxVideoPlayer.tsx     # Video player component
+│   └── MarkdownRenderer.tsx   # Markdown content renderer
 ├── contexts/              # React Context providers
 │   └── AuthContext.tsx    # Authentication state
 ├── lib/                   # Utility functions
@@ -89,8 +93,26 @@ frontend/
 
 ### Admin Features
 - Dashboard with statistics
+- Course builder with drag-and-drop UI
+- Lesson editor with **auto-save** (real-time sync)
+- Video upload and management (Mux integration)
+- Rich content creation (Markdown, quizzes)
 - Grading queue for boss battles
-- Course builder interface
+- Student management
+- Settings page
+
+### Video Features
+- Video upload via Mux from admin interface
+- HLS streaming with adaptive bitrate
+- Real-time upload and processing status
+- Video management (upload, delete)
+
+### Recent Updates
+- **Auto-Save**: Lesson editor auto-saves after 2 seconds of inactivity
+- **Real-time Sync**: Changes in editor automatically sync to database
+- **Music Control**: Background music disabled on lesson pages
+- **Extended Sessions**: JWT tokens expire after 7 days (persistent login)
+- **Markdown Support**: Rich markdown rendering in lesson content
 
 ## API Integration
 

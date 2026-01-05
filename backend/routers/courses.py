@@ -148,7 +148,8 @@ async def get_world_lessons(
                 day_number=lesson.day_number,
                 content_json=lesson.content_json,
                 mux_playback_id=lesson.mux_playback_id,
-                mux_asset_id=lesson.mux_asset_id
+                mux_asset_id=lesson.mux_asset_id,
+                duration_minutes=lesson.duration_minutes
             ))
     
     return lessons
