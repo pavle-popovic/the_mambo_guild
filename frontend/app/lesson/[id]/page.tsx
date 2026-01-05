@@ -38,6 +38,8 @@ interface WorldLesson {
   is_locked: boolean;
   is_boss_battle: boolean;
   order_index: number;
+  week_number?: number | null;
+  day_number?: number | null;
   duration_minutes?: number | null;
 }
 

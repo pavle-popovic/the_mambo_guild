@@ -64,8 +64,8 @@ backend/
 
 ### Courses (`/api/courses`)
 - `GET /api/courses/worlds` - List all courses/worlds
-- `GET /api/courses/worlds/{world_id}/lessons` - Get lessons for a course
-- `GET /api/courses/lessons/{lesson_id}` - Get lesson details
+- `GET /api/courses/worlds/{world_id}/lessons` - Get lessons for a course (sorted by week/day/order)
+- `GET /api/courses/lessons/{lesson_id}` - Get lesson details with next/prev lesson IDs (based on proper ordering)
 - `POST /api/courses/lessons/{lesson_id}/complete` - Complete a lesson
 
 ### Admin (`/api/admin`)
@@ -143,10 +143,12 @@ REDIS_URL=redis://redis:6379
 ### Lesson
 - Title, description, content
 - Week and day numbers for hierarchical organization
+- Order index for sorting within days
 - Video content (Mux playback ID and asset ID)
 - Thumbnail URL
 - Rich content (JSONB): notes (markdown), quizzes
 - XP value and boss battle flag
+- Lessons sorted by: week_number → day_number → order_index
 
 ## 🔐 Authentication
 

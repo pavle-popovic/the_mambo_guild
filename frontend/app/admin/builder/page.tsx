@@ -342,7 +342,8 @@ export default function AdminBuilderPage() {
       await loadCourse();
     } catch (err: any) {
       console.error("Failed to delete lesson:", err);
-      alert(err.message || "Failed to delete lesson");
+      const errorMessage = err.message || "Failed to delete lesson";
+      alert(`Error: ${errorMessage}\n\nPlease check:\n1. Backend is running (http://localhost:8000)\n2. You are logged in as admin\n3. Network connection is working`);
     }
   };
 
@@ -750,6 +751,13 @@ export default function AdminBuilderPage() {
                 } else {
                   ungroupedLessons.push(lesson);
                 }
+              });
+              
+              // Sort lessons within each day group by order_index
+              Object.keys(weekGroups).forEach(week => {
+                Object.keys(weekGroups[parseInt(week)]).forEach(day => {
+                  weekGroups[parseInt(week)][parseInt(day)].sort((a, b) => a.order_index - b.order_index);
+                });
               });
               
               // Sort weeks and days

@@ -392,7 +392,13 @@ async def get_course_full_details(
     levels_data = []
     for level in world.levels:
         lessons_data = []
-        for lesson in level.lessons:
+        # Sort lessons by week_number, day_number, and order_index
+        sorted_lessons = sorted(level.lessons, key=lambda l: (
+            l.week_number if l.week_number is not None else 0,
+            l.day_number if l.day_number is not None else 0,
+            l.order_index
+        ))
+        for lesson in sorted_lessons:
             lessons_data.append({
                 "id": str(lesson.id),
                 "title": lesson.title,

@@ -198,6 +198,13 @@ export default function CourseDetailPage() {
               }
             });
             
+            // Sort lessons within each day group by order_index
+            Object.keys(weekGroups).forEach(week => {
+              Object.keys(weekGroups[parseInt(week)]).forEach(day => {
+                weekGroups[parseInt(week)][parseInt(day)].sort((a, b) => a.order_index - b.order_index);
+              });
+            });
+            
             // Sort weeks and days
             const sortedWeeks = Object.keys(weekGroups)
               .map(Number)

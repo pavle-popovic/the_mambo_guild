@@ -28,7 +28,7 @@ export default function LessonContentEditor({
       setBlocks(
         contentJson.blocks.map((block: any, index: number) => ({
           ...block,
-          id: block.id || `block-${index}-${Date.now()}`,
+          id: block.id || `block-${index}`,
         }))
       );
     } else {

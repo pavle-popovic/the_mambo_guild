@@ -61,7 +61,7 @@ frontend/
 │   ├── SuccessNotification.tsx # Completion animations
 │   ├── NavBar.tsx           # Navigation bar with animations
 │   ├── Footer.tsx           # Footer component
-│   └── QuestLogSidebar.tsx  # Lesson sidebar
+│   └── QuestLogSidebar.tsx  # Lesson sidebar with Week/Day organization
 ├── contexts/                # React contexts
 │   └── AuthContext.tsx      # Authentication context
 ├── lib/                     # Utilities
@@ -119,10 +119,11 @@ frontend/
 - Direct links to pricing page
 
 **Course Detail** (`/courses/[id]`):
-- Lesson list organized by Week/Day
+- Lesson list organized by Week/Day with proper ordering
 - Progress indicators
 - Lesson thumbnails
 - Completion tracking
+- Consistent ordering matching course builder
 
 **Lesson Page** (`/lesson/[id]`):
 - Video player (Mux)
@@ -130,6 +131,8 @@ frontend/
 - Interactive quizzes
 - Discussion section
 - Completion tracking
+- QuestLogSidebar with Week/Day sections matching course structure
+- Next/previous lesson navigation based on proper ordering
 
 **Profile Page** (`/profile`):
 - User information display
@@ -210,13 +213,14 @@ The application is fully responsive:
 - Dark mode throughout with club-like studio aesthetic
 - Editorial-style typography with improved spacing
 - Framer Motion animations:
-  - Page transitions (fade in/out)
+  - Page transitions (fade in/out) with hydration-safe implementation
   - Hover effects on cards and buttons
   - Stagger animations for lists
   - Interactive button feedback
 - Glass/neon effects on buttons and cards
 - Gradient backgrounds and shadows
 - Smooth transitions throughout
+- Server-side rendering compatibility (no hydration mismatches)
 
 ## 🔐 Authentication
 
