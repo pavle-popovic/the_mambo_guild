@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, Depends, Header
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.sessions import SessionMiddleware
 from routers import api_router
 from routers.mux import mux_webhook_handler
 from config import settings
@@ -11,6 +12,15 @@ app = FastAPI(
     title="Salsa Lab API",
     description="Backend API for Salsa Lab",
     version="1.0.0"
+)
+
+# Session middleware - Required for OAuth state management and session support
+# Use SECRET_KEY from settings (static key for consistency)
+app.add_middleware(
+    SessionMiddleware,
+    secret_key=settings.SECRET_KEY,
+    max_age=3600,  # 1 hour session timeout
+    same_site="lax"
 )
 
 # CORS middleware configuration - Industry standard: Explicit origins, credentials support

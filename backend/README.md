@@ -27,6 +27,11 @@ See `requirements.txt` for complete dependency list. Key packages:
 - `python-jose[cryptography]==3.3.0`
 - `mux-python==5.1.0`
 - `boto3==1.34.0`
+- `authlib==1.3.0` - OAuth2/OIDC client for Google authentication
+- `httpx==0.27.0` - Async HTTP client for OAuth token exchange
+- `resend==2.1.0` - Transactional email service for password reset
+- `itsdangerous==2.1.2` - Secure token generation for password reset links
+- `stripe==7.0.0` - Payment processing
 
 ## 🏗️ Project Structure
 
@@ -58,8 +63,12 @@ backend/
 ## 🔌 API Endpoints
 
 ### Authentication (`/api/auth`)
-- `POST /api/auth/register` - User registration
+- `POST /api/auth/register` - User registration (with password confirmation)
 - `POST /api/auth/token` - Login (get JWT token)
+- `GET /api/auth/login/google` - Initiate Google OAuth login
+- `GET /api/auth/callback/google` - Google OAuth callback handler
+- `POST /api/auth/forgot-password` - Request password reset email
+- `POST /api/auth/reset-password` - Reset password with token
 - `GET /api/auth/me` - Get current user profile
 
 ### Courses (`/api/courses`)
@@ -121,14 +130,32 @@ R2_PUBLIC_DOMAIN=https://pub-xyz.r2.dev
 
 # Redis
 REDIS_URL=redis://redis:6379
+
+# OAuth Configuration (Google)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Email Service Configuration (Resend)
+RESEND_API_KEY=your-resend-api-key
+FRONTEND_URL=http://localhost:3000
+BACKEND_URL=http://localhost:8000
+PASSWORD_RESET_EXPIRE_MINUTES=60
+
+# OAuthlib for local development (set to 1 to allow HTTP for OAuth)
+OAUTHLIB_INSECURE_TRANSPORT=1
 ```
 
 ## 🗄️ Database Models
 
 ### User & UserProfile
 - User authentication and profile information
+- **Authentication fields**:
+  - `auth_provider`: "email" or "google" (default: "email")
+  - `social_id`: OAuth provider's unique user ID (nullable)
+  - `is_verified`: Email verification status (default: false)
+  - `hashed_password`: Nullable for OAuth users
 - XP, level, streak tracking
-- Avatar URL for profile pictures
+- Avatar URL for profile pictures (can sync from Google)
 - Subscription tier
 
 ### World (Course)
@@ -152,10 +179,38 @@ REDIS_URL=redis://redis:6379
 
 ## 🔐 Authentication
 
+### Email/Password Authentication
 - JWT tokens with 7-day expiration
 - Password hashing with bcrypt
+- Password confirmation validation on registration
+- Minimum password length: 8 characters
 - Role-based access control (admin/user)
 - Protected routes with dependency injection
+
+### OAuth Authentication (Google)
+- OAuth 2.0 flow using Authlib
+- CSRF protection with Redis state tokens
+- Automatic user creation for new OAuth users
+- Account linking for existing email users
+- Profile picture sync from Google
+- Email verification automatically set to true for OAuth users
+
+### Password Reset
+- Secure token generation using `itsdangerous`
+- Time-limited reset tokens (configurable expiration)
+- Email delivery via Resend service
+- Password confirmation required on reset
+- Token validation and expiration checking
+
+### OAuth Flow
+1. User clicks "Sign in with Google"
+2. Backend generates CSRF state token and stores in Redis
+3. User redirected to Google consent screen
+4. Google redirects back to `/api/auth/callback/google` with code
+5. Backend verifies state token, exchanges code for access token
+6. Backend fetches user info from Google
+7. Backend creates/logs in user and returns JWT
+8. Frontend receives JWT via redirect URL and stores in localStorage
 
 ## 📤 File Uploads
 
@@ -202,6 +257,12 @@ from database import Base, engine
 Base.metadata.create_all(bind=engine)
 ```
 
+**OAuth Migration**: Run the migration script to add OAuth columns:
+```bash
+docker-compose exec backend python migrations/add_oauth_columns.py
+docker-compose exec backend python migrations/make_password_nullable.py
+```
+
 ## 📝 API Documentation
 
 Interactive API documentation available at:
@@ -212,10 +273,14 @@ Interactive API documentation available at:
 
 - JWT token authentication
 - Password hashing with bcrypt
+- OAuth state token verification (CSRF protection)
+- Password reset token expiration and validation
 - Webhook signature verification
 - CORS configuration
 - Input validation with Pydantic
 - SQL injection prevention (SQLAlchemy ORM)
+- Email enumeration prevention in password reset
+- Secure token generation with `itsdangerous`
 
 ## 🚀 Performance
 

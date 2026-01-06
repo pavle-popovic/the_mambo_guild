@@ -182,6 +182,7 @@ class ApiClient {
   async register(data: {
     email: string;
     password: string;
+    confirm_password: string;
     first_name: string;
     last_name: string;
     current_level_tag: string;

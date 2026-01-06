@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, Integer, DateTime, Enum as SQLEnum, ForeignKey
+from sqlalchemy import Column, String, Integer, DateTime, Enum as SQLEnum, ForeignKey, Boolean
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -23,7 +23,10 @@ class User(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     email = Column(String, unique=True, index=True, nullable=False)
-    hashed_password = Column(String, nullable=False)
+    hashed_password = Column(String, nullable=True)  # Nullable for OAuth users
+    auth_provider = Column(String, default="email", nullable=False)  # "email", "google", "apple"
+    social_id = Column(String, index=True, nullable=True)  # OAuth provider's unique user ID
+    is_verified = Column(Boolean, default=False, nullable=False)  # Email verification status
     role = Column(SQLEnum(UserRole), default=UserRole.STUDENT, nullable=False)
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)

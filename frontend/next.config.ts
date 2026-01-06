@@ -15,6 +15,11 @@ const nextConfig: NextConfig = {
         hostname: 'image.mux.com',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com',
+        pathname: '/**',
+      },
     ],
   },
 };

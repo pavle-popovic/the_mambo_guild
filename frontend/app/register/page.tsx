@@ -20,8 +20,10 @@ export default function RegisterPage() {
     lastName: "",
     email: "",
     password: "",
+    confirmPassword: "",
     currentLevelTag: "Beginner",
   });
+  const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const { register } = useAuth();
@@ -30,12 +32,28 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setPasswordError("");
     setLoading(true);
+
+    // Client-side validation: passwords must match
+    if (formData.password !== formData.confirmPassword) {
+      setPasswordError("Passwords do not match");
+      setLoading(false);
+      return;
+    }
+
+    // Password strength check
+    if (formData.password.length < 8) {
+      setPasswordError("Password must be at least 8 characters long");
+      setLoading(false);
+      return;
+    }
 
     try {
       await register({
         email: formData.email,
         password: formData.password,
+        confirm_password: formData.confirmPassword,
         first_name: formData.firstName,
         last_name: formData.lastName,
         current_level_tag: formData.currentLevelTag,
@@ -148,13 +166,37 @@ export default function RegisterPage() {
             <input
               type="password"
               value={formData.password}
-              onChange={(e) =>
-                setFormData({ ...formData, password: e.target.value })
-              }
+              onChange={(e) => {
+                setFormData({ ...formData, password: e.target.value });
+                setPasswordError("");
+              }}
               required
-              minLength={6}
+              minLength={8}
               className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue focus:outline-none transition"
             />
+            <p className="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
+              Confirm Password
+            </label>
+            <input
+              type="password"
+              value={formData.confirmPassword}
+              onChange={(e) => {
+                setFormData({ ...formData, confirmPassword: e.target.value });
+                setPasswordError("");
+              }}
+              required
+              minLength={8}
+              className={`w-full bg-black/50 border rounded-lg p-3 text-mambo-text-light focus:outline-none transition ${
+                passwordError ? "border-red-500" : "border-white/10 focus:border-mambo-blue"
+              }`}
+            />
+            {passwordError && (
+              <p className="text-xs text-red-400 mt-1">{passwordError}</p>
+            )}
           </div>
 
           <button

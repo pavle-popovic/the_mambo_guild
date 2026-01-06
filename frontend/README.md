@@ -48,8 +48,12 @@ frontend/
 │   │   └── [id]/            # Individual lesson page
 │   ├── profile/             # User profile
 │   ├── pricing/             # Pricing/subscription
-│   ├── login/               # Login page
-│   └── register/            # Registration page
+│   ├── login/               # Login page (with Google OAuth)
+│   ├── register/            # Registration page (with password confirmation)
+│   ├── forgot-password/     # Password reset request page
+│   ├── reset-password/      # Password reset page
+│   └── auth/                # OAuth callback handler
+│       └── callback/        # OAuth callback page
 ├── components/              # React components
 │   ├── common/              # Reusable components
 │   │   └── ImageUploader.tsx # R2 image upload component
@@ -168,8 +172,12 @@ NEXT_PUBLIC_API_URL=http://localhost:8000
 ### Key Configuration
 
 **next.config.ts**:
-- Remote image patterns for R2 and Mux domains
+- Remote image patterns for R2, Mux, and Google domains
 - Image optimization settings
+- Configured domains:
+  - `pub-bad1fce3595144f2bac8492efa3aec64.r2.dev` (Cloudflare R2)
+  - `image.mux.com` (Mux thumbnails)
+  - `lh3.googleusercontent.com` (Google profile pictures)
 
 ## 🎯 Key Features Implementation
 
@@ -224,11 +232,32 @@ The application is fully responsive:
 
 ## 🔐 Authentication
 
+### Login Methods
+- **Email/Password**: Traditional login form
+- **Google OAuth**: One-click sign-in with Google account
+  - Redirects to Google consent screen
+  - Handles callback and stores JWT token
+  - Automatic account creation
+
+### Registration
+- Email/password registration
+- Password confirmation validation
+- Client-side password strength validation (minimum 8 characters)
+- Automatic login after successful registration
+
+### Password Reset
+- Forgot password page to request reset email
+- Reset password page with token validation
+- Password confirmation required
+- Secure token-based flow
+
+### Session Management
 - JWT token storage in localStorage
 - Automatic token refresh
 - Protected routes
 - Role-based access (admin/user)
 - Extended session duration (7 days)
+- OAuth callback handling with Suspense boundary
 
 ## 🚀 Performance Optimizations
 

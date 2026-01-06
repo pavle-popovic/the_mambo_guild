@@ -22,6 +22,7 @@ interface AuthContextType {
   register: (data: {
     email: string;
     password: string;
+    confirm_password: string;
     first_name: string;
     last_name: string;
     current_level_tag: string;
@@ -102,6 +103,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const register = async (data: {
     email: string;
     password: string;
+    confirm_password: string;
     first_name: string;
     last_name: string;
     current_level_tag: string;

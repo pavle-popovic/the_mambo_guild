@@ -6,6 +6,10 @@ A comprehensive, gamified learning management system built with Next.js, FastAPI
 
 ### Core Functionality
 - **User Authentication & Authorization**: JWT-based auth with extended sessions (1 week)
+  - Email/password registration with password confirmation
+  - Google OAuth login
+  - Secure password reset flow via email
+  - OAuth account linking for existing users
 - **Gamification**: XP system, levels, streaks, and leaderboards
 - **Course Management**: Hierarchical course structure (Weeks → Days → Lessons)
 - **Video Streaming**: Mux integration for high-quality video upload and playback
@@ -132,6 +136,18 @@ R2_PUBLIC_DOMAIN=https://pub-xyz.r2.dev
 # Redis
 REDIS_URL=redis://redis:6379
 
+# OAuth Configuration (Google)
+GOOGLE_CLIENT_ID=your-google-client-id
+GOOGLE_CLIENT_SECRET=your-google-client-secret
+
+# Email Service Configuration (Resend)
+RESEND_API_KEY=your-resend-api-key
+FRONTEND_URL=http://localhost:3000
+BACKEND_URL=http://localhost:8000
+
+# OAuthlib for local development (set to 1 to allow HTTP for OAuth)
+OAUTHLIB_INSECURE_TRANSPORT=1
+
 # API
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
@@ -204,11 +220,20 @@ Lessons support:
 5. Frontend updates UI immediately without page refresh
 
 ### Authentication Flow
-- JWT tokens stored in localStorage
-- Extended session duration (7 days)
-- Automatic token refresh
-- Protected routes with auth checks
-- Role-based access control (admin/user)
+- **Email/Password**: Traditional registration with password confirmation validation
+- **Google OAuth**: One-click login with Google account
+  - Automatic account creation for new users
+  - Account linking for existing email users
+  - Profile picture sync from Google
+- **Password Reset**: Secure email-based password recovery
+  - Time-limited reset tokens
+  - Email delivery via Resend
+- **Session Management**:
+  - JWT tokens stored in localStorage
+  - Extended session duration (7 days)
+  - Automatic token refresh
+  - Protected routes with auth checks
+  - Role-based access control (admin/user)
 
 ## 🔧 Development
 
@@ -264,6 +289,9 @@ The application includes comprehensive error handling and validation:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Enhanced Authentication System**: Google OAuth login, password reset flow, and password confirmation validation
+- ✅ **OAuth Integration**: Seamless Google sign-in with automatic account creation and profile sync
+- ✅ **Password Reset**: Secure email-based password recovery with time-limited tokens
 - ✅ **Performance Optimizations**: Parallel API calls, request caching, and memoization for faster load times
 - ✅ **Premium UI Transformation**: Complete visual overhaul with Framer Motion animations
 - ✅ **Motion System**: Reusable animation components (HoverCard, FadeIn, Clickable, StaggerContainer)

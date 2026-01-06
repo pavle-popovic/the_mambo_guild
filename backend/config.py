@@ -38,6 +38,21 @@ class Settings:
     AWS_ENDPOINT_URL: Optional[str] = os.getenv("AWS_ENDPOINT_URL")
     AWS_BUCKET_NAME: Optional[str] = os.getenv("AWS_BUCKET_NAME")
     R2_PUBLIC_DOMAIN: Optional[str] = os.getenv("R2_PUBLIC_DOMAIN")
+    
+    # OAuth Configuration
+    GOOGLE_CLIENT_ID: Optional[str] = os.getenv("GOOGLE_CLIENT_ID")
+    GOOGLE_CLIENT_SECRET: Optional[str] = os.getenv("GOOGLE_CLIENT_SECRET")
+    APPLE_CLIENT_ID: Optional[str] = os.getenv("APPLE_CLIENT_ID")
+    APPLE_PRIVATE_KEY: Optional[str] = os.getenv("APPLE_PRIVATE_KEY")
+    APPLE_TEAM_ID: Optional[str] = os.getenv("APPLE_TEAM_ID")
+    APPLE_KEY_ID: Optional[str] = os.getenv("APPLE_KEY_ID")
+    
+    # Email Service Configuration
+    RESEND_API_KEY: Optional[str] = os.getenv("RESEND_API_KEY")
+    FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
+    
+    # Password Reset Configuration
+    PASSWORD_RESET_EXPIRE_MINUTES: int = int(os.getenv("PASSWORD_RESET_EXPIRE_MINUTES", "60"))  # 1 hour default
 
 settings = Settings()
 
