@@ -279,12 +279,18 @@ The application is fully responsive:
   - Automatic detection when all lessons in a course are completed
   - Shows completion modal instead of regular lesson success when course is done
   - Direct navigation to courses page from completion modal
+  - "Complete" badge on course cards when progress reaches 100%
   - Progress bar shows 100% when course is complete
-- ✅ **Progress Bar Fixes**: Improved calculation and edge case handling
+- ✅ **Progress Bar Visual Fix**: Green gradient progress bar in quest sidebar
+  - Fixed progress bar not showing visual fill (was transparent)
+  - Now displays vibrant green gradient (emerald-500 to emerald-600)
+  - Proper width calculation using worldProgress prop
+  - Smooth transitions and visual feedback
+- ✅ **Progress Bar Calculation**: Improved accuracy and edge case handling
   - Fixed division by zero errors
   - Progress clamped to valid 0-100% range
   - Handles empty lesson lists gracefully
-  - Accurate progress tracking in all scenarios
+  - Uses worldProgress prop for accurate tracking
 - ✅ **Quest Bar Auto-Scroll**: Enhanced user experience
   - Auto-scrolls to current lesson on page load
   - Scrolls to current lesson after completion

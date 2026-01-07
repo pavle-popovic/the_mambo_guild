@@ -290,15 +290,21 @@ The application includes comprehensive error handling and validation:
 
 ### Latest Features
 - ✅ **Course Completion System**: Complete course celebration and tracking
-  - Beautiful course completion modal with congratulations message
+  - Beautiful course completion modal with congratulations message and trophy icon
   - Automatic detection when all lessons in a course are completed
-  - Progress bar fixes (handles edge cases, division by zero)
   - Course marked as completed when all lessons are done
   - Direct link back to courses page from completion modal
-- ✅ **Progress Bar Improvements**: Fixed calculation and edge case handling
+  - "Complete" badge displayed on course cards when progress reaches 100%
+- ✅ **Progress Bar Improvements**: Fixed calculation and visual display
+  - Green gradient progress bar in quest sidebar (emerald-500 to emerald-600)
   - Handles zero lessons case gracefully
   - Progress clamped to 0-100% range
-  - Accurate progress tracking across all completion scenarios
+  - Accurate progress tracking using worldProgress prop
+  - Visual progress bar now properly displays filled portion
+- ✅ **Quest Bar Enhancements**: Improved user experience
+  - Auto-scrolls to current lesson on page load and after completion
+  - Current lesson positioned at top of quest bar
+  - Smooth scrolling with retry logic for reliability
 - ✅ **Course Preview Videos**: Upload preview videos for courses that play on hover
   - Admin can upload preview videos via course builder
   - Smooth hover preview with automatic playback

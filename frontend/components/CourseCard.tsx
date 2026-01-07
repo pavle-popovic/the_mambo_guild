@@ -193,16 +193,35 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
             {/* Content section */}
             <div className="p-6 border-t border-white/10">
               <div className="flex justify-between items-start mb-3">
-                <h3
-                  className={`font-bold text-lg tracking-tight transition ${
-                    course.is_locked || !user
-                      ? "text-gray-500"
-                      : "group-hover:text-mambo-blue text-mambo-text"
-                  }`}
-                >
-                  {course.title}
-                </h3>
-                {!course.is_locked && user && (
+                <div className="flex items-center gap-3 flex-1">
+                  <h3
+                    className={`font-bold text-lg tracking-tight transition ${
+                      course.is_locked || !user
+                        ? "text-gray-500"
+                        : "group-hover:text-mambo-blue text-mambo-text"
+                    }`}
+                  >
+                    {course.title}
+                  </h3>
+                  {/* Complete Badge - Show when course is 100% complete */}
+                  {user && !course.is_locked && course.progress_percentage >= 100 && (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 text-green-400 text-xs font-bold tracking-wide shadow-lg shadow-green-500/20">
+                      <svg
+                        className="w-3.5 h-3.5 text-green-400"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      COMPLETE
+                    </span>
+                  )}
+                </div>
+                {!course.is_locked && user && course.progress_percentage < 100 && (
                   <svg
                     className="w-6 h-6 text-mambo-blue shrink-0"
                     fill="currentColor"

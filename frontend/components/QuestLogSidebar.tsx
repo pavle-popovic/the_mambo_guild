@@ -31,11 +31,20 @@ export default function QuestLogSidebar({
   worldProgress,
 }: QuestLogSidebarProps) {
   // Memoize completed count calculation
-  const { completedCount, progressPercentage } = useMemo(() => {
-    const completed = lessons.filter((l) => l.is_completed).length;
-    const progress = lessons.length > 0 ? (completed / lessons.length) * 100 : 0;
-    return { completedCount: completed, progressPercentage: progress };
+  const completedCount = useMemo(() => {
+    return lessons.filter((l) => l.is_completed).length;
   }, [lessons]);
+  
+  // Use worldProgress prop if available, otherwise calculate from lessons
+  const progressPercentage = useMemo(() => {
+    // Use the worldProgress prop if it's a valid number (0-100)
+    if (worldProgress !== undefined && worldProgress !== null && !isNaN(worldProgress)) {
+      return Math.min(100, Math.max(0, worldProgress));
+    }
+    // Fallback to calculating from lessons
+    const completed = lessons.filter((l) => l.is_completed).length;
+    return lessons.length > 0 ? (completed / lessons.length) * 100 : 0;
+  }, [lessons, worldProgress]);
 
   // Memoize sorted lessons - only recalculate when lessons array changes
   const sortedLessons = useMemo(() => {
@@ -130,10 +139,15 @@ export default function QuestLogSidebar({
           <span className="text-gray-400">Progress</span>
           <span className="text-mambo-gold font-bold">{Math.round(progressPercentage)}%</span>
         </div>
-        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden">
+        <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden relative">
           <div
-            className="bg-mambo-gold h-full shadow-[0_0_10px_rgba(212,175,55,0.5)] transition-all"
-            style={{ width: `${progressPercentage}%` }}
+            className="h-full transition-all duration-500 ease-out rounded-full"
+            style={{ 
+              width: `${Math.min(100, Math.max(0, progressPercentage))}%`,
+              minWidth: progressPercentage > 0 ? '2px' : '0px',
+              background: 'linear-gradient(to right, #10b981, #059669)', // Green gradient (emerald-500 to emerald-600)
+              boxShadow: '0 0 8px rgba(16, 185, 129, 0.4)'
+            }}
           />
         </div>
       </div>
