@@ -270,3 +270,30 @@ The application is fully responsive:
 - Debounced auto-save
 - Efficient state updates
 - Minimal re-renders
+
+## 📝 Recent Updates
+
+### Latest Features
+- ✅ **Course Preview Videos**: Smooth hover preview experience
+  - Upload preview videos via admin course builder
+  - Automatic playback on card hover
+  - Smooth fade transitions between thumbnail and video
+  - Video restarts on each hover for consistent experience
+  - Hidden controls for clean preview playback
+  - Error handling with graceful fallback to thumbnails
+  - Full Mux integration with asset management
+- ✅ **Enhanced Course Cards**: Improved user experience
+  - Thumbnail always visible as base layer
+  - Video overlays smoothly on hover
+  - No layout shift or dark flash
+  - Consistent behavior on repeated hovers
+- ✅ **Stripe Payment Integration**: Complete payment flow
+  - Pricing page with Euro currency support
+  - Checkout session creation
+  - Login prompts for unauthenticated users
+  - Subscription tier management
+- ✅ **Course Preview Uploader Component**: Full-featured upload interface
+  - Sync with Mux on mount
+  - Polling for video readiness
+  - Delete functionality with Mux sync
+  - Status indicators (idle, uploading, processing, live, deleting)

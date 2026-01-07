@@ -222,10 +222,18 @@ OAUTHLIB_INSECURE_TRANSPORT=1
 
 ### Video Uploads (Mux)
 1. Client requests upload URL from `/api/mux/upload-url`
-2. Backend creates Mux direct upload
+   - Supports both lesson videos and course preview videos
+   - Pass `lesson_id` for lesson videos or `course_id` for course previews
+2. Backend creates Mux direct upload with passthrough metadata
 3. Client uploads directly to Mux
 4. Mux processes video and sends webhook
-5. Backend updates lesson with Mux IDs
+5. Backend updates lesson/course with Mux IDs (`mux_playback_id`, `mux_asset_id`, `mux_preview_playback_id`, `mux_preview_asset_id`)
+
+### Course Preview Videos
+- Course preview videos are stored in the `World` model with `mux_preview_playback_id` and `mux_preview_asset_id`
+- Same upload pipeline as lesson videos
+- Webhook handler automatically updates course preview IDs when video is ready
+- Delete endpoint handles both lesson videos and course previews
 
 ## 🔔 Webhooks
 
@@ -233,7 +241,9 @@ OAUTHLIB_INSECURE_TRANSPORT=1
 - Endpoint: `POST /api/mux/webhook`
 - Verifies webhook signature for security
 - Updates lesson with `mux_playback_id` and `mux_asset_id` when video is ready
+- Updates course with `mux_preview_playback_id` and `mux_preview_asset_id` when preview video is ready
 - Handles video deletion events
+- Supports both lesson videos and course preview videos via passthrough metadata
 
 ## 🧪 Development
 
@@ -297,3 +307,21 @@ Interactive API documentation available at:
 - Database constraint errors
 - HTTP exception handling
 - Detailed error messages for debugging
+
+## 📝 Recent Updates
+
+### Latest Features
+- ✅ **Course Preview Videos**: Full support for course preview video uploads and management
+  - Added `mux_preview_playback_id` and `mux_preview_asset_id` to `World` model
+  - Mux webhook handler updates course preview IDs automatically
+  - Delete endpoint handles both lesson videos and course previews
+  - Asset existence checking for sync verification
+- ✅ **Stripe Payment Integration**: Complete payment processing system
+  - Checkout session creation with specific price IDs
+  - Webhook handling for subscription activation
+  - Tier-based access control (Rookie/Advanced/Performer)
+- ✅ **Enhanced Mux Integration**: Improved video upload and management
+  - Support for both lesson videos and course previews in upload endpoint
+  - Passthrough metadata for entity type identification
+  - Asset deletion with database sync
+  - Asset existence verification endpoint

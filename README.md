@@ -289,6 +289,22 @@ The application includes comprehensive error handling and validation:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Course Preview Videos**: Upload preview videos for courses that play on hover
+  - Admin can upload preview videos via course builder
+  - Smooth hover preview with automatic playback
+  - Seamless transitions between thumbnail and video
+  - Full Mux integration with asset management
+  - Delete functionality with Mux sync
+- ✅ **Enhanced Course Cards**: Improved hover experience
+  - Smooth fade transitions between thumbnail and preview video
+  - Video restarts on each hover for consistent experience
+  - Hidden controls for clean preview playback
+  - Error handling with graceful fallback to thumbnails
+- ✅ **Stripe Payment Integration**: Complete payment system
+  - Checkout session creation with specific price IDs
+  - Webhook handling for subscription activation
+  - Tier-based access control (Rookie/Advanced/Performer)
+  - Pricing page with Euro currency support
 - ✅ **Enhanced Authentication System**: Google OAuth login, password reset flow, and password confirmation validation
 - ✅ **OAuth Integration**: Seamless Google sign-in with automatic account creation and profile sync
 - ✅ **Password Reset**: Secure email-based password recovery with time-limited tokens
