@@ -54,5 +54,13 @@ class Settings:
     # Password Reset Configuration
     PASSWORD_RESET_EXPIRE_MINUTES: int = int(os.getenv("PASSWORD_RESET_EXPIRE_MINUTES", "60"))  # 1 hour default
 
+    # Stripe Configuration
+    STRIPE_SECRET_KEY: Optional[str] = os.getenv("STRIPE_SECRET_KEY")
+    STRIPE_WEBHOOK_SECRET: Optional[str] = os.getenv("STRIPE_WEBHOOK_SECRET")
+    
+    # Stripe Price IDs
+    ADVANCED_PRICE_ID: str = "price_1SmeXA1a6FlufVwfOLg5SMcc"
+    PERFORMER_PRICE_ID: str = "price_1SmeZa1a6FlufVwfrJCJrv94"
+
 settings = Settings()
 

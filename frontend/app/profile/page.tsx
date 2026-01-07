@@ -10,16 +10,82 @@ import { useAuth } from "@/contexts/AuthContext";
 import { FaFire, FaBolt, FaMedal } from "react-icons/fa";
 import { apiClient } from "@/lib/api";
 
+interface Course {
+  id: string;
+  title: string;
+  description: string | null;
+  image_url: string | null;
+  thumbnail_url: string | null;
+  difficulty: string;
+  progress_percentage: number;
+  is_locked: boolean;
+}
+
+interface Lesson {
+  id: string;
+  title: string;
+  is_completed: boolean;
+  is_locked: boolean;
+  order_index: number;
+  week_number: number | null;
+  day_number: number | null;
+}
+
 export default function ProfilePage() {
   const { user, loading, logout, refreshUser } = useAuth();
   const router = useRouter();
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
+  const [activeCourses, setActiveCourses] = useState<Array<Course & { nextLessonId: string | null }>>([]);
+  const [loadingCourses, setLoadingCourses] = useState(true);
 
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
     }
   }, [user, loading, router]);
+
+  useEffect(() => {
+    if (user) {
+      loadActiveCourses();
+    }
+  }, [user]);
+
+  const loadActiveCourses = async () => {
+    try {
+      setLoadingCourses(true);
+      const allCourses = await apiClient.getWorlds();
+      
+      // Filter courses with progress > 0 (courses user is currently doing)
+      const coursesWithProgress = allCourses.filter(course => course.progress_percentage > 0 && !course.is_locked);
+      
+      // For each course, find the next uncompleted lesson
+      const coursesWithNextLesson = await Promise.all(
+        coursesWithProgress.map(async (course) => {
+          try {
+            const lessons = await apiClient.getWorldLessons(course.id);
+            const nextLesson = lessons.find(l => !l.is_completed && !l.is_locked);
+            return {
+              ...course,
+              nextLessonId: nextLesson?.id || null
+            };
+          } catch (error) {
+            console.error(`Failed to load lessons for course ${course.id}:`, error);
+            return {
+              ...course,
+              nextLessonId: null
+            };
+          }
+        })
+      );
+      
+      setActiveCourses(coursesWithNextLesson);
+    } catch (error) {
+      console.error("Failed to load active courses:", error);
+      setActiveCourses([]);
+    } finally {
+      setLoadingCourses(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -219,38 +285,97 @@ export default function ProfilePage() {
         {/* Continue Learning Section */}
         <div>
           <h2 className="text-xl font-bold mb-6 text-mambo-text">Continue Learning</h2>
-          <Link
-            href="/courses"
-            className="block bg-mambo-panel border border-gray-800 rounded-xl p-6 hover:border-gray-600 transition"
-          >
-            <div className="flex gap-6 items-center">
-              <div className="w-32 h-20 bg-gray-800 rounded-lg overflow-hidden shrink-0">
-                <Image
-                  src="/assets/Mambo_image_1.png"
-                  alt="Course"
-                  width={128}
-                  height={80}
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              <div className="flex-1">
-                <h3 className="font-bold text-lg text-mambo-text mb-1">
-                  Continue Your Journey
-                </h3>
-                <p className="text-sm text-gray-500 mb-3">
-                  Explore all available worlds and lessons
-                </p>
-                <div className="w-full bg-gray-800 h-1.5 rounded-full">
-                  <div className="bg-mambo-blue h-full w-[45%]" />
+          
+          {loadingCourses ? (
+            <div className="text-center text-gray-400 py-8">Loading your courses...</div>
+          ) : activeCourses.length === 0 ? (
+            <Link
+              href="/courses"
+              className="block bg-mambo-panel border border-gray-800 rounded-xl p-6 hover:border-gray-600 transition group"
+            >
+              <div className="flex gap-6 items-center">
+                <div className="w-32 h-20 bg-gray-800 rounded-lg overflow-hidden shrink-0">
+                  <Image
+                    src="/assets/Mambo_image_1.png"
+                    alt="Course"
+                    width={128}
+                    height={80}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-lg text-mambo-text mb-1">
+                    Start Your Journey
+                  </h3>
+                  <p className="text-sm text-gray-500 mb-3">
+                    Explore all available worlds and lessons
+                  </p>
+                </div>
+                <div className="w-10 h-10 rounded-full bg-mambo-blue flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                  </svg>
                 </div>
               </div>
-              <div className="w-10 h-10 rounded-full bg-mambo-blue flex items-center justify-center text-white shrink-0">
-                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
-                </svg>
-              </div>
+            </Link>
+          ) : (
+            <div className="space-y-4">
+              {activeCourses.map((course) => (
+                <Link
+                  key={course.id}
+                  href={course.nextLessonId ? `/lesson/${course.nextLessonId}` : `/courses/${course.id}`}
+                  className="block bg-mambo-panel border border-gray-800 rounded-xl p-6 hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                >
+                  <div className="flex gap-6 items-center">
+                    <div className="w-32 h-20 bg-gray-800 rounded-lg overflow-hidden shrink-0 relative">
+                      {course.thumbnail_url || course.image_url ? (
+                        <Image
+                          src={course.thumbnail_url || course.image_url || ""}
+                          alt={course.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                        />
+                      ) : (
+                        <Image
+                          src="/assets/Mambo_image_1.png"
+                          alt={course.title}
+                          fill
+                          className="object-cover group-hover:scale-105 transition-transform duration-300"
+                          style={{ objectPosition: 'center 15%' }}
+                        />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h3 className="font-bold text-lg text-mambo-text mb-1 group-hover:text-mambo-blue transition-colors">
+                        {course.title}
+                      </h3>
+                      {course.description && (
+                        <p className="text-sm text-gray-500 mb-3 line-clamp-2">
+                          {course.description}
+                        </p>
+                      )}
+                      <div className="flex items-center gap-3">
+                        <div className="flex-1 bg-gray-800 h-2 rounded-full overflow-hidden">
+                          <div 
+                            className="bg-gradient-to-r from-mambo-blue to-purple-600 h-full transition-all duration-500" 
+                            style={{ width: `${Math.min(course.progress_percentage, 100)}%` }}
+                          />
+                        </div>
+                        <span className="text-xs font-bold text-gray-400 whitespace-nowrap">
+                          {Math.round(course.progress_percentage)}%
+                        </span>
+                      </div>
+                    </div>
+                    <div className="w-12 h-12 rounded-full bg-gradient-to-r from-mambo-blue to-purple-600 flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform shadow-lg shadow-blue-500/30">
+                      <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                      </svg>
+                    </div>
+                  </div>
+                </Link>
+              ))}
             </div>
-          </Link>
+          )}
         </div>
       </div>
 

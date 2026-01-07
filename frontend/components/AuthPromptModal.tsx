@@ -2,6 +2,7 @@
 
 import { FaTimes, FaSignInAlt, FaUserPlus, FaArrowLeft, FaLock, FaCreditCard } from "react-icons/fa";
 import { useRouter } from "next/navigation";
+import { motion } from "framer-motion";
 
 interface AuthPromptModalProps {
   isOpen: boolean;
@@ -65,27 +66,45 @@ export default function AuthPromptModal({
 
             {/* Actions */}
             <div className="flex flex-col gap-3">
-              <button
+              <motion.button
                 onClick={handleLogin}
-                className="w-full bg-mambo-blue hover:bg-mambo-blue/90 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/40 relative overflow-hidden group"
               >
-                <FaSignInAlt />
-                Log In
-              </button>
-              <button
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+                />
+                <FaSignInAlt className="relative z-10" />
+                <span className="relative z-10">Log In</span>
+              </motion.button>
+              <motion.button
                 onClick={handleRegister}
-                className="w-full bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+                whileHover={{ scale: 1.02, y: -2 }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full bg-gradient-to-r from-gray-700 to-gray-600 hover:from-gray-600 hover:to-gray-500 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-gray-900/30 hover:shadow-xl hover:shadow-gray-900/40 relative overflow-hidden group"
               >
-                <FaUserPlus />
-                Register
-              </button>
-              <button
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+                />
+                <FaUserPlus className="relative z-10" />
+                <span className="relative z-10">Register</span>
+              </motion.button>
+              <motion.button
                 onClick={handleBackToCourses}
-                className="w-full bg-transparent border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+                whileHover={{ scale: 1.02, y: -2, borderColor: "rgba(156, 163, 175, 0.8)" }}
+                whileTap={{ scale: 0.98 }}
+                className="w-full bg-transparent border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 hover:bg-gray-800/50 relative overflow-hidden group"
               >
-                <FaArrowLeft />
-                Back to Courses
-              </button>
+                <motion.div
+                  animate={{ x: [0, -4, 0] }}
+                  transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                  className="relative z-10"
+                >
+                  <FaArrowLeft />
+                </motion.div>
+                <span className="relative z-10">Back to Courses</span>
+              </motion.button>
             </div>
           </div>
         </div>
@@ -126,20 +145,39 @@ export default function AuthPromptModal({
 
           {/* Actions */}
           <div className="flex flex-col gap-3">
-            <button
+            <motion.button
               onClick={handleSubscribe}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.02, y: -2 }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 shadow-lg shadow-purple-500/25 hover:shadow-xl hover:shadow-purple-500/40 relative overflow-hidden group"
             >
-              <FaCreditCard />
-              View Pricing & Subscribe
-            </button>
-            <button
+              <motion.div
+                className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
+              />
+              <motion.div
+                animate={{ rotate: [0, 10, -10, 0] }}
+                transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
+                className="relative z-10"
+              >
+                <FaCreditCard />
+              </motion.div>
+              <span className="relative z-10">View Pricing & Subscribe</span>
+            </motion.button>
+            <motion.button
               onClick={handleBackToCourses}
-              className="w-full bg-transparent border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white font-semibold py-3 px-4 rounded-lg transition flex items-center justify-center gap-2"
+              whileHover={{ scale: 1.02, y: -2, borderColor: "rgba(156, 163, 175, 0.8)" }}
+              whileTap={{ scale: 0.98 }}
+              className="w-full bg-transparent border border-gray-600 hover:border-gray-500 text-gray-300 hover:text-white font-semibold py-3 px-4 rounded-lg transition-all duration-300 flex items-center justify-center gap-2 hover:bg-gray-800/50 relative overflow-hidden group"
             >
-              <FaArrowLeft />
-              Back to Courses
-            </button>
+              <motion.div
+                animate={{ x: [0, -4, 0] }}
+                transition={{ duration: 1.5, repeat: Infinity, repeatDelay: 2 }}
+                className="relative z-10"
+              >
+                <FaArrowLeft />
+              </motion.div>
+              <span className="relative z-10">Back to Courses</span>
+            </motion.button>
           </div>
         </div>
       </div>

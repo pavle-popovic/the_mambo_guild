@@ -18,7 +18,15 @@ async def get_worlds(
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
-    """Get all worlds with lock status based on subscription. Accessible without authentication."""
+    """
+    Get all worlds with lock status based on subscription.
+    Accessible without authentication (for preview viewing).
+    
+    Access Control:
+    - Not logged in: ALL courses locked (can see previews)
+    - Logged in (Rookie/Free): Only free courses unlocked
+    - Logged in (Paid): All courses unlocked
+    """
     worlds = db.query(World).filter(World.is_published == True).order_by(World.order_index).all()
     
     # Check subscription if user is authenticated
@@ -29,8 +37,19 @@ async def get_worlds(
     
     result = []
     for world in worlds:
-        # Check if world is locked (for unauthenticated users, only free worlds are unlocked)
-        is_locked = not world.is_free and (not current_user or not is_subscribed)
+        # REFINED ACCESS CONTROL:
+        # - If user not logged in: ALL courses are locked (can see previews)
+        # - If logged in but not subscribed: Only free courses unlocked
+        # - If subscribed: All courses unlocked
+        if not current_user:
+            # Not logged in - all courses locked (but can see previews)
+            is_locked = True
+        elif world.is_free:
+            # Free course - unlocked for logged in users
+            is_locked = False
+        else:
+            # Paid course - requires active subscription
+            is_locked = not is_subscribed
         
         # Calculate progress (only if user is authenticated)
         progress_percentage = 0
@@ -56,6 +75,7 @@ async def get_worlds(
             description=world.description,
             image_url=world.image_url,
             thumbnail_url=world.thumbnail_url,
+            mux_preview_playback_id=world.mux_preview_playback_id,  # Include preview playback ID
             difficulty=difficulty_str,
             progress_percentage=progress_percentage,
             is_locked=is_locked
@@ -67,21 +87,40 @@ async def get_worlds(
 @router.get("/lessons/{lesson_id}", response_model=LessonDetailResponse)
 async def get_lesson(
     lesson_id: str,
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(get_current_user),  # Requires authentication
     db: Session = Depends(get_db)
 ):
-    """Get lesson details. No prerequisites - users can access any lesson immediately."""
+    """
+    Get lesson details. Requires authentication.
+    Access Control:
+    - Free courses: Accessible to all logged in users
+    - Paid courses: Requires active subscription
+    """
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
     
-    # Check subscription for non-free worlds (paywall logic remains)
+    # Get the world this lesson belongs to
     level = db.query(Level).filter(Level.id == lesson.level_id).first()
     world = db.query(World).filter(World.id == level.world_id).first() if level else None
-    if world and not world.is_free:
+    
+    if not world:
+        raise HTTPException(status_code=404, detail="World not found")
+    
+    # REFINED ACCESS CONTROL:
+    # - Free courses: Accessible to all logged in users
+    # - Paid courses: Requires active subscription
+    if world.is_free:
+        # Free course - accessible to all logged in users
+        pass  # Allow access
+    else:
+        # Paid course - requires active subscription
         subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
         if not subscription or subscription.status != SubscriptionStatus.ACTIVE:
-            raise HTTPException(status_code=403, detail="Subscription required")
+            raise HTTPException(
+                status_code=403, 
+                detail="Subscription required. Please upgrade to access this course."
+            )
     
     # Get the world this lesson belongs to
     level = db.query(Level).filter(Level.id == lesson.level_id).first()
@@ -115,6 +154,9 @@ async def get_lesson(
         if current_index > 0:
             prev_lesson = all_lessons[current_index - 1]
     
+    # lesson_type is now a string, use it directly
+    lesson_type_str = lesson.lesson_type or "video"
+    
     return LessonDetailResponse(
         id=str(lesson.id),
         title=lesson.title,
@@ -128,7 +170,9 @@ async def get_lesson(
         day_number=lesson.day_number,
         content_json=lesson.content_json,
         mux_playback_id=lesson.mux_playback_id,
-        mux_asset_id=lesson.mux_asset_id
+        mux_asset_id=lesson.mux_asset_id,
+        thumbnail_url=lesson.thumbnail_url,
+        lesson_type=lesson_type_str
     )
 
 
@@ -158,33 +202,37 @@ async def get_world_lessons(
     
     lessons = []
     for lesson in all_lessons:
-        # Check completion (only if user is authenticated)
-        is_completed = False
-        if current_user:
-            progress = db.query(UserProgress).filter(
-                UserProgress.user_id == current_user.id,
-                UserProgress.lesson_id == lesson.id
-            ).first()
-            is_completed = progress.is_completed if progress else False
-        
-        # All lessons are unlocked (no prerequisites)
-        lessons.append(LessonResponse(
-            id=str(lesson.id),
-            title=lesson.title,
-            description=lesson.description,
-            video_url=lesson.video_url,
-            xp_value=lesson.xp_value,
-            is_completed=is_completed,
-            is_locked=False,  # Always false - no prerequisites
-            is_boss_battle=lesson.is_boss_battle,
-            order_index=lesson.order_index,
-            week_number=lesson.week_number,
-            day_number=lesson.day_number,
-            content_json=lesson.content_json,
-            mux_playback_id=lesson.mux_playback_id,
-            mux_asset_id=lesson.mux_asset_id,
-            duration_minutes=lesson.duration_minutes,
-            thumbnail_url=lesson.thumbnail_url
-        ))
+            # Check completion (only if user is authenticated)
+            is_completed = False
+            if current_user:
+                progress = db.query(UserProgress).filter(
+                    UserProgress.user_id == current_user.id,
+                    UserProgress.lesson_id == lesson.id
+                ).first()
+                is_completed = progress.is_completed if progress else False
+            
+            # lesson_type is now a string, use it directly
+            lesson_type_str = lesson.lesson_type or "video"
+            
+            # All lessons are unlocked (no prerequisites)
+            lessons.append(LessonResponse(
+                id=str(lesson.id),
+                title=lesson.title,
+                description=lesson.description,
+                video_url=lesson.video_url,
+                xp_value=lesson.xp_value,
+                is_completed=is_completed,
+                is_locked=False,  # Always false - no prerequisites
+                is_boss_battle=lesson.is_boss_battle,
+                order_index=lesson.order_index,
+                week_number=lesson.week_number,
+                day_number=lesson.day_number,
+                content_json=lesson.content_json,
+                mux_playback_id=lesson.mux_playback_id,
+                mux_asset_id=lesson.mux_asset_id,
+                duration_minutes=lesson.duration_minutes,
+                thumbnail_url=lesson.thumbnail_url,
+                lesson_type=lesson_type_str
+            ))
     
     return lessons

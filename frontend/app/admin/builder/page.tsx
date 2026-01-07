@@ -12,6 +12,7 @@ import MuxUploader from "@/components/MuxUploader";
 import CreateCourseModal from "@/components/CreateCourseModal";
 import LessonEditorModal from "@/components/LessonEditorModal";
 import ImageUploader from "@/components/common/ImageUploader";
+import CoursePreviewUploader from "@/components/CoursePreviewUploader";
 
 interface Lesson {
   id: string;
@@ -28,6 +29,7 @@ interface Lesson {
   mux_playback_id: string | null;
   mux_asset_id: string | null;
   thumbnail_url: string | null;
+  lesson_type?: string;
 }
 
 interface Level {
@@ -78,6 +80,7 @@ export default function AdminBuilderPage() {
   const [isFree, setIsFree] = useState(false);
   const [slug, setSlug] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>("");
+  const [previewMuxPlaybackId, setPreviewMuxPlaybackId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!authLoading && (!user || user.role !== "admin")) {
@@ -119,6 +122,7 @@ export default function AdminBuilderPage() {
       setIsFree(data.is_free);
       setSlug(data.slug);
       setThumbnailUrl(data.thumbnail_url || null);
+      setPreviewMuxPlaybackId((data as any).mux_preview_playback_id || null);
     } catch (err: any) {
       console.error("Failed to load course:", err);
       setError(err.message || "Failed to load course");
@@ -145,6 +149,7 @@ export default function AdminBuilderPage() {
         is_free: isFree,
         slug: slug || undefined,
         thumbnail_url: thumbnailUrl || undefined,
+        mux_preview_playback_id: previewMuxPlaybackId || undefined,
       });
       
       // Reload course data
@@ -211,6 +216,7 @@ export default function AdminBuilderPage() {
     duration_minutes?: number | null;
     content_json?: any;
     delete_video?: boolean; // Flag to explicitly delete video (clears Mux IDs)
+    lesson_type?: string;
   }) => {
     try {
       if (editingLesson) {
@@ -606,7 +612,7 @@ export default function AdminBuilderPage() {
           <div className="flex justify-between items-center mb-10">
             <div className="flex items-center gap-4">
               <button
-                onClick={() => router.push("/admin")}
+                onClick={() => router.push("/admin/builder")}
                 className="text-gray-400 hover:text-mambo-text"
               >
                 <FaArrowLeft />
@@ -710,6 +716,30 @@ export default function AdminBuilderPage() {
                   <span className="text-sm text-mambo-text-light">Published</span>
                 </label>
               </div>
+            </div>
+          </div>
+
+          {/* Course Preview Video Section */}
+          <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6 mb-8">
+            <h3 className="font-bold border-b border-gray-800 pb-4 mb-4 text-mambo-text">
+              Course Preview Video
+            </h3>
+            <p className="text-sm text-gray-400 mb-4">
+              Upload a preview video that will play when users hover over the course card on the courses page.
+            </p>
+            <div className="space-y-4">
+              {courseId && (
+                <CoursePreviewUploader
+                  courseId={courseId}
+                  currentPlaybackId={previewMuxPlaybackId}
+                  onUploadComplete={async (playbackId) => {
+                    setPreviewMuxPlaybackId(playbackId);
+                    // Reload course to get updated preview ID
+                    await loadCourse();
+                  }}
+                  onRefreshCourse={loadCourse}
+                />
+              )}
             </div>
           </div>
 

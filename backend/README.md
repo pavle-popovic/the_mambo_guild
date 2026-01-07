@@ -311,6 +311,11 @@ Interactive API documentation available at:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Course Completion Detection**: Backend support for course completion tracking
+  - Progress calculation returns accurate completion percentages
+  - Course completion determined by all lessons being completed
+  - Progress endpoint handles edge cases (zero lessons, division by zero)
+  - Consistent progress tracking across all API endpoints
 - ✅ **Course Preview Videos**: Full support for course preview video uploads and management
   - Added `mux_preview_playback_id` and `mux_preview_asset_id` to `World` model
   - Mux webhook handler updates course preview IDs automatically

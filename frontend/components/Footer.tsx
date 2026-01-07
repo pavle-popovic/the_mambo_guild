@@ -19,7 +19,11 @@ export default function Footer({ className = "" }: FooterProps) {
               className="h-8 w-auto logo-img"
               style={{ mixBlendMode: "screen" }}
             />
-            <span className="text-mambo-text">THE MAMBO INN</span>
+            <span className="font-serif text-xl">
+              <span className="text-gray-400">THE</span>{" "}
+              <span className="text-[#d4af37] font-bold drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]">MAMBO</span>{" "}
+              <span className="text-gray-400">INN</span>
+            </span>
           </Link>
           <p className="text-gray-500 max-w-sm">
             The world&apos;s first structured salsa academy. We use proven methods to make you a

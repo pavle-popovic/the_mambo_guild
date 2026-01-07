@@ -60,6 +60,7 @@ def get_admin_user_from_token_or_query(
 class CreateUploadRequest(BaseModel):
     filename: Optional[str] = None
     lesson_id: Optional[str] = None  # Pass lesson_id to associate upload with lesson
+    course_id: Optional[str] = None  # Pass course_id for course preview uploads
 
 
 class CreateUploadResponse(BaseModel):
@@ -71,6 +72,7 @@ class CreateUploadResponse(BaseModel):
 @router.post("/upload-url")
 async def create_mux_upload_url(
     request: Request,
+    request_data: Optional[CreateUploadRequest] = None,  # Accept JSON body (Pydantic model)
     lesson_id: Optional[str] = Query(None),  # Accept from query params for MuxUploader compatibility
     filename: Optional[str] = Query(None),   # Accept from query params
     admin_user: User = Depends(get_admin_user_from_token_or_query)  # Supports both Bearer and query param token
@@ -89,21 +91,15 @@ async def create_mux_upload_url(
     # Verify admin access - use admin_user from get_admin_user (which handles Bearer token)
     # If that fails, the endpoint will return 401/403, which is correct
     
-    # Try to parse request body if it exists (for our API client)
-    request_body = None
-    try:
-        body_bytes = await request.body()
-        if body_bytes:
-            request_body = json.loads(body_bytes.decode('utf-8'))
-    except:
-        pass
-    
-    # Handle both request body and query params
-    lesson_id_val = lesson_id or (request_body.get("lesson_id") if request_body else None)
-    filename_val = filename or (request_body.get("filename") if request_body else None)
+    # Handle both request body (Pydantic model) and query params
+    # Priority: query params (for MuxUploader) > request body (for our API client)
+    lesson_id_val = lesson_id or (request_data.lesson_id if request_data else None)
+    course_id_val = request_data.course_id if request_data else None
+    filename_val = filename or (request_data.filename if request_data else None)
     
     print(f"[MUX] ===== Upload URL Request Received =====")
     print(f"[MUX] Lesson ID: {lesson_id_val}")
+    print(f"[MUX] Course ID: {course_id_val}")
     print(f"[MUX] Filename: {filename_val}")
     print(f"[MUX] Admin User: {admin_user.email}")
     
@@ -116,12 +112,14 @@ async def create_mux_upload_url(
     
     print("[MUX] Mux credentials found, proceeding...")
     
-    # Create passthrough data if lesson_id is provided
+    # Create passthrough data if lesson_id or course_id is provided
     passthrough = None
     if lesson_id_val:
-        import json
         passthrough = json.dumps({"lesson_id": lesson_id_val})
         print(f"[MUX] Passthrough data: {passthrough}")
+    elif course_id_val:
+        passthrough = json.dumps({"course_id": course_id_val})
+        print(f"[MUX] Passthrough data (course preview): {passthrough}")
     
     print("[MUX] Calling Mux API to create direct upload...")
     result = create_direct_upload(filename=filename_val, test=False, passthrough=passthrough)
@@ -181,8 +179,10 @@ async def check_asset_exists(
         assets_api = AssetsApi(api_client)
         
         try:
-            asset = assets_api.get_asset(asset_id)
-            return {"exists": True, "asset_id": asset.id}
+            # Just try to get the asset - if it succeeds, it exists
+            assets_api.get_asset(asset_id)
+            # If we get here, asset exists
+            return {"exists": True, "asset_id": asset_id}
         except ApiException as api_error:
             if api_error.status == 404:
                 return {"exists": False, "asset_id": asset_id}
@@ -207,22 +207,24 @@ async def delete_mux_asset(
     """
     Delete a video asset from Mux.
     If asset doesn't exist in Mux (404), just clear from database.
+    Handles both lessons and course previews.
     Admin only.
     """
     try:
         from mux_python import AssetsApi, ApiException
         from services.mux_service import _get_mux_configuration
         from mux_python import ApiClient
+        from models.course import World
         
-        # Find lesson(s) using this asset first (we'll need to clear them anyway)
+        # Find lesson(s) using this asset
         lessons = db.query(Lesson).filter(Lesson.mux_asset_id == asset_id).all()
         
-        if not lessons:
-            # No lessons using this asset, nothing to do
-            return {
-                "status": "success",
-                "message": f"Asset {asset_id} not found in any lessons, nothing to delete"
-            }
+        # Find course(s) using this asset for preview
+        courses = db.query(World).filter(World.mux_preview_asset_id == asset_id).all()
+        
+        if not lessons and not courses:
+            # No lessons or courses using this asset, but still try to delete from Mux
+            print(f"[MUX] Asset {asset_id} not found in any lessons or courses, but attempting Mux deletion...")
         
         configuration = _get_mux_configuration()
         api_client = ApiClient(configuration)
@@ -255,9 +257,21 @@ async def delete_mux_asset(
             lesson.mux_playback_id = None
             lesson.video_url = ""  # Also clear fallback video URL
         
+        # Clear Mux IDs from all courses using this asset for preview
+        for course in courses:
+            print(f"[MUX] Clearing Mux preview IDs for course {course.id} (title: {course.title})")
+            course.mux_preview_asset_id = None
+            course.mux_preview_playback_id = None
+        
         db.commit()
         
-        message = f"Asset {asset_id} {'deleted from Mux and ' if mux_deleted else ''}cleared from {len(lessons)} lesson(s)"
+        entities_cleared = []
+        if lessons:
+            entities_cleared.append(f"{len(lessons)} lesson(s)")
+        if courses:
+            entities_cleared.append(f"{len(courses)} course preview(s)")
+        
+        message = f"Asset {asset_id} {'deleted from Mux and ' if mux_deleted else ''}cleared from {', '.join(entities_cleared) if entities_cleared else 'database'}"
         
         return {
             "status": "success",
@@ -275,12 +289,13 @@ async def delete_mux_asset(
 
 @router.post("/check-upload-status")
 async def check_upload_status(
-    lesson_id: str,
+    lesson_id: Optional[str] = Query(None),
+    course_id: Optional[str] = Query(None),
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
     """
-    Manually check if a lesson's video upload has completed and update the lesson.
+    Manually check if a lesson's or course preview's video upload has completed and update it.
     This is useful if the webhook didn't fire.
     Admin only.
     """
@@ -288,6 +303,75 @@ async def check_upload_status(
         from mux_python import AssetsApi, DirectUploadsApi
         from services.mux_service import _get_mux_configuration
         from mux_python import ApiClient
+        from models.course import World
+        
+        # Handle course preview check
+        if course_id:
+            world = db.query(World).filter(World.id == course_id).first()
+            if not world:
+                raise HTTPException(status_code=404, detail="Course not found")
+            
+            # If course already has preview playback_id, it's already ready
+            if world.mux_preview_playback_id:
+                return {
+                    "status": "ready",
+                    "playback_id": world.mux_preview_playback_id,
+                    "asset_id": None,  # We don't store asset_id for course previews
+                    "message": "Preview video is already ready"
+                }
+            
+            # Try to find the asset by querying Mux API using passthrough
+            configuration = _get_mux_configuration()
+            api_client = ApiClient(configuration)
+            assets_api = AssetsApi(api_client)
+            
+            passthrough_filter = json.dumps({"course_id": course_id})
+            
+            try:
+                assets_response = assets_api.list_assets(limit=50)  # Get recent assets
+                
+                found_asset = None
+                for asset in assets_response.data:
+                    asset_passthrough = asset.passthrough
+                    if asset_passthrough:
+                        try:
+                            passthrough_data = json.loads(asset_passthrough) if isinstance(asset_passthrough, str) else asset_passthrough
+                            if passthrough_data.get("course_id") == course_id:
+                                found_asset = asset
+                                break
+                        except:
+                            continue
+                
+                if found_asset and found_asset.playback_ids and len(found_asset.playback_ids) > 0:
+                    # Asset found and ready!
+                    playback_id = found_asset.playback_ids[0].id
+                    
+                    # Update course preview
+                    world.mux_preview_playback_id = playback_id
+                    world.mux_preview_asset_id = found_asset.id  # Store asset_id for deletion
+                    db.commit()
+                    
+                    return {
+                        "status": "ready",
+                        "playback_id": playback_id,
+                        "asset_id": found_asset.id,
+                        "message": "Preview video found and course updated"
+                    }
+                else:
+                    return {
+                        "status": "processing",
+                        "message": "Preview video is still processing or not found"
+                    }
+            except Exception as e:
+                print(f"[MUX] Error checking course preview upload status: {e}")
+                return {
+                    "status": "error",
+                    "message": f"Error checking status: {str(e)}"
+                }
+        
+        # Handle lesson check (existing logic)
+        if not lesson_id:
+            raise HTTPException(status_code=400, detail="Either lesson_id or course_id must be provided")
         
         lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
         if not lesson:
@@ -303,19 +387,15 @@ async def check_upload_status(
             }
         
         # Try to find the asset by querying Mux API
-        # We can search for assets with passthrough containing lesson_id
         configuration = _get_mux_configuration()
         api_client = ApiClient(configuration)
         assets_api = AssetsApi(api_client)
         
         # Search for assets with passthrough matching our lesson_id
-        # Mux API allows filtering by passthrough
         passthrough_filter = json.dumps({"lesson_id": lesson_id})
         
         try:
             # List assets and filter by passthrough
-            # Note: Mux API might not support direct passthrough filtering in list,
-            # so we'll list recent assets and check their passthrough
             assets_response = assets_api.list_assets(limit=50)  # Get recent assets
             
             found_asset = None
@@ -419,6 +499,7 @@ async def mux_webhook_handler(
                 # For now, continue even if signature verification fails (for testing)
         
         # Parse request body from bytes
+        # json is imported at the top of the file
         body = json.loads(body_bytes.decode('utf-8'))
         event_type = body.get("type")
         print(f"[MUX WEBHOOK] Event type: {event_type}")
@@ -440,15 +521,18 @@ async def mux_webhook_handler(
                 passthrough = asset_data.get("passthrough")
                 print(f"[MUX WEBHOOK] Passthrough data: {passthrough}")
                 
-                # If passthrough contains lesson_id, update that lesson
+                # If passthrough contains lesson_id or course_id, update accordingly
                 if passthrough:
                     try:
-                        import json
                         passthrough_data = json.loads(passthrough) if isinstance(passthrough, str) else passthrough
                         lesson_id = passthrough_data.get("lesson_id")
+                        course_id = passthrough_data.get("course_id")
                         print(f"[MUX WEBHOOK] Lesson ID from passthrough: {lesson_id}")
+                        print(f"[MUX WEBHOOK] Course ID from passthrough: {course_id}")
                         
                         if lesson_id:
+                            # Update lesson
+                            from models.course import Lesson
                             lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
                             if lesson:
                                 print(f"[MUX WEBHOOK] Found lesson: {lesson.title}")
@@ -458,10 +542,22 @@ async def mux_webhook_handler(
                                 print(f"[MUX WEBHOOK] SUCCESS! Updated lesson with playback_id: {playback_id}")
                             else:
                                 print(f"[MUX WEBHOOK] WARNING: Lesson {lesson_id} not found in database")
+                        elif course_id:
+                            # Update course preview
+                            from models.course import World
+                            world = db.query(World).filter(World.id == course_id).first()
+                            if world:
+                                print(f"[MUX WEBHOOK] Found course: {world.title}")
+                                world.mux_preview_playback_id = playback_id
+                                world.mux_preview_asset_id = asset_id  # Store asset_id for deletion
+                                db.commit()
+                                print(f"[MUX WEBHOOK] SUCCESS! Updated course preview with playback_id: {playback_id}, asset_id: {asset_id}")
+                            else:
+                                print(f"[MUX WEBHOOK] WARNING: Course {course_id} not found in database")
                         else:
-                            print(f"[MUX WEBHOOK] WARNING: No lesson_id in passthrough data")
+                            print(f"[MUX WEBHOOK] WARNING: No lesson_id or course_id in passthrough data")
                     except Exception as e:
-                        print(f"[MUX WEBHOOK] ERROR updating lesson from webhook: {e}")
+                        print(f"[MUX WEBHOOK] ERROR updating from webhook: {e}")
                         import traceback
                         traceback.print_exc()
                 else:

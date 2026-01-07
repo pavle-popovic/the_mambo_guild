@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -22,13 +22,12 @@ interface Course {
   is_locked: boolean;
 }
 
-type FilterType = "all" | "beginner" | "intermediate" | "styling";
+type FilterType = "all" | "beginner" | "intermediate" | "advanced";
 
 export default function CoursesPage() {
   const { user } = useAuth();
   const router = useRouter();
   const [courses, setCourses] = useState<Course[]>([]);
-  const [filteredCourses, setFilteredCourses] = useState<Course[]>([]);
   const [activeFilter, setActiveFilter] = useState<FilterType>("all");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -37,72 +36,56 @@ export default function CoursesPage() {
     loadCourses();
   }, []);
 
-  useEffect(() => {
-    filterCourses();
-  }, [courses, activeFilter]);
-
-  const loadCourses = async () => {
-    try {
-      // Load courses - works for both authenticated and unauthenticated users
-      const data = await apiClient.getWorlds();
-      console.log("Loaded courses:", data);
-      setCourses(data);
-      setError("");
-      // Immediately filter the loaded courses
-      if (activeFilter === "all") {
-        setFilteredCourses(data);
-      } else {
-        const filtered = data.filter((course) => {
-          const difficultyLower = course.difficulty?.toLowerCase() || "";
-          switch (activeFilter) {
-            case "beginner":
-              return difficultyLower === "beginner" || difficultyLower.includes("beginner");
-            case "intermediate":
-              return difficultyLower === "intermediate" || difficultyLower.includes("intermediate");
-            case "styling":
-              return course.title.toLowerCase().includes("styling") || 
-                     course.title.toLowerCase().includes("shines") ||
-                     course.description?.toLowerCase().includes("styling") ||
-                     course.description?.toLowerCase().includes("shines");
-            default:
-              return true;
-          }
-        });
-        setFilteredCourses(filtered);
-      }
-    } catch (err: any) {
-      console.error("Failed to load courses:", err);
-      setCourses([]);
-      setFilteredCourses([]);
-      setError(err.message || "Failed to load courses. Please try again.");
-    } finally {
-      setLoading(false);
+  // Use useMemo to compute filtered courses - this ensures it always works correctly
+  const filteredCourses = useMemo(() => {
+    // Defensive check: if courses array is empty or not loaded yet, return empty array
+    if (!courses || courses.length === 0) {
+      return [];
     }
-  };
 
-  const filterCourses = () => {
     if (activeFilter === "all") {
-      setFilteredCourses(courses);
-      return;
+      return courses;
     }
 
-    const filtered = courses.filter((course) => {
-      const difficultyLower = course.difficulty?.toLowerCase() || "";
+    return courses.filter((course) => {
+      if (!course || !course.difficulty) {
+        return false;
+      }
+
+      // Normalize difficulty to lowercase for comparison
+      // Backend returns "Beginner", "Intermediate", "Advanced" (capitalized)
+      const difficultyLower = String(course.difficulty).toLowerCase().trim();
+      
+      // Use exact matching to avoid false positives
       switch (activeFilter) {
         case "beginner":
-          return difficultyLower === "beginner" || difficultyLower.includes("beginner");
+          return difficultyLower === "beginner";
         case "intermediate":
-          return difficultyLower === "intermediate" || difficultyLower.includes("intermediate");
-        case "styling":
-          return course.title.toLowerCase().includes("styling") || 
-                 course.title.toLowerCase().includes("shines") ||
-                 course.description?.toLowerCase().includes("styling") ||
-                 course.description?.toLowerCase().includes("shines");
+          return difficultyLower === "intermediate";
+        case "advanced":
+          return difficultyLower === "advanced";
         default:
           return true;
       }
     });
-    setFilteredCourses(filtered);
+  }, [courses, activeFilter]);
+
+  const loadCourses = async () => {
+    try {
+      setLoading(true);
+      // Load courses - works for both authenticated and unauthenticated users
+      const data = await apiClient.getWorlds();
+      
+      // Ensure we always set an array, even if data is null/undefined
+      setCourses(Array.isArray(data) ? data : []);
+      setError("");
+    } catch (err: any) {
+      console.error("Failed to load courses:", err);
+      setCourses([]);
+      setError(err.message || "Failed to load courses. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCourseClick = (course: Course) => {
@@ -141,55 +124,59 @@ export default function CoursesPage() {
           
           {/* Filters */}
           <div className="flex flex-wrap gap-3">
-              <Clickable>
             <button
-              onClick={() => setActiveFilter("all")}
-                  className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
+              onClick={() => {
+                console.log("Setting filter to: all");
+                setActiveFilter("all");
+              }}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
                 activeFilter === "all"
-                      ? "bg-gradient-to-r from-white to-gray-100 text-black shadow-lg"
-                      : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-gray-600"
+                  ? "bg-gradient-to-r from-white to-gray-100 text-black shadow-lg"
+                  : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-gray-600"
               }`}
             >
               All Courses
             </button>
-              </Clickable>
-              <Clickable>
             <button
-              onClick={() => setActiveFilter("beginner")}
-                  className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
+              onClick={() => {
+                console.log("Setting filter to: beginner");
+                setActiveFilter("beginner");
+              }}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
                 activeFilter === "beginner"
-                      ? "bg-gradient-to-r from-white to-gray-100 text-black shadow-lg"
-                      : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-gray-600"
+                  ? "bg-gradient-to-r from-white to-gray-100 text-black shadow-lg"
+                  : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-gray-600"
               }`}
             >
               Beginner
             </button>
-              </Clickable>
-              <Clickable>
             <button
-              onClick={() => setActiveFilter("intermediate")}
-                  className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
+              onClick={() => {
+                console.log("Setting filter to: intermediate");
+                setActiveFilter("intermediate");
+              }}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
                 activeFilter === "intermediate"
-                      ? "bg-gradient-to-r from-white to-gray-100 text-black shadow-lg"
-                      : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-gray-600"
+                  ? "bg-gradient-to-r from-white to-gray-100 text-black shadow-lg"
+                  : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-gray-600"
               }`}
             >
               Intermediate
             </button>
-              </Clickable>
-              <Clickable>
             <button
-              onClick={() => setActiveFilter("styling")}
-                  className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
-                activeFilter === "styling"
-                      ? "bg-gradient-to-r from-white to-gray-100 text-black shadow-lg"
-                      : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-gray-600"
+              onClick={() => {
+                console.log("Setting filter to: advanced");
+                setActiveFilter("advanced");
+              }}
+              className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
+                activeFilter === "advanced"
+                  ? "bg-gradient-to-r from-white to-gray-100 text-black shadow-lg"
+                  : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-gray-600"
               }`}
             >
-              Styling & Shines
+              Advanced
             </button>
-              </Clickable>
-            </div>
+          </div>
           </div>
         </div>
       </FadeIn>
@@ -209,25 +196,30 @@ export default function CoursesPage() {
           </button>
         </div>
       ) : (
-        <StaggerContainer className="max-w-7xl mx-auto px-8 py-16 grid md:grid-cols-3 gap-8">
+        <div className="max-w-7xl mx-auto px-8 py-16">
           {filteredCourses.length === 0 ? (
-            <div className="col-span-3 text-center text-gray-400 py-16">
+            <div className="text-center text-gray-400 py-16">
               {courses.length === 0 
                 ? "No courses available at the moment. Please check back later."
                 : "No courses found for this filter. Try a different filter."}
             </div>
           ) : (
-            filteredCourses.map((course, index) => (
-              <CourseCard
-                key={course.id}
-                course={course}
-                index={index}
-                user={user}
-                onCourseClick={handleCourseClick}
-              />
-            ))
+            <StaggerContainer 
+              key={`${activeFilter}-${filteredCourses.length}`}
+              className="grid md:grid-cols-3 gap-8"
+            >
+              {filteredCourses.map((course, index) => (
+                <CourseCard
+                  key={course.id}
+                  course={course}
+                  index={index}
+                  user={user}
+                  onCourseClick={handleCourseClick}
+                />
+              ))}
+            </StaggerContainer>
           )}
-        </StaggerContainer>
+        </div>
       )}
 
       <Footer />

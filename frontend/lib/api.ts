@@ -276,27 +276,32 @@ class ApiClient {
       content_json: any | null;
       mux_playback_id: string | null;
       mux_asset_id: string | null;
+      lesson_type?: string;
     }>(`/api/courses/lessons/${lessonId}`);
   }
 
-  async createMuxUploadUrl(lessonId?: string, filename?: string) {
+  async createMuxUploadUrl(lessonId?: string, filename?: string, courseId?: string) {
     return this.request<{
       upload_id: string;
       upload_url: string;
       status: string;
     }>("/api/mux/upload-url", {
       method: "POST",
-      body: JSON.stringify({ lesson_id: lessonId, filename }),
+      body: JSON.stringify({ lesson_id: lessonId, filename, course_id: courseId }),
     });
   }
 
-  async checkMuxUploadStatus(lessonId: string) {
+  async checkMuxUploadStatus(lessonId?: string, courseId?: string) {
+    const params = new URLSearchParams();
+    if (lessonId) params.append("lesson_id", lessonId);
+    if (courseId) params.append("course_id", courseId);
+    
     return this.request<{
       status: "ready" | "processing" | "error";
       playback_id?: string;
       asset_id?: string;
       message: string;
-    }>(`/api/mux/check-upload-status?lesson_id=${lessonId}`, {
+    }>(`/api/mux/check-upload-status?${params.toString()}`, {
       method: "POST",
     });
   }
@@ -472,6 +477,7 @@ class ApiClient {
           is_boss_battle: boolean;
           duration_minutes: number | null;
           thumbnail_url?: string | null;
+          lesson_type?: string;
         }>;
       }>;
     }>(`/api/admin/courses/${courseId}/full`);
@@ -563,6 +569,7 @@ class ApiClient {
     content_json?: any | null;
     mux_playback_id?: string | null;
     mux_asset_id?: string | null;
+    lesson_type?: string;
   }) {
     return this.request<{
       id: string;
@@ -592,6 +599,7 @@ class ApiClient {
     content_json?: any | null;
     delete_video?: boolean; // Flag to explicitly delete video (clears Mux IDs)
     thumbnail_url?: string | null;
+    lesson_type?: string;
   }) {
     return this.request<{
       id: string;
@@ -606,6 +614,21 @@ class ApiClient {
   async deleteLesson(lessonId: string) {
     return this.request<{ message: string }>(`/api/admin/lessons/${lessonId}`, {
       method: "DELETE",
+    });
+  }
+
+  // Payment endpoints
+  async createCheckoutSession(priceId: string, successUrl: string, cancelUrl: string) {
+    return this.request<{
+      session_id: string;
+      url: string;
+    }>("/api/payments/create-checkout-session", {
+      method: "POST",
+      body: JSON.stringify({
+        price_id: priceId,
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      }),
     });
   }
 

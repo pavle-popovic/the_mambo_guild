@@ -77,3 +77,40 @@ h2 {
   object-fit: cover;
   z-index: 0;
 }
+
+/* Hide all Mux player controls for course previews */
+.course-preview-player mux-player {
+  --controls: none !important;
+  --time-display: none !important;
+  --seekbar: none !important;
+  --volume-control: none !important;
+  --play-button: none !important;
+  --fullscreen-button: none !important;
+  --pip-button: none !important;
+  --cast-button: none !important;
+  --captions-button: none !important;
+}
+
+.course-preview-player mux-player::part(controls) {
+  display: none !important;
+}
+
+.course-preview-player mux-player::part(time-display) {
+  display: none !important;
+}
+
+.course-preview-player mux-player::part(seekbar) {
+  display: none !important;
+}
+
+.course-preview-player mux-player::part(volume-control) {
+  display: none !important;
+}
+
+.course-preview-player mux-player::part(play-button) {
+  display: none !important;
+}
+
+.course-preview-player mux-player::part(fullscreen-button) {
+  display: none !important;
+}

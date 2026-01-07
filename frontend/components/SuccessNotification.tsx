@@ -6,6 +6,7 @@ import { FaCheckCircle, FaTrophy, FaStar } from "react-icons/fa";
 interface SuccessNotificationProps {
   isOpen: boolean;
   onClose: () => void;
+  onContinue?: () => void; // Optional callback for immediate navigation
   xpGained: number;
   leveledUp: boolean;
   newLevel?: number;
@@ -14,6 +15,7 @@ interface SuccessNotificationProps {
 export default function SuccessNotification({
   isOpen,
   onClose,
+  onContinue,
   xpGained,
   leveledUp,
   newLevel,
@@ -36,13 +38,17 @@ export default function SuccessNotification({
         console.log("Could not play success sound:", err);
       }
 
-      // Auto-close after 3 seconds
+      // Auto-close after 2 seconds (reduced from 3)
       const timer = setTimeout(() => {
         setIsAnimating(false);
         setTimeout(() => {
-          onClose();
+          if (onContinue) {
+            onContinue();
+          } else {
+            onClose();
+          }
         }, 300); // Wait for fade-out animation
-      }, 3000);
+      }, 2000);
 
       return () => {
         clearTimeout(timer);
@@ -119,7 +125,12 @@ export default function SuccessNotification({
         <button
           onClick={() => {
             setIsAnimating(false);
-            setTimeout(() => onClose(), 300);
+            // Navigate immediately when Continue is clicked
+            if (onContinue) {
+              onContinue();
+            } else {
+              onClose();
+            }
           }}
           className="mt-6 w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm text-white font-bold py-3 rounded-lg transition-all duration-200 border border-white/30"
         >

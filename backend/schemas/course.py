@@ -9,6 +9,7 @@ class WorldResponse(BaseModel):
     description: Optional[str]
     image_url: Optional[str]
     thumbnail_url: Optional[str] = None
+    mux_preview_playback_id: Optional[str] = None  # Mux playback ID for course preview
     difficulty: str
     progress_percentage: float
     is_locked: bool
@@ -34,6 +35,7 @@ class LessonResponse(BaseModel):
     mux_asset_id: Optional[str] = None
     duration_minutes: Optional[int] = None
     thumbnail_url: Optional[str] = None
+    lesson_type: str = "video"  # video, quiz, or history
 
     class Config:
         from_attributes = True
@@ -65,7 +67,19 @@ class LessonDetailResponse(BaseModel):
     mux_playback_id: Optional[str] = None
     mux_asset_id: Optional[str] = None
     thumbnail_url: Optional[str] = None
+    lesson_type: str = "video"  # video, quiz, or history
 
     class Config:
         from_attributes = True
+
+
+class CheckoutSessionRequest(BaseModel):
+    price_id: str
+    success_url: str
+    cancel_url: str
+
+
+class CheckoutSessionResponse(BaseModel):
+    session_id: str
+    url: str
 

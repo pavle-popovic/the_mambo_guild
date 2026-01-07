@@ -118,10 +118,10 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
             onClick={handleCourseClickInternal}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
-            className={`bg-mambo-panel border border-transparent hover:border-blue-500/30 rounded-xl overflow-hidden transition-all duration-300 ${
+            className={`bg-mambo-panel border border-transparent hover:border-blue-500/60 hover:shadow-2xl hover:shadow-blue-500/40 rounded-xl overflow-hidden transition-all duration-300 ${
               course.is_locked || !user
                 ? "opacity-75 relative"
-                : "group cursor-pointer shadow-lg shadow-black/20"
+                : "group cursor-pointer shadow-lg shadow-black/20 hover:scale-[1.02]"
             } cursor-pointer`}
           >
             {/* Image/Preview section */}
@@ -220,22 +220,25 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
                 {course.description}
               </p>
             
-              <div className="flex items-center gap-3 text-xs font-semibold text-gray-400 mb-4">
-                <div className="flex-1 bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                  <div 
-                    className="bg-gradient-to-r from-green-500 to-emerald-500 h-full transition-all duration-500" 
-                    style={{ width: `${course.progress_percentage}%` }}
-                  ></div>
+              {/* Progress Bar - Only show if course is started (has progress) */}
+              {course.progress_percentage > 0 && user && !course.is_locked && (
+                <div className="flex items-center gap-3 text-xs font-semibold text-gray-400 mb-4">
+                  <div className="flex-1 bg-gray-800 h-1.5 rounded-full overflow-hidden">
+                    <div 
+                      className="bg-gradient-to-r from-green-500 to-emerald-500 h-full transition-all duration-500" 
+                      style={{ width: `${course.progress_percentage}%` }}
+                    ></div>
+                  </div>
+                  <span className="text-white font-bold">{Math.round(course.progress_percentage)}%</span>
                 </div>
-                <span className="text-white font-bold">{Math.round(course.progress_percentage)}%</span>
-              </div>
+              )}
               
-              {/* Action Button */}
+              {/* Action Button - Only show if course is not started (no progress) and not locked */}
               {course.is_locked || !user ? (
                 <div className="w-full py-2.5 bg-gray-800 text-gray-500 rounded-lg text-sm font-bold text-center cursor-not-allowed">
                   Locked
                 </div>
-              ) : (
+              ) : course.progress_percentage === 0 ? (
                 <Clickable>
                   <Link
                     href={`/courses/${course.id}`}
@@ -244,7 +247,7 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
                     Start Course
                   </Link>
                 </Clickable>
-              )}
+              ) : null}
             </div>
           </div>
         </HoverCard>

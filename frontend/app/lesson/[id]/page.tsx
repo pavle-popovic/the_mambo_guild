@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
@@ -10,6 +10,8 @@ import QuestLogSidebar from "@/components/QuestLogSidebar";
 import MuxVideoPlayer from "@/components/MuxVideoPlayer";
 import SuccessNotification from "@/components/SuccessNotification";
 import AuthPromptModal from "@/components/AuthPromptModal";
+import QuizResultModal from "@/components/QuizResultModal";
+import CourseCompletionModal from "@/components/CourseCompletionModal";
 import { FaCheck, FaPlay, FaLock, FaBolt, FaArrowRight, FaClipboardList, FaCheckCircle } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -28,6 +30,7 @@ interface Lesson {
   mux_playback_id: string | null;
   mux_asset_id: string | null;
   duration_minutes: number | null;
+  lesson_type?: string;  // "video", "quiz", or "history"
 }
 
 interface WorldLesson {
@@ -58,6 +61,7 @@ export default function LessonPage() {
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [worldLessons, setWorldLessons] = useState<WorldLesson[]>([]);
   const [worldTitle, setWorldTitle] = useState("Loading...");
+  const [worldId, setWorldId] = useState<string | null>(null);
   const [worldProgress, setWorldProgress] = useState(0);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
@@ -66,6 +70,9 @@ export default function LessonPage() {
   const [videoPlaying, setVideoPlaying] = useState(false);
   const [quizAnswers, setQuizAnswers] = useState<{ [questionId: string]: number }>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizPassed, setQuizPassed] = useState(false);
+  const [showQuizResult, setShowQuizResult] = useState(false);
+  const [quizIsCorrect, setQuizIsCorrect] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [successData, setSuccessData] = useState<{
     xpGained: number;
@@ -74,7 +81,9 @@ export default function LessonPage() {
   } | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [showCourseCompletion, setShowCourseCompletion] = useState(false);
   const [courseTitle, setCourseTitle] = useState("");
+  const navigateToNextLessonRef = useRef<(() => void) | null>(null);
 
   useEffect(() => {
     // Wait for auth to finish loading before making any decisions
@@ -117,10 +126,25 @@ export default function LessonPage() {
         const foundLesson = allLessonsArrays[i].find((l) => l.id === lessonId);
         if (foundLesson) {
           setWorldTitle(worldsData[i].title);
+          setWorldId(worldsData[i].id);
           setCourseTitle(worldsData[i].title);
-          setWorldLessons(allLessonsArrays[i]);
-          const completed = allLessonsArrays[i].filter((l) => l.is_completed).length;
-          setWorldProgress((completed / allLessonsArrays[i].length) * 100);
+          
+          // Apply optimistic updates from sessionStorage
+          const updatedLessons = allLessonsArrays[i].map(l => {
+            const isCompletedInStorage = sessionStorage.getItem(`lesson_completed_${l.id}`) === 'true';
+            return isCompletedInStorage ? { ...l, is_completed: true } : l;
+          });
+          
+          setWorldLessons(updatedLessons);
+          // Fix progress calculation: handle zero lessons case and ensure valid percentage
+          const totalLessons = updatedLessons.length;
+          if (totalLessons > 0) {
+            const completed = updatedLessons.filter((l) => l.is_completed).length;
+            const progress = Math.min(100, Math.max(0, (completed / totalLessons) * 100));
+            setWorldProgress(progress);
+          } else {
+            setWorldProgress(0);
+          }
           
           // Check if the lesson is locked (subscription required)
           if (foundLesson.is_locked && user) {
@@ -132,7 +156,10 @@ export default function LessonPage() {
         }
       }
     } catch (err: any) {
-      setError(err.message || "Failed to load lesson");
+      // Don't set error if it's about lesson already completed - allow viewing completed lessons
+      if (!err.message || !err.message.includes("already completed")) {
+        setError(err.message || "Failed to load lesson");
+      }
     } finally {
       setLoading(false);
     }
@@ -141,12 +168,64 @@ export default function LessonPage() {
   const handleComplete = async () => {
     if (!lesson) return;
 
+    // Check if lesson is already completed
+    const alreadyCompleted = currentLesson?.is_completed || false;
+
     setCompleting(true);
     try {
       const result = await apiClient.completeLesson(lessonId);
       await refreshUser();
       
-      // Show success notification
+      // Optimistically update the quest bar immediately
+      const updatedLessons = worldLessons.map(l => 
+        l.id === lessonId ? { ...l, is_completed: true } : l
+      );
+      
+      // Check if course is fully completed (all lessons done)
+      const totalLessons = updatedLessons.length;
+      const completedLessons = updatedLessons.filter((l) => l.is_completed).length;
+      const isCourseComplete = totalLessons > 0 && completedLessons === totalLessons;
+      
+      // Update progress - fix division by zero
+      if (totalLessons > 0) {
+        const progress = Math.min(100, Math.max(0, (completedLessons / totalLessons) * 100));
+        setWorldProgress(progress);
+      } else {
+        setWorldProgress(0);
+      }
+      
+      setWorldLessons(updatedLessons);
+      
+      // Store completion status in sessionStorage
+      if (lessonId) {
+        sessionStorage.setItem(`lesson_completed_${lessonId}`, 'true');
+      }
+      
+      // Reload lesson data in background to sync with server
+      loadLesson().catch(console.error);
+
+      // If already completed, just navigate to next lesson without showing XP/completion animation
+      if (alreadyCompleted) {
+        // Use requestAnimationFrame to ensure DOM update is visible before navigation
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (lesson.next_lesson_id) {
+              router.push(`/lesson/${lesson.next_lesson_id}`);
+            }
+          });
+        });
+        setCompleting(false);
+        return;
+      }
+      
+      // If course is complete, show course completion modal instead of lesson success
+      if (isCourseComplete) {
+        setCompleting(false);
+        setShowCourseCompletion(true);
+        return;
+      }
+
+      // Show success notification only if lesson was not already completed
       setSuccessData({
         xpGained: result.xp_gained,
         leveledUp: result.leveled_up || false,
@@ -154,19 +233,59 @@ export default function LessonPage() {
       });
       setShowSuccess(true);
 
-      // Reload lesson data
-      await loadLesson();
-
-      // Navigate to next lesson if available (after notification closes)
-      if (result.leveled_up || lesson.next_lesson_id) {
+      // Store next lesson ID for navigation
+      const nextLessonId = lesson.next_lesson_id;
+      
+      // Create navigation handler that updates quest bar and navigates
+      const handleNavigate = () => {
+        setShowSuccess(false);
+        setSuccessData(null);
+        
+        // Navigate immediately (no delay)
+        // Store scroll trigger for next page load
+        if (nextLessonId) {
+          sessionStorage.setItem('questbar_scroll_trigger', nextLessonId);
+          router.push(`/lesson/${nextLessonId}`);
+        }
+      };
+      
+      // Store navigation handler for SuccessNotification
+      navigateToNextLessonRef.current = handleNavigate;
+      
+      // Auto-navigate after notification timeout (but Continue button will navigate instantly)
+      if (result.leveled_up || nextLessonId) {
         setTimeout(() => {
-          if (lesson.next_lesson_id) {
-            router.push(`/lesson/${lesson.next_lesson_id}`);
+          if (nextLessonId) {
+            handleNavigate();
           }
-        }, 3500); // Wait for notification to close
+        }, 2300); // 2000ms notification + 300ms fade-out
       }
     } catch (err: any) {
-      alert(err.message || "Failed to complete lesson");
+      // If error is "already completed", just navigate to next lesson silently
+      if (err?.message && (err.message.includes("already completed") || err.message.includes("Lesson already completed"))) {
+        // Optimistically update quest bar even on error
+        setWorldLessons(prevLessons => {
+          const updated = prevLessons.map(l => 
+            l.id === lessonId ? { ...l, is_completed: true } : l
+          );
+          const completed = updated.filter((l) => l.is_completed).length;
+          setWorldProgress((completed / updated.length) * 100);
+          return updated;
+        });
+        if (lesson.next_lesson_id) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              router.push(`/lesson/${lesson.next_lesson_id}`);
+            });
+          });
+        } else {
+          // If no next lesson, just reload to show completed state
+          await loadLesson();
+        }
+        setCompleting(false);
+        return;
+      }
+      alert(err?.message || "Failed to complete lesson");
     } finally {
       setCompleting(false);
     }
@@ -179,7 +298,7 @@ export default function LessonPage() {
 
   const handleQuizSubmit = () => {
     setQuizSubmitted(true);
-    // Calculate score - TODO: Send to backend for validation
+    // Calculate score
     const quiz = lesson?.content_json?.quiz || [];
     let correct = 0;
     quiz.forEach((q: QuizQuestion, qIndex: number) => {
@@ -190,10 +309,149 @@ export default function LessonPage() {
       }
     });
     const percentage = (correct / quiz.length) * 100;
-    if (percentage >= 80) {
-      alert(`Quiz passed! You got ${correct}/${quiz.length} correct (${Math.round(percentage)}%)`);
-    } else {
-      alert(`Quiz failed. You got ${correct}/${quiz.length} correct (${Math.round(percentage)}%). Need 80% to pass.`);
+    const passed = percentage >= 80;
+    
+    setQuizIsCorrect(passed);
+    setShowQuizResult(true);
+    
+    if (passed) {
+      setQuizPassed(true);
+    }
+  };
+
+  const handleTryAgain = () => {
+    setQuizSubmitted(false);
+    setQuizAnswers({});
+    setShowQuizResult(false);
+    setQuizPassed(false);
+  };
+
+  const handleQuizContinue = async () => {
+    setShowQuizResult(false);
+    // Auto-complete the lesson
+    if (!lesson) return;
+    
+    // Check if lesson is already completed
+    const alreadyCompleted = currentLesson?.is_completed || false;
+    
+    setCompleting(true);
+    try {
+      const result = await apiClient.completeLesson(lesson.id);
+      await refreshUser();
+      
+      // Optimistically update the quest bar immediately
+      const updatedLessons = worldLessons.map(l => 
+        l.id === lessonId ? { ...l, is_completed: true } : l
+      );
+      
+      // Check if course is fully completed (all lessons done)
+      const totalLessons = updatedLessons.length;
+      const completedLessons = updatedLessons.filter((l) => l.is_completed).length;
+      const isCourseComplete = totalLessons > 0 && completedLessons === totalLessons;
+      
+      // Update progress - fix division by zero
+      if (totalLessons > 0) {
+        const progress = Math.min(100, Math.max(0, (completedLessons / totalLessons) * 100));
+        setWorldProgress(progress);
+      } else {
+        setWorldProgress(0);
+      }
+      
+      setWorldLessons(updatedLessons);
+      
+      // Store completion status in sessionStorage
+      if (lessonId) {
+        sessionStorage.setItem(`lesson_completed_${lessonId}`, 'true');
+      }
+      
+      // Reload lesson data in background to sync with server
+      loadLesson().catch(console.error);
+
+      // If already completed, just navigate to next lesson without showing XP/completion animation
+      if (alreadyCompleted) {
+        // Use requestAnimationFrame to ensure DOM update is visible before navigation
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (lesson.next_lesson_id) {
+              router.push(`/lesson/${lesson.next_lesson_id}`);
+            }
+          });
+        });
+        setCompleting(false);
+        return;
+      }
+      
+      // If course is complete, show course completion modal instead of lesson success
+      if (isCourseComplete) {
+        setCompleting(false);
+        setShowCourseCompletion(true);
+        return;
+      }
+      
+      // Show success notification only if lesson was not already completed
+      setSuccessData({
+        xpGained: result.xp_gained,
+        leveledUp: result.leveled_up || false,
+        newLevel: result.new_level,
+      });
+      setShowSuccess(true);
+
+      // Store next lesson ID for navigation
+      const nextLessonId = lesson.next_lesson_id;
+      
+      // Create navigation handler that updates quest bar and navigates
+      const handleNavigate = () => {
+        setShowSuccess(false);
+        setSuccessData(null);
+        
+        // Navigate immediately (no delay)
+        // Store scroll trigger for next page load
+        if (nextLessonId) {
+          sessionStorage.setItem('questbar_scroll_trigger', nextLessonId);
+          router.push(`/lesson/${nextLessonId}`);
+        }
+      };
+      
+      // Store navigation handler for SuccessNotification
+      navigateToNextLessonRef.current = handleNavigate;
+      
+      // Auto-navigate after shorter timeout (2 seconds + animation)
+      if (result.leveled_up || nextLessonId) {
+        setTimeout(() => {
+          if (nextLessonId) {
+            handleNavigate();
+          }
+        }, 2300); // 2000ms notification + 300ms fade-out
+      }
+    } catch (err: any) {
+      // If error is "already completed", just navigate to next lesson silently
+      if (err?.message && (err.message.includes("already completed") || err.message.includes("Lesson already completed"))) {
+        // Optimistically update quest bar even on error
+        setWorldLessons(prevLessons => {
+          const updated = prevLessons.map(l => 
+            l.id === lessonId ? { ...l, is_completed: true } : l
+          );
+          const completed = updated.filter((l) => l.is_completed).length;
+          setWorldProgress((completed / updated.length) * 100);
+          return updated;
+        });
+        if (lesson.next_lesson_id) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              router.push(`/lesson/${lesson.next_lesson_id}`);
+            });
+          });
+        } else {
+          // If no next lesson, just reload to show completed state
+          await loadLesson();
+        }
+        setCompleting(false);
+        return;
+      }
+      console.error("Failed to complete lesson:", err);
+      setError(err?.message || "Failed to complete lesson");
+    } finally {
+      setCompleting(false);
     }
   };
 
@@ -206,7 +464,8 @@ export default function LessonPage() {
     );
   }
 
-  if (error || !lesson) {
+  // Only show error screen if lesson truly doesn't exist (allow viewing completed lessons even if there's an error)
+  if (!lesson) {
     return (
       <>
         {showSuccess && successData && (
@@ -216,6 +475,7 @@ export default function LessonPage() {
               setShowSuccess(false);
               setSuccessData(null);
             }}
+            onContinue={navigateToNextLessonRef.current || undefined}
             xpGained={successData.xpGained}
             leveledUp={successData.leveledUp}
             newLevel={successData.newLevel}
@@ -230,8 +490,14 @@ export default function LessonPage() {
 
   const currentLesson = worldLessons.find((l) => l.id === lessonId);
   const isCompleted = currentLesson?.is_completed || false;
+  const lessonType = lesson.lesson_type || "video"; // Default to "video" for backwards compatibility
   const hasQuiz = lesson.content_json?.quiz && Array.isArray(lesson.content_json.quiz) && lesson.content_json.quiz.length > 0;
   const lessonNotes = lesson.content_json?.notes || "";
+  
+  // Determine what to show based on lesson type
+  const isVideoLesson = lessonType === "video";
+  const isQuizLesson = lessonType === "quiz";
+  const isHistoryLesson = lessonType === "history";
 
   // Determine lesson display number (week.day or order)
   const lessonNumber = lesson.week_number && lesson.day_number 
@@ -240,7 +506,8 @@ export default function LessonPage() {
 
   // Check if lesson has a real video (not placeholder)
   // Only show video player if we have a Mux playback ID or a valid non-placeholder video URL
-  const hasVideo = !!(
+  // AND it's a video lesson type
+  const hasVideo = isVideoLesson && !!(
     (lesson.mux_playback_id && lesson.mux_playback_id.trim() !== "") ||
     (lesson.video_url && 
      lesson.video_url.trim() !== "" &&
@@ -277,6 +544,24 @@ export default function LessonPage() {
 
   return (
     <>
+      {/* Course Completion Modal */}
+      <CourseCompletionModal
+        isOpen={showCourseCompletion}
+        courseTitle={courseTitle}
+        onClose={() => {
+          setShowCourseCompletion(false);
+          router.push("/courses");
+        }}
+      />
+
+      {/* Quiz Result Modal */}
+      <QuizResultModal
+        isOpen={showQuizResult}
+        isCorrect={quizIsCorrect}
+        onTryAgain={handleTryAgain}
+        onContinue={handleQuizContinue}
+      />
+
       {/* Success Notification */}
       {showSuccess && successData && (
         <SuccessNotification
@@ -285,6 +570,7 @@ export default function LessonPage() {
             setShowSuccess(false);
             setSuccessData(null);
           }}
+          onContinue={navigateToNextLessonRef.current || undefined}
           xpGained={successData.xpGained}
           leveledUp={successData.leveledUp}
           newLevel={successData.newLevel}
@@ -296,12 +582,21 @@ export default function LessonPage() {
       <nav className="border-b border-gray-800 bg-mambo-panel flex-none z-20">
         <div className="px-6 py-3 flex justify-between items-center">
           <div className="flex items-center gap-4">
-            <Link
-              href="/courses"
-              className="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold"
-            >
-              <FaPlay className="rotate-[-90deg]" /> Map
-            </Link>
+            {worldId ? (
+              <Link
+                href={`/courses/${worldId}`}
+                className="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold"
+              >
+                <FaPlay className="rotate-[-90deg]" /> Back to Lessons
+              </Link>
+            ) : (
+              <Link
+                href="/courses"
+                className="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold"
+              >
+                <FaPlay className="rotate-[-90deg]" /> Map
+              </Link>
+            )}
             <span className="text-gray-700 text-2xl font-light">|</span>
             <div className="flex flex-col">
               <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Current Quest</span>
@@ -344,8 +639,8 @@ export default function LessonPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* Main Content */}
         <main className="flex-1 overflow-y-auto bg-black relative flex flex-col">
-          {/* Video Player - Only show if video exists */}
-          {hasVideo && (
+          {/* Video Player - Only show for video lessons with video */}
+          {isVideoLesson && hasVideo && (
             <>
               {lesson.mux_playback_id ? (
                 <MuxVideoPlayer
@@ -390,7 +685,7 @@ export default function LessonPage() {
                 <h2 className="font-serif text-3xl font-bold mb-2 text-white">{lesson.title}</h2>
                 <div className="flex items-center gap-3">
                   <span className="bg-mambo-blue/10 text-mambo-blue text-xs font-bold px-2 py-1 rounded border border-mambo-blue/20">
-                    {hasVideo ? "Video Lesson" : lesson.content_json?.quiz ? "Quiz Lesson" : "Lesson"}
+                    {isVideoLesson ? "Video Lesson" : isQuizLesson ? "Quiz" : isHistoryLesson ? "History Lesson" : "Lesson"}
                   </span>
                   <span className="text-gray-500 text-sm">•</span>
                   <span className="text-mambo-gold text-sm font-bold flex items-center gap-1">
@@ -405,7 +700,13 @@ export default function LessonPage() {
                 </div>
               </div>
 
-              {!isCompleted && (
+              {/* Only show Complete Lesson button if:
+                  - Lesson is not completed AND
+                  - (Not a quiz lesson OR quiz is passed) AND
+                  - (Not a video lesson with quiz OR quiz is passed) */}
+              {!isCompleted && 
+               !(isQuizLesson && !quizPassed) && 
+               !(isVideoLesson && hasQuiz && !quizPassed) && (
                 <button
                   onClick={handleComplete}
                   disabled={completing}
@@ -423,106 +724,107 @@ export default function LessonPage() {
               )}
             </div>
 
-            {/* Tabs */}
-            <div className="border-b border-gray-800 mb-6 flex gap-8">
-              <button
-                onClick={() => setActiveTab("description")}
-                className={`pb-3 border-b-2 font-bold text-sm transition ${
-                  activeTab === "description"
-                    ? "border-mambo-blue text-white"
-                    : "border-transparent text-gray-400 hover:text-white"
-                }`}
-              >
-                Description
-              </button>
-              {hasQuiz && (
+            {/* Tabs - Only show for video lessons */}
+            {isVideoLesson && (
+              <div className="border-b border-gray-800 mb-6 flex gap-8">
                 <button
-                  onClick={() => setActiveTab("quiz")}
-                  className={`pb-3 border-b-2 font-bold text-sm transition flex items-center gap-2 ${
-                    activeTab === "quiz"
+                  onClick={() => setActiveTab("description")}
+                  className={`pb-3 border-b-2 font-bold text-sm transition ${
+                    activeTab === "description"
                       ? "border-mambo-blue text-white"
                       : "border-transparent text-gray-400 hover:text-white"
                   }`}
                 >
-                  Knowledge Check
-                  <span className="bg-gray-800 text-gray-400 text-[10px] px-1.5 py-0.5 rounded">Required</span>
+                  Description
                 </button>
-              )}
-              <button
-                onClick={() => setActiveTab("discuss")}
-                className={`pb-3 border-b-2 font-bold text-sm transition ${
-                  activeTab === "discuss"
-                    ? "border-mambo-blue text-white"
-                    : "border-transparent text-gray-400 hover:text-white"
-                }`}
-              >
-                Discussion (0)
-              </button>
-            </div>
-
-            {/* Tab Content */}
-            {activeTab === "description" && (
-              <div className="tab-content active prose prose-invert prose-sm max-w-none text-gray-300">
-                {lessonNotes ? (
-                  <div className="prose prose-invert prose-lg max-w-none">
-                    <ReactMarkdown
-                      remarkPlugins={[remarkGfm]}
-                      components={{
-                        // Custom styling for headings
-                        h1: ({...props}) => <h1 className="text-3xl font-bold text-white mt-8 mb-4" {...props} />,
-                        h2: ({...props}) => <h2 className="text-2xl font-bold text-white mt-6 mb-3" {...props} />,
-                        h3: ({...props}) => <h3 className="text-xl font-bold text-white mt-6 mb-3" {...props} />,
-                        h4: ({...props}) => <h4 className="text-lg font-bold text-white mt-4 mb-2" {...props} />,
-                        // Custom styling for paragraphs
-                        p: ({...props}) => <p className="text-gray-300 mb-4 leading-relaxed" {...props} />,
-                        // Custom styling for lists
-                        ul: ({...props}) => <ul className="list-disc list-inside space-y-2 text-gray-300 mb-4 pl-5" {...props} />,
-                        ol: ({...props}) => <ol className="list-decimal list-inside space-y-2 text-gray-300 mb-4 pl-5" {...props} />,
-                        li: ({...props}) => <li className="text-gray-300" {...props} />,
-                        // Custom styling for links
-                        a: ({...props}) => <a className="text-mambo-blue hover:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
-                        // Custom styling for code blocks
-                        code: ({className, inline, ...props}: any) => {
-                          const isInline = inline !== undefined && inline;
-                          return isInline ? (
-                            <code className="bg-gray-800 text-mambo-blue px-1 py-0.5 rounded text-sm font-mono" {...props} />
-                          ) : (
-                            <code className="block bg-gray-900 text-gray-300 p-4 rounded-lg overflow-x-auto mb-4 font-mono text-sm" {...props} />
-                          );
-                        },
-                        pre: ({...props}) => <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto mb-4" {...props} />,
-                        // Custom styling for blockquotes
-                        blockquote: ({...props}) => <blockquote className="border-l-4 border-mambo-blue pl-4 italic text-gray-400 my-4" {...props} />,
-                        // Custom styling for strong/bold
-                        strong: ({...props}) => <strong className="font-bold text-white" {...props} />,
-                        // Custom styling for emphasis/italic
-                        em: ({...props}) => <em className="italic text-gray-200" {...props} />,
-                        // Custom styling for horizontal rules
-                        hr: ({...props}) => <hr className="border-gray-700 my-6" {...props} />,
-                      }}
-                    >
-                      {lessonNotes}
-                    </ReactMarkdown>
-                  </div>
-                ) : (
-                  <p className="lead text-lg text-white">
-                    {lesson.description || "Master the fundamentals of this lesson."}
-                  </p>
-                )}
+                <button
+                  onClick={() => setActiveTab("discuss")}
+                  className={`pb-3 border-b-2 font-bold text-sm transition ${
+                    activeTab === "discuss"
+                      ? "border-mambo-blue text-white"
+                      : "border-transparent text-gray-400 hover:text-white"
+                  }`}
+                >
+                  Discussion (0)
+                </button>
               </div>
             )}
 
-            {activeTab === "quiz" && hasQuiz && (
-              <div className="tab-content active">
-                <div className="bg-mambo-panel border border-gray-800 rounded-xl p-8 text-center max-w-2xl mx-auto">
-                  <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-700">
-                    <FaClipboardList className="text-3xl text-mambo-gold" />
+            {/* Content based on lesson type */}
+            {/* Video Lesson: Show video + notes in tabs */}
+            {isVideoLesson && (
+              <>
+                {activeTab === "description" && (
+                  <div className="tab-content active prose prose-invert prose-sm max-w-none text-gray-300">
+                    {lessonNotes ? (
+                      <div className="prose prose-invert prose-lg max-w-none">
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm]}
+                          components={{
+                            // Custom styling for headings
+                            h1: ({...props}) => <h1 className="text-3xl font-bold text-white mt-8 mb-4" {...props} />,
+                            h2: ({...props}) => <h2 className="text-2xl font-bold text-white mt-6 mb-3" {...props} />,
+                            h3: ({...props}) => <h3 className="text-xl font-bold text-white mt-6 mb-3" {...props} />,
+                            h4: ({...props}) => <h4 className="text-lg font-bold text-white mt-4 mb-2" {...props} />,
+                            // Custom styling for paragraphs
+                            p: ({...props}) => <p className="text-gray-300 mb-4 leading-relaxed" {...props} />,
+                            // Custom styling for lists
+                            ul: ({...props}) => <ul className="list-disc list-inside space-y-2 text-gray-300 mb-4 pl-5" {...props} />,
+                            ol: ({...props}) => <ol className="list-decimal list-inside space-y-2 text-gray-300 mb-4 pl-5" {...props} />,
+                            li: ({...props}) => <li className="text-gray-300" {...props} />,
+                            // Custom styling for links
+                            a: ({...props}) => <a className="text-mambo-blue hover:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                            // Custom styling for code blocks
+                            code: ({className, inline, ...props}: any) => {
+                              const isInline = inline !== undefined && inline;
+                              return isInline ? (
+                                <code className="bg-gray-800 text-mambo-blue px-1 py-0.5 rounded text-sm font-mono" {...props} />
+                              ) : (
+                                <code className="block bg-gray-900 text-gray-300 p-4 rounded-lg overflow-x-auto mb-4 font-mono text-sm" {...props} />
+                              );
+                            },
+                            pre: ({...props}) => <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto mb-4" {...props} />,
+                            // Custom styling for blockquotes
+                            blockquote: ({...props}) => <blockquote className="border-l-4 border-mambo-blue pl-4 italic text-gray-400 my-4" {...props} />,
+                            // Custom styling for strong/bold
+                            strong: ({...props}) => <strong className="font-bold text-white" {...props} />,
+                            // Custom styling for emphasis/italic
+                            em: ({...props}) => <em className="italic text-gray-200" {...props} />,
+                            // Custom styling for horizontal rules
+                            hr: ({...props}) => <hr className="border-gray-700 my-6" {...props} />,
+                          }}
+                        >
+                          {lessonNotes}
+                        </ReactMarkdown>
+                      </div>
+                    ) : (
+                      <p className="lead text-lg text-white">
+                        {lesson.description || "Master the fundamentals of this lesson."}
+                      </p>
+                    )}
                   </div>
-                  <h3 className="text-xl font-bold text-white mb-2">Prove Your Knowledge</h3>
-                  <p className="text-gray-400 mb-8 text-sm">
-                    Pass this quiz to earn your badge and unlock the next lesson.
-                  </p>
+                )}
+                {activeTab === "discuss" && (
+                  <div className="tab-content active">
+                    <p className="text-gray-400">Discussion coming soon...</p>
+                  </div>
+                )}
+              </>
+            )}
 
+            {/* Quiz Lesson: Show only quiz, no tabs, no video, no notes */}
+            {isQuizLesson && (
+              <div className="bg-mambo-panel border border-gray-800 rounded-xl p-8 text-center max-w-2xl mx-auto">
+                <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-6 border border-gray-700">
+                  <FaClipboardList className="text-3xl text-mambo-gold" />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Prove Your Knowledge</h3>
+                <p className="text-gray-400 mb-8 text-sm">
+                  Pass this quiz to earn your badge and unlock the next lesson.
+                </p>
+
+                {hasQuiz ? (
+                  <>
                   {lesson.content_json.quiz.map((question: QuizQuestion, qIndex: number) => {
                     const questionId = question.id || `q-${qIndex}`;
                     const selectedAnswer = quizAnswers[questionId];
@@ -547,27 +849,27 @@ export default function LessonPage() {
                             return (
                               <label
                                 key={oIndex}
-                                className={`flex items-center p-4 rounded-lg border cursor-pointer transition relative overflow-hidden ${
+                                className={`flex items-center p-4 rounded-lg border cursor-pointer transition-all duration-200 relative overflow-hidden ${
                                   showResult
                                     ? "border-mambo-gold bg-mambo-gold/10"
                                     : isSelected
-                                    ? "border-mambo-blue bg-mambo-blue/10"
-                                    : "border-gray-700 hover:bg-gray-800"
+                                    ? "border-green-500 bg-green-500/10"
+                                    : "border-gray-700 hover:border-gray-600 hover:bg-gray-800/50 hover:scale-[1.02]"
                                 } ${quizSubmitted ? "cursor-not-allowed" : ""}`}
                               >
                                 <div
-                                  className={`w-5 h-5 rounded-full border mr-4 flex items-center justify-center shrink-0 ${
+                                  className={`w-5 h-5 rounded-full border mr-4 flex items-center justify-center shrink-0 transition-all ${
                                     showResult
                                       ? "border-2 border-mambo-gold"
                                       : isSelected
-                                      ? "border-2 border-mambo-blue"
+                                      ? "border-2 border-green-500"
                                       : "border border-gray-500"
                                   }`}
                                 >
                                   {showResult ? (
                                     <div className="w-2.5 h-2.5 rounded-full bg-mambo-gold"></div>
                                   ) : isSelected ? (
-                                    <div className="w-2.5 h-2.5 rounded-full bg-mambo-blue"></div>
+                                    <div className="w-2.5 h-2.5 rounded-full bg-green-500"></div>
                                   ) : null}
                                 </div>
                                 <span
@@ -601,7 +903,7 @@ export default function LessonPage() {
                     );
                   })}
 
-                  {!quizSubmitted ? (
+                  {!quizSubmitted && (
                     <button
                       onClick={handleQuizSubmit}
                       disabled={Object.keys(quizAnswers).length < lesson.content_json.quiz.length}
@@ -609,12 +911,57 @@ export default function LessonPage() {
                     >
                       Submit Answer{lesson.content_json.quiz.length > 1 ? "s" : ""}
                     </button>
-                  ) : (
-                    <div className="text-green-400 font-bold">
-                      Quiz submitted! {Object.keys(quizAnswers).length === lesson.content_json.quiz.length && "You can now complete the lesson."}
-                    </div>
                   )}
-                </div>
+                  </>
+                ) : (
+                  <div className="text-gray-400 text-center py-8">
+                    <p>This quiz lesson doesn't have any questions yet.</p>
+                    <p className="text-sm mt-2">Please contact the instructor if you believe this is an error.</p>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* History Lesson: Show only notes, no tabs, no video */}
+            {isHistoryLesson && (
+              <div className="prose prose-invert prose-sm max-w-none text-gray-300">
+                {lessonNotes ? (
+                  <div className="prose prose-invert prose-lg max-w-none">
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm]}
+                      components={{
+                        h1: ({...props}) => <h1 className="text-3xl font-bold text-white mt-8 mb-4" {...props} />,
+                        h2: ({...props}) => <h2 className="text-2xl font-bold text-white mt-6 mb-3" {...props} />,
+                        h3: ({...props}) => <h3 className="text-xl font-bold text-white mt-6 mb-3" {...props} />,
+                        h4: ({...props}) => <h4 className="text-lg font-bold text-white mt-4 mb-2" {...props} />,
+                        p: ({...props}) => <p className="text-gray-300 mb-4 leading-relaxed" {...props} />,
+                        ul: ({...props}) => <ul className="list-disc list-inside space-y-2 text-gray-300 mb-4 pl-5" {...props} />,
+                        ol: ({...props}) => <ol className="list-decimal list-inside space-y-2 text-gray-300 mb-4 pl-5" {...props} />,
+                        li: ({...props}) => <li className="text-gray-300" {...props} />,
+                        a: ({...props}) => <a className="text-mambo-blue hover:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
+                        code: ({className, inline, ...props}: any) => {
+                          const isInline = inline !== undefined && inline;
+                          return isInline ? (
+                            <code className="bg-gray-800 text-mambo-blue px-1 py-0.5 rounded text-sm font-mono" {...props} />
+                          ) : (
+                            <code className="block bg-gray-900 text-gray-300 p-4 rounded-lg overflow-x-auto mb-4 font-mono text-sm" {...props} />
+                          );
+                        },
+                        pre: ({...props}) => <pre className="bg-gray-900 p-4 rounded-lg overflow-x-auto mb-4" {...props} />,
+                        blockquote: ({...props}) => <blockquote className="border-l-4 border-mambo-blue pl-4 italic text-gray-400 my-4" {...props} />,
+                        strong: ({...props}) => <strong className="font-bold text-white" {...props} />,
+                        em: ({...props}) => <em className="italic text-gray-200" {...props} />,
+                        hr: ({...props}) => <hr className="border-gray-700 my-6" {...props} />,
+                      }}
+                    >
+                      {lessonNotes}
+                    </ReactMarkdown>
+                  </div>
+                ) : (
+                  <p className="lead text-lg text-white">
+                    {lesson.description || "Read through this history lesson."}
+                  </p>
+                )}
               </div>
             )}
 

@@ -77,23 +77,27 @@ export default function CourseDetailPage() {
   };
 
   const handleLessonClick = (lessonId: string, isLocked: boolean) => {
-    if (isLocked && user) {
-      // If logged in and lesson is locked, don't allow access
+    // If lesson is locked, don't navigate
+    if (isLocked) {
       return;
     }
     
-    if (!user) {
-      // Prompt to login when clicking on a lesson
-      if (confirm("Please log in to access this lesson. Would you like to log in now?")) {
-        router.push(`/login?redirect=/lesson/${lessonId}`);
-      }
-    } else {
-      router.push(`/lesson/${lessonId}`);
-    }
+    // Navigate immediately - no confirm dialogs for speed
+    router.push(`/lesson/${lessonId}`, { scroll: false });
   };
 
   const getFirstUnlockedLesson = () => {
-    return lessons.find((l) => !l.is_locked && !l.is_completed) || lessons[0];
+    return lessons.find((l) => !l.is_locked && !l.is_completed) || lessons.find((l) => !l.is_locked) || lessons[0];
+  };
+
+  const getNextLesson = () => {
+    // Find the first uncompleted, unlocked lesson
+    return lessons.find((l) => !l.is_locked && !l.is_completed) || lessons.find((l) => !l.is_locked);
+  };
+
+  const hasStartedCourse = () => {
+    // Check if user has completed any lessons
+    return lessons.some((l) => l.is_completed);
   };
 
   if (loading) {
@@ -140,6 +144,8 @@ export default function CourseDetailPage() {
   }
 
   const firstLesson = getFirstUnlockedLesson();
+  const nextLesson = getNextLesson();
+  const courseStarted = hasStartedCourse();
 
   return (
     <div className="min-h-screen bg-mambo-dark">
@@ -154,20 +160,63 @@ export default function CourseDetailPage() {
         </Link>
 
         <div className="mb-8">
-          <h1 className="text-4xl font-bold mb-4 text-mambo-text">{courseTitle}</h1>
-          {user && courseProgress > 0 && (
-            <div className="flex items-center gap-3 text-sm">
-              <div className="flex-1 bg-gray-800 h-2 rounded-full overflow-hidden max-w-md">
-                <div
-                  className="bg-green-500 h-full transition-all"
-                  style={{ width: `${courseProgress}%` }}
-                />
-              </div>
-              <span className="text-gray-400">
-                {Math.round(courseProgress)}% Complete
-              </span>
+          <div className="flex items-start justify-between gap-6 mb-6">
+            <div className="flex-1">
+              <h1 className="text-4xl font-bold mb-4 text-mambo-text">{courseTitle}</h1>
+              {user && courseProgress > 0 && (
+                <div className="flex items-center gap-3 text-sm">
+                  <div className="flex-1 bg-gray-800 h-2 rounded-full overflow-hidden max-w-md">
+                    <div
+                      className="bg-green-500 h-full transition-all"
+                      style={{ width: `${courseProgress}%` }}
+                    />
+                  </div>
+                  <span className="text-gray-400">
+                    {Math.round(courseProgress)}% Complete
+                  </span>
+                </div>
+              )}
             </div>
-          )}
+            
+            {/* Prominent button at top - always visible when available */}
+            {user && firstLesson && !firstLesson.is_locked && (
+              <div className="flex-shrink-0">
+                {firstLesson.is_completed && nextLesson ? (
+                  <Link
+                    href={`/lesson/${nextLesson.id}`}
+                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 hover:from-blue-600 hover:via-blue-600 hover:to-purple-700 text-white font-bold rounded-full transition-all duration-300 shadow-lg shadow-blue-500/40 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105 active:scale-95"
+                  >
+                    <span className="relative z-10">Continue Learning</span>
+                    <svg 
+                      className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  </Link>
+                ) : (
+                  <Link
+                    href={`/lesson/${courseStarted && nextLesson ? nextLesson.id : firstLesson.id}`}
+                    className="group relative inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 hover:from-blue-600 hover:via-blue-600 hover:to-purple-700 text-white font-bold rounded-full transition-all duration-300 shadow-lg shadow-blue-500/40 hover:shadow-xl hover:shadow-blue-500/50 hover:scale-105 active:scale-95"
+                  >
+                    <span className="relative z-10">{courseStarted ? "Continue Learning" : "Start First Lesson"}</span>
+                    <svg 
+                      className="w-5 h-5 relative z-10 transition-transform group-hover:translate-x-1" 
+                      fill="none" 
+                      stroke="currentColor" 
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                    </svg>
+                    <div className="absolute inset-0 bg-gradient-to-r from-white/20 to-transparent rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {lessons.length === 0 ? (
@@ -255,36 +304,42 @@ export default function CourseDetailPage() {
                                     : null;
 
                                   return (
-                                  <div
+                                  <Link
                                     key={lesson.id}
-                                    onClick={() => handleLessonClick(lesson.id, lesson.is_locked)}
-                                    className={`relative bg-mambo-panel border rounded-xl overflow-hidden transition ${
+                                    href={lesson.is_locked ? "#" : `/lesson/${lesson.id}`}
+                                    onClick={(e) => {
+                                      if (lesson.is_locked) {
+                                        e.preventDefault();
+                                        return;
+                                      }
+                                    }}
+                                    className={`relative bg-mambo-panel border border-transparent rounded-xl overflow-hidden transition-all duration-300 block ${
                                       lesson.is_locked
                                         ? "border-gray-800 opacity-60 cursor-not-allowed"
-                                        : "border-gray-800 hover:border-mambo-blue/50 hover:shadow-lg hover:shadow-mambo-blue/10 cursor-pointer aspect-video min-h-[140px] group"
+                                        : "hover:border-blue-500/60 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-[1.02] cursor-pointer aspect-video min-h-[140px] group"
                                     }`}
                                   >
                                     {/* Thumbnail background - full card */}
-                                    <div className="absolute inset-0 bg-black">
+                                    <div className="absolute inset-0 bg-black overflow-hidden">
                                       {lesson.thumbnail_url ? (
                                         <Image
                                           src={lesson.thumbnail_url}
                                           alt={lesson.title}
                                           fill
-                                          className="object-cover"
+                                          className="object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
                                       ) : lesson.mux_playback_id ? (
                                         <Image
                                           src={`https://image.mux.com/${lesson.mux_playback_id}/thumbnail.png`}
                                           alt={lesson.title}
                                           fill
-                                          className="object-cover"
+                                          className="object-cover transition-transform duration-500 group-hover:scale-110"
                                         />
                                       ) : (
                                         <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900" />
                                       )}
                                       {/* Dark overlay for better text readability */}
-                                      <div className="absolute inset-0 bg-black/50" />
+                                      <div className="absolute inset-0 bg-black/50 group-hover:bg-black/40 transition-colors duration-300" />
 
                                       {/* Lock icon */}
                                       {lesson.is_locked && (
@@ -327,7 +382,7 @@ export default function CourseDetailPage() {
                                         {lesson.xp_value} XP
                                       </p>
                                     </div>
-                                  </div>
+                                  </Link>
                                   );
                                 })}
                               </div>
@@ -348,13 +403,19 @@ export default function CourseDetailPage() {
                     </div>
                     <div className="grid md:grid-cols-3 gap-6">
                       {ungroupedLessons.map((lesson) => (
-                        <div
+                        <Link
                           key={lesson.id}
-                          onClick={() => handleLessonClick(lesson.id, lesson.is_locked)}
-                          className={`bg-mambo-panel border rounded-xl p-6 transition ${
+                          href={lesson.is_locked ? "#" : `/lesson/${lesson.id}`}
+                          onClick={(e) => {
+                            if (lesson.is_locked) {
+                              e.preventDefault();
+                              return;
+                            }
+                          }}
+                          className={`bg-mambo-panel border border-transparent rounded-xl p-6 transition-all duration-300 block ${
                             lesson.is_locked
                               ? "border-gray-800 opacity-60 cursor-not-allowed"
-                              : "border-gray-800 hover:border-gray-600 cursor-pointer"
+                              : "hover:border-blue-500/60 hover:shadow-2xl hover:shadow-blue-500/40 hover:scale-[1.02] cursor-pointer group"
                           }`}
                         >
                           <div className="flex items-start justify-between mb-4">
@@ -394,7 +455,7 @@ export default function CourseDetailPage() {
                           {lesson.is_completed && (
                             <div className="text-green-400 text-sm font-semibold">✓ Completed</div>
                           )}
-                        </div>
+                        </Link>
                       ))}
                     </div>
                   </div>
@@ -404,16 +465,6 @@ export default function CourseDetailPage() {
           })()
         )}
 
-        {user && firstLesson && !firstLesson.is_locked && (
-          <div className="mt-8 text-center">
-            <button
-              onClick={() => router.push(`/lesson/${firstLesson.id}`)}
-              className="px-8 py-4 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-full transition shadow-lg shadow-blue-500/25"
-            >
-              {firstLesson.is_completed ? "Continue Learning" : "Start First Lesson"}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );

@@ -3,5 +3,10 @@
     "clsx": "^2.1.1",
     "framer-motion": "^12.24.0",
     "tailwind-merge": "^3.4.0"
-  }
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0",
+    "@types/node": "^25.0.3"
+  },
+  "scripts": {}
 }

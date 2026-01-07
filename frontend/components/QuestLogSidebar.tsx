@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useRef } from "react";
 import { FaLock, FaCheck, FaPlay, FaSkull } from "react-icons/fa";
 import Link from "next/link";
 
@@ -82,6 +82,42 @@ export default function QuestLogSidebar({
     return { weekGroups: groups, ungroupedLessons: ungrouped, sortedWeeks: weeks };
   }, [sortedLessons]);
 
+  // Ref for the scrollable container
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll to current lesson (or first uncompleted lesson) on mount and when currentLessonId changes
+  useEffect(() => {
+    if (scrollContainerRef.current && currentLessonId) {
+      // Use multiple attempts to ensure DOM is fully rendered
+      const attemptScroll = (attempt: number = 0) => {
+        const currentLessonElement = scrollContainerRef.current?.querySelector(
+          `[data-lesson-id="${currentLessonId}"]`
+        ) as HTMLElement;
+        
+        if (currentLessonElement && scrollContainerRef.current) {
+          const container = scrollContainerRef.current;
+          
+          // Get the element's position relative to the container's scrollable content
+          const elementRect = currentLessonElement.getBoundingClientRect();
+          const containerRect = container.getBoundingClientRect();
+          
+          // Calculate scroll position: element's viewport position - container's viewport position + current scroll
+          // This gives us the element's position within the scrollable content
+          const scrollOffset = (elementRect.top - containerRect.top) + container.scrollTop;
+          
+          // Set scroll position to place the lesson at the top (accounting for padding)
+          container.scrollTop = Math.max(0, scrollOffset - 12);
+        } else if (attempt < 10) {
+          // Retry up to 10 times with increasing delays to ensure DOM is ready
+          setTimeout(() => attemptScroll(attempt + 1), 200 * (attempt + 1));
+        }
+      };
+      
+      // Start scrolling after initial delay - longer delay to ensure all content is rendered
+      setTimeout(() => attemptScroll(), 500);
+    }
+  }, [currentLessonId, lessons]);
+
   return (
     <aside className="w-80 bg-mambo-panel border-l border-gray-800 flex-none hidden lg:flex flex-col z-10 shadow-2xl">
       <div className="p-6 border-b border-gray-800 bg-black/20">
@@ -102,7 +138,7 @@ export default function QuestLogSidebar({
         </div>
       </div>
 
-      <div className="overflow-y-auto flex-1 p-3 space-y-4">
+      <div ref={scrollContainerRef} className="overflow-y-auto flex-1 p-3 space-y-4">
         {(() => {
           const regularLessonsByWeek = sortedWeeks.map(week => {
             const days = Object.keys(weekGroups[week])
@@ -145,6 +181,7 @@ export default function QuestLogSidebar({
 
                         return (
                           <Link
+                            data-lesson-id={lesson.id}
                             key={lesson.id}
                             href={isLocked ? "#" : `/lesson/${lesson.id}`}
                             className={`p-2.5 rounded-lg flex gap-2.5 items-center transition relative overflow-hidden group ${
@@ -223,6 +260,7 @@ export default function QuestLogSidebar({
 
                 return (
                   <Link
+                    data-lesson-id={lesson.id}
                     key={lesson.id}
                     href={isLocked ? "#" : `/lesson/${lesson.id}`}
                     className={`p-2.5 rounded-lg flex gap-2.5 items-center transition relative overflow-hidden group ${
@@ -297,6 +335,7 @@ export default function QuestLogSidebar({
 
                     return (
                       <Link
+                        data-lesson-id={lesson.id}
                         key={lesson.id}
                         href={isLocked ? "#" : `/lesson/${lesson.id}`}
                         className={`mt-6 p-4 border rounded-xl flex gap-3 items-center transition ${

@@ -1,22 +1,23 @@
 import stripe
 from typing import Dict, Any
 
-from output.backend.config import settings
+from config import settings
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 def create_checkout_session(
-    user_id: str,
+    customer_id: str,
     price_id: str,
     success_url: str,
-    cancel_url: str
+    cancel_url: str,
+    metadata: Dict[str, str] = None
 ) -> stripe.checkout.Session:
     """
     Creates a Stripe Checkout Session for a new subscription.
     """
     try:
         checkout_session = stripe.checkout.Session.create(
-            customer_email=None, # Can be pre-filled if user email is known
+            customer=customer_id,  # Use existing customer ID
             line_items=[
                 {
                     'price': price_id,
@@ -26,13 +27,7 @@ def create_checkout_session(
             mode='subscription',
             success_url=success_url,
             cancel_url=cancel_url,
-            metadata={
-                'user_id': str(user_id), # Store user_id for webhook processing
-            },
-            # Allow Stripe to create a customer if one doesn't exist
-            # or attach to an existing one if customer_email is provided and matches.
-            # If we already have stripe_customer_id, we can pass it here:
-            # customer=stripe_customer_id,
+            metadata=metadata or {},  # Store user_id and other metadata for webhook processing
         )
         return checkout_session
     except stripe.error.StripeError as e:

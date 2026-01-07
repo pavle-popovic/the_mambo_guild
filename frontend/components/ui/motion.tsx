@@ -104,6 +104,7 @@ export function StaggerContainer({
       opacity: 1,
       transition: {
         staggerChildren: staggerDelay,
+        delayChildren: 0,
       },
     },
   };

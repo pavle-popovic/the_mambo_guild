@@ -36,6 +36,8 @@ class WorldUpdateRequest(BaseModel):
     is_free: Optional[bool] = None
     image_url: Optional[str] = None
     thumbnail_url: Optional[str] = None
+    mux_preview_playback_id: Optional[str] = None  # Mux playback ID for course preview
+    mux_preview_asset_id: Optional[str] = None  # Mux asset ID for course preview (needed for deletion)
     difficulty: Optional[str] = None
     is_published: Optional[bool] = None
 
@@ -61,6 +63,7 @@ class LessonCreateRequest(BaseModel):
     mux_playback_id: Optional[str] = None
     mux_asset_id: Optional[str] = None
     thumbnail_url: Optional[str] = None
+    lesson_type: Optional[str] = "video"  # video, quiz, or history
 
 
 class LessonUpdateRequest(BaseModel):
@@ -78,6 +81,7 @@ class LessonUpdateRequest(BaseModel):
     mux_asset_id: Optional[str] = None
     delete_video: Optional[bool] = False  # Flag to explicitly delete video (clears Mux IDs)
     thumbnail_url: Optional[str] = None
+    lesson_type: Optional[str] = None  # video, quiz, or history
 
 
 @router.get("/courses", response_model=List[WorldResponse])
@@ -184,6 +188,10 @@ async def update_course(
         world.image_url = course_data.image_url
     if course_data.thumbnail_url is not None:
         world.thumbnail_url = course_data.thumbnail_url
+    if course_data.mux_preview_playback_id is not None:
+        world.mux_preview_playback_id = course_data.mux_preview_playback_id
+    if course_data.mux_preview_asset_id is not None:
+        world.mux_preview_asset_id = course_data.mux_preview_asset_id
     if course_data.difficulty is not None:
         try:
             world.difficulty = Difficulty[course_data.difficulty.upper()]
@@ -273,6 +281,15 @@ async def create_lesson(
     if not level:
         raise HTTPException(status_code=404, detail="Level not found")
     
+    # Validate and normalize lesson_type string
+    lesson_type_str = "video"  # default
+    if lesson_data.lesson_type:
+        lesson_type_lower = lesson_data.lesson_type.lower()
+        if lesson_type_lower in ["video", "quiz", "history"]:
+            lesson_type_str = lesson_type_lower
+        else:
+            lesson_type_str = "video"  # fallback to default
+    
     lesson = Lesson(
         id=uuid.uuid4(),
         level_id=level.id,
@@ -288,7 +305,8 @@ async def create_lesson(
         content_json=lesson_data.content_json,
         mux_playback_id=lesson_data.mux_playback_id,
         mux_asset_id=lesson_data.mux_asset_id,
-        thumbnail_url=lesson_data.thumbnail_url
+        thumbnail_url=lesson_data.thumbnail_url,
+        lesson_type=lesson_type_str
     )
     
     db.add(lesson)
@@ -338,6 +356,11 @@ async def update_lesson(
         lesson.content_json = lesson_data.content_json
     if lesson_data.thumbnail_url is not None:
         lesson.thumbnail_url = lesson_data.thumbnail_url
+    if lesson_data.lesson_type is not None:
+        lesson_type_lower = lesson_data.lesson_type.lower()
+        if lesson_type_lower in ["video", "quiz", "history"]:
+            lesson.lesson_type = lesson_type_lower
+        # If invalid, keep existing value (no change)
     
     # Mux fields are managed by the Webhook (source of truth)
     # Only allow clearing them if explicitly requested via delete_video flag
@@ -399,6 +422,9 @@ async def get_course_full_details(
             l.order_index
         ))
         for lesson in sorted_lessons:
+            # lesson_type is now a string, use it directly
+            lesson_type_str = lesson.lesson_type or "video"
+            
             lessons_data.append({
                 "id": str(lesson.id),
                 "title": lesson.title,
@@ -413,7 +439,8 @@ async def get_course_full_details(
                 "content_json": lesson.content_json,
                 "thumbnail_url": lesson.thumbnail_url,
                 "mux_playback_id": lesson.mux_playback_id,
-                "mux_asset_id": lesson.mux_asset_id
+                "mux_asset_id": lesson.mux_asset_id,
+                "lesson_type": lesson_type_str
             })
         
         levels_data.append({
@@ -432,6 +459,8 @@ async def get_course_full_details(
         "is_free": world.is_free,
         "image_url": world.image_url,
         "thumbnail_url": world.thumbnail_url,
+        "mux_preview_playback_id": world.mux_preview_playback_id,  # Include preview playback ID
+        "mux_preview_asset_id": world.mux_preview_asset_id,  # Include preview asset ID
         "difficulty": difficulty_str,
         "is_published": world.is_published,
         "levels": levels_data

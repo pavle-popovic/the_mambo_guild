@@ -18,6 +18,7 @@ interface LessonEditorModalProps {
     mux_playback_id?: string | null;
     mux_asset_id?: string | null;
     thumbnail_url?: string | null;
+    lesson_type?: string;
   }) => Promise<void>;
   lesson?: {
     id: string;
@@ -33,6 +34,7 @@ interface LessonEditorModalProps {
     mux_playback_id: string | null;
     mux_asset_id: string | null;
     thumbnail_url?: string | null;
+    lesson_type?: string;
   } | null;
   onRefreshLesson?: () => Promise<void>; // Optional callback to refresh lesson data
 }
@@ -63,6 +65,7 @@ export default function LessonEditorModal({
   const [muxPlaybackId, setMuxPlaybackId] = useState<string | null>(null);
   const [muxAssetId, setMuxAssetId] = useState<string | null>(null);
   const [thumbnailUrl, setThumbnailUrl] = useState<string | null>(null);
+  const [lessonType, setLessonType] = useState<string>("video"); // "video", "quiz", or "history"
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
   
@@ -133,6 +136,7 @@ export default function LessonEditorModal({
         setMuxPlaybackId(lesson.mux_playback_id);
         setMuxAssetId(lesson.mux_asset_id);
         setThumbnailUrl((lesson as any).thumbnail_url || null);
+        setLessonType(lesson.lesson_type || "video"); // Initialize lesson type
         
         // Parse content_json for lesson notes and quiz
         if (lesson.content_json) {
@@ -178,6 +182,7 @@ export default function LessonEditorModal({
         setQuizQuestions([]);
         setMuxPlaybackId(null);
         setMuxAssetId(null);
+        setLessonType("video"); // Default to video for new lessons
       }
       initializedLessonIdRef.current = currentLessonId;
       hasInitializedThisSessionRef.current = true;
@@ -267,19 +272,31 @@ export default function LessonEditorModal({
 
   // Build lesson data object (used by both auto-save and manual save)
   const buildLessonData = () => {
-    // Build content_json
+    // Build content_json based on lesson type
     const contentJson: any = {};
-    if (lessonNotes.trim()) {
-      contentJson.notes = lessonNotes.trim();
+    
+    // Video lessons: can have notes
+    // History lessons: only notes
+    // Quiz lessons: only quiz
+    if (lessonType === "video" || lessonType === "history") {
+      if (lessonNotes.trim()) {
+        contentJson.notes = lessonNotes.trim();
+      }
     }
-    if (quizQuestions.length > 0) {
-      contentJson.quiz = quizQuestions;
+    
+    if (lessonType === "quiz" || lessonType === "video") {
+      if (quizQuestions.length > 0) {
+        contentJson.quiz = quizQuestions;
+      }
     }
 
     // Only set placeholder URL if we truly have no video
     // Don't set placeholder if muxPlaybackId exists (will be set when webhook processes)
+    // Video lessons can have video, quiz and history cannot
     let finalVideoUrl = videoUrl.trim();
-    if (!finalVideoUrl && !muxPlaybackId) {
+    if (lessonType === "quiz" || lessonType === "history") {
+      finalVideoUrl = ""; // No video for quiz or history lessons
+    } else if (!finalVideoUrl && !muxPlaybackId) {
       finalVideoUrl = ""; // Empty string instead of placeholder to avoid network errors
     } else if (muxPlaybackId && !finalVideoUrl) {
       finalVideoUrl = ""; // Let mux_playback_id handle video display
@@ -294,6 +311,7 @@ export default function LessonEditorModal({
       duration_minutes: durationMinutes ? parseInt(durationMinutes) : null,
       content_json: Object.keys(contentJson).length > 0 ? contentJson : undefined,
       thumbnail_url: thumbnailUrl || null,
+      lesson_type: lessonType,
       // DO NOT send mux_playback_id or mux_asset_id - webhook manages these
       delete_video: false, // Only set to true when explicitly deleting
     };
@@ -379,7 +397,7 @@ export default function LessonEditorModal({
       }
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [title, description, videoUrl, xpValue, isBossBattle, durationMinutes, lessonNotes, quizQuestionsString, lesson?.id]);
+  }, [title, description, videoUrl, xpValue, isBossBattle, durationMinutes, lessonNotes, quizQuestionsString, lessonType, lesson?.id]);
 
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) {
@@ -498,7 +516,30 @@ export default function LessonEditorModal({
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-8">
-                {/* Video Content */}
+                {/* Lesson Type Selector */}
+                <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
+                  <label className="block text-xs font-bold text-gray-500 uppercase mb-3">
+                    Lesson Type <span className="text-red-400">*</span>
+                  </label>
+                  <select
+                    value={lessonType}
+                    onChange={(e) => setLessonType(e.target.value)}
+                    disabled={isSaving}
+                    className="w-full bg-black border border-gray-700 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue outline-none disabled:opacity-50"
+                  >
+                    <option value="video">Video Lesson (Video + Notes)</option>
+                    <option value="quiz">Quiz (Quiz Only)</option>
+                    <option value="history">History Lesson (Notes Only)</option>
+                  </select>
+                  <p className="text-xs text-gray-500 mt-2">
+                    {lessonType === "video" && "Video lessons include a video player and lesson notes."}
+                    {lessonType === "quiz" && "Quiz lessons contain only quiz questions, no video or notes."}
+                    {lessonType === "history" && "History lessons contain only lesson notes, no video."}
+                  </p>
+                </div>
+
+                {/* Video Content - Only for video lessons */}
+                {lessonType === "video" && (
                 <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
                   <div className="flex justify-between items-center mb-4">
                     <h3 className="font-bold text-lg text-mambo-text">
@@ -581,8 +622,10 @@ export default function LessonEditorModal({
                   ) : null}
 
                 </div>
+                )}
 
-                {/* Lesson Notes */}
+                {/* Lesson Notes - For video and history lessons */}
+                {(lessonType === "video" || lessonType === "history") && (
                 <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
                   <h3 className="font-bold text-lg mb-4 text-mambo-text">
                     <FaPen className="inline text-mambo-blue mr-2" />
@@ -609,13 +652,15 @@ export default function LessonEditorModal({
                   />
                   <p className="text-xs text-gray-500 mt-2">Supports Markdown formatting</p>
                 </div>
+                )}
 
-                {/* Quiz Section */}
+                {/* Quiz Section - For video and quiz lessons */}
+                {(lessonType === "video" || lessonType === "quiz") && (
                 <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
                   <div className="flex justify-between items-center mb-6">
                     <h3 className="font-bold text-lg text-mambo-text">
                       <FaClipboardList className="inline text-mambo-blue mr-2" />
-                      Knowledge Check
+                      {lessonType === "quiz" ? "Quiz Questions" : "Knowledge Check"}
                     </h3>
                     <button
                       type="button"
@@ -629,7 +674,11 @@ export default function LessonEditorModal({
                   </div>
 
                   {quizQuestions.length === 0 ? (
-                    <p className="text-gray-500 text-sm text-center py-8">No questions yet. Click "Add Question" to create a quiz.</p>
+                    <p className="text-gray-500 text-sm text-center py-8">
+                      {lessonType === "quiz" 
+                        ? "No questions yet. Click 'Add Question' to create your quiz." 
+                        : "No questions yet. Click 'Add Question' to create a knowledge check."}
+                    </p>
                   ) : (
                     <div className="space-y-4">
                       {quizQuestions.map((question, qIndex) => (
@@ -719,6 +768,7 @@ export default function LessonEditorModal({
                     </div>
                   )}
                 </div>
+                )}
               </div>
 
               {/* Sidebar */}
@@ -798,37 +848,62 @@ export default function LessonEditorModal({
                       <label className="block text-xs font-bold text-gray-500 uppercase mb-3">Completion Criteria</label>
                       
                       <div className="space-y-3">
-                        <label className="flex items-start gap-3 cursor-pointer group">
-                          <input
-                            type="checkbox"
-                            checked={true}
-                            disabled={true}
-                            className="mt-1 w-4 h-4 rounded border-gray-600 text-mambo-blue focus:ring-mambo-blue bg-gray-700"
-                          />
-                          <div className="text-sm">
-                            <span className="block text-gray-200 font-medium group-hover:text-white">Watch 90% of Video</span>
-                            <span className="block text-xs text-gray-500">Automated via MUX webhooks</span>
-                          </div>
-                        </label>
+                        {/* Video completion - only for video lessons */}
+                        {lessonType === "video" && (
+                          <label className="flex items-start gap-3 cursor-pointer group">
+                            <input
+                              type="checkbox"
+                              checked={true}
+                              disabled={true}
+                              className="mt-1 w-4 h-4 rounded border-gray-600 text-mambo-blue focus:ring-mambo-blue bg-gray-700"
+                            />
+                            <div className="text-sm">
+                              <span className="block text-gray-200 font-medium group-hover:text-white">Watch 90% of Video</span>
+                              <span className="block text-xs text-gray-500">Automated via MUX webhooks</span>
+                            </div>
+                          </label>
+                        )}
 
-                        <label className="flex items-start gap-3 cursor-pointer group">
-                          <input
-                            type="checkbox"
-                            checked={quizQuestions.length > 0}
-                            disabled={true}
-                            className="mt-1 w-4 h-4 rounded border-gray-600 text-mambo-blue focus:ring-mambo-blue bg-gray-700"
-                          />
-                          <div className="text-sm">
-                            <span className="block text-gray-200 font-medium group-hover:text-white">Pass Quiz</span>
-                            <span className="block text-xs text-gray-500">Must get 80% correct</span>
-                          </div>
-                        </label>
+                        {/* Quiz completion - for video and quiz lessons */}
+                        {(lessonType === "video" || lessonType === "quiz") && (
+                          <label className="flex items-start gap-3 cursor-pointer group">
+                            <input
+                              type="checkbox"
+                              checked={quizQuestions.length > 0}
+                              disabled={true}
+                              className="mt-1 w-4 h-4 rounded border-gray-600 text-mambo-blue focus:ring-mambo-blue bg-gray-700"
+                            />
+                            <div className="text-sm">
+                              <span className="block text-gray-200 font-medium group-hover:text-white">
+                                {lessonType === "quiz" ? "Pass Quiz" : "Pass Knowledge Check"}
+                              </span>
+                              <span className="block text-xs text-gray-500">Must get 80% correct</span>
+                            </div>
+                          </label>
+                        )}
+
+                        {/* History lessons - no completion criteria */}
+                        {lessonType === "history" && (
+                          <label className="flex items-start gap-3 cursor-pointer group">
+                            <input
+                              type="checkbox"
+                              checked={true}
+                              disabled={true}
+                              className="mt-1 w-4 h-4 rounded border-gray-600 text-mambo-blue focus:ring-mambo-blue bg-gray-700"
+                            />
+                            <div className="text-sm">
+                              <span className="block text-gray-200 font-medium group-hover:text-white">Read Lesson Notes</span>
+                              <span className="block text-xs text-gray-500">Complete by reading through the content</span>
+                            </div>
+                          </label>
+                        )}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Boss Battle */}
+                {/* Boss Battle - Only for video lessons */}
+                {lessonType === "video" && (
                 <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
                   <label className="flex items-center justify-between cursor-pointer group">
                     <div>
@@ -844,6 +919,7 @@ export default function LessonEditorModal({
                     />
                   </label>
                 </div>
+                )}
               </div>
             </div>
           </div>

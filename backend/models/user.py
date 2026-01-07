@@ -76,7 +76,7 @@ class SubscriptionStatus(str, enum.Enum):
 
 class SubscriptionTier(str, enum.Enum):
     ROOKIE = "rookie"
-    SOCIAL_DANCER = "social_dancer"
+    ADVANCED = "advanced"  # Renamed from SOCIAL_DANCER
     PERFORMER = "performer"
 
 

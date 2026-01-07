@@ -69,17 +69,21 @@ export default function NavBar({ user }: NavBarProps) {
             transition: { type: "spring", stiffness: 400, damping: 17 }
           } : {})}
         >
-          <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-3">
-            <Image
-              src="/assets/Logo.png"
-              alt="The Mambo Inn"
-              width={48}
-              height={48}
-              className="h-12 w-auto logo-img"
-              style={{ mixBlendMode: "screen" }}
-            />
-            <span className="text-mambo-text">THE MAMBO INN</span>
-          </Link>
+        <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-3">
+          <Image
+            src="/assets/Logo.png"
+            alt="The Mambo Inn"
+            width={48}
+            height={48}
+            className="h-12 w-auto logo-img"
+            style={{ mixBlendMode: "screen" }}
+          />
+          <span className="font-serif text-xl">
+            <span className="text-gray-400">THE</span>{" "}
+            <span className="text-[#d4af37] font-bold drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]">MAMBO</span>{" "}
+            <span className="text-gray-400">INN</span>
+          </span>
+        </Link>
         </LogoWrapper>
 
         <div className="hidden md:flex gap-10 items-center">
@@ -121,20 +125,20 @@ export default function NavBar({ user }: NavBarProps) {
               {/* User Avatar */}
               <MotionDiv {...(mounted ? { whileHover: { scale: 1.1 }, whileTap: { scale: 0.95 } } : {})}>
                 <Link href="/profile" className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden ring-2 ring-transparent hover:ring-mambo-blue/50 transition-all flex items-center justify-center">
-                  {user.avatar_url ? (
-                    <Image
-                      src={user.avatar_url}
-                      alt={`${user.first_name} ${user.last_name}`}
+                {user.avatar_url ? (
+                  <Image
+                    src={user.avatar_url}
+                    alt={`${user.first_name} ${user.last_name}`}
                       width={40}
                       height={40}
                       className="w-full h-full object-cover rounded-full"
-                    />
-                  ) : (
+                  />
+                ) : (
                     <div className="w-full h-full rounded-full bg-gradient-to-br from-mambo-blue to-purple-600 flex items-center justify-center text-white text-xs font-bold">
-                      {(user.first_name?.[0] || "U").toUpperCase()}
-                    </div>
-                  )}
-                </Link>
+                    {(user.first_name?.[0] || "U").toUpperCase()}
+                  </div>
+                )}
+              </Link>
               </MotionDiv>
             </>
           ) : (
@@ -146,12 +150,12 @@ export default function NavBar({ user }: NavBarProps) {
                 Log In
               </Link>
               <MotionDiv {...(mounted ? { whileHover: { scale: 1.05 }, whileTap: { scale: 0.95 } } : {})}>
-                <Link
-                  href="/register"
+              <Link
+                href="/register"
                   className="px-5 py-2 bg-gradient-to-r from-white to-gray-100 text-black rounded-full text-sm font-bold hover:from-gray-100 hover:to-gray-200 transition-all shadow-lg shadow-white/10"
-                >
-                  Register
-                </Link>
+              >
+                Register
+              </Link>
               </MotionDiv>
             </>
           )}

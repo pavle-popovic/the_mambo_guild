@@ -36,12 +36,12 @@ const Button: React.FC<ButtonProps> = ({
 
     return (
         <Clickable>
-            <button
-                className={combinedClasses}
-                onClick={onClick}
-            >
+        <button
+            className={combinedClasses}
+            onClick={onClick}
+        >
                 <span className="relative z-10">{children}</span>
-            </button>
+        </button>
         </Clickable>
     );
 };

@@ -14,6 +14,12 @@ class Difficulty(str, enum.Enum):
     ADVANCED = "Advanced"
 
 
+class LessonType(str, enum.Enum):
+    VIDEO = "video"  # Video lesson with notes
+    QUIZ = "quiz"  # Quiz only, no video, no notes
+    HISTORY = "history"  # Notes only, no video
+
+
 class World(Base):
     __tablename__ = "worlds"
 
@@ -25,6 +31,8 @@ class World(Base):
     is_free = Column(Boolean, default=False, nullable=False)
     image_url = Column(String, nullable=True)
     thumbnail_url = Column(String, nullable=True)
+    mux_preview_playback_id = Column(String, nullable=True)  # Mux playback ID for course preview video
+    mux_preview_asset_id = Column(String, nullable=True)  # Mux asset ID for course preview video (needed for deletion)
     difficulty = Column(SQLEnum(Difficulty), nullable=False)
     is_published = Column(Boolean, default=False, nullable=False)
 
@@ -61,6 +69,10 @@ class Lesson(Base):
     order_index = Column(Integer, nullable=False)
     is_boss_battle = Column(Boolean, default=False, nullable=False)
     duration_minutes = Column(Integer, nullable=True)
+    
+    # Lesson type: video (video + notes), quiz (quiz only), history (notes only)
+    # Use String column to store enum values directly (not enum names)
+    lesson_type = Column(String, default=LessonType.VIDEO.value, nullable=False)
     
     # Week/Day sorting fields
     week_number = Column(Integer, nullable=True, index=True)
