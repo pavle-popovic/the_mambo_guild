@@ -632,6 +632,29 @@ class ApiClient {
     });
   }
 
+  async updateSubscription(newPriceId: string) {
+    return this.request<{
+      success: boolean;
+      message: string;
+      tier?: string;
+    }>("/api/payments/update-subscription", {
+      method: "POST",
+      body: JSON.stringify({
+        new_price_id: newPriceId,
+      }),
+    });
+  }
+
+  async cancelSubscription() {
+    return this.request<{
+      success: boolean;
+      message: string;
+      tier?: string;
+    }>("/api/payments/cancel-subscription", {
+      method: "POST",
+    });
+  }
+
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);

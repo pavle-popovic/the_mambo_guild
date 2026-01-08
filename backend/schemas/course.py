@@ -83,3 +83,13 @@ class CheckoutSessionResponse(BaseModel):
     session_id: str
     url: str
 
+
+class UpdateSubscriptionRequest(BaseModel):
+    new_price_id: str
+
+
+class SubscriptionResponse(BaseModel):
+    success: bool
+    message: str
+    tier: Optional[str] = None
+

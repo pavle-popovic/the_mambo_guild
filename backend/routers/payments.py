@@ -12,7 +12,12 @@ from models.user import User, Subscription, SubscriptionStatus, SubscriptionTier
 from services import stripe_service
 from config import settings
 
-from schemas.course import CheckoutSessionRequest, CheckoutSessionResponse
+from schemas.course import (
+    CheckoutSessionRequest, 
+    CheckoutSessionResponse,
+    UpdateSubscriptionRequest,
+    SubscriptionResponse
+)
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -39,14 +44,16 @@ async def create_checkout_session(
                 detail="Invalid price ID. Only Advanced and Performer tiers are available."
             )
         
-        # Check if user already has an active subscription
+        # Allow creating checkout session even if user has active subscription
+        # (for upgrades/downgrades, we'll use update-subscription endpoint instead)
+        # But for new subscriptions, check if they already have one
         existing_subscription = db.query(Subscription).filter(
             Subscription.user_id == current_user.id
         ).first()
         if existing_subscription and existing_subscription.status == SubscriptionStatus.ACTIVE:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail="User already has an active subscription."
+                detail="User already has an active subscription. Use update-subscription to change plans."
             )
 
         # Create or retrieve Stripe Customer ID
@@ -215,3 +222,159 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
     # Other event types can be handled here as needed
 
     return {"status": "success"}
+
+
+@router.post("/update-subscription", response_model=SubscriptionResponse)
+async def update_subscription(
+    request_data: UpdateSubscriptionRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Update an existing subscription (upgrade or downgrade).
+    Changes the subscription to a new price tier.
+    """
+    try:
+        # Validate price_id
+        if request_data.new_price_id not in [ADVANCED_PRICE_ID, PERFORMER_PRICE_ID]:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid price ID. Only Advanced and Performer tiers are available."
+            )
+        
+        # Get user's subscription
+        subscription = db.query(Subscription).filter(
+            Subscription.user_id == current_user.id
+        ).first()
+        
+        if not subscription:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No subscription found for this user."
+            )
+        
+        if subscription.status != SubscriptionStatus.ACTIVE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Subscription is not active. Cannot update."
+            )
+        
+        if not subscription.stripe_subscription_id:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="No Stripe subscription ID found. Cannot update."
+            )
+        
+        # Retrieve the Stripe subscription
+        stripe_subscription = stripe.Subscription.retrieve(subscription.stripe_subscription_id)
+        
+        # Get the subscription item ID (there should be one item)
+        subscription_item_id = stripe_subscription.items.data[0].id
+        
+        # Update the subscription with the new price
+        updated_subscription = stripe.Subscription.modify(
+            subscription.stripe_subscription_id,
+            items=[{
+                'id': subscription_item_id,
+                'price': request_data.new_price_id,
+            }],
+            proration_behavior='always_invoice',  # Prorate the difference
+        )
+        
+        # Determine the new tier based on price_id
+        tier_mapping = {
+            ADVANCED_PRICE_ID: SubscriptionTier.ADVANCED,
+            PERFORMER_PRICE_ID: SubscriptionTier.PERFORMER,
+        }
+        new_tier = tier_mapping.get(request_data.new_price_id, SubscriptionTier.ROOKIE)
+        
+        # Update our database
+        subscription.tier = new_tier
+        subscription.current_period_end = datetime.fromtimestamp(
+            updated_subscription.current_period_end
+        )
+        db.commit()
+        db.refresh(subscription)
+        
+        return SubscriptionResponse(
+            success=True,
+            message="Subscription updated successfully.",
+            tier=new_tier.value
+        )
+        
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {e}"
+        )
+
+
+@router.post("/cancel-subscription", response_model=SubscriptionResponse)
+async def cancel_subscription(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Cancel an active subscription. Sets the subscription to cancel at period end.
+    User will retain access until the end of the billing period, then revert to Rookie tier.
+    """
+    try:
+        # Get user's subscription
+        subscription = db.query(Subscription).filter(
+            Subscription.user_id == current_user.id
+        ).first()
+        
+        if not subscription:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No subscription found for this user."
+            )
+        
+        if subscription.status != SubscriptionStatus.ACTIVE:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Subscription is not active. Nothing to cancel."
+            )
+        
+        if not subscription.stripe_subscription_id:
+            # If no Stripe subscription, just update our DB
+            subscription.status = SubscriptionStatus.CANCELED
+            subscription.tier = SubscriptionTier.ROOKIE
+            db.commit()
+            db.refresh(subscription)
+            
+            return SubscriptionResponse(
+                success=True,
+                message="Subscription canceled successfully.",
+                tier="rookie"
+            )
+        
+        # Cancel the Stripe subscription immediately
+        # This will trigger a customer.subscription.deleted webhook
+        stripe.Subscription.delete(subscription.stripe_subscription_id)
+        
+        # Update our database immediately
+        subscription.status = SubscriptionStatus.CANCELED
+        subscription.tier = SubscriptionTier.ROOKIE
+        db.commit()
+        db.refresh(subscription)
+        
+        return SubscriptionResponse(
+            success=True,
+            message="Subscription canceled successfully. You now have access to the Rookie plan.",
+            tier="rookie"
+        )
+        
+    except stripe.error.StripeError as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"An unexpected error occurred: {e}"
+        )

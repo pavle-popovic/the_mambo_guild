@@ -125,7 +125,7 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
             } cursor-pointer`}
           >
             {/* Image/Preview section */}
-            <div className="h-48 relative overflow-hidden bg-black">
+            <div className="aspect-square relative overflow-hidden bg-black">
               {/* Video Player - Load behind thumbnail, only mount when hovering */}
               {shouldShowVideo && (
                 <div className="absolute inset-0 z-0 course-preview-player">
@@ -161,7 +161,7 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
                   src={course.thumbnail_url || course.image_url || ""}
                   alt={course.title}
                   fill
-                  className={`object-cover aspect-video transition-opacity duration-300 rounded-t-xl relative z-10 ${
+                  className={`object-cover aspect-square transition-opacity duration-300 rounded-t-xl relative z-10 ${
                     thumbnailOpacity === "opacity-0" 
                       ? "opacity-0" 
                       : "opacity-100 group-hover:scale-105"
@@ -172,7 +172,7 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
                   src="/assets/Mambo_image_1.png"
                   alt={course.title}
                   fill
-                  className={`object-cover aspect-video transition-opacity duration-300 rounded-t-xl relative z-10 ${
+                  className={`object-cover aspect-square transition-opacity duration-300 rounded-t-xl relative z-10 ${
                     thumbnailOpacity === "opacity-0" 
                       ? "opacity-0" 
                       : "opacity-100 group-hover:scale-105"

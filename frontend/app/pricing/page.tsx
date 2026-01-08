@@ -85,6 +85,81 @@ export default function PricingPage() {
     }
   };
 
+  const handleUpgrade = async () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    try {
+      setLoading("upgrade");
+      await refreshUser();
+      await apiClient.updateSubscription(PERFORMER_PRICE_ID);
+      await refreshUser();
+      alert("Successfully upgraded to Performer plan!");
+      router.push("/courses");
+    } catch (error: any) {
+      console.error("Failed to upgrade:", error);
+      alert(error.message || "Failed to upgrade subscription. Please try again.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleDowngrade = async () => {
+    if (!user) {
+      return;
+    }
+
+    if (!confirm("Are you sure you want to downgrade to Advanced plan? Your subscription will be updated immediately.")) {
+      return;
+    }
+
+    try {
+      setLoading("downgrade");
+      await refreshUser();
+      await apiClient.updateSubscription(ADVANCED_PRICE_ID);
+      await refreshUser();
+      alert("Successfully downgraded to Advanced plan!");
+      router.push("/courses");
+    } catch (error: any) {
+      console.error("Failed to downgrade:", error);
+      alert(error.message || "Failed to downgrade subscription. Please try again.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    if (!user) {
+      return;
+    }
+
+    if (!confirm("Are you sure you want to cancel your subscription? You will lose access to premium features immediately and revert to the free Rookie plan.")) {
+      return;
+    }
+
+    try {
+      setLoading("cancel");
+      await refreshUser();
+      await apiClient.cancelSubscription();
+      await refreshUser();
+      alert("Subscription canceled successfully. You now have access to the free Rookie plan.");
+      router.push("/courses");
+    } catch (error: any) {
+      console.error("Failed to cancel subscription:", error);
+      alert(error.message || "Failed to cancel subscription. Please try again.");
+    } finally {
+      setLoading(null);
+    }
+  };
+
+  // Get current user tier (default to "rookie" if not logged in or no tier)
+  const currentTier = user?.tier?.toLowerCase() || "rookie";
+  const isRookie = currentTier === "rookie";
+  const isAdvanced = currentTier === "advanced";
+  const isPerformer = currentTier === "performer";
+
   return (
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user || undefined} />
@@ -103,13 +178,13 @@ export default function PricingPage() {
             <StaggerItem>
               <HoverCard>
                 <div className="border border-gray-800 hover:border-gray-700 bg-mambo-panel rounded-2xl p-8 flex flex-col h-full shadow-lg shadow-black/20 transition-all duration-300">
-            <div className="mb-4">
-              <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
-                Rookie
-              </span>
-            </div>
-            <div className="text-4xl font-bold mb-2 text-mambo-text">Free</div>
-            <div className="text-sm text-gray-500 mb-8">Forever. No credit card.</div>
+                  <div className="mb-4">
+                    <span className="text-xs font-bold uppercase tracking-widest text-gray-500">
+                      Rookie
+                    </span>
+                  </div>
+                  <div className="text-4xl font-bold mb-2 text-mambo-text">Free</div>
+                  <div className="text-sm text-gray-500 mb-8">Forever. No credit card.</div>
 
                   <ul className="text-left space-y-4 mb-8 flex-1">
                     <li className="flex gap-3 text-sm text-gray-300 leading-relaxed">
@@ -130,27 +205,55 @@ export default function PricingPage() {
                     </li>
                   </ul>
                   <Clickable>
-                    <Link
-                      href={user ? "/courses" : "/register"}
-                      className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text text-center shadow-md"
-                    >
-                      {user ? "Current Plan" : "Create Free Account"}
-                    </Link>
+                    {!user ? (
+                      <Link
+                        href="/register"
+                        className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text text-center shadow-md"
+                      >
+                        Create Free Account
+                      </Link>
+                    ) : isRookie ? (
+                      <Link
+                        href="/courses"
+                        className="block w-full py-3 border border-gray-600 rounded-lg font-bold bg-gray-800/50 transition-all duration-300 text-mambo-text text-center shadow-md cursor-default"
+                      >
+                        Current Plan
+                      </Link>
+                    ) : isAdvanced ? (
+                      <button
+                        onClick={handleCancelSubscription}
+                        disabled={loading === "cancel"}
+                        className="block w-full py-3 border border-red-600 hover:border-red-500 rounded-lg font-bold hover:bg-red-900/20 transition-all duration-300 text-red-400 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading === "cancel" ? "Loading..." : "Remove Subscription"}
+                      </button>
+                    ) : isPerformer ? (
+                      <button
+                        onClick={handleCancelSubscription}
+                        disabled={loading === "cancel"}
+                        className="block w-full py-3 border border-red-600 hover:border-red-500 rounded-lg font-bold hover:bg-red-900/20 transition-all duration-300 text-red-400 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading === "cancel" ? "Loading..." : "Remove Subscription"}
+                      </button>
+                    ) : null}
                   </Clickable>
                 </div>
               </HoverCard>
             </StaggerItem>
 
-            {/* Social Dancer Tier - Most Popular */}
+            {/* Advanced Tier */}
             <StaggerItem>
               <HoverCard>
-                <div className="relative border-2 border-mambo-blue bg-mambo-panel rounded-2xl p-8 flex flex-col shadow-2xl shadow-blue-900/30 h-full z-10">
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-gradient-to-r from-mambo-blue to-purple-600 text-white px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest shadow-lg">
-                    Most Popular
-                  </div>
-
-                  <div className="mb-4 mt-2">
-                    <span className="text-xs font-bold uppercase tracking-widest text-blue-400">
+                <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 ${
+                  (!user || isRookie) ? "z-10 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 shadow-2xl shadow-blue-900/30" : ""
+                }`}>
+                  <div className={`relative ${
+                    (!user || isRookie) ? "" : "border border-gray-800 hover:border-gray-700 bg-mambo-panel rounded-2xl p-8 flex flex-col h-full shadow-lg shadow-black/20 transition-all duration-300"
+                  } ${(!user || isRookie) ? "bg-mambo-panel rounded-2xl p-8 flex flex-col h-full shadow-lg shadow-black/20 transition-all duration-300" : ""}`}>
+                  <div className="mb-4">
+                    <span className={`text-xs font-bold uppercase tracking-widest ${
+                      isAdvanced ? "text-blue-400" : "text-gray-500"
+                    }`}>
                       Advanced
                     </span>
                   </div>
@@ -160,32 +263,74 @@ export default function PricingPage() {
                   <div className="text-sm text-gray-400 mb-8">Billed monthly.</div>
 
                   <ul className="text-left space-y-4 mb-8 flex-1">
-                    <li className="flex gap-3 text-sm text-mambo-text font-medium leading-relaxed">
-                      <FaCheck className="text-mambo-blue shrink-0 mt-0.5" />
+                    <li className={`flex gap-3 text-sm leading-relaxed ${
+                      isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"
+                    }`}>
+                      <FaCheck className={`shrink-0 mt-0.5 ${
+                        isAdvanced ? "text-mambo-blue" : "text-gray-500"
+                      }`} />
                       Unlimited Course Access
                     </li>
-                    <li className="flex gap-3 text-sm text-mambo-text font-medium leading-relaxed">
-                      <FaCheck className="text-mambo-blue shrink-0 mt-0.5" />
+                    <li className={`flex gap-3 text-sm leading-relaxed ${
+                      isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"
+                    }`}>
+                      <FaCheck className={`shrink-0 mt-0.5 ${
+                        isAdvanced ? "text-mambo-blue" : "text-gray-500"
+                      }`} />
                       New Workshops Weekly
                     </li>
-                    <li className="flex gap-3 text-sm text-mambo-text font-medium leading-relaxed">
-                      <FaCheck className="text-mambo-blue shrink-0 mt-0.5" />
+                    <li className={`flex gap-3 text-sm leading-relaxed ${
+                      isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"
+                    }`}>
+                      <FaCheck className={`shrink-0 mt-0.5 ${
+                        isAdvanced ? "text-mambo-blue" : "text-gray-500"
+                      }`} />
                       Advanced Partnerwork
                     </li>
-                    <li className="flex gap-3 text-sm text-mambo-text font-medium leading-relaxed">
-                      <FaCheck className="text-mambo-blue shrink-0 mt-0.5" />
+                    <li className={`flex gap-3 text-sm leading-relaxed ${
+                      isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"
+                    }`}>
+                      <FaCheck className={`shrink-0 mt-0.5 ${
+                        isAdvanced ? "text-mambo-blue" : "text-gray-500"
+                      }`} />
                       Community Challenges
                     </li>
                   </ul>
                   <Clickable>
-                    <button
-                      onClick={() => handleSubscribe(ADVANCED_PRICE_ID, "advanced")}
-                      disabled={loading === ADVANCED_PRICE_ID}
-                      className="block w-full py-4 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 hover:from-blue-600 hover:via-blue-600 hover:to-purple-700 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {loading === ADVANCED_PRICE_ID ? "Loading..." : "Start 7-Day Free Trial"}
-                    </button>
+                    {!user ? (
+                      <button
+                        onClick={() => handleSubscribe(ADVANCED_PRICE_ID, "advanced")}
+                        disabled={loading === ADVANCED_PRICE_ID}
+                        className="block w-full py-4 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 hover:from-blue-600 hover:via-blue-600 hover:to-purple-700 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading === ADVANCED_PRICE_ID ? "Loading..." : "Start 7-Day Free Trial"}
+                      </button>
+                    ) : isRookie ? (
+                      <button
+                        onClick={() => handleSubscribe(ADVANCED_PRICE_ID, "advanced")}
+                        disabled={loading === ADVANCED_PRICE_ID}
+                        className="block w-full py-4 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 hover:from-blue-600 hover:via-blue-600 hover:to-purple-700 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading === ADVANCED_PRICE_ID ? "Loading..." : "Start 7-Day Free Trial"}
+                      </button>
+                    ) : isAdvanced ? (
+                      <button
+                        disabled
+                        className="block w-full py-4 bg-gray-800/50 border border-gray-600 rounded-lg font-bold text-mambo-text text-center shadow-md cursor-default"
+                      >
+                        Current Plan
+                      </button>
+                    ) : isPerformer ? (
+                      <button
+                        onClick={handleDowngrade}
+                        disabled={loading === "downgrade"}
+                        className="block w-full py-4 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading === "downgrade" ? "Loading..." : "Downgrade to Advanced Pass Plan"}
+                      </button>
+                    ) : null}
                   </Clickable>
+                  </div>
                 </div>
               </HoverCard>
             </StaggerItem>
@@ -193,9 +338,14 @@ export default function PricingPage() {
             {/* Performer Tier */}
             <StaggerItem>
               <HoverCard>
-                <div className="border border-gray-800 hover:border-gray-700 bg-mambo-panel rounded-2xl p-8 flex flex-col h-full shadow-lg shadow-black/20 transition-all duration-300">
+                <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 ${
+                  (isAdvanced || isPerformer) ? "z-10 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 shadow-2xl shadow-blue-900/30" : ""
+                }`}>
+                  <div className="relative bg-mambo-panel rounded-2xl p-8 flex flex-col h-full shadow-lg shadow-black/20 transition-all duration-300">
                   <div className="mb-4">
-                    <span className="text-xs font-bold uppercase tracking-widest text-yellow-500">
+                    <span className={`text-xs font-bold uppercase tracking-widest ${
+                      isPerformer ? "text-blue-400" : "text-yellow-500"
+                    }`}>
                       Performer
                     </span>
                   </div>
@@ -205,32 +355,74 @@ export default function PricingPage() {
                   <div className="text-sm text-gray-400 mb-8">For serious students.</div>
 
                   <ul className="text-left space-y-4 mb-8 flex-1">
-                    <li className="flex gap-3 text-sm text-gray-300 leading-relaxed">
-                      <FaCheck className="text-yellow-500 shrink-0 mt-0.5" />
-                      Everything in Social Dancer
+                    <li className={`flex gap-3 text-sm leading-relaxed ${
+                      isPerformer ? "text-mambo-text font-medium" : "text-gray-300"
+                    }`}>
+                      <FaCheck className={`shrink-0 mt-0.5 ${
+                        isPerformer ? "text-mambo-blue" : "text-yellow-500"
+                      }`} />
+                      Everything in Advanced
                     </li>
-                    <li className="flex gap-3 text-sm text-gray-300 leading-relaxed">
-                      <FaCheck className="text-yellow-500 shrink-0 mt-0.5" />
+                    <li className={`flex gap-3 text-sm leading-relaxed ${
+                      isPerformer ? "text-mambo-text font-medium" : "text-gray-300"
+                    }`}>
+                      <FaCheck className={`shrink-0 mt-0.5 ${
+                        isPerformer ? "text-mambo-blue" : "text-yellow-500"
+                      }`} />
                       1 Video Review / Month
                     </li>
-                    <li className="flex gap-3 text-sm text-gray-300 leading-relaxed">
-                      <FaCheck className="text-yellow-500 shrink-0 mt-0.5" />
+                    <li className={`flex gap-3 text-sm leading-relaxed ${
+                      isPerformer ? "text-mambo-text font-medium" : "text-gray-300"
+                    }`}>
+                      <FaCheck className={`shrink-0 mt-0.5 ${
+                        isPerformer ? "text-mambo-blue" : "text-yellow-500"
+                      }`} />
                       Direct Chat with Instructors
                     </li>
-                    <li className="flex gap-3 text-sm text-gray-300 leading-relaxed">
-                      <FaCheck className="text-yellow-500 shrink-0 mt-0.5" />
+                    <li className={`flex gap-3 text-sm leading-relaxed ${
+                      isPerformer ? "text-mambo-text font-medium" : "text-gray-300"
+                    }`}>
+                      <FaCheck className={`shrink-0 mt-0.5 ${
+                        isPerformer ? "text-mambo-blue" : "text-yellow-500"
+                      }`} />
                       &quot;Certified&quot; Badge on Profile
                     </li>
                   </ul>
                   <Clickable>
-                    <button
-                      onClick={() => handleSubscribe(PERFORMER_PRICE_ID, "performer")}
-                      disabled={loading === PERFORMER_PRICE_ID}
-                      className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                      {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Performer Access"}
-                    </button>
+                    {!user ? (
+                      <button
+                        onClick={() => handleSubscribe(PERFORMER_PRICE_ID, "performer")}
+                        disabled={loading === PERFORMER_PRICE_ID}
+                        className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Performer Access"}
+                      </button>
+                    ) : isRookie ? (
+                      <button
+                        onClick={() => handleSubscribe(PERFORMER_PRICE_ID, "performer")}
+                        disabled={loading === PERFORMER_PRICE_ID}
+                        className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Performer Access"}
+                      </button>
+                    ) : isAdvanced ? (
+                      <button
+                        onClick={handleUpgrade}
+                        disabled={loading === "upgrade"}
+                        className="block w-full py-4 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 hover:from-blue-600 hover:via-blue-600 hover:to-purple-700 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loading === "upgrade" ? "Loading..." : "Upgrade"}
+                      </button>
+                    ) : isPerformer ? (
+                      <button
+                        disabled
+                        className="block w-full py-4 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 hover:from-blue-600 hover:via-blue-600 hover:to-purple-700 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 cursor-default"
+                      >
+                        Current Plan
+                      </button>
+                    ) : null}
                   </Clickable>
+                  </div>
                 </div>
               </HoverCard>
             </StaggerItem>
