@@ -54,6 +54,18 @@ backend/
 ├── services/                # Business logic services
 │   ├── storage_service.py   # R2/S3 storage service
 │   └── mux_service.py       # Mux API service
+├── scripts/                 # Utility and migration scripts
+│   ├── create_admin.py     # Create admin user
+│   ├── create_test_user.py # Create test user with subscription
+│   ├── seed_courses.py     # Seed initial course data
+│   ├── seed_direct.py      # Direct database seeding
+│   └── migrate_*.py        # Database migration scripts
+├── tests/                   # Test suite
+│   ├── conftest.py         # Pytest configuration
+│   ├── test_backend.py     # Backend unit tests
+│   ├── test_all_apis.py    # Comprehensive API tests
+│   └── test_*.py           # Additional test files
+├── migrations/              # Database schema migrations
 ├── dependencies.py          # FastAPI dependencies
 ├── database.py              # Database connection and session
 ├── config.py                # Environment configuration
@@ -311,6 +323,12 @@ Interactive API documentation available at:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Codebase Cleanup & Reorganization** (January 2026)
+  - Scripts moved to `backend/scripts/` directory
+  - Tests moved to `backend/tests/` directory with pytest configuration
+  - Deleted dead code (node_modules, package.json from Python backend)
+  - **Security Fix**: SECRET_KEY now raises `ValueError` in production if not set
+  - **Performance Fix**: Eliminated N+1 queries in `get_worlds` and `get_world_lessons` endpoints
 - ✅ **Course Completion Detection**: Backend support for course completion tracking
   - Progress calculation returns accurate completion percentages
   - Course completion determined by all lessons being completed

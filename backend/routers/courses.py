@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from typing import List
+from sqlalchemy import func
+from typing import List, Dict
 from models import get_db
 from models.user import User, Subscription, SubscriptionStatus
 from models.course import World, Lesson, Level
@@ -35,6 +36,42 @@ async def get_worlds(
         subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
         is_subscribed = subscription and subscription.status == SubscriptionStatus.ACTIVE
     
+    # PERFORMANCE FIX: Pre-fetch all user progress in a single query
+    # Build a map of world_id -> (completed_count, total_lessons)
+    world_progress_map: Dict[str, tuple] = {}
+    if current_user:
+        # First, build a mapping of lesson_id -> world_id for all lessons
+        lesson_to_world: Dict[str, str] = {}
+        world_lesson_counts: Dict[str, int] = {}
+        
+        for world in worlds:
+            world_lesson_counts[str(world.id)] = 0
+            for level in world.levels:
+                for lesson in level.lessons:
+                    lesson_to_world[str(lesson.id)] = str(world.id)
+                    world_lesson_counts[str(world.id)] += 1
+        
+        # Get all completed lesson IDs for this user in a single query
+        all_lesson_ids = list(lesson_to_world.keys())
+        if all_lesson_ids:
+            completed_progress = db.query(UserProgress.lesson_id).filter(
+                UserProgress.user_id == current_user.id,
+                UserProgress.is_completed == True,
+                UserProgress.lesson_id.in_(all_lesson_ids)
+            ).all()
+            
+            # Count completions per world
+            world_completed_counts: Dict[str, int] = {str(w.id): 0 for w in worlds}
+            for (lesson_id,) in completed_progress:
+                world_id = lesson_to_world.get(str(lesson_id))
+                if world_id:
+                    world_completed_counts[world_id] += 1
+            
+            # Build the progress map
+            for world_id, completed in world_completed_counts.items():
+                total = world_lesson_counts.get(world_id, 0)
+                world_progress_map[world_id] = (completed, total)
+    
     result = []
     for world in worlds:
         # REFINED ACCESS CONTROL:
@@ -51,20 +88,11 @@ async def get_worlds(
             # Paid course - requires active subscription
             is_locked = not is_subscribed
         
-        # Calculate progress (only if user is authenticated)
+        # Calculate progress from pre-fetched data
         progress_percentage = 0
         if current_user:
-            world_lessons = []
-            for level in world.levels:
-                world_lessons.extend(level.lessons)
-            
-            completed_count = db.query(UserProgress).filter(
-                UserProgress.user_id == current_user.id,
-                UserProgress.is_completed == True,
-                UserProgress.lesson_id.in_([l.id for l in world_lessons])
-            ).count()
-            
-            progress_percentage = (completed_count / len(world_lessons) * 100 if world_lessons else 0)
+            completed, total = world_progress_map.get(str(world.id), (0, 0))
+            progress_percentage = (completed / total * 100) if total > 0 else 0
         
         # Convert enum to string value
         difficulty_str = world.difficulty.value if hasattr(world.difficulty, 'value') else str(world.difficulty)
@@ -200,39 +228,44 @@ async def get_world_lessons(
         l.order_index
     ))
     
+    # PERFORMANCE FIX: Pre-fetch all user progress for this world's lessons in a single query
+    completed_lesson_ids: set = set()
+    if current_user and all_lessons:
+        lesson_ids = [str(l.id) for l in all_lessons]
+        completed_progress = db.query(UserProgress.lesson_id).filter(
+            UserProgress.user_id == current_user.id,
+            UserProgress.is_completed == True,
+            UserProgress.lesson_id.in_(lesson_ids)
+        ).all()
+        completed_lesson_ids = {str(lesson_id) for (lesson_id,) in completed_progress} if completed_progress else set()
+    
     lessons = []
     for lesson in all_lessons:
-            # Check completion (only if user is authenticated)
-            is_completed = False
-            if current_user:
-                progress = db.query(UserProgress).filter(
-                    UserProgress.user_id == current_user.id,
-                    UserProgress.lesson_id == lesson.id
-                ).first()
-                is_completed = progress.is_completed if progress else False
-            
-            # lesson_type is now a string, use it directly
-            lesson_type_str = lesson.lesson_type or "video"
-            
-            # All lessons are unlocked (no prerequisites)
-            lessons.append(LessonResponse(
-                id=str(lesson.id),
-                title=lesson.title,
-                description=lesson.description,
-                video_url=lesson.video_url,
-                xp_value=lesson.xp_value,
-                is_completed=is_completed,
-                is_locked=False,  # Always false - no prerequisites
-                is_boss_battle=lesson.is_boss_battle,
-                order_index=lesson.order_index,
-                week_number=lesson.week_number,
-                day_number=lesson.day_number,
-                content_json=lesson.content_json,
-                mux_playback_id=lesson.mux_playback_id,
-                mux_asset_id=lesson.mux_asset_id,
-                duration_minutes=lesson.duration_minutes,
-                thumbnail_url=lesson.thumbnail_url,
-                lesson_type=lesson_type_str
-            ))
+        # Check completion from pre-fetched data
+        is_completed = str(lesson.id) in completed_lesson_ids if current_user else False
+        
+        # lesson_type is now a string, use it directly
+        lesson_type_str = lesson.lesson_type or "video"
+        
+        # All lessons are unlocked (no prerequisites)
+        lessons.append(LessonResponse(
+            id=str(lesson.id),
+            title=lesson.title,
+            description=lesson.description,
+            video_url=lesson.video_url,
+            xp_value=lesson.xp_value,
+            is_completed=is_completed,
+            is_locked=False,  # Always false - no prerequisites
+            is_boss_battle=lesson.is_boss_battle,
+            order_index=lesson.order_index,
+            week_number=lesson.week_number,
+            day_number=lesson.day_number,
+            content_json=lesson.content_json,
+            mux_playback_id=lesson.mux_playback_id,
+            mux_asset_id=lesson.mux_asset_id,
+            duration_minutes=lesson.duration_minutes,
+            thumbnail_url=lesson.thumbnail_url,
+            lesson_type=lesson_type_str
+        ))
     
     return lessons

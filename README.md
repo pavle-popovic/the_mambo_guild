@@ -97,6 +97,13 @@ salsa_lab_v2/
 │   ├── services/           # Business logic services
 │   │   ├── storage_service.py # R2/S3 storage service
 │   │   └── mux_service.py  # Mux API service
+│   ├── scripts/            # Utility scripts
+│   │   ├── create_admin.py # Create admin user
+│   │   ├── seed_courses.py # Seed course data
+│   │   └── migrate_*.py    # Database migrations
+│   ├── tests/              # Test suite
+│   │   ├── conftest.py     # Pytest configuration
+│   │   └── test_*.py       # Test files
 │   └── requirements.txt    # Python dependencies
 └── docker-compose.yml      # Docker orchestration
 
@@ -289,6 +296,12 @@ The application includes comprehensive error handling and validation:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Codebase Cleanup & Reorganization** (January 2026)
+  - Backend scripts moved to `backend/scripts/` directory
+  - Tests moved to `backend/tests/` directory with pytest configuration
+  - Deleted dead code (node_modules, package.json from Python backend)
+  - Security hardening: SECRET_KEY validation in production
+  - Performance optimization: Fixed N+1 queries in courses API
 - ✅ **Course Completion System**: Complete course celebration and tracking
   - Beautiful course completion modal with congratulations message and trophy icon
   - Automatic detection when all lessons in a course are completed

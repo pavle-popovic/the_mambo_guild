@@ -15,8 +15,17 @@ class Settings:
     REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
     REDIS_URL: str = f"redis://{REDIS_HOST}:{REDIS_PORT}"
     
-    # JWT
-    SECRET_KEY: str = os.getenv("SECRET_KEY", "your-secret-key-change-in-production")
+    # JWT - SECURITY: In production, SECRET_KEY MUST be set via environment variable
+    # For local development, a default is provided
+    _secret_key_env: Optional[str] = os.getenv("SECRET_KEY")
+    _is_production: bool = os.getenv("ENVIRONMENT", "development").lower() == "production"
+    
+    @property
+    def SECRET_KEY(self) -> str:
+        if self._is_production and not self._secret_key_env:
+            raise ValueError("No SECRET_KEY set for production environment! Set the SECRET_KEY environment variable.")
+        return self._secret_key_env or "your-secret-key-change-in-production"
+    
     ALGORITHM: str = "HS256"
     # Token expires in 1 week (7 days * 24 hours * 60 minutes)
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
