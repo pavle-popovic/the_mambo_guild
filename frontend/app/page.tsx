@@ -31,6 +31,8 @@ export default function HomePage() {
           loop
           muted
           playsInline
+          preload="none"
+          poster="/assets/Mambo_image_1.jpg"
           className="absolute top-0 left-0 w-full h-full object-cover object-center"
           style={{ objectPosition: 'center 20%' }}
         >

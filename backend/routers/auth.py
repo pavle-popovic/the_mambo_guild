@@ -11,7 +11,7 @@ from schemas.auth import (
 from services.auth_service import verify_password, get_password_hash, create_access_token
 from services.gamification_service import update_streak
 from services.email_service import send_password_reset_email
-from services.redis_service import set_oauth_state, verify_oauth_state
+from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
 from dependencies import get_current_user
 from config import settings
 import uuid
@@ -488,13 +488,25 @@ async def google_callback(
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
 async def forgot_password(
     request_data: ForgotPasswordRequest,
+    request: Request,
     db: Session = Depends(get_db)
 ):
     """
     Send password reset email.
     Always returns success to prevent email enumeration.
+    Rate limited to 5 requests per 5 minutes per email/IP.
     """
-    user = db.query(User).filter(User.email == request_data.email.lower().strip()).first()
+    # Rate limit by email and IP to prevent abuse
+    email_normalized = request_data.email.lower().strip()
+    client_ip = request.client.host if request.client else "unknown"
+    
+    if not check_rate_limit(email_normalized, "forgot_password", max_requests=5, window_seconds=300):
+        return {"message": "If the email exists, a password reset link has been sent."}
+    
+    if not check_rate_limit(client_ip, "forgot_password_ip", max_requests=10, window_seconds=300):
+        return {"message": "If the email exists, a password reset link has been sent."}
+    
+    user = db.query(User).filter(User.email == email_normalized).first()
     
     # Always return success to prevent email enumeration
     if not user:

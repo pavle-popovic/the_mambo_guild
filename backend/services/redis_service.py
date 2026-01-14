@@ -83,3 +83,38 @@ def verify_oauth_state(state: str, provider: str) -> bool:
         logger.error(f"Failed to verify OAuth state from Redis: {e}", exc_info=True)
         return False
 
+
+def check_rate_limit(identifier: str, action: str, max_requests: int = 5, window_seconds: int = 300) -> bool:
+    """
+    Check if an action is rate limited for a given identifier.
+    
+    Args:
+        identifier: Unique identifier (e.g., email or IP address)
+        action: The action being rate limited (e.g., 'forgot_password')
+        max_requests: Maximum requests allowed in the window
+        window_seconds: Time window in seconds (default: 5 minutes)
+    
+    Returns:
+        True if allowed (not rate limited), False if blocked
+    """
+    try:
+        client = get_redis_client()
+        key = f"rate_limit:{action}:{identifier}"
+        current = client.get(key)
+        
+        if current is None:
+            # First request - set counter with expiration
+            client.setex(key, window_seconds, 1)
+            return True
+        
+        if int(current) >= max_requests:
+            logger.warning(f"Rate limit exceeded for {action}: {identifier}")
+            return False
+        
+        # Increment counter (keep existing TTL)
+        client.incr(key)
+        return True
+    except Exception as e:
+        logger.error(f"Rate limit check failed: {e}")
+        # Fail open - allow request if Redis is unavailable
+        return True

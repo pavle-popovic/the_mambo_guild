@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from pydantic import BaseModel
 from datetime import datetime
@@ -116,7 +116,8 @@ async def get_all_students(
     search: Optional[str] = None
 ):
     """Get all enrolled students with their profile information."""
-    query = db.query(User).join(UserProfile)
+    # PERFORMANCE FIX: Use joinedload to eager-load profiles in a single query
+    query = db.query(User).options(joinedload(User.profile)).join(UserProfile)
     
     # Optional search by name or email
     if search:

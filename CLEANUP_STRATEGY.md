@@ -87,9 +87,9 @@ These components exist in `frontend/components/` but are **never imported** in a
 
 ### 2.2 Remaining Security Audits
 
-| Priority | Action | Target | Issue |
+| Priority | Status | Target | Issue |
 |----------|--------|--------|-------|
-| MEDIUM | **AUDIT** | `backend/routers/auth.py` | Verify rate limiting on `/forgot-password` endpoint to prevent email enumeration attacks. |
+| ✅ FIXED | Complete | `backend/routers/auth.py` | Rate limiting added to `/forgot-password` (5 req/5min per email, 10 req/5min per IP). |
 | MEDIUM | **AUDIT** | `backend/routers/payments.py` | Stripe webhook signature verification - ensure `stripe.Webhook.construct_event` is used correctly. |
 | LOW | **AUDIT** | CORS configuration | Currently allows `localhost:3000` and `localhost:8000`. Ensure production values are set via env vars. |
 
@@ -112,10 +112,10 @@ These components exist in `frontend/components/` but are **never imported** in a
 
 ### 3.2 Remaining Performance Issues
 
-| Priority | Action | Target | Issue |
+| Priority | Status | Target | Issue |
 |----------|--------|--------|-------|
-| MEDIUM | **OPTIMIZE** | `backend/routers/admin.py` → `get_all_students` | Loops through users to build response. Consider using `joinedload` for profiles. |
-| MEDIUM | **OPTIMIZE** | `frontend/app/page.tsx` | Background video `Background_video.mp4` loads immediately. Add `poster` image and `preload="none"` for mobile. |
+| ✅ FIXED | Complete | `backend/routers/admin.py` → `get_all_students` | Added `joinedload` for profiles - single query instead of N+1. |
+| ✅ FIXED | Complete | `frontend/app/page.tsx` | Added `poster="/assets/Mambo_image_1.jpg"` and `preload="none"` to background video. |
 | LOW | **MONITOR** | `backend/routers/admin_courses.py` → `get_course_full_details` | Multiple nested loops for levels/lessons. Watch as course count grows. |
 
 ### 3.3 Frontend Bundle Size
@@ -167,9 +167,9 @@ These components exist in `frontend/components/` but are **never imported** in a
 ### Short-term (This Week)
 - [ ] Audit all "AUDIT" flagged components - delete or document why kept
 - [ ] Remove `howler` if confirmed unused
-- [ ] Add rate limiting to `/forgot-password` endpoint
-- [ ] Add `poster` and `preload="none"` to background video
-- [ ] Rotate exposed Google API keys in Google Cloud Console
+- [x] Add rate limiting to `/forgot-password` endpoint ✅
+- [x] Add `poster` and `preload="none"` to background video ✅
+- [ ] Rotate exposed Google API keys in Google Cloud Console (manual action)
 
 ### Before Scaling
 - [ ] Consolidate `Ressources/` → `frontend/public/assets/`
