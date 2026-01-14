@@ -93,11 +93,11 @@ export function NavigationProgress() {
           {/* Background track */}
           <div className="absolute inset-0 bg-white/10" />
           
-          {/* Progress bar */}
+          {/* Progress bar - Warm Amber/Gold for Vintage Palladium vibe */}
           <motion.div
-            className="h-full bg-gradient-to-r from-blue-500 via-blue-400 to-purple-500"
+            className="h-full bg-gradient-to-r from-amber-500 via-yellow-400 to-orange-400"
             style={{
-              boxShadow: "0 0 10px rgba(59, 130, 246, 0.7), 0 0 5px rgba(139, 92, 246, 0.5)",
+              boxShadow: "0 0 10px rgba(255, 180, 0, 0.7), 0 0 5px rgba(255, 150, 0, 0.5)",
             }}
             initial={{ width: "0%" }}
             animate={{ width: `${progress}%` }}

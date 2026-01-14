@@ -111,14 +111,19 @@ frontend/
 
 **Admin Builder** (`/admin/builder`):
 - Course creation and management
+- **Content type selector**: Tag as Course (📚), Choreo (💃), or Topic (💡)
 - Hierarchical curriculum builder (Week/Day/Lesson)
 - Lesson editor with auto-save
 - Thumbnail management
 - Video upload integration
 
 **Course Listing** (`/courses`):
-- Browse all available courses
+- Browse all available courses, choreographies, and topics
+- **Search bar**: Find content by name with aesthetic amber glow design
+- **Type filters**: Filter by Courses (📚), Choreos (💃), Topics (💡) with count badges
+- **Difficulty filters**: Filter by Beginner, Intermediate, Advanced
 - Progress tracking
+- Type-specific badges on cards (color-coded)
 - Locked course indicators with "Become A Member" messaging
 - Direct links to pricing page
 
@@ -274,6 +279,12 @@ The application is fully responsive:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Content Type System**: Courses, Choreographies, and Topics
+  - Type selector in admin course builder (📚 Course, 💃 Choreo, 💡 Topic)
+  - Type-specific colored badges on course cards
+  - Aesthetic search bar with amber glow effect
+  - Type filter buttons with count badges
+  - Combined filtering (type + difficulty + search)
 - ✅ **Course Completion System**: Beautiful course completion celebration
   - CourseCompletionModal component with trophy icon and congratulations
   - Automatic detection when all lessons in a course are completed

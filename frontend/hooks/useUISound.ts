@@ -3,77 +3,29 @@
 import { useCallback, useEffect, useRef } from "react";
 
 // ============================================================================
-// CONFIGURATION - Hardcoded for maximum tactile feel
+// VINTAGE SALSA / PALLADIUM (1950s NYC) - PERCUSSION SECTION
+// Organic, Warm, and Rhythmic - Purely percussive sounds
 // ============================================================================
 
-const MASTER_VOLUME = 0.75; // 75% volume - clearly audible on laptop speakers
-
-// Sound presets tuned for distinct, satisfying feedback
-const SOUND_PRESETS = {
-  // TICK: Short, crisp high-pitched click for hover (max 50ms)
-  // Like a mechanical keyboard key touching the switch
-  tick: {
-    frequency: 3200,           // High-pitched for crispness
-    type: "square" as OscillatorType,
-    duration: 0.035,           // 35ms - very short and snappy
-    attackTime: 0.001,         // Instant attack
-    volume: 0.6,               // Prominent
-  },
-  
-  // THOCK: Deeper bubble pop / mechanical thock for clicks
-  // Satisfying, tactile "thunk" sound
-  thock: {
-    baseFrequency: 180,        // Deep bass
-    popFrequency: 800,         // Mid "pop" harmonic
-    type: "sine" as OscillatorType,
-    duration: 0.12,            // 120ms - fuller body
-    attackTime: 0.002,
-    volume: 0.8,               // Very prominent
-  },
-  
-  // WHOOSH: Smooth transition sweep
-  whoosh: {
-    startFrequency: 600,
-    endFrequency: 200,
-    type: "sine" as OscillatorType,
-    duration: 0.25,
-    attackTime: 0.02,
-    volume: 0.5,
-  },
-  
-  // SUCCESS: Satisfying completion chime
-  success: {
-    frequencies: [523.25, 659.25, 783.99], // C5, E5, G5 chord
-    type: "sine" as OscillatorType,
-    duration: 0.2,
-    gap: 0.1,
-    volume: 0.6,
-  },
-} as const;
+const MASTER_VOLUME = 0.4; // Acoustic sounds cut through well at lower volume
 
 // ============================================================================
-// AUDIO ENGINE - Low-latency Web Audio API implementation
+// AUDIO ENGINE
 // ============================================================================
 
 interface UIAudioContext {
   ctx: AudioContext | null;
   gainNode: GainNode | null;
-  activeOscillators: Map<string, OscillatorNode[]>;
 }
 
-// Global singleton for performance
 let globalAudioCtx: UIAudioContext = {
   ctx: null,
   gainNode: null,
-  activeOscillators: new Map(),
 };
 
-/**
- * Initialize or get the global audio context
- */
 function getAudioContext(): UIAudioContext {
   if (typeof window === "undefined") {
-    return { ctx: null, gainNode: null, activeOscillators: new Map() };
+    return { ctx: null, gainNode: null };
   }
 
   if (!globalAudioCtx.ctx) {
@@ -87,7 +39,6 @@ function getAudioContext(): UIAudioContext {
         globalAudioCtx.gainNode = globalAudioCtx.ctx.createGain();
         globalAudioCtx.gainNode.connect(globalAudioCtx.ctx.destination);
         globalAudioCtx.gainNode.gain.value = MASTER_VOLUME;
-        globalAudioCtx.activeOscillators = new Map();
       }
     } catch (e) {
       console.warn("Web Audio API not supported:", e);
@@ -97,289 +48,304 @@ function getAudioContext(): UIAudioContext {
   return globalAudioCtx;
 }
 
-/**
- * Resume audio context after user interaction (required by browsers)
- */
 function ensureContextResumed(): boolean {
   const { ctx } = getAudioContext();
   if (!ctx) return false;
-  
-  if (ctx.state === "suspended") {
-    ctx.resume();
-  }
+  if (ctx.state === "suspended") ctx.resume();
   return ctx.state === "running" || ctx.state === "suspended";
 }
 
-/**
- * Stop any currently playing sounds of a given type (interrupt mode)
- */
-function interruptSound(soundType: string): void {
-  const { activeOscillators } = globalAudioCtx;
-  const oscillators = activeOscillators.get(soundType);
-  
-  if (oscillators) {
-    oscillators.forEach((osc) => {
-      try {
-        osc.stop();
-      } catch {
-        // Already stopped
-      }
-    });
-    activeOscillators.delete(soundType);
-  }
-}
+// ============================================================================
+// SHAKER / MARACA - Hover Sound (LOUDER)
+// Crisp "chhh" sound - white noise burst with high-pass filter
+// Max 80ms, with random pitch shift (0.95 - 1.05)
+// ============================================================================
 
-/**
- * Track an oscillator for potential interruption
- */
-function trackOscillator(soundType: string, oscillator: OscillatorNode): void {
-  const { activeOscillators } = globalAudioCtx;
-  if (!activeOscillators.has(soundType)) {
-    activeOscillators.set(soundType, []);
-  }
-  activeOscillators.get(soundType)!.push(oscillator);
+function playShaker(pitchShift: number = 1.0): void {
+  const { ctx, gainNode } = getAudioContext();
+  if (!ctx || !gainNode || !ensureContextResumed()) return;
+
+  const now = ctx.currentTime;
+  const duration = 0.08; // 80ms - crisp and short
+
+  // Create white noise buffer
+  const bufferSize = ctx.sampleRate * duration;
+  const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+  const output = noiseBuffer.getChannelData(0);
   
-  // Auto-cleanup when oscillator ends
-  oscillator.onended = () => {
-    const oscs = activeOscillators.get(soundType);
-    if (oscs) {
-      const idx = oscs.indexOf(oscillator);
-      if (idx > -1) oscs.splice(idx, 1);
-    }
-  };
+  for (let i = 0; i < bufferSize; i++) {
+    output[i] = Math.random() * 2 - 1;
+  }
+
+  const noise = ctx.createBufferSource();
+  noise.buffer = noiseBuffer;
+  noise.playbackRate.value = pitchShift;
+
+  // High-pass filter for crisp "chhh" character
+  const highpass = ctx.createBiquadFilter();
+  highpass.type = "highpass";
+  highpass.frequency.value = 6000 * pitchShift;
+  highpass.Q.value = 0.7;
+
+  // Band-pass for maraca resonance
+  const bandpass = ctx.createBiquadFilter();
+  bandpass.type = "bandpass";
+  bandpass.frequency.value = 5000 * pitchShift;
+  bandpass.Q.value = 1.5;
+
+  // Envelope - sharp attack, quick decay - LOUDER
+  const envelope = ctx.createGain();
+  envelope.gain.setValueAtTime(0, now);
+  envelope.gain.linearRampToValueAtTime(1.2, now + 0.003); // Faster attack, louder peak
+  envelope.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+  // Connect chain
+  noise.connect(highpass);
+  highpass.connect(bandpass);
+  bandpass.connect(envelope);
+  envelope.connect(gainNode);
+
+  noise.start(now);
+  noise.stop(now + duration);
 }
 
 // ============================================================================
-// SOUND FUNCTIONS - Distinct, satisfying audio feedback
+// TIMBALE - Click Sound
+// Bright metallic shell hit - classic salsa percussion
+// Sharp attack with ringing metallic overtones
 // ============================================================================
 
-/**
- * Play TICK sound - crisp, high-pitched click for hover
- * Short and snappy like a mechanical switch
- */
-function playTickSound(): void {
+function playTimbale(): void {
   const { ctx, gainNode } = getAudioContext();
   if (!ctx || !gainNode || !ensureContextResumed()) return;
 
-  // Interrupt any previous tick
-  interruptSound("tick");
-
-  const preset = SOUND_PRESETS.tick;
   const now = ctx.currentTime;
+  const duration = 0.12; // 120ms - metallic ring
 
-  // Main high-pitched tick
-  const oscillator = ctx.createOscillator();
-  const envelope = ctx.createGain();
-  const filter = ctx.createBiquadFilter();
+  // === Shell tone (fundamental) - bright, metallic ===
+  const shell = ctx.createOscillator();
+  shell.type = "sine";
+  shell.frequency.setValueAtTime(520, now); // Timbale shell pitch
+  shell.frequency.exponentialRampToValueAtTime(480, now + duration);
 
-  oscillator.type = preset.type;
-  oscillator.frequency.setValueAtTime(preset.frequency, now);
-  // Quick pitch drop for "click" character
-  oscillator.frequency.exponentialRampToValueAtTime(preset.frequency * 0.7, now + preset.duration);
+  // === First overtone - metallic ring ===
+  const ring1 = ctx.createOscillator();
+  ring1.type = "sine";
+  ring1.frequency.setValueAtTime(1040, now); // 2x fundamental
+  ring1.frequency.exponentialRampToValueAtTime(960, now + 0.08);
 
-  // High-pass filter to keep it crisp
-  filter.type = "highpass";
-  filter.frequency.value = 1000;
+  // === Second overtone - brightness ===
+  const ring2 = ctx.createOscillator();
+  ring2.type = "sine";
+  ring2.frequency.setValueAtTime(1560, now); // 3x fundamental
+  ring2.frequency.exponentialRampToValueAtTime(1440, now + 0.06);
 
-  oscillator.connect(filter);
-  filter.connect(envelope);
-  envelope.connect(gainNode);
+  // === Stick attack transient - the "tick" ===
+  const stick = ctx.createOscillator();
+  stick.type = "triangle";
+  stick.frequency.setValueAtTime(4000, now);
+  stick.frequency.exponentialRampToValueAtTime(2000, now + 0.008);
 
-  // Sharp attack, quick decay
-  envelope.gain.setValueAtTime(0, now);
-  envelope.gain.linearRampToValueAtTime(preset.volume * MASTER_VOLUME, now + preset.attackTime);
-  envelope.gain.exponentialRampToValueAtTime(0.001, now + preset.duration);
+  // === High metallic shimmer ===
+  const shimmer = ctx.createOscillator();
+  shimmer.type = "sine";
+  shimmer.frequency.setValueAtTime(3200, now);
 
-  oscillator.start(now);
-  oscillator.stop(now + preset.duration);
-  trackOscillator("tick", oscillator);
+  // Envelopes
+  const shellEnv = ctx.createGain();
+  shellEnv.gain.setValueAtTime(0.9, now);
+  shellEnv.gain.exponentialRampToValueAtTime(0.001, now + duration);
+
+  const ring1Env = ctx.createGain();
+  ring1Env.gain.setValueAtTime(0.5, now);
+  ring1Env.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+  const ring2Env = ctx.createGain();
+  ring2Env.gain.setValueAtTime(0.3, now);
+  ring2Env.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+
+  const stickEnv = ctx.createGain();
+  stickEnv.gain.setValueAtTime(0.6, now);
+  stickEnv.gain.exponentialRampToValueAtTime(0.001, now + 0.012);
+
+  const shimmerEnv = ctx.createGain();
+  shimmerEnv.gain.setValueAtTime(0.15, now);
+  shimmerEnv.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+
+  // High-pass filter to remove mud
+  const highpass = ctx.createBiquadFilter();
+  highpass.type = "highpass";
+  highpass.frequency.value = 300;
+  highpass.Q.value = 0.5;
+
+  // Resonant peak for metallic character
+  const resonance = ctx.createBiquadFilter();
+  resonance.type = "peaking";
+  resonance.frequency.value = 1200;
+  resonance.Q.value = 4;
+  resonance.gain.value = 6;
+
+  // Connect shell and rings through filters
+  shell.connect(shellEnv);
+  ring1.connect(ring1Env);
+  ring2.connect(ring2Env);
+  stick.connect(stickEnv);
+  shimmer.connect(shimmerEnv);
+
+  shellEnv.connect(highpass);
+  ring1Env.connect(highpass);
+  ring2Env.connect(highpass);
+  highpass.connect(resonance);
+  resonance.connect(gainNode);
+
+  // Stick and shimmer direct to output
+  stickEnv.connect(gainNode);
+  shimmerEnv.connect(gainNode);
+
+  // Start all oscillators
+  shell.start(now);
+  ring1.start(now);
+  ring2.start(now);
+  stick.start(now);
+  shimmer.start(now);
+
+  // Stop all oscillators
+  shell.stop(now + duration);
+  ring1.stop(now + 0.08);
+  ring2.stop(now + 0.06);
+  stick.stop(now + 0.012);
+  shimmer.stop(now + 0.04);
 }
 
-/**
- * Play THOCK sound - deep, satisfying bubble pop / mechanical thock for clicks
- * Fuller, more tactile than the tick
- */
-function playThockSound(): void {
+// ============================================================================
+// CONGA SLAP - Navigation Sound  
+// Open tone with slap attack - warm, resonant "pah" sound
+// ~180ms duration for richness
+// ============================================================================
+
+function playCongaSlap(): void {
   const { ctx, gainNode } = getAudioContext();
   if (!ctx || !gainNode || !ensureContextResumed()) return;
 
-  // Interrupt any previous thock
-  interruptSound("thock");
-
-  const preset = SOUND_PRESETS.thock;
   const now = ctx.currentTime;
+  const duration = 0.18; // 180ms - warm and resonant
 
-  // === Layer 1: Deep bass thump ===
-  const bassOsc = ctx.createOscillator();
-  const bassEnv = ctx.createGain();
-  
-  bassOsc.type = "sine";
-  bassOsc.frequency.setValueAtTime(preset.baseFrequency, now);
-  bassOsc.frequency.exponentialRampToValueAtTime(preset.baseFrequency * 0.5, now + preset.duration);
-  
-  bassOsc.connect(bassEnv);
-  bassEnv.connect(gainNode);
-  
-  bassEnv.gain.setValueAtTime(0, now);
-  bassEnv.gain.linearRampToValueAtTime(preset.volume * MASTER_VOLUME * 0.7, now + preset.attackTime);
-  bassEnv.gain.exponentialRampToValueAtTime(0.001, now + preset.duration);
-  
-  bassOsc.start(now);
-  bassOsc.stop(now + preset.duration);
-  trackOscillator("thock", bassOsc);
+  // Fundamental tone (low, warm)
+  const fundamental = ctx.createOscillator();
+  fundamental.type = "sine";
+  fundamental.frequency.setValueAtTime(180, now);
+  fundamental.frequency.exponentialRampToValueAtTime(120, now + duration);
 
-  // === Layer 2: Mid "pop" transient ===
-  const popOsc = ctx.createOscillator();
-  const popEnv = ctx.createGain();
-  
-  popOsc.type = "triangle";
-  popOsc.frequency.setValueAtTime(preset.popFrequency, now);
-  popOsc.frequency.exponentialRampToValueAtTime(preset.popFrequency * 0.4, now + 0.08);
-  
-  popOsc.connect(popEnv);
-  popEnv.connect(gainNode);
-  
-  // Faster decay for the pop
-  popEnv.gain.setValueAtTime(0, now);
-  popEnv.gain.linearRampToValueAtTime(preset.volume * MASTER_VOLUME * 0.5, now + 0.003);
-  popEnv.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
-  
-  popOsc.start(now);
-  popOsc.stop(now + 0.08);
-  trackOscillator("thock", popOsc);
+  // Second harmonic
+  const harmonic2 = ctx.createOscillator();
+  harmonic2.type = "sine";
+  harmonic2.frequency.setValueAtTime(360, now);
+  harmonic2.frequency.exponentialRampToValueAtTime(240, now + 0.1);
 
-  // === Layer 3: High click transient ===
-  const clickOsc = ctx.createOscillator();
-  const clickEnv = ctx.createGain();
-  
-  clickOsc.type = "square";
-  clickOsc.frequency.setValueAtTime(2000, now);
-  
-  clickOsc.connect(clickEnv);
-  clickEnv.connect(gainNode);
-  
-  clickEnv.gain.setValueAtTime(preset.volume * MASTER_VOLUME * 0.3, now);
-  clickEnv.gain.exponentialRampToValueAtTime(0.001, now + 0.015);
-  
-  clickOsc.start(now);
-  clickOsc.stop(now + 0.015);
-  trackOscillator("thock", clickOsc);
-}
+  // Slap transient (high, sharp)
+  const slap = ctx.createOscillator();
+  slap.type = "triangle";
+  slap.frequency.setValueAtTime(800, now);
+  slap.frequency.exponentialRampToValueAtTime(300, now + 0.03);
 
-/**
- * Play WHOOSH sound for page transitions
- */
-function playWhooshSound(): void {
-  const { ctx, gainNode } = getAudioContext();
-  if (!ctx || !gainNode || !ensureContextResumed()) return;
+  // Noise burst for skin texture
+  const noiseLength = 0.02;
+  const noiseBuffer = ctx.createBuffer(1, ctx.sampleRate * noiseLength, ctx.sampleRate);
+  const noiseData = noiseBuffer.getChannelData(0);
+  for (let i = 0; i < noiseData.length; i++) {
+    noiseData[i] = Math.random() * 2 - 1;
+  }
+  const noise = ctx.createBufferSource();
+  noise.buffer = noiseBuffer;
 
-  interruptSound("whoosh");
+  // Envelopes
+  const fundEnv = ctx.createGain();
+  fundEnv.gain.setValueAtTime(0.8, now);
+  fundEnv.gain.exponentialRampToValueAtTime(0.001, now + duration);
 
-  const preset = SOUND_PRESETS.whoosh;
-  const now = ctx.currentTime;
+  const harm2Env = ctx.createGain();
+  harm2Env.gain.setValueAtTime(0.4, now);
+  harm2Env.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
 
-  // Frequency sweep oscillator
-  const oscillator = ctx.createOscillator();
-  const envelope = ctx.createGain();
-  const filter = ctx.createBiquadFilter();
+  const slapEnv = ctx.createGain();
+  slapEnv.gain.setValueAtTime(0.5, now);
+  slapEnv.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
 
-  oscillator.type = preset.type;
-  oscillator.frequency.setValueAtTime(preset.startFrequency, now);
-  oscillator.frequency.exponentialRampToValueAtTime(preset.endFrequency, now + preset.duration);
+  const noiseEnv = ctx.createGain();
+  noiseEnv.gain.setValueAtTime(0.3, now);
+  noiseEnv.gain.exponentialRampToValueAtTime(0.001, now + noiseLength);
 
-  // Low-pass for smoothness
-  filter.type = "lowpass";
-  filter.frequency.setValueAtTime(3000, now);
-  filter.frequency.exponentialRampToValueAtTime(500, now + preset.duration);
-  filter.Q.value = 2;
+  // Low-pass filter for warmth
+  const lowpass = ctx.createBiquadFilter();
+  lowpass.type = "lowpass";
+  lowpass.frequency.value = 2000;
+  lowpass.Q.value = 1;
 
-  oscillator.connect(filter);
-  filter.connect(envelope);
-  envelope.connect(gainNode);
+  // Band-pass for noise (skin slap character)
+  const noiseBand = ctx.createBiquadFilter();
+  noiseBand.type = "bandpass";
+  noiseBand.frequency.value = 3000;
+  noiseBand.Q.value = 1;
 
-  envelope.gain.setValueAtTime(0, now);
-  envelope.gain.linearRampToValueAtTime(preset.volume * MASTER_VOLUME, now + preset.attackTime);
-  envelope.gain.exponentialRampToValueAtTime(0.001, now + preset.duration);
+  // Connect
+  fundamental.connect(fundEnv);
+  harmonic2.connect(harm2Env);
+  slap.connect(slapEnv);
+  noise.connect(noiseBand);
+  noiseBand.connect(noiseEnv);
 
-  oscillator.start(now);
-  oscillator.stop(now + preset.duration);
-  trackOscillator("whoosh", oscillator);
-}
+  fundEnv.connect(lowpass);
+  harm2Env.connect(lowpass);
+  slapEnv.connect(lowpass);
+  lowpass.connect(gainNode);
+  noiseEnv.connect(gainNode);
 
-/**
- * Play SUCCESS sound - ascending chord
- */
-function playSuccessSound(): void {
-  const { ctx, gainNode } = getAudioContext();
-  if (!ctx || !gainNode || !ensureContextResumed()) return;
+  fundamental.start(now);
+  harmonic2.start(now);
+  slap.start(now);
+  noise.start(now);
 
-  const preset = SOUND_PRESETS.success;
-  const now = ctx.currentTime;
-
-  preset.frequencies.forEach((freq, i) => {
-    const oscillator = ctx.createOscillator();
-    const envelope = ctx.createGain();
-
-    oscillator.type = preset.type;
-    oscillator.frequency.value = freq;
-
-    oscillator.connect(envelope);
-    envelope.connect(gainNode);
-
-    const noteStart = now + i * preset.gap;
-    envelope.gain.setValueAtTime(0, noteStart);
-    envelope.gain.linearRampToValueAtTime(preset.volume * MASTER_VOLUME, noteStart + 0.01);
-    envelope.gain.exponentialRampToValueAtTime(0.001, noteStart + preset.duration);
-
-    oscillator.start(noteStart);
-    oscillator.stop(noteStart + preset.duration);
-    trackOscillator("success", oscillator);
-  });
+  fundamental.stop(now + duration);
+  harmonic2.stop(now + 0.1);
+  slap.stop(now + 0.04);
+  noise.stop(now + noiseLength);
 }
 
 // ============================================================================
 // HOOK & EXPORTS
 // ============================================================================
 
-/**
- * Hook for UI sounds - returns memoized sound functions
- */
 export function useUISound() {
   const lastHoverTime = useRef(0);
 
-  // Debounced tick to prevent sound spam
-  const playTick = useCallback(() => {
+  // Shaker with random pitch shift (0.95 - 1.05) for human feel
+  const playHover = useCallback(() => {
     const now = Date.now();
-    // Max 1 tick per 80ms to prevent overlap
-    if (now - lastHoverTime.current < 80) return;
+    // Debounce: max 1 per 100ms to avoid noise mess
+    if (now - lastHoverTime.current < 100) return;
     lastHoverTime.current = now;
-    playTickSound();
+    
+    // Random pitch shift for natural variation
+    const pitchShift = 0.95 + Math.random() * 0.1; // 0.95 to 1.05
+    playShaker(pitchShift);
   }, []);
 
-  const playThock = useCallback(() => {
-    playThockSound();
+  const playClick = useCallback(() => {
+    playTimbale();
   }, []);
 
   const playWhoosh = useCallback(() => {
-    playWhooshSound();
+    playCongaSlap();
   }, []);
 
-  const playSuccess = useCallback(() => {
-    playSuccessSound();
-  }, []);
-
-  // Pre-warm audio context on first interaction
+  // Pre-warm audio context
   useEffect(() => {
     const warmUp = () => {
       const { ctx } = getAudioContext();
-      if (ctx?.state === "suspended") {
-        ctx.resume();
-      }
+      if (ctx?.state === "suspended") ctx.resume();
     };
-    
     document.addEventListener("click", warmUp, { once: true });
     document.addEventListener("touchstart", warmUp, { once: true });
-    
     return () => {
       document.removeEventListener("click", warmUp);
       document.removeEventListener("touchstart", warmUp);
@@ -387,27 +353,26 @@ export function useUISound() {
   }, []);
 
   return {
-    playTick,      // For hover - crisp, short
-    playThock,     // For click - deep, satisfying
-    playWhoosh,    // For transitions
-    playSuccess,   // For completions
-    // Legacy aliases
-    playHover: playTick,
-    playClick: playThock,
+    playHover,    // Shaker - crisp "chhh"
+    playClick,    // Timbale - metallic "ting"
+    playWhoosh,   // Conga - warm "pah"
+    // Aliases
+    playTick: playHover,
+    playThock: playClick,
   };
 }
 
-/**
- * Global sound player for non-hook contexts
- */
+// Global sound player
 export const UISound = {
-  tick: playTickSound,
-  thock: playThockSound,
-  whoosh: playWhooshSound,
-  success: playSuccessSound,
-  // Legacy aliases
-  hover: playTickSound,
-  click: playThockSound,
+  shaker: (pitch?: number) => playShaker(pitch),
+  timbale: playTimbale,
+  conga: playCongaSlap,
+  // Aliases for existing code
+  hover: () => playShaker(0.95 + Math.random() * 0.1),
+  tick: () => playShaker(0.95 + Math.random() * 0.1),
+  click: playTimbale,
+  thock: playTimbale,
+  whoosh: playCongaSlap,
 };
 
 export default useUISound;

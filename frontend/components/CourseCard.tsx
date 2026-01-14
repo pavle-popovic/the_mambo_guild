@@ -20,6 +20,7 @@ interface CourseCardProps {
     thumbnail_url: string | null;
     mux_preview_playback_id?: string | null;
     difficulty: string;
+    course_type?: string;
     progress_percentage: number;
     is_locked: boolean;
   };
@@ -184,9 +185,15 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
               {/* Dark overlay for better text readability */}
               <div className="absolute inset-0 bg-black/30 z-10" />
               
-              {/* Course badge at bottom-left */}
-              <div className="absolute bottom-3 left-3 bg-black/80 backdrop-blur px-2 py-1 rounded text-xs font-bold text-white z-20">
-                COURSE {index + 1}
+              {/* Course type badge at bottom-left */}
+              <div className={`absolute bottom-3 left-3 backdrop-blur px-2 py-1 rounded text-xs font-bold z-20 ${
+                course.course_type === "choreo" 
+                  ? "bg-pink-500/80 text-white" 
+                  : course.course_type === "topic" 
+                    ? "bg-amber-500/80 text-black" 
+                    : "bg-black/80 text-white"
+              }`}>
+                {course.course_type === "choreo" ? "💃 CHOREO" : course.course_type === "topic" ? "💡 TOPIC" : "📚 COURSE"} {index + 1}
               </div>
             </div>
 

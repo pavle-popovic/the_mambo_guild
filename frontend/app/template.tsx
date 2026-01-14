@@ -6,23 +6,25 @@ import { ReactNode, useEffect, useState, useRef, Suspense } from "react";
 import { UISound } from "@/hooks/useUISound";
 import NavigationProgress from "@/components/NavigationProgress";
 
-// Transition animation configuration
+// VINTAGE PALLADIUM STYLE: Lateral Slide (Left to Right)
+// Like a dance movement - smooth, luxurious finish
 const pageTransition = {
   initial: { 
     opacity: 0, 
-    y: 15,  // Slide up from 15px below
+    x: 20,  // Slide in from the right
   },
   animate: { 
     opacity: 1, 
-    y: 0,
+    x: 0,
   },
   exit: { 
     opacity: 0, 
-    y: -15, // Slide up 15px on exit
+    x: -20, // Slide out to the left
   },
   transition: {
-    duration: 0.3,
-    ease: [0.16, 1, 0.3, 1], // Custom easeOut curve for snappy feel
+    duration: 0.35,
+    // Ease-out-quart: luxurious slow-down finish
+    ease: [0.43, 0.13, 0.23, 0.96],
   },
 };
 

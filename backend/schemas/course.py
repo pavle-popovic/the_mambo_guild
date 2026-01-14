@@ -11,6 +11,7 @@ class WorldResponse(BaseModel):
     thumbnail_url: Optional[str] = None
     mux_preview_playback_id: Optional[str] = None  # Mux playback ID for course preview
     difficulty: str
+    course_type: str = "course"  # course, choreo, topic
     progress_percentage: float
     is_locked: bool
 

@@ -172,6 +172,7 @@ OAUTHLIB_INSECURE_TRANSPORT=1
 
 ### World (Course)
 - Course title, description, difficulty
+- **Content type**: `course`, `choreo`, or `topic` (default: `course`)
 - Thumbnail URL
 - Progress tracking
 
@@ -323,6 +324,11 @@ Interactive API documentation available at:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Content Type System** (January 2026)
+  - Added `course_type` column to `worlds` table (course, choreo, topic)
+  - Create/Update/Get course endpoints now support `course_type` field
+  - Migration script: `scripts/add_course_type.py`
+  - Default type is "course" for backwards compatibility
 - ✅ **Codebase Cleanup & Reorganization** (January 2026)
   - Scripts moved to `backend/scripts/` directory
   - Tests moved to `backend/tests/` directory with pytest configuration

@@ -17,6 +17,7 @@ interface CreateCourseModalProps {
     is_published: boolean;
     image_url?: string;
     thumbnail_url?: string;
+    course_type?: string;
   }) => Promise<void>;
   defaultOrderIndex: number;
 }
@@ -31,6 +32,7 @@ export default function CreateCourseModal({
   const [slug, setSlug] = useState("");
   const [description, setDescription] = useState("");
   const [difficulty, setDifficulty] = useState("BEGINNER");
+  const [courseType, setCourseType] = useState("course");
   const [isFree, setIsFree] = useState(false);
   const [isPublished, setIsPublished] = useState(false);
   const [imageUrl, setImageUrl] = useState("");
@@ -76,6 +78,7 @@ export default function CreateCourseModal({
         is_published: isPublished,
         image_url: imageUrl.trim() || undefined,
         thumbnail_url: thumbnailUrl || undefined,
+        course_type: courseType,
       });
       
       // Reset form
@@ -83,6 +86,7 @@ export default function CreateCourseModal({
       setSlug("");
       setDescription("");
       setDifficulty("BEGINNER");
+      setCourseType("course");
       setIsFree(false);
       setIsPublished(false);
       setImageUrl("");
@@ -101,6 +105,7 @@ export default function CreateCourseModal({
       setSlug("");
       setDescription("");
       setDifficulty("BEGINNER");
+      setCourseType("course");
       setIsFree(false);
       setIsPublished(false);
       setImageUrl("");
@@ -190,8 +195,37 @@ export default function CreateCourseModal({
             />
           </div>
 
-          {/* Difficulty and Settings Row */}
+          {/* Type and Difficulty Row */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Course Type */}
+            <div>
+              <label className="block text-sm font-bold text-mambo-text mb-2">
+                Content Type <span className="text-red-400">*</span>
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {[
+                  { value: "course", label: "Course", icon: "📚", desc: "Full curriculum" },
+                  { value: "choreo", label: "Choreo", icon: "💃", desc: "Dance routine" },
+                  { value: "topic", label: "Topic", icon: "💡", desc: "Single topic" },
+                ].map((type) => (
+                  <button
+                    key={type.value}
+                    type="button"
+                    onClick={() => setCourseType(type.value)}
+                    disabled={isCreating}
+                    className={`p-3 rounded-lg border-2 transition-all text-center ${
+                      courseType === type.value
+                        ? "border-amber-500 bg-amber-500/10 text-amber-400"
+                        : "border-gray-700 bg-gray-900 text-gray-400 hover:border-gray-600"
+                    } disabled:opacity-50`}
+                  >
+                    <div className="text-2xl mb-1">{type.icon}</div>
+                    <div className="text-xs font-bold">{type.label}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+
             {/* Difficulty */}
             <div>
               <label className="block text-sm font-bold text-mambo-text mb-2">
@@ -208,7 +242,6 @@ export default function CreateCourseModal({
                 <option value="ADVANCED">Advanced</option>
               </select>
             </div>
-
           </div>
 
           {/* Thumbnail Upload */}

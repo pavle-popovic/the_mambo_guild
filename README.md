@@ -12,6 +12,8 @@ A comprehensive, gamified learning management system built with Next.js, FastAPI
   - OAuth account linking for existing users
 - **Gamification**: XP system, levels, streaks, and leaderboards
 - **Course Management**: Hierarchical course structure (Weeks → Days → Lessons)
+  - **Content Types**: Courses, Choreographies, and Topics with distinct tagging
+  - Search and filter by content type and difficulty level
 - **Video Streaming**: Mux integration for high-quality video upload and playback
 - **Rich Content**: Markdown support for lesson notes, quizzes, and interactive content
 - **Image Management**: Direct upload to Cloudflare R2 for avatars, course thumbnails, and lesson thumbnails
@@ -24,6 +26,9 @@ A comprehensive, gamified learning management system built with Next.js, FastAPI
 
 ### User Experience
 - **Course Discovery**: Browse courses with progress tracking and smooth animations
+  - **Search**: Find courses by name with aesthetic search bar
+  - **Type Filters**: Filter by Courses, Choreographies, or Topics
+  - **Difficulty Filters**: Filter by Beginner, Intermediate, or Advanced
 - **Lesson Player**: Immersive lesson viewing with video, markdown content, and quizzes
 - **Progress Tracking**: Visual progress indicators and completion tracking
 - **Success Animations**: Engaging completion notifications with audio feedback
@@ -200,6 +205,7 @@ docker-compose up -d
 
 ### Course Builder
 The admin course builder allows creating courses with a hierarchical structure:
+- **Content Types**: Tag content as Course (📚), Choreography (💃), or Topic (💡)
 - **Weeks**: Top-level organization
 - **Days**: Sub-organization within weeks
 - **Lessons**: Individual learning units within days
@@ -296,6 +302,13 @@ The application includes comprehensive error handling and validation:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Content Type System** (January 2026)
+  - Three distinct content types: Courses (📚), Choreographies (💃), and Topics (💡)
+  - Content type selector in admin course builder
+  - Type-specific badges on course cards with color coding
+  - Search bar with aesthetic design and warm amber glow
+  - Type filters on courses page with count badges
+  - Full database support with `course_type` column
 - ✅ **Codebase Cleanup & Reorganization** (January 2026)
   - Backend scripts moved to `backend/scripts/` directory
   - Tests moved to `backend/tests/` directory with pytest configuration

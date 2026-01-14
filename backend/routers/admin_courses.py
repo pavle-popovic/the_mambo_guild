@@ -25,6 +25,7 @@ class WorldCreateRequest(BaseModel):
     image_url: Optional[str] = None
     thumbnail_url: Optional[str] = None
     difficulty: str  # "BEGINNER", "INTERMEDIATE", "ADVANCED"
+    course_type: str = "course"  # "course", "choreo", "topic"
     is_published: bool = False
 
 
@@ -39,6 +40,7 @@ class WorldUpdateRequest(BaseModel):
     mux_preview_playback_id: Optional[str] = None  # Mux playback ID for course preview
     mux_preview_asset_id: Optional[str] = None  # Mux asset ID for course preview (needed for deletion)
     difficulty: Optional[str] = None
+    course_type: Optional[str] = None  # "course", "choreo", "topic"
     is_published: Optional[bool] = None
 
 
@@ -102,6 +104,7 @@ async def get_all_courses_admin(
             image_url=world.image_url,
             thumbnail_url=world.thumbnail_url,
             difficulty=difficulty_str,
+            course_type=world.course_type or "course",
             progress_percentage=0.0,
             is_locked=False
         ))
@@ -127,6 +130,11 @@ async def create_course(
     except KeyError:
         raise HTTPException(status_code=400, detail=f"Invalid difficulty: {course_data.difficulty}")
     
+    # Normalize course_type
+    course_type = (course_data.course_type or "course").lower()
+    if course_type not in ["course", "choreo", "topic"]:
+        course_type = "course"
+    
     world = World(
         id=uuid.uuid4(),
         title=course_data.title,
@@ -137,6 +145,7 @@ async def create_course(
         image_url=course_data.image_url,
         thumbnail_url=course_data.thumbnail_url,
         difficulty=difficulty_enum,
+        course_type=course_type,
         is_published=course_data.is_published
     )
     
@@ -152,6 +161,7 @@ async def create_course(
         image_url=world.image_url,
         thumbnail_url=world.thumbnail_url,
         difficulty=difficulty_str,
+        course_type=world.course_type or "course",
         progress_percentage=0.0,
         is_locked=False
     )
@@ -199,6 +209,10 @@ async def update_course(
             raise HTTPException(status_code=400, detail=f"Invalid difficulty: {course_data.difficulty}")
     if course_data.is_published is not None:
         world.is_published = course_data.is_published
+    if course_data.course_type is not None:
+        course_type = course_data.course_type.lower()
+        if course_type in ["course", "choreo", "topic"]:
+            world.course_type = course_type
     
     db.commit()
     db.refresh(world)
@@ -211,6 +225,7 @@ async def update_course(
         image_url=world.image_url,
         thumbnail_url=world.thumbnail_url,
         difficulty=difficulty_str,
+        course_type=world.course_type or "course",
         progress_percentage=0.0,
         is_locked=False
     )
@@ -462,6 +477,7 @@ async def get_course_full_details(
         "mux_preview_playback_id": world.mux_preview_playback_id,  # Include preview playback ID
         "mux_preview_asset_id": world.mux_preview_asset_id,  # Include preview asset ID
         "difficulty": difficulty_str,
+        "course_type": world.course_type or "course",
         "is_published": world.is_published,
         "levels": levels_data
     }

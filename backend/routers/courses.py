@@ -105,6 +105,7 @@ async def get_worlds(
             thumbnail_url=world.thumbnail_url,
             mux_preview_playback_id=world.mux_preview_playback_id,  # Include preview playback ID
             difficulty=difficulty_str,
+            course_type=world.course_type or "course",
             progress_percentage=progress_percentage,
             is_locked=is_locked
         ))

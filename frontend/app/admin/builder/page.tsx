@@ -22,13 +22,13 @@ interface Lesson {
   xp_value: number;
   order_index: number;
   is_boss_battle: boolean;
-  duration_minutes: number | null;
-  week_number: number | null;
-  day_number: number | null;
-  content_json: any | null;
-  mux_playback_id: string | null;
-  mux_asset_id: string | null;
-  thumbnail_url: string | null;
+  duration_minutes?: number | null;
+  week_number?: number | null;
+  day_number?: number | null;
+  content_json?: any | null;
+  mux_playback_id?: string | null;
+  mux_asset_id?: string | null;
+  thumbnail_url?: string | null;
   lesson_type?: string;
 }
 
@@ -51,6 +51,7 @@ interface CourseData {
   difficulty: string;
   is_published: boolean;
   levels: Level[];
+  course_type?: string;
 }
 
 export default function AdminBuilderPage() {
@@ -75,6 +76,7 @@ export default function AdminBuilderPage() {
   // Form state
   const [worldTitle, setWorldTitle] = useState("");
   const [difficulty, setDifficulty] = useState("BEGINNER");
+  const [courseType, setCourseType] = useState("course");
   const [description, setDescription] = useState("");
   const [isPublished, setIsPublished] = useState(false);
   const [isFree, setIsFree] = useState(false);
@@ -114,10 +116,11 @@ export default function AdminBuilderPage() {
     try {
       setLoading(true);
       const data = await apiClient.getCourseFullDetails(courseId);
-      setCourseData(data);
+      setCourseData(data as CourseData);
       setWorldTitle(data.title);
       setDescription(data.description || "");
       setDifficulty(data.difficulty.toUpperCase());
+      setCourseType((data as any).course_type || "course");
       setIsPublished(data.is_published);
       setIsFree(data.is_free);
       setSlug(data.slug);
@@ -145,12 +148,13 @@ export default function AdminBuilderPage() {
         title: worldTitle,
         description: description || undefined,
         difficulty: difficulty,
+        course_type: courseType,
         is_published: isPublished,
         is_free: isFree,
         slug: slug || undefined,
         thumbnail_url: thumbnailUrl || undefined,
         mux_preview_playback_id: previewMuxPlaybackId || undefined,
-      });
+      } as any);
       
       // Reload course data
       await loadCourse();
@@ -332,7 +336,7 @@ export default function AdminBuilderPage() {
 
   const handleUpdateLesson = async (lessonId: string, updates: Partial<Lesson>) => {
     try {
-      await apiClient.updateLesson(lessonId, updates);
+      await apiClient.updateLesson(lessonId, updates as any);
       await loadCourse();
     } catch (err: any) {
       console.error("Failed to update lesson:", err);
@@ -658,6 +662,32 @@ export default function AdminBuilderPage() {
                   onChange={(e) => setWorldTitle(e.target.value)}
                   className="w-full bg-black border border-gray-700 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue outline-none"
                 />
+              </div>
+              <div>
+                <label className="block text-xs font-bold text-gray-500 uppercase mb-2">
+                  Content Type
+                </label>
+                <div className="flex gap-2">
+                  {[
+                    { value: "course", label: "Course", icon: "📚" },
+                    { value: "choreo", label: "Choreo", icon: "💃" },
+                    { value: "topic", label: "Topic", icon: "💡" },
+                  ].map((type) => (
+                    <button
+                      key={type.value}
+                      type="button"
+                      onClick={() => setCourseType(type.value)}
+                      className={`flex-1 p-3 rounded-lg border-2 transition-all text-center ${
+                        courseType === type.value
+                          ? "border-amber-500 bg-amber-500/10 text-amber-400"
+                          : "border-gray-700 bg-black text-gray-400 hover:border-gray-600"
+                      }`}
+                    >
+                      <div className="text-xl mb-0.5">{type.icon}</div>
+                      <div className="text-xs font-bold">{type.label}</div>
+                    </button>
+                  ))}
+                </div>
               </div>
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-2">
@@ -1099,7 +1129,15 @@ export default function AdminBuilderPage() {
           setCreatingLessonDay(undefined);
         }}
         onSave={handleSaveLesson}
-        lesson={editingLesson}
+        lesson={editingLesson ? {
+          ...editingLesson,
+          week_number: editingLesson.week_number ?? null,
+          day_number: editingLesson.day_number ?? null,
+          duration_minutes: editingLesson.duration_minutes ?? null,
+          content_json: editingLesson.content_json ?? null,
+          mux_playback_id: editingLesson.mux_playback_id ?? null,
+          mux_asset_id: editingLesson.mux_asset_id ?? null,
+        } : null}
         onRefreshLesson={loadCourse}
       />
     </div>

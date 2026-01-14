@@ -492,6 +492,7 @@ class ApiClient {
     image_url?: string;
     thumbnail_url?: string;
     difficulty: string;
+    course_type?: string;
     is_published?: boolean;
   }) {
     return this.request<{
@@ -500,6 +501,7 @@ class ApiClient {
       description: string | null;
       image_url: string | null;
       difficulty: string;
+      course_type: string;
       progress_percentage: number;
       is_locked: boolean;
     }>("/api/admin/courses", {
@@ -517,6 +519,7 @@ class ApiClient {
     image_url?: string;
     thumbnail_url?: string;
     difficulty?: string;
+    course_type?: string;
     is_published?: boolean;
   }) {
     return this.request<{
@@ -525,6 +528,7 @@ class ApiClient {
       description: string | null;
       image_url: string | null;
       difficulty: string;
+      course_type: string;
       progress_percentage: number;
       is_locked: boolean;
     }>(`/api/admin/courses/${courseId}`, {

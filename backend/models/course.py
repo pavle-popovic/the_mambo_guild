@@ -14,6 +14,12 @@ class Difficulty(str, enum.Enum):
     ADVANCED = "Advanced"
 
 
+class CourseType(str, enum.Enum):
+    COURSE = "course"
+    CHOREO = "choreo"
+    TOPIC = "topic"
+
+
 class LessonType(str, enum.Enum):
     VIDEO = "video"  # Video lesson with notes
     QUIZ = "quiz"  # Quiz only, no video, no notes
@@ -35,6 +41,7 @@ class World(Base):
     mux_preview_asset_id = Column(String, nullable=True)  # Mux asset ID for course preview video (needed for deletion)
     difficulty = Column(SQLEnum(Difficulty), nullable=False)
     is_published = Column(Boolean, default=False, nullable=False)
+    course_type = Column(String, default="course", nullable=False)  # course, choreo, topic
 
     # Relationships
     levels = relationship("Level", back_populates="world", order_by="Level.order_index")
