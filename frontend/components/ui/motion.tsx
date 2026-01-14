@@ -1,8 +1,9 @@
 "use client";
 
 import { motion, MotionProps, Variants } from "framer-motion";
-import { ReactNode } from "react";
+import { ReactNode, useCallback } from "react";
 import { cn } from "@/lib/utils";
+import { UISound } from "@/hooks/useUISound";
 
 // HoverCard: Card with hover scale and lift effect
 interface HoverCardProps extends MotionProps {
@@ -65,19 +66,28 @@ export function FadeIn({ children, className, delay = 0, ...props }: FadeInProps
   );
 }
 
-// Clickable: Button with tap scale effect
+// Clickable: Button with tap scale effect and tactile sound
 interface ClickableProps extends MotionProps {
   children: ReactNode;
   className?: string;
+  enableSound?: boolean;
 }
 
-export function Clickable({ children, className, ...props }: ClickableProps) {
+export function Clickable({ children, className, enableSound = true, ...props }: ClickableProps) {
+  // Fire sound on mousedown for faster feedback (not on click)
+  const handleMouseDown = useCallback(() => {
+    if (enableSound) {
+      UISound.click();
+    }
+  }, [enableSound]);
+
   return (
     <motion.div
       whileTap={{ scale: 0.95 }}
-      whileHover={{ scale: 1.02 }}
+      whileHover={{ scale: 1.05 }}
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
       className={cn("cursor-pointer", className)}
+      onMouseDown={handleMouseDown}
       {...props}
     >
       {children}

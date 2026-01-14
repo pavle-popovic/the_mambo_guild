@@ -47,3 +47,13 @@ node_modules/
 /blob-report/
 /playwright/.cache/
 /playwright/.auth/
+
+# Downloaded/saved web pages (may contain embedded secrets)
+*.download
+*_files/
+Full_Logo*
+
+# Sensitive files
+*.pem
+*.key
+secrets.json

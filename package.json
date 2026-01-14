@@ -5,5 +5,8 @@
     "lucide-react": "^0.562.0",
     "tailwind-merge": "^3.4.0",
     "use-sound": "^5.0.0"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.57.0"
   }
 }
