@@ -33,6 +33,12 @@ def engine():
 from models.user import User, UserProfile, Subscription
 from models.course import World, Level, Lesson
 from models.progress import UserProgress, BossSubmission, Comment
+from models.community import (
+    ClaveTransaction,
+    Post, PostReply, PostReaction,
+    BadgeDefinition, UserBadge,
+    CommunityTag
+)
 
 # Dependency to get database session
 def get_db():

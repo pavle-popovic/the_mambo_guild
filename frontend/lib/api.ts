@@ -659,6 +659,282 @@ class ApiClient {
     });
   }
 
+  // ============================================
+  // Clave Economy Endpoints (v4.0)
+  // ============================================
+  
+  async getWallet() {
+    return this.request<{
+      current_claves: number;
+      is_pro: boolean;
+      recent_transactions: Array<{
+        id: string;
+        amount: number;
+        reason: string;
+        reference_id: string | null;
+        created_at: string;
+      }>;
+      video_slots_used: number;
+      video_slots_limit: number;
+    }>("/api/claves/wallet");
+  }
+
+  async claimDailyClaves() {
+    return this.request<{
+      success: boolean;
+      amount: number;
+      new_balance: number;
+      streak_bonus: number | null;
+      message: string;
+    }>("/api/claves/daily-claim", {
+      method: "POST",
+    });
+  }
+
+  async checkBalance(amount: number) {
+    return this.request<{
+      can_afford: boolean;
+      current_balance: number;
+      required_amount: number;
+      shortfall: number;
+    }>(`/api/claves/balance-check/${amount}`);
+  }
+
+  async getSlotStatus() {
+    return this.request<{
+      allowed: boolean;
+      current_slots: number;
+      max_slots: number;
+      message: string;
+    }>("/api/claves/slot-status");
+  }
+
+  // ============================================
+  // Community Endpoints (v4.0)
+  // ============================================
+
+  async getCommunityFeed(options?: {
+    post_type?: 'stage' | 'lab';
+    tag?: string;
+    skip?: number;
+    limit?: number;
+  }) {
+    const params = new URLSearchParams();
+    if (options?.post_type) params.append("post_type", options.post_type);
+    if (options?.tag) params.append("tag", options.tag);
+    if (options?.skip !== undefined) params.append("skip", String(options.skip));
+    if (options?.limit !== undefined) params.append("limit", String(options.limit));
+    
+    const query = params.toString();
+    return this.request<Array<{
+      id: string;
+      user: {
+        id: string;
+        first_name: string;
+        last_name: string;
+        avatar_url: string | null;
+        is_pro: boolean;
+        level: number;
+      };
+      post_type: string;
+      title: string;
+      body: string | null;
+      mux_playback_id: string | null;
+      video_duration_seconds: number | null;
+      tags: string[];
+      is_wip: boolean;
+      feedback_type: string;
+      is_solved: boolean;
+      reaction_count: number;
+      reply_count: number;
+      user_reaction: string | null;
+      created_at: string;
+      updated_at: string;
+    }>>(`/api/community/feed${query ? `?${query}` : ""}`);
+  }
+
+  async getPost(postId: string) {
+    return this.request<{
+      id: string;
+      user: {
+        id: string;
+        first_name: string;
+        last_name: string;
+        avatar_url: string | null;
+        is_pro: boolean;
+        level: number;
+      };
+      post_type: string;
+      title: string;
+      body: string | null;
+      mux_playback_id: string | null;
+      tags: string[];
+      is_wip: boolean;
+      feedback_type: string;
+      is_solved: boolean;
+      reaction_count: number;
+      reply_count: number;
+      user_reaction: string | null;
+      created_at: string;
+      replies: Array<{
+        id: string;
+        user: {
+          id: string;
+          first_name: string;
+          last_name: string;
+          avatar_url: string | null;
+          is_pro: boolean;
+          level: number;
+        };
+        content: string;
+        mux_playback_id: string | null;
+        is_accepted_answer: boolean;
+        created_at: string;
+      }>;
+    }>(`/api/community/posts/${postId}`);
+  }
+
+  async createPost(data: {
+    post_type: 'stage' | 'lab';
+    title: string;
+    body?: string;
+    tags: string[];
+    is_wip?: boolean;
+    feedback_type?: 'hype' | 'coach';
+    mux_asset_id?: string;
+    mux_playback_id?: string;
+    video_duration_seconds?: number;
+  }) {
+    return this.request<{
+      success: boolean;
+      post?: any;
+      message: string;
+    }>("/api/community/posts", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async addReaction(postId: string, reactionType: 'fire' | 'ruler' | 'clap') {
+    return this.request<{
+      success: boolean;
+      message: string;
+    }>(`/api/community/posts/${postId}/react`, {
+      method: "POST",
+      body: JSON.stringify({ reaction_type: reactionType }),
+    });
+  }
+
+  async removeReaction(postId: string) {
+    return this.request<{
+      success: boolean;
+      message: string;
+    }>(`/api/community/posts/${postId}/react`, {
+      method: "DELETE",
+    });
+  }
+
+  async addReply(postId: string, content: string, muxPlaybackId?: string) {
+    return this.request<{
+      success: boolean;
+      reply?: any;
+      message: string;
+    }>(`/api/community/posts/${postId}/replies`, {
+      method: "POST",
+      body: JSON.stringify({
+        content,
+        mux_playback_id: muxPlaybackId,
+      }),
+    });
+  }
+
+  async markSolution(postId: string, replyId: string) {
+    return this.request<{
+      success: boolean;
+      message: string;
+    }>(`/api/community/posts/${postId}/replies/${replyId}/accept`, {
+      method: "POST",
+    });
+  }
+
+  async deletePost(postId: string) {
+    return this.request<{
+      success: boolean;
+      message: string;
+    }>(`/api/community/posts/${postId}`, {
+      method: "DELETE",
+    });
+  }
+
+  async getCommunityTags() {
+    return this.request<Array<{
+      slug: string;
+      name: string;
+      category: string | null;
+      usage_count: number;
+    }>>("/api/community/tags");
+  }
+
+  async searchPosts(query: string, options?: {
+    post_type?: 'stage' | 'lab';
+    skip?: number;
+    limit?: number;
+  }) {
+    const params = new URLSearchParams({ q: query });
+    if (options?.post_type) params.append("post_type", options.post_type);
+    if (options?.skip !== undefined) params.append("skip", String(options.skip));
+    if (options?.limit !== undefined) params.append("limit", String(options.limit));
+    
+    return this.request<Array<any>>(`/api/community/search?${params.toString()}`);
+  }
+
+  // ============================================
+  // Badge Endpoints (v4.0)
+  // ============================================
+
+  async getBadges() {
+    return this.request<Array<{
+      id: string;
+      name: string;
+      description: string;
+      icon_url: string | null;
+      category: string;
+      requirement_type: string;
+      requirement_value: number;
+      is_earned: boolean;
+      earned_at: string | null;
+    }>>("/api/badges/");
+  }
+
+  async getUserBadges(userId: string) {
+    return this.request<Array<{
+      id: string;
+      name: string;
+      description: string;
+      icon_url: string | null;
+      category: string;
+      earned_at: string | null;
+    }>>(`/api/badges/user/${userId}`);
+  }
+
+  async getUserStats(userId: string) {
+    return this.request<{
+      questions_solved: number;
+      fires_received: number;
+      current_streak: number;
+    }>(`/api/badges/stats/${userId}`);
+  }
+
+  async checkMyBadges() {
+    return this.request<{
+      success: boolean;
+      message: string;
+      badges: Array<any>;
+    }>("/api/badges/check", {
+      method: "POST",
+    });
+  }
+
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);

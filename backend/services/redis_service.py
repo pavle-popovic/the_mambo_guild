@@ -118,3 +118,136 @@ def check_rate_limit(identifier: str, action: str, max_requests: int = 5, window
         logger.error(f"Rate limit check failed: {e}")
         # Fail open - allow request if Redis is unavailable
         return True
+
+
+# ============================================
+# Clave Economy Caching (v4.0)
+# ============================================
+
+CLAVE_BALANCE_TTL = 300  # 5 minutes
+FEED_CACHE_TTL = 60      # 1 minute (social data changes often)
+
+
+def cache_clave_balance(user_id: str, balance: int) -> bool:
+    """
+    Cache user's clave balance for fast reads.
+    
+    Args:
+        user_id: User's UUID
+        balance: Current clave balance
+    
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        client = get_redis_client()
+        key = f"claves:balance:{user_id}"
+        client.setex(key, CLAVE_BALANCE_TTL, str(balance))
+        return True
+    except Exception as e:
+        logger.error(f"Failed to cache clave balance: {e}")
+        return False
+
+
+def get_cached_clave_balance(user_id: str) -> Optional[int]:
+    """
+    Get cached clave balance.
+    
+    Returns:
+        Cached balance or None if cache miss
+    """
+    try:
+        client = get_redis_client()
+        key = f"claves:balance:{user_id}"
+        cached = client.get(key)
+        if cached is not None:
+            return int(cached)
+        return None
+    except Exception as e:
+        logger.error(f"Failed to get cached clave balance: {e}")
+        return None
+
+
+def invalidate_clave_balance(user_id: str) -> bool:
+    """
+    Invalidate cached clave balance after a transaction.
+    
+    Args:
+        user_id: User's UUID
+    
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        client = get_redis_client()
+        key = f"claves:balance:{user_id}"
+        client.delete(key)
+        return True
+    except Exception as e:
+        logger.error(f"Failed to invalidate clave balance cache: {e}")
+        return False
+
+
+def cache_feed_page(feed_type: str, page: int, data: str) -> bool:
+    """
+    Cache a page of feed data.
+    
+    Args:
+        feed_type: 'stage' or 'lab' or 'all'
+        page: Page number
+        data: JSON string of feed data
+    
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        client = get_redis_client()
+        key = f"feed:{feed_type}:page:{page}"
+        client.setex(key, FEED_CACHE_TTL, data)
+        return True
+    except Exception as e:
+        logger.error(f"Failed to cache feed page: {e}")
+        return False
+
+
+def get_cached_feed_page(feed_type: str, page: int) -> Optional[str]:
+    """
+    Get cached feed page.
+    
+    Returns:
+        Cached JSON string or None if cache miss
+    """
+    try:
+        client = get_redis_client()
+        key = f"feed:{feed_type}:page:{page}"
+        return client.get(key)
+    except Exception as e:
+        logger.error(f"Failed to get cached feed page: {e}")
+        return None
+
+
+def invalidate_feed_cache(feed_type: str = None) -> bool:
+    """
+    Invalidate feed cache. Called when posts are created/deleted.
+    
+    Args:
+        feed_type: Specific feed type to invalidate, or None for all
+    
+    Returns:
+        True if successful, False otherwise
+    """
+    try:
+        client = get_redis_client()
+        if feed_type:
+            pattern = f"feed:{feed_type}:*"
+        else:
+            pattern = "feed:*"
+        
+        keys = client.keys(pattern)
+        if keys:
+            client.delete(*keys)
+            logger.info(f"Invalidated {len(keys)} feed cache entries")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to invalidate feed cache: {e}")
+        return False

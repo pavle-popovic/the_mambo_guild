@@ -15,7 +15,6 @@ app = FastAPI(
 )
 
 # Session middleware - Required for OAuth state management and session support
-# Use SECRET_KEY from settings (static key for consistency)
 app.add_middleware(
     SessionMiddleware,
     secret_key=settings.SECRET_KEY,
@@ -23,7 +22,8 @@ app.add_middleware(
     same_site="lax"
 )
 
-# CORS middleware configuration - Industry standard: Explicit origins, credentials support
+# CORS middleware MUST be added LAST (Starlette uses LIFO order)
+# This ensures it's the outermost layer and CORS headers are added to ALL responses including errors
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,

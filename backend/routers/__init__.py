@@ -14,6 +14,11 @@ from .uploads import router as uploads_router
 from .users import router as users_router
 from .payments import router as payments_router
 
+# v4.0 Community Features
+from .claves import router as claves_router
+from .community import router as community_router
+from .badges import router as badges_router
+
 # Register routers
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(courses_router, prefix="/courses", tags=["courses"])
@@ -25,4 +30,9 @@ api_router.include_router(mux_router, prefix="/mux", tags=["mux"])
 api_router.include_router(uploads_router, prefix="/uploads", tags=["uploads"])
 api_router.include_router(users_router, tags=["users"])
 api_router.include_router(payments_router, tags=["payments"])
+
+# v4.0 Community Features
+api_router.include_router(claves_router, prefix="/claves", tags=["claves"])
+api_router.include_router(community_router, prefix="/community", tags=["community"])
+api_router.include_router(badges_router, prefix="/badges", tags=["badges"])
 

@@ -12,6 +12,7 @@ from services.auth_service import verify_password, get_password_hash, create_acc
 from services.gamification_service import update_streak
 from services.email_service import send_password_reset_email
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
+from services.clave_service import process_daily_login
 from dependencies import get_current_user
 from config import settings
 import uuid
@@ -174,6 +175,14 @@ async def login(
             update_streak(str(user.id), db)
         except Exception:
             # Don't fail login if streak update fails
+            pass
+        
+        # Process daily clave claim (v4.0)
+        try:
+            process_daily_login(str(user.id), db)
+            db.commit()
+        except Exception:
+            # Don't fail login if clave claim fails
             pass
 
         # Create access token

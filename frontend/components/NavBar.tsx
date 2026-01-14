@@ -7,6 +7,8 @@ import { FaFire, FaBolt } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import { ClaveWallet } from "./ClaveWallet";
+import { WalletModal } from "./WalletModal";
 
 interface NavBarProps {
   user?: {
@@ -22,6 +24,7 @@ interface NavBarProps {
 export default function NavBar({ user }: NavBarProps) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
+  const [isWalletOpen, setIsWalletOpen] = useState(false);
   const isAuthenticated = !!user;
 
   useEffect(() => {
@@ -61,6 +64,7 @@ export default function NavBar({ user }: NavBarProps) {
   const MotionDiv = mounted ? motion.div : "div";
 
   return (
+    <>
     <nav className="fixed w-full z-50 glass-nav transition-all duration-300" suppressHydrationWarning>
       <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
         <LogoWrapper
@@ -89,6 +93,7 @@ export default function NavBar({ user }: NavBarProps) {
         <div className="hidden md:flex gap-10 items-center">
           <NavLink href="/">Home</NavLink>
           <NavLink href="/courses" activePaths={["/courses"]}>Courses</NavLink>
+          <NavLink href="/community" activePaths={["/community"]}>Community</NavLink>
           <NavLink href="/pricing">Pricing</NavLink>
           <NavLink href="/instructors">Instructors</NavLink>
         </div>
@@ -96,6 +101,12 @@ export default function NavBar({ user }: NavBarProps) {
         <div className="flex gap-4 items-center">
           {isAuthenticated ? (
             <>
+              {/* Clave Wallet (v4.0) */}
+              <ClaveWallet 
+                onOpenWallet={() => setIsWalletOpen(true)}
+                className="hidden md:flex"
+              />
+
               {/* XP Display */}
               <MotionDiv 
                 className="hidden md:flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-mambo-panel/50 backdrop-blur-sm border border-mambo-blue/20"
@@ -162,6 +173,10 @@ export default function NavBar({ user }: NavBarProps) {
         </div>
       </div>
     </nav>
+    
+    {/* Wallet Modal - Rendered outside nav to avoid stacking context issues */}
+    <WalletModal isOpen={isWalletOpen} onClose={() => setIsWalletOpen(false)} />
+  </>
   );
 }
 

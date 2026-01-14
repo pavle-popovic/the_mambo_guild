@@ -1,8 +1,8 @@
-from sqlalchemy import Column, String, Integer, DateTime, Enum as SQLEnum, ForeignKey, Boolean
+from sqlalchemy import Column, String, Integer, DateTime, Enum as SQLEnum, ForeignKey, Boolean, Date
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
-from datetime import datetime
+from datetime import datetime, date
 import enum
 from typing import TYPE_CHECKING
 
@@ -61,11 +61,18 @@ class UserProfile(Base):
     streak_count = Column(Integer, default=0, nullable=False)
     last_login_date = Column(DateTime, nullable=True)
     badges = Column(String, default="[]", nullable=False)  # JSONB stored as string for now
+    
+    # Clave Economy (v4.0)
+    current_claves = Column(Integer, default=0, nullable=False)
+    last_daily_claim = Column(Date, nullable=True)  # Track daily login bonus
 
     # Relationships
     user = relationship("User", back_populates="profile")
 
 
+# NOTE: SubscriptionStatus and SubscriptionTier use LOWERCASE values in database
+# (e.g., 'active', 'rookie'), so we use values_callable to match.
+# UserRole and CurrentLevelTag use UPPERCASE names in database (e.g., 'ADMIN', 'BEGINNER').
 class SubscriptionStatus(str, enum.Enum):
     ACTIVE = "active"
     PAST_DUE = "past_due"
@@ -87,8 +94,17 @@ class Subscription(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), unique=True, nullable=False, index=True)
     stripe_customer_id = Column(String, index=True, nullable=True)
     stripe_subscription_id = Column(String, nullable=True)
-    status = Column(SQLEnum(SubscriptionStatus), default=SubscriptionStatus.INCOMPLETE, nullable=False)
-    tier = Column(SQLEnum(SubscriptionTier), default=SubscriptionTier.ROOKIE, nullable=False)
+    # Use values_callable to match lowercase values in database
+    status = Column(
+        SQLEnum(SubscriptionStatus, values_callable=lambda x: [e.value for e in x]),
+        default=SubscriptionStatus.INCOMPLETE,
+        nullable=False
+    )
+    tier = Column(
+        SQLEnum(SubscriptionTier, values_callable=lambda x: [e.value for e in x]),
+        default=SubscriptionTier.ROOKIE,
+        nullable=False
+    )
     current_period_end = Column(DateTime, nullable=True)
 
     # Relationships
