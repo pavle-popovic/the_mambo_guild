@@ -2,8 +2,29 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { usePathname } from "next/navigation";
-import { ReactNode, useEffect, useState, useRef } from "react";
+import { ReactNode, useEffect, useState, useRef, Suspense } from "react";
 import { UISound } from "@/hooks/useUISound";
+import NavigationProgress from "@/components/NavigationProgress";
+
+// Transition animation configuration
+const pageTransition = {
+  initial: { 
+    opacity: 0, 
+    y: 15,  // Slide up from 15px below
+  },
+  animate: { 
+    opacity: 1, 
+    y: 0,
+  },
+  exit: { 
+    opacity: 0, 
+    y: -15, // Slide up 15px on exit
+  },
+  transition: {
+    duration: 0.3,
+    ease: [0.16, 1, 0.3, 1], // Custom easeOut curve for snappy feel
+  },
+};
 
 export default function Template({ children }: { children: ReactNode }) {
   const pathname = usePathname();
@@ -39,20 +60,25 @@ export default function Template({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={pathname}
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{
-          duration: 0.3,
-          ease: [0.25, 0.1, 0.25, 1],
-        }}
-      >
-        {children}
-      </motion.div>
-    </AnimatePresence>
+    <>
+      {/* Navigation progress bar at top of viewport */}
+      <Suspense fallback={null}>
+        <NavigationProgress />
+      </Suspense>
+      
+      {/* Page transition wrapper */}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={pathname}
+          initial={pageTransition.initial}
+          animate={pageTransition.animate}
+          exit={pageTransition.exit}
+          transition={pageTransition.transition}
+        >
+          {children}
+        </motion.div>
+      </AnimatePresence>
+    </>
   );
 }
 

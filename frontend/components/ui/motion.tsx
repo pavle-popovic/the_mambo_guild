@@ -71,15 +71,29 @@ interface ClickableProps extends MotionProps {
   children: ReactNode;
   className?: string;
   enableSound?: boolean;
+  enableHoverSound?: boolean;
 }
 
-export function Clickable({ children, className, enableSound = true, ...props }: ClickableProps) {
-  // Fire sound on mousedown for faster feedback (not on click)
+export function Clickable({ 
+  children, 
+  className, 
+  enableSound = true,
+  enableHoverSound = true,
+  ...props 
+}: ClickableProps) {
+  // THOCK sound on mousedown (deeper, satisfying click)
   const handleMouseDown = useCallback(() => {
     if (enableSound) {
-      UISound.click();
+      UISound.thock();
     }
   }, [enableSound]);
+
+  // TICK sound on hover (crisp, high-pitched)
+  const handleHoverStart = useCallback(() => {
+    if (enableSound && enableHoverSound) {
+      UISound.tick();
+    }
+  }, [enableSound, enableHoverSound]);
 
   return (
     <motion.div
@@ -88,6 +102,7 @@ export function Clickable({ children, className, enableSound = true, ...props }:
       transition={{ type: "spring", stiffness: 400, damping: 17 }}
       className={cn("cursor-pointer", className)}
       onMouseDown={handleMouseDown}
+      onHoverStart={handleHoverStart}
       {...props}
     >
       {children}
