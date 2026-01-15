@@ -3,6 +3,7 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import GlobalAudioPlayer from "@/components/GlobalAudioPlayer";
 import { AuthProvider } from "@/contexts/AuthContext";
+import PalladiumMesh from "@/components/PalladiumMesh";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -28,7 +29,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-mambo-dark`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-black`}>
+        {/* PalladiumMesh background - subtle dark mesh gradient */}
+        <PalladiumMesh />
         <AuthProvider>
           {children}
           <GlobalAudioPlayer />

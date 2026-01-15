@@ -387,6 +387,10 @@ export default function PricingPage() {
                       }`} />
                       &quot;Certified&quot; Badge on Profile
                     </li>
+                    <li className="flex gap-3 text-sm leading-relaxed text-gray-500 italic">
+                      <span className="shrink-0 mt-0.5">🚧</span>
+                      <span>Pro Mastery Features Coming Soon: Practice Playlist Builder, DJ Booth, Smart Looper, Legends Vault, Precision Player</span>
+                    </li>
                   </ul>
                   <Clickable>
                     {!user ? (

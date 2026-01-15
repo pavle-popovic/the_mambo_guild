@@ -7,6 +7,7 @@ from datetime import datetime
 from typing import Optional, List
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func, desc
+from sqlalchemy.dialects.postgresql import ARRAY
 import uuid
 
 from models.user import User, UserProfile, Subscription, SubscriptionTier, SubscriptionStatus
@@ -191,7 +192,8 @@ def get_feed(
         query = query.filter(Post.post_type == post_type)
     
     if tag:
-        query = query.filter(Post.tags.contains([tag]))
+        # Use PostgreSQL array contains operator (@>)
+        query = query.filter(Post.tags.any(tag))
     
     posts = query.order_by(desc(Post.created_at)).offset(skip).limit(limit).all()
     

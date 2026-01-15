@@ -45,15 +45,20 @@ backend/
 │   ├── uploads.py           # Image upload presigned URLs
 │   └── mux.py               # Mux webhook and upload endpoints
 ├── models/                  # SQLAlchemy database models
-│   ├── user.py             # User and UserProfile models
-│   └── course.py            # World, Level, Lesson models
+│   ├── user.py             # User, UserProfile, Subscription models
+│   ├── course.py            # World, Level, Lesson models
+│   └── community.py        # Post, PostReply, PostReaction, BadgeDefinition, UserBadge, CommunityTag models
 ├── schemas/                 # Pydantic validation schemas
 │   ├── auth.py             # Auth-related schemas
 │   ├── course.py            # Course/lesson schemas
 │   └── gamification.py      # Gamification schemas
 ├── services/                # Business logic services
 │   ├── storage_service.py   # R2/S3 storage service
-│   └── mux_service.py       # Mux API service
+│   ├── mux_service.py       # Mux API service
+│   ├── clave_service.py     # Clave economy logic (earnings, spending, daily bonuses)
+│   ├── post_service.py      # Community posts, reactions, replies, solutions
+│   ├── badge_service.py     # Badge definitions and award checking
+│   └── redis_service.py     # Redis caching (extended for clave/feed cache)
 ├── scripts/                 # Utility and migration scripts
 │   ├── create_admin.py     # Create admin user
 │   ├── create_test_user.py # Create test user with subscription
@@ -66,6 +71,11 @@ backend/
 │   ├── test_all_apis.py    # Comprehensive API tests
 │   └── test_*.py           # Additional test files
 ├── migrations/              # Database schema migrations
+│   ├── migration_001_create_clave_tables.py
+│   ├── migration_002_create_posts_tables.py
+│   ├── migration_003_create_badges_tables.py
+│   ├── migration_004_create_tags_table.py
+│   └── 005_run_all_v4.py   # Master migration runner
 ├── dependencies.py          # FastAPI dependencies
 ├── database.py              # Database connection and session
 ├── config.py                # Environment configuration
@@ -113,6 +123,31 @@ backend/
 - `POST /api/mux/check-upload-status` - Check video processing status
 - `DELETE /api/mux/asset/{asset_id}` - Delete Mux asset
 - `POST /api/mux/webhook` - Mux webhook endpoint (video processing updates)
+
+### Clave Economy (`/api/claves`)
+- `GET /api/claves/wallet` - Get wallet balance and recent transactions
+- `POST /api/claves/daily-claim` - Claim daily login bonus
+- `GET /api/claves/balance-check/{amount}` - Check if user can afford amount
+- `GET /api/claves/slot-status` - Get video slot usage and limit
+
+### Community (`/api/community`)
+- `GET /api/community/feed` - Get paginated feed (Stage/Lab, tag filters)
+- `GET /api/community/posts/{post_id}` - Get full post details with replies
+- `POST /api/community/posts` - Create new post (Stage: 15 claves, Lab: 5 claves)
+- `POST /api/community/posts/{post_id}/react` - Add reaction (1 clave)
+- `DELETE /api/community/posts/{post_id}/react` - Remove reaction
+- `POST /api/community/posts/{post_id}/replies` - Add reply/comment (2 claves)
+- `POST /api/community/posts/{post_id}/replies/{reply_id}/accept` - Mark solution (awards 10 claves)
+- `DELETE /api/community/posts/{post_id}` - Delete own post
+- `GET /api/community/upload-check` - Pre-upload video slot limit check
+- `GET /api/community/tags` - List all community tags
+- `GET /api/community/search` - Search posts by title/tags
+
+### Badges (`/api/badges`)
+- `GET /api/badges/` - Get all badge definitions with user's earned status
+- `GET /api/badges/user/{user_id}` - Get badges earned by specific user
+- `GET /api/badges/stats/{user_id}` - Get public stats (questions solved, fires received, streak)
+- `POST /api/badges/check` - Manually trigger badge eligibility check
 
 ## 🔧 Configuration
 
@@ -324,6 +359,16 @@ Interactive API documentation available at:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Community Features v4.0** (January 2026)
+  - **Clave Economy**: Complete currency system with transactions, daily bonuses, streak rewards
+  - **Community Posts**: Stage (video) and Lab (Q&A) post types with full CRUD
+  - **Reactions System**: Fire, Ruler, Clap reactions with clave costs
+  - **Reply/Solution System**: Comments with accepted answer marking and rewards
+  - **Badge System**: 7 badge definitions with automatic award checking
+  - **Tag System**: Community taxonomy with 15 predefined tags
+  - **Video Slot Management**: Base (5) and Pro (20) slot limits with checking
+  - **Redis Caching**: Clave balance and feed page caching for performance
+  - **PostgreSQL ARRAY Fix**: Fixed tag filtering using `ANY()` operator
 - ✅ **Content Type System** (January 2026)
   - Added `course_type` column to `worlds` table (course, choreo, topic)
   - Create/Update/Get course endpoints now support `course_type` field

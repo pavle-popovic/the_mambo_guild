@@ -46,8 +46,9 @@ frontend/
 │   │   └── [id]/            # Course detail page
 │   ├── lesson/              # Lesson viewing
 │   │   └── [id]/            # Individual lesson page
-│   ├── profile/             # User profile
+│   ├── profile/             # User profile (with badge trophy case)
 │   ├── pricing/             # Pricing/subscription
+│   ├── community/           # Community feed (Stage & Lab)
 │   ├── login/               # Login page (with Google OAuth)
 │   ├── register/            # Registration page (with password confirmation)
 │   ├── forgot-password/     # Password reset request page
@@ -58,14 +59,22 @@ frontend/
 │   ├── common/              # Reusable components
 │   │   └── ImageUploader.tsx # R2 image upload component
 │   ├── ui/                  # UI primitives
-│   │   └── motion.tsx       # Framer Motion animation components
+│   │   ├── motion.tsx       # Framer Motion animation components
+│   │   ├── GlassCard.tsx    # Frosted glass card component
+│   │   └── MagicButton.tsx  # Premium animated button component
 │   ├── MuxUploader.tsx      # Mux video upload component
 │   ├── MuxVideoPlayer.tsx   # Mux video player component
 │   ├── AuthPromptModal.tsx  # Login/subscribe modals
 │   ├── SuccessNotification.tsx # Completion animations
 │   ├── NavBar.tsx           # Navigation bar with animations
 │   ├── Footer.tsx           # Footer component
-│   └── QuestLogSidebar.tsx  # Lesson sidebar with Week/Day organization
+│   ├── QuestLogSidebar.tsx  # Lesson sidebar with Week/Day organization
+│   ├── PalladiumMesh.tsx    # Dark mesh gradient background
+│   ├── ClaveWallet.tsx      # Clave balance navbar component
+│   ├── WalletModal.tsx      # Wallet details and transaction history
+│   ├── CreatePostModal.tsx  # Community post creation modal
+│   ├── BadgeTrophyCase.tsx  # Badge display component
+│   └── ReferralSection.tsx  # Referral program UI
 ├── contexts/                # React contexts
 │   └── AuthContext.tsx      # Authentication context
 ├── lib/                     # Utilities
@@ -148,6 +157,17 @@ frontend/
 - Profile picture upload (hover overlay)
 - Level and XP display
 - Progress tracking
+- Badge Trophy Case with earned/locked badges
+- Referral section with link sharing
+
+**Community Page** (`/community`):
+- Dual-mode feed: The Stage (video posts) and The Lab (Q&A)
+- Tag filtering system
+- Create Post Modal with video upload (Stage) or text (Lab)
+- Post reactions (Fire, Ruler, Clap)
+- Solution marking for Lab questions
+- WIP (Work in Progress) toggle for Stage posts
+- Feedback type selection (Hype Only vs Coaching Allowed)
 
 ## 🔧 Development
 
@@ -279,6 +299,20 @@ The application is fully responsive:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **PalladiumMesh Background** (January 2026)
+  - Dark monochrome mesh gradient background component
+  - 5 animated blurred circles with Framer Motion
+  - 90% black base with 10% subtle mesh elements
+  - Global background (excludes home page video)
+  - Performance optimized with GPU acceleration
+- ✅ **Community Features v4.0** (January 2026)
+  - **Community Page**: Dual-mode feed (The Stage & The Lab)
+  - **Create Post Modal**: Full-featured post creation with video upload, tags, WIP toggle, feedback types
+  - **Clave Wallet**: Navbar balance display with wallet modal
+  - **Badge Trophy Case**: Profile page badge display component
+  - **Referral Section**: Referral link generation UI
+  - **Post Cards**: StagePostCard and LabPostCard components
+  - **Reaction System**: Fire, Ruler, Clap reactions with visual feedback
 - ✅ **Content Type System**: Courses, Choreographies, and Topics
   - Type selector in admin course builder (📚 Course, 💃 Choreo, 💡 Topic)
   - Type-specific colored badges on course cards

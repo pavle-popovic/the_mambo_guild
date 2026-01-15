@@ -9,6 +9,8 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { FaFire, FaBolt, FaMedal } from "react-icons/fa";
 import { apiClient } from "@/lib/api";
+import { BadgeTrophyCase } from "@/components/BadgeTrophyCase";
+import { ReferralSection } from "@/components/ReferralSection";
 
 interface Course {
   id: string;
@@ -376,6 +378,16 @@ export default function ProfilePage() {
               ))}
             </div>
           )}
+        </div>
+
+        {/* Badge Trophy Case */}
+        <div className="mt-8">
+          <BadgeTrophyCase />
+        </div>
+
+        {/* Referral Section */}
+        <div className="mt-8">
+          <ReferralSection />
         </div>
       </div>
 

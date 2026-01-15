@@ -8,6 +8,10 @@ import { UISound } from "@/hooks/useUISound";
 import { GlassCard, GlassPanel } from "@/components/ui/GlassCard";
 import { MagicButton } from "@/components/ui/MagicButton";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/motion";
+import { CreatePostModal } from "@/components/CreatePostModal";
+import NavBar from "@/components/NavBar";
+import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 
 // Types
 interface PostUser {
@@ -48,12 +52,14 @@ interface Tag {
 type FeedMode = "stage" | "lab";
 
 export default function CommunityPage() {
+  const { user } = useAuth();
   const [mode, setMode] = useState<FeedMode>("stage");
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
   // Fetch posts
   const fetchPosts = useCallback(async () => {
@@ -109,8 +115,10 @@ export default function CommunityPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-900 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-mambo-dark">
+      <NavBar user={user || undefined} />
+      
+      <div className="max-w-4xl mx-auto px-8 py-12 pt-28">
         {/* Header */}
         <FadeIn>
           <div className="text-center mb-8">
@@ -188,7 +196,10 @@ export default function CommunityPage() {
         {/* Create Post Button */}
         <div className="flex justify-center mb-8">
           <MagicButton
-            onClick={() => alert("Create post modal coming soon!")}
+            onClick={() => {
+              UISound.click();
+              setIsCreateModalOpen(true);
+            }}
             leftIcon={mode === "stage" ? "🎬" : "❓"}
           >
             {mode === "stage" ? "Share Your Progress" : "Ask a Question"}
@@ -216,7 +227,10 @@ export default function CommunityPage() {
             <p className="text-white/60 mb-6">
               Be the first to {mode === "stage" ? "share your progress" : "ask a question"}!
             </p>
-            <MagicButton onClick={() => alert("Create post modal coming soon!")}>
+            <MagicButton onClick={() => {
+              UISound.click();
+              setIsCreateModalOpen(true);
+            }}>
               Create First Post
             </MagicButton>
           </GlassPanel>
@@ -233,7 +247,20 @@ export default function CommunityPage() {
             ))}
           </StaggerContainer>
         )}
+
+        {/* Create Post Modal */}
+        <CreatePostModal
+          isOpen={isCreateModalOpen}
+          onClose={() => setIsCreateModalOpen(false)}
+          mode={mode}
+          onPostCreated={() => {
+            fetchPosts();
+            setIsCreateModalOpen(false);
+          }}
+        />
       </div>
+      
+      <Footer />
     </div>
   );
 }

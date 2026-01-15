@@ -29,12 +29,23 @@ A comprehensive, gamified learning management system built with Next.js, FastAPI
   - **Search**: Find courses by name with aesthetic search bar
   - **Type Filters**: Filter by Courses, Choreographies, or Topics
   - **Difficulty Filters**: Filter by Beginner, Intermediate, or Advanced
+- **Community Platform**: The Stage & The Lab dual-mode community
+  - **The Stage**: Video posts for sharing progress and getting hype
+  - **The Lab**: Q&A posts for technical questions and solutions
+  - **Tag System**: Categorize posts with community tags
+  - **Reactions**: Fire, Ruler, and Clap reactions
+  - **Video Upload**: Direct Mux upload for Stage posts
+- **Clave Economy**: Gamified currency system
+  - **Daily Bonuses**: Login rewards with streak bonuses
+  - **Wallet Modal**: Transaction history and balance display
+  - **Cost System**: Reactions (1), Comments (2), Questions (5), Videos (15)
 - **Lesson Player**: Immersive lesson viewing with video, markdown content, and quizzes
 - **Progress Tracking**: Visual progress indicators and completion tracking
 - **Success Animations**: Engaging completion notifications with audio feedback
 - **Responsive Design**: Mobile-friendly interface with dark theme
 - **Smooth Animations**: Page transitions, hover effects, and interactive elements powered by Framer Motion
 - **Premium UI**: Glass/neon effects, gradient buttons, and polished typography
+- **PalladiumMesh Background**: Subtle dark mesh gradient for vintage aesthetic
 
 ### Technical Features
 - **Real-time Updates**: Auto-save functionality, live status updates
@@ -81,13 +92,21 @@ salsa_lab_v2/
 │   │   ├── courses/         # Course listing and detail pages
 │   │   ├── lesson/          # Lesson viewing page
 │   │   ├── profile/         # User profile page
-│   │   └── pricing/         # Pricing/subscription page
+│   │   ├── pricing/         # Pricing/subscription page
+│   │   └── community/       # Community feed (Stage & Lab)
 │   ├── components/          # React components
 │   │   ├── common/         # Reusable components (ImageUploader)
+│   │   ├── ui/            # UI primitives (GlassCard, MagicButton, motion)
 │   │   ├── MuxUploader.tsx # Video upload component
 │   │   ├── MuxVideoPlayer.tsx # Video player component
 │   │   ├── AuthPromptModal.tsx # Login/subscribe prompts
-│   │   └── SuccessNotification.tsx # Completion animations
+│   │   ├── SuccessNotification.tsx # Completion animations
+│   │   ├── PalladiumMesh.tsx # Dark mesh gradient background
+│   │   ├── ClaveWallet.tsx # Clave balance display
+│   │   ├── WalletModal.tsx # Wallet details modal
+│   │   ├── CreatePostModal.tsx # Community post creation
+│   │   ├── BadgeTrophyCase.tsx # Badge display component
+│   │   └── ReferralSection.tsx # Referral program UI
 │   └── lib/                # Utilities and API client
 ├── backend/                 # FastAPI backend application
 │   ├── routers/            # API route handlers
@@ -96,12 +115,19 @@ salsa_lab_v2/
 │   │   ├── admin_courses.py # Admin course management
 │   │   ├── users.py        # User profile endpoints
 │   │   ├── uploads.py      # Image upload presigned URLs
-│   │   └── mux.py          # Mux webhook and upload endpoints
+│   │   ├── mux.py          # Mux webhook and upload endpoints
+│   │   ├── claves.py       # Clave economy endpoints
+│   │   ├── community.py    # Community posts, reactions, replies
+│   │   └── badges.py       # Badge system endpoints
 │   ├── models/             # SQLAlchemy database models
 │   ├── schemas/            # Pydantic validation schemas
 │   ├── services/           # Business logic services
 │   │   ├── storage_service.py # R2/S3 storage service
-│   │   └── mux_service.py  # Mux API service
+│   │   ├── mux_service.py  # Mux API service
+│   │   ├── clave_service.py # Clave economy logic
+│   │   ├── post_service.py # Community post logic
+│   │   ├── badge_service.py # Badge system logic
+│   │   └── redis_service.py # Redis caching (extended for clave/feed cache)
 │   ├── scripts/            # Utility scripts
 │   │   ├── create_admin.py # Create admin user
 │   │   ├── seed_courses.py # Seed course data
@@ -302,6 +328,20 @@ The application includes comprehensive error handling and validation:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **PalladiumMesh Background** (January 2026)
+  - Dark monochrome mesh gradient background component
+  - Subtle drifting blurred circles (90% black, 10% mesh elements)
+  - Global background with Framer Motion animations
+  - Performance optimized with GPU acceleration
+- ✅ **Community Features v4.0** (January 2026)
+  - **Clave Economy**: Currency system with wallet, transactions, and daily bonuses
+  - **The Stage & The Lab**: Dual-mode community feed (video posts vs Q&A)
+  - **Create Post Modal**: Full-featured post creation with video upload, tags, and feedback types
+  - **Badge Trophy Case**: Profile page badge display with earned/locked states
+  - **Referral System**: Referral link generation and tracking (UI ready)
+  - **Video Slot Management**: Base (5 slots) and Pro (20 slots) limits
+  - **Post Reactions**: Fire, Ruler, and Clap reactions with clave costs
+  - **Solution Marking**: Lab Q&A with accepted answer awards
 - ✅ **Content Type System** (January 2026)
   - Three distinct content types: Courses (📚), Choreographies (💃), and Topics (💡)
   - Content type selector in admin course builder
