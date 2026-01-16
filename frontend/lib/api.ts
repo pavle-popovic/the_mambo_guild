@@ -4,7 +4,8 @@
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
 export interface ApiError {
-  detail: string;
+  detail?: string | object;
+  message?: string;
 }
 
 interface CacheEntry {
@@ -34,13 +35,13 @@ class ApiClient {
   private getCached<T>(cacheKey: string): T | null {
     const cached = this.cache.get(cacheKey);
     if (!cached) return null;
-    
+
     // Check if cache is still valid
     if (Date.now() - cached.timestamp > this.CACHE_TTL) {
       this.cache.delete(cacheKey);
       return null;
     }
-    
+
     return cached.data as T;
   }
 
@@ -68,7 +69,7 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit = {}
+    options: RequestInit & { signal?: AbortSignal; forceRefresh?: boolean } = {}
   ): Promise<T> {
     // Always check localStorage for token (in case it was updated in another tab)
     if (typeof window !== "undefined") {
@@ -78,10 +79,11 @@ class ApiClient {
       }
     }
 
-    // Skip cache for non-GET requests or if cache is disabled
+    // Skip cache for non-GET requests or if cache is disabled or if forceRefresh is true
     const method = options.method || "GET";
-    const shouldCache = method === "GET" && !options.headers?.["X-No-Cache"];
-    
+    const headersObj = options.headers as Record<string, string> | undefined;
+    const shouldCache = method === "GET" && !headersObj?.["X-No-Cache"] && !options.forceRefresh;
+
     if (shouldCache) {
       const cacheKey = this.getCacheKey(endpoint, options);
       const cached = this.getCached<T>(cacheKey);
@@ -101,10 +103,44 @@ class ApiClient {
     }
 
     try {
-      const response = await fetch(url, {
-        ...options,
-        headers,
-      });
+      let response: Response;
+      try {
+        // Create AbortController for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
+        // Merge signals: if both provided, abort if either aborts
+        let finalSignal: AbortSignal;
+        if (options.signal) {
+          const mergedController = new AbortController();
+          options.signal.addEventListener('abort', () => mergedController.abort());
+          controller.signal.addEventListener('abort', () => mergedController.abort());
+          finalSignal = mergedController.signal;
+        } else {
+          finalSignal = controller.signal;
+        }
+
+        try {
+          response = await fetch(url, {
+            ...options,
+            headers,
+            signal: finalSignal,
+          });
+          clearTimeout(timeoutId);
+        } catch (fetchError: any) {
+          clearTimeout(timeoutId);
+          throw fetchError;
+        }
+      } catch (fetchError: any) {
+        // Handle network errors (connection refused, CORS, timeout, etc.)
+        if (fetchError.name === 'AbortError' || fetchError.name === 'TimeoutError') {
+          throw new Error("Request timed out. Please check if the backend is running.");
+        }
+        if (fetchError instanceof TypeError || (fetchError.message && (fetchError.message.includes('fetch') || fetchError.message.includes('network') || fetchError.message.includes('Failed') || fetchError.message.includes('CORS')))) {
+          throw new Error("Failed to connect to server. Please check if the backend is running.");
+        }
+        throw fetchError;
+      }
 
       if (!response.ok) {
         // If unauthorized (401), clear token as it's invalid/expired
@@ -124,14 +160,30 @@ class ApiClient {
             if (typeof errorData.detail === 'string') {
               errorMessage = errorData.detail;
             } else if (typeof errorData.detail === 'object') {
-              errorMessage = JSON.stringify(errorData.detail);
+              // Try to extract a meaningful message from the object
+              const detailObj = errorData.detail as any;
+              if (detailObj.message) {
+                errorMessage = detailObj.message;
+              } else if (detailObj.msg) {
+                errorMessage = detailObj.msg;
+              } else if (Array.isArray(detailObj)) {
+                // Handle Pydantic validation errors array
+                errorMessage = detailObj.map((e: any) => {
+                  if (typeof e === 'string') return e;
+                  const loc = e.loc ? e.loc.join('.') : '';
+                  const msg = e.msg || e.message || JSON.stringify(e);
+                  return loc ? `${loc}: ${msg}` : msg;
+                }).join(', ');
+              } else {
+                errorMessage = JSON.stringify(errorData.detail);
+              }
             } else {
               errorMessage = String(errorData.detail);
             }
           } else if (errorData.message) {
             errorMessage = typeof errorData.message === 'string' ? errorData.message : String(errorData.message);
           }
-        } catch {
+        } catch (parseError) {
           // If response is not JSON, use status text
           try {
             const text = await response.text();
@@ -148,7 +200,7 @@ class ApiClient {
       // Handle empty responses
       const contentType = response.headers.get("content-type");
       let data: T;
-      
+
       if (contentType && contentType.includes("application/json")) {
         const text = await response.text();
         if (!text) {
@@ -165,15 +217,22 @@ class ApiClient {
         const cacheKey = this.getCacheKey(endpoint, options);
         this.setCache(cacheKey, data);
       }
-      
+
       return data;
-    } catch (error) {
+    } catch (error: any) {
       // Network errors, CORS errors, etc.
-      if (error instanceof TypeError && error.message.includes("fetch")) {
-        throw new Error(
-          "Failed to connect to server. Please check if the backend is running."
-        );
+      // If we already set a custom error message, re-throw it
+      if (error instanceof Error && error.message.includes("Failed to connect to server")) {
+        throw error;
       }
+
+      // Handle network/fetch errors
+      if (error instanceof TypeError || (error.message && (error.message.includes("fetch") || error.message.includes("network") || error.message.includes("Failed")))) {
+        throw new Error("Failed to connect to server. Please check if the backend is running.");
+      }
+
+      // Re-throw other errors (including our custom Error from above)
+      // Re-throw other errors (including our custom Error from above)
       throw error;
     }
   }
@@ -280,22 +339,23 @@ class ApiClient {
     }>(`/api/courses/lessons/${lessonId}`);
   }
 
-  async createMuxUploadUrl(lessonId?: string, filename?: string, courseId?: string) {
+  async createMuxUploadUrl(lessonId?: string, filename?: string, courseId?: string, postId?: string) {
     return this.request<{
       upload_id: string;
       upload_url: string;
       status: string;
     }>("/api/mux/upload-url", {
       method: "POST",
-      body: JSON.stringify({ lesson_id: lessonId, filename, course_id: courseId }),
+      body: JSON.stringify({ lesson_id: lessonId, filename, course_id: courseId, post_id: postId }),
     });
   }
 
-  async checkMuxUploadStatus(lessonId?: string, courseId?: string) {
+  async checkMuxUploadStatus(lessonId?: string, courseId?: string, postId?: string) {
     const params = new URLSearchParams();
     if (lessonId) params.append("lesson_id", lessonId);
     if (courseId) params.append("course_id", courseId);
-    
+    if (postId) params.append("post_id", postId);
+
     return this.request<{
       status: "ready" | "processing" | "error";
       playback_id?: string;
@@ -662,7 +722,7 @@ class ApiClient {
   // ============================================
   // Clave Economy Endpoints (v4.0)
   // ============================================
-  
+
   async getWallet() {
     return this.request<{
       current_claves: number;
@@ -718,13 +778,14 @@ class ApiClient {
     tag?: string;
     skip?: number;
     limit?: number;
+    forceRefresh?: boolean;
   }) {
     const params = new URLSearchParams();
     if (options?.post_type) params.append("post_type", options.post_type);
     if (options?.tag) params.append("tag", options.tag);
     if (options?.skip !== undefined) params.append("skip", String(options.skip));
     if (options?.limit !== undefined) params.append("limit", String(options.limit));
-    
+
     const query = params.toString();
     return this.request<Array<{
       id: string;
@@ -750,10 +811,12 @@ class ApiClient {
       user_reaction: string | null;
       created_at: string;
       updated_at: string;
-    }>>(`/api/community/feed${query ? `?${query}` : ""}`);
+    }>>(`/api/community/feed${query ? `?${query}` : ""}`, {
+      forceRefresh: options?.forceRefresh
+    });
   }
 
-  async getPost(postId: string) {
+  async getPost(postId: string, requestOptions?: { signal?: AbortSignal; forceRefresh?: boolean }) {
     return this.request<{
       id: string;
       user: {
@@ -791,7 +854,10 @@ class ApiClient {
         is_accepted_answer: boolean;
         created_at: string;
       }>;
-    }>(`/api/community/posts/${postId}`);
+    }>(`/api/community/posts/${postId}`, {
+      signal: requestOptions?.signal,
+      forceRefresh: requestOptions?.forceRefresh
+    });
   }
 
   async createPost(data: {
@@ -834,7 +900,7 @@ class ApiClient {
     });
   }
 
-  async addReply(postId: string, content: string, muxPlaybackId?: string) {
+  async addReply(postId: string, content: string, muxAssetId?: string, muxPlaybackId?: string) {
     return this.request<{
       success: boolean;
       reply?: any;
@@ -843,6 +909,7 @@ class ApiClient {
       method: "POST",
       body: JSON.stringify({
         content,
+        mux_asset_id: muxAssetId,
         mux_playback_id: muxPlaybackId,
       }),
     });
@@ -854,6 +921,23 @@ class ApiClient {
       message: string;
     }>(`/api/community/posts/${postId}/replies/${replyId}/accept`, {
       method: "POST",
+    });
+  }
+
+  async updatePost(postId: string, data: {
+    title?: string;
+    body?: string;
+    tags?: string[];
+    is_wip?: boolean;
+    feedback_type?: 'hype' | 'coach';
+  }) {
+    return this.request<{
+      success: boolean;
+      post?: any;
+      message: string;
+    }>(`/api/community/posts/${postId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
     });
   }
 
@@ -884,7 +968,7 @@ class ApiClient {
     if (options?.post_type) params.append("post_type", options.post_type);
     if (options?.skip !== undefined) params.append("skip", String(options.skip));
     if (options?.limit !== undefined) params.append("limit", String(options.limit));
-    
+
     return this.request<Array<any>>(`/api/community/search?${params.toString()}`);
   }
 

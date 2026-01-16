@@ -109,13 +109,21 @@ def create_post(
     Returns: {success, post, message} or {success: False, message}
     """
     # Validate tags exist
+    if not tags or len(tags) == 0:
+        return {"success": False, "message": "At least one tag is required"}
+    
     valid_tags = db.query(CommunityTag.slug).filter(
         CommunityTag.slug.in_(tags)
     ).all()
     valid_tag_slugs = [t[0] for t in valid_tags]
     
     if not valid_tag_slugs:
-        return {"success": False, "message": "At least one valid tag is required"}
+        return {"success": False, "message": "At least one valid tag is required. Invalid tags provided."}
+    
+    # Check if any tags were invalid
+    if len(valid_tag_slugs) < len(tags):
+        invalid_tags = set(tags) - set(valid_tag_slugs)
+        return {"success": False, "message": f"Invalid tags: {', '.join(invalid_tags)}. Please select valid tags."}
     
     # Determine cost
     if post_type == "stage":
@@ -424,6 +432,85 @@ def mark_solution(
     return {"success": True, "message": "Solution marked! Helper awarded 10 🥢"}
 
 
+def update_post(
+    post_id: str,
+    user_id: str,
+    title: str = None,
+    body: str = None,
+    tags: List[str] = None,
+    is_wip: bool = None,
+    feedback_type: str = None,
+    db: Session = None
+) -> dict:
+    """
+    Update an existing post (own posts only).
+    Returns: {success, post, message} or {success: False, message}
+    """
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if not post:
+        return {"success": False, "message": "Post not found"}
+    
+    # Only owner can update
+    if str(post.user_id) != user_id:
+        return {"success": False, "message": "You can only edit your own posts"}
+    
+    # Update fields if provided
+    if title is not None:
+        post.title = title
+    
+    if body is not None:
+        # Lab posts require body
+        if post.post_type == "lab" and not body.strip():
+            return {"success": False, "message": "Question body is required for Lab posts"}
+        post.body = body
+    
+    if tags is not None:
+        # Validate tags exist
+        valid_tags = db.query(CommunityTag.slug).filter(
+            CommunityTag.slug.in_(tags)
+        ).all()
+        valid_tag_slugs = [t[0] for t in valid_tags]
+        
+        if not valid_tag_slugs:
+            return {"success": False, "message": "At least one valid tag is required"}
+        
+        if len(valid_tag_slugs) < len(tags):
+            invalid_tags = set(tags) - set(valid_tag_slugs)
+            return {"success": False, "message": f"Invalid tags: {', '.join(invalid_tags)}. Please select valid tags."}
+        
+        # Update tag usage counts (decrement old, increment new)
+        old_tags = set(post.tags or [])
+        new_tags = set(valid_tag_slugs)
+        
+        for tag_slug in old_tags - new_tags:
+            db.query(CommunityTag).filter(
+                CommunityTag.slug == tag_slug
+            ).update({"usage_count": CommunityTag.usage_count - 1})
+        
+        for tag_slug in new_tags - old_tags:
+            db.query(CommunityTag).filter(
+                CommunityTag.slug == tag_slug
+            ).update({"usage_count": CommunityTag.usage_count + 1})
+        
+        post.tags = valid_tag_slugs
+    
+    if is_wip is not None:
+        post.is_wip = is_wip
+    
+    if feedback_type is not None:
+        post.feedback_type = feedback_type
+    
+    db.flush()
+    
+    logger.info(f"User {user_id} updated post {post_id}")
+    
+    return {
+        "success": True,
+        "post": _format_post_response(post, user_id, db),
+        "message": "Post updated successfully"
+    }
+
+
 def delete_post(
     post_id: str,
     user_id: str,
@@ -436,16 +523,42 @@ def delete_post(
     if not post:
         return {"success": False, "message": "Post not found"}
     
-    # Only owner can delete
-    if str(post.user_id) != user_id:
-        return {"success": False, "message": "You can only delete your own posts"}
-    
-    # Delete the post (cascades to reactions and replies)
-    db.delete(post)
-    db.flush()
-    
-    logger.info(f"User {user_id} deleted post {post_id}")
-    return {"success": True, "message": "Post deleted"}
+    try:
+        # Check ownership or admin status
+        # Local import to assure no circular deps and correct Enum access
+        from models.user import User, UserRole
+        
+        # Get user to check role
+        user = db.query(User).filter(User.id == user_id).first()
+        is_admin = False
+        if user:
+            # Check against Enum or string value
+            is_admin = (user.role == UserRole.ADMIN) or (str(user.role) == "admin")
+        
+        if str(post.user_id) != user_id and not is_admin:
+            return {"success": False, "message": "You can only delete your own posts"}
+        
+        # Delete from Mux if asset ID exists
+        if post.mux_asset_id:
+            try:
+                from services import mux_service
+                logger.info(f"Attempting to delete Mux asset {post.mux_asset_id} for post {post_id}")
+                mux_service.delete_asset(post.mux_asset_id)
+            except Exception as e:
+                # Log but do not block post deletion
+                logger.error(f"Failed to delete Mux asset {post.mux_asset_id} for post {post_id}: {e}")
+        
+        # Delete the post (cascades to reactions and replies)
+        db.delete(post)
+        db.commit() # Commit explicitly
+        
+        logger.info(f"User {user_id} (Admin: {is_admin}) deleted post {post_id}")
+        return {"success": True, "message": "Post deleted"}
+        
+    except Exception as e:
+        logger.error(f"CRITICAL ERROR deleting post {post_id}: {e}", exc_info=True)
+        db.rollback()
+        return {"success": False, "message": f"Server error while deleting post: {str(e)}"}
 
 
 def get_tags(db: Session) -> List[dict]:

@@ -11,7 +11,7 @@ from models.user import User
 from dependencies import get_current_user
 from services import post_service, badge_service
 from schemas.community import (
-    PostCreateRequest, PostResponse, PostDetailResponse,
+    PostCreateRequest, PostUpdateRequest, PostResponse, PostDetailResponse,
     ReactionRequest, ReplyCreateRequest, ReplyResponse,
     UploadCheckResponse, TagResponse
 )
@@ -71,6 +71,7 @@ async def create_post(
     - Stage posts cost 15 claves
     - Lab posts cost 5 claves
     """
+    print(f"[COMMUNITY] Creating post - User: {current_user.email}, Type: {request.post_type}, Tags: {request.tags}, Title: {request.title[:50] if request.title else 'None'}")
     result = post_service.create_post(
         user_id=str(current_user.id),
         post_type=request.post_type,
@@ -86,16 +87,22 @@ async def create_post(
     )
     
     if not result["success"]:
+        error_message = result.get("message", "Failed to create post")
         raise HTTPException(
-            status_code=400 if "Insufficient" in result.get("message", "") else 422,
-            detail=result
+            status_code=400 if "Insufficient" in error_message else 422,
+            detail={"message": error_message, **result}
         )
     
     db.commit()
     
-    # Check for badge eligibility after creating post
-    badge_service.check_and_award_badges(str(current_user.id), db)
-    db.commit()
+    # Check for badge eligibility after creating post (non-blocking)
+    try:
+        badge_service.check_and_award_badges(str(current_user.id), db)
+        db.commit()
+    except Exception as e:
+        # Log error but don't fail post creation
+        print(f"[COMMUNITY] Error checking badges (non-fatal): {e}")
+        db.rollback()  # Rollback badge check transaction, but post is already committed
     
     return result
 
@@ -212,6 +219,35 @@ async def mark_solution(
         badge_service.check_and_award_badges(str(reply.user_id), db)
         db.commit()
     
+    return result
+
+
+@router.put("/posts/{post_id}")
+async def update_post(
+    post_id: str,
+    request: PostUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update your own post.
+    Only title, body, tags, is_wip, and feedback_type can be updated.
+    """
+    result = post_service.update_post(
+        post_id=post_id,
+        user_id=str(current_user.id),
+        title=request.title,
+        body=request.body,
+        tags=request.tags,
+        is_wip=request.is_wip,
+        feedback_type=request.feedback_type,
+        db=db
+    )
+    
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result)
+    
+    db.commit()
     return result
 
 

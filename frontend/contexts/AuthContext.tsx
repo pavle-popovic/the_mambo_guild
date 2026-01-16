@@ -13,6 +13,7 @@ interface User {
   tier: string;
   role: string;
   avatar_url: string | null;
+  is_pro?: boolean;
 }
 
 interface AuthContextType {
@@ -54,7 +55,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
       return;
     }
-    
+
     const checkAuth = async () => {
       const token = localStorage.getItem("auth_token");
       if (token) {
@@ -71,9 +72,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       setLoading(false);
     };
-    
+
     checkAuth();
-    
+
     // Listen for storage changes (e.g., login in another tab)
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === "auth_token") {
@@ -86,9 +87,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
       }
     };
-    
+
     window.addEventListener("storage", handleStorageChange);
-    
+
     return () => {
       window.removeEventListener("storage", handleStorageChange);
     };

@@ -88,7 +88,7 @@ class Post(Base):
 
     # Relationships
     user = relationship("User", backref="posts")
-    replies = relationship("PostReply", back_populates="post", foreign_keys="PostReply.post_id")
+    replies = relationship("PostReply", back_populates="post", foreign_keys="PostReply.post_id", cascade="all, delete-orphan")
     reactions = relationship("PostReaction", back_populates="post", cascade="all, delete-orphan")
     accepted_answer = relationship("PostReply", foreign_keys=[accepted_answer_id], post_update=True)
 

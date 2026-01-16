@@ -355,6 +355,11 @@ The application includes comprehensive error handling and validation:
   - Deleted dead code (node_modules, package.json from Python backend)
   - Security hardening: SECRET_KEY validation in production
   - Performance optimization: Fixed N+1 queries in courses API
+- ✅ **Post Deletion & Cleanup** (January 2026)
+  - **Mux Integration**: Automated video asset deletion when posts are removed
+  - **Cascade Deletion**: Fixed database constraints to properly remove replies with posts
+  - **Admin Powers**: Global delete/edit permissions for admin users
+  - **Ghost Post Fix**: Improved state management to prevent UI sync issues after deletion
 - ✅ **Course Completion System**: Complete course celebration and tracking
   - Beautiful course completion modal with congratulations message and trophy icon
   - Automatic detection when all lessons in a course are completed

@@ -79,6 +79,21 @@ class PostCreateRequest(BaseModel):
         return v
 
 
+class PostUpdateRequest(BaseModel):
+    """Request to update an existing post."""
+    title: Optional[str] = Field(None, min_length=3, max_length=200)
+    body: Optional[str] = None
+    tags: Optional[List[str]] = Field(None, min_items=1, max_items=5)
+    is_wip: Optional[bool] = None
+    feedback_type: Optional[Literal['hype', 'coach']] = None
+
+    @validator('body')
+    def body_required_for_lab(cls, v, values):
+        # Note: post_type is not in update request, so we can't validate here
+        # Validation will happen in the service layer
+        return v
+
+
 class PostUserInfo(BaseModel):
     """Embedded user info in post response."""
     id: str

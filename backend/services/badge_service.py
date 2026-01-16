@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timedelta
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, and_, case, text
 import uuid
 
 from models.user import UserProfile
@@ -124,9 +124,14 @@ def check_and_award_badges(user_id: str, db: Session) -> List[dict]:
     ]
     
     for checker in checkers:
-        result = checker(user_id, db)
-        if result:
-            awarded.append(result)
+        try:
+            result = checker(user_id, db)
+            if result:
+                awarded.append(result)
+        except Exception as e:
+            # Log error but don't crash - badge checking shouldn't break post creation
+            logger.error(f"Error checking badge {checker.__name__}: {e}", exc_info=True)
+            continue
     
     return awarded
 
@@ -208,15 +213,19 @@ def check_first_responder(user_id: str, db: Session) -> Optional[dict]:
         return None
     
     # This is complex - need to count replies that were within 1 hour of post creation
-    # Using a subquery approach
-    from sqlalchemy import and_
-    
-    fast_answers = db.query(PostReply).join(Post).filter(
-        PostReply.user_id == user_id,
-        Post.post_type == "lab",
-        PostReply.user_id != Post.user_id,  # Not answering own question
-        func.extract('epoch', PostReply.created_at - Post.created_at) <= 3600  # Within 1 hour
-    ).count()
+    # Use raw SQL for time difference calculation (PostgreSQL)
+    fast_answers = db.execute(
+        text("""
+            SELECT COUNT(*) 
+            FROM post_replies pr
+            JOIN posts p ON pr.post_id = p.id
+            WHERE pr.user_id = :user_id
+            AND p.post_type = 'lab'
+            AND pr.user_id != p.user_id
+            AND EXTRACT(EPOCH FROM (pr.created_at - p.created_at)) <= 3600
+        """),
+        {"user_id": user_id}
+    ).scalar() or 0
     
     if fast_answers >= 5:
         return award_badge(user_id, badge_id, db)

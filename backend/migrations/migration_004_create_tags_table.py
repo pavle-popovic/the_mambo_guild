@@ -45,7 +45,7 @@ def run_migration():
                 conn.execute(text("""
                     INSERT INTO community_tags (slug, name, category) VALUES
                     ('on2', 'On2 Timing', 'technique'),
-                    ('on1', 'On1 Timing', 'technique'),
+                    ('timing', 'Timing', 'technique'),
                     ('spinning', 'Spinning', 'technique'),
                     ('musicality', 'Musicality', 'general'),
                     ('partnerwork', 'Partnerwork', 'technique'),

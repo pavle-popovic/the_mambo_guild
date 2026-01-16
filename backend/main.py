@@ -26,7 +26,7 @@ app.add_middleware(
 # This ensures it's the outermost layer and CORS headers are added to ALL responses including errors
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
@@ -36,7 +36,7 @@ app.add_middleware(
 # Include routers
 app.include_router(api_router, prefix="/api")
 
-# Add webhook endpoint at /api/webhook for Mux (also available at /api/mux/webhook)
+# Add webhook endpoints for Mux (support multiple paths)
 @app.post("/api/webhook")
 async def mux_webhook_alias(
     request: Request,
@@ -46,6 +46,18 @@ async def mux_webhook_alias(
     """
     Alias for Mux webhook endpoint.
     Mux webhooks can be configured to POST to /api/webhook or /api/mux/webhook
+    """
+    return await mux_webhook_handler(request, db, mux_signature)
+
+@app.post("/api/webhooks")
+async def mux_webhooks_alias(
+    request: Request,
+    db: Session = Depends(get_db),
+    mux_signature: Optional[str] = Header(None, alias="Mux-Signature")
+):
+    """
+    Alias for Mux webhook endpoint (plural form).
+    Some Mux configurations may use /api/webhooks
     """
     return await mux_webhook_handler(request, db, mux_signature)
 

@@ -4,8 +4,9 @@ Mux service for video upload and playback URL generation.
 import logging
 import time
 from typing import Dict, Optional
+import mux_python
 from mux_python import Configuration, ApiClient, ApiException, DirectUploadsApi
-from mux_python.models import CreateUploadRequest
+from mux_python.models import CreateUploadRequest, Asset, AssetMetadata
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -31,7 +32,14 @@ def _get_direct_uploads_api() -> DirectUploadsApi:
     return DirectUploadsApi(api_client)
 
 
-def create_direct_upload(filename: Optional[str] = None, test: bool = False, passthrough: Optional[str] = None) -> Dict:
+def create_direct_upload(
+    filename: Optional[str] = None, 
+    test: bool = False, 
+    passthrough: Optional[str] = None,
+    external_id: Optional[str] = None,
+    title: Optional[str] = None,
+    creator_id: Optional[str] = None
+) -> Dict:
     """
     Create a Mux direct upload URL for video upload.
     
@@ -39,6 +47,9 @@ def create_direct_upload(filename: Optional[str] = None, test: bool = False, pas
         filename: Optional filename for the upload
         test: Whether this is a test upload (uses Mux test mode)
         passthrough: Optional JSON string to pass through to webhook (e.g., lesson_id)
+        external_id: Optional external ID for asset organization (e.g., "lesson-mambo-212-w1-d1-l1")
+        title: Optional human-readable title (e.g., "Mambo 212 - Week 1 Day 1: Basic Steps")
+        creator_id: Optional creator ID for folder-like organization (e.g., "lesson", "course-preview", "community-stage")
     
     Returns:
         Dictionary with upload_url and upload_id
@@ -52,13 +63,26 @@ def create_direct_upload(filename: Optional[str] = None, test: bool = False, pas
                 "message": "Mux credentials not configured. Please set MUX_TOKEN_ID and MUX_TOKEN_SECRET."
             }
         
+        # Build metadata object if any metadata fields provided
+        meta = None
+        if external_id or title or creator_id:
+            meta = AssetMetadata(
+                external_id=external_id[:128] if external_id else None,  # Max 128 code points
+                title=title[:512] if title else None,  # Max 512 code points
+                creator_id=creator_id[:128] if creator_id else None  # Max 128 code points
+            )
+        
+        # Build asset settings as dict (Mux Python SDK accepts dict for new_asset_settings)
         asset_settings = {
-            "playback_policy": ["public"],  # Make videos publicly playable
+            "playback_policies": ["public"],  # Make videos publicly playable
             "test": test
         }
         
         if passthrough:
             asset_settings["passthrough"] = passthrough
+        
+        if meta:
+            asset_settings["meta"] = meta  # AssetMetadata object
         
         create_upload_request = CreateUploadRequest(
             new_asset_settings=asset_settings,
@@ -122,36 +146,33 @@ def create_direct_upload(filename: Optional[str] = None, test: bool = False, pas
         }
 
 
-def get_playback_url(playback_id: str) -> str:
+def delete_asset(asset_id: str) -> bool:
     """
-    Generate Mux playback URL from playback ID.
+    Delete an asset from Mux.
     
     Args:
-        playback_id: Mux playback ID
-    
+        asset_id: Mux asset ID
+        
     Returns:
-        Mux playback URL
+        True if successful, False otherwise
     """
-    if not playback_id:
-        return ""
-    
-    # Mux playback URL format
-    return f"https://stream.mux.com/{playback_id}.m3u8"
+    if not asset_id:
+        return False
+        
+    try:
+        configuration = _get_mux_configuration()
+        api_client = ApiClient(configuration)
+        assets_api = mux_python.AssetsApi(api_client)
+        
+        assets_api.delete_asset(asset_id)
+        logger.info(f"Deleted Mux asset: {asset_id}")
+        return True
+        
+    except ApiException as e:
+        logger.error(f"Failed to delete Mux asset {asset_id}: {e}")
+        return False
+    except Exception as e:
+        logger.error(f"Error deleting Mux asset {asset_id}: {e}")
+        return False
 
-
-def get_thumbnail_url(playback_id: str, time: float = 0) -> str:
-    """
-    Generate Mux thumbnail URL from playback ID.
-    
-    Args:
-        playback_id: Mux playback ID
-        time: Time in seconds for thumbnail (default: 0)
-    
-    Returns:
-        Mux thumbnail URL
-    """
-    if not playback_id:
-        return ""
-    
-    return f"https://image.mux.com/{playback_id}/thumbnail.png?time={time}"
 

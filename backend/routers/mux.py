@@ -4,9 +4,9 @@ Mux video upload endpoints.
 from fastapi import APIRouter, Depends, HTTPException, Request, Header, Query
 from pydantic import BaseModel
 from typing import Optional
-from dependencies import get_admin_user, get_current_user_optional
+from dependencies import get_admin_user, get_current_user_optional, get_current_user
 from models.user import User, UserRole
-from models.course import Lesson
+from models.course import Lesson, World, Level
 from models import get_db
 from sqlalchemy.orm import Session
 from services.mux_service import create_direct_upload
@@ -61,6 +61,7 @@ class CreateUploadRequest(BaseModel):
     filename: Optional[str] = None
     lesson_id: Optional[str] = None  # Pass lesson_id to associate upload with lesson
     course_id: Optional[str] = None  # Pass course_id for course preview uploads
+    post_id: Optional[str] = None  # Pass post_id for community post uploads
 
 
 class CreateUploadResponse(BaseModel):
@@ -75,33 +76,67 @@ async def create_mux_upload_url(
     request_data: Optional[CreateUploadRequest] = None,  # Accept JSON body (Pydantic model)
     lesson_id: Optional[str] = Query(None),  # Accept from query params for MuxUploader compatibility
     filename: Optional[str] = Query(None),   # Accept from query params
-    admin_user: User = Depends(get_admin_user_from_token_or_query)  # Supports both Bearer and query param token
+    post_id: Optional[str] = Query(None),  # For community posts
+    current_user_opt: Optional[User] = Depends(get_current_user_optional),
+    db: Session = Depends(get_db)
 ):
     """
     Create a Mux direct upload URL for video upload.
-    Admin only - generates a direct upload URL that can be used to upload videos directly to Mux.
+    - Admin only for lesson/course videos
+    - Authenticated users for community posts
     Supports both JSON body (our API client) and query params (for MuxUploader compatibility).
     
     MuxUploader calls this endpoint with POST and query params, expecting { url, uploadId } response.
     Our API client calls with JSON body, expecting { upload_id, upload_url } response.
-    
-    Note: This endpoint accepts token in query params as a fallback for MuxUploader compatibility,
-    since MuxUploader may not send custom headers. The primary auth method is still Bearer token.
     """
-    # Verify admin access - use admin_user from get_admin_user (which handles Bearer token)
-    # If that fails, the endpoint will return 401/403, which is correct
-    
     # Handle both request body (Pydantic model) and query params
     # Priority: query params (for MuxUploader) > request body (for our API client)
     lesson_id_val = lesson_id or (request_data.lesson_id if request_data else None)
     course_id_val = request_data.course_id if request_data else None
+    post_id_val = post_id or (request_data.post_id if request_data else None)
     filename_val = filename or (request_data.filename if request_data else None)
     
     print(f"[MUX] ===== Upload URL Request Received =====")
     print(f"[MUX] Lesson ID: {lesson_id_val}")
     print(f"[MUX] Course ID: {course_id_val}")
+    print(f"[MUX] Post ID: {post_id_val}")
     print(f"[MUX] Filename: {filename_val}")
-    print(f"[MUX] Admin User: {admin_user.email}")
+    
+    # Auth check: Admin for lessons/courses, authenticated user for community posts
+    if lesson_id_val or course_id_val:
+        # Lesson/course uploads require admin
+        if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
+            # Try query param token as fallback
+            token_query = request.query_params.get("token")
+            if token_query:
+                try:
+                    payload = decode_access_token(token_query)
+                    if payload:
+                        user_id_str = payload.get("sub")
+                        if user_id_str:
+                            import uuid
+                            try:
+                                user_id = uuid.UUID(user_id_str)
+                                user = db.query(User).filter(User.id == user_id).first()
+                                if user and user.role == UserRole.ADMIN:
+                                    current_user_opt = user
+                            except ValueError:
+                                pass
+                except Exception:
+                    pass
+            if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
+                raise HTTPException(status_code=403, detail="Admin access required for lesson/course video uploads")
+        print(f"[MUX] Admin User: {current_user_opt.email}")
+    elif post_id_val:
+        # Community post uploads require authenticated user
+        if not current_user_opt:
+            raise HTTPException(status_code=401, detail="Authentication required for community post uploads")
+        print(f"[MUX] User: {current_user_opt.email}")
+    else:
+        # No entity specified - require admin
+        if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
+            raise HTTPException(status_code=401, detail="Admin access required")
+        print(f"[MUX] Admin User: {current_user_opt.email}")
     
     if not settings.MUX_TOKEN_ID or not settings.MUX_TOKEN_SECRET:
         print("[MUX] ERROR: Mux credentials not configured!")
@@ -112,17 +147,130 @@ async def create_mux_upload_url(
     
     print("[MUX] Mux credentials found, proceeding...")
     
-    # Create passthrough data if lesson_id or course_id is provided
+    # Generate metadata for Mux asset organization
+    external_id = None
+    title = None
+    creator_id = None
     passthrough = None
-    if lesson_id_val:
-        passthrough = json.dumps({"lesson_id": lesson_id_val})
+    passthrough_data = {}
+    
+    try:
+        if lesson_id_val:
+            # Fetch lesson data for metadata
+            lesson = db.query(Lesson).filter(Lesson.id == lesson_id_val).first()
+            if lesson:
+                # Get course/level info for better organization
+                level = db.query(Level).filter(Level.id == lesson.level_id).first()
+                world = None
+                if level:
+                    world = db.query(World).filter(World.id == level.world_id).first()
+                
+                # Generate external_id: "lesson-{course_slug}-w{week}-d{day}-l{order}"
+                if world:
+                    course_slug = world.slug or world.title.lower().replace(" ", "-")
+                    week_str = f"w{lesson.week_number}" if lesson.week_number else ""
+                    day_str = f"d{lesson.day_number}" if lesson.day_number else ""
+                    order_str = f"l{lesson.order_index}" if lesson.order_index else ""
+                    parts = [p for p in [course_slug, week_str, day_str, order_str] if p]
+                    external_id = f"lesson-{'-'.join(parts)}"
+                else:
+                    external_id = f"lesson-{lesson_id_val[:8]}"
+                
+                # Generate title: "{course_title} - {lesson_title}"
+                if world:
+                    title = f"{world.title} - {lesson.title}"
+                else:
+                    title = lesson.title
+                
+                creator_id = "lesson"
+                
+                # Enhanced passthrough
+                passthrough_data = {
+                    "lesson_id": lesson_id_val,
+                    "type": "lesson"
+                }
+                if world:
+                    passthrough_data["course_slug"] = world.slug or world.title.lower().replace(" ", "-")
+                if lesson.week_number:
+                    passthrough_data["week"] = lesson.week_number
+                if lesson.day_number:
+                    passthrough_data["day"] = lesson.day_number
+                if lesson.order_index:
+                    passthrough_data["lesson_order"] = lesson.order_index
+                
+        elif course_id_val:
+            # Fetch course data for metadata
+            world = db.query(World).filter(World.id == course_id_val).first()
+            if world:
+                # Generate external_id: "course-preview-{course_slug}"
+                course_slug = world.slug or world.title.lower().replace(" ", "-")
+                external_id = f"course-preview-{course_slug}"
+                
+                # Generate title: "{course_title} - Preview"
+                title = f"{world.title} - Preview"
+                
+                creator_id = "course-preview"
+                
+                # Enhanced passthrough
+                passthrough_data = {
+                    "course_id": course_id_val,
+                    "type": "course-preview",
+                    "course_slug": course_slug
+                }
+        elif post_id_val:
+            # Community post - fetch post data for metadata
+            from models.community import Post
+            post = db.query(Post).filter(Post.id == post_id_val).first()
+            if post:
+                # Generate external_id: "community-post-{post_id}"
+                external_id = f"community-post-{post_id_val[:8]}"
+                
+                # Generate title: "{post_title}"
+                title = post.title[:512] if post.title else "Community Post"
+                
+                # Set creator_id based on post type
+                creator_id = "community-stage" if post.post_type == "stage" else "community-lab"
+                
+                # Enhanced passthrough
+                passthrough_data = {
+                    "post_id": post_id_val,
+                    "type": "community-post",
+                    "post_type": post.post_type
+                }
+            else:
+                # Post doesn't exist yet (during creation) - use basic metadata
+                external_id = f"community-post-{post_id_val[:8]}"
+                title = "Community Post"
+                creator_id = "community-stage"  # Default, will be updated when post is created
+                passthrough_data = {
+                    "post_id": post_id_val,
+                    "type": "community-post"
+                }
+    except Exception as e:
+        print(f"[MUX] Warning: Error fetching metadata: {e}")
+        # Continue without metadata if fetch fails
+    
+    # Create passthrough JSON string
+    if passthrough_data:
+        passthrough = json.dumps(passthrough_data)
         print(f"[MUX] Passthrough data: {passthrough}")
-    elif course_id_val:
-        passthrough = json.dumps({"course_id": course_id_val})
-        print(f"[MUX] Passthrough data (course preview): {passthrough}")
+    
+    if external_id:
+        print(f"[MUX] External ID: {external_id}")
+    if title:
+        print(f"[MUX] Title: {title}")
+    if creator_id:
+        print(f"[MUX] Creator ID: {creator_id}")
     
     print("[MUX] Calling Mux API to create direct upload...")
-    result = create_direct_upload(filename=filename_val, test=False, passthrough=passthrough)
+    result = create_direct_upload(
+        filename=filename_val, 
+        test=False, 
+        passthrough=passthrough,
+        external_id=external_id,
+        title=title,
+        creator_id=creator_id
+    )
     
     if result.get("status") == "error":
         print(f"[MUX] ERROR creating upload: {result.get('message')}")
@@ -201,20 +349,38 @@ async def check_asset_exists(
 @router.delete("/asset/{asset_id}")
 async def delete_mux_asset(
     asset_id: str,
-    admin_user: User = Depends(get_admin_user),
+    current_user_opt: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
     """
     Delete a video asset from Mux.
     If asset doesn't exist in Mux (404), just clear from database.
-    Handles both lessons and course previews.
-    Admin only.
+    Handles lessons, course previews, and community posts.
+    - Admin can delete any asset
+    - Users can delete assets from their own posts
     """
+    # Check if user owns any posts using this asset (for non-admin users)
+    from models.community import Post
+    user_posts = []
+    if current_user_opt and current_user_opt.role != UserRole.ADMIN:
+        user_posts = db.query(Post).filter(
+            Post.mux_asset_id == asset_id,
+            Post.user_id == current_user_opt.id
+        ).all()
+        if not user_posts:
+            # Check if asset is used by lessons or courses (admin only)
+            lessons_check = db.query(Lesson).filter(Lesson.mux_asset_id == asset_id).all()
+            courses_check = db.query(World).filter(World.mux_preview_asset_id == asset_id).all()
+            if lessons_check or courses_check:
+                raise HTTPException(status_code=403, detail="Admin access required to delete lesson/course videos")
+            # No posts owned by user - deny access
+            raise HTTPException(status_code=403, detail="You can only delete videos from your own posts")
+    
+    # Admin or user with owned posts - proceed
     try:
         from mux_python import AssetsApi, ApiException
         from services.mux_service import _get_mux_configuration
         from mux_python import ApiClient
-        from models.course import World
         
         # Find lesson(s) using this asset
         lessons = db.query(Lesson).filter(Lesson.mux_asset_id == asset_id).all()
@@ -222,9 +388,15 @@ async def delete_mux_asset(
         # Find course(s) using this asset for preview
         courses = db.query(World).filter(World.mux_preview_asset_id == asset_id).all()
         
-        if not lessons and not courses:
-            # No lessons or courses using this asset, but still try to delete from Mux
-            print(f"[MUX] Asset {asset_id} not found in any lessons or courses, but attempting Mux deletion...")
+        # Find post(s) using this asset (use user_posts if already queried, otherwise query all)
+        if user_posts:
+            posts = user_posts
+        else:
+            posts = db.query(Post).filter(Post.mux_asset_id == asset_id).all()
+        
+        if not lessons and not courses and not posts:
+            # No lessons, courses, or posts using this asset, but still try to delete from Mux
+            print(f"[MUX] Asset {asset_id} not found in any lessons, courses, or posts, but attempting Mux deletion...")
         
         configuration = _get_mux_configuration()
         api_client = ApiClient(configuration)
@@ -263,6 +435,12 @@ async def delete_mux_asset(
             course.mux_preview_asset_id = None
             course.mux_preview_playback_id = None
         
+        # Clear Mux IDs from all posts using this asset
+        for post in posts:
+            print(f"[MUX] Clearing Mux IDs for post {post.id} (title: {post.title})")
+            post.mux_asset_id = None
+            post.mux_playback_id = None
+        
         db.commit()
         
         entities_cleared = []
@@ -270,6 +448,8 @@ async def delete_mux_asset(
             entities_cleared.append(f"{len(lessons)} lesson(s)")
         if courses:
             entities_cleared.append(f"{len(courses)} course preview(s)")
+        if posts:
+            entities_cleared.append(f"{len(posts)} post(s)")
         
         message = f"Asset {asset_id} {'deleted from Mux and ' if mux_deleted else ''}cleared from {', '.join(entities_cleared) if entities_cleared else 'database'}"
         
@@ -291,19 +471,35 @@ async def delete_mux_asset(
 async def check_upload_status(
     lesson_id: Optional[str] = Query(None),
     course_id: Optional[str] = Query(None),
-    admin_user: User = Depends(get_admin_user),
+    post_id: Optional[str] = Query(None),
+    current_user_opt: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
     """
-    Manually check if a lesson's or course preview's video upload has completed and update it.
+    Manually check if a lesson's, course preview's, or community post's video upload has completed and update it.
     This is useful if the webhook didn't fire.
-    Admin only.
+    - Admin only for lessons/courses
+    - Authenticated users for their own posts
     """
     try:
         from mux_python import AssetsApi, DirectUploadsApi
         from services.mux_service import _get_mux_configuration
         from mux_python import ApiClient
         from models.course import World
+        
+        # Auth check
+        if lesson_id or course_id:
+            # Lesson/course checks require admin
+            if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
+                raise HTTPException(status_code=403, detail="Admin access required")
+        elif post_id:
+            # Post checks require authenticated user (and must own the post)
+            if not current_user_opt:
+                raise HTTPException(status_code=401, detail="Authentication required")
+            from models.community import Post
+            post = db.query(Post).filter(Post.id == post_id).first()
+            if post and str(post.user_id) != str(current_user_opt.id):
+                raise HTTPException(status_code=403, detail="You can only check your own posts")
         
         # Handle course preview check
         if course_id:
@@ -369,9 +565,74 @@ async def check_upload_status(
                     "message": f"Error checking status: {str(e)}"
                 }
         
+        # Handle community post check
+        if post_id:
+            from models.community import Post
+            post = db.query(Post).filter(Post.id == post_id).first()
+            if not post:
+                raise HTTPException(status_code=404, detail="Post not found")
+            
+            # If post already has playback_id, it's already ready
+            if post.mux_playback_id and post.mux_asset_id:
+                return {
+                    "status": "ready",
+                    "playback_id": post.mux_playback_id,
+                    "asset_id": post.mux_asset_id,
+                    "message": "Video is already ready"
+                }
+            
+            # Try to find the asset by querying Mux API using passthrough
+            configuration = _get_mux_configuration()
+            api_client = ApiClient(configuration)
+            assets_api = AssetsApi(api_client)
+            
+            passthrough_filter = json.dumps({"post_id": post_id})
+            
+            try:
+                assets_response = assets_api.list_assets(limit=50)  # Get recent assets
+                
+                found_asset = None
+                for asset in assets_response.data:
+                    asset_passthrough = asset.passthrough
+                    if asset_passthrough:
+                        try:
+                            passthrough_data = json.loads(asset_passthrough) if isinstance(asset_passthrough, str) else asset_passthrough
+                            if passthrough_data.get("post_id") == post_id:
+                                found_asset = asset
+                                break
+                        except:
+                            continue
+                
+                if found_asset and found_asset.playback_ids and len(found_asset.playback_ids) > 0:
+                    # Asset found and ready!
+                    playback_id = found_asset.playback_ids[0].id
+                    
+                    # Update post
+                    post.mux_playback_id = playback_id
+                    post.mux_asset_id = found_asset.id
+                    db.commit()
+                    
+                    return {
+                        "status": "ready",
+                        "playback_id": playback_id,
+                        "asset_id": found_asset.id,
+                        "message": "Video found and post updated"
+                    }
+                else:
+                    return {
+                        "status": "processing",
+                        "message": "Video is still processing or not found"
+                    }
+            except Exception as e:
+                print(f"[MUX] Error checking post upload status: {e}")
+                return {
+                    "status": "error",
+                    "message": f"Error checking status: {str(e)}"
+                }
+        
         # Handle lesson check (existing logic)
         if not lesson_id:
-            raise HTTPException(status_code=400, detail="Either lesson_id or course_id must be provided")
+            raise HTTPException(status_code=400, detail="Either lesson_id, course_id, or post_id must be provided")
         
         lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
         if not lesson:
@@ -527,8 +788,10 @@ async def mux_webhook_handler(
                         passthrough_data = json.loads(passthrough) if isinstance(passthrough, str) else passthrough
                         lesson_id = passthrough_data.get("lesson_id")
                         course_id = passthrough_data.get("course_id")
+                        post_id = passthrough_data.get("post_id")
                         print(f"[MUX WEBHOOK] Lesson ID from passthrough: {lesson_id}")
                         print(f"[MUX WEBHOOK] Course ID from passthrough: {course_id}")
+                        print(f"[MUX WEBHOOK] Post ID from passthrough: {post_id}")
                         
                         if lesson_id:
                             # Update lesson
@@ -554,8 +817,20 @@ async def mux_webhook_handler(
                                 print(f"[MUX WEBHOOK] SUCCESS! Updated course preview with playback_id: {playback_id}, asset_id: {asset_id}")
                             else:
                                 print(f"[MUX WEBHOOK] WARNING: Course {course_id} not found in database")
+                        elif post_id:
+                            # Update community post
+                            from models.community import Post
+                            post = db.query(Post).filter(Post.id == post_id).first()
+                            if post:
+                                print(f"[MUX WEBHOOK] Found post: {post.title}")
+                                post.mux_asset_id = asset_id
+                                post.mux_playback_id = playback_id
+                                db.commit()
+                                print(f"[MUX WEBHOOK] SUCCESS! Updated post with playback_id: {playback_id}, asset_id: {asset_id}")
+                            else:
+                                print(f"[MUX WEBHOOK] WARNING: Post {post_id} not found in database")
                         else:
-                            print(f"[MUX WEBHOOK] WARNING: No lesson_id or course_id in passthrough data")
+                            print(f"[MUX WEBHOOK] WARNING: No lesson_id, course_id, or post_id in passthrough data")
                     except Exception as e:
                         print(f"[MUX WEBHOOK] ERROR updating from webhook: {e}")
                         import traceback

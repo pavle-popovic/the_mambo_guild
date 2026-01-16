@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api";
@@ -9,6 +9,7 @@ import { GlassCard, GlassPanel } from "@/components/ui/GlassCard";
 import { MagicButton } from "@/components/ui/MagicButton";
 import { FadeIn, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 import { CreatePostModal } from "@/components/CreatePostModal";
+import PostDetailModal from "@/components/PostDetailModal";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,22 +61,57 @@ export default function CommunityPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
+  const [openInEditMode, setOpenInEditMode] = useState(false);
+  const [showSuccessNotification, setShowSuccessNotification] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  // Fetch posts
-  const fetchPosts = useCallback(async () => {
+  // Auto-dismiss success notification
+  useEffect(() => {
+    if (showSuccessNotification) {
+      const timer = setTimeout(() => {
+        setShowSuccessNotification(false);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [showSuccessNotification]);
+
+  // Fetch posts with AbortController
+  const fetchPostsAbortRef = useRef<AbortController | null>(null);
+
+  const fetchPosts = useCallback(async (options?: { forceRefresh?: boolean }) => {
+    // Cancel previous request
+    if (fetchPostsAbortRef.current) {
+      fetchPostsAbortRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    fetchPostsAbortRef.current = controller;
+
+    setIsLoading(true);
+    setError(null);
     try {
-      setIsLoading(true);
-      setError(null);
+      // Note: getCommunityFeed doesn't support signal yet, but we track abort state
       const data = await apiClient.getCommunityFeed({
         post_type: mode,
         tag: selectedTag || undefined,
         limit: 20,
+        forceRefresh: options?.forceRefresh,
       });
-      setPosts(data);
+
+      // Only update if request wasn't aborted
+      if (!controller.signal.aborted) {
+        setPosts(data as unknown as Post[]);
+        return data;
+      }
     } catch (err: any) {
-      setError(err.message || "Failed to load posts");
+      if (err.name !== 'AbortError' && !controller.signal.aborted) {
+        setError(err.message || "Failed to load posts");
+      }
     } finally {
-      setIsLoading(false);
+      if (!controller.signal.aborted) {
+        setIsLoading(false);
+      }
     }
   }, [mode, selectedTag]);
 
@@ -87,6 +123,16 @@ export default function CommunityPage() {
   // Fetch posts when mode or tag changes
   useEffect(() => {
     fetchPosts();
+  }, [fetchPosts]);
+
+  // Listen for video ready events to refresh feed
+  useEffect(() => {
+    const handleVideoReady = () => {
+      console.log("[CommunityPage] Video ready event received, refreshing feed...");
+      fetchPosts({ forceRefresh: true });
+    };
+    window.addEventListener("post-video-ready", handleVideoReady);
+    return () => window.removeEventListener("post-video-ready", handleVideoReady);
   }, [fetchPosts]);
 
   const handleModeChange = (newMode: FeedMode) => {
@@ -101,23 +147,86 @@ export default function CommunityPage() {
   };
 
   const handleReaction = async (postId: string, reactionType: "fire" | "ruler" | "clap") => {
+    // Store original state for potential revert
+    const originalPosts = [...posts];
+
     try {
       UISound.click();
+
+      // Optimistically update UI
+      setPosts((prevPosts) =>
+        prevPosts.map((p) => {
+          if (p.id === postId) {
+            const currentReaction = p.user_reaction;
+            const isTogglingOff = currentReaction === reactionType;
+            const isNewReaction = currentReaction === null;
+
+            const newReaction = isTogglingOff ? null : reactionType;
+            const newReactionCount = isTogglingOff
+              ? p.reaction_count - 1
+              : isNewReaction
+                ? p.reaction_count + 1
+                : p.reaction_count;
+
+            return {
+              ...p,
+              user_reaction: newReaction,
+              reaction_count: newReactionCount,
+            };
+          }
+          return p;
+        })
+      );
+
       await apiClient.addReaction(postId, reactionType);
-      // Refresh posts
-      fetchPosts();
       // Update wallet
       window.dispatchEvent(new Event("wallet-updated"));
+      // Background sync - don't block UI, just refresh quietly
+      setTimeout(() => fetchPosts({ forceRefresh: true }), 1000);
     } catch (err: any) {
       console.error("Failed to react:", err);
+      // Revert optimistic update on error
+      setPosts(originalPosts);
       alert(err.message || "Failed to add reaction");
     }
   };
 
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
+
+  const confirmDelete = async () => {
+    if (!postToDelete) return;
+
+    try {
+      await apiClient.deletePost(postToDelete);
+      UISound.click();
+
+      // Optimistically remove from feed
+      setPosts(prev => prev.filter(p => p.id !== postToDelete));
+      setSuccessMessage("Post deleted successfully");
+      setShowSuccessNotification(true);
+
+      // Background refresh to confirm
+      setTimeout(() => fetchPosts(), 500);
+    } catch (err: any) {
+      alert(err.message || "Failed to delete post");
+    } finally {
+      setIsDeleteModalOpen(false);
+      setPostToDelete(null);
+    }
+  };
+
+  const handleDeleteClick = (postId: string) => {
+    setPostToDelete(postId);
+    setIsDeleteModalOpen(true);
+  };
+
+
+
   return (
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user || undefined} />
-      
+
       <div className="max-w-4xl mx-auto px-8 py-12 pt-28">
         {/* Header */}
         <FadeIn>
@@ -214,7 +323,7 @@ export default function CommunityPage() {
         ) : error ? (
           <GlassPanel className="p-8 text-center">
             <p className="text-red-400 mb-4">{error}</p>
-            <MagicButton onClick={fetchPosts} variant="secondary">
+            <MagicButton onClick={() => fetchPosts({ forceRefresh: true })} variant="secondary">
               Try Again
             </MagicButton>
           </GlassPanel>
@@ -239,9 +348,35 @@ export default function CommunityPage() {
             {posts.map((post) => (
               <StaggerItem key={post.id}>
                 {mode === "stage" ? (
-                  <StagePostCard post={post} onReaction={handleReaction} />
+                  <StagePostCard
+                    post={post}
+                    onReaction={handleReaction}
+                    onClick={() => {
+                      UISound.click();
+                      setSelectedPostId(post.id);
+                    }}
+                    isOwner={user?.id === post.user.id}
+                    onEdit={() => {
+                      setOpenInEditMode(true);
+                      setSelectedPostId(post.id);
+                    }}
+                    onDelete={() => handleDeleteClick(post.id)}
+                  />
                 ) : (
-                  <LabPostCard post={post} onReaction={handleReaction} />
+                  <LabPostCard
+                    post={post}
+                    onReaction={handleReaction}
+                    onClick={() => {
+                      UISound.click();
+                      setSelectedPostId(post.id);
+                    }}
+                    isOwner={user?.id === post.user.id}
+                    onEdit={() => {
+                      setOpenInEditMode(true);
+                      setSelectedPostId(post.id);
+                    }}
+                    onDelete={() => handleDeleteClick(post.id)}
+                  />
                 )}
               </StaggerItem>
             ))}
@@ -253,13 +388,139 @@ export default function CommunityPage() {
           isOpen={isCreateModalOpen}
           onClose={() => setIsCreateModalOpen(false)}
           mode={mode}
-          onPostCreated={() => {
-            fetchPosts();
+          onPostCreated={(newPostData) => {
+            setSuccessMessage(mode === "stage" ? "Video posted successfully! 🎬" : "Question posted successfully! 💡");
+            setShowSuccessNotification(true);
             setIsCreateModalOpen(false);
+
+            // Create optimistic post with user data
+            if (newPostData && user) {
+              const optimisticPost = {
+                ...newPostData,
+                user: {
+                  id: user.id,
+                  first_name: user.first_name || "You",
+                  last_name: user.last_name || "",
+                  avatar_url: user.avatar_url || null,
+                  is_pro: user.is_pro || false,
+                  level: user.level || 1,
+                },
+              };
+
+              // Add immediately to feed
+              setPosts(prev => [optimisticPost, ...prev]);
+            }
+
+            // Background sync after delay to get server-confirmed data
+            setTimeout(() => {
+              fetchPosts({ forceRefresh: true }).then(freshPosts => {
+                if (!freshPosts) return;
+
+                // Replace optimistic posts with real data
+                setPosts(prev => {
+                  const withoutTemp = prev.filter(p => !p.id.startsWith('temp-'));
+                  const freshIds = new Set(freshPosts.map(p => p.id));
+                  // Keep fresh posts, add any that weren't in optimistic list
+                  return [
+                    ...freshPosts,
+                    ...withoutTemp.filter(p => !freshIds.has(p.id))
+                  ] as Post[];
+                });
+              });
+            }, 2000);
+
+            // If it's a stage post, poll for video updates (webhook may take a few seconds)
+            if (mode === "stage") {
+              let pollCount = 0;
+              const maxPolls = 10; // Poll for up to 20 seconds (10 * 2s)
+              const pollInterval = setInterval(() => {
+                pollCount++;
+                fetchPosts();
+                if (pollCount >= maxPolls) {
+                  clearInterval(pollInterval);
+                }
+              }, 2000);
+            }
           }}
         />
+
+        {/* Post Detail Modal */}
+        {selectedPostId && (
+          <PostDetailModal
+            isOpen={!!selectedPostId}
+            onClose={() => {
+              setSelectedPostId(null);
+              setOpenInEditMode(false);
+            }}
+            postId={selectedPostId || ""}
+            currentUserId={user?.id}
+            initialEditMode={openInEditMode}
+            onPostDeleted={(deletedId) => {
+              // Optimistically remove post from feed
+              const idToRemove = deletedId || selectedPostId;
+              setPosts((prevPosts) => prevPosts.filter((p) => p.id !== idToRemove));
+              setSelectedPostId(null);
+              // Background refresh
+              setTimeout(() => fetchPosts(), 500);
+            }}
+            onReaction={handleReaction}
+            onRefresh={() => {
+              // Background refresh - don't block UI
+              setTimeout(() => fetchPosts(), 500);
+            }}
+          />
+        )}
+
+        {/* Success Notification */}
+        {showSuccessNotification && (
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right">
+            <GlassCard className="p-4 bg-green-500/20 border-green-500/50">
+              <div className="flex items-center gap-3">
+                <div className="text-2xl">✅</div>
+                <div>
+                  <p className="text-white font-semibold">{successMessage}</p>
+                </div>
+                <button
+                  onClick={() => setShowSuccessNotification(false)}
+                  className="ml-4 text-white/60 hover:text-white"
+                >
+                  ×
+                </button>
+              </div>
+            </GlassCard>
+          </div>
+        )}
+
+        {/* Delete Confirmation Modal */}
+        {isDeleteModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+            <GlassCard className="max-w-md w-full p-6 space-y-4">
+              <h3 className="text-xl font-bold text-white">Delete Post?</h3>
+              <p className="text-white/70">
+                Are you sure you want to delete this post? This action cannot be undone and will remove all reactions and comments.
+              </p>
+              <div className="flex justify-end gap-3 mt-6">
+                <button
+                  onClick={() => {
+                    setIsDeleteModalOpen(false);
+                    setPostToDelete(null);
+                  }}
+                  className="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={confirmDelete}
+                  className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
+                >
+                  Delete
+                </button>
+              </div>
+            </GlassCard>
+          </div>
+        )}
       </div>
-      
+
       <Footer />
     </div>
   );
@@ -327,12 +588,20 @@ function TagPill({
 function StagePostCard({
   post,
   onReaction,
+  onClick,
+  isOwner,
+  onEdit,
+  onDelete,
 }: {
   post: Post;
   onReaction: (postId: string, type: "fire" | "ruler" | "clap") => void;
+  onClick?: () => void;
+  isOwner?: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }) {
   return (
-    <GlassCard className="overflow-hidden">
+    <GlassCard className="overflow-hidden cursor-pointer hover:scale-[1.01] transition-transform" onClick={onClick}>
       {/* Video Thumbnail */}
       <div className="relative aspect-video bg-black/30">
         {post.mux_playback_id ? (
@@ -346,13 +615,49 @@ function StagePostCard({
             <span className="text-4xl">📺</span>
           </div>
         )}
-        
+
         {/* WIP Banner */}
         {post.is_wip && (
           <div className="absolute top-2 left-2 px-2 py-1 rounded bg-orange-500/80 text-white text-xs font-semibold">
             🚧 Work in Progress
           </div>
         )}
+
+        {(() => {
+          if (isOwner) console.log('Rendering StagePostCard owner actions for:', post.id);
+          return isOwner;
+        })() && (
+            <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onEdit?.();
+                }}
+                className="p-1.5 rounded-lg bg-black/40 hover:bg-black/60 text-white/80 hover:text-white backdrop-blur-sm transition-colors"
+                title="Edit post"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onDelete?.();
+                }}
+                className="p-1.5 rounded-lg bg-black/40 hover:bg-red-500/80 text-white/80 hover:text-white backdrop-blur-sm transition-colors"
+                title="Delete post"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <polyline points="3 6 5 6 21 6"></polyline>
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                  <line x1="10" y1="11" x2="10" y2="17"></line>
+                  <line x1="14" y1="11" x2="14" y2="17"></line>
+                </svg>
+              </button>
+            </div>
+          )}
 
         {/* Duration */}
         {post.video_duration_seconds && (
@@ -419,25 +724,25 @@ function StagePostCard({
         <div className="flex items-center gap-4 pt-3 border-t border-white/10">
           <ReactionButton
             icon="🔥"
-            count={post.reaction_count}
+            count={(!post.user_reaction || post.user_reaction === "fire") ? post.reaction_count : 0}
             active={post.user_reaction === "fire"}
             onClick={() => onReaction(post.id, "fire")}
           />
           <ReactionButton
             icon="📏"
-            count={0}
+            count={post.user_reaction === "ruler" ? post.reaction_count : 0}
             active={post.user_reaction === "ruler"}
             onClick={() => onReaction(post.id, "ruler")}
           />
           <ReactionButton
             icon="👏"
-            count={0}
+            count={post.user_reaction === "clap" ? post.reaction_count : 0}
             active={post.user_reaction === "clap"}
             onClick={() => onReaction(post.id, "clap")}
           />
-          
+
           <div className="flex-1" />
-          
+
           {post.feedback_type === "hype" ? (
             <span className="text-xs text-white/40">Hype Only</span>
           ) : (
@@ -454,12 +759,55 @@ function StagePostCard({
 function LabPostCard({
   post,
   onReaction,
+  onClick,
+  isOwner,
+  onEdit,
+  onDelete,
 }: {
   post: Post;
   onReaction: (postId: string, type: "fire" | "ruler" | "clap") => void;
+  onClick?: () => void;
+  isOwner?: boolean;
+  onEdit?: () => void;
+  onDelete?: () => void;
 }) {
   return (
-    <GlassCard className="p-4">
+    <GlassCard className="p-4 cursor-pointer hover:scale-[1.01] transition-transform relative group" onClick={onClick}>
+      {(() => {
+        if (isOwner) console.log('Rendering LabPostCard owner actions for:', post.id);
+        return isOwner;
+      })() && (
+          <div className="absolute top-2 right-2 flex items-center gap-1 z-10">
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onEdit?.();
+              }}
+              className="p-1.5 rounded-lg bg-black/40 hover:bg-black/60 text-white/80 hover:text-white backdrop-blur-sm transition-colors"
+              title="Edit post"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+              </svg>
+            </button>
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                onDelete?.();
+              }}
+              className="p-1.5 rounded-lg bg-black/40 hover:bg-red-500/80 text-white/80 hover:text-white backdrop-blur-sm transition-colors"
+              title="Delete post"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="3 6 5 6 21 6"></polyline>
+                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                <line x1="10" y1="11" x2="10" y2="17"></line>
+                <line x1="14" y1="11" x2="14" y2="17"></line>
+              </svg>
+            </button>
+          </div>
+        )}
       <div className="flex gap-4">
         {/* Status indicator */}
         <div className="flex flex-col items-center gap-2 pt-1">
@@ -509,7 +857,26 @@ function LabPostCard({
               {post.user.first_name}
             </span>
             <span>💬 {post.reply_count} answers</span>
-            <span>🔥 {post.reaction_count}</span>
+            <div onClick={(e) => e.stopPropagation()} className="flex items-center gap-2">
+              <ReactionButton
+                icon="🔥"
+                count={(!post.user_reaction || post.user_reaction === "fire") ? post.reaction_count : 0}
+                active={post.user_reaction === "fire"}
+                onClick={() => onReaction(post.id, "fire")}
+              />
+              <ReactionButton
+                icon="📏"
+                count={post.user_reaction === "ruler" ? post.reaction_count : 0}
+                active={post.user_reaction === "ruler"}
+                onClick={() => onReaction(post.id, "ruler")}
+              />
+              <ReactionButton
+                icon="👏"
+                count={post.user_reaction === "clap" ? post.reaction_count : 0}
+                active={post.user_reaction === "clap"}
+                onClick={() => onReaction(post.id, "clap")}
+              />
+            </div>
           </div>
         </div>
       </div>
