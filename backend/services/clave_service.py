@@ -26,20 +26,22 @@ COST_POST_VIDEO = 15
 # ============================================
 # Earning Constants (from PRD)
 # ============================================
-EARN_DAILY_BASE = (1, 3)      # RNG range for base users
-EARN_DAILY_PRO = (4, 8)       # RNG range for pro users
-EARN_STREAK_BONUS_BASE = 10
-EARN_STREAK_BONUS_PRO = 20
+EARN_DAILY_BASE = (2, 5)      # RNG range for base users
+EARN_DAILY_PRO = (5, 10)       # RNG range for pro users
+EARN_STREAK_BONUS_BASE = 15
+EARN_STREAK_BONUS_PRO = 30
 EARN_STREAK_INTERVAL = 5      # Every 5 consecutive days
 EARN_ACCEPTED_ANSWER = 10
-EARN_FIRE_REFUND = 1          # Refund when post gets Fire (capped)
-EARN_FIRE_REFUND_CAP = 5      # Max refunds per video
-EARN_CHOREO_COMPLETE = 10
-EARN_WEEK_COMPLETE = 10
-EARN_COURSE_COMPLETE = 20
-EARN_LEVEL_UP = 5
+EARN_REACTION_REFUND = 1          # Refund when post gets ANY reaction (capped)
+EARN_REACTION_REFUND_CAP = 5      # Max refunds per video
+EARN_CHOREO_COMPLETE = 0
+EARN_WEEK_COMPLETE = 0
+EARN_COURSE_COMPLETE = 0
+EARN_LEVEL_UP = 0
 EARN_REFERRAL_BONUS = 50
-EARN_NEW_USER_STARTER = 15
+EARN_NEW_USER_STARTER = 10
+EARN_SUB_ADVANCED = 10
+EARN_SUB_PERFORMER = 20
 
 # ============================================
 # Slot Limits
@@ -343,20 +345,35 @@ def award_course_milestone(
     return get_balance(user_id, db)
 
 
-def process_fire_refund(post_id: str, post_owner_id: str, db: Session) -> bool:
+def process_reaction_refund(post_id: str, post_owner_id: str, db: Session) -> bool:
     """
-    Process Fire reaction refund (max 5 per video).
-    Returns True if refund was given.
+    Process reaction refund (max 5 per video).
+    Triggered by ANY reaction type.
     """
-    # Count existing fire refunds for this post
+    # Count existing refunds for this post (reason='reaction_refund')
     existing_refunds = db.query(func.count(ClaveTransaction.id)).filter(
         ClaveTransaction.user_id == post_owner_id,
         ClaveTransaction.reference_id == post_id,
-        ClaveTransaction.reason == "fire_refund"
+        ClaveTransaction.reason == "reaction_refund"
     ).scalar() or 0
     
-    if existing_refunds < EARN_FIRE_REFUND_CAP:
-        earn_claves(post_owner_id, EARN_FIRE_REFUND, "fire_refund", db, reference_id=post_id)
+    if existing_refunds < EARN_REACTION_REFUND_CAP:
+        earn_claves(post_owner_id, EARN_REACTION_REFUND, "reaction_refund", db, reference_id=post_id)
         return True
     
     return False
+
+
+def award_subscription_bonus(user_id: str, tier: SubscriptionTier, db: Session, reference_id: str = None) -> int:
+    """
+    Award monthly subscription bonus.
+    """
+    amount = 0
+    if tier == SubscriptionTier.ADVANCED:
+        amount = EARN_SUB_ADVANCED
+    elif tier == SubscriptionTier.PERFORMER:
+        amount = EARN_SUB_PERFORMER
+        
+    if amount > 0:
+        return earn_claves(user_id, amount, "subscription_bonus", db, reference_id=reference_id)
+    return get_balance(user_id, db)

@@ -13,6 +13,7 @@ import PostDetailModal from "@/components/PostDetailModal";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
+import { CommunityTeaser } from "@/components/CommunityTeaser";
 
 // Types
 interface PostUser {
@@ -53,7 +54,11 @@ interface Tag {
 type FeedMode = "stage" | "lab";
 
 export default function CommunityPage() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+
+  // Access Control Logic
+  const hasAccess = user && (user.is_pro || user.role === 'admin' || user.role === 'instructor');
+
   const [mode, setMode] = useState<FeedMode>("stage");
   const [posts, setPosts] = useState<Post[]>([]);
   const [tags, setTags] = useState<Tag[]>([]);
@@ -65,6 +70,7 @@ export default function CommunityPage() {
   const [openInEditMode, setOpenInEditMode] = useState(false);
   const [showSuccessNotification, setShowSuccessNotification] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Auto-dismiss success notification
   useEffect(() => {
@@ -80,6 +86,9 @@ export default function CommunityPage() {
   const fetchPostsAbortRef = useRef<AbortController | null>(null);
 
   const fetchPosts = useCallback(async (options?: { forceRefresh?: boolean }) => {
+    // Skip fetching if no access (security + optimization)
+    if (!hasAccess && !loading) return;
+
     // Cancel previous request
     if (fetchPostsAbortRef.current) {
       fetchPostsAbortRef.current.abort();
@@ -113,27 +122,35 @@ export default function CommunityPage() {
         setIsLoading(false);
       }
     }
-  }, [mode, selectedTag]);
+  }, [mode, selectedTag, hasAccess, loading]);
 
   // Fetch tags
   useEffect(() => {
-    apiClient.getCommunityTags().then(setTags).catch(console.error);
-  }, []);
+    if (hasAccess) {
+      apiClient.getCommunityTags().then(setTags).catch(console.error);
+    }
+  }, [hasAccess]);
 
   // Fetch posts when mode or tag changes
   useEffect(() => {
-    fetchPosts();
-  }, [fetchPosts]);
+    if (hasAccess) {
+      fetchPosts();
+    } else {
+      setIsLoading(false);
+    }
+  }, [fetchPosts, hasAccess]);
 
   // Listen for video ready events to refresh feed
   useEffect(() => {
+    if (!hasAccess) return;
+
     const handleVideoReady = () => {
       console.log("[CommunityPage] Video ready event received, refreshing feed...");
       fetchPosts({ forceRefresh: true });
     };
     window.addEventListener("post-video-ready", handleVideoReady);
     return () => window.removeEventListener("post-video-ready", handleVideoReady);
-  }, [fetchPosts]);
+  }, [fetchPosts, hasAccess]);
 
   const handleModeChange = (newMode: FeedMode) => {
     UISound.click();
@@ -187,7 +204,10 @@ export default function CommunityPage() {
       console.error("Failed to react:", err);
       // Revert optimistic update on error
       setPosts(originalPosts);
-      alert(err.message || "Failed to add reaction");
+      setErrorMessage(err.message || "Failed to add reaction");
+      // Auto-dismiss after 5 seconds
+      setTimeout(() => setErrorMessage(null), 5000);
+      throw err; // Re-throw so child components (Modal) know it failed
     }
   };
 
@@ -221,7 +241,26 @@ export default function CommunityPage() {
     setIsDeleteModalOpen(true);
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-mambo-dark flex items-center justify-center">
+        <div className="w-10 h-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+      </div>
+    );
+  }
 
+  // Show Teaser if no access
+  if (!hasAccess) {
+    return (
+      <div className="min-h-screen bg-mambo-dark">
+        <NavBar user={user || undefined} />
+        <div className="pt-28">
+          <CommunityTeaser />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-mambo-dark">
@@ -482,6 +521,27 @@ export default function CommunityPage() {
                 </div>
                 <button
                   onClick={() => setShowSuccessNotification(false)}
+                  className="ml-4 text-white/60 hover:text-white"
+                >
+                  ×
+                </button>
+              </div>
+            </GlassCard>
+          </div>
+        )}
+
+        {/* Error Notification */}
+        {errorMessage && (
+          <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-right">
+            <GlassCard className="p-4 bg-red-500/20 border-red-500/50">
+              <div className="flex items-center gap-3">
+                <div className="text-2xl">⚠️</div>
+                <div>
+                  <p className="text-white font-semibold">Error</p>
+                  <p className="text-sm text-white/80">{errorMessage}</p>
+                </div>
+                <button
+                  onClick={() => setErrorMessage(null)}
                   className="ml-4 text-white/60 hover:text-white"
                 >
                   ×

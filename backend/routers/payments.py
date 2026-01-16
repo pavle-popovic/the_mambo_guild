@@ -10,6 +10,7 @@ from pydantic import BaseModel
 from dependencies import get_db, get_current_user
 from models.user import User, Subscription, SubscriptionStatus, SubscriptionTier
 from services import stripe_service
+from services.clave_service import award_subscription_bonus
 from config import settings
 
 from schemas.course import (
@@ -170,6 +171,9 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                     )
                     db.commit()
                     db.refresh(db_subscription)
+                    
+                    # Award subscription bonus (Advanced/Performer)
+                    award_subscription_bonus(str(db_subscription.user_id), tier, db, reference_id=invoice.id)
                 else:
                     # This case might happen if the subscription was created directly in Stripe
                     # or if the initial 'incomplete' record wasn't found.
@@ -190,6 +194,9 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                         db.add(new_subscription)
                         db.commit()
                         db.refresh(new_subscription)
+                        
+                        # Award subscription bonus
+                        award_subscription_bonus(str(new_subscription.user_id), tier, db, reference_id=invoice.id)
                     else:
                         print(f"Warning: Could not find user_id in metadata for new subscription {subscription_id}")
 

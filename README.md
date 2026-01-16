@@ -342,6 +342,15 @@ The application includes comprehensive error handling and validation:
   - **Video Slot Management**: Base (5 slots) and Pro (20 slots) limits
   - **Post Reactions**: Fire, Ruler, and Clap reactions with clave costs
   - **Solution Marking**: Lab Q&A with accepted answer awards
+- ✅ **Community Features v5.0** (January 2026)
+  - **Restricted Access**: "Teaser" view for non-pro users on Community page
+  - **Teaser UI**: Premium marketing component with "Join/Upgrade" CTAs
+  - **Clave Economy Overhaul**:
+    - **Subscription Bonuses**: Automatic monthly rewards (Advanced: +10, Performer: +20)
+    - **Engagement Rewards**: Enhanced Daily Login (Base: 2-5, Pro: 5-10) and Streak bonuses
+    - **Community Rewards**: "Accepted Answer" (+10) and reaction refunds
+    - **Rebalancing**: Removed course completion clave rewards to focus on community engagement
+  - **Rules**: Self-reaction ban implemented for fair play
 - ✅ **Content Type System** (January 2026)
   - Three distinct content types: Courses (📚), Choreographies (💃), and Topics (💡)
   - Content type selector in admin course builder

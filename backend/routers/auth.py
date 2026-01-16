@@ -12,7 +12,7 @@ from services.auth_service import verify_password, get_password_hash, create_acc
 from services.gamification_service import update_streak
 from services.email_service import send_password_reset_email
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
-from services.clave_service import process_daily_login
+from services.clave_service import process_daily_login, award_new_user_bonus
 from dependencies import get_current_user
 from config import settings
 import uuid
@@ -115,6 +115,9 @@ async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)
             status=SubscriptionStatus.INCOMPLETE
         )
         db.add(subscription)
+        
+        # Award new user starter pack (Claves)
+        award_new_user_bonus(str(user_id), db)
 
         db.commit()
         db.refresh(user)
@@ -217,7 +220,7 @@ async def get_current_user_profile(
     tier = subscription.tier if subscription else "rookie"
 
     return UserProfileResponse(
-        id=str(profile.id),
+        id=str(current_user.id),
         first_name=profile.first_name,
         last_name=profile.last_name,
         xp=profile.xp,

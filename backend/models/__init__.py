@@ -14,7 +14,7 @@ def get_engine():
     """Get or create the database engine."""
     global _engine
     if _engine is None:
-        _engine = create_engine(settings.DATABASE_URL, echo=True)
+        _engine = create_engine(settings.DATABASE_URL, echo=False)
     return _engine
 
 def get_session_local():

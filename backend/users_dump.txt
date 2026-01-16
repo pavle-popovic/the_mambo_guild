@@ -1,0 +1,5 @@
+Total Users: 4
+ID: 14bd1d94-003a-4ef2-8429-b32b1950125f | Email: admin@themamboinn.com | Auth: email
+ID: a7727803-a26d-455e-9146-88c7ed880121 | Email: pavlepopovic1999@hotmail.com | Auth: email
+ID: 7128646c-4d5f-46af-b0eb-536f2581ec84 | Email: thelightpopo@gmail.com | Auth: google
+ID: 970bf8e6-6d91-479f-9f96-f7cfb9ba6d5d | Email: test.advanced@example.com | Auth: email

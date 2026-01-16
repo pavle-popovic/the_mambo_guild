@@ -14,7 +14,7 @@ from models.user import User, UserProfile, Subscription, SubscriptionTier, Subsc
 from models.community import Post, PostReply, PostReaction, CommunityTag
 from services.clave_service import (
     spend_claves, can_afford, get_video_slot_status,
-    award_accepted_answer, process_fire_refund,
+    award_accepted_answer, process_reaction_refund,
     COST_REACTION, COST_COMMENT, COST_POST_QUESTION, COST_POST_VIDEO
 )
 
@@ -261,6 +261,10 @@ def add_reaction(
             return {"success": True, "message": "Reaction updated"}
         else:
             return {"success": True, "message": "Already reacted"}
+            
+    # Prevent self-reaction
+    if str(post.user_id) == user_id:
+         return {"success": False, "message": "You cannot react to your own posts"}
     
     # New reaction - charge claves
     success, balance = spend_claves(user_id, COST_REACTION, "reaction", db, reference_id=str(post_id))
@@ -284,9 +288,9 @@ def add_reaction(
     # Update post reaction count
     post.reaction_count += 1
     
-    # Process fire refund for post owner
-    if reaction_type == "fire" and str(post.user_id) != user_id:
-        process_fire_refund(str(post_id), str(post.user_id), db)
+    # Process refund for post owner (ANY reaction type triggers it)
+    if str(post.user_id) != user_id:
+        process_reaction_refund(str(post_id), str(post.user_id), db)
     
     db.flush()
     
