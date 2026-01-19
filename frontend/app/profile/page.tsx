@@ -17,7 +17,7 @@ interface Course {
   title: string;
   description: string | null;
   image_url: string | null;
-  thumbnail_url: string | null;
+  thumbnail_url?: string | null;
   difficulty: string;
   progress_percentage: number;
   is_locked: boolean;
@@ -109,7 +109,7 @@ export default function ProfilePage() {
   const handleAvatarUpload = async (url: string | null) => {
     setUploadingAvatar(true);
     try {
-      await apiClient.updateProfile({ avatar_url: url || null });
+      await apiClient.updateProfile({ avatar_url: url || undefined });
       await refreshUser();
     } catch (error) {
       console.error("Failed to update avatar:", error);
@@ -121,7 +121,7 @@ export default function ProfilePage() {
   const handleAvatarRemove = async () => {
     setUploadingAvatar(true);
     try {
-      await apiClient.updateProfile({ avatar_url: null });
+      await apiClient.updateProfile({ avatar_url: undefined });
       await refreshUser();
     } catch (error) {
       console.error("Failed to remove avatar:", error);

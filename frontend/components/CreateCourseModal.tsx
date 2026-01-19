@@ -248,7 +248,7 @@ export default function CreateCourseModal({
           <div className="max-w-md">
             <ImageUploader
               currentImageUrl={thumbnailUrl}
-              onUploadComplete={setThumbnailUrl}
+              onUploadComplete={(url) => setThumbnailUrl(url || "")}
               folder="thumbnails"
               aspectRatio="video"
               label="Course Thumbnail (Optional)"

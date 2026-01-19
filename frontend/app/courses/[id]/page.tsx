@@ -19,6 +19,8 @@ interface Lesson {
   order_index: number;
   week_number: number | null;
   day_number: number | null;
+  thumbnail_url?: string | null;
+  mux_playback_id?: string | null;
 }
 
 export default function CourseDetailPage() {

@@ -22,7 +22,7 @@ export default function PalladiumMesh() {
         duration: 28000,
         repeat: Infinity,
         repeatType: "reverse" as const,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     },
     {
@@ -37,7 +37,7 @@ export default function PalladiumMesh() {
         duration: 32000,
         repeat: Infinity,
         repeatType: "reverse" as const,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     },
     {
@@ -52,7 +52,7 @@ export default function PalladiumMesh() {
         duration: 25000,
         repeat: Infinity,
         repeatType: "reverse" as const,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     },
     {
@@ -67,7 +67,7 @@ export default function PalladiumMesh() {
         duration: 30000,
         repeat: Infinity,
         repeatType: "reverse" as const,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     },
     {
@@ -82,7 +82,7 @@ export default function PalladiumMesh() {
         duration: 35000,
         repeat: Infinity,
         repeatType: "reverse" as const,
-        ease: "easeInOut",
+        ease: "easeInOut" as const,
       },
     },
   ];

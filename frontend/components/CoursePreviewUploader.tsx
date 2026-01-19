@@ -40,7 +40,7 @@ export default function CoursePreviewUploader({
       await apiClient.updateCourse(courseId, {
         mux_preview_playback_id: undefined,
         mux_preview_asset_id: undefined,
-      });
+      } as any);
     },
   });
 
@@ -52,6 +52,8 @@ export default function CoursePreviewUploader({
     await handleDelete();
     onUploadComplete("");
   };
+
+  const isDeleting = uploadStatus === "deleting";
 
   return (
     <div className="space-y-4">
@@ -76,7 +78,7 @@ export default function CoursePreviewUploader({
               onClick={handleDeleteClick}
               className="text-red-400 hover:text-red-300 transition p-2"
               title="Remove preview"
-              disabled={uploadStatus === "deleting"}
+              disabled={isDeleting}
             >
               <FaTrash />
             </button>

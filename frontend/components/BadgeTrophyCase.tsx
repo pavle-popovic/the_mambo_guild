@@ -12,9 +12,9 @@ interface Badge {
   description: string;
   icon_url: string | null;
   category: string;
-  requirement_type: string;
-  requirement_value: number;
-  is_earned: boolean;
+  requirement_type?: string;
+  requirement_value?: number;
+  is_earned?: boolean;
   earned_at: string | null;
 }
 
@@ -196,9 +196,11 @@ export function BadgeTrophyCase({ userId }: BadgeTrophyCaseProps) {
                   </div>
                   <h4 className="font-bold text-white/60 text-sm mb-1">{badge.name}</h4>
                   <p className="text-xs text-white/40 line-clamp-2">{badge.description}</p>
-                  <p className="text-xs text-amber-400/60 mt-2">
-                    {badge.requirement_type.replace(/_/g, " ")}: {badge.requirement_value}
-                  </p>
+                  {badge.requirement_type && (
+                    <p className="text-xs text-amber-400/60 mt-2">
+                      {badge.requirement_type.replace(/_/g, " ")}: {badge.requirement_value}
+                    </p>
+                  )}
                 </div>
                 {/* Lock overlay */}
                 <div className="absolute inset-0 rounded-lg bg-black/40 flex items-center justify-center">

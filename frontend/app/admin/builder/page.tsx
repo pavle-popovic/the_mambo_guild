@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AdminSidebar from "@/components/AdminSidebar";
 import { useAuth } from "@/contexts/AuthContext";
@@ -54,7 +54,7 @@ interface CourseData {
   course_type?: string;
 }
 
-export default function AdminBuilderPage() {
+function AdminBuilderPageContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -1141,5 +1141,13 @@ export default function AdminBuilderPage() {
         onRefreshLesson={loadCourse}
       />
     </div>
+  );
+}
+
+export default function AdminBuilderPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-mambo-dark flex items-center justify-center"><div className="animate-spin w-8 h-8 border-2 border-mambo-blue border-t-transparent rounded-full" /></div>}>
+      <AdminBuilderPageContent />
+    </Suspense>
   );
 }

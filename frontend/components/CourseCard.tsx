@@ -139,13 +139,9 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
                     loop
                     playsInline
                     className="w-full h-full object-cover"
-                    style={{ 
+                    style={{
                       pointerEvents: "none",
-                    } as React.CSSProperties}
-                    controls={false}
-                    nohotkeys
-                    novolumepref
-                    defaultShowCaptions={false}
+                    } as any}
                     onPlaying={handlePlaying}
                     onError={handleError}
                     onLoadedData={() => {

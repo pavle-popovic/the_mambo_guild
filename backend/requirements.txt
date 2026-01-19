@@ -17,3 +17,4 @@ resend==2.1.0
 itsdangerous==2.1.2
 stripe==7.0.0
 
+google-generativeai==0.8.3

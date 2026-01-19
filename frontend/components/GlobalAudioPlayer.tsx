@@ -9,7 +9,7 @@ export default function GlobalAudioPlayer() {
   const [isMuted, setIsMuted] = useState(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const pathname = usePathname();
-  
+
   // Check if we're on pages where music should NOT play
   const isLessonPage = pathname?.startsWith("/lesson/");
   const isAdminPage = pathname?.startsWith("/admin/");
@@ -77,7 +77,7 @@ export default function GlobalAudioPlayer() {
       <audio ref={audioRef} src="/assets/Mambo_Inn.mp3" preload="auto" />
       <button
         onClick={toggleMute}
-        className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-mambo-panel border border-gray-700 rounded-full flex items-center justify-center hover:bg-gray-800 transition shadow-lg"
+        className="fixed top-24 right-6 z-50 w-12 h-12 bg-mambo-panel border border-gray-700 rounded-full flex items-center justify-center hover:bg-gray-800 transition shadow-lg"
         aria-label={isMuted ? "Unmute background music" : "Mute background music"}
       >
         {isMuted ? (

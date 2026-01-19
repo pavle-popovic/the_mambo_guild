@@ -8,8 +8,8 @@ interface MarkdownRendererProps {
 
 export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
   return (
+    <div className="prose prose-invert prose-lg max-w-none">
     <ReactMarkdown
-      className="prose prose-invert prose-lg max-w-none"
       components={{
         h1: ({ children }) => (
           <h1 className="text-3xl font-bold text-white mt-8 mb-4">{children}</h1>
@@ -82,6 +82,7 @@ export default function MarkdownRenderer({ content }: MarkdownRendererProps) {
     >
       {content}
     </ReactMarkdown>
+    </div>
   );
 }
 

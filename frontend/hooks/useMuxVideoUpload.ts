@@ -96,12 +96,12 @@ export function useMuxVideoUpload({
                 await apiClient.updateLesson(entityId, {
                   mux_playback_id: undefined,
                   mux_asset_id: undefined,
-                });
+                } as any);
               } else if (entityType === "course") {
                 await apiClient.updateCourse(entityId, {
                   mux_preview_playback_id: undefined,
                   mux_preview_asset_id: undefined,
-                });
+                } as any);
               }
               setUploadStatus("idle");
               if (onRefresh) {
@@ -392,7 +392,7 @@ export function useMuxVideoUpload({
       } else if (entityType === "community") {
         try {
           const post = await apiClient.getPost(entityId);
-          assetIdToDelete = post.mux_asset_id || null;
+          assetIdToDelete = (post as any).mux_asset_id || null;
         } catch (e) {
           console.log("[useMuxVideoUpload] Post not found for deletion");
         }

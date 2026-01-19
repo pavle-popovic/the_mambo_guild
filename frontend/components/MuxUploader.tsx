@@ -49,7 +49,7 @@ export default function MuxUploader({
         mux_playback_id: undefined,
         mux_asset_id: undefined,
         delete_video: true,
-      });
+      } as any);
       if (onDeleteVideo) {
         await onDeleteVideo();
       }
@@ -63,6 +63,8 @@ export default function MuxUploader({
   const handleUploadButtonClick = () => {
     fileInputRef.current?.click();
   };
+
+  const isDeleting = uploadStatus === "deleting";
 
   return (
     <div className="space-y-3">
@@ -150,7 +152,7 @@ export default function MuxUploader({
         )}
 
         {/* Video Status Display - Live - Show as row below upload button (hide when deleting) */}
-        {uploadStatus === "live" && currentPlaybackId && uploadStatus !== "deleting" && (
+        {uploadStatus === "live" && currentPlaybackId && !isDeleting && (
           <div className="flex items-center justify-between p-3 bg-gray-800/50 border border-gray-700 rounded-lg">
             <div className="flex items-center gap-3 flex-1 min-w-0">
               <FaCheck className="text-green-400 flex-shrink-0" />

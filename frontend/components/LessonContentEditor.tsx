@@ -389,7 +389,7 @@ function QuizBlockEditor({
   };
 
   const deleteQuestion = (index: number) => {
-    onUpdate({ questions: questions.filter((_, i) => i !== index) });
+    onUpdate({ questions: questions.filter((_: any, i: number) => i !== index) });
   };
 
   const addOption = (questionIndex: number) => {
@@ -407,7 +407,7 @@ function QuizBlockEditor({
   const deleteOption = (questionIndex: number, optionIndex: number) => {
     const updated = [...questions];
     updated[questionIndex].options = updated[questionIndex].options.filter(
-      (_, i) => i !== optionIndex
+      (_: any, i: number) => i !== optionIndex
     );
     // Adjust correct_answer if needed
     if (updated[questionIndex].correct_answer >= updated[questionIndex].options.length) {
