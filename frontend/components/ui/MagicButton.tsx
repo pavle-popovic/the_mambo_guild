@@ -58,26 +58,27 @@ export function MagicButton({
   };
 
   const variantStyles = {
+    // Palladium Era - Polished Brass Button
     primary: cn(
-      "bg-gradient-to-r from-amber-500 to-orange-500",
-      "text-white font-semibold",
-      "shadow-lg shadow-amber-500/30",
-      "hover:shadow-amber-500/50",
+      "bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)]",
+      "text-black font-bold",
+      "shadow-lg shadow-[rgba(212,175,55,0.3)]",
+      "hover:shadow-[rgba(212,175,55,0.5)]",
       "border-none"
     ),
     secondary: cn(
-      "bg-white/10 backdrop-blur-sm",
-      "text-amber-100",
-      "border border-amber-500/30",
-      "hover:bg-white/20",
-      "hover:border-amber-500/50"
+      "bg-black/60 backdrop-blur-sm",
+      "text-[#D4AF37]",
+      "border border-[rgba(212,175,55,0.3)]",
+      "hover:bg-black/80",
+      "hover:border-[rgba(212,175,55,0.6)]"
     ),
     ghost: cn(
       "bg-transparent",
-      "text-amber-200",
+      "text-[#D4AF37]",
       "border border-transparent",
       "hover:bg-white/10",
-      "hover:border-white/20"
+      "hover:border-[rgba(212,175,55,0.3)]"
     ),
     danger: cn(
       "bg-gradient-to-r from-red-500 to-rose-500",
@@ -96,19 +97,18 @@ export function MagicButton({
         isDisabled
           ? undefined
           : {
-              scale: 1.03,
+              scale: 1.05,
               boxShadow:
                 variant === "primary"
-                  ? "0 10px 30px -5px rgba(255, 180, 0, 0.4)"
-                  : "0 8px 20px -5px rgba(255, 255, 255, 0.1)",
+                  ? "0 12px 40px -5px rgba(212, 175, 55, 0.5)"
+                  : "0 8px 30px -5px rgba(212, 175, 55, 0.3)",
             }
       }
-      whileTap={isDisabled ? undefined : { scale: 0.97 }}
+      whileTap={isDisabled ? undefined : { scale: 0.95 }}
       transition={{
         type: "spring",
-        stiffness: 300,
-        damping: 15,
-        mass: 0.8,
+        stiffness: 400,
+        damping: 17,
       }}
       onClick={handleClick}
       onHoverStart={handleHoverStart}
@@ -118,7 +118,7 @@ export function MagicButton({
         "relative inline-flex items-center justify-center",
         "rounded-xl font-medium",
         "transition-colors duration-200",
-        "focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:ring-offset-2 focus:ring-offset-transparent",
+        "focus:outline-none focus:ring-2 focus:ring-[rgba(212,175,55,0.5)] focus:ring-offset-2 focus:ring-offset-transparent",
         // Size
         sizeStyles[size],
         // Variant
@@ -147,7 +147,7 @@ export function MagicButton({
           }}
           style={{
             background:
-              "linear-gradient(90deg, rgba(255,180,0,0), rgba(255,200,50,0.5), rgba(255,180,0,0))",
+              "linear-gradient(90deg, rgba(212,175,55,0), rgba(252,226,5,0.5), rgba(212,175,55,0))",
           }}
         />
       )}

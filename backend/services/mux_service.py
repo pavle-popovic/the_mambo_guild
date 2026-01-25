@@ -33,16 +33,17 @@ def _get_direct_uploads_api() -> DirectUploadsApi:
 
 
 def create_direct_upload(
-    filename: Optional[str] = None, 
-    test: bool = False, 
+    filename: Optional[str] = None,
+    test: bool = False,
     passthrough: Optional[str] = None,
     external_id: Optional[str] = None,
     title: Optional[str] = None,
-    creator_id: Optional[str] = None
+    creator_id: Optional[str] = None,
+    is_community: bool = False
 ) -> Dict:
     """
     Create a Mux direct upload URL for video upload.
-    
+
     Args:
         filename: Optional filename for the upload
         test: Whether this is a test upload (uses Mux test mode)
@@ -50,7 +51,8 @@ def create_direct_upload(
         external_id: Optional external ID for asset organization (e.g., "lesson-mambo-212-w1-d1-l1")
         title: Optional human-readable title (e.g., "Mambo 212 - Week 1 Day 1: Basic Steps")
         creator_id: Optional creator ID for folder-like organization (e.g., "lesson", "course-preview", "community-stage")
-    
+        is_community: If True, cap resolution at 720p for community posts. If False, enable MP4 downloads for lessons.
+
     Returns:
         Dictionary with upload_url and upload_id
     """
@@ -77,7 +79,14 @@ def create_direct_upload(
             "playback_policies": ["public"],  # Make videos publicly playable
             "test": test
         }
-        
+
+        # Cost efficiency: Community videos capped at 720p, lesson videos get MP4 downloads
+        if is_community:
+            asset_settings["max_resolution_tier"] = "720p"
+        else:
+            # Enable MP4 downloads for lesson videos (requires Mux Launch/Pro plan)
+            asset_settings["mp4_support"] = "capped-1080p"  # Generates 1080p and lower MP4 renditions
+
         if passthrough:
             asset_settings["passthrough"] = passthrough
         

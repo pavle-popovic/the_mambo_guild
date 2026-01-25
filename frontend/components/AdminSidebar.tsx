@@ -35,7 +35,7 @@ export default function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
   ];
 
   return (
-    <aside className="w-64 bg-mambo-panel border-r border-gray-800 flex flex-col">
+    <aside className="w-64 bg-mambo-panel border-r border-white/10 flex flex-col fixed left-0 top-0 h-screen z-10">
       <div className="p-6 flex items-center gap-3">
         <Image
           src="/assets/Logo.png"
@@ -56,11 +56,10 @@ export default function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition ${
-                isActive
-                  ? "bg-blue-600/10 text-blue-400 border border-blue-600/20"
-                  : "text-gray-400 hover:bg-gray-800 hover:text-mambo-text"
-              }`}
+              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition ${isActive
+                ? "bg-blue-600/10 text-blue-400 border border-blue-600/20"
+                : "text-gray-400 hover:bg-gray-800 hover:text-mambo-text"
+                }`}
             >
               <Icon className="w-5" />
               <span>{item.label}</span>
@@ -74,7 +73,7 @@ export default function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
         })}
       </nav>
 
-      <div className="p-4 border-t border-gray-800">
+      <div className="p-4 border-t border-white/10">
         <button
           onClick={logout}
           className="flex items-center gap-2 text-gray-500 hover:text-mambo-text text-sm w-full"

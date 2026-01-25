@@ -240,6 +240,7 @@ export default function CreateCourseModal({
                 <option value="BEGINNER">Beginner</option>
                 <option value="INTERMEDIATE">Intermediate</option>
                 <option value="ADVANCED">Advanced</option>
+                <option value="OPEN">Open (All Levels)</option>
               </select>
             </div>
           </div>

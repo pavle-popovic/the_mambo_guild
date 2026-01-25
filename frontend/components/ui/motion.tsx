@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { UISound } from "@/hooks/useUISound";
 
 // HoverCard: Card with hover scale and lift effect
-// VINTAGE PALLADIUM STYLE: Warm amber/gold glow, bouncy spring
+// PALLADIUM ERA: Polished brass glow, snappy spring
 interface HoverCardProps extends MotionProps {
   children: ReactNode;
   className?: string;
@@ -20,26 +20,29 @@ export function HoverCard({ children, className, ...props }: HoverCardProps) {
 
   return (
     <motion.div
-      whileHover={{ scale: 1.02, y: -5 }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 200,  // Softer spring for organic feel
-        damping: 15,     // More bounce
-        mass: 0.8 
+      whileHover={{
+        scale: 1.02,
+        y: -8,
+        boxShadow: "0 12px 40px -5px rgba(212, 175, 55, 0.3)",
+      }}
+      transition={{
+        type: "spring",
+        stiffness: 400,  // Snappy, rhythmic
+        damping: 17,
       }}
       className={cn("relative", className)}
       onHoverStart={handleHoverStart}
       {...props}
     >
       {children}
-      {/* Warm Amber/Gold glow on hover */}
+      {/* Polished Brass glow on hover */}
       <motion.div
-        className="absolute inset-0 rounded-lg opacity-0 pointer-events-none"
+        className="absolute inset-0 rounded-xl opacity-0 pointer-events-none"
         whileHover={{
           opacity: 1,
-          boxShadow: "0 20px 30px -5px rgba(255, 180, 0, 0.3), 0 10px 15px -5px rgba(255, 150, 0, 0.2)",
+          boxShadow: "0 20px 40px -5px rgba(212, 175, 55, 0.35), 0 10px 20px -5px rgba(212, 175, 55, 0.2)",
         }}
-        transition={{ type: "spring", stiffness: 300, damping: 20 }}
+        transition={{ type: "spring", stiffness: 400, damping: 17 }}
       />
     </motion.div>
   );
@@ -80,7 +83,7 @@ export function FadeIn({ children, className, delay = 0, ...props }: FadeInProps
 }
 
 // Clickable: Button with tap scale effect and tactile sound
-// VINTAGE PALLADIUM STYLE: Warm amber glow, bouncy spring, percussion sounds
+// PALLADIUM ERA: Polished brass glow, snappy spring, percussion sounds
 interface ClickableProps extends MotionProps {
   children: ReactNode;
   className?: string;
@@ -112,16 +115,15 @@ export function Clickable({
   return (
     <motion.div
       whileTap={{ scale: 0.95 }}
-      whileHover={{ 
+      whileHover={{
         scale: 1.05,
-        // Warm amber/gold glow
-        boxShadow: "0 8px 20px -4px rgba(255, 180, 0, 0.3), 0 4px 10px -4px rgba(255, 150, 0, 0.2)",
+        // Polished brass glow
+        boxShadow: "0 8px 30px -4px rgba(212, 175, 55, 0.35), 0 4px 15px -4px rgba(212, 175, 55, 0.2)",
       }}
-      transition={{ 
-        type: "spring", 
-        stiffness: 300,   // Bouncy, alive feel
-        damping: 15,      // More oscillation
-        mass: 0.8 
+      transition={{
+        type: "spring",
+        stiffness: 400,   // Snappy, rhythmic
+        damping: 17,
       }}
       className={cn("cursor-pointer", className)}
       onMouseDown={handleMouseDown}

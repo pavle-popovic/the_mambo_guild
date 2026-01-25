@@ -1,15 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
-import dynamic from "next/dynamic";
-import { HoverCard, Clickable, StaggerItem } from "@/components/ui/motion";
+import { HoverCard } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
-
-// Dynamically import Mux player to avoid SSR issues
-const MuxPlayer = dynamic(() => import("@mux/mux-player-react"), { ssr: false });
+import { Clock, CheckCircle, Sparkles } from "lucide-react";
 
 interface CourseCardProps {
   course: {
@@ -23,6 +19,11 @@ interface CourseCardProps {
     course_type?: string;
     progress_percentage: number;
     is_locked: boolean;
+    // Course metadata
+    total_duration_minutes?: number;
+    objectives?: string[];
+    module_count?: number;
+    lesson_count?: number;
   };
   index: number;
   user: any;
@@ -32,66 +33,40 @@ interface CourseCardProps {
 export default function CourseCard({ course, index, user, onCourseClick }: CourseCardProps) {
   const router = useRouter();
   const [isHovering, setIsHovering] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [hasError, setHasError] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
-  const playerRef = useRef<any>(null);
-  const errorHandledRef = useRef(false);
 
-  // Reset state when mouse leaves
+  // Static thumbnail URL
+  const thumbnailUrl = course.thumbnail_url || course.image_url || "/assets/Mambo_image_1.png";
+
+  // Animated GIF preview URL (3 seconds, 15fps) - only loads on hover, uses Mux Image API (cheap!)
+  const previewGifUrl = course.mux_preview_playback_id
+    ? `https://image.mux.com/${course.mux_preview_playback_id}/animated.gif?start=0&end=3&width=480&fps=15`
+    : null;
+
+  // Show GIF on hover if available, otherwise show static thumbnail
+  const displayUrl = isHovering && previewGifUrl ? previewGifUrl : thumbnailUrl;
+
+  // Format duration (e.g., "15 min" or "1h 30m")
+  const formatDuration = (minutes: number) => {
+    if (!minutes) return null;
+    if (minutes < 60) return `${minutes} min`;
+    const hours = Math.floor(minutes / 60);
+    const mins = minutes % 60;
+    return mins > 0 ? `${hours}h ${mins}m` : `${hours}h`;
+  };
+
   const handleMouseLeave = () => {
     setIsHovering(false);
-    setIsPlaying(false);
-    setHasError(false);
-    errorHandledRef.current = false;
-    
-    // Pause and reset video if player exists
-    if (playerRef.current) {
-      try {
-        const playerElement = playerRef.current;
-        if (playerElement && typeof playerElement.pause === 'function') {
-          playerElement.pause();
-          if (playerElement.currentTime !== undefined) {
-            playerElement.currentTime = 0;
-          }
-        }
-      } catch (e) {
-        // Ignore errors when resetting
-      }
-    }
   };
 
   const handleMouseEnter = () => {
-    // Only set hovering if we have a preview video
-    if (course.mux_preview_playback_id && !hasError) {
-      setIsHovering(true);
-      setIsPlaying(false);
-      setHasError(false);
-      errorHandledRef.current = false;
-    }
-  };
-
-  const handlePlaying = () => {
-    setIsPlaying(true);
-    setHasError(false);
-  };
-
-  const handleError = (e?: Event) => {
-    if (!errorHandledRef.current) {
-      errorHandledRef.current = true;
-      setHasError(true);
-      setIsPlaying(false);
-      if (e) {
-        e.preventDefault();
-        e.stopPropagation();
-      }
-    }
+    setIsHovering(true);
   };
 
   const handleCourseClickInternal = () => {
     onCourseClick(course);
-    
+
     if (!user) {
       setShowAuthModal(true);
       return;
@@ -101,179 +76,174 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
       setShowSubscribeModal(true);
       return;
     }
-    
+
     router.push(`/courses/${course.id}`);
   };
 
-  // Determine if we should show the video
-  const shouldShowVideo = isHovering && course.mux_preview_playback_id && !hasError;
-  
-  // Determine thumbnail opacity - only hide when video is actually playing
-  const thumbnailOpacity = shouldShowVideo && isPlaying ? "opacity-0" : "opacity-100";
+  const duration = formatDuration(course.total_duration_minutes || 0);
+  const hasObjectives = course.objectives && course.objectives.length > 0;
+  const moduleCount = course.module_count ?? 0;
+  const lessonCount = course.lesson_count ?? 0;
 
   return (
     <>
-      <StaggerItem>
-        <HoverCard>
-          <div
-            onClick={handleCourseClickInternal}
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
-            className={`bg-mambo-panel border border-transparent hover:border-blue-500/60 hover:shadow-2xl hover:shadow-blue-500/40 rounded-xl overflow-hidden transition-all duration-300 ${
-              course.is_locked || !user
-                ? "opacity-75 relative"
-                : "group cursor-pointer shadow-lg shadow-black/20 hover:scale-[1.02]"
-            } cursor-pointer`}
-          >
-            {/* Image/Preview section */}
-            <div className="aspect-square relative overflow-hidden bg-black">
-              {/* Video Player - Load behind thumbnail, only mount when hovering */}
-              {shouldShowVideo && (
-                <div className="absolute inset-0 z-0 course-preview-player">
-                  <MuxPlayer
-                    ref={playerRef}
-                    streamType="on-demand"
-                    playbackId={course.mux_preview_playback_id!}
-                    autoPlay
-                    muted
-                    loop
-                    playsInline
-                    className="w-full h-full object-cover"
-                    style={{
-                      pointerEvents: "none",
-                    } as any}
-                    onPlaying={handlePlaying}
-                    onError={handleError}
-                    onLoadedData={() => {
-                      // Video data loaded, ready to play
-                      setIsPlaying(false); // Will be set to true by onPlaying
-                    }}
-                  />
-                </div>
-              )}
+      {/* Gold shimmer animation style */}
+      <style jsx>{`
+        @keyframes gold-shimmer {
+          0% {
+            background-position: -200% center;
+          }
+          100% {
+            background-position: 200% center;
+          }
+        }
+        .gold-shimmer-text {
+          background: linear-gradient(
+            90deg,
+            #d4af37 0%,
+            #f4e5a3 25%,
+            #d4af37 50%,
+            #f4e5a3 75%,
+            #d4af37 100%
+          );
+          background-size: 200% auto;
+          -webkit-background-clip: text;
+          background-clip: text;
+          -webkit-text-fill-color: transparent;
+          animation: gold-shimmer 3s linear infinite;
+        }
+      `}</style>
 
-              {/* Thumbnail - Always visible, fades out when video is playing */}
-              {(course.thumbnail_url || course.image_url) ? (
-                <Image
-                  src={course.thumbnail_url || course.image_url || ""}
-                  alt={course.title}
-                  fill
-                  className={`object-cover aspect-square transition-opacity duration-300 rounded-t-xl relative z-10 ${
-                    thumbnailOpacity === "opacity-0" 
-                      ? "opacity-0" 
-                      : "opacity-100 group-hover:scale-105"
-                  }`}
-                />
-              ) : (
-                <Image
-                  src="/assets/Mambo_image_1.png"
-                  alt={course.title}
-                  fill
-                  className={`object-cover aspect-square transition-opacity duration-300 rounded-t-xl relative z-10 ${
-                    thumbnailOpacity === "opacity-0" 
-                      ? "opacity-0" 
-                      : "opacity-100 group-hover:scale-105"
-                  }`}
-                  style={{ objectPosition: 'center 15%' }}
-                />
-              )}
+      <HoverCard>
+        <div
+          onClick={handleCourseClickInternal}
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
+          className={`relative bg-zinc-900 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 group cursor-pointer ${course.is_locked || !user ? "opacity-90" : "hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
+            }`}
+        >
+          {/* Image/Preview section */}
+          <div className="relative aspect-[16/9]">
+            <Image
+              src={displayUrl}
+              alt={course.title}
+              fill
+              unoptimized={isHovering && !!previewGifUrl}
+              className="object-cover transition-opacity duration-300"
+            />
 
-              {/* Dark overlay for better text readability */}
-              <div className="absolute inset-0 bg-black/30 z-10" />
-              
-              {/* Course type badge at bottom-left */}
-              <div className={`absolute bottom-3 left-3 backdrop-blur px-2 py-1 rounded text-xs font-bold z-20 ${
-                course.course_type === "choreo" 
-                  ? "bg-pink-500/80 text-white" 
-                  : course.course_type === "topic" 
-                    ? "bg-amber-500/80 text-black" 
-                    : "bg-black/80 text-white"
-              }`}>
-                {course.course_type === "choreo" ? "💃 CHOREO" : course.course_type === "topic" ? "💡 TOPIC" : "📚 COURSE"} {index + 1}
-              </div>
-            </div>
+            {/* Gradient Overlay for Text Readability */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent opacity-80" />
 
-            {/* Content section */}
-            <div className="p-6 border-t border-white/10">
-              <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-3 flex-1">
-                  <h3
-                    className={`font-bold text-lg tracking-tight transition ${
-                      course.is_locked || !user
-                        ? "text-gray-500"
-                        : "group-hover:text-mambo-blue text-mambo-text"
-                    }`}
-                  >
-                    {course.title}
-                  </h3>
-                  {/* Complete Badge - Show when course is 100% complete */}
-                  {user && !course.is_locked && course.progress_percentage >= 100 && (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/50 text-green-400 text-xs font-bold tracking-wide shadow-lg shadow-green-500/20">
-                      <svg
-                        className="w-3.5 h-3.5 text-green-400"
-                        fill="currentColor"
-                        viewBox="0 0 20 20"
-                      >
-                        <path
-                          fillRule="evenodd"
-                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                          clipRule="evenodd"
-                        />
-                      </svg>
-                      COMPLETE
-                    </span>
-                  )}
-                </div>
-                {!course.is_locked && user && course.progress_percentage < 100 && (
-                  <svg
-                    className="w-6 h-6 text-mambo-blue shrink-0"
-                    fill="currentColor"
-                    viewBox="0 0 20 20"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+            {/* Stats Badge - Top Left */}
+            {(moduleCount > 0 || lessonCount > 0 || duration) && (
+              <div className="absolute top-1 left-1 flex items-center gap-2 z-20">
+                {moduleCount > 0 && (
+                  <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2.5 py-1 border border-white/10">
+                    <span className="text-sm font-bold text-mambo-gold">{moduleCount}</span>
+                    <span className="text-[10px] text-gray-400 ml-1 uppercase">Modules</span>
+                  </div>
+                )}
+                {lessonCount > 0 && (
+                  <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2.5 py-1 border border-white/10">
+                    <span className="text-sm font-bold text-cyan-400">{lessonCount}</span>
+                    <span className="text-[10px] text-gray-400 ml-1 uppercase">Lessons</span>
+                  </div>
+                )}
+                {duration && (
+                  <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2.5 py-1 border border-white/10 flex items-center gap-1.5">
+                    <Clock className="w-3 h-3 text-purple-400" />
+                    <span className="text-[11px] font-bold text-purple-100 uppercase tracking-wide">{duration}</span>
+                  </div>
                 )}
               </div>
-              <p className="text-sm text-gray-300 mb-6 line-clamp-2 leading-relaxed flex-1">
-                {course.description}
-              </p>
-            
-              {/* Progress Bar - Only show if course is started (has progress) */}
-              {course.progress_percentage > 0 && user && !course.is_locked && (
-                <div className="flex items-center gap-3 text-xs font-semibold text-gray-400 mb-4">
-                  <div className="flex-1 bg-gray-800 h-1.5 rounded-full overflow-hidden">
-                    <div 
-                      className="bg-gradient-to-r from-green-500 to-emerald-500 h-full transition-all duration-500" 
-                      style={{ width: `${course.progress_percentage}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-white font-bold">{Math.round(course.progress_percentage)}%</span>
+            )}
+
+            {/* Lock Badge - Top Right */}
+            {(course.is_locked || !user) && (
+              <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md p-1.5 rounded-full text-mambo-gold z-20">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                  <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                </svg>
+              </div>
+            )}
+
+            {/* Title and metadata overlay at bottom of image */}
+            <div className="absolute bottom-0 left-0 right-0 px-4 pt-4 pb-0 z-10">
+              {/* Title + Level + Type on same line */}
+              <div className="flex items-baseline gap-3 flex-wrap mb-0.5">
+                <h3 className="gold-shimmer-text font-bold text-xl tracking-wide drop-shadow-md">{course.title}</h3>
+                <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider font-semibold">
+                  <span className={`${course.difficulty === 'Beginner' ? 'text-green-400' : course.difficulty === 'Intermediate' ? 'text-yellow-400' : course.difficulty === 'Advanced' ? 'text-red-400' : 'text-purple-400'}`}>
+                    {course.difficulty || "All Levels"}
+                  </span>
+                  <span className="text-gray-500">•</span>
+                  <span className="text-cyan-300">{course.course_type === 'choreo' ? 'Choreo' : course.course_type === 'topic' ? 'Topic' : 'Course'}</span>
                 </div>
-              )}
-              
-              {/* Action Button - Only show if course is not started (no progress) and not locked */}
-              {course.is_locked || !user ? (
-                <div className="w-full py-2.5 bg-gray-800 text-gray-500 rounded-lg text-sm font-bold text-center cursor-not-allowed">
-                  Locked
-                </div>
-              ) : course.progress_percentage === 0 ? (
-                <Clickable>
-                  <Link
-                    href={`/courses/${course.id}`}
-                    className="w-full py-2.5 bg-gradient-to-r from-mambo-blue via-blue-500 to-purple-600 hover:from-blue-600 hover:via-blue-600 hover:to-purple-700 rounded-lg text-sm font-bold text-white transition-all duration-300 text-center cursor-pointer shadow-lg shadow-blue-500/25 hover:shadow-xl hover:shadow-blue-500/30"
-                  >
-                    Start Course
-                  </Link>
-                </Clickable>
-              ) : null}
+              </div>
+
             </div>
           </div>
-        </HoverCard>
-      </StaggerItem>
+
+          {/* Bottom Section - Progress/Action */}
+          <div className="p-3 bg-gradient-to-b from-zinc-900 to-black">
+            {course.progress_percentage === 0 ? (
+              // 0% - Start Course Button
+              <button
+                className="w-full py-2.5 bg-gradient-to-r from-mambo-gold/20 to-yellow-600/20 hover:from-mambo-gold/30 hover:to-yellow-600/30 text-mambo-gold font-bold text-sm uppercase tracking-wider rounded-lg border border-mambo-gold/40 transition-all duration-300"
+              >
+                <span className="flex items-center justify-center gap-2">
+                  <i className="fa-solid fa-play text-xs"></i> Start Course
+                </span>
+              </button>
+            ) : course.progress_percentage >= 100 ? (
+              // 100% - Completed Badge
+              <div className="w-full py-2.5 bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 font-bold text-sm uppercase tracking-wider rounded-lg border border-green-500/40 flex items-center justify-center gap-2">
+                <i className="fa-solid fa-check-circle"></i> Completed
+              </div>
+            ) : (
+              // 1-99% - Progress Bar
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-2.5 bg-gray-800/50 rounded-full overflow-hidden border border-white/5">
+                  <div
+                    className="bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 h-full transition-all duration-500 relative"
+                    style={{ width: `${Math.min(course.progress_percentage, 100)}%` }}
+                  >
+                    <div className="absolute inset-0 bg-white/20 animate-pulse" />
+                  </div>
+                </div>
+                <span className="text-sm font-bold text-purple-400 min-w-[3ch]">
+                  {Math.round(course.progress_percentage)}%
+                </span>
+              </div>
+            )}
+          </div>
+
+          {/* Objectives Section - Expands below on hover */}
+          {hasObjectives && (
+            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isHovering ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
+              <div className="p-4 pt-0 bg-black border-t border-gray-800">
+                <div className="flex items-center gap-2 mb-3">
+                  <Sparkles className="w-4 h-4 text-mambo-gold" />
+                  <span className="text-xs uppercase text-mambo-gold font-bold tracking-wider">What You'll Learn</span>
+                </div>
+                <ul className="space-y-2">
+                  {course.objectives?.slice(0, 3).map((objective, idx) => (
+                    <li key={idx} className="flex items-start gap-2.5">
+                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mt-0.5">
+                        <CheckCircle className="w-3 h-3 text-white" />
+                      </div>
+                      <span className="text-sm text-gray-200 leading-tight">{objective}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          )}
+        </div>
+      </HoverCard>
+
 
       {/* Auth Prompt Modal */}
       <AuthPromptModal
@@ -293,4 +263,3 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
     </>
   );
 }
-

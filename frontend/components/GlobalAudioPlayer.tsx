@@ -77,7 +77,7 @@ export default function GlobalAudioPlayer() {
       <audio ref={audioRef} src="/assets/Mambo_Inn.mp3" preload="auto" />
       <button
         onClick={toggleMute}
-        className="fixed top-24 right-6 z-50 w-12 h-12 bg-mambo-panel border border-gray-700 rounded-full flex items-center justify-center hover:bg-gray-800 transition shadow-lg"
+        className="fixed bottom-6 right-6 z-50 w-12 h-12 bg-black/80 backdrop-blur-md border border-white/20 rounded-full flex items-center justify-center hover:bg-mambo-gold/20 hover:border-mambo-gold transition-all duration-300 shadow-2xl group"
         aria-label={isMuted ? "Unmute background music" : "Mute background music"}
       >
         {isMuted ? (

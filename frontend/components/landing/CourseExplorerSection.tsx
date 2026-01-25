@@ -1,148 +1,130 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { FaPlay, FaChevronLeft, FaChevronRight, FaLock } from "react-icons/fa";
+import { Search, ChevronDown, Lock, Play, Star } from "lucide-react";
 import Image from "next/image";
 
 // Mock Data for Courses
-const TRENDING_COURSES = [
-    { id: 1, title: "Salsa On-1 Fundamentals", level: "Beginner", duration: "4 Weeks", image: "/assets/course_thumbnails/salsa_fund.jpg", locked: false },
-    { id: 2, title: "Musicality Masterclass", level: "All Levels", duration: "2 Hours", image: "/assets/course_thumbnails/musicality.jpg", locked: true },
-    { id: 3, title: "Partnerwork Patterns Vol. 1", level: "Intermediate", duration: "6 Weeks", image: "/assets/course_thumbnails/partnerwork1.jpg", locked: true },
-    { id: 4, title: "Body Isolation Drills", level: "All Levels", duration: "30 Mins", image: "/assets/course_thumbnails/isolation.jpg", locked: false },
-    { id: 5, title: "Spin Technique 101", level: "Beginner", duration: "1 Hour", image: "/assets/course_thumbnails/spins.jpg", locked: true },
+const ALL_COURSES = [
+    { id: 1, title: "Salsa Colure Mural", level: "Beginner", duration: "4 Weeks", image: "/assets/course_thumbnails/salsa_fund.jpg", locked: false, progress: 60 },
+    { id: 2, title: "Salsa Dancers", level: "Intermediate", duration: "2 Hours", image: "/assets/course_thumbnails/musicality.jpg", locked: false, progress: 85 },
+    { id: 3, title: "Salsa Dance Library", level: "Advanced", duration: "6 Weeks", image: "/assets/course_thumbnails/partnerwork1.jpg", locked: false, progress: 45 },
+    { id: 4, title: "Salsa Campirer", level: "Beginner", duration: "30 Mins", image: "/assets/course_thumbnails/isolation.jpg", locked: false, progress: 10 },
+    { id: 5, title: "Salsa Dancer", level: "Advanced", duration: "1 Hour", image: "/assets/course_thumbnails/spins.jpg", locked: true, progress: 0 },
+    { id: 6, title: "Salsa Enimation", level: "Intermediate", duration: "45 Mins", image: "/assets/course_thumbnails/rhythm.jpg", locked: false, progress: 70 },
+    { id: 7, title: "Salsa Rhythm", level: "Beginner", duration: "1 Hour", image: "/assets/course_thumbnails/basics.jpg", locked: false, progress: 30 },
+    { id: 8, title: "Partner Connection", level: "All Levels", duration: "2 Hours", image: "/assets/course_thumbnails/leadfollow.jpg", locked: true, progress: 0 },
+    { id: 9, title: "Salsa History", level: "Theory", duration: "20 Mins", image: "/assets/course_thumbnails/history.jpg", locked: false, progress: 100 },
+    { id: 10, title: "Social Survival", level: "Beginner", duration: "30 Mins", image: "/assets/course_thumbnails/social.jpg", locked: true, progress: 0 },
+    // Duplicates for grid density
+    { id: 11, title: "Salsa Styling", level: "Intermediate", duration: "1.5 Hours", image: "/assets/course_thumbnails/styling.jpg", locked: false, progress: 20 },
+    { id: 12, title: "Spin Drills", level: "Advanced", duration: "1 Hour", image: "/assets/course_thumbnails/spins2.jpg", locked: true, progress: 0 },
 ];
 
-const BEGINNER_COURSES = [
-    { id: 6, title: "Intro to Rhythm", level: "Beginner", duration: "45 Mins", image: "/assets/course_thumbnails/rhythm.jpg", locked: false },
-    { id: 7, title: "Basic Steps Breakdown", level: "Beginner", duration: "1 Hour", image: "/assets/course_thumbnails/basics.jpg", locked: false },
-    { id: 8, title: "Leading & Following 101", level: "Beginner", duration: "2 Hours", image: "/assets/course_thumbnails/leadfollow.jpg", locked: true },
-    { id: 9, title: "Salsa History", level: "Theory", duration: "20 Mins", image: "/assets/course_thumbnails/history.jpg", locked: false },
-    { id: 10, title: "First Social Dance Survival", level: "Beginner", duration: "30 Mins", image: "/assets/course_thumbnails/social.jpg", locked: true },
-];
+const FilterPill = ({ label }: { label: string }) => (
+    <button className="flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 hover:border-mambo-gold/50 hover:bg-white/10 hover:shadow-lg hover:shadow-mambo-gold/10 transition-all duration-300 text-sm text-gray-300 hover:text-mambo-gold">
+        {label}
+        <ChevronDown size={14} className="text-gray-500 group-hover:text-mambo-gold transition-colors" />
+    </button>
+);
 
 const CourseCard = ({ course }: { course: any }) => (
     <motion.div
-        className="relative flex-none w-[280px] aspect-[16/9] rounded-md overflow-hidden cursor-pointer group border border-white/10 bg-zinc-900"
-        whileHover={{ scale: 1.05, zIndex: 10 }}
-        transition={{ duration: 0.2 }}
+        className="relative aspect-[16/9] rounded-xl overflow-hidden cursor-pointer group border border-white/10 bg-zinc-900 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
     >
-        {/* Placeholder Image Gradient if no real image */}
-        <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-950 group-hover:from-zinc-700 transition-colors duration-300">
-            <div className="absolute inset-0 flex items-center justify-center text-zinc-700 opacity-20">
-                <FaPlay size={40} />
-            </div>
-        </div>
-
-        {/* Content Overlay */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
-
-        <div className="absolute bottom-0 left-0 p-3 w-full">
-            <h4 className="text-white font-bold text-sm truncate">{course.title}</h4>
-            <div className="flex items-center gap-2 text-[10px] text-gray-300 mt-1 uppercase tracking-wider">
-                <span>{course.level}</span>
-                <span>•</span>
-                <span>{course.duration}</span>
-            </div>
+        {/* Placeholder Image Gradient if no real image - simulating the warm photography */}
+        <div className="absolute inset-0 bg-gradient-to-br from-orange-900/40 via-zinc-900 to-black group-hover:scale-105 transition-transform duration-500">
+            {/* This would be the Image component with src={course.image} */}
+            {/* Using a subtle pattern/gradient to mimic the 'warm lighting' descriptions if image fails load or for placeholder */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-amber-900/20 via-transparent to-transparent opacity-60" />
         </div>
 
         {/* Lock Overlay */}
         {course.locked && (
-            <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-md p-1.5 rounded-full text-mambo-gold">
-                <FaLock size={10} />
+            <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md p-1.5 rounded-full text-mambo-gold z-20">
+                <Lock size={12} />
             </div>
         )}
+
+        {/* Hover: Start Journey Button */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
+            {course.locked ? (
+                <button className="px-5 py-2 bg-mambo-gold/20 border border-mambo-gold/60 text-mambo-gold rounded-full font-serif font-bold text-sm backdrop-blur-md flex items-center gap-2">
+                    <Lock size={14} /> Unlock
+                </button>
+            ) : (
+                <button className="px-5 py-2 bg-mambo-gold text-black rounded-full font-serif font-bold text-sm shadow-[0_0_20px_rgba(212,175,55,0.4)] flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all">
+                    <Play size={14} fill="currentColor" /> Start Journey
+                </button>
+            )}
+        </div>
+
+        {/* Active Constellation Effect on Hover (Optional, subtle) */}
+        <div className="absolute inset-0 opacity-0 group-hover:opacity-30 pointer-events-none transition-opacity duration-500">
+            <div className="absolute top-1/4 left-1/4 w-1 h-1 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+            <div className="absolute top-1/3 right-1/4 w-1 h-1 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+            <div className="absolute bottom-1/3 left-1/3 w-1 h-1 bg-cyan-400 rounded-full shadow-[0_0_10px_rgba(34,211,238,0.8)]" />
+            {/* SVG Lines connecting stars could be added here for 'constellation' effect */}
+        </div>
+
+        {/* Bottom Glass Content Area */}
+        <div className="absolute bottom-0 left-0 right-0 h-[35%] bg-white/5 backdrop-blur-md border-t border-white/10 flex flex-col justify-center px-4 z-10">
+            <h4 className="text-white font-medium text-sm tracking-wide mb-1 drop-shadow-md">{course.title}</h4>
+
+            {/* Progress Bar - Neon Cyan */}
+            <div className="w-full h-1 bg-white/10 rounded-full mt-2 overflow-hidden">
+                <div
+                    className="h-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.6)]"
+                    style={{ width: `${course.progress}%` }}
+                />
+            </div>
+        </div>
     </motion.div>
 );
 
-const CarouselRow = ({ title, courses }: { title: string, courses: any[] }) => {
-    const rowRef = useRef<HTMLDivElement>(null);
-    const [showLeft, setShowLeft] = useState(false);
-    const [showRight, setShowRight] = useState(true);
-
-    const checkScroll = () => {
-        if (rowRef.current) {
-            const { scrollLeft, scrollWidth, clientWidth } = rowRef.current;
-            setShowLeft(scrollLeft > 0);
-            setShowRight(scrollLeft < scrollWidth - clientWidth - 10);
-        }
-    };
-
-    useEffect(() => {
-        checkScroll();
-        window.addEventListener("resize", checkScroll);
-        return () => window.removeEventListener("resize", checkScroll);
-    }, []);
-
-    const scroll = (direction: "left" | "right") => {
-        if (rowRef.current) {
-            const scrollAmount = rowRef.current.clientWidth * 0.75;
-            rowRef.current.scrollBy({
-                left: direction === "left" ? -scrollAmount : scrollAmount,
-                behavior: "smooth"
-            });
-            setTimeout(checkScroll, 300);
-        }
-    };
-
+export default function CourseExplorerSection() {
     return (
-        <div className="mb-12 relative group/row">
-            <h3 className="text-xl text-white font-bold mb-4 px-6 md:px-12 flex items-center gap-2">
-                {title} <span className="text-mambo-gold text-sm font-normal uppercase tracking-widest opacity-0 group-hover/row:opacity-100 transition-opacity transform translate-x-[-10px] group-hover/row:translate-x-0 cursor-pointer">Explore All &rarr;</span>
-            </h3>
+        <section className="relative min-h-screen bg-transparent pb-32">
+            {/* Sticky Control Bar */}
+            <div className="sticky top-20 z-40 w-full py-4 px-6 md:px-12 backdrop-blur-xl bg-black/20 border-b border-white/5 transition-all duration-300">
+                <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+                    {/* Left: Title */}
+                    <div className="flex items-center gap-3">
+                        <h2 className="text-2xl font-serif font-bold text-mambo-gold tracking-wide">Explore Courses</h2>
+                    </div>
 
-            <div className="relative group">
-                {/* Left Arrow */}
-                {showLeft && (
-                    <button
-                        onClick={() => scroll("left")}
-                        className="absolute left-0 top-0 bottom-0 w-12 bg-black/50 hover:bg-black/80 z-20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    >
-                        <FaChevronLeft size={24} />
-                    </button>
-                )}
+                    {/* Center: Search Bar */}
+                    <div className="flex-1 max-w-lg w-full relative group">
+                        <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                            <Search size={16} className="text-gray-400 group-focus-within:text-mambo-gold transition-colors" />
+                        </div>
+                        <input
+                            type="text"
+                            placeholder="Search library..."
+                            className="w-full bg-white/5 hover:bg-white/10 focus:bg-white/10 border border-white/10 focus:border-mambo-gold/50 rounded-full py-2 pl-10 pr-4 text-sm text-white placeholder-gray-500 outline-none transition-all duration-300 backdrop-blur-md"
+                        />
+                    </div>
 
-                {/* Right Arrow */}
-                {showRight && (
-                    <button
-                        onClick={() => scroll("right")}
-                        className="absolute right-0 top-0 bottom-0 w-12 bg-black/50 hover:bg-black/80 z-20 flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                    >
-                        <FaChevronRight size={24} />
-                    </button>
-                )}
+                    {/* Right: Filters */}
+                    <div className="flex items-center gap-3">
+                        <FilterPill label="Level" />
+                        <FilterPill label="Style" />
+                    </div>
+                </div>
+            </div>
 
-                {/* Scroll Container */}
-                <div
-                    ref={rowRef}
-                    onScroll={checkScroll}
-                    className="flex gap-4 overflow-x-auto px-6 md:px-12 pb-8 scrollbar-hide scroll-smooth"
-                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                    {courses.map((course) => (
+            {/* Course Grid */}
+            <div className="max-w-[1800px] mx-auto px-6 md:px-12 mt-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {ALL_COURSES.map((course) => (
                         <CourseCard key={course.id} course={course} />
                     ))}
                 </div>
             </div>
-        </div>
-    );
-};
 
-export default function CourseExplorerSection() {
-    return (
-        <section className="bg-[#141414] py-20 border-t border-white/5 relative z-10">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent pointer-events-none" />
-
-            <div className="max-w-[1800px] mx-auto">
-                <div className="px-6 md:px-12 mb-8">
-                    <h2 className="text-3xl font-bold text-white tracking-tight">Everything you need to <span className="text-mambo-gold">level up</span>.</h2>
-                    <p className="text-gray-400 mt-2">Unlimited access to our entire library of workshops and drills.</p>
-                </div>
-
-                <CarouselRow title="Trending Now" courses={TRENDING_COURSES} />
-                <CarouselRow title="Start from Scratch" courses={BEGINNER_COURSES} />
-            </div>
+            {/* Background enhancement for this section */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-900/10 via-transparent to-transparent pointer-events-none z-0" />
         </section>
     );
 }

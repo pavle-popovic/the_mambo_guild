@@ -4,28 +4,29 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  HeroScrollAnimation,
+  NewHero,
   ValuePropsSection,
   HowItWorksSection,
   TestimonialsSection,
   LandingPricingSection,
   MaestroSection,
   CourseExplorerSection,
+  ConstellationSection,
 } from "@/components/landing";
 
 export default function HomePage() {
   const { user } = useAuth();
 
   return (
-    <div className="min-h-screen bg-mambo-dark">
+    <div className="min-h-screen bg-transparent">
       {/* Fixed Navigation */}
       <NavBar user={user || undefined} />
 
-      {/* Hero with Scroll Animation */}
-      <HeroScrollAnimation user={user} />
+      {/* New Hero Section */}
+      <NewHero />
 
-      {/* Maestro Section */}
-      <MaestroSection />
+      {/* Constellation Roadmap - Feature Highlight (Second Section) */}
+      <ConstellationSection />
 
       {/* Value Props - Rule of Three */}
       <ValuePropsSection />

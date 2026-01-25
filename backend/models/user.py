@@ -64,6 +64,7 @@ class UserProfile(Base):
     
     # Clave Economy (v4.0)
     current_claves = Column(Integer, default=0, nullable=False)
+    reputation = Column(Integer, default=0, nullable=False)  # "Maestro Score"
     last_daily_claim = Column(Date, nullable=True)  # Track daily login bonus
 
     # Relationships

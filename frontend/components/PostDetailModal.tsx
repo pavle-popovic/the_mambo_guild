@@ -88,6 +88,7 @@ export default function PostDetailModal({
   const [tags, setTags] = useState<Tag[]>([]);
   const [replyContent, setReplyContent] = useState("");
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
+  const [playerInitialized, setPlayerInitialized] = useState(false);
 
   // Optimistic state management
   const [optimisticReaction, setOptimisticReaction] = useState<{ type: string | null, count: number } | null>(null);
@@ -107,6 +108,7 @@ export default function PostDetailModal({
     if (isOpen && postId) {
       // Reset optimistic state when opening modal
       setOptimisticReaction(null);
+      setPlayerInitialized(false); // Reset tap-to-play state
       loadPost({ skipIfOptimistic: false });
       apiClient.getCommunityTags().then(setTags).catch(console.error);
 
@@ -512,17 +514,47 @@ export default function PostDetailModal({
               </GlassPanel>
             ) : post ? (
               <>
-                {/* Video Player (for Stage posts) */}
+                {/* Video Player (for Stage posts) - Tap-to-Play for cost efficiency */}
                 {post.post_type === "stage" && (
                   <div className="mb-6">
                     {post.mux_playback_id ? (
-                      <MuxVideoPlayer
-                        playbackId={post.mux_playback_id}
-                        metadata={{
-                          video_title: post.title,
-                          video_id: post.id,
-                        }}
-                      />
+                      !playerInitialized ? (
+                        // Thumbnail with play button (tap-to-play)
+                        <div
+                          className="relative aspect-video cursor-pointer group rounded-lg overflow-hidden"
+                          onClick={() => setPlayerInitialized(true)}
+                        >
+                          <img
+                            src={`https://image.mux.com/${post.mux_playback_id}/thumbnail.jpg?width=800&time=1`}
+                            alt={post.title}
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition">
+                            <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
+                              <svg
+                                className="w-8 h-8 text-black ml-1"
+                                fill="currentColor"
+                                viewBox="0 0 24 24"
+                              >
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                            </div>
+                          </div>
+                          <div className="absolute bottom-3 left-3 px-2 py-1 bg-black/60 rounded text-xs text-white/80">
+                            Tap to play
+                          </div>
+                        </div>
+                      ) : (
+                        // Full Mux player (only loads after user taps)
+                        <MuxVideoPlayer
+                          playbackId={post.mux_playback_id}
+                          autoPlay={true}
+                          metadata={{
+                            video_title: post.title,
+                            video_id: post.id,
+                          }}
+                        />
+                      )
                     ) : (
                       <div className="w-full aspect-video bg-black/30 rounded-lg flex items-center justify-center">
                         <div className="text-center text-white/40">

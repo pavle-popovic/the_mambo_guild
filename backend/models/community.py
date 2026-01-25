@@ -142,7 +142,7 @@ class PostReaction(Base):
 
 
 # ============================================
-# Badge System
+# Badge System & Stats
 # ============================================
 
 class BadgeCategory(str, enum.Enum):
@@ -151,17 +151,29 @@ class BadgeCategory(str, enum.Enum):
     PERFORMANCE = "performance"
 
 
+class BadgeTier(str, enum.Enum):
+    SILVER = "silver"
+    GOLD = "gold"
+    DIAMOND = "diamond"
+
+
 class BadgeDefinition(Base):
-    """Badge definitions and requirements."""
+    """Badge definitions with tiering."""
     __tablename__ = "badge_definitions"
 
-    id = Column(String(50), primary_key=True)  # e.g., 'metronome', 'el_maestro'
+    id = Column(String(50), primary_key=True)  # e.g., 'metronome_silver', 'el_maestro_gold'
     name = Column(String(100), nullable=False)
     description = Column(Text, nullable=False)
+    
+    # Visuals
+    tier = Column(String(20), nullable=False, default="silver")  # 'silver', 'gold', 'diamond'
     icon_url = Column(String(255), nullable=True)
+    
+    # Logic
     category = Column(String(20), nullable=False)  # 'course', 'community', 'performance'
-    requirement_type = Column(String(50), nullable=False)  # 'drills_7_days', 'solutions_10', etc.
-    requirement_value = Column(Integer, nullable=False)  # The threshold to earn
+    requirement_type = Column(String(50), nullable=False)  # 'drills_7_days', 'solutions_count', etc.
+    threshold = Column(Integer, nullable=False)  # The value needed to earn (10, 50, 100...)
+    
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships
@@ -175,7 +187,9 @@ class UserBadge(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     badge_id = Column(String(50), ForeignKey("badge_definitions.id"), nullable=False)
+    
     earned_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    display_order = Column(Integer, default=0)  # For custom profile sorting
 
     # Relationships
     user = relationship("User", backref="badges")
@@ -185,6 +199,22 @@ class UserBadge(Base):
     __table_args__ = (
         UniqueConstraint("user_id", "badge_id", name="unique_user_badge"),
     )
+
+
+class UserStats(Base):
+    """Aggregated stats for gamification triggers."""
+    __tablename__ = "user_stats"
+
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    
+    reactions_given_count = Column(Integer, default=0)
+    reactions_received_count = Column(Integer, default=0)
+    solutions_accepted_count = Column(Integer, default=0)
+    
+    last_updated = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    # Relationships
+    user = relationship("User", backref="stats")
 
 
 # ============================================

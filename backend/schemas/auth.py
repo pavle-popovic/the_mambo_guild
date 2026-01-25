@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, field_validator, model_validator
-from typing import Optional
+from typing import Optional, List
 from datetime import datetime
 
 
@@ -35,6 +35,32 @@ class TokenResponse(BaseModel):
     token_type: str = "bearer"
 
 
+class BadgeResponse(BaseModel):
+    id: str
+    name: str
+    description: str
+    tier: str
+    icon_url: Optional[str] = None
+    category: str
+    requirement_type: str
+    requirement_value: int
+    is_earned: bool
+    earned_at: Optional[datetime] = None
+    display_order: int = 0
+
+    class Config:
+        from_attributes = True
+
+
+class UserStatsResponse(BaseModel):
+    reactions_given: int
+    reactions_received: int
+    solutions_accepted: int
+    
+    class Config:
+        from_attributes = True
+
+
 class UserProfileResponse(BaseModel):
     id: str
     first_name: str
@@ -46,6 +72,12 @@ class UserProfileResponse(BaseModel):
     role: str
     avatar_url: Optional[str] = None
     current_level_tag: Optional[str] = None
+    
+    # Gamification v4
+    reputation: int = 0
+    current_claves: int = 0
+    badges: List[BadgeResponse] = []
+    stats: Optional[UserStatsResponse] = None
 
     class Config:
         from_attributes = True
@@ -73,3 +105,6 @@ class ResetPasswordRequest(BaseModel):
             raise ValueError("Password must be at least 8 characters long")
         return v
 
+
+class BadgeReorderRequest(BaseModel):
+    badge_ids: List[str]

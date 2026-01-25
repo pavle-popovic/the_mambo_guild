@@ -1,10 +1,42 @@
 import { useState, useCallback, useRef } from "react";
 
-interface Message {
+// Types for function call results
+interface RecommendationResult {
+  type: "recommendation";
+  tier_info: {
+    name: string;
+    tier: string;
+    price: string;
+    period: string;
+    description: string;
+    features: string[];
+    cta: string;
+    ctaLink: string;
+    highlighted?: boolean;
+  };
+  reasoning: string;
+}
+
+interface KnowledgeBaseResult {
+  type: "knowledge_base";
+  query: string;
+  result: string;
+}
+
+type FunctionCallResult = RecommendationResult | KnowledgeBaseResult;
+
+interface FunctionCall {
+  name: string;
+  args: Record<string, string>;
+  result: FunctionCallResult;
+}
+
+export interface Message {
   id: string;
   role: "user" | "model";
   content: string;
   timestamp: Date;
+  functionCall?: FunctionCall;
 }
 
 interface UseGeminiReturn {
@@ -19,12 +51,14 @@ interface UseGeminiReturn {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
+const DIEGO_WELCOME_MESSAGE = `Bienvenido to The Mambo Inn! I'm Diego, your concierge. Whether you're taking your first steps or ready to shine on stage, I'm here to guide you. What brings you to salsa today?`;
+
 export function useGemini(): UseGeminiReturn {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "model",
-      content: "Splendid! Welcome to The Mambo Inn. I am MamboBot, your dedicated concierge. How may I assist your dance journey today, my friend?",
+      content: DIEGO_WELCOME_MESSAGE,
       timestamp: new Date(),
     },
   ]);
@@ -72,6 +106,7 @@ export function useGemini(): UseGeminiReturn {
     ]);
 
     try {
+      // Build API messages from history (excluding welcome message and function calls)
       const apiMessages = messages
         .filter((m) => m.id !== "welcome" && m.content.trim())
         .map((m) => ({
@@ -113,44 +148,122 @@ export function useGemini(): UseGeminiReturn {
 
       const decoder = new TextDecoder();
       let accumulatedText = "";
+      let functionCall: FunctionCall | undefined;
+      let buffer = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        const lines = chunk.split(/\r?\n/);
+        buffer += decoder.decode(value, { stream: true });
 
-        for (const line of lines) {
-          if (line.startsWith("data: ")) {
-            const data = line.slice(6).trim();
-            if (data === "[DONE]") break;
-            try {
-              const parsed = JSON.parse(data);
-              if (parsed.error) throw new Error(parsed.error);
-              if (parsed.content) {
-                accumulatedText += parsed.content;
-                setMessages((prev) =>
-                  prev.map((m) =>
-                    m.id === botMessageId ? { ...m, content: accumulatedText } : m
-                  )
-                );
-              }
-              if (parsed.done) break;
-            } catch (parseError) {
-              if (parseError instanceof Error && !parseError.message.includes("JSON")) {
-                throw parseError;
+        // Process complete SSE messages
+        const parts = buffer.split(/\n\n/);
+        buffer = parts.pop() || "";
+
+        for (const part of parts) {
+          const lines = part.split(/\r?\n/);
+          for (const line of lines) {
+            if (line.startsWith("data: ")) {
+              const data = line.slice(6).trim();
+              if (data === "[DONE]") continue;
+
+              try {
+                const parsed = JSON.parse(data);
+
+                // Handle different message types
+                switch (parsed.type) {
+                  case "text":
+                    if (parsed.content) {
+                      accumulatedText += parsed.content;
+                      setMessages((prev) =>
+                        prev.map((m) =>
+                          m.id === botMessageId
+                            ? { ...m, content: accumulatedText }
+                            : m
+                        )
+                      );
+                    }
+                    break;
+
+                  case "function_call":
+                    functionCall = {
+                      name: parsed.name,
+                      args: parsed.args,
+                      result: parsed.result,
+                    };
+                    // Update message with function call
+                    setMessages((prev) =>
+                      prev.map((m) =>
+                        m.id === botMessageId
+                          ? { ...m, functionCall }
+                          : m
+                      )
+                    );
+                    break;
+
+                  case "error":
+                    throw new Error(parsed.error || "An error occurred");
+
+                  case "done":
+                    // Stream complete
+                    break;
+                }
+              } catch (parseError) {
+                if (parseError instanceof Error && !parseError.message.includes("JSON")) {
+                  throw parseError;
+                }
               }
             }
           }
         }
       }
 
-      if (!accumulatedText.trim()) {
+      // Process any remaining buffer
+      if (buffer.trim()) {
+        const lines = buffer.split(/\r?\n/);
+        for (const line of lines) {
+          if (line.startsWith("data: ")) {
+            const data = line.slice(6).trim();
+            if (data === "[DONE]") continue;
+            try {
+              const parsed = JSON.parse(data);
+              if (parsed.type === "text" && parsed.content) {
+                accumulatedText += parsed.content;
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === botMessageId
+                      ? { ...m, content: accumulatedText }
+                      : m
+                  )
+                );
+              } else if (parsed.type === "function_call") {
+                functionCall = {
+                  name: parsed.name,
+                  args: parsed.args,
+                  result: parsed.result,
+                };
+                setMessages((prev) =>
+                  prev.map((m) =>
+                    m.id === botMessageId
+                      ? { ...m, functionCall }
+                      : m
+                  )
+                );
+              }
+            } catch {
+              // Ignore incomplete JSON
+            }
+          }
+        }
+      }
+
+      // If no text content and no function call, show a fallback
+      if (!accumulatedText.trim() && !functionCall) {
         setMessages((prev) =>
           prev.map((m) =>
             m.id === botMessageId
-              ? { ...m, content: "My apologies, I seem to have missed a step! Could you try that again?" }
+              ? { ...m, content: "Perdón, I missed a step there. Could you try again, mi amigo?" }
               : m
           )
         );
@@ -159,7 +272,9 @@ export function useGemini(): UseGeminiReturn {
       if (err instanceof Error && err.name === "AbortError") {
         setMessages((prev) =>
           prev.map((m) =>
-            m.id === botMessageId ? { ...m, content: m.content || "[Response cancelled]" } : m
+            m.id === botMessageId
+              ? { ...m, content: m.content || "[Response cancelled]" }
+              : m
           )
         );
         return;
@@ -171,7 +286,7 @@ export function useGemini(): UseGeminiReturn {
       setMessages((prev) =>
         prev.map((m) =>
           m.id === botMessageId
-            ? { ...m, content: "My apologies, I seem to have missed a step! Could you try that again?" }
+            ? { ...m, content: "Ay, something went wrong on my end. Please try again in a moment." }
             : m
         )
       );
@@ -187,7 +302,7 @@ export function useGemini(): UseGeminiReturn {
       {
         id: "welcome",
         role: "model",
-        content: "Splendid! Welcome to The Mambo Inn. I am MamboBot, your dedicated concierge. How may I assist your dance journey today, my friend?",
+        content: DIEGO_WELCOME_MESSAGE,
         timestamp: new Date(),
       },
     ]);

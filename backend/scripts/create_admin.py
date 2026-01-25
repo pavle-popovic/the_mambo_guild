@@ -43,32 +43,36 @@ def create_admin_user():
             
             # Insert user
             conn.execute(text("""
-                INSERT INTO users (id, email, hashed_password, role, created_at, updated_at)
-                VALUES (:id, :email, :hashed_password, :role, :created_at, :updated_at)
+                INSERT INTO users (id, email, hashed_password, role, created_at, updated_at, auth_provider, is_verified)
+                VALUES (:id, :email, :hashed_password, :role, :created_at, :updated_at, :auth_provider, :is_verified)
             """), {
                 "id": str(admin_id),
                 "email": "admin@themamboinn.com",
                 "hashed_password": hashed_password,
-                "role": "ADMIN",  # Database enum uses uppercase
+                "role": "ADMIN",  # Database enum uses UPPERCASE
                 "created_at": now,
-                "updated_at": now
+                "updated_at": now,
+                "auth_provider": "email",
+                "is_verified": True
             })
             
             # Create admin profile
             profile_id = uuid.uuid4()
             conn.execute(text("""
-                INSERT INTO user_profiles (id, user_id, first_name, last_name, current_level_tag, xp, level, streak_count, badges)
-                VALUES (:id, :user_id, :first_name, :last_name, :current_level_tag, :xp, :level, :streak_count, :badges)
+                INSERT INTO user_profiles (id, user_id, first_name, last_name, current_level_tag, xp, level, streak_count, badges, current_claves, reputation)
+                VALUES (:id, :user_id, :first_name, :last_name, :current_level_tag, :xp, :level, :streak_count, :badges, :current_claves, :reputation)
             """), {
                 "id": str(profile_id),
                 "user_id": str(admin_id),
                 "first_name": "Admin",
                 "last_name": "User",
-                "current_level_tag": "ADVANCED",  # Database enum uses uppercase
+                "current_level_tag": "ADVANCED",  # Database enum uses UPPERCASE
                 "xp": 0,
                 "level": 1,
                 "streak_count": 0,
-                "badges": "[]"
+                "badges": "[]",
+                "current_claves": 0,
+                "reputation": 0
             })
             
             # Create subscription (PRO tier for admin)
@@ -79,8 +83,8 @@ def create_admin_user():
             """), {
                 "id": str(subscription_id),
                 "user_id": str(admin_id),
-                "tier": "PERFORMER",
-                "status": "ACTIVE"
+                "tier": "performer",  # Database enum uses lowercase
+                "status": "active"    # Database enum uses lowercase
             })
             
             print("✅ Admin user created successfully!")

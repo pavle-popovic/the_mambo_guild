@@ -61,6 +61,7 @@ class CreateUploadRequest(BaseModel):
     filename: Optional[str] = None
     lesson_id: Optional[str] = None  # Pass lesson_id to associate upload with lesson
     course_id: Optional[str] = None  # Pass course_id for course preview uploads
+    level_id: Optional[str] = None  # Pass level_id for skill tree node preview uploads
     post_id: Optional[str] = None  # Pass post_id for community post uploads
 
 
@@ -93,17 +94,19 @@ async def create_mux_upload_url(
     # Priority: query params (for MuxUploader) > request body (for our API client)
     lesson_id_val = lesson_id or (request_data.lesson_id if request_data else None)
     course_id_val = request_data.course_id if request_data else None
+    level_id_val = request_data.level_id if request_data else None
     post_id_val = post_id or (request_data.post_id if request_data else None)
     filename_val = filename or (request_data.filename if request_data else None)
-    
+
     print(f"[MUX] ===== Upload URL Request Received =====")
     print(f"[MUX] Lesson ID: {lesson_id_val}")
     print(f"[MUX] Course ID: {course_id_val}")
+    print(f"[MUX] Level ID: {level_id_val}")
     print(f"[MUX] Post ID: {post_id_val}")
     print(f"[MUX] Filename: {filename_val}")
-    
-    # Auth check: Admin for lessons/courses, authenticated user for community posts
-    if lesson_id_val or course_id_val:
+
+    # Auth check: Admin for lessons/courses/levels, authenticated user for community posts
+    if lesson_id_val or course_id_val or level_id_val:
         # Lesson/course uploads require admin
         if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
             # Try query param token as fallback
@@ -217,6 +220,37 @@ async def create_mux_upload_url(
                     "type": "course-preview",
                     "course_slug": course_slug
                 }
+        elif level_id_val:
+            # Level preview video - fetch level data for metadata
+            level = db.query(Level).filter(Level.id == level_id_val).first()
+            if level:
+                # Get world info for better organization
+                world = db.query(World).filter(World.id == level.world_id).first()
+
+                # Generate external_id: "level-preview-{course_slug}-{level_title}"
+                level_slug = level.title.lower().replace(" ", "-")[:30]
+                if world:
+                    course_slug = world.slug or world.title.lower().replace(" ", "-")
+                    external_id = f"level-preview-{course_slug}-{level_slug}"
+                else:
+                    external_id = f"level-preview-{level_id_val[:8]}"
+
+                # Generate title: "{course_title} - {level_title} Preview"
+                if world:
+                    title = f"{world.title} - {level.title} Preview"
+                else:
+                    title = f"{level.title} Preview"
+
+                creator_id = "level-preview"
+
+                # Enhanced passthrough
+                passthrough_data = {
+                    "level_id": level_id_val,
+                    "type": "level-preview"
+                }
+                if world:
+                    passthrough_data["course_slug"] = world.slug or world.title.lower().replace(" ", "-")
+                    passthrough_data["course_id"] = str(world.id)
         elif post_id_val:
             # Community post - fetch post data for metadata
             from models.community import Post
@@ -263,13 +297,16 @@ async def create_mux_upload_url(
         print(f"[MUX] Creator ID: {creator_id}")
     
     print("[MUX] Calling Mux API to create direct upload...")
+    # Community posts get resolution cap (720p), lesson/course videos get MP4 support
+    is_community_upload = post_id_val is not None
     result = create_direct_upload(
-        filename=filename_val, 
-        test=False, 
+        filename=filename_val,
+        test=False,
         passthrough=passthrough,
         external_id=external_id,
         title=title,
-        creator_id=creator_id
+        creator_id=creator_id,
+        is_community=is_community_upload
     )
     
     if result.get("status") == "error":
@@ -299,6 +336,83 @@ async def create_mux_upload_url(
         upload_id=upload_id,
         upload_url=upload_url,
         status=result["status"]
+    )
+
+
+class UploadStatusResponse(BaseModel):
+    status: str  # "waiting", "asset_created", "ready", "errored"
+    asset_id: Optional[str] = None
+    playback_id: Optional[str] = None
+
+
+@router.get("/upload-status/{upload_id}")
+async def get_upload_status(
+    upload_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Check the status of a direct upload by its upload_id.
+    Returns asset_id and playback_id when the upload is complete.
+    """
+    try:
+        from mux_python import DirectUploadsApi, AssetsApi
+        from services.mux_service import _get_mux_configuration
+        from mux_python import ApiClient
+
+        configuration = _get_mux_configuration()
+        api_client = ApiClient(configuration)
+        uploads_api = DirectUploadsApi(api_client)
+
+        # Get the upload status from Mux
+        upload = uploads_api.get_direct_upload(upload_id)
+        upload_data = upload.data
+
+        status = upload_data.status  # "waiting", "asset_created", "ready", "errored"
+        asset_id = upload_data.asset_id if hasattr(upload_data, 'asset_id') else None
+
+        # If asset exists, get the playback_id
+        playback_id = None
+        if asset_id:
+            assets_api = AssetsApi(api_client)
+            asset = assets_api.get_asset(asset_id)
+            if asset.data.playback_ids and len(asset.data.playback_ids) > 0:
+                playback_id = asset.data.playback_ids[0].id
+
+        return UploadStatusResponse(
+            status=status,
+            asset_id=asset_id,
+            playback_id=playback_id
+        )
+    except Exception as e:
+        print(f"[MUX] Error checking upload status: {e}")
+        raise HTTPException(status_code=500, detail=f"Error checking upload status: {str(e)}")
+
+
+class DownloadUrlResponse(BaseModel):
+    download_url: str
+    resolution: str
+
+
+@router.get("/download-url/{playback_id}")
+async def get_download_url(
+    playback_id: str,
+    resolution: str = Query("high", description="Resolution: 'high' for 1080p, 'medium' for 720p"),
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Get a direct MP4 download URL for offline practice.
+    Requires mp4_support to be enabled on the asset (set during upload for lesson videos).
+    """
+    # Validate resolution parameter
+    if resolution not in ["high", "medium"]:
+        raise HTTPException(status_code=400, detail="Resolution must be 'high' or 'medium'")
+
+    # Mux public playback URLs are static and predictable
+    download_url = f"https://stream.mux.com/{playback_id}/{resolution}.mp4"
+
+    return DownloadUrlResponse(
+        download_url=download_url,
+        resolution=resolution
     )
 
 
@@ -471,14 +585,15 @@ async def delete_mux_asset(
 async def check_upload_status(
     lesson_id: Optional[str] = Query(None),
     course_id: Optional[str] = Query(None),
+    level_id: Optional[str] = Query(None),
     post_id: Optional[str] = Query(None),
     current_user_opt: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
     """
-    Manually check if a lesson's, course preview's, or community post's video upload has completed and update it.
+    Manually check if a lesson's, course preview's, level preview's, or community post's video upload has completed and update it.
     This is useful if the webhook didn't fire.
-    - Admin only for lessons/courses
+    - Admin only for lessons/courses/levels
     - Authenticated users for their own posts
     """
     try:
@@ -486,10 +601,10 @@ async def check_upload_status(
         from services.mux_service import _get_mux_configuration
         from mux_python import ApiClient
         from models.course import World
-        
+
         # Auth check
-        if lesson_id or course_id:
-            # Lesson/course checks require admin
+        if lesson_id or course_id or level_id:
+            # Lesson/course/level checks require admin
             if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
                 raise HTTPException(status_code=403, detail="Admin access required")
         elif post_id:
@@ -564,7 +679,69 @@ async def check_upload_status(
                     "status": "error",
                     "message": f"Error checking status: {str(e)}"
                 }
-        
+
+        # Handle level preview check (skill tree node)
+        if level_id:
+            level = db.query(Level).filter(Level.id == level_id).first()
+            if not level:
+                raise HTTPException(status_code=404, detail="Level not found")
+
+            # If level already has preview playback_id, it's already ready
+            if level.mux_preview_playback_id:
+                return {
+                    "status": "ready",
+                    "playback_id": level.mux_preview_playback_id,
+                    "asset_id": level.mux_preview_asset_id,
+                    "message": "Preview video is already ready"
+                }
+
+            # Try to find the asset by querying Mux API using passthrough
+            configuration = _get_mux_configuration()
+            api_client = ApiClient(configuration)
+            assets_api = AssetsApi(api_client)
+
+            try:
+                assets_response = assets_api.list_assets(limit=50)  # Get recent assets
+
+                found_asset = None
+                for asset in assets_response.data:
+                    asset_passthrough = asset.passthrough
+                    if asset_passthrough:
+                        try:
+                            passthrough_data = json.loads(asset_passthrough) if isinstance(asset_passthrough, str) else asset_passthrough
+                            if passthrough_data.get("level_id") == level_id:
+                                found_asset = asset
+                                break
+                        except:
+                            continue
+
+                if found_asset and found_asset.playback_ids and len(found_asset.playback_ids) > 0:
+                    # Asset found and ready!
+                    playback_id = found_asset.playback_ids[0].id
+
+                    # Update level preview
+                    level.mux_preview_playback_id = playback_id
+                    level.mux_preview_asset_id = found_asset.id
+                    db.commit()
+
+                    return {
+                        "status": "ready",
+                        "playback_id": playback_id,
+                        "asset_id": found_asset.id,
+                        "message": "Preview video found and level updated"
+                    }
+                else:
+                    return {
+                        "status": "processing",
+                        "message": "Preview video is still processing or not found"
+                    }
+            except Exception as e:
+                print(f"[MUX] Error checking level preview upload status: {e}")
+                return {
+                    "status": "error",
+                    "message": f"Error checking status: {str(e)}"
+                }
+
         # Handle community post check
         if post_id:
             from models.community import Post
@@ -632,7 +809,7 @@ async def check_upload_status(
         
         # Handle lesson check (existing logic)
         if not lesson_id:
-            raise HTTPException(status_code=400, detail="Either lesson_id, course_id, or post_id must be provided")
+            raise HTTPException(status_code=400, detail="Either lesson_id, course_id, level_id, or post_id must be provided")
         
         lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
         if not lesson:
@@ -788,11 +965,13 @@ async def mux_webhook_handler(
                         passthrough_data = json.loads(passthrough) if isinstance(passthrough, str) else passthrough
                         lesson_id = passthrough_data.get("lesson_id")
                         course_id = passthrough_data.get("course_id")
+                        level_id = passthrough_data.get("level_id")
                         post_id = passthrough_data.get("post_id")
                         print(f"[MUX WEBHOOK] Lesson ID from passthrough: {lesson_id}")
                         print(f"[MUX WEBHOOK] Course ID from passthrough: {course_id}")
+                        print(f"[MUX WEBHOOK] Level ID from passthrough: {level_id}")
                         print(f"[MUX WEBHOOK] Post ID from passthrough: {post_id}")
-                        
+
                         if lesson_id:
                             # Update lesson
                             from models.course import Lesson
@@ -817,6 +996,18 @@ async def mux_webhook_handler(
                                 print(f"[MUX WEBHOOK] SUCCESS! Updated course preview with playback_id: {playback_id}, asset_id: {asset_id}")
                             else:
                                 print(f"[MUX WEBHOOK] WARNING: Course {course_id} not found in database")
+                        elif level_id:
+                            # Update level preview (skill tree node)
+                            from models.course import Level
+                            level = db.query(Level).filter(Level.id == level_id).first()
+                            if level:
+                                print(f"[MUX WEBHOOK] Found level: {level.title}")
+                                level.mux_preview_playback_id = playback_id
+                                level.mux_preview_asset_id = asset_id
+                                db.commit()
+                                print(f"[MUX WEBHOOK] SUCCESS! Updated level preview with playback_id: {playback_id}, asset_id: {asset_id}")
+                            else:
+                                print(f"[MUX WEBHOOK] WARNING: Level {level_id} not found in database")
                         elif post_id:
                             # Update community post
                             from models.community import Post
@@ -830,7 +1021,7 @@ async def mux_webhook_handler(
                             else:
                                 print(f"[MUX WEBHOOK] WARNING: Post {post_id} not found in database")
                         else:
-                            print(f"[MUX WEBHOOK] WARNING: No lesson_id, course_id, or post_id in passthrough data")
+                            print(f"[MUX WEBHOOK] WARNING: No lesson_id, course_id, level_id, or post_id in passthrough data")
                     except Exception as e:
                         print(f"[MUX WEBHOOK] ERROR updating from webhook: {e}")
                         import traceback

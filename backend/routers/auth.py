@@ -219,6 +219,22 @@ async def get_current_user_profile(
     subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
     tier = subscription.tier if subscription else "rookie"
 
+    today = datetime.now()
+    # Award daily login entries/claves logic if needed here, but it's handled in login
+
+    # Get stats
+    from models.community import UserStats
+    stats = db.query(UserStats).filter(UserStats.user_id == current_user.id).first()
+    stats_dict = {
+        "reactions_given": stats.reactions_given_count if stats else 0,
+        "reactions_received": stats.reactions_received_count if stats else 0,
+        "solutions_accepted": stats.solutions_accepted_count if stats else 0
+    }
+
+    # Get badges
+    from services import badge_service
+    badges_data = badge_service.get_all_badges_for_user(str(current_user.id), db)
+
     return UserProfileResponse(
         id=str(current_user.id),
         first_name=profile.first_name,
@@ -228,7 +244,12 @@ async def get_current_user_profile(
         streak_count=profile.streak_count,
         tier=tier,
         role=current_user.role.value,
-        avatar_url=profile.avatar_url
+        avatar_url=profile.avatar_url,
+        current_level_tag=profile.current_level_tag.value if hasattr(profile, 'current_level_tag') else "Beginner",
+        reputation=profile.reputation if hasattr(profile, 'reputation') else 0,
+        current_claves=profile.current_claves if hasattr(profile, 'current_claves') else 0,
+        badges=badges_data,
+        stats=stats_dict
     )
 
 

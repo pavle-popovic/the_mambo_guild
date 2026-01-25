@@ -30,7 +30,7 @@ const StatOverview: React.FC<StatOverviewProps> = ({ stats }) => {
                 }
 
                 return (
-                    <div key={index} className="bg-mambo-panel border border-gray-800 p-6 rounded-xl">
+                    <div key={index} className="bg-mambo-panel border border-white/10 p-6 rounded-xl">
                         <div className="text-gray-500 text-xs font-bold uppercase mb-2">{stat.label}</div>
                         <div className="text-3xl font-bold">{stat.value}</div>
                         {stat.change && (

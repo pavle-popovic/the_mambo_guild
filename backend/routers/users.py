@@ -7,7 +7,7 @@ from pydantic import BaseModel
 from dependencies import get_current_user
 from models import get_db
 from models.user import User, UserProfile
-from schemas.auth import UserProfileResponse
+from schemas.auth import UserProfileResponse, BadgeReorderRequest
 from schemas.gamification import LeaderboardEntry
 
 router = APIRouter(prefix="/users", tags=["users"])
@@ -31,6 +31,18 @@ def read_users_me(
     # Assuming Subscription model has a 'tier' attribute
     subscription_tier = current_user.subscription.tier.value if current_user.subscription else "rookie"
 
+    # Fetch Badges & Stats
+    from services import badge_service
+    from models.community import UserStats
+    
+    badges_data = badge_service.get_all_badges_for_user(str(current_user.id), db)
+    stats = db.query(UserStats).filter(UserStats.user_id == current_user.id).first()
+    stats_dict = {
+        "reactions_given": stats.reactions_given_count if stats else 0,
+        "reactions_received": stats.reactions_received_count if stats else 0,
+        "solutions_accepted": stats.solutions_accepted_count if stats else 0
+    }
+
     return UserProfileResponse(
         id=str(current_user.profile.id),
         first_name=current_user.profile.first_name,
@@ -41,7 +53,11 @@ def read_users_me(
         tier=subscription_tier,
         role=current_user.role,
         avatar_url=current_user.profile.avatar_url,
-        current_level_tag=current_user.profile.current_level_tag.value
+        current_level_tag=current_user.profile.current_level_tag.value,
+        reputation=current_user.profile.reputation,
+        current_claves=current_user.profile.current_claves,
+        badges=badges_data,
+        stats=stats_dict
     )
 
 
@@ -67,6 +83,18 @@ def update_user_profile(
     # Assuming Subscription model has a 'tier' attribute
     subscription_tier = current_user.subscription.tier.value if current_user.subscription else "rookie"
     
+    # Fetch Badges & Stats
+    from services import badge_service
+    from models.community import UserStats
+    
+    badges_data = badge_service.get_all_badges_for_user(str(current_user.id), db)
+    stats = db.query(UserStats).filter(UserStats.user_id == current_user.id).first()
+    stats_dict = {
+        "reactions_given": stats.reactions_given_count if stats else 0,
+        "reactions_received": stats.reactions_received_count if stats else 0,
+        "solutions_accepted": stats.solutions_accepted_count if stats else 0
+    }
+
     return UserProfileResponse(
         id=str(current_user.profile.id),
         first_name=current_user.profile.first_name,
@@ -77,7 +105,11 @@ def update_user_profile(
         tier=subscription_tier,
         role=current_user.role,
         avatar_url=current_user.profile.avatar_url,
-        current_level_tag=current_user.profile.current_level_tag.value
+        current_level_tag=current_user.profile.current_level_tag.value,
+        reputation=current_user.profile.reputation,
+        current_claves=current_user.profile.current_claves,
+        badges=badges_data,
+        stats=stats_dict
     )
 
 
@@ -105,3 +137,28 @@ def get_leaderboard(db: Annotated[Session, Depends(get_db)]):
             )
         )
     return results
+
+
+@router.put("/me/badges/reorder")
+def reorder_badges(
+    reorder_data: BadgeReorderRequest,
+    current_user: Annotated[User, Depends(get_current_user)],
+    db: Session = Depends(get_db),
+):
+    """
+    Update the display order of user's badges.
+    """
+    from models.community import UserBadge
+    
+    # Get all user badges
+    user_badges = db.query(UserBadge).filter(UserBadge.user_id == current_user.id).all()
+    badge_map = {ub.badge_id: ub for ub in user_badges}
+    
+    # Update orders based on input list
+    # Input list is expected to be the user's preferred order
+    for index, badge_id in enumerate(reorder_data.badge_ids):
+        if badge_id in badge_map:
+            badge_map[badge_id].display_order = index + 1
+            
+    db.commit()
+    return {"status": "success"}

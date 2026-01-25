@@ -68,12 +68,17 @@ export default function LessonEditorModal({
   const [lessonType, setLessonType] = useState<string>("video"); // "video", "quiz", or "history"
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
-  
+
+  // Track unsaved video for new lessons (to clean up on cancel)
+  const [pendingMuxAssetId, setPendingMuxAssetId] = useState<string | null>(null);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+
   // Track the lesson ID we initialized with to avoid resetting when same lesson updates
   const initializedLessonIdRef = useRef<string | null>(null);
   const previousIsOpenRef = useRef<boolean>(false);
   const hasInitializedThisSessionRef = useRef<boolean>(false);
-  
+
   // Auto-save debounce timer
   const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastSavedDataRef = useRef<string>(""); // Track last saved state as JSON string
@@ -91,39 +96,42 @@ export default function LessonEditorModal({
   // NEVER reset when the same lesson updates after save (to preserve user's unsaved edits)
   useEffect(() => {
     const wasOpen = previousIsOpenRef.current;
-    
+
     // Check if modal just opened (transition from closed to open)
     const modalJustOpened = isOpen && !wasOpen;
-    
+
     // Check if modal just closed
     const modalJustClosed = !isOpen && wasOpen;
-    
+
     // Update previous open state
     previousIsOpenRef.current = isOpen;
-    
+
     if (modalJustClosed) {
       // Modal just closed - reset all refs for next time
       initializedLessonIdRef.current = null;
       hasInitializedThisSessionRef.current = false;
+      setPendingMuxAssetId(null);
+      setHasUnsavedChanges(false);
+      setShowConfirmDialog(false);
       return;
     }
-    
+
     if (!isOpen) {
       // Modal is closed - do nothing
       return;
     }
-    
+
     // Modal is open
     const currentLessonId = lesson?.id || "new";
     const previousLessonId = initializedLessonIdRef.current;
-    
+
     // Only initialize if:
     // 1. Modal just opened (first time in this session) - always initialize
     // 2. Modal is open AND lesson ID actually changed (switching to different lesson)
     // NEVER initialize if modal is already open and lesson ID is the same (preserves user edits)
-    const shouldInitialize = (modalJustOpened && !hasInitializedThisSessionRef.current) || 
+    const shouldInitialize = (modalJustOpened && !hasInitializedThisSessionRef.current) ||
       (previousLessonId !== null && previousLessonId !== currentLessonId);
-    
+
     if (shouldInitialize) {
       if (lesson) {
         setTitle(lesson.title);
@@ -137,7 +145,7 @@ export default function LessonEditorModal({
         setMuxAssetId(lesson.mux_asset_id);
         setThumbnailUrl((lesson as any).thumbnail_url || null);
         setLessonType(lesson.lesson_type || "video"); // Initialize lesson type
-        
+
         // Parse content_json for lesson notes and quiz
         if (lesson.content_json) {
           if (lesson.content_json.notes) {
@@ -154,10 +162,10 @@ export default function LessonEditorModal({
           setLessonNotes("");
           setQuizQuestions([]);
         }
-        
+
         // Mark as initializing to prevent auto-save during initialization
         isInitializingRef.current = true;
-        
+
         // Initialize last saved data ref for auto-save comparison
         // Use a timeout to ensure all state is set first
         setTimeout(() => {
@@ -183,12 +191,15 @@ export default function LessonEditorModal({
         setMuxPlaybackId(null);
         setMuxAssetId(null);
         setLessonType("video"); // Default to video for new lessons
+        // Reset tracking for new lessons
+        setPendingMuxAssetId(null);
+        setHasUnsavedChanges(false);
       }
       initializedLessonIdRef.current = currentLessonId;
       hasInitializedThisSessionRef.current = true;
       setError("");
     }
-    
+
     // IMPORTANT: Never reset form when modal is already open and lesson prop updates
     // This preserves user's edits even when parent updates lesson after save
     // We only depend on isOpen, so lesson prop changes won't trigger this effect
@@ -212,9 +223,9 @@ export default function LessonEditorModal({
     if (!lesson?.id || isInitializingRef.current) {
       return;
     }
-    
+
     triggerAutoSave();
-    
+
     // Cleanup timer on unmount or when dependencies change
     return () => {
       if (autoSaveTimerRef.current) {
@@ -274,7 +285,7 @@ export default function LessonEditorModal({
   const buildLessonData = () => {
     // Build content_json based on lesson type
     const contentJson: any = {};
-    
+
     // Video lessons: can have notes
     // History lessons: only notes
     // Quiz lessons: only quiz
@@ -283,7 +294,7 @@ export default function LessonEditorModal({
         contentJson.notes = lessonNotes.trim();
       }
     }
-    
+
     if (lessonType === "quiz" || lessonType === "video") {
       if (quizQuestions.length > 0) {
         contentJson.quiz = quizQuestions;
@@ -302,7 +313,7 @@ export default function LessonEditorModal({
       finalVideoUrl = ""; // Let mux_playback_id handle video display
     }
 
-    return {
+    const lessonData: any = {
       title: title.trim(),
       description: description.trim() || undefined,
       video_url: finalVideoUrl,
@@ -312,9 +323,17 @@ export default function LessonEditorModal({
       content_json: Object.keys(contentJson).length > 0 ? contentJson : undefined,
       thumbnail_url: thumbnailUrl || null,
       lesson_type: lessonType,
-      // DO NOT send mux_playback_id or mux_asset_id - webhook manages these
       delete_video: false, // Only set to true when explicitly deleting
     };
+
+    // For NEW lessons with pre-uploaded video, include the Mux IDs
+    // (For existing lessons, webhook manages these)
+    if (!lesson?.id && muxPlaybackId && muxAssetId) {
+      lessonData.mux_playback_id = muxPlaybackId;
+      lessonData.mux_asset_id = muxAssetId;
+    }
+
+    return lessonData;
   };
 
   // Auto-save function (debounced) - optimized to prevent refresh loops
@@ -323,7 +342,7 @@ export default function LessonEditorModal({
     if (isInitializingRef.current) {
       return;
     }
-    
+
     // Only auto-save if editing an existing lesson
     if (!lesson?.id || !title.trim()) {
       return;
@@ -340,9 +359,9 @@ export default function LessonEditorModal({
       if (isInitializingRef.current || isSaving) {
         return;
       }
-      
+
       const currentData = JSON.stringify(buildLessonData());
-      
+
       // Only save if data has actually changed
       if (currentData === lastSavedDataRef.current) {
         return;
@@ -354,14 +373,14 @@ export default function LessonEditorModal({
       try {
         const lessonData = buildLessonData();
         await onSave(lessonData);
-        
+
         // Update last saved data
         lastSavedDataRef.current = currentData;
-        
+
         // DO NOT call onRefreshLesson here - it causes refresh loops
         // The lesson page will get updates on next manual refresh or navigation
         // Auto-save should be silent and non-disruptive
-        
+
       } catch (err: any) {
         setError(err.message || "Failed to auto-save lesson");
         console.error("Auto-save error:", err);
@@ -374,21 +393,21 @@ export default function LessonEditorModal({
   // Auto-save effect - triggers when any form field changes
   // Use useMemo to memoize quiz questions string to avoid recreating on every render
   const quizQuestionsString = useMemo(() => JSON.stringify(quizQuestions), [quizQuestions]);
-  
+
   useEffect(() => {
     // Only auto-save for existing lessons, not during initialization or while saving
     if (!lesson?.id || isInitializingRef.current || isSaving) {
       return;
     }
-    
+
     // Check if data actually changed before triggering save
     const currentData = JSON.stringify(buildLessonData());
     if (currentData === lastSavedDataRef.current) {
       return; // No changes, skip auto-save
     }
-    
+
     triggerAutoSave();
-    
+
     // Cleanup timer on unmount or when dependencies change
     return () => {
       if (autoSaveTimerRef.current) {
@@ -403,7 +422,7 @@ export default function LessonEditorModal({
     if (e) {
       e.preventDefault();
     }
-    
+
     if (!title.trim()) {
       setError("Lesson title is required");
       return;
@@ -421,12 +440,19 @@ export default function LessonEditorModal({
     try {
       const lessonData = buildLessonData();
       await onSave(lessonData);
-      
+
       // Update last saved data
       lastSavedDataRef.current = JSON.stringify(lessonData);
-      
-      // Don't close the modal - let the user continue editing
-      // onClose();
+
+      // Clear pending video tracking (it's now saved with the lesson)
+      setPendingMuxAssetId(null);
+      setHasUnsavedChanges(false);
+
+      // For new lessons, close the modal after successful creation
+      if (!lesson?.id) {
+        onClose();
+      }
+      // For existing lessons, don't close - let the user continue editing
     } catch (err: any) {
       setError(err.message || "Failed to save lesson");
     } finally {
@@ -434,11 +460,61 @@ export default function LessonEditorModal({
     }
   };
 
-  const handleClose = () => {
-    if (!isSaving) {
-      setError("");
-      onClose();
+  // Function to delete a pending Mux video that wasn't saved
+  const deletePendingVideo = async (assetId: string) => {
+    try {
+      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
+      await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/mux/asset/${assetId}`,
+        {
+          method: 'DELETE',
+          headers: token ? { Authorization: `Bearer ${token}` } : {},
+        }
+      );
+      console.log('Deleted pending Mux asset:', assetId);
+    } catch (err) {
+      console.error('Failed to delete pending Mux asset:', err);
     }
+  };
+
+  const handleClose = () => {
+    if (isSaving) return;
+
+    // For new lessons with unsaved changes (including uploaded video), show confirmation
+    if (!lesson?.id && (hasUnsavedChanges || pendingMuxAssetId)) {
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    setError("");
+    onClose();
+  };
+
+  // Handle confirmation dialog responses
+  const handleConfirmSave = async () => {
+    setShowConfirmDialog(false);
+    await handleSubmit();
+    // If save was successful, close the modal
+    if (!error) {
+      // Note: onClose is handled in handleSubmit for new lessons
+    }
+  };
+
+  const handleConfirmDiscard = async () => {
+    setShowConfirmDialog(false);
+
+    // Delete any pending video that was uploaded
+    if (pendingMuxAssetId) {
+      await deletePendingVideo(pendingMuxAssetId);
+      setPendingMuxAssetId(null);
+    }
+
+    setError("");
+    onClose();
+  };
+
+  const handleCancelConfirm = () => {
+    setShowConfirmDialog(false);
   };
 
   if (!isOpen) return null;
@@ -540,234 +616,266 @@ export default function LessonEditorModal({
 
                 {/* Video Content - Only for video lessons */}
                 {lessonType === "video" && (
-                <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
-                  <div className="flex justify-between items-center mb-4">
-                    <h3 className="font-bold text-lg text-mambo-text">
-                      <FaVideo className="inline text-mambo-blue mr-2" />
-                      Video Content
-                    </h3>
-                    <span className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded">Powered by MUX</span>
-                  </div>
-                  
-                  {lesson?.id && (
-                    <div className="mb-4">
-                      <MuxUploader
-                        key={lesson.id} // Force re-render when lesson changes
-                        lessonId={lesson.id}
-                        currentPlaybackId={muxPlaybackId || undefined}
-                        onUploadComplete={(playbackId, assetId) => {
-                          // Update the state with new video info, but don't reset other fields
-                          setMuxPlaybackId(playbackId);
-                          setMuxAssetId(assetId);
-                          // Note: The webhook will also update the lesson, but we keep our form state
-                        }}
-                        onRefreshLesson={async () => {
-                          // Refresh lesson data from parent
-                          if (onRefreshLesson) {
-                            await onRefreshLesson();
-                            // After refresh, update local state with latest lesson data
-                            // But only if it's the same lesson (preserve user edits)
-                            if (lesson?.id) {
-                              try {
-                                const { apiClient } = await import("@/lib/api");
-                                const updatedLesson = await apiClient.getLesson(lesson.id);
-                                // Always sync with latest data from DB
-                                setMuxPlaybackId(updatedLesson.mux_playback_id || null);
-                                setMuxAssetId(updatedLesson.mux_asset_id || null);
-                              } catch (error) {
-                                console.error("Error refreshing lesson data:", error);
-                              }
-                            }
-                          }
-                        }}
-                        onDeleteVideo={async () => {
-                          // Delete video by clearing Mux fields from DB
-                          // Note: Mux deletion happens in MuxUploader component before this is called
-                          if (!lesson?.id) return;
-                          
-                          try {
-                            const { apiClient } = await import("@/lib/api");
-                            // Update lesson to clear Mux fields using delete_video flag
-                            await apiClient.updateLesson(lesson.id, {
-                              delete_video: true, // Explicit flag to delete video
-                              video_url: "", // Also clear fallback video URL
-                            });
-                            
-                            // Clear local state
-                            setMuxPlaybackId(null);
-                            setMuxAssetId(null);
-                            setVideoUrl("");
-                            
-                            // Refresh lesson data
+                  <div className={`bg-mambo-panel border rounded-xl p-6 ${muxPlaybackId ? 'border-green-700/50' : 'border-gray-800'}`}>
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="font-bold text-lg text-mambo-text flex items-center gap-2">
+                        <FaVideo className={muxPlaybackId ? "text-green-500" : "text-mambo-blue"} />
+                        Video Content
+                        {muxPlaybackId && (
+                          <span className="flex items-center gap-1.5 text-xs bg-green-900/50 text-green-400 px-2 py-1 rounded-full font-medium">
+                            <FaCheck className="text-[10px]" />
+                            Uploaded
+                          </span>
+                        )}
+                      </h3>
+                      <span className="text-xs bg-gray-800 text-gray-400 px-2 py-1 rounded">Powered by MUX</span>
+                    </div>
+
+                    {/* Video uploader for existing lessons */}
+                    {lesson?.id && (
+                      <div className="mb-4">
+                        <MuxUploader
+                          key={lesson.id} // Force re-render when lesson changes
+                          lessonId={lesson.id}
+                          currentPlaybackId={muxPlaybackId || undefined}
+                          onUploadComplete={(playbackId, assetId) => {
+                            // Update the state with new video info, but don't reset other fields
+                            setMuxPlaybackId(playbackId);
+                            setMuxAssetId(assetId);
+                            // Note: The webhook will also update the lesson, but we keep our form state
+                          }}
+                          onRefreshLesson={async () => {
+                            // Refresh lesson data from parent
                             if (onRefreshLesson) {
                               await onRefreshLesson();
+                              // After refresh, update local state with latest lesson data
+                              // But only if it's the same lesson (preserve user edits)
+                              if (lesson?.id) {
+                                try {
+                                  const { apiClient } = await import("@/lib/api");
+                                  const updatedLesson = await apiClient.getLesson(lesson.id);
+                                  // Always sync with latest data from DB
+                                  setMuxPlaybackId(updatedLesson.mux_playback_id || null);
+                                  setMuxAssetId(updatedLesson.mux_asset_id || null);
+                                } catch (error) {
+                                  console.error("Error refreshing lesson data:", error);
+                                }
+                              }
                             }
-                          } catch (error: any) {
-                            console.error("Error deleting video from DB:", error);
-                            throw error;
-                          }
-                        }}
-                      />
-                    </div>
-                  )}
+                          }}
+                          onDeleteVideo={async () => {
+                            // Delete video by clearing Mux fields from DB
+                            // Note: Mux deletion happens in MuxUploader component before this is called
+                            if (!lesson?.id) return;
 
-                  {!lesson?.id || !lesson.id.trim() ? (
-                    <div className="border-2 border-dashed border-gray-700 rounded-xl p-10 flex flex-col items-center justify-center text-center bg-black/20 hover:bg-black/40 hover:border-mambo-blue transition cursor-pointer group">
-                      <div className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition">
-                        <FaVideo className="text-2xl text-mambo-blue" />
+                            try {
+                              const { apiClient } = await import("@/lib/api");
+                              // Update lesson to clear Mux fields using delete_video flag
+                              await apiClient.updateLesson(lesson.id, {
+                                delete_video: true, // Explicit flag to delete video
+                                video_url: "", // Also clear fallback video URL
+                              });
+
+                              // Clear local state
+                              setMuxPlaybackId(null);
+                              setMuxAssetId(null);
+                              setVideoUrl("");
+
+                              // Refresh lesson data
+                              if (onRefreshLesson) {
+                                await onRefreshLesson();
+                              }
+                            } catch (error: any) {
+                              console.error("Error deleting video from DB:", error);
+                              throw error;
+                            }
+                          }}
+                        />
                       </div>
-                      <h4 className="font-bold text-mambo-text">Video will be available after saving</h4>
-                      <p className="text-sm text-gray-500 mt-1">Save the lesson first, then upload video</p>
-                    </div>
-                  ) : null}
+                    )}
 
-                </div>
+                    {/* Video uploader for NEW lessons (before saving) */}
+                    {!lesson?.id && (
+                      <div className="mb-4">
+                        <MuxUploader
+                          key="new-lesson-uploader"
+                          lessonId={undefined} // No lesson ID yet
+                          currentPlaybackId={muxPlaybackId || undefined}
+                          onUploadComplete={(playbackId, assetId) => {
+                            // Store the video info - will be attached when lesson is created
+                            setMuxPlaybackId(playbackId);
+                            setMuxAssetId(assetId);
+                            // Track this as a pending video that needs cleanup if not saved
+                            setPendingMuxAssetId(assetId);
+                            setHasUnsavedChanges(true);
+                          }}
+                          onRefreshLesson={async () => {
+                            // No refresh needed for new lessons
+                          }}
+                          onDeleteVideo={async () => {
+                            // For new lessons, just clear the state and delete from Mux
+                            if (pendingMuxAssetId) {
+                              await deletePendingVideo(pendingMuxAssetId);
+                            }
+                            setMuxPlaybackId(null);
+                            setMuxAssetId(null);
+                            setPendingMuxAssetId(null);
+                          }}
+                        />
+                        {pendingMuxAssetId && (
+                          <p className="text-xs text-amber-400 mt-2 flex items-center gap-1">
+                            ⚠️ Video uploaded but lesson not saved. Click "Create Lesson" to save.
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                  </div>
                 )}
 
                 {/* Lesson Notes - For video and history lessons */}
                 {(lessonType === "video" || lessonType === "history") && (
-                <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
-                  <h3 className="font-bold text-lg mb-4 text-mambo-text">
-                    <FaPen className="inline text-mambo-blue mr-2" />
-                    Lesson Notes
-                  </h3>
-                  
-                  <div className="flex gap-2 mb-3 border-b border-gray-800 pb-3 overflow-x-auto">
-                    <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"><strong>B</strong></button>
-                    <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"><em>I</em></button>
-                    <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">H</button>
-                    <div className="w-px bg-gray-700 h-6 mx-1 self-center"></div>
-                    <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">•</button>
-                    <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">🔗</button>
-                    <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">🖼️</button>
-                  </div>
+                  <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
+                    <h3 className="font-bold text-lg mb-4 text-mambo-text">
+                      <FaPen className="inline text-mambo-blue mr-2" />
+                      Lesson Notes
+                    </h3>
 
-                  <textarea
-                    value={lessonNotes}
-                    onChange={(e) => setLessonNotes(e.target.value)}
-                    placeholder="Write your lesson content here using Markdown..."
-                    rows={12}
-                    disabled={isSaving}
-                    className="w-full h-64 bg-black/50 border border-gray-700 rounded-lg p-4 text-mambo-text-light focus:border-mambo-blue outline-none leading-relaxed resize-none disabled:opacity-50"
-                  />
-                  <p className="text-xs text-gray-500 mt-2">Supports Markdown formatting</p>
-                </div>
+                    <div className="flex gap-2 mb-3 border-b border-gray-800 pb-3 overflow-x-auto">
+                      <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"><strong>B</strong></button>
+                      <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded"><em>I</em></button>
+                      <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">H</button>
+                      <div className="w-px bg-gray-700 h-6 mx-1 self-center"></div>
+                      <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">•</button>
+                      <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">🔗</button>
+                      <button type="button" className="p-2 text-gray-400 hover:text-white hover:bg-gray-800 rounded">🖼️</button>
+                    </div>
+
+                    <textarea
+                      value={lessonNotes}
+                      onChange={(e) => setLessonNotes(e.target.value)}
+                      placeholder="Write your lesson content here using Markdown..."
+                      rows={12}
+                      disabled={isSaving}
+                      className="w-full h-64 bg-black/50 border border-gray-700 rounded-lg p-4 text-mambo-text-light focus:border-mambo-blue outline-none leading-relaxed resize-none disabled:opacity-50"
+                    />
+                    <p className="text-xs text-gray-500 mt-2">Supports Markdown formatting</p>
+                  </div>
                 )}
 
                 {/* Quiz Section - For video and quiz lessons */}
                 {(lessonType === "video" || lessonType === "quiz") && (
-                <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
-                  <div className="flex justify-between items-center mb-6">
-                    <h3 className="font-bold text-lg text-mambo-text">
-                      <FaClipboardList className="inline text-mambo-blue mr-2" />
-                      {lessonType === "quiz" ? "Quiz Questions" : "Knowledge Check"}
-                    </h3>
-                    <button
-                      type="button"
-                      onClick={addQuizQuestion}
-                      disabled={isSaving}
-                      className="text-xs bg-mambo-blue/10 text-mambo-blue border border-mambo-blue/30 px-3 py-1.5 rounded-lg hover:bg-mambo-blue hover:text-white transition font-bold disabled:opacity-50"
-                    >
-                      <FaPlus className="inline mr-1" />
-                      Add Question
-                    </button>
-                  </div>
+                  <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
+                    <div className="flex justify-between items-center mb-6">
+                      <h3 className="font-bold text-lg text-mambo-text">
+                        <FaClipboardList className="inline text-mambo-blue mr-2" />
+                        {lessonType === "quiz" ? "Quiz Questions" : "Knowledge Check"}
+                      </h3>
+                      <button
+                        type="button"
+                        onClick={addQuizQuestion}
+                        disabled={isSaving}
+                        className="text-xs bg-mambo-blue/10 text-mambo-blue border border-mambo-blue/30 px-3 py-1.5 rounded-lg hover:bg-mambo-blue hover:text-white transition font-bold disabled:opacity-50"
+                      >
+                        <FaPlus className="inline mr-1" />
+                        Add Question
+                      </button>
+                    </div>
 
-                  {quizQuestions.length === 0 ? (
-                    <p className="text-gray-500 text-sm text-center py-8">
-                      {lessonType === "quiz" 
-                        ? "No questions yet. Click 'Add Question' to create your quiz." 
-                        : "No questions yet. Click 'Add Question' to create a knowledge check."}
-                    </p>
-                  ) : (
-                    <div className="space-y-4">
-                      {quizQuestions.map((question, qIndex) => (
-                        <div key={question.id} className="bg-black/40 border border-gray-700 rounded-lg p-4">
-                          <div className="flex justify-between mb-3">
-                            <span className="text-xs font-bold text-gray-500 uppercase">Question {qIndex + 1}</span>
-                            <div className="flex gap-2">
-                              <button
-                                type="button"
-                                onClick={() => deleteQuizQuestion(question.id)}
-                                disabled={isSaving}
-                                className="text-gray-500 hover:text-red-500 disabled:opacity-50"
-                              >
-                                <FaTrash />
-                              </button>
+                    {quizQuestions.length === 0 ? (
+                      <p className="text-gray-500 text-sm text-center py-8">
+                        {lessonType === "quiz"
+                          ? "No questions yet. Click 'Add Question' to create your quiz."
+                          : "No questions yet. Click 'Add Question' to create a knowledge check."}
+                      </p>
+                    ) : (
+                      <div className="space-y-4">
+                        {quizQuestions.map((question, qIndex) => (
+                          <div key={question.id} className="bg-black/40 border border-gray-700 rounded-lg p-4">
+                            <div className="flex justify-between mb-3">
+                              <span className="text-xs font-bold text-gray-500 uppercase">Question {qIndex + 1}</span>
+                              <div className="flex gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => deleteQuizQuestion(question.id)}
+                                  disabled={isSaving}
+                                  className="text-gray-500 hover:text-red-500 disabled:opacity-50"
+                                >
+                                  <FaTrash />
+                                </button>
+                              </div>
+                            </div>
+                            <input
+                              type="text"
+                              value={question.question}
+                              onChange={(e) => updateQuizQuestion(question.id, "question", e.target.value)}
+                              placeholder="Enter your question..."
+                              disabled={isSaving}
+                              className="w-full bg-transparent border-b border-gray-700 pb-2 text-white font-bold mb-4 focus:border-mambo-blue outline-none disabled:opacity-50"
+                            />
+
+                            <div className="space-y-2">
+                              {question.options.map((option, oIndex) => (
+                                <div key={oIndex} className="flex items-center gap-3">
+                                  <input
+                                    type="radio"
+                                    name={`q-${question.id}`}
+                                    checked={option.isCorrect}
+                                    onChange={() => {
+                                      const newOptions = question.options.map((opt, idx) => ({
+                                        ...opt,
+                                        isCorrect: idx === oIndex,
+                                      }));
+                                      updateQuizQuestion(question.id, "options", newOptions);
+                                    }}
+                                    disabled={isSaving}
+                                    className="accent-gray-500 disabled:opacity-50"
+                                  />
+                                  <input
+                                    type="text"
+                                    value={option.text}
+                                    onChange={(e) => {
+                                      const newOptions = [...question.options];
+                                      newOptions[oIndex] = { ...option, text: e.target.value };
+                                      updateQuizQuestion(question.id, "options", newOptions);
+                                    }}
+                                    placeholder={`Option ${oIndex + 1}`}
+                                    disabled={isSaving}
+                                    className={`bg-transparent text-sm border-none w-full focus:ring-0 flex-1 ${option.isCorrect ? "text-green-400 font-bold" : "text-gray-400"
+                                      } disabled:opacity-50`}
+                                  />
+                                  {option.isCorrect && (
+                                    <FaCheck className="text-green-500 text-xs" />
+                                  )}
+                                  {question.options.length > 2 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => removeQuizOption(question.id, oIndex)}
+                                      disabled={isSaving}
+                                      className="text-gray-500 hover:text-red-500 text-xs disabled:opacity-50"
+                                    >
+                                      <FaTimes />
+                                    </button>
+                                  )}
+                                </div>
+                              ))}
+                              {question.options.length < 4 && (
+                                <button
+                                  type="button"
+                                  onClick={() => addQuizOption(question.id)}
+                                  disabled={isSaving}
+                                  className="text-xs text-mambo-blue hover:text-blue-400 disabled:opacity-50"
+                                >
+                                  <FaPlus className="inline mr-1" />
+                                  Add Option
+                                </button>
+                              )}
                             </div>
                           </div>
-                          <input
-                            type="text"
-                            value={question.question}
-                            onChange={(e) => updateQuizQuestion(question.id, "question", e.target.value)}
-                            placeholder="Enter your question..."
-                            disabled={isSaving}
-                            className="w-full bg-transparent border-b border-gray-700 pb-2 text-white font-bold mb-4 focus:border-mambo-blue outline-none disabled:opacity-50"
-                          />
-                          
-                          <div className="space-y-2">
-                            {question.options.map((option, oIndex) => (
-                              <div key={oIndex} className="flex items-center gap-3">
-                                <input
-                                  type="radio"
-                                  name={`q-${question.id}`}
-                                  checked={option.isCorrect}
-                                  onChange={() => {
-                                    const newOptions = question.options.map((opt, idx) => ({
-                                      ...opt,
-                                      isCorrect: idx === oIndex,
-                                    }));
-                                    updateQuizQuestion(question.id, "options", newOptions);
-                                  }}
-                                  disabled={isSaving}
-                                  className="accent-gray-500 disabled:opacity-50"
-                                />
-                                <input
-                                  type="text"
-                                  value={option.text}
-                                  onChange={(e) => {
-                                    const newOptions = [...question.options];
-                                    newOptions[oIndex] = { ...option, text: e.target.value };
-                                    updateQuizQuestion(question.id, "options", newOptions);
-                                  }}
-                                  placeholder={`Option ${oIndex + 1}`}
-                                  disabled={isSaving}
-                                  className={`bg-transparent text-sm border-none w-full focus:ring-0 flex-1 ${
-                                    option.isCorrect ? "text-green-400 font-bold" : "text-gray-400"
-                                  } disabled:opacity-50`}
-                                />
-                                {option.isCorrect && (
-                                  <FaCheck className="text-green-500 text-xs" />
-                                )}
-                                {question.options.length > 2 && (
-                                  <button
-                                    type="button"
-                                    onClick={() => removeQuizOption(question.id, oIndex)}
-                                    disabled={isSaving}
-                                    className="text-gray-500 hover:text-red-500 text-xs disabled:opacity-50"
-                                  >
-                                    <FaTimes />
-                                  </button>
-                                )}
-                              </div>
-                            ))}
-                            {question.options.length < 4 && (
-                              <button
-                                type="button"
-                                onClick={() => addQuizOption(question.id)}
-                                disabled={isSaving}
-                                className="text-xs text-mambo-blue hover:text-blue-400 disabled:opacity-50"
-                              >
-                                <FaPlus className="inline mr-1" />
-                                Add Option
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 )}
               </div>
 
@@ -776,7 +884,7 @@ export default function LessonEditorModal({
                 {/* Settings */}
                 <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
                   <h3 className="font-bold text-lg mb-4 text-mambo-text">Settings</h3>
-                  
+
                   <div className="space-y-4">
                     <div>
                       <label className="block text-xs font-bold text-gray-500 uppercase mb-2">
@@ -785,7 +893,10 @@ export default function LessonEditorModal({
                       <input
                         type="text"
                         value={title}
-                        onChange={(e) => setTitle(e.target.value)}
+                        onChange={(e) => {
+                          setTitle(e.target.value);
+                          if (!lesson?.id) setHasUnsavedChanges(true);
+                        }}
                         placeholder="e.g., The Basic Step"
                         required
                         disabled={isSaving}
@@ -846,7 +957,7 @@ export default function LessonEditorModal({
 
                     <div className="border-t border-gray-800 pt-4">
                       <label className="block text-xs font-bold text-gray-500 uppercase mb-3">Completion Criteria</label>
-                      
+
                       <div className="space-y-3">
                         {/* Video completion - only for video lessons */}
                         {lessonType === "video" && (
@@ -904,27 +1015,70 @@ export default function LessonEditorModal({
 
                 {/* Boss Battle - Only for video lessons */}
                 {lessonType === "video" && (
-                <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
-                  <label className="flex items-center justify-between cursor-pointer group">
-                    <div>
-                      <span className="block text-sm font-bold text-gray-300 mb-1">Boss Battle</span>
-                      <span className="block text-xs text-gray-500">Requires video submission</span>
-                    </div>
-                    <input
-                      type="checkbox"
-                      checked={isBossBattle}
-                      onChange={(e) => setIsBossBattle(e.target.checked)}
-                      disabled={isSaving}
-                      className="w-11 h-6 bg-gray-700 rounded-full appearance-none cursor-pointer checked:bg-red-600 disabled:opacity-50 relative transition-colors before:absolute before:top-0.5 before:left-0.5 before:w-5 before:h-5 before:bg-white before:rounded-full before:transition-transform checked:before:translate-x-5"
-                    />
-                  </label>
-                </div>
+                  <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
+                    <label className="flex items-center justify-between cursor-pointer group">
+                      <div>
+                        <span className="block text-sm font-bold text-gray-300 mb-1">Boss Battle</span>
+                        <span className="block text-xs text-gray-500">Requires video submission</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={isBossBattle}
+                        onChange={(e) => setIsBossBattle(e.target.checked)}
+                        disabled={isSaving}
+                        className="w-11 h-6 bg-gray-700 rounded-full appearance-none cursor-pointer checked:bg-red-600 disabled:opacity-50 relative transition-colors before:absolute before:top-0.5 before:left-0.5 before:w-5 before:h-5 before:bg-white before:rounded-full before:transition-transform checked:before:translate-x-5"
+                      />
+                    </label>
+                  </div>
                 )}
               </div>
             </div>
           </div>
         </form>
       </div>
+
+      {/* Confirmation Dialog for unsaved changes */}
+      {showConfirmDialog && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/60" onClick={handleCancelConfirm} />
+          <div className="relative bg-mambo-dark border border-gray-700 rounded-xl p-6 max-w-md w-full m-4 shadow-2xl">
+            <h3 className="text-xl font-bold text-white mb-3">Unsaved Changes</h3>
+            <p className="text-gray-300 mb-6">
+              {pendingMuxAssetId
+                ? "You have uploaded a video but haven't saved the lesson. What would you like to do?"
+                : "You have unsaved changes. What would you like to do?"}
+            </p>
+
+            {pendingMuxAssetId && (
+              <p className="text-amber-400 text-sm mb-6 bg-amber-900/20 border border-amber-700/30 rounded-lg p-3">
+                ⚠️ If you discard, the uploaded video will be deleted.
+              </p>
+            )}
+
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={handleConfirmSave}
+                disabled={!title.trim()}
+                className="w-full px-4 py-3 bg-green-600 hover:bg-green-500 text-white rounded-lg font-bold transition disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                Save Lesson
+              </button>
+              <button
+                onClick={handleConfirmDiscard}
+                className="w-full px-4 py-3 bg-red-600/80 hover:bg-red-600 text-white rounded-lg font-bold transition"
+              >
+                Discard Changes
+              </button>
+              <button
+                onClick={handleCancelConfirm}
+                className="w-full px-4 py-3 bg-gray-800 hover:bg-gray-700 text-gray-300 rounded-lg font-bold transition"
+              >
+                Continue Editing
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

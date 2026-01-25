@@ -75,7 +75,7 @@ const plans = [
 export default function LandingPricingSection() {
   const { user, refreshUser } = useAuth();
   const router = useRouter();
-  const [loading, setLoading] = useState<string | null>(null);
+  const [loading, setLoading] = useState<string>(""); // Initialize as empty string to avoid null === null match
   const [showAuthModal, setShowAuthModal] = useState(false);
 
   const handleSubscribe = async (priceId: string | null, planId: string) => {
@@ -101,7 +101,7 @@ export default function LandingPricingSection() {
         console.error("Failed to refresh user:", refreshError);
         alert("Your session has expired. Please log in again.");
         router.push(`/login?redirect=/pricing`);
-        setLoading(null);
+        setLoading("");
         return;
       }
 
@@ -128,14 +128,14 @@ export default function LandingPricingSection() {
       } else {
         alert(error.message || "Failed to start checkout. Please try again.");
       }
-      setLoading(null);
+      setLoading("");
     }
   };
 
   const currentTier = user?.tier?.toLowerCase() || "rookie";
 
   return (
-    <section className="relative py-32 px-6 bg-mambo-dark z-10">
+    <section className="relative py-32 px-6 bg-transparent z-10">
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
@@ -164,8 +164,8 @@ export default function LandingPricingSection() {
                 <HoverCard>
                   <div
                     className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 ${(isHighlighted || isCurrentPlan)
-                      ? "bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 shadow-2xl shadow-yellow-900/40"
-                      : "bg-gray-800"
+                      ? "bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 shadow-2xl shadow-yellow-900/40 md:scale-110 z-10"
+                      : "bg-gray-800 scale-100"
                       }`}
                   >
                     <div

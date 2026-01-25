@@ -7,7 +7,7 @@ import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { FaFire, FaBolt, FaMedal } from "react-icons/fa";
+import { FaFire, FaBolt, FaMedal, FaStar } from "react-icons/fa";
 import { apiClient } from "@/lib/api";
 import { BadgeTrophyCase } from "@/components/BadgeTrophyCase";
 import { ReferralSection } from "@/components/ReferralSection";
@@ -56,10 +56,10 @@ export default function ProfilePage() {
     try {
       setLoadingCourses(true);
       const allCourses = await apiClient.getWorlds();
-      
+
       // Filter courses with progress > 0 (courses user is currently doing)
       const coursesWithProgress = allCourses.filter(course => course.progress_percentage > 0 && !course.is_locked);
-      
+
       // For each course, find the next uncompleted lesson
       const coursesWithNextLesson = await Promise.all(
         coursesWithProgress.map(async (course) => {
@@ -79,7 +79,7 @@ export default function ProfilePage() {
           }
         })
       );
-      
+
       setActiveCourses(coursesWithNextLesson);
     } catch (error) {
       console.error("Failed to load active courses:", error);
@@ -170,13 +170,13 @@ export default function ProfilePage() {
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
-                  
+
                   // Check file size (5MB max)
                   if (file.size > 5 * 1024 * 1024) {
                     alert("File size must be less than 5MB");
                     return;
                   }
-                  
+
                   setUploadingAvatar(true);
                   try {
                     // Get presigned URL
@@ -184,7 +184,7 @@ export default function ProfilePage() {
                       file.type,
                       "avatars"
                     );
-                    
+
                     // Upload to R2
                     await fetch(upload_url, {
                       method: "PUT",
@@ -193,7 +193,7 @@ export default function ProfilePage() {
                         "Content-Type": file.type,
                       },
                     });
-                    
+
                     // Update profile immediately
                     await apiClient.updateProfile({ avatar_url: public_url });
                     // Refresh user data to update the UI
@@ -261,9 +261,42 @@ export default function ProfilePage() {
                   <div className="font-bold text-mambo-text capitalize">{user.tier}</div>
                 </div>
               </div>
+              {/* Gamification Stats */}
+              <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
+                <FaStar className="text-yellow-400" />
+                <div>
+                  <div className="text-xs text-gray-500 uppercase font-bold">Reputation</div>
+                  <div className="font-bold text-mambo-text">{user.reputation}</div>
+                </div>
+              </div>
+              <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
+                <span className="text-lg">🥢</span>
+                <div>
+                  <div className="text-xs text-gray-500 uppercase font-bold">Claves</div>
+                  <div className="font-bold text-mambo-text">{user.current_claves}</div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+        {/* Detailed Stats Row */}
+        {user.stats && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+            <div className="bg-mambo-panel border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+              <span className="text-gray-400 text-sm font-medium">Reactions Given</span>
+              <span className="text-white font-bold text-lg">{user.stats.reactions_given}</span>
+            </div>
+            <div className="bg-mambo-panel border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+              <span className="text-gray-400 text-sm font-medium">Reactions Received</span>
+              <span className="text-white font-bold text-lg">{user.stats.reactions_received}</span>
+            </div>
+            <div className="bg-mambo-panel border border-gray-800 p-4 rounded-xl flex items-center justify-between">
+              <span className="text-gray-400 text-sm font-medium">Solutions Accepted</span>
+              <span className="text-white font-bold text-lg">{user.stats.solutions_accepted}</span>
+            </div>
+          </div>
+        )}
 
         {/* Level Progress */}
         <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6 mb-8">
@@ -287,7 +320,7 @@ export default function ProfilePage() {
         {/* Continue Learning Section */}
         <div>
           <h2 className="text-xl font-bold mb-6 text-mambo-text">Continue Learning</h2>
-          
+
           {loadingCourses ? (
             <div className="text-center text-gray-400 py-8">Loading your courses...</div>
           ) : activeCourses.length === 0 ? (
@@ -358,8 +391,8 @@ export default function ProfilePage() {
                       )}
                       <div className="flex items-center gap-3">
                         <div className="flex-1 bg-gray-800 h-2 rounded-full overflow-hidden">
-                          <div 
-                            className="bg-gradient-to-r from-mambo-blue to-purple-600 h-full transition-all duration-500" 
+                          <div
+                            className="bg-gradient-to-r from-mambo-blue to-purple-600 h-full transition-all duration-500"
                             style={{ width: `${Math.min(course.progress_percentage, 100)}%` }}
                           />
                         </div>
@@ -382,7 +415,11 @@ export default function ProfilePage() {
 
         {/* Badge Trophy Case */}
         <div className="mt-8">
-          <BadgeTrophyCase />
+          <BadgeTrophyCase
+            initialBadges={user.badges}
+            streakCount={user.streak_count}
+            userStats={user.stats}
+          />
         </div>
 
         {/* Referral Section */}

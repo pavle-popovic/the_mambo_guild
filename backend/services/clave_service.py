@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from models.user import UserProfile, Subscription, SubscriptionTier, SubscriptionStatus
-from models.community import ClaveTransaction, Post
+from models.community import ClaveTransaction, Post, PostReply
 
 logger = logging.getLogger(__name__)
 
@@ -26,12 +26,12 @@ COST_POST_VIDEO = 15
 # ============================================
 # Earning Constants (from PRD)
 # ============================================
-EARN_DAILY_BASE = (2, 5)      # RNG range for base users
-EARN_DAILY_PRO = (5, 10)       # RNG range for pro users
-EARN_STREAK_BONUS_BASE = 15
-EARN_STREAK_BONUS_PRO = 30
+EARN_DAILY_BASE = (1, 3)      # RNG range for base users
+EARN_DAILY_PRO = (4, 8)       # RNG range for pro users
+EARN_STREAK_BONUS_BASE = 10
+EARN_STREAK_BONUS_PRO = 20
 EARN_STREAK_INTERVAL = 5      # Every 5 consecutive days
-EARN_ACCEPTED_ANSWER = 10
+EARN_ACCEPTED_ANSWER = 15
 EARN_REACTION_REFUND = 1          # Refund when post gets ANY reaction (capped)
 EARN_REACTION_REFUND_CAP = 5      # Max refunds per video
 EARN_CHOREO_COMPLETE = 0
@@ -39,7 +39,7 @@ EARN_WEEK_COMPLETE = 0
 EARN_COURSE_COMPLETE = 0
 EARN_LEVEL_UP = 0
 EARN_REFERRAL_BONUS = 50
-EARN_NEW_USER_STARTER = 10
+EARN_NEW_USER_STARTER = 15
 EARN_SUB_ADVANCED = 10
 EARN_SUB_PERFORMER = 20
 
@@ -198,6 +198,10 @@ def process_daily_login(user_id: str, db: Session) -> dict:
         streak_bonus = bonus_amount
         logger.info(f"User {user_id} hit streak milestone {profile.streak_count}, bonus: {bonus_amount}")
     
+    # Check for Metronome Badge (Streak)
+    from services import badge_service
+    badge_service.check_streak_badges(user_id, profile.streak_count, db)
+    
     db.flush()
     
     message = f"You earned {daily_amount} 🥢"
@@ -272,14 +276,20 @@ def get_video_slot_status(user_id: str, db: Session) -> dict:
     is_pro = is_user_pro(user_id, db)
     limit = PRO_VIDEO_SLOTS if is_pro else BASE_VIDEO_SLOTS
     
-    # Count user's video posts (excluding accepted solutions which don't count)
-    current = db.query(func.count(Post.id)).filter(
+    # Count Post videos (Stage/Lab posts with video)
+    post_count = db.query(func.count(Post.id)).filter(
         Post.user_id == user_id,
-        Post.post_type == 'stage',
         Post.mux_asset_id.isnot(None)
     ).scalar() or 0
+
+    # Count Reply videos (that are NOT accepted solutions)
+    reply_count = db.query(func.count(PostReply.id)).filter(
+        PostReply.user_id == user_id,
+        PostReply.mux_asset_id.isnot(None),
+        PostReply.is_accepted_answer == False
+    ).scalar() or 0
     
-    # TODO: Exclude videos that are "Accepted Solutions" in The Lab
+    current = post_count + reply_count
     
     allowed = current < limit
     

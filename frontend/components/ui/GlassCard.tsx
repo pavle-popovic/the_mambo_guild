@@ -1,20 +1,22 @@
 "use client";
 
-import { motion, MotionProps, HTMLMotionProps } from "framer-motion";
 import { ReactNode, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { UISound } from "@/hooks/useUISound";
 
 /**
- * GlassCard - Frosted glass card with warm amber glow
- * Part of the "Vintage Salsa/Palladium" design system
+ * GlassCard - Stage lighting card with polished brass glow
+ * Part of the "Palladium Era" design system
+ *
+ * Uses the standardized Mambo Gold hover pattern:
+ * - Base: border-white/10
+ * - Hover: border-mambo-gold/50, shadow-2xl, shadow-mambo-gold/10, scale-[1.02]
  */
-interface GlassCardProps extends HTMLMotionProps<"div"> {
+interface GlassCardProps {
   children: ReactNode;
   className?: string;
   enableSound?: boolean;
   enableHover?: boolean;
-  glowIntensity?: "subtle" | "medium" | "strong";
 }
 
 export function GlassCard({
@@ -22,62 +24,36 @@ export function GlassCard({
   className,
   enableSound = true,
   enableHover = true,
-  glowIntensity = "medium",
-  ...props
 }: GlassCardProps) {
-  const handleHoverStart = useCallback(() => {
+  const handleMouseEnter = useCallback(() => {
     if (enableSound) {
       UISound.hover();
     }
   }, [enableSound]);
 
-  const glowStyles = {
-    subtle: "0 8px 20px -4px rgba(255, 180, 0, 0.15), 0 4px 10px -4px rgba(255, 150, 0, 0.1)",
-    medium: "0 15px 30px -5px rgba(255, 180, 0, 0.25), 0 8px 15px -5px rgba(255, 150, 0, 0.15)",
-    strong: "0 20px 40px -5px rgba(255, 180, 0, 0.35), 0 10px 20px -5px rgba(255, 150, 0, 0.2)",
-  };
-
   return (
-    <motion.div
-      whileHover={
-        enableHover
-          ? {
-              scale: 1.02,
-              y: -4,
-              boxShadow: glowStyles[glowIntensity],
-            }
-          : undefined
-      }
-      transition={{
-        type: "spring",
-        stiffness: 200,
-        damping: 15,
-        mass: 0.8,
-      }}
+    <div
+      onMouseEnter={enableHover ? handleMouseEnter : undefined}
       className={cn(
-        // Frosted glass effect
+        // Palladium Era: Stage lighting effect
         "relative overflow-hidden rounded-xl",
-        "backdrop-blur-md",
-        "bg-white/10 dark:bg-white/5",
-        "border border-white/20 dark:border-white/10",
-        // Subtle inner glow
-        "shadow-inner shadow-white/5",
+        "backdrop-blur-sm",
+        "bg-black/80",
+        "border border-white/10",
+        "transition-all duration-300",
+        // Mambo Gold hover pattern (when enabled)
+        enableHover && "cursor-pointer z-0 hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] hover:z-10",
         className
       )}
-      onHoverStart={enableHover ? handleHoverStart : undefined}
-      {...props}
     >
-      {/* Subtle gradient overlay for depth */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none" />
-      
       {/* Content */}
       <div className="relative z-10">{children}</div>
-    </motion.div>
+    </div>
   );
 }
 
 /**
- * GlassPanel - Larger glass container without hover effects
+ * GlassPanel - Palladium Era: Stage lighting container
  * For sections and containers
  */
 interface GlassPanelProps {
@@ -90,15 +66,12 @@ export function GlassPanel({ children, className }: GlassPanelProps) {
     <div
       className={cn(
         "relative overflow-hidden rounded-2xl",
-        "backdrop-blur-lg",
-        "bg-white/10 dark:bg-white/5",
-        "border border-white/20 dark:border-white/10",
+        "backdrop-blur-sm",
+        "bg-black/80",
+        "border border-[rgba(212,175,55,0.2)]",
         className
       )}
     >
-      {/* Gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/5 via-transparent to-black/5 pointer-events-none" />
-      
       {/* Content */}
       <div className="relative z-10">{children}</div>
     </div>

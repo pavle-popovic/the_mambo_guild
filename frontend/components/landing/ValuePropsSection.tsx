@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { GlassCard } from "@/components/ui/GlassCard";
 import LevelSelectionModal from "./LevelSelectionModal";
 
 const containerVariants = {
@@ -34,9 +33,9 @@ export default function ValuePropsSection() {
   return (
     <section
       id="value-props"
-      className="relative px-6 z-20 pt-[66vh] pb-24 bg-transparent pointer-events-none"
+      className="relative px-6 z-20 py-24 bg-transparent"
     >
-      <div className="max-w-7xl mx-auto pointer-events-auto">
+      <div className="max-w-7xl mx-auto">
         <LevelSelectionModal
           isOpen={!!selectedLevel}
           onClose={() => setSelectedLevel(null)}
@@ -49,7 +48,7 @@ export default function ValuePropsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16 pointer-events-auto"
+          className="text-center mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 font-serif italic tracking-tight">
             Choose Your <span className="text-mambo-gold">Stage</span> or Find Your <span className="text-mambo-gold">Rhythm</span>
@@ -69,9 +68,8 @@ export default function ValuePropsSection() {
         >
           {valueProps.map((prop, index) => (
             <motion.div key={prop.title} variants={itemVariants} className="h-full">
-              <GlassCard
-                className="p-0 h-full backdrop-blur-md bg-black/80 border-white/10 overflow-hidden group hover:border-mambo-gold/50 transition-colors duration-300 cursor-pointer flex flex-col"
-                glowIntensity="subtle"
+              <motion.div
+                className="relative h-full rounded-2xl overflow-hidden cursor-pointer group border border-white/10 bg-black/80 backdrop-blur-md transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
                 onClick={() => {
                   setSelectedLevel(prop.title);
                 }}
@@ -100,7 +98,7 @@ export default function ValuePropsSection() {
                     {prop.description}
                   </p>
                 </div>
-              </GlassCard>
+              </motion.div>
             </motion.div>
           ))}
         </motion.div>

@@ -14,6 +14,25 @@ interface User {
   role: string;
   avatar_url: string | null;
   is_pro?: boolean;
+  reputation: number;
+  current_claves: number;
+  badges: Array<{
+    id: string;
+    name: string;
+    description: string;
+    tier: string;
+    icon_url: string | null;
+    category: string;
+    requirement_type: string;
+    requirement_value: number;
+    is_earned: boolean;
+    earned_at: string | null;
+  }>;
+  stats: {
+    reactions_given: number;
+    reactions_received: number;
+    solutions_accepted: number;
+  } | null;
 }
 
 interface AuthContextType {

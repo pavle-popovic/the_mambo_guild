@@ -15,6 +15,17 @@ const config: Config = {
         "mambo-gold": "#fbbf24",
         "mambo-text": "#fafaf5",
         "mambo-text-light": "#f5f5f0",
+        "mambo-electric": "#00D4FF",
+        "mambo-purple": "#7C3AED",
+        "mambo-cream": "#F0F0F0",
+        // Palladium Era - Polished Brass
+        "brass": {
+          light: "#FCE205",
+          DEFAULT: "#D4AF37",
+          dark: "#B8860B",
+        },
+        "electric-teal": "#00E0FF",
+        "stage-dark": "rgba(0, 0, 0, 0.8)",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "Inter", "sans-serif"],

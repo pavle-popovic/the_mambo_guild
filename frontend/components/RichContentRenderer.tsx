@@ -178,7 +178,7 @@ function QuizBlock({ block }: { block: ContentBlock }) {
   const score = submitted ? getScore() : null;
 
   return (
-    <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
+    <div className="bg-mambo-panel border border-white/10 rounded-xl p-6">
       {block.title && (
         <h3 className="text-xl font-bold text-mambo-text mb-6">{block.title}</h3>
       )}
@@ -191,13 +191,12 @@ function QuizBlock({ block }: { block: ContentBlock }) {
           return (
             <div
               key={qIndex}
-              className={`border rounded-lg p-4 ${
-                isCorrect
+              className={`border rounded-lg p-4 ${isCorrect
                   ? "border-green-500 bg-green-500/10"
                   : isWrong
-                  ? "border-red-500 bg-red-500/10"
-                  : "border-gray-700"
-              }`}
+                    ? "border-red-500 bg-red-500/10"
+                    : "border-gray-700"
+                }`}
             >
               <h4 className="font-bold text-mambo-text mb-3">
                 {qIndex + 1}. {q.question}
@@ -213,17 +212,16 @@ function QuizBlock({ block }: { block: ContentBlock }) {
                       key={oIndex}
                       onClick={() => handleAnswer(qIndex, oIndex)}
                       disabled={submitted}
-                      className={`w-full text-left p-3 rounded-lg border transition ${
-                        isSelected
+                      className={`w-full text-left p-3 rounded-lg border transition ${isSelected
                           ? isCorrectAnswer
                             ? "bg-green-600/20 border-green-500 text-green-300"
                             : isWrong
-                            ? "bg-red-600/20 border-red-500 text-red-300"
-                            : "bg-blue-600/20 border-blue-500 text-blue-300"
+                              ? "bg-red-600/20 border-red-500 text-red-300"
+                              : "bg-blue-600/20 border-blue-500 text-blue-300"
                           : isCorrectAnswer && submitted
-                          ? "bg-green-600/10 border-green-500/50 text-green-400"
-                          : "bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600"
-                      } ${submitted ? "cursor-default" : "cursor-pointer"}`}
+                            ? "bg-green-600/10 border-green-500/50 text-green-400"
+                            : "bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600"
+                        } ${submitted ? "cursor-default" : "cursor-pointer"}`}
                     >
                       <div className="flex items-center gap-3">
                         {isSelected && (
@@ -268,8 +266,8 @@ function QuizBlock({ block }: { block: ContentBlock }) {
             {score && score.correct === score.total
               ? "Perfect! 🎉"
               : score && score.correct >= score.total / 2
-              ? "Good job! 👍"
-              : "Keep practicing! 💪"}
+                ? "Good job! 👍"
+                : "Keep practicing! 💪"}
           </div>
         </div>
       )}

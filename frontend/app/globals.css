@@ -4,6 +4,23 @@
 :root {
   --background: #0a0a0a;
   --foreground: #f5f5f0;
+
+  /* Palladium Era - Stage Lighting Design System */
+  --brass-gradient: linear-gradient(135deg, #FCE205 0%, #D4AF37 100%);
+  --brass-light: #FCE205;
+  --brass: #D4AF37;
+  --brass-dark: #B8860B;
+  --electric-teal: #00E0FF;
+
+  /* Stage lighting shadows */
+  --stage-shadow: 0 4px 30px rgba(212, 175, 55, 0.15);
+  --stage-shadow-hover: 0 8px 40px rgba(212, 175, 55, 0.3);
+  --stage-shadow-intense: 0 12px 50px rgba(212, 175, 55, 0.4);
+
+  /* Stage borders */
+  --stage-border: rgba(212, 175, 55, 0.3);
+  --stage-border-hover: rgba(212, 175, 55, 0.6);
+  --stage-border-active: rgba(212, 175, 55, 0.8);
 }
 
 @theme inline {
@@ -19,8 +36,10 @@ body {
   font-family: var(--font-inter), "Inter", sans-serif;
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color: #fafaf5;
+/* Typography: Serif for h1, h2 (brand identity), Sans for everything else */
+h1, h2 {
+  font-family: var(--font-playfair), "Playfair Display", serif;
+  color: #F0F0F0;
   letter-spacing: -0.02em;
 }
 
@@ -30,6 +49,16 @@ h1 {
 
 h2 {
   letter-spacing: -0.02em;
+}
+
+/* Force sans-serif on all readable text for readability */
+h3, h4, h5, h6, p, span, label, input, textarea, button, a {
+  font-family: var(--font-inter), "Inter", sans-serif;
+}
+
+h3, h4, h5, h6 {
+  color: #F0F0F0;
+  letter-spacing: -0.01em;
 }
 
 /* Glass navigation effect */
@@ -113,4 +142,61 @@ h2 {
 
 .course-preview-player mux-player::part(fullscreen-button) {
   display: none !important;
+}
+
+/* Palladium Era - Stage Lighting Containers */
+.stage-container {
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid var(--stage-border);
+  border-radius: 12px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stage-container:hover {
+  border-color: var(--stage-border-hover);
+  box-shadow: var(--stage-shadow-hover);
+}
+
+/* Brass text gradient */
+.text-brass-gradient {
+  background: var(--brass-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Brass button base */
+.btn-brass {
+  background: var(--brass-gradient);
+  color: #000;
+  font-weight: 700;
+  box-shadow: var(--stage-shadow);
+  transition: box-shadow 0.2s ease;
+}
+
+.btn-brass:hover {
+  box-shadow: var(--stage-shadow-hover);
+}
+
+/* Stage spotlight effect (radial glow from top) */
+.stage-spotlight {
+  position: relative;
+}
+
+.stage-spotlight::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 80%;
+  height: 60%;
+  background: radial-gradient(ellipse at top, rgba(212, 175, 55, 0.1) 0%, transparent 70%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.stage-spotlight:hover::before {
+  opacity: 1;
 }

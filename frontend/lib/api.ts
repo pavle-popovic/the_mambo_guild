@@ -203,10 +203,15 @@ class ApiClient {
 
       if (contentType && contentType.includes("application/json")) {
         const text = await response.text();
-        if (!text) {
+        if (!text || !text.trim()) {
           data = {} as T;
         } else {
-          data = JSON.parse(text);
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            console.error("Failed to parse JSON response:", text);
+            throw new Error("Invalid JSON response from server");
+          }
         }
       } else {
         data = {} as T;
@@ -280,6 +285,25 @@ class ApiClient {
       tier: string;
       role: string;
       avatar_url: string | null;
+      reputation: number;
+      current_claves: number;
+      badges: Array<{
+        id: string;
+        name: string;
+        description: string;
+        tier: string;
+        icon_url: string | null;
+        category: string;
+        requirement_type: string;
+        requirement_value: number;
+        is_earned: boolean;
+        earned_at: string | null;
+      }>;
+      stats: {
+        reactions_given: number;
+        reactions_received: number;
+        solutions_accepted: number;
+      } | null;
     }>("/api/auth/me");
   }
 
@@ -336,25 +360,50 @@ class ApiClient {
       mux_playback_id: string | null;
       mux_asset_id: string | null;
       lesson_type?: string;
+      level_id?: string | null;
+      level_title?: string | null;
     }>(`/api/courses/lessons/${lessonId}`);
   }
 
-  async createMuxUploadUrl(lessonId?: string, filename?: string, courseId?: string, postId?: string) {
+  async getLevelLessons(levelId: string) {
+    return this.request<
+      Array<{
+        id: string;
+        title: string;
+        description: string | null;
+        video_url: string;
+        xp_value: number;
+        is_completed: boolean;
+        is_locked: boolean;
+        is_boss_battle: boolean;
+        order_index: number;
+        week_number: number | null;
+        day_number: number | null;
+        content_json: any | null;
+        mux_playback_id: string | null;
+        mux_asset_id: string | null;
+        duration_minutes: number | null;
+      }>
+    >(`/api/courses/levels/${levelId}/lessons`);
+  }
+
+  async createMuxUploadUrl(lessonId?: string, filename?: string, courseId?: string, postId?: string, levelId?: string) {
     return this.request<{
       upload_id: string;
       upload_url: string;
       status: string;
     }>("/api/mux/upload-url", {
       method: "POST",
-      body: JSON.stringify({ lesson_id: lessonId, filename, course_id: courseId, post_id: postId }),
+      body: JSON.stringify({ lesson_id: lessonId, filename, course_id: courseId, post_id: postId, level_id: levelId }),
     });
   }
 
-  async checkMuxUploadStatus(lessonId?: string, courseId?: string, postId?: string) {
+  async checkMuxUploadStatus(lessonId?: string, courseId?: string, postId?: string, levelId?: string) {
     const params = new URLSearchParams();
     if (lessonId) params.append("lesson_id", lessonId);
     if (courseId) params.append("course_id", courseId);
     if (postId) params.append("post_id", postId);
+    if (levelId) params.append("level_id", levelId);
 
     return this.request<{
       status: "ready" | "processing" | "error";
@@ -373,6 +422,13 @@ class ApiClient {
     }>(`/api/mux/asset/${assetId}`, {
       method: "DELETE",
     });
+  }
+
+  async getDownloadUrl(playbackId: string, resolution: "high" | "medium" = "high") {
+    return this.request<{
+      download_url: string;
+      resolution: string;
+    }>(`/api/mux/download-url/${playbackId}?resolution=${resolution}`);
   }
 
   // Image upload endpoints (R2 presigned URLs)
@@ -620,6 +676,40 @@ class ApiClient {
     });
   }
 
+  async updateLevel(levelId: string, data: {
+    title?: string;
+    description?: string;
+    thumbnail_url?: string | null;
+    mux_preview_playback_id?: string | null;
+    mux_preview_asset_id?: string | null;
+    outcome?: string | null;
+    duration_minutes?: number;
+    total_xp?: number;
+    status?: string;
+  }) {
+    return this.request<{
+      id: string;
+      title: string;
+      description?: string;
+      thumbnail_url?: string | null;
+      mux_preview_playback_id?: string | null;
+      mux_preview_asset_id?: string | null;
+      outcome?: string | null;
+      duration_minutes?: number;
+      total_xp?: number;
+      status?: string;
+    }>(`/api/admin/levels/${levelId}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteLevel(levelId: string) {
+    return this.request<{ success: boolean }>(`/api/admin/levels/${levelId}`, {
+      method: "DELETE",
+    });
+  }
+
   async createLesson(levelId: string, data: {
     title: string;
     description?: string;
@@ -772,6 +862,21 @@ class ApiClient {
   // ============================================
   // Community Endpoints (v4.0)
   // ============================================
+
+  async getCommunityStats() {
+    // This endpoint is public (no auth required)
+    return this.request<{
+      member_count: number;
+      active_now: number;
+      leaderboard: Array<{
+        id: string;
+        first_name: string;
+        avatar_url: string | null;
+        score: number;
+        rank: number;
+      }>;
+    }>("/api/community/stats");
+  }
 
   async getCommunityFeed(options?: {
     post_type?: 'stage' | 'lab';
@@ -987,6 +1092,7 @@ class ApiClient {
       requirement_value: number;
       is_earned: boolean;
       earned_at: string | null;
+      display_order: number;
     }>>("/api/badges/");
   }
 
@@ -1016,6 +1122,13 @@ class ApiClient {
       badges: Array<any>;
     }>("/api/badges/check", {
       method: "POST",
+    });
+  }
+
+  async updateBadgeOrder(badgeIds: string[]) {
+    return this.request<{ status: string }>("/api/users/me/badges/reorder", {
+      method: "PUT",
+      body: JSON.stringify({ badge_ids: badgeIds }),
     });
   }
 

@@ -169,19 +169,11 @@ function PricingPageContent() {
             {/* Rookie Tier */}
             <StaggerItem>
               <HoverCard>
-                <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 ${(isRookie && user) ? "z-10 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 shadow-2xl shadow-yellow-900/40" : "bg-gray-800"
-                  }`}>
+                <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 bg-gray-800`}>
                   <div className={`relative rounded-2xl p-8 flex flex-col h-full transition-all duration-300 bg-[#111111] ${!(isRookie && user) ? "border border-gray-800 hover:border-gray-700 hover:bg-[#161616]" : ""
                     }`}>
 
-                    {/* Active Plan Badge */}
-                    {isRookie && user && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                        <div className="px-4 py-1.5 bg-mambo-blue rounded-full text-xs font-bold text-white shadow-lg">
-                          Active Plan
-                        </div>
-                      </div>
-                    )}
+
 
                     <div className="mb-4">
                       <span className={`text-xs font-bold uppercase tracking-widest ${(isRookie && user) ? "text-mambo-gold" : "text-gray-500"}`}>
@@ -228,7 +220,7 @@ function PricingPageContent() {
                         <button
                           onClick={handleCancelSubscription}
                           disabled={loading === "cancel"}
-                          className="block w-full py-3 border border-red-600 hover:border-red-500 rounded-lg font-bold hover:bg-red-900/20 transition-all duration-300 text-red-400 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/20 transition-all duration-300 text-gray-400 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {loading === "cancel" ? "Loading..." : "Remove Subscription"}
                         </button>
@@ -242,32 +234,19 @@ function PricingPageContent() {
             {/* Advanced Tier */}
             <StaggerItem>
               <HoverCard>
-                <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 ${(isAdvanced || !user) ? "z-10 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 shadow-2xl shadow-yellow-900/40" : "bg-gray-800"
-                  }`}>
-                  <div className={`relative rounded-2xl p-8 flex flex-col h-full transition-all duration-300 bg-[#111111] ${!(isAdvanced || !user) ? "border border-gray-800 hover:border-gray-700 hover:bg-[#161616]" : ""
-                    }`}>
+                <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 z-10 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 shadow-2xl shadow-yellow-900/40`}>
+                  <div className={`relative rounded-2xl p-8 flex flex-col h-full transition-all duration-300 bg-[#111111]`}>
 
-                    {/* Most Popular badge (Logged out only) */}
-                    {!user && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                        <div className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-mambo-gold to-orange-500 rounded-full text-xs font-bold text-black shadow-lg">
-                          <FaCrown className="w-3 h-3" />
-                          Most Popular
-                        </div>
+                    {/* Full Access Badge - Always show */}
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2">
+                      <div className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-mambo-gold to-orange-500 rounded-full text-xs font-bold text-black shadow-lg">
+                        <FaCrown className="w-3 h-3" />
+                        Full Access
                       </div>
-                    )}
-
-                    {/* Active Plan Badge (Logged in & Advanced) */}
-                    {isAdvanced && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                        <div className="px-4 py-1.5 bg-mambo-blue rounded-full text-xs font-bold text-white shadow-lg">
-                          Active Plan
-                        </div>
-                      </div>
-                    )}
+                    </div>
 
                     <div className="mb-4">
-                      <span className={`text-xs font-bold uppercase tracking-widest ${isAdvanced ? "text-mambo-gold" : "text-gray-500"}`}>
+                      <span className="text-xs font-bold uppercase tracking-widest text-mambo-gold">
                         Advanced
                       </span>
                     </div>
@@ -336,19 +315,11 @@ function PricingPageContent() {
             {/* Performer Tier */}
             <StaggerItem>
               <HoverCard>
-                <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 ${isPerformer ? "z-10 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 shadow-2xl shadow-yellow-900/40" : "bg-gray-800"
-                  }`}>
+                <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 bg-gray-800`}>
                   <div className={`relative rounded-2xl p-8 flex flex-col h-full transition-all duration-300 bg-[#111111] ${!isPerformer ? "border border-gray-800 hover:border-gray-700 hover:bg-[#161616]" : ""
                     }`}>
 
-                    {/* Active Plan Badge */}
-                    {isPerformer && (
-                      <div className="absolute -top-4 left-1/2 -translate-x-1/2">
-                        <div className="px-4 py-1.5 bg-mambo-blue rounded-full text-xs font-bold text-white shadow-lg">
-                          Active Plan
-                        </div>
-                      </div>
-                    )}
+
 
                     <div className="mb-4">
                       <span className={`text-xs font-bold uppercase tracking-widest ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`}>

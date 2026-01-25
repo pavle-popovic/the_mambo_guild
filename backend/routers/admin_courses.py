@@ -42,6 +42,9 @@ class WorldUpdateRequest(BaseModel):
     difficulty: Optional[str] = None
     course_type: Optional[str] = None  # "course", "choreo", "topic"
     is_published: Optional[bool] = None
+    # Course metadata
+    total_duration_minutes: Optional[int] = None
+    objectives: Optional[List[str]] = None
 
 
 class LevelCreateRequest(BaseModel):
@@ -213,7 +216,12 @@ async def update_course(
         course_type = course_data.course_type.lower()
         if course_type in ["course", "choreo", "topic"]:
             world.course_type = course_type
-    
+    # Course metadata
+    if course_data.total_duration_minutes is not None:
+        world.total_duration_minutes = course_data.total_duration_minutes
+    if course_data.objectives is not None:
+        world.objectives = course_data.objectives
+
     db.commit()
     db.refresh(world)
     
@@ -461,7 +469,18 @@ async def get_course_full_details(
         levels_data.append({
             "id": str(level.id),
             "title": level.title,
+            "description": level.description,
             "order_index": level.order_index,
+            "thumbnail_url": level.thumbnail_url,
+            "mux_preview_playback_id": level.mux_preview_playback_id,
+            "mux_preview_asset_id": level.mux_preview_asset_id,
+            "x_position": level.x_position,
+            "y_position": level.y_position,
+            # Module metadata
+            "outcome": level.outcome,
+            "duration_minutes": level.duration_minutes,
+            "total_xp": level.total_xp,
+            "status": level.status,
             "lessons": lessons_data
         })
     
@@ -479,6 +498,343 @@ async def get_course_full_details(
         "difficulty": difficulty_str,
         "course_type": world.course_type or "course",
         "is_published": world.is_published,
+        # Course metadata
+        "total_duration_minutes": world.total_duration_minutes,
+        "objectives": world.objectives or [],
         "levels": levels_data
     }
 
+
+
+@router.get("/levels/{level_id}/lessons", response_model=List[LessonResponse])
+async def get_level_lessons(
+    level_id: str,
+    db: Session = Depends(get_db)
+):
+    """Get all lessons for a specific level. Open endpoint for skill tree modal."""
+    from models.progress import UserProgress
+    from dependencies import get_current_user_optional
+    from fastapi import Request
+    
+    level = db.query(Level).filter(Level.id == level_id).first()
+    if not level:
+        raise HTTPException(status_code=404, detail="Level not found")
+    
+    # Get lessons sorted by order_index
+    lessons = sorted(level.lessons, key=lambda l: l.order_index)
+    
+    # Pre-fetch user progress if authenticated (via admin_user context or passed user)
+    # Note: admin_courses is usually for admins, but if used for preview it might be useful.
+    # Actually, for admin view, we might not care about user progress, but let's assume we might likely want to see it or at least not have it hardcoded false if an admin is testing.
+    # Since this is the admin endpoint, 'admin_user' is the current user.
+    
+    from models.progress import UserProgress
+    completed_lesson_ids: set = set()
+    
+    # We use admin_user.id as the user to check progress for, effectively letting the admin see their own progress
+    # or potentially we could allow passing a user_id to check progress FOR someone else, but let's keep it simple.
+    
+    lesson_ids = [str(l.id) for l in lessons]
+    if lesson_ids:
+        completed = db.query(UserProgress.lesson_id).filter(
+            UserProgress.user_id == admin_user.id,
+            UserProgress.is_completed == True,
+            UserProgress.lesson_id.in_(lesson_ids)
+        ).all()
+        completed_lesson_ids = {str(lid) for (lid,) in completed}
+
+    result = []
+    for lesson in lessons:
+        lesson_type_str = lesson.lesson_type.value if hasattr(lesson.lesson_type, 'value') else str(lesson.lesson_type or "video")
+        is_completed = str(lesson.id) in completed_lesson_ids
+        
+        result.append(LessonResponse(
+            id=str(lesson.id),
+            title=lesson.title,
+            description=lesson.description,
+            video_url=lesson.video_url,
+            xp_value=lesson.xp_value,
+            is_completed=is_completed,
+            is_locked=False,  # Handled by frontend based on node unlock status
+            is_boss_battle=lesson.is_boss_battle,
+            order_index=lesson.order_index,
+            week_number=lesson.week_number,
+            day_number=lesson.day_number,
+            content_json=lesson.content_json,
+            mux_playback_id=lesson.mux_playback_id,
+            mux_asset_id=lesson.mux_asset_id,
+            duration_minutes=lesson.duration_minutes,
+            thumbnail_url=lesson.thumbnail_url,
+            lesson_type=lesson_type_str
+        ))
+    
+    return result
+
+
+@router.put("/levels/{level_id}/position")
+async def update_level_position(
+    level_id: str,
+    position_data: dict,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Update a level's position in the skill tree graph."""
+    level = db.query(Level).filter(Level.id == level_id).first()
+    if not level:
+        raise HTTPException(status_code=404, detail="Level not found")
+    
+    if "x_position" in position_data:
+        level.x_position = float(position_data["x_position"])
+    if "y_position" in position_data:
+        level.y_position = float(position_data["y_position"])
+    
+    db.commit()
+    
+    return {"message": "Position updated successfully"}
+
+
+@router.post("/worlds/{world_id}/edges")
+async def create_edge(
+    world_id: str,
+    edge_data: dict,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Create a new edge between two levels."""
+    from models.course import LevelEdge
+    
+    # Validate levels exist
+    from_level = db.query(Level).filter(Level.id == edge_data["from_level_id"]).first()
+    to_level = db.query(Level).filter(Level.id == edge_data["to_level_id"]).first()
+    
+    if not from_level or not to_level:
+        raise HTTPException(status_code=404, detail="Level not found")
+    
+    # Check if edge already exists
+    existing = db.query(LevelEdge).filter(
+        LevelEdge.from_level_id == edge_data["from_level_id"],
+        LevelEdge.to_level_id == edge_data["to_level_id"]
+    ).first()
+    
+    if existing:
+        raise HTTPException(status_code=400, detail="Edge already exists")
+    
+    edge = LevelEdge(
+        id=uuid.uuid4(),
+        world_id=uuid.UUID(world_id),
+        from_level_id=uuid.UUID(edge_data["from_level_id"]),
+        to_level_id=uuid.UUID(edge_data["to_level_id"])
+    )
+    
+    db.add(edge)
+    db.commit()
+    db.refresh(edge)
+    
+    return {
+        "id": str(edge.id),
+        "from_level_id": str(edge.from_level_id),
+        "to_level_id": str(edge.to_level_id),
+        "world_id": str(edge.world_id)
+    }
+
+
+@router.delete("/edges/{edge_id}")
+async def delete_edge(
+    edge_id: str,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Delete an edge."""
+    from models.course import LevelEdge
+
+    edge = db.query(LevelEdge).filter(LevelEdge.id == edge_id).first()
+    if not edge:
+        raise HTTPException(status_code=404, detail="Edge not found")
+
+    db.delete(edge)
+    db.commit()
+
+    return {"message": "Edge deleted successfully"}
+
+
+@router.get("/levels/{level_id}")
+async def get_level(
+    level_id: str,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Get a single level's details including preview video IDs."""
+    level = db.query(Level).filter(Level.id == level_id).first()
+    if not level:
+        raise HTTPException(status_code=404, detail="Level not found")
+
+    return {
+        "id": str(level.id),
+        "title": level.title,
+        "description": level.description,
+        "thumbnail_url": level.thumbnail_url,
+        "mux_preview_playback_id": level.mux_preview_playback_id,
+        "mux_preview_asset_id": level.mux_preview_asset_id,
+        "x_position": level.x_position,
+        "y_position": level.y_position,
+        "outcome": level.outcome,
+        "duration_minutes": level.duration_minutes,
+        "total_xp": level.total_xp,
+        "status": level.status
+    }
+
+
+@router.put("/levels/{level_id}")
+async def update_level(
+    level_id: str,
+    level_data: dict,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Update a level's details (title, description, thumbnail, preview video, metadata)."""
+    level = db.query(Level).filter(Level.id == level_id).first()
+    if not level:
+        raise HTTPException(status_code=404, detail="Level not found")
+
+    if "title" in level_data:
+        level.title = level_data["title"]
+    if "description" in level_data:
+        level.description = level_data["description"]
+    if "thumbnail_url" in level_data:
+        level.thumbnail_url = level_data["thumbnail_url"]
+    # Mux preview video for skill tree hover (uses animated GIF)
+    if "mux_preview_playback_id" in level_data:
+        level.mux_preview_playback_id = level_data["mux_preview_playback_id"]
+    if "mux_preview_asset_id" in level_data:
+        level.mux_preview_asset_id = level_data["mux_preview_asset_id"]
+
+    # Module metadata
+    if "outcome" in level_data:
+        level.outcome = level_data["outcome"]
+    if "duration_minutes" in level_data:
+        level.duration_minutes = level_data["duration_minutes"]
+    if "total_xp" in level_data:
+        level.total_xp = level_data["total_xp"]
+    if "status" in level_data:
+        level.status = level_data["status"]
+
+    db.commit()
+    db.refresh(level)
+
+    return {
+        "id": str(level.id),
+        "title": level.title,
+        "description": level.description,
+        "thumbnail_url": level.thumbnail_url,
+        "mux_preview_playback_id": level.mux_preview_playback_id,
+        "mux_preview_asset_id": level.mux_preview_asset_id,
+        "x_position": level.x_position,
+        "y_position": level.y_position,
+        "outcome": level.outcome,
+        "duration_minutes": level.duration_minutes,
+        "total_xp": level.total_xp,
+        "status": level.status
+    }
+
+
+@router.delete("/levels/{level_id}")
+async def delete_level(
+    level_id: str,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Delete a level and cascade delete its lessons and edges."""
+    from models.course import LevelEdge
+
+    level = db.query(Level).filter(Level.id == level_id).first()
+    if not level:
+        raise HTTPException(status_code=404, detail="Level not found")
+
+    # Delete associated edges
+    db.query(LevelEdge).filter(
+        (LevelEdge.from_level_id == level_id) | (LevelEdge.to_level_id == level_id)
+    ).delete(synchronize_session=False)
+
+    # Delete associated lessons
+    db.query(Lesson).filter(Lesson.level_id == level_id).delete(synchronize_session=False)
+
+    # Delete the level
+    db.delete(level)
+    db.commit()
+
+    return {"message": "Level deleted successfully"}
+
+
+@router.get("/lessons/{lesson_id}")
+async def get_lesson(
+    lesson_id: str,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Get a single lesson's details."""
+    lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
+    if not lesson:
+        raise HTTPException(status_code=404, detail="Lesson not found")
+
+    # Convert lesson_type enum to string
+    lesson_type_str = lesson.lesson_type.value if hasattr(lesson.lesson_type, 'value') else str(lesson.lesson_type)
+
+    return {
+        "id": str(lesson.id),
+        "level_id": str(lesson.level_id),
+        "title": lesson.title,
+        "description": lesson.description,
+        "xp_value": lesson.xp_value,
+        "order_index": lesson.order_index,
+        "is_boss_battle": lesson.is_boss_battle,
+        "day_number": lesson.day_number,
+        "content_json": lesson.content_json,
+        "mux_playback_id": lesson.mux_playback_id,
+        "mux_asset_id": lesson.mux_asset_id,
+        "duration_minutes": lesson.duration_minutes,
+        "thumbnail_url": lesson.thumbnail_url,
+        "lesson_type": lesson_type_str
+    }
+
+
+@router.post("/worlds/{world_id}/levels")
+async def create_level_in_world(
+    world_id: str,
+    level_data: dict,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Create a new level in a world/course."""
+    from models.course import World
+
+    # Verify world exists
+    world = db.query(World).filter(World.id == world_id).first()
+    if not world:
+        raise HTTPException(status_code=404, detail="World not found")
+
+    # Get the next order_index
+    max_order = db.query(Level).filter(Level.world_id == world_id).count()
+
+    level = Level(
+        id=uuid.uuid4(),
+        world_id=uuid.UUID(world_id),
+        title=level_data.get("title", "New Level"),
+        description=level_data.get("description", ""),
+        order_index=max_order,
+        x_position=float(level_data.get("x_position", 50)),
+        y_position=float(level_data.get("y_position", 50))
+    )
+
+    db.add(level)
+    db.commit()
+    db.refresh(level)
+
+    return {
+        "id": str(level.id),
+        "world_id": str(level.world_id),
+        "title": level.title,
+        "description": level.description,
+        "order_index": level.order_index,
+        "x_position": level.x_position,
+        "y_position": level.y_position
+    }

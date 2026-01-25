@@ -35,8 +35,8 @@ def seed_courses():
             # Create Mambo 101 (Beginner Course)
             world_101_id = str(uuid.uuid4())
             conn.execute(text("""
-                INSERT INTO worlds (id, title, description, slug, order_index, is_free, difficulty, is_published)
-                VALUES (:id, :title, :description, :slug, :order_index, :is_free, :difficulty, :is_published)
+                INSERT INTO worlds (id, title, description, slug, order_index, is_free, difficulty, is_published, course_type, total_duration_minutes, objectives)
+                VALUES (:id, :title, :description, :slug, :order_index, :is_free, :difficulty, :is_published, :course_type, :total_duration_minutes, :objectives)
             """), {
                 "id": world_101_id,
                 "title": "Mambo 101",
@@ -45,19 +45,27 @@ def seed_courses():
                 "order_index": 1,
                 "is_free": True,
                 "difficulty": "BEGINNER",
-                "is_published": True
+                "is_published": True,
+                "course_type": "course",
+                "total_duration_minutes": 100,
+                "objectives": "[]"
             })
             
             # Create Level 1 for Mambo 101
             level_101_1_id = str(uuid.uuid4())
             conn.execute(text("""
-                INSERT INTO levels (id, world_id, title, order_index)
-                VALUES (:id, :world_id, :title, :order_index)
+                INSERT INTO levels (id, world_id, title, order_index, x_position, y_position, duration_minutes, total_xp, status)
+                VALUES (:id, :world_id, :title, :order_index, :x_position, :y_position, :duration_minutes, :total_xp, :status)
             """), {
                 "id": level_101_1_id,
                 "world_id": world_101_id,
                 "title": "Foundation",
-                "order_index": 1
+                "order_index": 1,
+                "x_position": 50.0,
+                "y_position": 90.0,
+                "duration_minutes": 0,
+                "total_xp": 0,
+                "status": "active"
             })
             
             # Create lessons for Mambo 101
@@ -91,7 +99,7 @@ def seed_courses():
             },
             {
                 "title": "Cross Body Lead Basics",
-                "description": "Learn the essential cross body lead pattern. Understand the lead and follow mechanics, practice the basic pattern, and develop your connection with a partner.",
+                "description": "Learn the essential cross body lead patterns. Understand the lead and follow mechanics, practice the basic pattern, and develop your connection with a partner.",
                 "video_url": "https://example.com/video/mambo-101-4",
                 "xp_value": 50,
                 "order_index": 4,
@@ -121,8 +129,8 @@ def seed_courses():
             for lesson_data in lessons_101:
                 lesson_id = str(uuid.uuid4())
                 conn.execute(text("""
-                    INSERT INTO lessons (id, level_id, title, description, video_url, xp_value, order_index, is_boss_battle, duration_minutes)
-                    VALUES (:id, :level_id, :title, :description, :video_url, :xp_value, :order_index, :is_boss_battle, :duration_minutes)
+                    INSERT INTO lessons (id, level_id, title, description, video_url, xp_value, order_index, is_boss_battle, duration_minutes, lesson_type)
+                    VALUES (:id, :level_id, :title, :description, :video_url, :xp_value, :order_index, :is_boss_battle, :duration_minutes, :lesson_type)
                 """), {
                     "id": lesson_id,
                     "level_id": level_101_1_id,
@@ -132,14 +140,15 @@ def seed_courses():
                     "xp_value": lesson_data["xp_value"],
                     "order_index": lesson_data["order_index"],
                     "is_boss_battle": lesson_data["is_boss_battle"],
-                    "duration_minutes": lesson_data["duration_minutes"]
+                    "duration_minutes": lesson_data["duration_minutes"],
+                    "lesson_type": "video"
                 })
         
             # Create Mambo 201 (Intermediate Course)
             world_201_id = str(uuid.uuid4())
             conn.execute(text("""
-                INSERT INTO worlds (id, title, description, slug, order_index, is_free, difficulty, is_published)
-                VALUES (:id, :title, :description, :slug, :order_index, :is_free, :difficulty, :is_published)
+                INSERT INTO worlds (id, title, description, slug, order_index, is_free, difficulty, is_published, course_type, total_duration_minutes, objectives)
+                VALUES (:id, :title, :description, :slug, :order_index, :is_free, :difficulty, :is_published, :course_type, :total_duration_minutes, :objectives)
             """), {
                 "id": world_201_id,
                 "title": "Mambo 201",
@@ -148,19 +157,27 @@ def seed_courses():
                 "order_index": 2,
                 "is_free": False,
                 "difficulty": "INTERMEDIATE",
-                "is_published": True
+                "is_published": True,
+                "course_type": "course",
+                "total_duration_minutes": 130,
+                "objectives": "[]"
             })
             
             # Create Level 1 for Mambo 201
             level_201_1_id = str(uuid.uuid4())
             conn.execute(text("""
-                INSERT INTO levels (id, world_id, title, order_index)
-                VALUES (:id, :world_id, :title, :order_index)
+                INSERT INTO levels (id, world_id, title, order_index, x_position, y_position, duration_minutes, total_xp, status)
+                VALUES (:id, :world_id, :title, :order_index, :x_position, :y_position, :duration_minutes, :total_xp, :status)
             """), {
                 "id": level_201_1_id,
                 "world_id": world_201_id,
                 "title": "Intermediate Patterns",
-                "order_index": 1
+                "order_index": 1,
+                "x_position": 50.0,
+                "y_position": 90.0,
+                "duration_minutes": 0,
+                "total_xp": 0,
+                "status": "active"
             })
             
             # Create lessons for Mambo 201
@@ -224,8 +241,8 @@ def seed_courses():
             for lesson_data in lessons_201:
                 lesson_id = str(uuid.uuid4())
                 conn.execute(text("""
-                    INSERT INTO lessons (id, level_id, title, description, video_url, xp_value, order_index, is_boss_battle, duration_minutes)
-                    VALUES (:id, :level_id, :title, :description, :video_url, :xp_value, :order_index, :is_boss_battle, :duration_minutes)
+                    INSERT INTO lessons (id, level_id, title, description, video_url, xp_value, order_index, is_boss_battle, duration_minutes, lesson_type)
+                    VALUES (:id, :level_id, :title, :description, :video_url, :xp_value, :order_index, :is_boss_battle, :duration_minutes, :lesson_type)
                 """), {
                     "id": lesson_id,
                     "level_id": level_201_1_id,
@@ -235,7 +252,8 @@ def seed_courses():
                     "xp_value": lesson_data["xp_value"],
                     "order_index": lesson_data["order_index"],
                     "is_boss_battle": lesson_data["is_boss_battle"],
-                    "duration_minutes": lesson_data["duration_minutes"]
+                    "duration_minutes": lesson_data["duration_minutes"],
+                    "lesson_type": "video"
                 })
             
             print("[SUCCESS] Successfully created courses and lessons!")

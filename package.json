@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@playwright/test": "^1.57.0"
+  },
+  "dependencies": {
+    "remotion": "^4.0.409"
   }
 }

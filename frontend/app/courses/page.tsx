@@ -24,7 +24,7 @@ interface Course {
   course_type?: string; // "course" | "choreo" | "topic"
 }
 
-type DifficultyFilter = "all" | "beginner" | "intermediate" | "advanced";
+type DifficultyFilter = "all" | "beginner" | "intermediate" | "advanced" | "open";
 type TypeFilter = "all" | "course" | "choreo" | "topic";
 
 export default function CoursesPage() {
@@ -112,141 +112,90 @@ export default function CoursesPage() {
   }, [courses]);
 
   return (
-    <div className="min-h-screen bg-mambo-dark">
+    <div className="min-h-screen bg-transparent">
       <NavBar user={user || undefined} />
 
-      <FadeIn>
-        <div className="bg-mambo-panel border-b border-gray-800 py-16 pt-24">
-          <div className="max-w-7xl mx-auto px-8">
-            <h1 className="text-4xl md:text-5xl font-bold mb-6 text-mambo-text tracking-tight">
-              Explore Courses
-            </h1>
-            <p className="text-gray-300 text-lg mb-10 max-w-2xl leading-relaxed">
-              Follow the path. Master the foundation before you unlock the flair.
-            </p>
-
-            {/* Search Bar - Aesthetic Design */}
-            <div className="relative max-w-xl mb-8">
-              <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-r from-amber-500/20 to-orange-500/20 rounded-full blur-xl opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity duration-300" />
-                <div className="relative flex items-center">
-                  <FaSearch className="absolute left-5 text-gray-400 group-focus-within:text-amber-400 transition-colors" />
-                  <input
-                    type="text"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    placeholder="Search by course name..."
-                    className="w-full bg-black/50 border border-gray-700 rounded-full pl-12 pr-12 py-4 text-mambo-text-light placeholder-gray-500 focus:border-amber-500/50 focus:outline-none focus:ring-2 focus:ring-amber-500/20 transition-all duration-300"
-                  />
-                  {searchQuery && (
-                    <button
-                      onClick={clearSearch}
-                      className="absolute right-5 text-gray-400 hover:text-white transition-colors"
-                    >
-                      <FaTimes />
-                    </button>
-                  )}
-                </div>
+      <div className="relative min-h-screen">
+        {/* Sticky Header Control Bar */}
+        <div className="sticky top-0 z-40 w-full bg-black/60 backdrop-blur-xl border-b border-white/10 pt-24 pb-4 transition-all duration-300">
+          <div className="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row items-center gap-10">
+            {/* Title & Stats */}
+            <div className="flex items-center gap-4">
+              <h1 className="text-3xl font-serif font-bold text-mambo-gold tracking-tight">Explore Courses</h1>
+              <div className="hidden md:flex items-center gap-2 text-sm text-gray-400 border-l border-white/10 pl-4">
+                <span className="font-bold text-white">{filteredCourses.length}</span>
+                <span>titles available</span>
               </div>
             </div>
 
-            {/* Type Filters - Courses / Choreos / Topics */}
-            <div className="flex flex-wrap gap-3 mb-6">
-              <span className="text-sm font-bold text-gray-500 uppercase tracking-wider self-center mr-2">
-                Type:
-              </span>
-              {[
-                { value: "all", label: "All", icon: "🎯" },
-                { value: "course", label: "Courses", icon: "📚" },
-                { value: "choreo", label: "Choreos", icon: "💃" },
-                { value: "topic", label: "Topics", icon: "💡" },
-              ].map((filter) => (
-                <button
-                  key={filter.value}
-                  onClick={() => setTypeFilter(filter.value as TypeFilter)}
-                  className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 flex items-center gap-2 ${
-                    typeFilter === filter.value
-                      ? "bg-gradient-to-r from-amber-500 to-orange-500 text-black shadow-lg shadow-amber-500/20"
-                      : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-amber-500/30"
-                  }`}
-                >
-                  <span>{filter.icon}</span>
-                  {filter.label}
-                  <span className={`text-xs px-1.5 py-0.5 rounded-full ${
-                    typeFilter === filter.value
-                      ? "bg-black/20"
-                      : "bg-gray-700"
-                  }`}>
-                    {typeCounts[filter.value as keyof typeof typeCounts]}
-                  </span>
-                </button>
-              ))}
-            </div>
+            {/* Controls: Search + Filters */}
+            <div className="flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
 
-            {/* Difficulty Filters */}
-            <div className="flex flex-wrap gap-3">
-              <span className="text-sm font-bold text-gray-500 uppercase tracking-wider self-center mr-2">
-                Level:
-              </span>
-              {[
-                { value: "all", label: "All Levels" },
-                { value: "beginner", label: "Beginner" },
-                { value: "intermediate", label: "Intermediate" },
-                { value: "advanced", label: "Advanced" },
-              ].map((filter) => (
-                <button
-                  key={filter.value}
-                  onClick={() => setDifficultyFilter(filter.value as DifficultyFilter)}
-                  className={`px-5 py-2.5 rounded-full text-sm font-bold transition-all duration-300 ${
-                    difficultyFilter === filter.value
-                      ? "bg-gradient-to-r from-white to-gray-100 text-black shadow-lg"
-                      : "bg-gray-800 hover:bg-gray-700 text-gray-300 border border-gray-700 hover:border-gray-600"
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
+              {/* Search Pill */}
+              <div className="relative group min-w-[200px]">
+                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-mambo-gold transition-colors text-sm" />
+                <input
+                  type="text"
+                  placeholder="Search..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white/5 border border-white/20 rounded-full pl-9 pr-8 py-2.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-mambo-gold/50 focus:bg-black/40 transition-all font-medium"
+                />
+                {searchQuery && (
+                  <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                    <FaTimes className="text-xs" />
+                  </button>
+                )}
+              </div>
+
+              <div className="h-6 w-px bg-white/10 mx-1 hidden md:block" />
+
+              {/* Type Filter Pills */}
+              <div className="flex bg-black/30 rounded-full p-1 border border-white/10">
+                {[{ v: 'all', l: 'All' }, { v: 'course', l: 'Courses' }, { v: 'choreo', l: 'Choreo' }, { v: 'topic', l: 'Topics' }].map(f => (
+                  <button
+                    key={f.v}
+                    onClick={() => setTypeFilter(f.v as TypeFilter)}
+                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all border ${typeFilter === f.v ? 'bg-white/20 text-white border-white/40 shadow-sm' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
+                  >
+                    {f.l}
+                  </button>
+                ))}
+              </div>
+
+              {/* Level Filter Dropdown Style Pill */}
+              <div className="flex bg-black/30 rounded-full p-1 border border-white/10">
+                {[{ v: 'all', l: 'All Levels' }, { v: 'beginner', l: 'Beg' }, { v: 'intermediate', l: 'Int' }, { v: 'advanced', l: 'Adv' }, { v: 'open', l: 'Open' }].map(f => (
+                  <button
+                    key={f.v}
+                    onClick={() => setDifficultyFilter(f.v as DifficultyFilter)}
+                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all border ${difficultyFilter === f.v ? 'bg-[#fbbf24] text-black border-[#fbbf24] shadow-[0_0_15px_rgba(251,191,36,0.4)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
+                  >
+                    {f.l}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </FadeIn>
 
-      {loading ? (
-        <div className="max-w-7xl mx-auto px-8 py-16 text-center text-gray-400">
-          Loading courses...
-        </div>
-      ) : error ? (
-        <div className="max-w-7xl mx-auto px-8 py-16 text-center">
-          <div className="text-red-400 mb-4">{error}</div>
-          <button
-            onClick={loadCourses}
-            className="px-6 py-2 bg-mambo-blue hover:bg-blue-600 text-white rounded-lg font-bold transition"
-          >
-            Retry
-          </button>
-        </div>
-      ) : (
-        <div className="max-w-7xl mx-auto px-8 py-16">
-          {/* Results count */}
-          {searchQuery && (
-            <p className="text-gray-400 mb-6">
-              {filteredCourses.length} result{filteredCourses.length !== 1 ? "s" : ""} for "{searchQuery}"
-            </p>
-          )}
-
-          {filteredCourses.length === 0 ? (
-            <div className="text-center text-gray-400 py-16">
-              {courses.length === 0 
-                ? "No courses available at the moment. Please check back later."
-                : searchQuery
-                ? `No courses found matching "${searchQuery}". Try a different search.`
-                : "No courses found for these filters. Try a different combination."}
+        {/* Main Grid Content */}
+        <div className="max-w-[1600px] mx-auto px-6 py-8">
+          {loading ? (
+            <div className="text-center py-20">
+              <div className="animate-spin w-8 h-8 border-2 border-mambo-gold border-t-transparent rounded-full mx-auto mb-4" />
+              <p className="text-gray-400">Loading library...</p>
+            </div>
+          ) : filteredCourses.length === 0 ? (
+            <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
+              <p className="text-xl text-gray-300 font-serif mb-2">No courses found</p>
+              <p className="text-gray-500 text-sm">Try adjusting your search or filters to find what you're looking for.</p>
+              <button onClick={() => { setSearchQuery(''); setTypeFilter('all'); setDifficultyFilter('all'); }} className="mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-bold transition-colors">
+                Clear All Filters
+              </button>
             </div>
           ) : (
-            <StaggerContainer 
-              key={`${typeFilter}-${difficultyFilter}-${searchQuery}-${filteredCourses.length}`}
-              className="grid md:grid-cols-3 gap-8"
-            >
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {filteredCourses.map((course, index) => (
                 <CourseCard
                   key={course.id}
@@ -261,10 +210,10 @@ export default function CoursesPage() {
                   onCourseClick={handleCourseClick}
                 />
               ))}
-            </StaggerContainer>
+            </div>
           )}
         </div>
-      )}
+      </div>
 
       <Footer />
     </div>

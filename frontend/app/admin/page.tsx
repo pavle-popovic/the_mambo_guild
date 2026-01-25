@@ -69,7 +69,7 @@ export default function AdminDashboardPage() {
         </header>
 
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
-          <div className="bg-mambo-panel border border-gray-800 p-6 rounded-xl">
+          <div className="bg-mambo-panel border border-white/10 p-6 rounded-xl transition-all duration-300 cursor-pointer hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10">
             <div className="text-gray-500 text-xs font-bold uppercase mb-2">
               Total Students
             </div>
@@ -81,7 +81,7 @@ export default function AdminDashboardPage() {
               +12% this week
             </div>
           </div>
-          <div className="bg-mambo-panel border border-gray-800 p-6 rounded-xl">
+          <div className="bg-mambo-panel border border-white/10 p-6 rounded-xl transition-all duration-300 cursor-pointer hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10">
             <div className="text-gray-500 text-xs font-bold uppercase mb-2">
               Active Subscriptions
             </div>
@@ -90,7 +90,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="text-xs mt-1 text-gray-400">$24,500 MRR</div>
           </div>
-          <div className="bg-mambo-panel border border-gray-800 p-6 rounded-xl">
+          <div className="bg-mambo-panel border border-white/10 p-6 rounded-xl transition-all duration-300 cursor-pointer hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10">
             <div className="text-gray-500 text-xs font-bold uppercase mb-2">
               Pending Homework
             </div>
@@ -99,7 +99,7 @@ export default function AdminDashboardPage() {
             </div>
             <div className="text-xs mt-1 text-gray-400">Needs Grading</div>
           </div>
-          <div className="bg-mambo-panel border border-gray-800 p-6 rounded-xl">
+          <div className="bg-mambo-panel border border-white/10 p-6 rounded-xl transition-all duration-300 cursor-pointer hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10">
             <div className="text-gray-500 text-xs font-bold uppercase mb-2">
               Completion Rate
             </div>
@@ -109,8 +109,8 @@ export default function AdminDashboardPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 bg-mambo-panel border border-gray-800 rounded-xl overflow-hidden">
-            <div className="p-6 border-b border-gray-800 flex justify-between items-center">
+          <div className="lg:col-span-2 bg-mambo-panel border border-white/10 rounded-xl overflow-hidden">
+            <div className="p-6 border-b border-white/10 flex justify-between items-center">
               <h3 className="font-bold text-mambo-text">Recent Signups</h3>
               <button className="text-xs text-mambo-blue hover:underline">View All</button>
             </div>
@@ -119,15 +119,15 @@ export default function AdminDashboardPage() {
             </div>
           </div>
 
-          <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
+          <div className="bg-mambo-panel border border-white/10 rounded-xl p-6">
             <h3 className="font-bold mb-4 text-mambo-text">Quick Actions</h3>
             <div className="space-y-3">
               <a
                 href="/admin/builder"
-                className="block p-4 border border-dashed border-gray-700 rounded-lg hover:border-mambo-blue hover:bg-gray-800 transition text-center group"
+                className="block p-4 border border-white/10 rounded-xl transition-all duration-300 text-center group hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
               >
                 <svg
-                  className="w-8 h-8 text-gray-500 mb-2 mx-auto group-hover:text-mambo-blue"
+                  className="w-8 h-8 text-gray-500 mb-2 mx-auto group-hover:text-mambo-gold transition-colors"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >
@@ -137,10 +137,10 @@ export default function AdminDashboardPage() {
               </a>
               <a
                 href="/admin/grading"
-                className="block p-4 border border-dashed border-gray-700 rounded-lg hover:border-yellow-500 hover:bg-gray-800 transition text-center group"
+                className="block p-4 border border-white/10 rounded-xl transition-all duration-300 text-center group hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
               >
                 <svg
-                  className="w-8 h-8 text-gray-500 mb-2 mx-auto group-hover:text-yellow-500"
+                  className="w-8 h-8 text-gray-500 mb-2 mx-auto group-hover:text-mambo-gold transition-colors"
                   fill="currentColor"
                   viewBox="0 0 20 20"
                 >

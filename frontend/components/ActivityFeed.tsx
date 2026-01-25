@@ -15,7 +15,7 @@ interface ActivityFeedProps {
 
 const ActivityFeed: React.FC<ActivityFeedProps> = ({ activities }) => {
     return (
-        <div className="bg-mambo-panel border border-gray-800 rounded-xl p-4 space-y-4">
+        <div className="bg-mambo-panel border border-white/10 rounded-xl p-4 space-y-4">
             {activities.map(activity => (
                 <div key={activity.id} className="flex gap-3">
                     <div className={`w-8 h-8 rounded-full ${activity.initialsBgColor} flex items-center justify-center text-xs font-bold`}>

@@ -1,0 +1,27 @@
+Total Badges Found: 24
+------------------------------------------------------------
+Name: The Metronome                  | Tier: silver     | Icon: None
+Name: The Eye                        | Tier: silver     | Icon: None
+Name: Firestarter                    | Tier: silver     | Icon: None
+Name: The Critic                     | Tier: diamond    | Icon: /badges/placeholder.png
+Name: The Star                       | Tier: diamond    | Icon: /badges/placeholder.png
+Name: The Critic III                 | Tier: gold       | Icon: /badges/placeholder.png
+Name: The Critic II                  | Tier: silver     | Icon: /badges/placeholder.png
+Name: The Metronome V                | Tier: diamond    | Icon: /badges/placeholder.png
+Name: The Metronome III              | Tier: gold       | Icon: /badges/placeholder.png
+Name: The Metronome II               | Tier: silver     | Icon: /badges/placeholder.png
+Name: Supernova                      | Tier: gold       | Icon: /badges/placeholder.png
+Name: Shining Star                   | Tier: silver     | Icon: /badges/placeholder.png
+Name: The Metronome I                | Tier: bronze     | Icon: /badges/metronome_bronze.png
+Name: The Metronome IV               | Tier: platinum   | Icon: /badges/metronome_platinum.png
+Name: The Critic I                   | Tier: bronze     | Icon: /badges/critic_bronze.png
+Name: Rising Star                    | Tier: bronze     | Icon: /badges/star_bronze.png
+Name: The Cinematographer            | Tier: silver     | Icon: /badges/camera_style.png
+Name: El Maestro                     | Tier: silver     | Icon: /badges/maestro_style.png
+Name: First Responder                | Tier: silver     | Icon: /badges/maestro_style.png
+Name: Helpful Hand                   | Tier: bronze     | Icon: /badges/maestro_style.png
+Name: El Maestro                     | Tier: diamond    | Icon: /badges/maestro_style.png
+Name: El Maestro                     | Tier: gold       | Icon: /badges/maestro_style.png
+Name: Problem Solver                 | Tier: silver     | Icon: /badges/maestro_style.png
+Name: The Lion                       | Tier: silver     | Icon: /badges/lion_style.png
+------------------------------------------------------------

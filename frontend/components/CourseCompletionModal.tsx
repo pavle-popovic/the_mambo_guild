@@ -9,12 +9,16 @@ interface CourseCompletionModalProps {
   isOpen: boolean;
   courseTitle: string;
   onClose: () => void;
+  type?: 'module' | 'course';  // Default to 'course' for backward compatibility
+  courseId?: string;  // For navigation back to skill tree
 }
 
 export default function CourseCompletionModal({
   isOpen,
   courseTitle,
   onClose,
+  type = 'course',
+  courseId,
 }: CourseCompletionModalProps) {
   const [isAnimating, setIsAnimating] = useState(false);
 
@@ -68,10 +72,10 @@ export default function CourseCompletionModal({
                 transition={{ delay: 0.3 }}
                 className="text-3xl font-bold text-white mb-2"
               >
-                Course Complete! 🎉
+                {type === 'module' ? 'Module Complete! 🎉' : 'Course Complete! 🎉'}
               </motion.h2>
 
-              {/* Course Name */}
+              {/* Course/Module Name */}
               <motion.p
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -88,7 +92,10 @@ export default function CourseCompletionModal({
                 transition={{ delay: 0.5 }}
                 className="text-gray-300 text-lg leading-relaxed"
               >
-                Congratulations! You've mastered every lesson in this course. Your dedication and hard work have paid off!
+                {type === 'module'
+                  ? "Excellent work! You've completed all lessons in this module. Keep the momentum going!"
+                  : "Congratulations! You've mastered every lesson in this course. Your dedication and hard work have paid off!"
+                }
               </motion.p>
 
               {/* Action Button */}
@@ -99,11 +106,11 @@ export default function CourseCompletionModal({
                 className="pt-4"
               >
                 <Link
-                  href="/courses"
+                  href={type === 'module' && courseId ? `/courses/${courseId}` : '/courses'}
                   onClick={onClose}
                   className="inline-block w-full bg-gradient-to-r from-mambo-gold to-yellow-500 hover:from-yellow-500 hover:to-mambo-gold text-black font-bold py-4 px-8 rounded-lg transition-all duration-200 shadow-lg hover:shadow-xl hover:scale-105 transform"
                 >
-                  Back to Courses
+                  {type === 'module' ? 'Back to Skill Tree' : 'Back to Courses'}
                 </Link>
               </motion.div>
             </div>

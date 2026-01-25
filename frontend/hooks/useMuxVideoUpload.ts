@@ -6,8 +6,8 @@ import { apiClient } from "@/lib/api";
 export type UploadStatus = "idle" | "uploading" | "processing" | "live" | "error" | "deleting";
 
 interface UseMuxVideoUploadOptions {
-  entityId: string; // lesson_id, course_id, or post_id
-  entityType: "lesson" | "course" | "community";
+  entityId?: string; // lesson_id, course_id, level_id, or post_id
+  entityType: "lesson" | "course" | "level" | "community";
   currentPlaybackId?: string | null;
   onUploadComplete: (playbackId: string, assetId: string) => void;
   onRefresh?: () => Promise<void>;
@@ -59,13 +59,32 @@ export function useMuxVideoUpload({
 
         // Fetch entity data based on type
         if (entityType === "lesson") {
-          entity = await apiClient.getLesson(entityId);
+          entity = await apiClient.getLesson(entityId!);
           playbackId = entity.mux_playback_id;
           assetId = entity.mux_asset_id;
         } else if (entityType === "course") {
-          entity = await apiClient.getCourseFullDetails(entityId);
+          entity = await apiClient.getCourseFullDetails(entityId!);
           playbackId = entity.mux_preview_playback_id;
           assetId = (entity as any).mux_preview_asset_id;
+        } else if (entityType === "level") {
+          // Level preview videos - fetch level details
+          try {
+            const response = await fetch(
+              `${process.env.NEXT_PUBLIC_API_URL}/api/admin/levels/${entityId}`,
+              {
+                headers: {
+                  Authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+              }
+            );
+            if (response.ok) {
+              entity = await response.json();
+              playbackId = entity.mux_preview_playback_id || null;
+              assetId = entity.mux_preview_asset_id || null;
+            }
+          } catch (e) {
+            console.log("[useMuxVideoUpload] Level not found");
+          }
         } else if (entityType === "community") {
           // Community posts - check if post exists
           try {
@@ -81,7 +100,7 @@ export function useMuxVideoUpload({
         // If entity has video in DB, verify it exists in Mux
         if (playbackId && assetId) {
           console.log(`[useMuxVideoUpload] ✅ Video found in DB: playback_id=${playbackId}`);
-          
+
           try {
             const assetCheck = await apiClient.checkMuxAssetExists(assetId);
             if (assetCheck.exists) {
@@ -123,7 +142,8 @@ export function useMuxVideoUpload({
         const checkResult = await apiClient.checkMuxUploadStatus(
           entityType === "lesson" ? entityId : undefined,
           entityType === "course" ? entityId : undefined,
-          entityType === "community" ? entityId : undefined
+          entityType === "community" ? entityId : undefined,
+          entityType === "level" ? entityId : undefined
         );
 
         if (checkResult.status === "ready" && checkResult.playback_id && checkResult.asset_id) {
@@ -161,7 +181,8 @@ export function useMuxVideoUpload({
       const checkResult = await apiClient.checkMuxUploadStatus(
         entityType === "lesson" ? entityId : undefined,
         entityType === "course" ? entityId : undefined,
-        entityType === "community" ? entityId : undefined
+        entityType === "community" ? entityId : undefined,
+        entityType === "level" ? entityId : undefined
       );
       console.log("[useMuxVideoUpload] Check result:", checkResult);
 
@@ -202,35 +223,44 @@ export function useMuxVideoUpload({
                 return;
               }
             }
-            } else if (entityType === "course") {
-              entity = await apiClient.getCourseFullDetails(entityId);
-              if (entity.mux_preview_playback_id && (entity as any).mux_preview_asset_id) {
-                const assetCheck = await apiClient.checkMuxAssetExists((entity as any).mux_preview_asset_id);
-                if (assetCheck.exists) {
-                  console.log("[useMuxVideoUpload] ✅ Video found in entity!");
-                  statusRef.current = "live";
-                  setUploadStatus("live");
-                  onUploadComplete(entity.mux_preview_playback_id, (entity as any).mux_preview_asset_id);
-                  if (onRefresh) {
-                    await onRefresh();
-                  }
-                  if (pollIntervalRef.current) {
-                    clearInterval(pollIntervalRef.current);
-                    pollIntervalRef.current = null;
-                  }
-                  return;
+          } else if (entityType === "course") {
+            entity = await apiClient.getCourseFullDetails(entityId);
+            if (entity.mux_preview_playback_id && (entity as any).mux_preview_asset_id) {
+              const assetCheck = await apiClient.checkMuxAssetExists((entity as any).mux_preview_asset_id);
+              if (assetCheck.exists) {
+                console.log("[useMuxVideoUpload] ✅ Video found in entity!");
+                statusRef.current = "live";
+                setUploadStatus("live");
+                onUploadComplete(entity.mux_preview_playback_id, (entity as any).mux_preview_asset_id);
+                if (onRefresh) {
+                  await onRefresh();
                 }
+                if (pollIntervalRef.current) {
+                  clearInterval(pollIntervalRef.current);
+                  pollIntervalRef.current = null;
+                }
+                return;
               }
-            } else if (entityType === "community") {
-              try {
-                entity = await apiClient.getPost(entityId);
-                if (entity.mux_playback_id && entity.mux_asset_id) {
-                  const assetCheck = await apiClient.checkMuxAssetExists(entity.mux_asset_id);
+            }
+          } else if (entityType === "level") {
+            try {
+              const response = await fetch(
+                `${process.env.NEXT_PUBLIC_API_URL}/api/admin/levels/${entityId}`,
+                {
+                  headers: {
+                    Authorization: `Bearer ${localStorage.getItem("token")}`,
+                  },
+                }
+              );
+              if (response.ok) {
+                entity = await response.json();
+                if (entity.mux_preview_playback_id && entity.mux_preview_asset_id) {
+                  const assetCheck = await apiClient.checkMuxAssetExists(entity.mux_preview_asset_id);
                   if (assetCheck.exists) {
-                    console.log("[useMuxVideoUpload] ✅ Video found in entity!");
+                    console.log("[useMuxVideoUpload] ✅ Video found in level entity!");
                     statusRef.current = "live";
                     setUploadStatus("live");
-                    onUploadComplete(entity.mux_playback_id, entity.mux_asset_id);
+                    onUploadComplete(entity.mux_preview_playback_id, entity.mux_preview_asset_id);
                     if (onRefresh) {
                       await onRefresh();
                     }
@@ -241,10 +271,34 @@ export function useMuxVideoUpload({
                     return;
                   }
                 }
-              } catch (e) {
-                console.log("[useMuxVideoUpload] Post not found in fallback check");
               }
+            } catch (e) {
+              console.log("[useMuxVideoUpload] Level not found in fallback check");
             }
+          } else if (entityType === "community") {
+            try {
+              entity = await apiClient.getPost(entityId);
+              if (entity.mux_playback_id && entity.mux_asset_id) {
+                const assetCheck = await apiClient.checkMuxAssetExists(entity.mux_asset_id);
+                if (assetCheck.exists) {
+                  console.log("[useMuxVideoUpload] ✅ Video found in entity!");
+                  statusRef.current = "live";
+                  setUploadStatus("live");
+                  onUploadComplete(entity.mux_playback_id, entity.mux_asset_id);
+                  if (onRefresh) {
+                    await onRefresh();
+                  }
+                  if (pollIntervalRef.current) {
+                    clearInterval(pollIntervalRef.current);
+                    pollIntervalRef.current = null;
+                  }
+                  return;
+                }
+              }
+            } catch (e) {
+              console.log("[useMuxVideoUpload] Post not found in fallback check");
+            }
+          }
           console.log("[useMuxVideoUpload] Video still processing...");
         } catch (fallbackError) {
           console.error("[useMuxVideoUpload] Error in fallback check:", fallbackError);
@@ -303,7 +357,8 @@ export function useMuxVideoUpload({
           entityType === "lesson" ? entityId : undefined,
           file.name,
           entityType === "course" ? entityId : undefined,
-          entityType === "community" ? entityId : undefined
+          entityType === "community" ? entityId : undefined,
+          entityType === "level" ? entityId : undefined
         );
 
         if (!upload_url || !upload_id) {
@@ -389,6 +444,23 @@ export function useMuxVideoUpload({
       } else if (entityType === "course") {
         const course = await apiClient.getCourseFullDetails(entityId);
         assetIdToDelete = (course as any).mux_preview_asset_id;
+      } else if (entityType === "level") {
+        try {
+          const response = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/admin/levels/${entityId}`,
+            {
+              headers: {
+                Authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+            }
+          );
+          if (response.ok) {
+            const level = await response.json();
+            assetIdToDelete = level.mux_preview_asset_id || null;
+          }
+        } catch (e) {
+          console.log("[useMuxVideoUpload] Level not found for deletion");
+        }
       } else if (entityType === "community") {
         try {
           const post = await apiClient.getPost(entityId);
