@@ -62,16 +62,15 @@ export default function FrameByFrame({ playerRef }: FrameByFrameProps) {
           onClick={stepBackward}
           disabled={!isPaused}
           className={`
-            w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200
-            ${
-              isPaused
-                ? "bg-gray-800 text-white hover:bg-gray-700 hover:scale-105 active:scale-95"
-                : "bg-gray-800/50 text-gray-600 cursor-not-allowed"
+            w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 border
+            ${isPaused
+              ? "bg-black/20 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white hover:border-white/30 active:scale-95"
+              : "bg-black/10 border-white/5 text-gray-600 cursor-not-allowed"
             }
           `}
           title={isPaused ? "Step backward (,)" : "Pause video first"}
         >
-          <FaStepBackward className="text-lg" />
+          <FaStepBackward className="text-sm" />
         </button>
 
         {/* Step Forward Button */}
@@ -79,23 +78,22 @@ export default function FrameByFrame({ playerRef }: FrameByFrameProps) {
           onClick={stepForward}
           disabled={!isPaused}
           className={`
-            w-12 h-12 rounded-xl flex items-center justify-center transition-all duration-200
-            ${
-              isPaused
-                ? "bg-gray-800 text-white hover:bg-gray-700 hover:scale-105 active:scale-95"
-                : "bg-gray-800/50 text-gray-600 cursor-not-allowed"
+            w-10 h-10 rounded-lg flex items-center justify-center transition-all duration-200 border
+            ${isPaused
+              ? "bg-black/20 border-white/10 text-gray-300 hover:bg-white/10 hover:text-white hover:border-white/30 active:scale-95"
+              : "bg-black/10 border-white/5 text-gray-600 cursor-not-allowed"
             }
           `}
           title={isPaused ? "Step forward (.)" : "Pause video first"}
         >
-          <FaStepForward className="text-lg" />
+          <FaStepForward className="text-sm" />
         </button>
 
         {/* Pause hint */}
         {!isPaused && (
           <button
             onClick={handlePause}
-            className="text-xs text-gray-400 hover:text-white transition-colors px-3 py-1.5 bg-gray-800/50 rounded-lg"
+            className="text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors px-3 py-1.5 bg-black/40 border border-white/10 hover:bg-white/5 rounded-md"
           >
             Pause to step
           </button>

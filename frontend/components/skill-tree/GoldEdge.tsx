@@ -142,49 +142,124 @@ function GoldEdge({
       )}
 
       {/* ============================================
-          AVAILABLE STATE: Gold line + intense ethereal glow
+          AVAILABLE STATE: Flickering between gold and gray
+          Creates a "transitional" feel between completed and locked
           ============================================ */}
       {isAvailable && (
         <>
-          {/* Outer ethereal glow - wide spread */}
+          {/* Base gray track (always visible as fallback) */}
+          <path
+            d={edgePath}
+            fill="none"
+            stroke="rgba(100, 100, 120, 0.4)"
+            strokeWidth={2}
+            strokeLinecap="round"
+          />
+
+          {/* Flickering gold glow - outer */}
           <motion.path
             d={edgePath}
             fill="none"
-            stroke="rgba(255, 200, 100, 0.15)"
-            strokeWidth={20}
+            stroke="rgba(255, 200, 100, 0.2)"
+            strokeWidth={16}
             strokeLinecap="round"
-            style={{ filter: "blur(8px)" }}
-            animate={{ opacity: [0.1, 0.25, 0.1] }}
-            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            style={{ filter: "blur(6px)" }}
+            animate={{
+              opacity: [0, 0.3, 0.5, 0.3, 0],
+              strokeWidth: [12, 16, 20, 16, 12],
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              times: [0, 0.3, 0.5, 0.7, 1],
+            }}
           />
-          {/* Middle glow layer */}
+
+          {/* Flickering gold glow - middle */}
           <motion.path
             d={edgePath}
             fill="none"
             stroke="rgba(255, 215, 0, 0.4)"
-            strokeWidth={10}
+            strokeWidth={8}
             strokeLinecap="round"
-            style={{ filter: "blur(4px)" }}
-            animate={{ opacity: [0.3, 0.6, 0.3] }}
-            transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
+            style={{ filter: "blur(3px)" }}
+            animate={{
+              opacity: [0.1, 0.6, 0.8, 0.6, 0.1],
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              times: [0, 0.3, 0.5, 0.7, 1],
+            }}
           />
-          {/* Core gold line */}
-          <path
+
+          {/* Flickering core gold line */}
+          <motion.path
             d={edgePath}
             fill="none"
             stroke={`url(#${gradientId})`}
             strokeWidth={2.5}
             strokeLinecap="round"
             filter={`url(#${glowFilterId})`}
-            opacity={0.85}
+            animate={{
+              opacity: [0.2, 0.9, 1, 0.9, 0.2],
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              times: [0, 0.3, 0.5, 0.7, 1],
+            }}
           />
-          {/* Bright center highlight */}
-          <path
+
+          {/* Flickering bright center highlight */}
+          <motion.path
             d={edgePath}
             fill="none"
-            stroke="rgba(255, 250, 220, 0.6)"
+            stroke="rgba(255, 250, 220, 0.8)"
             strokeWidth={1}
             strokeLinecap="round"
+            animate={{
+              opacity: [0, 0.5, 0.8, 0.5, 0],
+            }}
+            transition={{
+              duration: 2.5,
+              repeat: Infinity,
+              ease: "easeInOut",
+              times: [0, 0.3, 0.5, 0.7, 1],
+            }}
+          />
+
+          {/* Traveling spark during flicker "on" phase */}
+          <motion.path
+            d={edgePath}
+            fill="none"
+            stroke="rgba(255, 255, 240, 1)"
+            strokeWidth={2}
+            strokeLinecap="round"
+            strokeDasharray={`8 ${pathLength}`}
+            filter={`url(#${pulseFilterId})`}
+            initial={{ strokeDashoffset: 0, opacity: 0 }}
+            animate={{
+              strokeDashoffset: [0, -(pathLength + 8)],
+              opacity: [0, 0.8, 1, 0.8, 0],
+            }}
+            transition={{
+              strokeDashoffset: {
+                duration: 1.5,
+                repeat: Infinity,
+                ease: "linear",
+                repeatDelay: 1,
+              },
+              opacity: {
+                duration: 2.5,
+                repeat: Infinity,
+                ease: "easeInOut",
+                times: [0, 0.3, 0.5, 0.7, 1],
+              },
+            }}
           />
         </>
       )}

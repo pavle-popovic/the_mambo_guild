@@ -37,26 +37,27 @@ export default function SpeedControl({ playerRef }: SpeedControlProps) {
 
   return (
     <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
+      <div className="flex justify-between items-center mb-1">
         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Speed</span>
-        <div className="flex gap-1.5">
-          {SPEED_OPTIONS.map((speed) => (
-            <button
-              key={speed}
-              onClick={() => handleSpeedChange(speed)}
-              className={`
-                px-3 py-1.5 rounded-lg text-sm font-bold transition-all duration-200
-                ${
-                  currentSpeed === speed
-                    ? "bg-mambo-gold text-black shadow-[0_0_10px_rgba(212,175,55,0.3)]"
-                    : "bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white"
-                }
-              `}
-            >
-              {speed}x
-            </button>
-          ))}
-        </div>
+        <span className="text-xs font-mono text-mambo-gold">{currentSpeed}x</span>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {SPEED_OPTIONS.map((speed) => (
+          <button
+            key={speed}
+            onClick={() => handleSpeedChange(speed)}
+            className={`
+              flex-1 min-w-[2.5rem] px-2 py-1.5 rounded-md text-xs font-bold transition-all duration-200 text-center border
+              ${currentSpeed === speed
+                ? "bg-mambo-gold/20 text-mambo-gold border-mambo-gold/50 shadow-[0_0_10px_rgba(212,175,55,0.2)]"
+                : "bg-black/20 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
+              }
+            `}
+          >
+            {speed}x
+          </button>
+        ))}
       </div>
 
       {/* Warning for slower speeds */}

@@ -9,6 +9,7 @@ interface MuxVideoPlayerProps {
   poster?: string;
   onEnded?: () => void;
   onPlay?: () => void;
+  onPlaying?: () => void; // Fires when playback actually starts (after buffering)
   onPause?: () => void;
   onTimeUpdate?: (currentTime: number) => void;
   onLoadedMetadata?: (duration: number) => void;
@@ -39,6 +40,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       poster,
       onEnded,
       onPlay,
+      onPlaying,
       onPause,
       onTimeUpdate,
       onLoadedMetadata,
@@ -149,6 +151,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           }}
           onEnded={onEnded}
           onPlay={onPlay}
+          onPlaying={onPlaying}
           onPause={onPause}
           onTimeUpdate={handleTimeUpdate}
           onLoadedMetadata={handleLoadedMetadata}

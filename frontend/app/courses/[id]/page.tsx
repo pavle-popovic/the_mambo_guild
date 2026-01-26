@@ -146,28 +146,28 @@ export default function CourseDetailPage() {
         </div>
       </div>
 
-      {/* Course Progress Widget (Top Right) */}
-      <div className="absolute top-24 right-8 z-30 w-80 bg-black/80 backdrop-blur-xl border border-yellow-900/30 rounded-2xl p-6 shadow-2xl pointer-events-auto">
-        <h2 className="text-2xl font-serif font-bold text-white mb-4 text-center">{skillTree.title}</h2>
+      {/* Course Progress Widget (Top Right) - Compact */}
+      <div className="absolute top-20 right-4 z-30 w-52 bg-black/70 backdrop-blur-md border border-yellow-900/20 rounded-xl p-3 shadow-xl pointer-events-auto">
+        <h2 className="text-sm font-serif font-bold text-white mb-2 truncate">{skillTree.title}</h2>
 
-        <div className="flex justify-between items-baseline mb-2">
-          <span className="text-xs font-bold text-gray-500 tracking-widest uppercase">Course Progress</span>
-          <span className="text-xl font-bold text-mambo-gold">
+        <div className="flex justify-between items-baseline mb-1">
+          <span className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Progress</span>
+          <span className="text-sm font-bold text-mambo-gold">
             {Math.round(stats.progress)}%
           </span>
         </div>
 
-        <div className="h-3 bg-gray-900/50 rounded-full overflow-hidden border border-white/10 mb-2">
+        <div className="h-2 bg-gray-900/50 rounded-full overflow-hidden border border-white/10 mb-1">
           <div
-            className="bg-gradient-to-r from-mambo-blue to-purple-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_12px_rgba(139,92,246,0.6),0_0_20px_rgba(59,130,246,0.4)]"
+            className="bg-gradient-to-r from-mambo-blue to-purple-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(139,92,246,0.5)]"
             style={{
               width: `${Math.round(stats.progress)}%`
             }}
           />
         </div>
 
-        <div className="text-xs text-gray-500 font-medium">
-          {stats.completed}/{stats.total} lessons completed
+        <div className="text-[10px] text-gray-500">
+          {stats.completed}/{stats.total} lessons
         </div>
       </div>
     </div>

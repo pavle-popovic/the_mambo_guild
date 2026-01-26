@@ -152,6 +152,7 @@ class BadgeCategory(str, enum.Enum):
 
 
 class BadgeTier(str, enum.Enum):
+    BRONZE = "bronze"
     SILVER = "silver"
     GOLD = "gold"
     DIAMOND = "diamond"

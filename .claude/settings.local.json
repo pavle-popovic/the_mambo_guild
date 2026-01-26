@@ -37,7 +37,10 @@
       "Bash(docker-compose ps:*)",
       "Bash(docker-compose exec postgres psql:*)",
       "Bash(docker-compose logs:*)",
-      "Bash(docker-compose exec:*)"
+      "Bash(docker-compose exec:*)",
+      "Bash(pip show:*)",
+      "Bash(echo:*)",
+      "Bash(read:*)"
     ]
   }
 }

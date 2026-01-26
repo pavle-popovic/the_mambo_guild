@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface DrillViewData {
   viewCount: number;
@@ -13,7 +13,8 @@ interface DrillViewStore {
 }
 
 const STORAGE_KEY = "mambo_drill_views";
-const VIEWS_THRESHOLD = 3;
+const VIEWS_THRESHOLD = 1000000000; // Effectively disabled for now
+const DEBOUNCE_MS = 5000; // Minimum 5 seconds between view counts
 
 /**
  * Hook for tracking lesson video view counts.
@@ -23,6 +24,7 @@ export function useDrillViewCount(lessonId: string) {
   const [viewCount, setViewCount] = useState(0);
   const [showPracticeMode, setShowPracticeMode] = useState(false);
   const [dismissedForSession, setDismissedForSession] = useState(false);
+  const lastIncrementRef = useRef<number>(0);
 
   // Load view count from localStorage on mount
   useEffect(() => {
@@ -46,9 +48,17 @@ export function useDrillViewCount(lessonId: string) {
     }
   }, [lessonId]);
 
-  // Increment view count when video starts playing
+  // Increment view count when video starts playing (debounced to prevent duplicate counts)
   const incrementView = useCallback(() => {
     if (typeof window === "undefined" || !lessonId) return;
+
+    // Debounce: prevent counting multiple times in quick succession
+    const now = Date.now();
+    if (now - lastIncrementRef.current < DEBOUNCE_MS) {
+      console.log("[DrillView] Debounced - too soon since last count");
+      return;
+    }
+    lastIncrementRef.current = now;
 
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -66,8 +76,11 @@ export function useDrillViewCount(lessonId: string) {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
       setViewCount(newCount);
 
+      console.log(`[DrillView] View count incremented: ${newCount} for lesson ${lessonId}`);
+
       // Show practice mode overlay after threshold (if not downloaded yet)
       if (newCount >= VIEWS_THRESHOLD && !currentData.downloadedAt) {
+        console.log(`[DrillView] Threshold reached (${VIEWS_THRESHOLD}), showing practice mode overlay`);
         setShowPracticeMode(true);
       }
     } catch (e) {

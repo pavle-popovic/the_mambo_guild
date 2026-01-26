@@ -1,0 +1,340 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model badge_definitions {
+  id               String        @id @db.VarChar(50)
+  name             String        @db.VarChar(100)
+  description      String
+  tier             String        @db.VarChar(20)
+  icon_url         String?       @db.VarChar(255)
+  category         String        @db.VarChar(20)
+  requirement_type String        @db.VarChar(50)
+  threshold        Int
+  created_at       DateTime      @db.Timestamp(6)
+  user_badges      user_badges[]
+}
+
+model boss_submissions {
+  id                                        String           @id @db.Uuid
+  user_id                                   String           @db.Uuid
+  lesson_id                                 String           @db.Uuid
+  video_url                                 String           @db.VarChar
+  status                                    submissionstatus
+  instructor_feedback                       String?
+  instructor_video_url                      String?          @db.VarChar
+  submitted_at                              DateTime         @db.Timestamp(6)
+  reviewed_at                               DateTime?        @db.Timestamp(6)
+  reviewed_by                               String?          @db.Uuid
+  lessons                                   lessons          @relation(fields: [lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_boss_submissions_reviewed_byTousers users?           @relation("boss_submissions_reviewed_byTousers", fields: [reviewed_by], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users_boss_submissions_user_idTousers     users            @relation("boss_submissions_user_idTousers", fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model clave_transactions {
+  id           String   @id @db.Uuid
+  user_id      String   @db.Uuid
+  amount       Int
+  reason       String   @db.VarChar(100)
+  reference_id String?  @db.Uuid
+  created_at   DateTime @db.Timestamp(6)
+  users        users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "ix_clave_transactions_user_id")
+}
+
+model comments {
+  id             String     @id @db.Uuid
+  user_id        String     @db.Uuid
+  lesson_id      String     @db.Uuid
+  parent_id      String?    @db.Uuid
+  content        String
+  created_at     DateTime   @db.Timestamp(6)
+  lessons        lessons    @relation(fields: [lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  comments       comments?  @relation("commentsTocomments", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  other_comments comments[] @relation("commentsTocomments")
+  users          users      @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model community_tags {
+  slug        String  @id @db.VarChar(50)
+  name        String  @db.VarChar(100)
+  category    String? @db.VarChar(50)
+  usage_count Int?
+}
+
+model lessons {
+  id               String             @id @db.Uuid
+  level_id         String             @db.Uuid
+  title            String             @db.VarChar
+  description      String?
+  video_url        String             @db.VarChar
+  xp_value         Int
+  order_index      Int
+  is_boss_battle   Boolean
+  duration_minutes Int?
+  lesson_type      String             @db.VarChar
+  week_number      Int?
+  day_number       Int?
+  content_json     Json?
+  mux_playback_id  String?            @db.VarChar
+  mux_asset_id     String?            @db.VarChar
+  thumbnail_url    String?            @db.VarChar
+  boss_submissions boss_submissions[]
+  comments         comments[]
+  levels           levels             @relation(fields: [level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  user_progress    user_progress[]
+
+  @@index([day_number], map: "ix_lessons_day_number")
+  @@index([week_number], map: "ix_lessons_week_number")
+}
+
+model level_edges {
+  id                                       String @id @db.Uuid
+  world_id                                 String @db.Uuid
+  from_level_id                            String @db.Uuid
+  to_level_id                              String @db.Uuid
+  levels_level_edges_from_level_idTolevels levels @relation("level_edges_from_level_idTolevels", fields: [from_level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  levels_level_edges_to_level_idTolevels   levels @relation("level_edges_to_level_idTolevels", fields: [to_level_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  worlds                                   worlds @relation(fields: [world_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([world_id], map: "ix_level_edges_world_id")
+}
+
+model levels {
+  id                                            String        @id @db.Uuid
+  world_id                                      String        @db.Uuid
+  title                                         String        @db.VarChar
+  order_index                                   Int
+  description                                   String?
+  x_position                                    Float
+  y_position                                    Float
+  thumbnail_url                                 String?       @db.VarChar
+  outcome                                       String?       @db.VarChar(255)
+  duration_minutes                              Int
+  total_xp                                      Int
+  status                                        String        @db.VarChar(50)
+  mux_preview_playback_id                       String?       @db.VarChar
+  mux_preview_asset_id                          String?       @db.VarChar
+  lessons                                       lessons[]
+  level_edges_level_edges_from_level_idTolevels level_edges[] @relation("level_edges_from_level_idTolevels")
+  level_edges_level_edges_to_level_idTolevels   level_edges[] @relation("level_edges_to_level_idTolevels")
+  worlds                                        worlds        @relation(fields: [world_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model post_reactions {
+  id            String   @id @db.Uuid
+  post_id       String   @db.Uuid
+  user_id       String   @db.Uuid
+  reaction_type String   @db.VarChar(20)
+  created_at    DateTime @db.Timestamp(6)
+  posts         posts    @relation(fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users         users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([post_id, user_id], map: "unique_post_user_reaction")
+  @@index([post_id], map: "ix_post_reactions_post_id")
+  @@index([user_id], map: "ix_post_reactions_user_id")
+}
+
+model post_replies {
+  id                                           String   @id @db.Uuid
+  post_id                                      String   @db.Uuid
+  user_id                                      String   @db.Uuid
+  content                                      String
+  mux_asset_id                                 String?  @db.VarChar(100)
+  mux_playback_id                              String?  @db.VarChar(100)
+  is_accepted_answer                           Boolean?
+  created_at                                   DateTime @db.Timestamp(6)
+  posts_post_replies_post_idToposts            posts    @relation("post_replies_post_idToposts", fields: [post_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  users                                        users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  posts_posts_accepted_answer_idTopost_replies posts[]  @relation("posts_accepted_answer_idTopost_replies")
+
+  @@index([post_id], map: "ix_post_replies_post_id")
+  @@index([user_id], map: "ix_post_replies_user_id")
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+model posts {
+  id                                                  String           @id @db.Uuid
+  user_id                                             String           @db.Uuid
+  post_type                                           String           @db.VarChar(10)
+  title                                               String           @db.VarChar(200)
+  body                                                String?
+  mux_asset_id                                        String?          @db.VarChar(100)
+  mux_playback_id                                     String?          @db.VarChar(100)
+  video_duration_seconds                              Int?
+  tags                                                String[]         @db.VarChar(50)
+  is_wip                                              Boolean?
+  feedback_type                                       String?          @db.VarChar(10)
+  is_solved                                           Boolean?
+  accepted_answer_id                                  String?          @db.Uuid
+  reaction_count                                      Int?
+  reply_count                                         Int?
+  created_at                                          DateTime         @db.Timestamp(6)
+  updated_at                                          DateTime         @db.Timestamp(6)
+  post_reactions                                      post_reactions[]
+  post_replies_post_replies_post_idToposts            post_replies[]   @relation("post_replies_post_idToposts")
+  post_replies_posts_accepted_answer_idTopost_replies post_replies?    @relation("posts_accepted_answer_idTopost_replies", fields: [accepted_answer_id], references: [id], onUpdate: NoAction)
+  users                                               users            @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "ix_posts_user_id")
+}
+
+model subscriptions {
+  id                     String             @id @db.Uuid
+  user_id                String             @unique(map: "ix_subscriptions_user_id") @db.Uuid
+  stripe_customer_id     String?            @db.VarChar
+  stripe_subscription_id String?            @db.VarChar
+  status                 subscriptionstatus
+  tier                   subscriptiontier
+  current_period_end     DateTime?          @db.Timestamp(6)
+  users                  users              @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@index([stripe_customer_id], map: "ix_subscriptions_stripe_customer_id")
+}
+
+model user_badges {
+  id                String            @id @db.Uuid
+  user_id           String            @db.Uuid
+  badge_id          String            @db.VarChar(50)
+  earned_at         DateTime          @db.Timestamp(6)
+  display_order     Int?
+  badge_definitions badge_definitions @relation(fields: [badge_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users             users             @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([user_id, badge_id], map: "unique_user_badge")
+  @@index([user_id], map: "ix_user_badges_user_id")
+}
+
+model user_profiles {
+  id                String          @id @db.Uuid
+  user_id           String          @unique(map: "ix_user_profiles_user_id") @db.Uuid
+  first_name        String          @db.VarChar
+  last_name         String          @db.VarChar
+  avatar_url        String?         @db.VarChar
+  current_level_tag currentleveltag
+  xp                Int
+  level             Int
+  streak_count      Int
+  last_login_date   DateTime?       @db.Timestamp(6)
+  badges            String          @db.VarChar
+  current_claves    Int
+  reputation        Int
+  last_daily_claim  DateTime?       @db.Date
+  users             users           @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model user_progress {
+  id           String    @id @db.Uuid
+  user_id      String    @db.Uuid
+  lesson_id    String    @db.Uuid
+  is_completed Boolean
+  completed_at DateTime? @db.Timestamp(6)
+  lessons      lessons   @relation(fields: [lesson_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  users        users     @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([user_id, lesson_id], map: "unique_user_lesson")
+}
+
+model user_stats {
+  user_id                  String    @id @db.Uuid
+  reactions_given_count    Int?
+  reactions_received_count Int?
+  solutions_accepted_count Int?
+  last_updated             DateTime? @db.Timestamp(6)
+  users                    users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model users {
+  id                                                   String               @id @db.Uuid
+  email                                                String               @unique(map: "ix_users_email") @db.VarChar
+  hashed_password                                      String?              @db.VarChar
+  auth_provider                                        String               @db.VarChar
+  social_id                                            String?              @db.VarChar
+  is_verified                                          Boolean
+  role                                                 userrole
+  created_at                                           DateTime             @db.Timestamp(6)
+  updated_at                                           DateTime             @db.Timestamp(6)
+  boss_submissions_boss_submissions_reviewed_byTousers boss_submissions[]   @relation("boss_submissions_reviewed_byTousers")
+  boss_submissions_boss_submissions_user_idTousers     boss_submissions[]   @relation("boss_submissions_user_idTousers")
+  clave_transactions                                   clave_transactions[]
+  comments                                             comments[]
+  post_reactions                                       post_reactions[]
+  post_replies                                         post_replies[]
+  posts                                                posts[]
+  subscriptions                                        subscriptions?
+  user_badges                                          user_badges[]
+  user_profiles                                        user_profiles?
+  user_progress                                        user_progress[]
+  user_stats                                           user_stats?
+
+  @@index([social_id], map: "ix_users_social_id")
+}
+
+model worlds {
+  id                      String        @id @db.Uuid
+  title                   String        @db.VarChar
+  description             String?
+  slug                    String        @unique(map: "ix_worlds_slug") @db.VarChar
+  order_index             Int
+  is_free                 Boolean
+  image_url               String?       @db.VarChar
+  thumbnail_url           String?       @db.VarChar
+  mux_preview_playback_id String?       @db.VarChar
+  mux_preview_asset_id    String?       @db.VarChar
+  difficulty              difficulty
+  is_published            Boolean
+  course_type             String        @db.VarChar
+  total_duration_minutes  Int
+  objectives              Json
+  level_edges             level_edges[]
+  levels                  levels[]
+}
+
+enum currentleveltag {
+  BEGINNER
+  NOVICE
+  INTERMEDIATE
+  ADVANCED
+}
+
+enum difficulty {
+  BEGINNER
+  INTERMEDIATE
+  ADVANCED
+  OPEN
+}
+
+enum submissionstatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum subscriptionstatus {
+  active
+  past_due
+  canceled
+  incomplete
+  trialing
+}
+
+enum subscriptiontier {
+  rookie
+  advanced
+  performer
+}
+
+enum userrole {
+  STUDENT
+  ADMIN
+  INSTRUCTOR
+}
+
+

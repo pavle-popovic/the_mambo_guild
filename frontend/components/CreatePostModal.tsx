@@ -43,10 +43,35 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
   const [createdPostId, setCreatedPostId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // Load tags on mount
+  // Predefined relevant tags
+  const RELEVANT_TAGS: Tag[] = [
+    // Styles
+    { slug: "salsa-on2", name: "Salsa On2", category: "Style", usage_count: 0 },
+    { slug: "mambo", name: "Mambo", category: "Style", usage_count: 0 },
+    { slug: "cha-cha-cha", name: "Cha Cha Cha", category: "Style", usage_count: 0 },
+    { slug: "boogaloo", name: "Boogaloo", category: "Style", usage_count: 0 },
+    { slug: "pachanga", name: "Pachanga", category: "Style", usage_count: 0 },
+    { slug: "salsa-fusion", name: "Salsa Fusion", category: "Style", usage_count: 0 },
+
+    // Focus
+    { slug: "timing", name: "Timing", category: "Focus", usage_count: 0 },
+    { slug: "body-movement", name: "Body Movement", category: "Focus", usage_count: 0 },
+    { slug: "styling", name: "Styling", category: "Focus", usage_count: 0 },
+    { slug: "musicality", name: "Musicality", category: "Focus", usage_count: 0 },
+    { slug: "choreo", name: "Choreo", category: "Focus", usage_count: 0 },
+    { slug: "turn", name: "Turn", category: "Focus", usage_count: 0 },
+    { slug: "drills", name: "Drills", category: "Focus", usage_count: 0 },
+
+    // Level
+    { slug: "beginner", name: "Beginner", category: "Level", usage_count: 0 },
+    { slug: "intermediate", name: "Intermediate", category: "Level", usage_count: 0 },
+    { slug: "advanced", name: "Advanced", category: "Level", usage_count: 0 },
+  ];
+
+  // Set tags on mount
   useEffect(() => {
     if (isOpen) {
-      apiClient.getCommunityTags().then(setTags).catch(console.error);
+      setTags(RELEVANT_TAGS);
     }
   }, [isOpen]);
 

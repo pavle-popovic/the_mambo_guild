@@ -431,6 +431,15 @@ class ApiClient {
     }>(`/api/mux/download-url/${playbackId}?resolution=${resolution}`);
   }
 
+  async checkDownloadAvailable(playbackId: string, resolution: "high" | "medium" = "high") {
+    return this.request<{
+      available: boolean;
+      download_url: string | null;
+      resolution: string | null;
+      message: string | null;
+    }>(`/api/mux/download-available/${playbackId}?resolution=${resolution}`);
+  }
+
   // Image upload endpoints (R2 presigned URLs)
   async getPresignedUploadUrl(fileType: string, folder: "avatars" | "thumbnails") {
     return this.request<{

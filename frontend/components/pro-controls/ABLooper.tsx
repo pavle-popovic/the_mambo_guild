@@ -182,18 +182,17 @@ export default function ABLooper({ playerRef, duration }: ABLooperProps) {
   return (
     <div className="flex flex-col gap-3">
       {/* Header with toggle */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between mb-1">
         <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
           AB Loop
         </span>
         <button
           onClick={toggleLoop}
           className={`
-            flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-bold transition-all duration-200
-            ${
-              enabled
-                ? "bg-mambo-gold text-black shadow-[0_0_10px_rgba(212,175,55,0.3)]"
-                : "bg-gray-800 text-gray-300 hover:bg-gray-700"
+            flex items-center gap-2 px-2 py-1 rounded-lg text-xs font-bold transition-all duration-200
+            ${enabled
+              ? "bg-mambo-gold text-black shadow-[0_0_10px_rgba(212,175,55,0.3)]"
+              : "bg-gray-800 text-gray-300 hover:bg-gray-700"
             }
           `}
         >

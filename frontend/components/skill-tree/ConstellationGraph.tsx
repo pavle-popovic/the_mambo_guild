@@ -379,14 +379,15 @@ function ConstellationGraphInner({
           // With BT layout and flipped tree:
           // - Root is at bottom (high Y value in graph coords)
           // - Boss nodes are at top (low Y value in graph coords)
-          // We want frontier node near BOTTOM of viewport
-          // setCenter centers the viewport on a point, so we center ABOVE the node
-          // to push the node down toward the bottom of the screen
+          // We want frontier node visible and not covered by overlays:
+          // - Progress widget is top-right
+          // - Legend is bottom-right
+          // So we offset LEFT (negative X) and CENTER vertically
           const zoom = 0.9;
 
           setCenter(
-            targetFlowNode.position.x + 100, // Slight right offset for aesthetics
-            targetFlowNode.position.y - 250, // Negative Y offset = center above node = node appears lower
+            targetFlowNode.position.x + 250, // Offset right in graph coords = view shifts LEFT
+            targetFlowNode.position.y - 80,  // Slight offset to show node in lower-center
             { zoom, duration: 0 }
           );
 
@@ -610,34 +611,25 @@ function ConstellationGraphInner({
         )}
       </AnimatePresence>
 
-      {/* Legend overlay - on top of everything (hide in admin mode) */}
+      {/* Legend overlay - compact (hide in admin mode) */}
       {!isAdminMode && (
-        <div className="absolute bottom-6 right-6 bg-black/70 backdrop-blur-md border border-yellow-900/30 rounded-xl p-4 shadow-xl z-20 pointer-events-none">
-          <div className="flex flex-col gap-3 text-sm">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full border border-gray-600/50 bg-gray-900/80 flex items-center justify-center opacity-60">
-                <span className="text-[10px]">🔒</span>
+        <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm border border-yellow-900/20 rounded-lg px-3 py-2 shadow-lg z-20 pointer-events-none">
+          <div className="flex items-center gap-4 text-[10px]">
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded-full border border-gray-600/50 bg-gray-900/80 opacity-60 flex items-center justify-center">
+                <span className="text-[6px]">🔒</span>
               </div>
-              <span className="text-gray-500 font-medium tracking-wide">
-                Locked
-              </span>
+              <span className="text-gray-500">Locked</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full border border-yellow-500/50 bg-yellow-900/20 shadow-[0_0_12px_rgba(255,215,0,0.2)]"></div>
-              <span className="text-yellow-200/80 font-medium tracking-wide">
-                Available
-              </span>
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded-full border border-yellow-500/50 bg-yellow-900/20 shadow-[0_0_6px_rgba(255,215,0,0.2)]"></div>
+              <span className="text-yellow-200/80">Available</span>
             </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full border-2 border-yellow-400 bg-yellow-900/30 shadow-[0_0_15px_rgba(255,215,0,0.4)] flex items-center justify-center">
-                <div className="w-3 h-3 bg-yellow-400 rounded-full shadow-[0_0_8px_#FFD700]" />
+            <div className="flex items-center gap-1.5">
+              <div className="w-4 h-4 rounded-full border border-yellow-400 bg-yellow-900/30 shadow-[0_0_8px_rgba(255,215,0,0.3)] flex items-center justify-center">
+                <div className="w-1.5 h-1.5 bg-yellow-400 rounded-full" />
               </div>
-              <span className="text-yellow-300 font-medium tracking-wide">
-                Mastered
-              </span>
-            </div>
-            <div className="mt-2 pt-2 border-t border-yellow-900/30 text-xs text-gray-500 text-center">
-              Scroll to Zoom • Right-click Drag to Pan
+              <span className="text-yellow-300">Mastered</span>
             </div>
           </div>
         </div>

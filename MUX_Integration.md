@@ -110,7 +110,7 @@ def create_direct_upload(
     }
 
     if is_community:
-        asset_settings["max_resolution_tier"] = "720p"  # Cap community at 720p
+        asset_settings["max_resolution_tier"] = "1080p"  # Cap community at 1080p (min supported tier)
     else:
         asset_settings["mp4_support"] = "standard"  # MP4 for lessons
 ```
@@ -227,7 +227,7 @@ const [playerInitialized, setPlayerInitialized] = useState(false);
 
 6. **Resolution Cap**
    - Upload new community video
-   - Check Mux dashboard for `max_resolution_tier: 720p`
+   - Check Mux dashboard for `max_resolution_tier: 1080p`
 
 ---
 

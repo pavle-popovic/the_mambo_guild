@@ -6,7 +6,7 @@ import time
 from typing import Dict, Optional
 import mux_python
 from mux_python import Configuration, ApiClient, ApiException, DirectUploadsApi
-from mux_python.models import CreateUploadRequest, Asset, AssetMetadata
+from mux_python.models import CreateUploadRequest, CreateAssetRequest, Asset, AssetMetadata
 from config import settings
 
 logger = logging.getLogger(__name__)
@@ -74,27 +74,33 @@ def create_direct_upload(
                 creator_id=creator_id[:128] if creator_id else None  # Max 128 code points
             )
         
-        # Build asset settings as dict (Mux Python SDK accepts dict for new_asset_settings)
-        asset_settings = {
-            "playback_policies": ["public"],  # Make videos publicly playable
-            "test": test
-        }
+        # Build asset settings using CreateAssetRequest
+        print(f"[MUX] Building asset request, is_community={is_community}", flush=True)
 
-        # Cost efficiency: Community videos capped at 720p, lesson videos get MP4 downloads
         if is_community:
-            asset_settings["max_resolution_tier"] = "720p"
+            print(f"[MUX] Community upload - capping at 1080p (min supported tier), was 720p but invalid", flush=True)
+            asset_request = CreateAssetRequest(
+                playback_policies=["public"],
+                test=test,
+                max_resolution_tier="1080p",
+                passthrough=passthrough if passthrough else None,
+                meta=meta
+            )
         else:
-            # Enable MP4 downloads for lesson videos (requires Mux Launch/Pro plan)
-            asset_settings["mp4_support"] = "capped-1080p"  # Generates 1080p and lower MP4 renditions
+            # Lesson upload - Enable MP4 downloads for offline practice
+            print(f"[MUX] LESSON UPLOAD - ENABLING MP4 SUPPORT (capped-1080p)!", flush=True)
+            asset_request = CreateAssetRequest(
+                playback_policies=["public"],
+                test=test,
+                mp4_support="capped-1080p",  # Non-deprecated value for MP4 renditions
+                passthrough=passthrough if passthrough else None,
+                meta=meta
+            )
 
-        if passthrough:
-            asset_settings["passthrough"] = passthrough
-        
-        if meta:
-            asset_settings["meta"] = meta  # AssetMetadata object
-        
+        print(f"[MUX] CreateAssetRequest created with mp4_support={asset_request.mp4_support}", flush=True)
+
         create_upload_request = CreateUploadRequest(
-            new_asset_settings=asset_settings,
+            new_asset_settings=asset_request,
             cors_origin="*"  # Allow uploads from any origin (can be restricted in production)
         )
         

@@ -232,10 +232,16 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                 >
                   <div className="text-6xl mb-4 drop-shadow-md">
                     {badge.icon_url ? (
-                      <img src={badge.icon_url} alt={badge.name} className="w-24 h-24 object-contain" />
+                      <img src={badge.icon_url} alt={badge.name} className="w-28 h-28 object-contain" />
                     ) : "🏆"}
                   </div>
-                  <h4 className="font-bold text-white text-sm leading-tight">{badge.name}</h4>
+                  <h4 className="font-bold text-white text-sm leading-tight">
+                    {badge.name}
+                    {badge.id.includes('bronze') && " I"}
+                    {badge.id.includes('silver') && " III"}
+                    {badge.id.includes('gold') && " V"}
+                    {badge.id.includes('diamond') && " X"}
+                  </h4>
                   <div className="absolute top-2 right-2 text-amber-200 text-xs">
                     ★
                   </div>
@@ -267,9 +273,15 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                 )}
               >
                 <div className="text-5xl mb-3 w-full flex justify-center">
-                  {badge.icon_url ? <img src={badge.icon_url} className="w-20 h-20 object-contain" alt={badge.name} /> : "🏅"}
+                  {badge.icon_url ? <img src={badge.icon_url} className="w-24 h-24 object-contain" alt={badge.name} /> : "🏅"}
                 </div>
-                <h4 className="font-medium text-white text-xs">{badge.name}</h4>
+                <h4 className="font-medium text-white text-xs">
+                  {badge.name}
+                  {badge.id.includes('bronze') && " I"}
+                  {badge.id.includes('silver') && " III"}
+                  {badge.id.includes('gold') && " V"}
+                  {badge.id.includes('diamond') && " X"}
+                </h4>
                 <p className="text-[10px] text-white/50 mt-1 line-clamp-1">{badge.description}</p>
 
                 {/* Add Trigger Hint */}
@@ -290,16 +302,23 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                   className="relative p-4 rounded-lg border border-white/5 bg-black/20 flex flex-col items-center text-center group"
                 >
                   {/* Badge Icon Background (Dimmed & Blurred) */}
-                  <div className="text-6xl mb-3 opacity-30 grayscale blur-[1px] w-full flex justify-center">
-                    {badge.icon_url ? <img src={badge.icon_url} className="w-20 h-20 object-contain" alt={badge.name} /> : "🏆"}
+                  {/* Badge Icon Background (Dimmed & Blurred) */}
+                  <div className="text-6xl mb-3 opacity-40 grayscale blur-[2px] w-full flex justify-center scale-110">
+                    {badge.icon_url ? <img src={badge.icon_url} className="w-24 h-24 object-contain" alt={badge.name} /> : "🏆"}
                   </div>
 
                   {/* Lock Icon Overlay (Absolute Center) */}
-                  <div className="absolute inset-0 flex items-center justify-center top-[-20px]">
-                    <FaLock className="text-white/40 text-4xl shadow-black drop-shadow-lg" />
+                  <div className="absolute inset-0 flex items-center justify-center -translate-y-4">
+                    <FaLock className="text-white/60 text-5xl shadow-black drop-shadow-xl" />
                   </div>
 
-                  <h4 className="font-medium text-white/40 text-xs mb-2 opacity-50 relative z-10">{badge.name}</h4>
+                  <h4 className="font-medium text-white/40 text-xs mb-2 opacity-50 relative z-10">
+                    {badge.name}
+                    {badge.id.includes('bronze') && " I"}
+                    {badge.id.includes('silver') && " III"}
+                    {badge.id.includes('gold') && " V"}
+                    {badge.id.includes('diamond') && " X"}
+                  </h4>
 
                   {/* Progress Bar */}
                   {progress ? (

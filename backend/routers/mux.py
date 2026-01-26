@@ -297,7 +297,7 @@ async def create_mux_upload_url(
         print(f"[MUX] Creator ID: {creator_id}")
     
     print("[MUX] Calling Mux API to create direct upload...")
-    # Community posts get resolution cap (720p), lesson/course videos get MP4 support
+    # Community posts get resolution cap (1080p), lesson/course videos get MP4 support
     is_community_upload = post_id_val is not None
     result = create_direct_upload(
         filename=filename_val,
@@ -393,6 +393,13 @@ class DownloadUrlResponse(BaseModel):
     resolution: str
 
 
+class DownloadAvailabilityResponse(BaseModel):
+    available: bool
+    download_url: str | None = None
+    resolution: str | None = None
+    message: str | None = None
+
+
 @router.get("/download-url/{playback_id}")
 async def get_download_url(
     playback_id: str,
@@ -414,6 +421,73 @@ async def get_download_url(
         download_url=download_url,
         resolution=resolution
     )
+
+
+@router.get("/download-available/{playback_id}")
+async def check_download_available(
+    playback_id: str,
+    resolution: str = Query("high", description="Resolution: 'high' for 1080p, 'medium' for 720p"),
+):
+    """
+    Check if MP4 download is available for a video.
+    Makes a GET request with Range header to verify the MP4 exists.
+    Note: Public endpoint since Mux playback URLs are already public.
+    """
+    import httpx
+
+    if resolution not in ["high", "medium", "low"]:
+        raise HTTPException(status_code=400, detail="Resolution must be 'high', 'medium', or 'low'")
+
+    download_url = f"https://stream.mux.com/{playback_id}/{resolution}.mp4"
+    print(f"[MUX] Checking MP4 availability: {download_url}")
+
+    try:
+        async with httpx.AsyncClient() as client:
+            # Use GET with Range header instead of HEAD (more reliable for Mux)
+            response = await client.get(
+                download_url,
+                headers={"Range": "bytes=0-0"},  # Request just 1 byte
+                timeout=10.0,
+                follow_redirects=True
+            )
+
+            # Log response details for debugging
+            content_type = response.headers.get("content-type", "")
+            print(f"[MUX] MP4 check response: status={response.status_code}, content-type={content_type}")
+
+            # 200 = full content, 206 = partial content (both mean file exists)
+            # Check content-type contains video OR octet-stream (binary)
+            is_video = "video" in content_type or "octet-stream" in content_type
+            is_success = response.status_code in [200, 206]
+
+            if is_success and is_video:
+                print(f"[MUX] MP4 available!")
+                return DownloadAvailabilityResponse(
+                    available=True,
+                    download_url=download_url,
+                    resolution=resolution
+                )
+            elif response.status_code == 404 or "application/json" in content_type:
+                # 404 or JSON error response means MP4 not available
+                print(f"[MUX] MP4 not available (404 or JSON error)")
+                return DownloadAvailabilityResponse(
+                    available=False,
+                    message="MP4 download not available for this video."
+                )
+            else:
+                # Unexpected response - log and assume not available
+                print(f"[MUX] Unexpected response: {response.status_code}, {content_type}")
+                print(f"[MUX] Response body: {response.text[:500] if response.text else 'empty'}")
+                return DownloadAvailabilityResponse(
+                    available=False,
+                    message="Could not verify MP4 availability."
+                )
+    except Exception as e:
+        print(f"[MUX] Error checking MP4 availability: {e}")
+        return DownloadAvailabilityResponse(
+            available=False,
+            message="Unable to verify download availability."
+        )
 
 
 class WebhookEvent(BaseModel):

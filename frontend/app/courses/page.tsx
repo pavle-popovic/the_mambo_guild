@@ -118,14 +118,11 @@ export default function CoursesPage() {
       <div className="relative min-h-screen">
         {/* Sticky Header Control Bar */}
         <div className="sticky top-0 z-40 w-full bg-black/60 backdrop-blur-xl border-b border-white/10 pt-24 pb-4 transition-all duration-300">
-          <div className="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row items-center gap-10">
+          <div className="max-w-[1600px] mx-auto px-6 flex flex-col md:flex-row items-center gap-1">
             {/* Title & Stats */}
             <div className="flex items-center gap-4">
               <h1 className="text-3xl font-serif font-bold text-mambo-gold tracking-tight">Explore Courses</h1>
-              <div className="hidden md:flex items-center gap-2 text-sm text-gray-400 border-l border-white/10 pl-4">
-                <span className="font-bold text-white">{filteredCourses.length}</span>
-                <span>titles available</span>
-              </div>
+
             </div>
 
             {/* Controls: Search + Filters */}
@@ -156,7 +153,7 @@ export default function CoursesPage() {
                   <button
                     key={f.v}
                     onClick={() => setTypeFilter(f.v as TypeFilter)}
-                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all border ${typeFilter === f.v ? 'bg-white/20 text-white border-white/40 shadow-sm' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
+                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all border ${typeFilter === f.v ? 'border-purple-500 bg-purple-500/20 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
                   >
                     {f.l}
                   </button>
