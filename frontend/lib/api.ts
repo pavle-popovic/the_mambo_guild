@@ -307,10 +307,10 @@ class ApiClient {
     return response;
   }
 
-  async waitlistRegister(email: string, username: string) {
-    return this.request<{ referral_code: string; position: number }>("/api/waitlist/join", {
+  async waitlistRegister(email: string, username: string, referrer_code?: string) {
+    return this.request<{ referral_code: string; position: number }>("/api/auth/waitlist", {
       method: "POST",
-      body: JSON.stringify({ email, username }),
+      body: JSON.stringify({ email, username, referrer_code }),
     });
   }
 

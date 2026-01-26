@@ -51,7 +51,7 @@ interface AuthContextType {
   }) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
-  waitlistRegister: (email: string, username: string) => Promise<{ referral_code: string; position: number }>;
+  waitlistRegister: (email: string, username: string, referrer_code?: string) => Promise<{ referral_code: string; position: number }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -136,8 +136,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await refreshUser();
   };
 
-  const waitlistRegister = async (email: string, username: string) => {
-    return await apiClient.waitlistRegister(email, username);
+  const waitlistRegister = async (email: string, username: string, referrer_code?: string) => {
+    return await apiClient.waitlistRegister(email, username, referrer_code);
   };
 
   const logout = () => {
