@@ -1,13 +1,12 @@
 "use client";
 
-import { NewHero, HeroOverlayEffects, ConstellationSection, ValuePropsSection, HowItWorksSection, TestimonialsSection, LandingPricingSection, MaestroSection, CourseExplorerSection } from "@/components/landing";
+import { NewHero, ConstellationSection, ValuePropsSection, HowItWorksSection, TestimonialsSection, LandingPricingSection, MaestroSection, CourseExplorerSection } from "@/components/landing";
 
 export default function HomePage() {
     return (
         <main className="min-h-screen text-white selection:bg-[#39FF14] selection:text-black overflow-x-hidden relative">
             {/* Hero Section */}
             <section className="relative min-h-screen z-10">
-                <HeroOverlayEffects />
                 <NewHero />
             </section>
 
