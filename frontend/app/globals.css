@@ -12,10 +12,19 @@
   --brass-dark: #B8860B;
   --electric-teal: #00E0FF;
 
+  /* Waitlist Redesign - Art Deco x Cyberpunk */
+  --gold-500: #D4AF37;
+  --gold-gradient: linear-gradient(135deg, #FCE205 0%, #D4AF37 40%, #B8860B 100%);
+  --neon-green: #39FF14;
+  --black-void: #050505;
+  --glass-border: rgba(212, 175, 55, 0.2);
+  --glass-bg: rgba(10, 10, 10, 0.7);
+
   /* Stage lighting shadows */
   --stage-shadow: 0 4px 30px rgba(212, 175, 55, 0.15);
   --stage-shadow-hover: 0 8px 40px rgba(212, 175, 55, 0.3);
   --stage-shadow-intense: 0 12px 50px rgba(212, 175, 55, 0.4);
+  --neon-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
 
   /* Stage borders */
   --stage-border: rgba(212, 175, 55, 0.3);
@@ -37,7 +46,8 @@ body {
 }
 
 /* Typography: Serif for h1, h2 (brand identity), Sans for everything else */
-h1, h2 {
+h1,
+h2 {
   font-family: var(--font-playfair), "Playfair Display", serif;
   color: #F0F0F0;
   letter-spacing: -0.02em;
@@ -52,11 +62,24 @@ h2 {
 }
 
 /* Force sans-serif on all readable text for readability */
-h3, h4, h5, h6, p, span, label, input, textarea, button, a {
+h3,
+h4,
+h5,
+h6,
+p,
+span,
+label,
+input,
+textarea,
+button,
+a {
   font-family: var(--font-inter), "Inter", sans-serif;
 }
 
-h3, h4, h5, h6 {
+h3,
+h4,
+h5,
+h6 {
   color: #F0F0F0;
   letter-spacing: -0.01em;
 }
@@ -199,4 +222,55 @@ h3, h4, h5, h6 {
 
 .stage-spotlight:hover::before {
   opacity: 1;
+}
+
+/* Waitlist Redesign Utilities */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+}
+
+.text-gradient-gold {
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.text-neon-green {
+  color: var(--neon-green);
+  text-shadow: 0 0 10px rgba(57, 255, 20, 0.4);
+}
+
+.holographic-card {
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.holographic-card::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(to right,
+      transparent 0%,
+      rgba(212, 175, 55, 0.1) 50%,
+      transparent 100%);
+  transform: skewX(-25deg);
+  transition: left 0.5s ease;
+  pointer-events: none;
+}
+
+.holographic-card:hover::before {
+  left: 200%;
+  transition: left 1s ease;
+}
+
+.holographic-card:hover {
+  box-shadow: var(--stage-shadow-hover);
 }

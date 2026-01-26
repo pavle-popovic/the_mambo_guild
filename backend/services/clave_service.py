@@ -1,5 +1,5 @@
 """
-Clave Service - The Central Bank of Mambo Inn v4.0
+Clave Service - The Central Bank of The Mambo Guild v4.0
 Handles all clave transactions, daily bonuses, and balance checks.
 """
 import random
@@ -189,6 +189,10 @@ def process_daily_login(user_id: str, db: Session) -> dict:
     
     # Update last claim date
     profile.last_daily_claim = today
+    
+    # Update streak (CRITICAL: This increments the streak_count)
+    from services import gamification_service
+    current_streak = gamification_service.update_streak(user_id, db)
     
     # Check for streak bonus
     streak_bonus = None

@@ -56,7 +56,7 @@ export function CommunityTeaser() {
                         <FaUsers className="text-3xl text-white/80" />
                     </div>
                     <h1 className="text-4xl md:text-5xl font-bold text-white mb-6 tracking-tight">
-                        Join the Mambo Inn <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Community</span>
+                        Join the Mambo Guild <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">Community</span>
                     </h1>
                     <p className="text-xl text-white/60 max-w-2xl mx-auto mb-8">
                         The heart of our salsa school. Connect, share, and grow with dancers from around the world.

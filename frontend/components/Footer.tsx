@@ -13,7 +13,7 @@ export default function Footer({ className = "" }: FooterProps) {
           <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-2 mb-4">
             <Image
               src="/assets/Logo.png"
-              alt="The Mambo Inn"
+              alt="The Mambo Guild"
               width={32}
               height={32}
               className="h-8 w-auto logo-img"
@@ -22,7 +22,7 @@ export default function Footer({ className = "" }: FooterProps) {
             <span className="font-serif text-xl">
               <span className="text-gray-400">THE</span>{" "}
               <span className="text-[#d4af37] font-bold drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]">MAMBO</span>{" "}
-              <span className="text-gray-400">INN</span>
+              <span className="text-gray-400">GUILD</span>
             </span>
           </Link>
           <p className="text-gray-500 max-w-sm">
@@ -82,7 +82,7 @@ export default function Footer({ className = "" }: FooterProps) {
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-6 border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between text-xs text-gray-600">
-        <p>&copy; 2024 The Mambo Inn. Keep dancing.</p>
+        <p>&copy; 2024 The Mambo Guild. Keep dancing.</p>
         <div className="flex gap-4 mt-2 md:mt-0">
           <Link href="#">Privacy Policy</Link>
           <Link href="#">Terms of Service</Link>

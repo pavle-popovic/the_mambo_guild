@@ -90,7 +90,7 @@ export default function NavBar({ user }: NavBarProps) {
             <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-3">
               <Image
                 src="/assets/Logo.png"
-                alt="The Mambo Inn"
+                alt="The Mambo Guild"
                 width={48}
                 height={48}
                 className="h-12 w-auto logo-img"
@@ -99,7 +99,7 @@ export default function NavBar({ user }: NavBarProps) {
               <span className="font-serif text-xl">
                 <span className="text-gray-400">THE</span>{" "}
                 <span className="text-[#d4af37] font-bold drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]">MAMBO</span>{" "}
-                <span className="text-gray-400">INN</span>
+                <span className="text-gray-400">GUILD</span>
               </span>
             </Link>
           </LogoWrapper>

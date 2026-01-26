@@ -11,7 +11,7 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-themamboinn}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-themamboinn}" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -27,7 +27,7 @@ services:
     volumes:
       - redis_data:/data
     healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
+      test: [ "CMD", "redis-cli", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -87,6 +87,7 @@ services:
     container_name: salsa_lab_frontend
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      NEXT_PUBLIC_WAITLIST_MODE: ${NEXT_PUBLIC_WAITLIST_MODE:-false}
       WATCHPACK_POLLING: "true"
       CHOKIDAR_USEPOLLING: "true"
       NODE_ENV: "development"
@@ -108,6 +109,7 @@ volumes:
   redis_data:
   frontend_node_modules:
   frontend_next:
+
 
 networks:
   salsa_lab_network:

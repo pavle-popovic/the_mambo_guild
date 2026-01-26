@@ -23,6 +23,7 @@ from itsdangerous import URLSafeTimedSerializer
 from authlib.integrations.httpx_client import AsyncOAuth2Client
 from typing import Optional
 import logging
+from pydantic import BaseModel, EmailStr
 
 # Allow HTTP for OAuth in development (localhost)
 # This must be set before importing oauthlib
@@ -104,6 +105,12 @@ async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)
             level_tag = CurrentLevelTag[user_data.current_level_tag.upper()]
         except KeyError:
             level_tag = CurrentLevelTag.BEGINNER
+        
+        # Generate Referral Code for new user
+        new_referral_code = secrets.token_hex(4).upper()
+        # Verify uniqueness collision
+        while db.query(UserProfile).filter(UserProfile.referral_code == new_referral_code).first():
+            new_referral_code = secrets.token_hex(4).upper()
 
         profile = UserProfile(
             id=uuid.uuid4(),
@@ -114,7 +121,8 @@ async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)
             current_level_tag=level_tag,
             xp=0,
             level=1,
-            streak_count=0
+            streak_count=0,
+            referral_code=new_referral_code
         )
         db.add(profile)
 
@@ -293,6 +301,11 @@ async def create_user_from_oauth(
     
     # Create user profile
     # Generate a temporary username or leave None. Let's leave None and prompt user later.
+    
+    new_referral_code = secrets.token_hex(4).upper()
+    while db.query(UserProfile).filter(UserProfile.referral_code == new_referral_code).first():
+        new_referral_code = secrets.token_hex(4).upper()
+
     profile = UserProfile(
         id=uuid.uuid4(),
         user_id=user_id,
@@ -303,7 +316,8 @@ async def create_user_from_oauth(
         xp=0,
         level=1,
         streak_count=0,
-        avatar_url=avatar_url
+        avatar_url=avatar_url,
+        referral_code=new_referral_code
     )
     db.add(profile)
     
@@ -631,3 +645,124 @@ async def reset_password(
             detail="Invalid or expired reset token"
         )
 
+# -------------------------------------------------------------------------
+# WAITLIST & VELVET ROPE AUTH
+# -------------------------------------------------------------------------
+
+class WaitlistRegisterRequest(BaseModel):
+    email: EmailStr
+    username: str
+    referrer_code: Optional[str] = None
+
+@router.post("/waitlist", status_code=status.HTTP_201_CREATED)
+async def join_waitlist(
+    request: WaitlistRegisterRequest,
+    db: Session = Depends(get_db)
+):
+    """
+    Join The Velvet Rope (Waitlist).
+    - Create User (no password)
+    - Reserve Username
+    - Assign 'Founder' Badge
+    - Track Referrals
+    """
+    try:
+        # Validate Email
+        email = request.email.lower().strip()
+        if db.query(User).filter(User.email == email).first():
+            raise HTTPException(status_code=400, detail="This email is already on the list.")
+
+        # Validate Username
+        username = request.username.strip()
+        if db.query(UserProfile).filter(func.lower(UserProfile.username) == username.lower()).first():
+            raise HTTPException(status_code=400, detail="This username is reserved. Choose another.")
+
+        # Create User
+        user_id = uuid.uuid4()
+        user = User(
+            id=user_id,
+            email=email,
+            auth_provider="waitlist",  # Special provider
+            is_verified=False,
+            role=UserRole.STUDENT,
+            hashed_password=None
+        )
+        db.add(user)
+        db.flush()
+
+        # Handle Referral
+        referrer_id = None
+        referrer_profile = None
+        if request.referrer_code:
+            referrer_profile = db.query(UserProfile).filter(UserProfile.referral_code == request.referrer_code).first()
+            if referrer_profile:
+                # Increment referrer count
+                referrer_profile.referral_count += 1
+                # Track who referred (store code for simple tracking)
+                # Ideally we'd store user_id but for v1 waitlist using code is fine
+                pass
+
+        # Generate Referral Code for new user
+        # Simple 8 char uppercase alphanumeric
+        new_referral_code = secrets.token_hex(4).upper()
+        # Verify uniqueness collision (rare but possible)
+        while db.query(UserProfile).filter(UserProfile.referral_code == new_referral_code).first():
+            new_referral_code = secrets.token_hex(4).upper()
+
+        # Create Profile
+        profile = UserProfile(
+            id=uuid.uuid4(),
+            user_id=user_id,
+            first_name="Founder", # Placeholder
+            last_name="Member",   # Placeholder
+            username=username,
+            current_level_tag=CurrentLevelTag.BEGINNER,
+            referral_code=new_referral_code,
+            referred_by_code=request.referrer_code,
+            badges="[]"
+        )
+        db.add(profile)
+
+        # Create Subscription (Rookie)
+        subscription = Subscription(
+            id=uuid.uuid4(),
+            user_id=user_id,
+            tier=SubscriptionTier.ROOKIE,
+            status=SubscriptionStatus.INCOMPLETE
+        )
+        db.add(subscription)
+        
+        db.commit() # Commit to generate IDs
+
+        # Award Founder Badge
+        from services import badge_service
+        try:
+            badge_service.award_badge(str(user_id), "founder_diamond", db)
+        except Exception as e:
+            logger.error(f"Failed to award founder badge: {e}")
+
+        # Check Referrer Milestones
+        if request.referrer_code and referrer_profile:
+            referrer_user_id = str(referrer_profile.user_id)
+            # Example: Invite 3 friends -> Get Beta Tester
+            if referrer_profile.referral_count >= 3:
+                try:
+                    badge_service.award_badge(referrer_user_id, "beta_tester", db)
+                except:
+                    pass
+        
+        db.commit()
+
+        return {
+            "message": "Welcome to the Inner Circle.",
+            "user_id": str(user_id),
+            "referral_code": new_referral_code,
+            "position": 1234 # Mock position or calc from COUNT(id)
+        }
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        db.rollback()
+        logger.error(f"Waitlist error: {str(e)}")
+        raise HTTPException(status_code=500, detail="Failed to join waitlist.")

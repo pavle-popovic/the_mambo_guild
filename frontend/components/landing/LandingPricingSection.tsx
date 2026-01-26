@@ -149,7 +149,7 @@ export default function LandingPricingSection() {
             className="text-4xl md:text-5xl font-bold mb-8 text-mambo-text tracking-tight font-serif italic"
             style={{ fontFamily: '"Playfair Display", serif' }}
           >
-            Join The <span className="text-mambo-gold drop-shadow-md">Mambo Inn Now</span>
+            Join The <span className="text-mambo-gold drop-shadow-md">Mambo Guild Now</span>
           </h2>
         </motion.div>
 

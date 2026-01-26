@@ -25,7 +25,14 @@ interface BadgeTrophyCaseProps {
   userStats?: {
     reactions_given: number;
     reactions_received: number;
+    fires_received: number;
+    claps_received: number;
+    metronomes_received: number;
     solutions_accepted: number;
+    questions_posted: number;
+    videos_posted: number;
+    comments_posted: number;
+    current_streak: number;
   } | null;
 }
 
@@ -155,17 +162,44 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
   const canEdit = !userId; // If userId is present, we are viewing someone else
 
   const getProgress = (badge: Badge) => {
-    if (!badge.requirement_value || !badge.requirement_type) return 0;
+    if (!badge.requirement_value || !badge.requirement_type) return { current: 0, target: badge.requirement_value || 0, percent: 0 };
 
     let current = 0;
-    if (badge.requirement_type === 'streak') {
-      current = streakCount;
-    } else if (badge.requirement_type === 'reactions_given') {
-      current = userStats?.reactions_given || 0;
-    } else if (badge.requirement_type === 'reactions_received') {
-      current = userStats?.reactions_received || 0;
-    } else if (badge.requirement_type === 'solutions_accepted') {
-      current = userStats?.solutions_accepted || 0;
+
+    // Match requirement_type to the corresponding stat
+    switch (badge.requirement_type) {
+      case 'daily_streak':
+        current = userStats?.current_streak || streakCount || 0;
+        break;
+      case 'reactions_given':
+        current = userStats?.reactions_given || 0;
+        break;
+      case 'reactions_received':
+        current = userStats?.reactions_received || 0;
+        break;
+      case 'fires_received':
+        current = userStats?.fires_received || 0;
+        break;
+      case 'claps_received':
+        current = userStats?.claps_received || 0;
+        break;
+      case 'metronomes_received':
+        current = userStats?.metronomes_received || 0;
+        break;
+      case 'solutions_accepted':
+        current = userStats?.solutions_accepted || 0;
+        break;
+      case 'questions_posted':
+        current = userStats?.questions_posted || 0;
+        break;
+      case 'videos_posted':
+        current = userStats?.videos_posted || 0;
+        break;
+      case 'comments_posted':
+        current = userStats?.comments_posted || 0;
+        break;
+      default:
+        current = 0;
     }
 
     const percent = Math.min(100, Math.round((current / badge.requirement_value) * 100));
@@ -232,7 +266,15 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                 >
                   <div className="text-6xl mb-4 drop-shadow-md">
                     {badge.icon_url ? (
-                      <img src={badge.icon_url} alt={badge.name} className="w-28 h-28 object-contain" />
+                      <div className="w-28 h-28 rounded-lg overflow-hidden" style={{
+                        background: badge.id.includes('bronze') ? 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)' :
+                          badge.id.includes('silver') ? 'linear-gradient(135deg, #A8A8A8 0%, #C0C0C0 100%)' :
+                            badge.id.includes('gold') ? 'linear-gradient(135deg, #DAA520 0%, #FFD700 100%)' :
+                              badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
+                                'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
+                      }}>
+                        <img src={badge.icon_url} alt={badge.name} className="w-full h-full object-cover" />
+                      </div>
                     ) : "🏆"}
                   </div>
                   <h4 className="font-bold text-white text-sm leading-tight">
@@ -273,7 +315,17 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                 )}
               >
                 <div className="text-5xl mb-3 w-full flex justify-center">
-                  {badge.icon_url ? <img src={badge.icon_url} className="w-24 h-24 object-contain" alt={badge.name} /> : "🏅"}
+                  {badge.icon_url ? (
+                    <div className="w-24 h-24 rounded-lg overflow-hidden" style={{
+                      background: badge.id.includes('bronze') ? 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)' :
+                        badge.id.includes('silver') ? 'linear-gradient(135deg, #A8A8A8 0%, #C0C0C0 100%)' :
+                          badge.id.includes('gold') ? 'linear-gradient(135deg, #DAA520 0%, #FFD700 100%)' :
+                            badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
+                              'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
+                    }}>
+                      <img src={badge.icon_url} className="w-full h-full object-cover" alt={badge.name} />
+                    </div>
+                  ) : "🏅"}
                 </div>
                 <h4 className="font-medium text-white text-xs">
                   {badge.name}

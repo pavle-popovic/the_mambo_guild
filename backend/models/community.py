@@ -1,5 +1,5 @@
 """
-Community Models for Mambo Inn v4.0
+Community Models for Mambo Guild v4.0
 - Clave Economy (transactions)
 - Posts (The Stage & The Lab)
 - Reactions, Replies

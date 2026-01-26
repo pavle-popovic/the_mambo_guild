@@ -168,7 +168,29 @@ async def create_post(
     
     db.commit()
     
-    # No badge trigger for post creation in v4
+    # Badge triggers
+    # Center Stage: Track video posts (Stage posts with video)
+    if result["success"] and request.post_type == "stage" and request.mux_asset_id:
+        from sqlalchemy import func
+        from models.community import Post
+        video_count = db.query(func.count(Post.id)).filter(
+            Post.user_id == current_user.id,
+            Post.post_type == "stage",
+            Post.mux_asset_id.isnot(None)
+        ).scalar() or 0
+        badge_service.check_and_award_badges(str(current_user.id), "videos_posted", video_count, db)
+        db.commit()
+    
+    # Curious Mind: Track questions posted (Lab posts)
+    if result["success"] and request.post_type == "lab":
+        from sqlalchemy import func
+        from models.community import Post
+        question_count = db.query(func.count(Post.id)).filter(
+            Post.user_id == current_user.id,
+            Post.post_type == "lab"
+        ).scalar() or 0
+        badge_service.check_and_award_badges(str(current_user.id), "questions_posted", question_count, db)
+        db.commit()
     
     return result
 
@@ -200,11 +222,11 @@ async def add_reaction(
     # 1. User gave a reaction (The Critic)
     badge_service.increment_reaction_given(str(current_user.id), db)
     
-    # 2. Post owner received a reaction (The Star)
+    # 2. Post owner received a reaction (The Star + Specific types)
     from models.community import Post
     post = db.query(Post).filter(Post.id == post_id).first()
     if post:
-        badge_service.increment_reaction_received(str(post.user_id), db)
+        badge_service.increment_reaction_received(str(post.user_id), request.reaction_type, db)
         
     db.commit()
     
@@ -259,6 +281,18 @@ async def add_reply(
         raise HTTPException(status_code=400, detail=result)
     
     db.commit()
+    
+    # Badge triggers
+    # The Socialite: Track comments posted
+    if result["success"]:
+        from sqlalchemy import func
+        from models.community import PostReply
+        comment_count = db.query(func.count(PostReply.id)).filter(
+            PostReply.user_id == current_user.id
+        ).scalar() or 0
+        badge_service.check_and_award_badges(str(current_user.id), "comments_posted", comment_count, db)
+        db.commit()
+    
     return result
 
 

@@ -88,7 +88,7 @@ export function useMuxVideoUpload({
         } else if (entityType === "community") {
           // Community posts - check if post exists
           try {
-            entity = await apiClient.getPost(entityId);
+            entity = await apiClient.getPost(entityId!);
             playbackId = entity.mux_playback_id || null;
             assetId = entity.mux_asset_id || null;
           } catch (e) {
@@ -112,12 +112,12 @@ export function useMuxVideoUpload({
               // Video doesn't exist in Mux - clear from DB
               console.log(`[useMuxVideoUpload] ⚠️ Video not found in Mux, clearing from DB...`);
               if (entityType === "lesson") {
-                await apiClient.updateLesson(entityId, {
+                await apiClient.updateLesson(entityId!, {
                   mux_playback_id: undefined,
                   mux_asset_id: undefined,
                 } as any);
               } else if (entityType === "course") {
-                await apiClient.updateCourse(entityId, {
+                await apiClient.updateCourse(entityId!, {
                   mux_preview_playback_id: undefined,
                   mux_preview_asset_id: undefined,
                 } as any);
@@ -205,7 +205,7 @@ export function useMuxVideoUpload({
         try {
           let entity: any = null;
           if (entityType === "lesson") {
-            entity = await apiClient.getLesson(entityId);
+            entity = await apiClient.getLesson(entityId!);
             if (entity.mux_playback_id && entity.mux_asset_id) {
               const assetCheck = await apiClient.checkMuxAssetExists(entity.mux_asset_id);
               if (assetCheck.exists) {
@@ -224,7 +224,7 @@ export function useMuxVideoUpload({
               }
             }
           } else if (entityType === "course") {
-            entity = await apiClient.getCourseFullDetails(entityId);
+            entity = await apiClient.getCourseFullDetails(entityId!);
             if (entity.mux_preview_playback_id && (entity as any).mux_preview_asset_id) {
               const assetCheck = await apiClient.checkMuxAssetExists((entity as any).mux_preview_asset_id);
               if (assetCheck.exists) {
@@ -277,7 +277,7 @@ export function useMuxVideoUpload({
             }
           } else if (entityType === "community") {
             try {
-              entity = await apiClient.getPost(entityId);
+              entity = await apiClient.getPost(entityId!);
               if (entity.mux_playback_id && entity.mux_asset_id) {
                 const assetCheck = await apiClient.checkMuxAssetExists(entity.mux_asset_id);
                 if (assetCheck.exists) {
@@ -439,10 +439,10 @@ export function useMuxVideoUpload({
       let assetIdToDelete: string | null = null;
 
       if (entityType === "lesson") {
-        const lesson = await apiClient.getLesson(entityId);
+        const lesson = await apiClient.getLesson(entityId!);
         assetIdToDelete = lesson.mux_asset_id;
       } else if (entityType === "course") {
-        const course = await apiClient.getCourseFullDetails(entityId);
+        const course = await apiClient.getCourseFullDetails(entityId!);
         assetIdToDelete = (course as any).mux_preview_asset_id;
       } else if (entityType === "level") {
         try {
@@ -463,7 +463,7 @@ export function useMuxVideoUpload({
         }
       } else if (entityType === "community") {
         try {
-          const post = await apiClient.getPost(entityId);
+          const post = await apiClient.getPost(entityId!);
           assetIdToDelete = (post as any).mux_asset_id || null;
         } catch (e) {
           console.log("[useMuxVideoUpload] Post not found for deletion");

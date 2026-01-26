@@ -1,5 +1,5 @@
 """
-Master Migration Runner for Mambo Inn v4.0
+Master Migration Runner for Mambo Guild v4.0
 Runs all migrations in order for the new ecosystem features.
 """
 import sys
@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 def run_all():
     """Run all v4.0 migrations in sequence."""
     print("=" * 60)
-    print("🎺 MAMBO INN v4.0 - DATABASE MIGRATIONS")
+    print("🎺 MAMBO GUILD v4.0 - DATABASE MIGRATIONS")
     print("=" * 60)
     print()
     

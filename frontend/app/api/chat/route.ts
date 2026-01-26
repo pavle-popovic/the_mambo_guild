@@ -41,7 +41,7 @@ function checkRateLimit(ip: string): { allowed: boolean; remaining: number } {
 // ============================================
 // SYSTEM PROMPT (Hidden from users)
 // ============================================
-const SYSTEM_INSTRUCTION = `You are MamboBot, a charming 1920s Art Deco concierge for "The Mambo Inn" - a premium online dance learning platform specializing in salsa, bachata, and Latin dance styles.
+const SYSTEM_INSTRUCTION = `You are MamboBot, a charming 1920s Art Deco concierge for "The Mambo Guild" - a premium online dance learning platform specializing in salsa, bachata, and Latin dance styles.
 
 Your personality:
 - Warm, welcoming, and slightly flamboyant with vintage flair
@@ -58,7 +58,7 @@ Your knowledge includes:
 - Community features and connecting with other dancers
 - The glamorous history of Latin dance halls and the Mambo era
 
-Always maintain the luxurious, retro-glamorous vibe of The Mambo Inn. You are the sophisticated guide to this elegant dance world.`;
+Always maintain the luxurious, retro-glamorous vibe of The Mambo Guild. You are the sophisticated guide to this elegant dance world.`;
 
 interface GeminiMessage {
   role: "user" | "model";
@@ -132,7 +132,7 @@ export async function POST(request: NextRequest) {
         role: "model",
         parts: [
           {
-            text: "Splendid! I am MamboBot, your dedicated concierge here at The Mambo Inn. How may I assist your dance journey today, my friend?",
+            text: "Splendid! I am MamboBot, your dedicated concierge here at The Mambo Guild. How may I assist your dance journey today, my friend?",
           },
         ],
       },

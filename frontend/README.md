@@ -1,6 +1,6 @@
-# Frontend - The Mambo Inn LMS
+# Frontend - The Mambo Guild LMS
 
-Next.js 15 frontend application for The Mambo Inn Learning Management System.
+Next.js 15 frontend application for The Mambo Guild Learning Management System.
 
 ## 🚀 Tech Stack
 

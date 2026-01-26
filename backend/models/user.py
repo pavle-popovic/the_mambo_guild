@@ -63,6 +63,11 @@ class UserProfile(Base):
     last_login_date = Column(DateTime, nullable=True)
     badges = Column(String, default="[]", nullable=False)  # JSONB stored as string for now
     
+    # Waitlist & Referrals
+    referral_code = Column(String(20), unique=True, nullable=True, index=True)
+    referred_by_code = Column(String(20), nullable=True, index=True)
+    referral_count = Column(Integer, default=0, nullable=False)
+    
     # Clave Economy (v4.0)
     current_claves = Column(Integer, default=0, nullable=False)
     reputation = Column(Integer, default=0, nullable=False)  # "Maestro Score"

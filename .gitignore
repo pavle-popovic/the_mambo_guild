@@ -53,6 +53,11 @@ node_modules/
 *_files/
 Full_Logo*
 
+Ressources/
+.vscode/
+.claude/
+Claude.md
+
 # Sensitive files
 *.pem
 *.key

@@ -39,7 +39,7 @@ export default function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
       <div className="p-6 flex items-center gap-3">
         <Image
           src="/assets/Logo.png"
-          alt="The Mambo Inn"
+          alt="The Mambo Guild"
           width={24}
           height={24}
           className="h-6 w-auto logo-img"

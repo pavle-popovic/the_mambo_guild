@@ -32,7 +32,7 @@ export default function ConstellationSection() {
                         </h2>
                         <p className="text-xl text-gray-300 mb-8 font-light leading-relaxed">
                             Our unique <strong className="text-white">Constellation System</strong> guides you step-by-step.
-                            Master one skill to unlock the next. Only on The Mambo Inn.
+                            Master one skill to unlock the next. Only on The Mambo Guild.
                         </p>
                         <button className="bg-white text-black font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-200 transition shadow-[0_0_15px_rgba(255,255,255,0.3)]">
                             View Interactive Map

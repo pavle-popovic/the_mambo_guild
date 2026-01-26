@@ -51,6 +51,7 @@ interface AuthContextType {
   }) => Promise<void>;
   logout: () => void;
   refreshUser: () => Promise<void>;
+  waitlistRegister: (email: string, username: string) => Promise<{ referral_code: string; position: number }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -135,6 +136,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await refreshUser();
   };
 
+  const waitlistRegister = async (email: string, username: string) => {
+    return await apiClient.waitlistRegister(email, username);
+  };
+
   const logout = () => {
     // Clear token from API client
     apiClient.setToken(null);
@@ -148,7 +153,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, login, register, logout, refreshUser }}
+      value={{ user, loading, login, register, logout, refreshUser, waitlistRegister }}
     >
       {children}
     </AuthContext.Provider>

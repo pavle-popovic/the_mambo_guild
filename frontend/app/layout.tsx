@@ -18,7 +18,7 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "The Mambo Inn | Gamify Your Dance",
+  title: "The Mambo Guild | Gamify Your Dance",
   description: "Structured courses. Real feedback. Stop memorizing steps—start mastering the game.",
 };
 

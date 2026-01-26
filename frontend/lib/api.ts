@@ -13,6 +13,38 @@ interface CacheEntry {
   timestamp: number;
 }
 
+export interface UserProfile {
+  id: string;
+  first_name: string;
+  last_name: string;
+  username: string; // Made required based on typical profile needs
+  xp: number;
+  level: number;
+  streak_count: number;
+  tier: string;
+  role: string;
+  avatar_url: string | null;
+  reputation: number;
+  current_claves: number;
+  badges: Array<{
+    id: string;
+    name: string;
+    description: string;
+    tier: string;
+    icon_url: string | null;
+    category: string;
+    requirement_type: string;
+    requirement_value: number;
+    is_earned: boolean;
+    earned_at: string | null;
+  }>;
+  stats: {
+    reactions_given: number;
+    reactions_received: number;
+    solutions_accepted: number;
+  } | null;
+}
+
 class ApiClient {
   private baseUrl: string;
   private token: string | null = null;
@@ -273,6 +305,13 @@ class ApiClient {
     );
     this.setToken(response.access_token);
     return response;
+  }
+
+  async waitlistRegister(email: string, username: string) {
+    return this.request<{ referral_code: string; position: number }>("/api/waitlist/join", {
+      method: "POST",
+      body: JSON.stringify({ email, username }),
+    });
   }
 
   async getProfile() {

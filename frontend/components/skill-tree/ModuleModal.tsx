@@ -15,6 +15,7 @@ interface Lesson {
     lesson_type: string;
     thumbnail_url?: string;
     duration_minutes?: number;
+    order_index: number;
 }
 
 interface ModuleModalProps {
@@ -251,26 +252,24 @@ export default function ModuleModal({
                                             initial={{ opacity: 0, x: -20 }}
                                             animate={{ opacity: 1, x: 0 }}
                                             transition={{ delay: 0.3 + index * 0.04 }}
-                                            className={`p-3 rounded-xl border transition-all ${
-                                                lesson.is_locked
+                                            className={`p-3 rounded-xl border transition-all ${lesson.is_locked
                                                     ? "bg-gray-900/30 border-gray-800/50 opacity-50 cursor-not-allowed"
                                                     : lesson.is_completed
                                                         ? "bg-gradient-to-r from-green-900/20 to-emerald-900/10 border-green-700/30 hover:border-green-600/50 cursor-pointer"
                                                         : "bg-gradient-to-r from-gray-800/40 to-gray-900/40 border-yellow-900/20 hover:border-yellow-700/40 cursor-pointer hover:shadow-[0_0_20px_rgba(212,175,55,0.1)]"
-                                            }`}
+                                                }`}
                                             onClick={() => handleLessonClick(lesson.id, lesson.is_locked)}
                                             whileHover={lesson.is_locked ? {} : { x: 4, scale: 1.01 }}
                                         >
                                             <div className="flex items-center gap-3">
                                                 {/* Icon */}
                                                 <div
-                                                    className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${
-                                                        lesson.is_locked
+                                                    className={`flex-shrink-0 w-9 h-9 rounded-lg flex items-center justify-center ${lesson.is_locked
                                                             ? "bg-gray-800/50"
                                                             : lesson.is_completed
                                                                 ? "bg-green-500/20 border border-green-600/30"
                                                                 : "bg-yellow-900/20 border border-yellow-700/30"
-                                                    }`}
+                                                        }`}
                                                 >
                                                     {getLessonIcon(lesson.lesson_type, lesson.is_boss_battle)}
                                                 </div>
@@ -279,13 +278,12 @@ export default function ModuleModal({
                                                 <div className="flex-1 min-w-0">
                                                     <div className="flex items-center gap-2">
                                                         <h4
-                                                            className={`font-medium text-sm truncate ${
-                                                                lesson.is_locked
+                                                            className={`font-medium text-sm truncate ${lesson.is_locked
                                                                     ? "text-gray-600"
                                                                     : lesson.is_completed
                                                                         ? "text-green-400"
                                                                         : "text-gray-200"
-                                                            }`}
+                                                                }`}
                                                         >
                                                             {lesson.title}
                                                         </h4>

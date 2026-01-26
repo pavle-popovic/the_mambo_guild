@@ -1,6 +1,6 @@
-# Backend - The Mambo Inn LMS API
+# Backend - The Mambo Guild LMS API
 
-FastAPI backend application providing RESTful API for The Mambo Inn Learning Management System.
+FastAPI backend application providing RESTful API for The Mambo Guild Learning Management System.
 
 ## 🚀 Tech Stack
 

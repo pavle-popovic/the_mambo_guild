@@ -45,7 +45,7 @@ def send_password_reset_email(email: str, reset_token: str) -> bool:
         result = resend_client.emails.send({
             "from": from_email,
             "to": [email],
-            "subject": "Reset Your Password - The Mambo Inn",
+            "subject": "Reset Your Password - The Mambo Guild",
             "html": f"""
             <!DOCTYPE html>
             <html>
@@ -60,7 +60,7 @@ def send_password_reset_email(email: str, reset_token: str) -> bool:
             <body>
                 <div class="container">
                     <h1>Reset Your Password</h1>
-                    <p>You requested to reset your password for The Mambo Inn account.</p>
+                    <p>You requested to reset your password for The Mambo Guild account.</p>
                     <p>Click the button below to reset your password. This link will expire in 1 hour.</p>
                     <a href="{reset_url}" class="button">Reset Password</a>
                     <p>If you didn't request this, please ignore this email.</p>

@@ -1,4 +1,4 @@
-# The Mambo Inn - Learning Management System
+# The Mambo Guild - Learning Management System
 
 A comprehensive, gamified learning management system built with Next.js, FastAPI, PostgreSQL, and Docker. Features video streaming with Mux, image uploads with Cloudflare R2, and a modern, engaging user interface.
 

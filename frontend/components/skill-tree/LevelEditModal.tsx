@@ -289,8 +289,8 @@ export default function LevelEditModal({
                                     <button
                                         onClick={() => setActiveTab("details")}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition ${activeTab === "details"
-                                                ? "bg-amber-600 text-white"
-                                                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                                            ? "bg-amber-600 text-white"
+                                            : "bg-gray-800 text-gray-400 hover:bg-gray-700"
                                             }`}
                                     >
                                         Details
@@ -298,8 +298,8 @@ export default function LevelEditModal({
                                     <button
                                         onClick={() => setActiveTab("lessons")}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${activeTab === "lessons"
-                                                ? "bg-amber-600 text-white"
-                                                : "bg-gray-800 text-gray-400 hover:bg-gray-700"
+                                            ? "bg-amber-600 text-white"
+                                            : "bg-gray-800 text-gray-400 hover:bg-gray-700"
                                             }`}
                                     >
                                         <BookOpen className="w-4 h-4" />
@@ -410,7 +410,7 @@ export default function LevelEditModal({
                                                     </div>
                                                     <button
                                                         onClick={handleDeletePreviewVideo}
-                                                        disabled={uploadStatus === "deleting"}
+                                                        disabled={(uploadStatus as string) === "deleting"}
                                                         className="w-full px-4 py-2 bg-red-600/20 hover:bg-red-600/30 text-red-400 rounded-lg transition flex items-center justify-center gap-2 text-sm disabled:opacity-50"
                                                     >
                                                         <Trash2 className="w-4 h-4" />
@@ -481,9 +481,8 @@ export default function LevelEditModal({
                                                     return (
                                                         <div
                                                             key={lesson.id}
-                                                            className={`flex items-center gap-3 p-3 bg-mambo-dark border rounded-lg hover:border-gray-600 transition ${
-                                                                isVideoLesson && hasVideo ? 'border-green-700/50' : 'border-gray-700'
-                                                            }`}
+                                                            className={`flex items-center gap-3 p-3 bg-mambo-dark border rounded-lg hover:border-gray-600 transition ${isVideoLesson && hasVideo ? 'border-green-700/50' : 'border-gray-700'
+                                                                }`}
                                                         >
                                                             <div className="w-8 h-8 bg-gray-800 rounded-lg flex items-center justify-center text-xs text-gray-400 font-medium">
                                                                 {index + 1}
@@ -507,11 +506,10 @@ export default function LevelEditModal({
                                                                     )}
                                                                 </div>
                                                                 <div className="text-xs text-gray-500 flex items-center gap-2">
-                                                                    <span className={`uppercase ${
-                                                                        lesson.lesson_type === 'video' ? 'text-green-500' :
+                                                                    <span className={`uppercase ${lesson.lesson_type === 'video' ? 'text-green-500' :
                                                                         lesson.lesson_type === 'quiz' ? 'text-blue-400' :
-                                                                        'text-amber-400'
-                                                                    }`}>{lesson.lesson_type}</span>
+                                                                            'text-amber-400'
+                                                                        }`}>{lesson.lesson_type}</span>
                                                                     <span>•</span>
                                                                     <span>{lesson.xp_value} XP</span>
                                                                     {lesson.is_boss_battle && (

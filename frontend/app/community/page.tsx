@@ -215,7 +215,7 @@ export default function CommunityPage() {
                                     <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-amber-400/60 rounded-br-xl" />
 
                                     <h2 className="text-2xl font-serif font-bold text-white mb-3">
-                                        Join The <span className="text-amber-400">Mambo Inn</span>
+                                        Join The <span className="text-amber-400">Mambo Guild</span>
                                     </h2>
                                     <p className="text-white/70 mb-6">
                                         Connect with dancers worldwide. Share videos, ask questions, and level up together.

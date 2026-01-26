@@ -51,7 +51,7 @@ interface UseGeminiReturn {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-const DIEGO_WELCOME_MESSAGE = `Bienvenido to The Mambo Inn! I'm Diego, your concierge. Whether you're taking your first steps or ready to shine on stage, I'm here to guide you. What brings you to salsa today?`;
+const DIEGO_WELCOME_MESSAGE = `Bienvenido to The Mambo Guild! I'm Diego, your concierge. Whether you're taking your first steps or ready to shine on stage, I'm here to guide you. What brings you to salsa today?`;
 
 export function useGemini(): UseGeminiReturn {
   const [messages, setMessages] = useState<Message[]>([

@@ -1,5 +1,5 @@
 """
-Pydantic schemas for Community features (Mambo Inn v4.0)
+Pydantic schemas for Community features (Mambo Guild v4.0)
 - Clave Economy
 - Posts (The Stage & The Lab)
 - Badges
@@ -220,10 +220,25 @@ class TagResponse(BaseModel):
 # ============================================
 
 class PublicProfileStats(BaseModel):
-    """Stats shown on public profile."""
-    questions_solved: int = 0  # Answers marked as Solution
-    fires_received: int = 0    # Total fire reactions on posts
-    current_streak: int = 0    # Login streak days
+    """Stats shown on public profile and used for badge progress calculation."""
+    # Reactions
+    reactions_given: int = 0
+    reactions_received: int = 0
+    fires_received: int = 0
+    claps_received: int = 0
+    metronomes_received: int = 0
+    
+    # Solutions & Questions
+    solutions_accepted: int = 0
+    questions_posted: int = 0
+    
+    # Content Creation
+    videos_posted: int = 0
+    comments_posted: int = 0
+    
+    # Streaks
+    current_streak: int = 0
+
 
 
 class PublicProfileResponse(BaseModel):

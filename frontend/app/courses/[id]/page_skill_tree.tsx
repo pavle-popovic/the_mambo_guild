@@ -44,7 +44,8 @@ interface Lesson {
     is_locked: boolean;
     is_boss_battle: boolean;
     lesson_type: string;
-    thumbnail_url?: string | null;
+    thumbnail_url?: string;
+    order_index: number;
 }
 
 export default function CourseDetailPage() {
@@ -236,6 +237,7 @@ export default function CourseDetailPage() {
                     <ModuleModal
                         isOpen={!!selectedLevelId}
                         onClose={handleCloseModal}
+                        levelId={selectedLevelId!}
                         levelTitle={selectedLevel.title}
                         levelDescription={selectedLevel.description}
                         lessons={levelLessons}
