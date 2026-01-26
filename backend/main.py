@@ -26,7 +26,7 @@ app.add_middleware(
 # This ensures it's the outermost layer and CORS headers are added to ALL responses including errors
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
     allow_headers=["*"],
