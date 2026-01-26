@@ -373,6 +373,10 @@ The application includes comprehensive error handling and validation:
     - **Community Rewards**: "Accepted Answer" (+10) and reaction refunds
     - **Rebalancing**: Removed course completion clave rewards to focus on community engagement
   - **Rules**: Self-reaction ban implemented for fair play
+- ✅ **Velvet Rope Waitlist & Account Claim** (January 2026)
+  - **Waitlist Mode**: Full-site lockout behind a "Founders Only" waitlist (configurable via ENV)
+  - **Account Claim**: Secure logic allowing waitlist users to reset password and convert to full accounts on launch day
+  - **Referral System**: Unique referral generation and `beta_tester` badge unlocking
 - ✅ **Content Type System** (January 2026)
   - Three distinct content types: Courses (📚), Choreographies (💃), and Topics (💡)
   - Content type selector in admin course builder

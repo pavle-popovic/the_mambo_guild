@@ -25,14 +25,14 @@ interface BadgeTrophyCaseProps {
   userStats?: {
     reactions_given: number;
     reactions_received: number;
-    fires_received: number;
-    claps_received: number;
-    metronomes_received: number;
     solutions_accepted: number;
-    questions_posted: number;
-    videos_posted: number;
-    comments_posted: number;
-    current_streak: number;
+    fires_received?: number;
+    claps_received?: number;
+    metronomes_received?: number;
+    questions_posted?: number;
+    videos_posted?: number;
+    comments_posted?: number;
+    current_streak?: number;
   } | null;
 }
 
