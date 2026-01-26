@@ -111,7 +111,8 @@ backend/
 
 ### Users (`/api/users`)
 - `GET /api/users/me` - Get user profile
-- `PATCH /api/users/me` - Update user profile (avatar_url)
+- `PATCH /api/users/me` - Update user profile (avatar_url, username)
+- `GET /api/users/public/{username}` - Get public profile data (stats, badges)
 
 ### Uploads (`/api/uploads`)
 - `POST /api/uploads/presigned-url` - Get presigned URL for R2 upload

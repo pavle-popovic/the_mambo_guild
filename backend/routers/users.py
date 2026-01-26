@@ -1,8 +1,9 @@
 from typing import Annotated, List, Optional
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import desc
-from pydantic import BaseModel
+from sqlalchemy import desc, func
+from pydantic import BaseModel, field_validator
+import re
 
 from dependencies import get_current_user
 from models import get_db
@@ -15,6 +16,20 @@ router = APIRouter(prefix="/users", tags=["users"])
 
 class UserProfileUpdateRequest(BaseModel):
     avatar_url: Optional[str] = None
+    username: Optional[str] = None
+
+    @field_validator('username')
+    @classmethod
+    def validate_username(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return v
+        if len(v) < 3:
+            raise ValueError("Username must be at least 3 characters")
+        if len(v) > 30:
+            raise ValueError("Username cannot exceed 30 characters")
+        if not re.match(r'^[a-zA-Z0-9_]+$', v):
+            raise ValueError("Username can only contain letters, numbers, and underscores")
+        return v.lower()
 
 
 @router.get("/me", response_model=UserProfileResponse)
@@ -47,6 +62,7 @@ def read_users_me(
         id=str(current_user.profile.id),
         first_name=current_user.profile.first_name,
         last_name=current_user.profile.last_name,
+        username=current_user.profile.username,
         xp=current_user.profile.xp,
         level=current_user.profile.level,
         streak_count=current_user.profile.streak_count,
@@ -67,15 +83,29 @@ def update_user_profile(
     current_user: Annotated[User, Depends(get_current_user)],
     db: Session = Depends(get_db),
 ):
-    """Update user profile (currently only avatar_url)."""
+    """Update user profile (avatar_url and username)."""
     if not current_user.profile:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND, detail="User profile not found"
         )
-    
+
     # Update avatar_url if provided
     if profile_data.avatar_url is not None:
         current_user.profile.avatar_url = profile_data.avatar_url
+
+    # Update username if provided
+    if profile_data.username is not None:
+        # Check if username is already taken (case-insensitive)
+        existing = db.query(UserProfile).filter(
+            func.lower(UserProfile.username) == profile_data.username.lower(),
+            UserProfile.user_id != current_user.id
+        ).first()
+        if existing:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already taken"
+            )
+        current_user.profile.username = profile_data.username
     
     db.commit()
     db.refresh(current_user.profile)
@@ -99,6 +129,7 @@ def update_user_profile(
         id=str(current_user.profile.id),
         first_name=current_user.profile.first_name,
         last_name=current_user.profile.last_name,
+        username=current_user.profile.username,
         xp=current_user.profile.xp,
         level=current_user.profile.level,
         streak_count=current_user.profile.streak_count,
@@ -108,6 +139,59 @@ def update_user_profile(
         current_level_tag=current_user.profile.current_level_tag.value,
         reputation=current_user.profile.reputation,
         current_claves=current_user.profile.current_claves,
+        badges=badges_data,
+        stats=stats_dict
+    )
+
+
+@router.get("/public/{username}", response_model=UserProfileResponse)
+def get_public_profile(
+    username: str,
+    db: Session = Depends(get_db),
+):
+    """Get public profile by username."""
+    profile = db.query(UserProfile).filter(UserProfile.username == username).first()
+    if not profile:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+    
+    user = db.query(User).filter(User.id == profile.user_id).first()
+    if not user:
+         raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
+        )
+
+    # Assuming Subscription model has a 'tier' attribute
+    subscription_tier = user.subscription.tier.value if user.subscription else "rookie"
+    
+    # Fetch Badges & Stats
+    from services import badge_service
+    from models.community import UserStats
+    
+    badges_data = badge_service.get_all_badges_for_user(str(user.id), db)
+    stats = db.query(UserStats).filter(UserStats.user_id == user.id).first()
+    stats_dict = {
+        "reactions_given": stats.reactions_given_count if stats else 0,
+        "reactions_received": stats.reactions_received_count if stats else 0,
+        "solutions_accepted": stats.solutions_accepted_count if stats else 0
+    }
+
+    return UserProfileResponse(
+        id=str(profile.id),
+        first_name=profile.first_name,
+        last_name=profile.last_name,
+        username=profile.username,
+        xp=profile.xp,
+        level=profile.level,
+        streak_count=profile.streak_count,
+        tier=subscription_tier,
+        # Role logic: if we want to hide role or not. Let's expose it.
+        role=user.role, 
+        avatar_url=profile.avatar_url,
+        current_level_tag=profile.current_level_tag.value,
+        reputation=profile.reputation,
+        current_claves=profile.current_claves,
         badges=badges_data,
         stats=stats_dict
     )
@@ -127,10 +211,12 @@ def get_leaderboard(db: Annotated[Session, Depends(get_db)]):
     for entry in leaderboard_entries:
         # Assuming User model has a 'subscription' relationship to get tier
         subscription_tier = entry.user.subscription.tier.value if entry.user.subscription else "rookie"
+        display_name = f"@{entry.username}" if entry.username else f"{entry.first_name} {entry.last_name}"
+        
         results.append(
             LeaderboardEntry(
                 user_id=entry.user_id,
-                name=f"{entry.first_name} {entry.last_name}",
+                name=display_name,
                 avatar_url=entry.avatar_url,
                 xp_total=entry.xp,
                 tier=subscription_tier

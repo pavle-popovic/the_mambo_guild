@@ -7,6 +7,7 @@ interface User {
   id: string;
   first_name: string;
   last_name: string;
+  username?: string | null;
   xp: number;
   level: number;
   streak_count: number;
@@ -41,6 +42,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (data: {
     email: string;
+    username: string;
     password: string;
     confirm_password: string;
     first_name: string;
@@ -122,6 +124,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const register = async (data: {
     email: string;
+    username: string;
     password: string;
     confirm_password: string;
     first_name: string;

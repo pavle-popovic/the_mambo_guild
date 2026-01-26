@@ -245,6 +245,7 @@ class ApiClient {
   // Auth endpoints
   async register(data: {
     email: string;
+    username: string;
     password: string;
     confirm_password: string;
     first_name: string;
@@ -451,11 +452,12 @@ class ApiClient {
     });
   }
 
-  async updateProfile(data: { avatar_url?: string }) {
+  async updateProfile(data: { avatar_url?: string; username?: string }) {
     return this.request<{
       id: string;
       first_name: string;
       last_name: string;
+      username?: string;
       xp: number;
       level: number;
       streak_count: number;
@@ -1141,6 +1143,9 @@ class ApiClient {
     });
   }
 
+  async getPublicProfile(username: string) {
+    return this.request<UserProfile>(`/api/users/public/${username}`);
+  }
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);

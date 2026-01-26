@@ -217,6 +217,7 @@ model user_profiles {
   user_id           String          @unique(map: "ix_user_profiles_user_id") @db.Uuid
   first_name        String          @db.VarChar
   last_name         String          @db.VarChar
+  username          String?         @unique(map: "ix_user_profiles_username") @db.VarChar(30)
   avatar_url        String?         @db.VarChar
   current_level_tag currentleveltag
   xp                Int

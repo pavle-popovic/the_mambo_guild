@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, Query
 from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from datetime import timedelta, datetime
 from models import get_db
 from models.user import User, UserProfile, CurrentLevelTag, Subscription, SubscriptionTier, SubscriptionStatus, UserRole
@@ -72,6 +73,16 @@ async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)
                 detail="Email already registered"
             )
 
+        # Check if username is taken (case-insensitive)
+        existing_username = db.query(UserProfile).filter(
+            func.lower(UserProfile.username) == user_data.username.strip().lower()
+        ).first()
+        if existing_username:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Username already taken"
+            )
+
         # Create user
         user_id = uuid.uuid4()
         hashed_password = get_password_hash(user_data.password)
@@ -99,6 +110,7 @@ async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)
             user_id=user_id,
             first_name=user_data.first_name.strip(),
             last_name=user_data.last_name.strip(),
+            username=user_data.username.strip(),
             current_level_tag=level_tag,
             xp=0,
             level=1,
@@ -239,6 +251,7 @@ async def get_current_user_profile(
         id=str(current_user.id),
         first_name=profile.first_name,
         last_name=profile.last_name,
+        username=profile.username,
         xp=profile.xp,
         level=profile.level,
         streak_count=profile.streak_count,
@@ -279,11 +292,13 @@ async def create_user_from_oauth(
     db.flush()
     
     # Create user profile
+    # Generate a temporary username or leave None. Let's leave None and prompt user later.
     profile = UserProfile(
         id=uuid.uuid4(),
         user_id=user_id,
         first_name=first_name.strip(),
         last_name=last_name.strip(),
+        username=None, # OAuth users verify this later
         current_level_tag=CurrentLevelTag.BEGINNER,
         xp=0,
         level=1,

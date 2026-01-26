@@ -328,6 +328,20 @@ The application includes comprehensive error handling and validation:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Gamertag & Public Profile v1.0** (January 2026)
+  - **Gamertag Identity**: Transitioned from Real Names to unique Usernames (Gamertags) for privacy and "Video Game" vibe
+  - **Public Profiles**: New `/u/[username]` pages to share stats, badges, and streaks with the world
+  - **Username Editing**: Built-in tool for users to change their handle (3-30 chars, specific validation)
+  - **Backend Support**: New public endpoints and case-insensitive uniqueness checks
+- ✅ **Gamification Badges System** (January 2026)
+  - **32 Unique Badges**: Custom 3D-rendered badges for Community, Lab, and Streak achievements
+  - **Trophy Case**: Visual display of earned/locked badges on User Profile
+  - **Database Seed**: Automated seed script for badge definitions
+  - **Categories**:
+    - **Firestarter**: Receiving "Fire" reactions (Bronze/Silver/Gold/Diamond)
+    - **The Professor**: Solving questions in The Lab
+    - **Center Stage**: Posting video homework
+    - **Unstoppable**: Maintenance of daily login streaks
 - ✅ **Conversion Optimization & Visual Overhaul** (January 2026)
   - **Cinematic Entrance**: Progressive loading hero animation with "Enter" experience
   - **"Meet the Maestro"**: Cinematic video introduction section

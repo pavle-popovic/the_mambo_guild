@@ -40,6 +40,37 @@ export default function ProfilePage() {
   const [activeCourses, setActiveCourses] = useState<Array<Course & { nextLessonId: string | null }>>([]);
   const [loadingCourses, setLoadingCourses] = useState(true);
 
+  // Username Editing
+  const [isEditingUsername, setIsEditingUsername] = useState(false);
+  const [newUsername, setNewUsername] = useState("");
+  const [updatingUsername, setUpdatingUsername] = useState(false);
+  const [usernameError, setUsernameError] = useState("");
+
+  const handleUpdateUsername = async () => {
+    if (!newUsername || newUsername.length < 3) {
+      setUsernameError("Username must be at least 3 characters");
+      return;
+    }
+
+    setUpdatingUsername(true);
+    setUsernameError("");
+
+    try {
+      await apiClient.updateProfile({ username: newUsername });
+      await refreshUser();
+      setIsEditingUsername(false);
+    } catch (error: any) {
+      console.error("Failed to update username:", error);
+      if (error.message && error.message.includes("Detail:")) {
+        setUsernameError(error.message);
+      } else {
+        setUsernameError(error.message || "Failed to update username. Try another one.");
+      }
+    } finally {
+      setUpdatingUsername(false);
+    }
+  };
+
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login");
@@ -142,7 +173,7 @@ export default function ProfilePage() {
                 <div className="w-32 h-32 rounded-full shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
                   <Image
                     src={user.avatar_url}
-                    alt={`${user.first_name} ${user.last_name}`}
+                    alt={user.username || `${user.first_name} ${user.last_name}`}
                     width={128}
                     height={128}
                     className="w-full h-full object-cover object-center"
@@ -150,7 +181,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="w-32 h-32 rounded-full shadow-2xl bg-mambo-blue flex items-center justify-center text-white text-4xl font-bold transition-transform group-hover:scale-105">
-                  {user.first_name[0].toUpperCase()}
+                  {(user.username?.[0] || user.first_name[0]).toUpperCase()}
                 </div>
               )}
               {/* Level badge - green and visible */}
@@ -224,18 +255,74 @@ export default function ProfilePage() {
 
           <div className="text-center md:text-left flex-1">
             <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-3 mb-2">
-              <h1 className="text-3xl font-bold text-mambo-text">
-                {user.first_name} {user.last_name}
-              </h1>
-              <button
-                onClick={() => {
-                  logout();
-                  router.push("/");
-                }}
-                className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-bold text-gray-300 transition shrink-0"
-              >
-                Log Out
-              </button>
+              {isEditingUsername ? (
+                <div className="flex items-center gap-2">
+                  <div className="flex flex-col gap-1">
+                    <input
+                      type="text"
+                      value={newUsername}
+                      onChange={(e) => setNewUsername(e.target.value)}
+                      className="bg-black/40 border border-gray-600 rounded-lg px-3 py-1 text-white text-xl font-bold w-full max-w-xs focus:ring-2 focus:ring-mambo-gold focus:border-transparent outline-none"
+                      placeholder="Enter new username"
+                      autoFocus
+                    />
+                    <span className="text-xs text-gray-500">3-30 chars, letters/numbers only</span>
+                  </div>
+                  <button
+                    onClick={handleUpdateUsername}
+                    disabled={updatingUsername}
+                    className="p-2 bg-green-600 hover:bg-green-500 text-white rounded-lg transition disabled:opacity-50"
+                  >
+                    {updatingUsername ? (
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    ) : (
+                      "Save"
+                    )}
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsEditingUsername(false);
+                      setNewUsername(user.username || "");
+                      setUsernameError("");
+                    }}
+                    disabled={updatingUsername}
+                    className="p-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              ) : (
+                <div className="flex items-center gap-3 group/username">
+                  <h1 className="text-3xl font-bold text-mambo-text">
+                    @{user.username || `${user.first_name}${user.last_name}`}
+                  </h1>
+                  <button
+                    onClick={() => {
+                      setNewUsername(user.username || "");
+                      setIsEditingUsername(true);
+                    }}
+                    className="opacity-0 group-hover/username:opacity-100 p-1.5 text-gray-400 hover:text-white transition-all transform hover:scale-110"
+                    title="Edit Username"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                    </svg>
+                  </button>
+                </div>
+              )}
+              {usernameError && <div className="text-red-500 text-sm mt-1 mb-2">{usernameError}</div>}
+
+              <div className="flex gap-2 mt-2 sm:mt-0">
+                <button
+                  onClick={() => {
+                    logout();
+                    router.push("/");
+                  }}
+                  className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-bold text-gray-300 transition shrink-0"
+                >
+                  Log Out
+                </button>
+              </div>
             </div>
             <p className="text-gray-400 mb-8">Mambo Engineer • Member since 2024</p>
 

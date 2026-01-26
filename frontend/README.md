@@ -153,12 +153,19 @@ frontend/
 - Next/previous lesson navigation based on proper ordering
 
 **Profile Page** (`/profile`):
-- User information display
+- User information display with Gamertag (Username)
+- **Edit Username**: Built-in tool to update handle
 - Profile picture upload (hover overlay)
 - Level and XP display
 - Progress tracking
 - Badge Trophy Case with earned/locked badges
 - Referral section with link sharing
+
+**Public Profile** (`/u/[username]`):
+- Publicly accessible view of user stats
+- Display of earned badges and level
+- Streak count and reputation visualization
+- "Copy Link" feature for sharing
 
 **Community Page** (`/community`):
 - Dual-mode feed: The Stage (video posts) and The Lab (Q&A)

@@ -16,6 +16,7 @@ const LEVEL_OPTIONS = [
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
+    username: "",
     firstName: "",
     lastName: "",
     email: "",
@@ -52,6 +53,7 @@ export default function RegisterPage() {
     try {
       await register({
         email: formData.email,
+        username: formData.username,
         password: formData.password,
         confirm_password: formData.confirmPassword,
         first_name: formData.firstName,
@@ -74,8 +76,8 @@ export default function RegisterPage() {
 
         <div className="relative z-10 w-full max-w-md bg-zinc-900/90 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl mx-4">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold mb-1 text-mambo-text">Create Account</h1>
-            <p className="text-gray-400 text-sm">Join 10,000+ dancers worldwide.</p>
+            <h1 className="text-2xl font-bold mb-1 text-mambo-text">Join The Stage</h1>
+            <p className="text-gray-400 text-sm">Create your dancer profile.</p>
           </div>
 
           {error && (
@@ -85,6 +87,26 @@ export default function RegisterPage() {
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+
+            {/* Handle / Username */}
+            <div>
+              <label className="block text-xs font-bold text-mambo-blue uppercase mb-1 drop-shadow-sm">
+                Choose your Handle (Username)
+              </label>
+              <input
+                type="text"
+                value={formData.username}
+                onChange={(e) =>
+                  setFormData({ ...formData, username: e.target.value })
+                }
+                required
+                minLength={3}
+                placeholder="e.g. MamboKing"
+                className="w-full bg-black/60 border border-mambo-blue/50 rounded-lg p-3 text-white focus:border-mambo-blue focus:ring-1 focus:ring-mambo-blue focus:outline-none transition shadow-inner"
+              />
+              <p className="text-[10px] text-gray-500 mt-1">This is how you will appear in the community.</p>
+            </div>
+
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">

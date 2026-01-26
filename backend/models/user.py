@@ -54,6 +54,7 @@ class UserProfile(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), unique=True, nullable=False, index=True)
     first_name = Column(String, nullable=False)
     last_name = Column(String, nullable=False)
+    username = Column(String(30), unique=True, index=True, nullable=True)
     avatar_url = Column(String, nullable=True)
     current_level_tag = Column(SQLEnum(CurrentLevelTag), nullable=False)
     xp = Column(Integer, default=0, nullable=False)
