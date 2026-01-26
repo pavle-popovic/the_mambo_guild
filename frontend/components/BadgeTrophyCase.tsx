@@ -356,7 +356,17 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                   {/* Badge Icon Background (Dimmed & Blurred) */}
                   {/* Badge Icon Background (Dimmed & Blurred) */}
                   <div className="text-6xl mb-3 opacity-40 grayscale blur-[2px] w-full flex justify-center scale-110">
-                    {badge.icon_url ? <img src={badge.icon_url} className="w-24 h-24 object-contain" alt={badge.name} /> : "🏆"}
+                    {badge.icon_url ? (
+                      <div className="w-24 h-24 rounded-lg overflow-hidden" style={{
+                        background: badge.id.includes('bronze') ? 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)' :
+                          badge.id.includes('silver') ? 'linear-gradient(135deg, #A8A8A8 0%, #C0C0C0 100%)' :
+                            badge.id.includes('gold') ? 'linear-gradient(135deg, #DAA520 0%, #FFD700 100%)' :
+                              badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
+                                'linear-gradient(135deg, #777777 0%, #999999 100%)'
+                      }}>
+                        <img src={badge.icon_url} alt={badge.name} className="w-full h-full object-cover" />
+                      </div>
+                    ) : "🔒"}
                   </div>
 
                   {/* Lock Icon Overlay (Absolute Center) */}

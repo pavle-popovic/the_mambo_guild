@@ -575,7 +575,14 @@ async def forgot_password(
         return {"message": "If the email exists, a password reset link has been sent."}
     
     # Only allow password reset for email-based accounts
-    if user.auth_provider != "email" or not user.hashed_password:
+    # UNLESS "Account Claiming" mode is active for Waitlist users
+    allow_claim = os.getenv("ALLOW_ACCOUNT_CLAIM", "false").lower() == "true"
+    
+    if user.auth_provider == "waitlist":
+        if not allow_claim:
+             return {"message": "If the email exists, a password reset link has been sent."}
+        # If allow_claim is True, we proceed for waitlist users
+    elif user.auth_provider != "email" or not user.hashed_password:
         return {"message": "If the email exists, a password reset link has been sent."}
     
     try:
@@ -624,7 +631,17 @@ async def reset_password(
             )
         
         # Only allow reset for email-based accounts
-        if user.auth_provider != "email":
+        # UNLESS "Account Claiming" mode is active for Waitlist users
+        allow_claim = os.getenv("ALLOW_ACCOUNT_CLAIM", "false").lower() == "true"
+        
+        if user.auth_provider == "waitlist":
+            if not allow_claim:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST, 
+                    detail="Account claiming is not currently active."
+                )
+            # If allow_claim is True, we proceed (and will convert user below)
+        elif user.auth_provider != "email":
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Password reset not available for OAuth accounts"
@@ -632,6 +649,13 @@ async def reset_password(
         
         # Hash new password
         user.hashed_password = get_password_hash(request_data.new_password)
+        
+        # If this was a waitlist user claiming their account, convert them!
+        if user.auth_provider == "waitlist":
+            user.auth_provider = "email"
+            user.is_verified = True
+            logger.info(f"User {user.id} claimed account and converted from waitlist to email.")
+            
         db.commit()
         
         return {"message": "Password reset successfully"}
