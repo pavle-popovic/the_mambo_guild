@@ -13,17 +13,54 @@ badges_dir = Path(r"c:\Users\pavle\Desktop\salsa_lab_v2\frontend\public\badges")
 
 # List of generated badges to copy
 badges_to_copy = [
+    # Firestarter (complete)
+    "firestarter_bronze",
     "firestarter_silver",
     "firestarter_gold", 
     "firestarter_diamond",
+    # Human Metronome (complete)
     "human_metronome_bronze",
     "human_metronome_silver",
     "human_metronome_gold",
     "human_metronome_diamond",
+    # Crowd Favorite (complete)
     "crowd_favorite_bronze",
     "crowd_favorite_silver",
     "crowd_favorite_gold",
-    "crowd_favorite_diamond"
+    "crowd_favorite_diamond",
+    # Talent Scout (complete)
+    "talent_scout_bronze",
+    "talent_scout_silver",
+    "talent_scout_gold",
+    "talent_scout_diamond",
+    # The Professor (complete)
+    "the_professor_bronze",
+    "the_professor_silver",
+    "the_professor_gold",
+    "the_professor_diamond",
+    # The Socialite (complete)
+    "the_socialite_bronze",
+    "the_socialite_silver",
+    "the_socialite_gold",
+    "the_socialite_diamond",
+    # Center Stage (complete)
+    "center_stage_bronze",
+    "center_stage_silver",
+    "center_stage_gold",
+    "center_stage_diamond",
+    # Curious Mind (complete)
+    "curious_mind_bronze",
+    "curious_mind_silver",
+    "curious_mind_gold",
+    "curious_mind_diamond",
+    # Unstoppable (complete)
+    "unstoppable_bronze",
+    "unstoppable_silver",
+    "unstoppable_gold",
+    "unstoppable_diamond",
+    # Special Badges (complete)
+    "beta_tester",
+    "founder_diamond",
 ]
 
 print("Copying newly generated badges...")

@@ -355,6 +355,73 @@ async function main() {
             requirement_type: 'streak',
             threshold: 100,
         },
+
+        // --- COURSE ---
+        // Curious Mind (Lessons Completed)
+        {
+            id: 'curious-mind-bronze',
+            name: 'Curious Mind',
+            description: 'Starting your learning journey with passion.',
+            category: Category.COURSE,
+            icon_url: '/badges/curious_mind_bronze.png',
+            tier: Tier.BRONZE,
+            requirement_type: 'lessons_completed',
+            threshold: 5,
+        },
+        {
+            id: 'curious-mind-silver',
+            name: 'Curious Mind',
+            description: 'Diving deeper into dance knowledge.',
+            category: Category.COURSE,
+            icon_url: '/badges/curious_mind_silver.png',
+            tier: Tier.SILVER,
+            requirement_type: 'lessons_completed',
+            threshold: 25,
+        },
+        {
+            id: 'curious-mind-gold',
+            name: 'Curious Mind',
+            description: 'A dedicated student of the craft.',
+            category: Category.COURSE,
+            icon_url: '/badges/curious_mind_gold.png',
+            tier: Tier.GOLD,
+            requirement_type: 'lessons_completed',
+            threshold: 100,
+        },
+        {
+            id: 'curious-mind-diamond',
+            name: 'Curious Mind',
+            description: 'A true scholar of dance, absorbing all knowledge!',
+            category: Category.COURSE,
+            icon_url: '/badges/curious_mind_diamond.png',
+            tier: Tier.DIAMOND,
+            requirement_type: 'lessons_completed',
+            threshold: 500,
+        },
+
+        // --- SPECIAL / LEGACY ---
+        // Beta Tester (Special award for early testers)
+        {
+            id: 'beta-tester',
+            name: 'Beta Tester',
+            description: 'A pioneer who helped shape the platform.',
+            category: Category.COMMUNITY,
+            icon_url: '/badges/beta_tester.png',
+            tier: Tier.GOLD,
+            requirement_type: 'special',
+            threshold: 1, // Manually awarded
+        },
+        // Founder (Special award for founding members)
+        {
+            id: 'founder',
+            name: 'Founder',
+            description: 'An original founding member of The Mambo Guild.',
+            category: Category.COMMUNITY,
+            icon_url: '/badges/founder_diamond.png',
+            tier: Tier.DIAMOND,
+            requirement_type: 'special',
+            threshold: 1, // Manually awarded
+        },
     ]
 
     for (const badge of badges) {
@@ -386,7 +453,7 @@ async function main() {
         // console.log(`Upserted badge definition: ${b.id}`)
     }
 
-    console.log('Seeding finished. Upserted 32 badges.')
+    console.log('Seeding finished. Upserted 38 badges.')
 }
 
 main()
