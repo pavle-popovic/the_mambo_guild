@@ -371,3 +371,10 @@ The application is fully responsive:
   - Polling for video readiness
   - Delete functionality with Mux sync
   - Status indicators (idle, uploading, processing, live, deleting)
+- ✅ **Badges V2 & Mobile Redesign** (January 2026)
+  - **Badge Overhaul**: Regenerated all 38 badges with premium 3D/metallic aesthetics.
+  - **Mobile Hero**: Optimized landing page hero for mobile with gold dust particles.
+  - **The Vault**: New 2x2 mobile grid layout for stats.
+  - **Skill Tree**: Mobile-first "Phone Frame" scanning animation.
+  - **Bottom Bar**: Sticky mobile navigation bar.
+  - **Typescript Fixes**: Resolved API endpoint types and referrer code validation.
