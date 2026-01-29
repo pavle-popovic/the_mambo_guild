@@ -55,6 +55,8 @@ Full_Logo*
 
 Ressources/
 my-video/out/
+my-video/public/
+my-video/node_modules/
 .vscode/
 .claude/
 Claude.md
