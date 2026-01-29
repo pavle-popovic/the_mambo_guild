@@ -58,6 +58,7 @@ class Settings:
 
     # Email Service Configuration
     RESEND_API_KEY: Optional[str] = os.getenv("RESEND_API_KEY")
+    FROM_EMAIL: str = os.getenv("FROM_EMAIL", "onboarding@resend.dev")
     FRONTEND_URL: str = os.getenv("FRONTEND_URL", "http://localhost:3000")
 
     # Password Reset Configuration

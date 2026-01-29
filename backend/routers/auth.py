@@ -11,7 +11,7 @@ from schemas.auth import (
 )
 from services.auth_service import verify_password, get_password_hash, create_access_token
 from services.gamification_service import update_streak
-from services.email_service import send_password_reset_email
+from services.email_service import send_password_reset_email, send_waitlist_welcome_email
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
 from services.clave_service import process_daily_login, award_new_user_bonus
 from dependencies import get_current_user
@@ -776,6 +776,14 @@ async def join_waitlist(
                     pass
         
         db.commit()
+
+        # Send Welcome Email
+        try:
+            # Construct referral link
+            referral_link = f"{settings.FRONTEND_URL}/waitlist?ref={new_referral_code}"
+            send_waitlist_welcome_email(email, username, referral_link)
+        except Exception as e:
+            logger.error(f"Failed to send welcome email: {e}")
 
         return {
             "message": "Welcome to the Inner Circle.",

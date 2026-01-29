@@ -271,6 +271,13 @@ export default function WaitlistPage() {
                         </p>
                     </div>
 
+                    <div className="bg-[#D4AF37]/10 p-4 rounded-xl border border-[#D4AF37]/20">
+                        <p className="text-gray-300 text-sm">
+                            <span className="text-[#39FF14] mr-2">➜</span>
+                            Check your emails for a free tip on training and a brief history class.
+                        </p>
+                    </div>
+
                     <div className="flex justify-center gap-6 text-gray-400 pt-2">
                         <Twitter className="w-6 h-6 hover:text-[#39FF14] cursor-pointer transition-colors" />
                         <Facebook className="w-6 h-6 hover:text-[#39FF14] cursor-pointer transition-colors" />
