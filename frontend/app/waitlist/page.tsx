@@ -278,11 +278,7 @@ export default function WaitlistPage() {
                         </p>
                     </div>
 
-                    <div className="flex justify-center gap-6 text-gray-400 pt-2">
-                        <Twitter className="w-6 h-6 hover:text-[#39FF14] cursor-pointer transition-colors" />
-                        <Facebook className="w-6 h-6 hover:text-[#39FF14] cursor-pointer transition-colors" />
-                        <Linkedin className="w-6 h-6 hover:text-[#39FF14] cursor-pointer transition-colors" />
-                    </div>
+
                 </motion.div>
             </main>
         );
