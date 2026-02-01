@@ -355,6 +355,18 @@ The application includes comprehensive error handling and validation:
   - Subtle drifting blurred circles (90% black, 10% mesh elements)
   - Global background with Framer Motion animations
   - Performance optimized with GPU acceleration
+- ✅ **AI Sales Concierge ("Diego")** (February 2026) -> *New!*
+  - **Persona**: 1920s Havana Head Concierge with a charming, sophisticated tone.
+  - **Tech**: Google Gemini 2.0 Flash with Function Calling and Redis rate limiting.
+  - **Capabilities**: Intelligently recommends membership tiers (Rookie/Advanced/Performer) based on user goals (social vs performance).
+  - **Streaming**: Real-time streaming responses with tool execution for dynamic UI components.
+- ✅ **Boss Battles & Video Submissions** (February 2026) -> *New!*
+  - **Video Homework**: Students submit "Boss Battle" videos for specific lessons.
+  - **Instructor Feedback**: Backend infrastructure for instructors to review and provide feedback.
+  - **Status Tracking**: Pending/Approved/Rejected workflows.
+- ✅ **Visual Skill Tree ("Constellation")** (February 2026) -> *New!*
+  - **Constellation UI**: Interactive 3D/Canvas visualization of the learning path on the landing page.
+  - **Course Explorer**: Netflix-style carousel for browsing courses, choreographies, and topics.
 - ✅ **Community Features v4.0** (January 2026)
   - **Clave Economy**: Currency system with wallet, transactions, and daily bonuses
   - **The Stage & The Lab**: Dual-mode community feed (video posts vs Q&A)

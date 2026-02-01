@@ -175,6 +175,33 @@ frontend/
 - Solution marking for Lab questions
 - WIP (Work in Progress) toggle for Stage posts
 - Feedback type selection (Hype Only vs Coaching Allowed)
+ 
+ **Instructors Page** (`/instructors`):
+ - Showcase of instructors and guest teachers
+ - Instructor bios with social links and accolades
+ - "Join Our Team" call to action
+ - Integrated branding with Mux video backgrounds
+ 
+ **Waitlist Page** (`/waitlist`):
+ - Gamified landing page for pre-launch users
+ - "Gold Dust" particle canvas animation
+ - Scarcity messaging ("Capped at 200 members")
+ - Feature checklist (Beginner to Pro, No partner, Anytime/Anywhere)
+ - Referral tracking with "Founder Access" badge rewards
+ 
+ ### Special Features
+ 
+ **AI Concierge ("Diego")**:
+ - Floating chat interface available across the site
+ - Interactive persona (1920s Havana Concierge)
+ - Real-time streaming responses
+ - Intelligent membership recommendations
+ 
+ **Constellation / Skill Tree**:
+ - Interactive visualization of the learning path
+ - 3D/Canvas-based "Star Map" connecting skills
+ - Animated progression tracking
+ - Located on the Landing Page (`/`)
 
 ## 🔧 Development
 

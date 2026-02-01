@@ -287,18 +287,18 @@ export default function WaitlistPage() {
     return (
         <main className="min-h-screen text-white selection:bg-[#39FF14] selection:text-black overflow-x-hidden relative">
             {/* HERO SECTION */}
-            <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-4 py-16 z-10">
+            <section ref={heroRef} className="relative min-h-screen flex items-center justify-center px-4 py-6 sm:py-16 z-10">
                 <GoldDustCanvas />
 
-                <div className="relative z-20 w-full max-w-md mx-auto text-center space-y-6">
+                <div className="relative z-20 w-full max-w-md mx-auto text-center space-y-3 sm:space-y-6">
                     {/* Badge */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/40"
+                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/40"
                     >
-                        <span className="text-[#D4AF37] text-sm font-medium uppercase tracking-wider">Founder Access</span>
+                        <span className="text-[#D4AF37] text-xs sm:text-sm font-medium uppercase tracking-wider">Founder Access</span>
                     </motion.div>
 
                     {/* Headline */}
@@ -306,7 +306,7 @@ export default function WaitlistPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="font-serif text-4xl sm:text-5xl md:text-6xl text-white leading-tight"
+                        className="font-serif text-3xl sm:text-5xl md:text-6xl text-white leading-tight"
                     >
                         Join The<br />
                         <span className="bg-gradient-to-r from-[#D4AF37] to-[#FCE205] bg-clip-text text-transparent">
@@ -319,7 +319,7 @@ export default function WaitlistPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
-                        className="text-lg sm:text-xl text-gray-400"
+                        className="text-base sm:text-xl text-gray-400"
                     >
                         The World's First Gamified Salsa Academy.
                     </motion.p>
@@ -328,17 +328,17 @@ export default function WaitlistPage() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.45 }}
-                        className="space-y-2 text-gray-300 text-sm sm:text-base font-medium py-2"
+                        className="space-y-1 sm:space-y-2 text-gray-300 text-sm sm:text-base font-medium py-1 sm:py-2"
                     >
                         <li className="flex items-center justify-center gap-2">
-                            <span className="text-[#39FF14]">✔</span> Complete courses from beginners to pros
+                            <Check size={16} className="text-[#39FF14]" /> Complete courses from beginners to pros
                         </li>
                         <li className="flex items-center justify-center gap-2">
-                            <span className="text-[#39FF14]">✔</span> No partner needed
+                            <Check size={16} className="text-[#39FF14]" /> No partner needed
                         </li>
 
                         <li className="flex items-center justify-center gap-2">
-                            <span className="text-[#39FF14]">✔</span> Learn anytime, anywhere
+                            <Check size={16} className="text-[#39FF14]" /> Learn anytime, anywhere
                         </li>
                     </motion.ul>
 
@@ -348,7 +348,7 @@ export default function WaitlistPage() {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
                         onSubmit={handleSubmit}
-                        className="space-y-4 pt-4"
+                        className="space-y-3 pt-2 sm:space-y-4 sm:pt-4"
                     >
                         <input
                             type="email"
@@ -356,7 +356,7 @@ export default function WaitlistPage() {
                             onChange={(e) => setEmail(e.target.value)}
                             placeholder="Your email"
                             required
-                            className="w-full px-4 py-4 bg-black/60 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] text-base"
+                            className="w-full px-4 py-3 sm:py-4 bg-black/60 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] text-sm sm:text-base"
                         />
                         <input
                             type="text"
@@ -364,7 +364,7 @@ export default function WaitlistPage() {
                             onChange={(e) => setUsername(e.target.value)}
                             placeholder="Choose your username"
                             required
-                            className="w-full px-4 py-4 bg-black/60 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] text-base"
+                            className="w-full px-4 py-3 sm:py-4 bg-black/60 border border-white/10 rounded-xl text-white placeholder-gray-500 focus:outline-none focus:border-[#D4AF37] text-sm sm:text-base"
                         />
 
                         {error && (
@@ -374,12 +374,12 @@ export default function WaitlistPage() {
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="w-full py-4 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-bold text-lg rounded-xl shadow-lg shadow-[#D4AF37]/30 hover:shadow-[#D4AF37]/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
+                            className="w-full py-3 sm:py-4 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-bold text-base sm:text-lg rounded-xl shadow-lg shadow-[#D4AF37]/30 hover:shadow-[#D4AF37]/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-[0.98]"
                         >
                             {isLoading ? 'Securing Your Spot...' : 'Claim Founder Status'}
                         </button>
 
-                        <p className="text-xs text-gray-500 pt-2">
+                        <p className="text-[10px] sm:text-xs text-gray-500 pt-1">
                             Reserve your unique username. <span className="text-[#D4AF37]">Capped at 200 members only!</span>
                         </p>
                     </motion.form>

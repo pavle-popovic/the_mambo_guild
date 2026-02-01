@@ -43,6 +43,8 @@ backend/
 │   ├── admin_courses.py     # Admin course management
 │   ├── users.py             # User profile endpoints
 │   ├── uploads.py           # Image upload presigned URLs
+│   ├── ai_chat.py           # AI Concierge (Diego) endpoints
+│   ├── submissions.py       # Boss Battle video submissions
 │   └── mux.py               # Mux webhook and upload endpoints
 ├── models/                  # SQLAlchemy database models
 │   ├── user.py             # User, UserProfile, Subscription models
@@ -63,6 +65,7 @@ backend/
 │   ├── create_admin.py     # Create admin user
 │   ├── create_test_user.py # Create test user with subscription
 │   ├── seed_courses.py     # Seed initial course data
+│   ├── broadcast_waitlist.py # Batch email sender (Resend)
 │   ├── seed_direct.py      # Direct database seeding
 │   └── migrate_*.py        # Database migration scripts
 ├── tests/                   # Test suite
@@ -143,6 +146,19 @@ backend/
 - `GET /api/community/upload-check` - Pre-upload video slot limit check
 - `GET /api/community/tags` - List all community tags
 - `GET /api/community/search` - Search posts by title/tags
+ 
+ ### AI Concierge (`/api/ai_chat`)
+ - `POST /api/ai_chat/chat` - Chat with "Diego" (Google Gemini 2.0 Flash)
+   - Supports streaming responses (server-sent events)
+   - Function calling for membership recommendations
+ - `GET /api/ai_chat/status` - Check AI service availability
+ - `GET /api/ai_chat/rate-limit` - Check user's rate limit status
+ 
+ ### Submissions (`/api/submissions`)
+ - `POST /api/submissions/submit` - Submit a "Boss Battle" video
+   - Requires `lesson_id` and `video_url`
+   - Validates lesson is a boss battle
+ - `GET /api/submissions/my-submissions` - View personal submission history
 
 ### Badges (`/api/badges`)
 - `GET /api/badges/` - Get all badge definitions with user's earned status
