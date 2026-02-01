@@ -65,3 +65,5 @@ Claude.md
 *.pem
 *.key
 secrets.json
+waitlist_import.json
+waitlist_users.json

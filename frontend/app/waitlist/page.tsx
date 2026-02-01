@@ -324,6 +324,24 @@ export default function WaitlistPage() {
                         The World's First Gamified Salsa Academy.
                     </motion.p>
 
+                    <motion.ul
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.45 }}
+                        className="space-y-2 text-gray-300 text-sm sm:text-base font-medium py-2"
+                    >
+                        <li className="flex items-center justify-center gap-2">
+                            <span className="text-[#39FF14]">✔</span> Complete courses from beginners to pros
+                        </li>
+                        <li className="flex items-center justify-center gap-2">
+                            <span className="text-[#39FF14]">✔</span> No partner needed
+                        </li>
+
+                        <li className="flex items-center justify-center gap-2">
+                            <span className="text-[#39FF14]">✔</span> Learn anytime, anywhere
+                        </li>
+                    </motion.ul>
+
                     {/* Form */}
                     <motion.form
                         initial={{ opacity: 0, y: 20 }}
@@ -362,7 +380,7 @@ export default function WaitlistPage() {
                         </button>
 
                         <p className="text-xs text-gray-500 pt-2">
-                            Reserve your unique username. <span className="text-[#D4AF37]">200 spots</span> remaining.
+                            Reserve your unique username. <span className="text-[#D4AF37]">Capped at 200 members only!</span>
                         </p>
                     </motion.form>
                 </div>
