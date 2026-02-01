@@ -246,7 +246,7 @@ export default function ProfilePage() {
               <button
                 onClick={handleAvatarRemove}
                 disabled={uploadingAvatar}
-                className="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Remove Image
               </button>

@@ -16,16 +16,18 @@ const MASTER_VOLUME = 0.4; // Acoustic sounds cut through well at lower volume
 interface UIAudioContext {
   ctx: AudioContext | null;
   gainNode: GainNode | null;
+  hoverBuffer: AudioBuffer | null;
 }
 
 let globalAudioCtx: UIAudioContext = {
   ctx: null,
   gainNode: null,
+  hoverBuffer: null,
 };
 
 function getAudioContext(): UIAudioContext {
   if (typeof window === "undefined") {
-    return { ctx: null, gainNode: null };
+    return { ctx: null, gainNode: null, hoverBuffer: null };
   }
 
   if (!globalAudioCtx.ctx) {
@@ -33,7 +35,7 @@ function getAudioContext(): UIAudioContext {
       const AudioContextClass =
         window.AudioContext ||
         (window as typeof window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
-      
+
       if (AudioContextClass) {
         globalAudioCtx.ctx = new AudioContextClass();
         globalAudioCtx.gainNode = globalAudioCtx.ctx.createGain();
@@ -55,58 +57,56 @@ function ensureContextResumed(): boolean {
   return ctx.state === "running" || ctx.state === "suspended";
 }
 
+// Load sound file
+async function loadSound(url: string): Promise<AudioBuffer | null> {
+  const { ctx } = getAudioContext();
+  if (!ctx) return null;
+
+  try {
+    const response = await fetch(url);
+    const arrayBuffer = await response.arrayBuffer();
+    return await ctx.decodeAudioData(arrayBuffer);
+  } catch (error) {
+    console.warn(`Failed to load sound from ${url}:`, error);
+    return null;
+  }
+}
+
+// Initialize sounds
+if (typeof window !== "undefined") {
+  // Pre-load the hover sound
+  loadSound("/sounds/hover_new.mp3").then(buffer => {
+    globalAudioCtx.hoverBuffer = buffer;
+  });
+}
+
 // ============================================================================
-// SHAKER / MARACA - Hover Sound (LOUDER)
-// Crisp "chhh" sound - white noise burst with high-pass filter
-// Max 80ms, with random pitch shift (0.95 - 1.05)
+// SHAKER / MARACA - Hover Sound (File Based)
 // ============================================================================
 
 function playShaker(pitchShift: number = 1.0): void {
-  const { ctx, gainNode } = getAudioContext();
+  const { ctx, gainNode, hoverBuffer } = getAudioContext();
   if (!ctx || !gainNode || !ensureContextResumed()) return;
 
-  const now = ctx.currentTime;
-  const duration = 0.08; // 80ms - crisp and short
+  // Use loaded buffer if available, otherwise fallback to silence or synth (optional)
+  if (hoverBuffer) {
+    const source = ctx.createBufferSource();
+    source.buffer = hoverBuffer;
+    source.playbackRate.value = pitchShift;
 
-  // Create white noise buffer
-  const bufferSize = ctx.sampleRate * duration;
-  const noiseBuffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-  const output = noiseBuffer.getChannelData(0);
-  
-  for (let i = 0; i < bufferSize; i++) {
-    output[i] = Math.random() * 2 - 1;
+    // Create a boost gain node for this specific sound
+    const boostGain = ctx.createGain();
+    boostGain.gain.value = 2.0; // Boost volume by 2x (adjusted based on user feedback)
+
+    source.connect(boostGain);
+    boostGain.connect(gainNode);
+    source.start(0);
+  } else {
+    // Try reloading if missing
+    loadSound("/sounds/hover_new.mp3").then(buffer => {
+      globalAudioCtx.hoverBuffer = buffer;
+    });
   }
-
-  const noise = ctx.createBufferSource();
-  noise.buffer = noiseBuffer;
-  noise.playbackRate.value = pitchShift;
-
-  // High-pass filter for crisp "chhh" character
-  const highpass = ctx.createBiquadFilter();
-  highpass.type = "highpass";
-  highpass.frequency.value = 6000 * pitchShift;
-  highpass.Q.value = 0.7;
-
-  // Band-pass for maraca resonance
-  const bandpass = ctx.createBiquadFilter();
-  bandpass.type = "bandpass";
-  bandpass.frequency.value = 5000 * pitchShift;
-  bandpass.Q.value = 1.5;
-
-  // Envelope - sharp attack, quick decay - LOUDER
-  const envelope = ctx.createGain();
-  envelope.gain.setValueAtTime(0, now);
-  envelope.gain.linearRampToValueAtTime(1.2, now + 0.003); // Faster attack, louder peak
-  envelope.gain.exponentialRampToValueAtTime(0.001, now + duration);
-
-  // Connect chain
-  noise.connect(highpass);
-  highpass.connect(bandpass);
-  bandpass.connect(envelope);
-  envelope.connect(gainNode);
-
-  noise.start(now);
-  noise.stop(now + duration);
 }
 
 // ============================================================================
@@ -321,10 +321,10 @@ export function useUISound() {
   // Shaker with random pitch shift (0.95 - 1.05) for human feel
   const playHover = useCallback(() => {
     const now = Date.now();
-    // Debounce: max 1 per 100ms to avoid noise mess
-    if (now - lastHoverTime.current < 100) return;
+    // Debounce: max 1 per 50ms (reduced from 100ms for more responsiveness with new sound)
+    if (now - lastHoverTime.current < 50) return;
     lastHoverTime.current = now;
-    
+
     // Random pitch shift for natural variation
     const pitchShift = 0.95 + Math.random() * 0.1; // 0.95 to 1.05
     playShaker(pitchShift);
@@ -343,6 +343,13 @@ export function useUISound() {
     const warmUp = () => {
       const { ctx } = getAudioContext();
       if (ctx?.state === "suspended") ctx.resume();
+
+      // Also ensure buffer is loaded
+      if (!getAudioContext().hoverBuffer) {
+        loadSound("/sounds/hover_new.mp3").then(buffer => {
+          globalAudioCtx.hoverBuffer = buffer;
+        });
+      }
     };
     document.addEventListener("click", warmUp, { once: true });
     document.addEventListener("touchstart", warmUp, { once: true });

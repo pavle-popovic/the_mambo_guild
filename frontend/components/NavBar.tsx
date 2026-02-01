@@ -45,7 +45,7 @@ export default function NavBar({ user }: NavBarProps) {
       <Link href={href} className="relative group" onMouseEnter={handleNavHover}>
         <motion.span
           className={cn(
-            "text-sm font-medium transition-colors duration-200",
+            "text-lg font-bold transition-colors duration-200",
             isActive ? "text-[#D4AF37]" : "text-gray-300"
           )}
           whileHover={{ color: "#D4AF37" }}
@@ -80,7 +80,7 @@ export default function NavBar({ user }: NavBarProps) {
   return (
     <>
       <nav className="fixed w-full z-50 glass-nav transition-all duration-300" suppressHydrationWarning>
-        <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center">
+        <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center relative">
           <LogoWrapper
             {...(mounted ? {
               whileHover: { scale: 1.05 },
@@ -104,7 +104,8 @@ export default function NavBar({ user }: NavBarProps) {
             </Link>
           </LogoWrapper>
 
-          <div className="hidden md:flex gap-10 items-center">
+          {/* Center: Navigation Links */}
+          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex gap-10 items-center">
             <NavLink href="/">Home</NavLink>
             <NavLink href="/courses" activePaths={["/courses"]}>Courses</NavLink>
             <NavLink href="/community" activePaths={["/community"]}>Community</NavLink>
@@ -115,41 +116,15 @@ export default function NavBar({ user }: NavBarProps) {
           <div className="flex gap-4 items-center">
             {isAuthenticated ? (
               <>
-                {/* Clave Wallet (v4.0) */}
-                <ClaveWallet
-                  onOpenWallet={() => setIsWalletOpen(true)}
-                  className="hidden md:flex"
-                />
-
-                {/* XP Display - Palladium Era */}
-                <MotionDiv
-                  className="hidden md:flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm border border-[rgba(212,175,55,0.2)]"
-                  {...(mounted ? {
-                    whileHover: { scale: 1.05, borderColor: "rgba(212, 175, 55, 0.5)", boxShadow: "0 4px 20px rgba(212, 175, 55, 0.2)" },
-                    transition: { type: "spring", stiffness: 400, damping: 17 }
-                  } : {})}
-                  onMouseEnter={handleNavHover}
-                >
-                  <FaBolt className="text-[#D4AF37]" />
-                  <span className="font-bold text-mambo-text">{user.xp || 0} XP</span>
-                </MotionDiv>
-
-                {/* Streak Display - Electric Teal accent for active streaks */}
-                {user.streak_count && user.streak_count > 0 && (
-                  <MotionDiv
-                    className="hidden md:flex items-center gap-2 text-xs px-3 py-1.5 rounded-full bg-black/60 backdrop-blur-sm border border-[rgba(0,224,255,0.2)]"
-                    {...(mounted ? {
-                      whileHover: { scale: 1.05, borderColor: "rgba(0, 224, 255, 0.5)", boxShadow: "0 4px 20px rgba(0, 224, 255, 0.2)" },
-                      transition: { type: "spring", stiffness: 400, damping: 17 }
-                    } : {})}
-                    onMouseEnter={handleNavHover}
-                  >
-                    <FaFire className="text-[#00E0FF]" />
-                    <span className="font-bold text-mambo-text">{user.streak_count} Days</span>
-                  </MotionDiv>
+                {/* Clave Wallet (v4.0) - Only show on Community page */}
+                {pathname === "/community" && (
+                  <ClaveWallet
+                    onOpenWallet={() => setIsWalletOpen(true)}
+                    className="hidden md:flex"
+                  />
                 )}
 
-                {/* User Avatar - Palladium Era */}
+                {/* XP and Streak removed from Navbar as per request (Hidden) */}
                 <MotionDiv
                   {...(mounted ? {
                     whileHover: { scale: 1.1 },
@@ -183,7 +158,7 @@ export default function NavBar({ user }: NavBarProps) {
                 >
                   <Link
                     href="/login"
-                    className="px-5 py-2 text-sm font-semibold text-gray-300 transition-colors"
+                    className="px-6 py-2.5 text-base font-bold text-gray-300 transition-colors"
                   >
                     Log In
                   </Link>
@@ -199,7 +174,7 @@ export default function NavBar({ user }: NavBarProps) {
                 >
                   <Link
                     href="/register"
-                    className="px-5 py-2 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black rounded-full text-sm font-bold shadow-lg shadow-[rgba(212,175,55,0.3)]"
+                    className="px-6 py-2.5 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black rounded-full text-base font-bold shadow-lg shadow-[rgba(212,175,55,0.3)]"
                   >
                     Register
                   </Link>
