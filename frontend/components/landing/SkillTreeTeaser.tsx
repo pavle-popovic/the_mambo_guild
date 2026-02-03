@@ -552,7 +552,7 @@ export default function SkillTreeTeaser() {
       setSelectedNode(null);
       try {
         const token = localStorage.getItem("auth_token");
-        console.log("[SkillTreeTeaser] Fetching skill tree, token exists:", !!token, "user:", user?.email);
+        console.log("[SkillTreeTeaser] Fetching skill tree, token exists:", !!token, "user:", user?.username);
         
         const response = await fetch(
           `${API_URL}/api/courses/worlds/${selectedCourseId}/skill-tree`, 
