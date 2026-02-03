@@ -1,7 +1,13 @@
 import os
 from typing import Optional
+import secrets
 
 class Settings:
+    # Environment detection
+    _environment: str = os.getenv("ENVIRONMENT", "development").lower()
+    _is_production: bool = _environment == "production"
+    _is_development: bool = _environment == "development"
+    
     # Database
     # In Docker, use service name 'postgres', otherwise use 'localhost' or '127.0.0.1'
     DATABASE_URL: str = os.getenv(
@@ -15,26 +21,49 @@ class Settings:
     REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
     REDIS_URL: str = f"redis://{REDIS_HOST}:{REDIS_PORT}"
 
-    # JWT - SECURITY: In production, SECRET_KEY MUST be set via environment variable
-    # For local development, a default is provided
+    # JWT - SECURITY: SECRET_KEY MUST be set via environment variable in all deployed environments
+    # Only local development (ENVIRONMENT=development) allows auto-generated keys
     _secret_key_env: Optional[str] = os.getenv("SECRET_KEY")
-    _is_production: bool = os.getenv("ENVIRONMENT", "development").lower() == "production"
+    
+    # Generate a random key for local dev only (changes on restart - intentional for security)
+    _dev_secret_key: str = secrets.token_urlsafe(32)
 
     @property
     def SECRET_KEY(self) -> str:
-        if self._is_production and not self._secret_key_env:
-            raise ValueError("No SECRET_KEY set for production environment! Set the SECRET_KEY environment variable.")
-        return self._secret_key_env or "your-secret-key-change-in-production"
+        if self._secret_key_env:
+            return self._secret_key_env
+        if self._is_development:
+            # Only allow auto-generated key in local development
+            print("⚠️  WARNING: Using auto-generated SECRET_KEY for development. Set SECRET_KEY env var for production!")
+            return self._dev_secret_key
+        # Non-development without SECRET_KEY = fail
+        raise ValueError(
+            "SECRET_KEY environment variable is required! "
+            "Set a secure random string (min 32 chars) in your Railway/Vercel environment variables."
+        )
 
     ALGORITHM: str = "HS256"
-    # Token expires in 1 week (7 days * 24 hours * 60 minutes)
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "10080"))
+    # Access token expires in 30 minutes (short-lived for security)
+    # Refresh tokens should be used for longer sessions
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
+    # Refresh token expires in 7 days
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
 
-    # CORS
-    CORS_ORIGINS: list = os.getenv(
-        "CORS_ORIGINS",
-        "http://localhost:3000,http://localhost:8000"
-    ).split(",")
+    # CORS - validate and parse origins
+    @property
+    def CORS_ORIGINS(self) -> list:
+        origins_str = os.getenv("CORS_ORIGINS", "http://localhost:3000,http://localhost:8000")
+        origins = [origin.strip() for origin in origins_str.split(",") if origin.strip()]
+        # Validate origins in production
+        if self._is_production:
+            for origin in origins:
+                if not origin.startswith("https://") and not origin.startswith("http://localhost"):
+                    print(f"⚠️  WARNING: Non-HTTPS origin in production CORS: {origin}")
+        return origins
+    
+    # Security settings
+    SECURE_COOKIES: bool = os.getenv("SECURE_COOKIES", "true" if _is_production else "false").lower() == "true"
+    COOKIE_DOMAIN: Optional[str] = os.getenv("COOKIE_DOMAIN")  # e.g., ".yourdomain.com" for cross-subdomain
 
     # Mux Configuration
     MUX_TOKEN_ID: Optional[str] = os.getenv("MUX_TOKEN_ID")

@@ -8,4 +8,7 @@ export { default as TestimonialsSection } from "./TestimonialsSection";
 export { default as LandingPricingSection } from "./LandingPricingSection";
 export { default as MaestroSection } from "./MaestroSection";
 export { default as CourseExplorerSection } from "./CourseExplorerSection";
+export { default as TrendingModulesSection } from "./TrendingModulesSection";
+export { default as SkillTreeTeaser } from "./SkillTreeTeaser";
+export { default as Mambobot } from "./Mambobot";
 

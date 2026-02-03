@@ -1,7 +1,7 @@
 from typing import Annotated
 import uuid
 import stripe
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
@@ -74,7 +74,7 @@ async def create_checkout_session(
                     stripe_customer_id=stripe_customer_id,
                     status=SubscriptionStatus.INCOMPLETE,  # Will be updated by webhook
                     tier=SubscriptionTier.ROOKIE,  # Default, will be updated
-                    current_period_end=datetime.utcnow()  # Placeholder
+                    current_period_end=datetime.now(timezone.utc)  # Placeholder
                 )
                 db.add(new_subscription)
             else:

@@ -1,6 +1,12 @@
 "use client";
 
-import { NewHero, ConstellationSection, ValuePropsSection, HowItWorksSection, TestimonialsSection, LandingPricingSection, MaestroSection, CourseExplorerSection } from "@/components/landing";
+import { 
+    NewHero, 
+    TrendingModulesSection, 
+    SkillTreeTeaser, 
+    TestimonialsSection, 
+    LandingPricingSection 
+} from "@/components/landing";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 
@@ -15,34 +21,19 @@ export default function HomePage() {
             <NavBar user={user || undefined} />
 
             <main className="min-h-screen text-white selection:bg-[#39FF14] selection:text-black overflow-x-hidden relative">
-                {/* Hero Section */}
+                {/* Hero Section - with chatbot included */}
                 <section className="relative min-h-screen z-10">
                     <NewHero />
                 </section>
 
-                {/* Value Props */}
+                {/* Trending Modules Carousel */}
                 <section className="relative z-10">
-                    <ValuePropsSection />
+                    <TrendingModulesSection />
                 </section>
 
-                {/* Course Explorer */}
+                {/* Skill Tree / Gamification Teaser */}
                 <section className="relative z-10">
-                    <CourseExplorerSection />
-                </section>
-
-                {/* Skill Tree / Constellation */}
-                <section className="relative z-10">
-                    <ConstellationSection />
-                </section>
-
-                {/* How It Works */}
-                <section className="relative z-10">
-                    <HowItWorksSection />
-                </section>
-
-                {/* Maestro Section */}
-                <section className="relative z-10">
-                    <MaestroSection />
+                    <SkillTreeTeaser />
                 </section>
 
                 {/* Testimonials */}

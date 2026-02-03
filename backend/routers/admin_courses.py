@@ -89,6 +89,39 @@ class LessonUpdateRequest(BaseModel):
     lesson_type: Optional[str] = None  # video, quiz, or history
 
 
+class LevelUpdateRequest(BaseModel):
+    """Update request for level/module details."""
+    title: Optional[str] = None
+    description: Optional[str] = None
+    thumbnail_url: Optional[str] = None
+    mux_preview_playback_id: Optional[str] = None
+    mux_preview_asset_id: Optional[str] = None
+    outcome: Optional[str] = None
+    duration_minutes: Optional[int] = None
+    total_xp: Optional[int] = None
+    status: Optional[str] = None
+
+
+class LevelPositionRequest(BaseModel):
+    """Update request for level position in skill tree."""
+    x_position: Optional[float] = None
+    y_position: Optional[float] = None
+
+
+class LevelCreateInWorldRequest(BaseModel):
+    """Create request for new level in a world."""
+    title: str = "New Level"
+    description: Optional[str] = ""
+    x_position: float = 50.0
+    y_position: float = 50.0
+
+
+class EdgeCreateRequest(BaseModel):
+    """Create request for edge between levels."""
+    from_level_id: str
+    to_level_id: str
+
+
 @router.get("/courses", response_model=List[WorldResponse])
 async def get_all_courses_admin(
     admin_user: User = Depends(get_admin_user),
@@ -574,7 +607,7 @@ async def get_level_lessons(
 @router.put("/levels/{level_id}/position")
 async def update_level_position(
     level_id: str,
-    position_data: dict,
+    position_data: LevelPositionRequest,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -583,10 +616,10 @@ async def update_level_position(
     if not level:
         raise HTTPException(status_code=404, detail="Level not found")
     
-    if "x_position" in position_data:
-        level.x_position = float(position_data["x_position"])
-    if "y_position" in position_data:
-        level.y_position = float(position_data["y_position"])
+    if position_data.x_position is not None:
+        level.x_position = position_data.x_position
+    if position_data.y_position is not None:
+        level.y_position = position_data.y_position
     
     db.commit()
     
@@ -596,7 +629,7 @@ async def update_level_position(
 @router.post("/worlds/{world_id}/edges")
 async def create_edge(
     world_id: str,
-    edge_data: dict,
+    edge_data: EdgeCreateRequest,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -604,16 +637,16 @@ async def create_edge(
     from models.course import LevelEdge
     
     # Validate levels exist
-    from_level = db.query(Level).filter(Level.id == edge_data["from_level_id"]).first()
-    to_level = db.query(Level).filter(Level.id == edge_data["to_level_id"]).first()
+    from_level = db.query(Level).filter(Level.id == edge_data.from_level_id).first()
+    to_level = db.query(Level).filter(Level.id == edge_data.to_level_id).first()
     
     if not from_level or not to_level:
         raise HTTPException(status_code=404, detail="Level not found")
     
     # Check if edge already exists
     existing = db.query(LevelEdge).filter(
-        LevelEdge.from_level_id == edge_data["from_level_id"],
-        LevelEdge.to_level_id == edge_data["to_level_id"]
+        LevelEdge.from_level_id == edge_data.from_level_id,
+        LevelEdge.to_level_id == edge_data.to_level_id
     ).first()
     
     if existing:
@@ -622,8 +655,8 @@ async def create_edge(
     edge = LevelEdge(
         id=uuid.uuid4(),
         world_id=uuid.UUID(world_id),
-        from_level_id=uuid.UUID(edge_data["from_level_id"]),
-        to_level_id=uuid.UUID(edge_data["to_level_id"])
+        from_level_id=uuid.UUID(edge_data.from_level_id),
+        to_level_id=uuid.UUID(edge_data.to_level_id)
     )
     
     db.add(edge)
@@ -687,7 +720,7 @@ async def get_level(
 @router.put("/levels/{level_id}")
 async def update_level(
     level_id: str,
-    level_data: dict,
+    level_data: LevelUpdateRequest,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -696,27 +729,27 @@ async def update_level(
     if not level:
         raise HTTPException(status_code=404, detail="Level not found")
 
-    if "title" in level_data:
-        level.title = level_data["title"]
-    if "description" in level_data:
-        level.description = level_data["description"]
-    if "thumbnail_url" in level_data:
-        level.thumbnail_url = level_data["thumbnail_url"]
+    if level_data.title is not None:
+        level.title = level_data.title
+    if level_data.description is not None:
+        level.description = level_data.description
+    if level_data.thumbnail_url is not None:
+        level.thumbnail_url = level_data.thumbnail_url
     # Mux preview video for skill tree hover (uses animated GIF)
-    if "mux_preview_playback_id" in level_data:
-        level.mux_preview_playback_id = level_data["mux_preview_playback_id"]
-    if "mux_preview_asset_id" in level_data:
-        level.mux_preview_asset_id = level_data["mux_preview_asset_id"]
+    if level_data.mux_preview_playback_id is not None:
+        level.mux_preview_playback_id = level_data.mux_preview_playback_id
+    if level_data.mux_preview_asset_id is not None:
+        level.mux_preview_asset_id = level_data.mux_preview_asset_id
 
     # Module metadata
-    if "outcome" in level_data:
-        level.outcome = level_data["outcome"]
-    if "duration_minutes" in level_data:
-        level.duration_minutes = level_data["duration_minutes"]
-    if "total_xp" in level_data:
-        level.total_xp = level_data["total_xp"]
-    if "status" in level_data:
-        level.status = level_data["status"]
+    if level_data.outcome is not None:
+        level.outcome = level_data.outcome
+    if level_data.duration_minutes is not None:
+        level.duration_minutes = level_data.duration_minutes
+    if level_data.total_xp is not None:
+        level.total_xp = level_data.total_xp
+    if level_data.status is not None:
+        level.status = level_data.status
 
     db.commit()
     db.refresh(level)
@@ -800,7 +833,7 @@ async def get_lesson(
 @router.post("/worlds/{world_id}/levels")
 async def create_level_in_world(
     world_id: str,
-    level_data: dict,
+    level_data: LevelCreateInWorldRequest,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -818,11 +851,11 @@ async def create_level_in_world(
     level = Level(
         id=uuid.uuid4(),
         world_id=uuid.UUID(world_id),
-        title=level_data.get("title", "New Level"),
-        description=level_data.get("description", ""),
+        title=level_data.title,
+        description=level_data.description or "",
         order_index=max_order,
-        x_position=float(level_data.get("x_position", 50)),
-        y_position=float(level_data.get("y_position", 50))
+        x_position=level_data.x_position,
+        y_position=level_data.y_position
     )
 
     db.add(level)

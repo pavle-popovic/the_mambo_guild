@@ -2,14 +2,14 @@ from fastapi import APIRouter, Depends, HTTPException, status, Request, Response
 from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
-from datetime import timedelta, datetime
+from datetime import timedelta, datetime, timezone
 from models import get_db
 from models.user import User, UserProfile, CurrentLevelTag, Subscription, SubscriptionTier, SubscriptionStatus, UserRole
 from schemas.auth import (
     UserRegisterRequest, UserLoginRequest, TokenResponse, UserProfileResponse,
     ForgotPasswordRequest, ResetPasswordRequest
 )
-from services.auth_service import verify_password, get_password_hash, create_access_token
+from services.auth_service import verify_password, get_password_hash, create_access_token, create_refresh_token
 from services.gamification_service import update_streak
 from services.email_service import send_password_reset_email, send_waitlist_welcome_email
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
@@ -25,9 +25,10 @@ from typing import Optional
 import logging
 from pydantic import BaseModel, EmailStr
 
-# Allow HTTP for OAuth in development (localhost)
+# Allow HTTP for OAuth ONLY in development (localhost)
 # This must be set before importing oauthlib
-os.environ.setdefault("OAUTHLIB_INSECURE_TRANSPORT", "1")
+if settings._is_development:
+    os.environ.setdefault("OAUTHLIB_INSECURE_TRANSPORT", "1")
 
 logger = logging.getLogger(__name__)
 
@@ -51,13 +52,17 @@ def get_google_oauth():
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)):
+async def register(
+    response: Response,
+    user_data: UserRegisterRequest,
+    db: Session = Depends(get_db)
+):
     """
     Register a new user account.
     Industry standard: Email validation, password strength, proper error handling.
     """
     try:
-        # Validate email format (basic check)
+        # Validate email format (basic check - Pydantic EmailStr handles most validation)
         if "@" not in user_data.email or "." not in user_data.email.split("@")[1]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -142,35 +147,89 @@ async def register(user_data: UserRegisterRequest, db: Session = Depends(get_db)
         db.commit()
         db.refresh(user)
 
-        # Create access token
+        # Create tokens
         access_token = create_access_token(data={"sub": str(user_id)})
+        refresh_token = create_refresh_token(data={"sub": str(user_id)})
+        
+        # Set httpOnly cookies
+        _set_auth_cookies(response, access_token, refresh_token)
+        
         return TokenResponse(access_token=access_token, token_type="bearer")
     
     except HTTPException:
         raise
     except Exception as e:
         db.rollback()
-        # Log error but don't expose internal details
-        import logging
-        logging.error(f"Registration error: {str(e)}")
+        logger.error(f"Registration error: {type(e).__name__}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Registration failed. Please try again."
         )
 
 
+def _set_auth_cookies(response: Response, access_token: str, refresh_token: str):
+    """Set httpOnly cookies for authentication tokens."""
+    # Access token cookie - short lived
+    response.set_cookie(
+        key="access_token",
+        value=access_token,
+        httponly=True,
+        secure=settings.SECURE_COOKIES,
+        samesite="lax",
+        max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
+        domain=settings.COOKIE_DOMAIN
+    )
+    # Refresh token cookie - long lived
+    response.set_cookie(
+        key="refresh_token",
+        value=refresh_token,
+        httponly=True,
+        secure=settings.SECURE_COOKIES,
+        samesite="lax",
+        max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
+        path="/api/auth/refresh",  # Only sent to refresh endpoint
+        domain=settings.COOKIE_DOMAIN
+    )
+
+
+def _clear_auth_cookies(response: Response):
+    """Clear authentication cookies."""
+    response.delete_cookie(key="access_token", domain=settings.COOKIE_DOMAIN)
+    response.delete_cookie(key="refresh_token", path="/api/auth/refresh", domain=settings.COOKIE_DOMAIN)
+
+
 @router.post("/token", response_model=TokenResponse)
 async def login(
+    request: Request,
+    response: Response,
     credentials: UserLoginRequest,
     db: Session = Depends(get_db)
 ):
     """
     OAuth2 compatible token endpoint for user login.
     Industry standard: Rate limiting, proper error messages, token expiration.
+    Sets httpOnly cookies for web clients, also returns token in response for mobile/API clients.
     """
     try:
-        # Normalize email (lowercase, strip whitespace)
+        # Rate limiting by email and IP
         email = credentials.email.lower().strip()
+        client_ip = request.client.host if request.client else "unknown"
+        
+        # Check rate limit (5 attempts per 5 minutes per email)
+        if not check_rate_limit(email, "login", max_requests=5, window_seconds=300):
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Too many login attempts. Please try again in a few minutes.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        # Also rate limit by IP (20 attempts per 5 minutes)
+        if not check_rate_limit(client_ip, "login_ip", max_requests=20, window_seconds=300):
+            raise HTTPException(
+                status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+                detail="Too many login attempts from this IP. Please try again later.",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
         
         # Find user
         user = db.query(User).filter(User.email == email).first()
@@ -208,20 +267,101 @@ async def login(
             # Don't fail login if clave claim fails
             pass
 
-        # Create access token
+        # Create tokens
         access_token = create_access_token(data={"sub": str(user.id)})
+        refresh_token = create_refresh_token(data={"sub": str(user.id)})
+        
+        # Set httpOnly cookies
+        _set_auth_cookies(response, access_token, refresh_token)
+        
+        # Also return token in response for mobile/API clients
         return TokenResponse(access_token=access_token, token_type="bearer")
     
     except HTTPException:
         raise
     except Exception as e:
-        import logging
-        logging.error(f"Login error: {str(e)}")
+        logger.error(f"Login error: {type(e).__name__}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="Login failed. Please try again.",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
+
+@router.post("/refresh", response_model=TokenResponse)
+async def refresh_access_token(
+    request: Request,
+    response: Response,
+    db: Session = Depends(get_db)
+):
+    """
+    Refresh access token using refresh token from httpOnly cookie.
+    """
+    from services.auth_service import decode_refresh_token
+    
+    refresh_token = request.cookies.get("refresh_token")
+    if not refresh_token:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    payload = decode_refresh_token(refresh_token)
+    if not payload:
+        _clear_auth_cookies(response)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or expired refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    user_id_str = payload.get("sub")
+    if not user_id_str:
+        _clear_auth_cookies(response)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Verify user still exists
+    try:
+        user_id = uuid.UUID(user_id_str)
+    except ValueError:
+        _clear_auth_cookies(response)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid refresh token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        _clear_auth_cookies(response)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="User not found",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Create new tokens
+    new_access_token = create_access_token(data={"sub": str(user.id)})
+    new_refresh_token = create_refresh_token(data={"sub": str(user.id)})
+    
+    # Set new cookies
+    _set_auth_cookies(response, new_access_token, new_refresh_token)
+    
+    return TokenResponse(access_token=new_access_token, token_type="bearer")
+
+
+@router.post("/logout")
+async def logout(response: Response):
+    """
+    Logout user by clearing authentication cookies.
+    """
+    _clear_auth_cookies(response)
+    return {"message": "Successfully logged out"}
 
 
 @router.get("/me", response_model=UserProfileResponse)
@@ -527,15 +667,19 @@ async def google_callback(
         except Exception:
             pass  # Non-critical, continue even if streak update fails
         
-        # Create access token
+        # Create tokens
         access_token = create_access_token(data={"sub": str(user.id)})
+        refresh_token = create_refresh_token(data={"sub": str(user.id)})
         
-        # Redirect to frontend with token
-        redirect_url = f"{settings.FRONTEND_URL}/auth/callback?token={access_token}&type=bearer"
-        logger.info(f"Redirecting to frontend: {redirect_url[:100]}...")  # Log first 100 chars for debugging
-        return RedirectResponse(
-            url=redirect_url
-        )
+        # Create response with redirect
+        redirect_url = f"{settings.FRONTEND_URL}/auth/callback?success=true"
+        response = RedirectResponse(url=redirect_url, status_code=status.HTTP_302_FOUND)
+        
+        # Set httpOnly cookies on the response
+        _set_auth_cookies(response, access_token, refresh_token)
+        
+        logger.info(f"OAuth login successful, redirecting to frontend")
+        return response
     
     except HTTPException:
         raise

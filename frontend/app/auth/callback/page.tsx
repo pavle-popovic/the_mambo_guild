@@ -24,34 +24,40 @@ function AuthCallbackContent() {
       processedRef.current = true;
 
       try {
-        // Get token from URL - use window.location as primary source for reliability
-        let token: string | null = null;
+        // Check for success parameter (new secure OAuth flow with httpOnly cookies)
+        let success: string | null = null;
+        let legacyToken: string | null = null;
+        
         if (typeof window !== "undefined") {
           const urlParams = new URLSearchParams(window.location.search);
-          token = urlParams.get("token");
+          success = urlParams.get("success");
+          legacyToken = urlParams.get("token"); // Backwards compatibility
         }
         
-        // Fallback to searchParams if window.location didn't work
-        if (!token) {
-          token = searchParams.get("token");
+        // Fallback to searchParams
+        if (!success && !legacyToken) {
+          success = searchParams.get("success");
+          legacyToken = searchParams.get("token");
         }
 
-        if (!token) {
-          setError("No authentication token received");
+        // Handle legacy token-in-URL flow (for backwards compatibility during transition)
+        if (legacyToken) {
+          if (typeof window !== "undefined") {
+            localStorage.setItem("auth_token", legacyToken);
+          }
+          const { apiClient } = await import("@/lib/api");
+          apiClient.setToken(legacyToken);
+        }
+        
+        // New secure flow: cookies are set automatically by the backend
+        // Just need to verify we can fetch the user profile
+        if (!success && !legacyToken) {
+          setError("Authentication failed. Please try again.");
           setLoading(false);
           return;
         }
 
-        // Store token
-        if (typeof window !== "undefined") {
-          localStorage.setItem("auth_token", token);
-        }
-
-        // Set token in API client
-        const { apiClient } = await import("@/lib/api");
-        apiClient.setToken(token);
-        
-        // Refresh user profile
+        // Refresh user profile - this will use the httpOnly cookie automatically
         await refreshUser();
 
         // Redirect to courses immediately

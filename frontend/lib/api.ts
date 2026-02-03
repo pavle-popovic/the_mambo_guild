@@ -53,6 +53,8 @@ class ApiClient {
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
+    // For backwards compatibility, check localStorage for token
+    // New auth uses httpOnly cookies (more secure)
     if (typeof window !== "undefined") {
       this.token = localStorage.getItem("auth_token");
     }
@@ -157,6 +159,7 @@ class ApiClient {
             ...options,
             headers,
             signal: finalSignal,
+            credentials: 'include', // Send cookies with requests for httpOnly auth
           });
           clearTimeout(timeoutId);
         } catch (fetchError: any) {
@@ -303,8 +306,33 @@ class ApiClient {
         body: JSON.stringify({ email, password }),
       }
     );
+    // Token is also set via httpOnly cookie, but we keep localStorage for backwards compatibility
     this.setToken(response.access_token);
     return response;
+  }
+
+  async refreshToken() {
+    try {
+      const response = await this.request<{ access_token: string; token_type: string }>(
+        "/api/auth/refresh",
+        { method: "POST" }
+      );
+      this.setToken(response.access_token);
+      return response;
+    } catch (error) {
+      // If refresh fails, clear auth state
+      this.setToken(null);
+      throw error;
+    }
+  }
+
+  async logout() {
+    try {
+      await this.request<{ message: string }>("/api/auth/logout", { method: "POST" });
+    } finally {
+      // Always clear local state even if server request fails
+      this.setToken(null);
+    }
   }
 
   async waitlistRegister(email: string, username: string, referrer_code?: string) {

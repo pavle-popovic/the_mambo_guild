@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc, func
 from pydantic import BaseModel, field_validator
+from urllib.parse import urlparse
 import re
 
 from dependencies import get_current_user
@@ -13,10 +14,54 @@ from schemas.gamification import LeaderboardEntry
 
 router = APIRouter(prefix="/users", tags=["users"])
 
+# Allowed domains for avatar URLs
+ALLOWED_AVATAR_DOMAINS = [
+    "pub-",  # Cloudflare R2 public URLs (pub-xxxxx.r2.dev)
+    "r2.dev",
+    "cloudflare",
+    "googleusercontent.com",  # Google profile pictures
+    "lh3.googleusercontent.com",
+    "gravatar.com",
+    "localhost",  # Development
+    "127.0.0.1",
+]
+
 
 class UserProfileUpdateRequest(BaseModel):
     avatar_url: Optional[str] = None
     username: Optional[str] = None
+
+    @field_validator('avatar_url')
+    @classmethod
+    def validate_avatar_url(cls, v: Optional[str]) -> Optional[str]:
+        if v is None or v == "":
+            return v
+        
+        # Parse the URL
+        try:
+            parsed = urlparse(v)
+        except Exception:
+            raise ValueError("Invalid URL format")
+        
+        # Must be HTTPS (or HTTP for localhost)
+        if parsed.scheme not in ("https", "http"):
+            raise ValueError("Avatar URL must use HTTPS")
+        
+        if parsed.scheme == "http" and parsed.hostname not in ("localhost", "127.0.0.1"):
+            raise ValueError("Avatar URL must use HTTPS")
+        
+        # Check against allowed domains
+        hostname = parsed.hostname or ""
+        is_allowed = any(domain in hostname for domain in ALLOWED_AVATAR_DOMAINS)
+        
+        if not is_allowed:
+            raise ValueError("Avatar URL domain not allowed")
+        
+        # Limit URL length
+        if len(v) > 2048:
+            raise ValueError("Avatar URL too long")
+        
+        return v
 
     @field_validator('username')
     @classmethod

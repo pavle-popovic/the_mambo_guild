@@ -328,6 +328,22 @@ The application includes comprehensive error handling and validation:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Landing Page Redesign v2.0** (February 2026) -> *New!*
+  - **New Hero Section**: Simplified "Join The Guild" title with bullet points (Beginners to Pro, Anytime/Anywhere, No Partner Needed)
+  - **Certified LXD Syllabus Badge**: Premium credential indicator
+  - **Mobile-Optimized Video**: Responsive video player (9:16 mobile, 16:9 desktop)
+  - **Trending Modules Carousel**: Auto-spinning carousel showcasing popular modules with hover previews
+  - **Content Stats**: 500+ lessons, Full Salsa Course, Choreographies, and more
+  - **Interactive Skill Tree Teaser**: Real skill tree from API with course toggle
+    - Live data from backend with user progress
+    - Animated gold edges (flickering, flowing, pulse effects)
+    - Hover tooltips with Mux GIF previews
+    - Grey-out effect for logged-out users
+    - Gamification features preview (Track Progress, Earn XP, Unlock Badges)
+  - **Tito P AI Concierge**: Renamed chatbot with modern dark glass UI
+    - Sleek zinc/gray color scheme matching site design
+    - Streaming responses with Gemini 2.0 Flash
+    - Pill-shaped collapsed state with online indicator
 - ✅ **Gamertag & Public Profile v1.0** (January 2026)
   - **Gamertag Identity**: Transitioned from Real Names to unique Usernames (Gamertags) for privacy and "Video Game" vibe
   - **Public Profiles**: New `/u/[username]` pages to share stats, badges, and streaks with the world
@@ -355,11 +371,12 @@ The application includes comprehensive error handling and validation:
   - Subtle drifting blurred circles (90% black, 10% mesh elements)
   - Global background with Framer Motion animations
   - Performance optimized with GPU acceleration
-- ✅ **AI Sales Concierge ("Diego")** (February 2026) -> *New!*
+- ✅ **AI Sales Concierge ("Tito P")** (February 2026)
   - **Persona**: 1920s Havana Head Concierge with a charming, sophisticated tone.
   - **Tech**: Google Gemini 2.0 Flash with Function Calling and Redis rate limiting.
   - **Capabilities**: Intelligently recommends membership tiers (Rookie/Advanced/Performer) based on user goals (social vs performance).
   - **Streaming**: Real-time streaming responses with tool execution for dynamic UI components.
+  - **Modern UI**: Redesigned with dark glass card aesthetic matching the site design.
 - ✅ **Boss Battles & Video Submissions** (February 2026) -> *New!*
   - **Video Homework**: Students submit "Boss Battle" videos for specific lessons.
   - **Instructor Feedback**: Backend infrastructure for instructors to review and provide feedback.

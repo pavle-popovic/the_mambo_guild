@@ -7,7 +7,7 @@ from models.course import Lesson
 from schemas.gamification import XPGainResponse
 from services.gamification_service import award_xp, update_streak
 from dependencies import get_current_user
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 
 router = APIRouter()
@@ -38,14 +38,14 @@ async def complete_lesson(
     # Create or update progress
     if existing_progress:
         existing_progress.is_completed = True
-        existing_progress.completed_at = datetime.utcnow()
+        existing_progress.completed_at = datetime.now(timezone.utc)
     else:
         progress = UserProgress(
             id=uuid.uuid4(),
             user_id=current_user.id,
             lesson_id=lesson.id,
             is_completed=True,
-            completed_at=datetime.utcnow()
+            completed_at=datetime.now(timezone.utc)
         )
         db.add(progress)
     

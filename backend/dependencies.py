@@ -1,25 +1,51 @@
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from typing import Optional
 from sqlalchemy.orm import Session
 from models import get_db
 from models.user import User, UserRole
 from services.auth_service import decode_access_token
+import uuid
 
 # OAuth2 scheme - token URL must match the actual endpoint
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token")
-oauth2_scheme_optional = OAuth2PasswordBearer(tokenUrl="/api/auth/token", auto_error=False)
+# auto_error=False allows us to check cookies as fallback
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/token", auto_error=False)
+
+
+def _extract_token(request: Request, bearer_token: Optional[str]) -> Optional[str]:
+    """
+    Extract token from Bearer header or httpOnly cookie.
+    Priority: Bearer header > Cookie (for API client compatibility)
+    """
+    # Try Bearer token first (for mobile/API clients)
+    if bearer_token:
+        return bearer_token
+    
+    # Try httpOnly cookie (for web clients)
+    cookie_token = request.cookies.get("access_token")
+    if cookie_token:
+        return cookie_token
+    
+    return None
 
 
 def get_current_user(
-    token: str = Depends(oauth2_scheme),
+    request: Request,
+    bearer_token: Optional[str] = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ) -> User:
+    """
+    Get current authenticated user from Bearer token or httpOnly cookie.
+    """
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    token = _extract_token(request, bearer_token)
+    if not token:
+        raise credentials_exception
     
     payload = decode_access_token(token)
     if payload is None:
@@ -29,7 +55,6 @@ def get_current_user(
     if user_id_str is None:
         raise credentials_exception
     
-    import uuid
     try:
         user_id = uuid.UUID(user_id_str)
     except ValueError:
@@ -43,11 +68,13 @@ def get_current_user(
 
 
 def get_current_user_optional(
-    token: Optional[str] = Depends(oauth2_scheme_optional),
+    request: Request,
+    bearer_token: Optional[str] = Depends(oauth2_scheme),
     db: Session = Depends(get_db)
 ) -> Optional[User]:
     """Optional authentication - returns user if token is valid, None otherwise."""
-    if token is None:
+    token = _extract_token(request, bearer_token)
+    if not token:
         return None
     
     try:
@@ -59,7 +86,6 @@ def get_current_user_optional(
         if user_id_str is None:
             return None
         
-        import uuid
         try:
             user_id = uuid.UUID(user_id_str)
         except ValueError:
@@ -71,7 +97,13 @@ def get_current_user_optional(
         return None
 
 
-def get_admin_user(current_user: User = Depends(get_current_user)):
+def get_admin_user(
+    request: Request,
+    bearer_token: Optional[str] = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> User:
+    """Get current user and verify they have admin role."""
+    current_user = get_current_user(request, bearer_token, db)
     if current_user.role != UserRole.ADMIN:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,

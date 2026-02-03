@@ -16,6 +16,9 @@ import hmac
 import hashlib
 import base64
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -98,12 +101,7 @@ async def create_mux_upload_url(
     post_id_val = post_id or (request_data.post_id if request_data else None)
     filename_val = filename or (request_data.filename if request_data else None)
 
-    print(f"[MUX] ===== Upload URL Request Received =====")
-    print(f"[MUX] Lesson ID: {lesson_id_val}")
-    print(f"[MUX] Course ID: {course_id_val}")
-    print(f"[MUX] Level ID: {level_id_val}")
-    print(f"[MUX] Post ID: {post_id_val}")
-    print(f"[MUX] Filename: {filename_val}")
+    logger.debug(f"Upload URL request - lesson: {lesson_id_val}, course: {course_id_val}, level: {level_id_val}, post: {post_id_val}")
 
     # Auth check: Admin for lessons/courses/levels, authenticated user for community posts
     if lesson_id_val or course_id_val or level_id_val:
@@ -129,26 +127,21 @@ async def create_mux_upload_url(
                     pass
             if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
                 raise HTTPException(status_code=403, detail="Admin access required for lesson/course video uploads")
-        print(f"[MUX] Admin User: {current_user_opt.email}")
     elif post_id_val:
         # Community post uploads require authenticated user
         if not current_user_opt:
             raise HTTPException(status_code=401, detail="Authentication required for community post uploads")
-        print(f"[MUX] User: {current_user_opt.email}")
     else:
         # No entity specified - require admin
         if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
             raise HTTPException(status_code=401, detail="Admin access required")
-        print(f"[MUX] Admin User: {current_user_opt.email}")
     
     if not settings.MUX_TOKEN_ID or not settings.MUX_TOKEN_SECRET:
-        print("[MUX] ERROR: Mux credentials not configured!")
+        logger.error("Mux credentials not configured")
         raise HTTPException(
             status_code=500,
-            detail="Mux is not configured. Please set MUX_TOKEN_ID and MUX_TOKEN_SECRET in environment variables."
+            detail="Video service not configured"
         )
-    
-    print("[MUX] Mux credentials found, proceeding...")
     
     # Generate metadata for Mux asset organization
     external_id = None
@@ -281,22 +274,12 @@ async def create_mux_upload_url(
                     "type": "community-post"
                 }
     except Exception as e:
-        print(f"[MUX] Warning: Error fetching metadata: {e}")
+        logger.debug(f"Error fetching metadata: {type(e).__name__}")
         # Continue without metadata if fetch fails
     
     # Create passthrough JSON string
     if passthrough_data:
         passthrough = json.dumps(passthrough_data)
-        print(f"[MUX] Passthrough data: {passthrough}")
-    
-    if external_id:
-        print(f"[MUX] External ID: {external_id}")
-    if title:
-        print(f"[MUX] Title: {title}")
-    if creator_id:
-        print(f"[MUX] Creator ID: {creator_id}")
-    
-    print("[MUX] Calling Mux API to create direct upload...")
     # Community posts get resolution cap (1080p), lesson/course videos get MP4 support
     is_community_upload = post_id_val is not None
     result = create_direct_upload(
@@ -310,18 +293,15 @@ async def create_mux_upload_url(
     )
     
     if result.get("status") == "error":
-        print(f"[MUX] ERROR creating upload: {result.get('message')}")
+        logger.error(f"Failed to create upload URL")
         raise HTTPException(
             status_code=500,
-            detail=result.get("message", "Failed to create Mux upload URL")
+            detail="Failed to create video upload URL"
         )
     
     upload_id = result.get("upload_id", "unknown")
     upload_url = result.get("upload_url", "unknown")
-    print(f"[MUX] SUCCESS! Upload URL created")
-    print(f"[MUX] Upload ID: {upload_id}")
-    print(f"[MUX] Upload URL: {upload_url[:50]}...")
-    print(f"[MUX] ========================================")
+    logger.info(f"Upload URL created: {upload_id}")
     
     # If called via query params (MuxUploader), return format it expects
     # MuxUploader expects { url, uploadId }
@@ -384,8 +364,8 @@ async def get_upload_status(
             playback_id=playback_id
         )
     except Exception as e:
-        print(f"[MUX] Error checking upload status: {e}")
-        raise HTTPException(status_code=500, detail=f"Error checking upload status: {str(e)}")
+        logger.error(f"Error checking upload status: {type(e).__name__}")
+        raise HTTPException(status_code=500, detail="Error checking upload status")
 
 
 class DownloadUrlResponse(BaseModel):
@@ -439,7 +419,6 @@ async def check_download_available(
         raise HTTPException(status_code=400, detail="Resolution must be 'high', 'medium', or 'low'")
 
     download_url = f"https://stream.mux.com/{playback_id}/{resolution}.mp4"
-    print(f"[MUX] Checking MP4 availability: {download_url}")
 
     try:
         async with httpx.AsyncClient() as client:
@@ -451,9 +430,7 @@ async def check_download_available(
                 follow_redirects=True
             )
 
-            # Log response details for debugging
             content_type = response.headers.get("content-type", "")
-            print(f"[MUX] MP4 check response: status={response.status_code}, content-type={content_type}")
 
             # 200 = full content, 206 = partial content (both mean file exists)
             # Check content-type contains video OR octet-stream (binary)
@@ -461,29 +438,23 @@ async def check_download_available(
             is_success = response.status_code in [200, 206]
 
             if is_success and is_video:
-                print(f"[MUX] MP4 available!")
                 return DownloadAvailabilityResponse(
                     available=True,
                     download_url=download_url,
                     resolution=resolution
                 )
             elif response.status_code == 404 or "application/json" in content_type:
-                # 404 or JSON error response means MP4 not available
-                print(f"[MUX] MP4 not available (404 or JSON error)")
                 return DownloadAvailabilityResponse(
                     available=False,
                     message="MP4 download not available for this video."
                 )
             else:
-                # Unexpected response - log and assume not available
-                print(f"[MUX] Unexpected response: {response.status_code}, {content_type}")
-                print(f"[MUX] Response body: {response.text[:500] if response.text else 'empty'}")
                 return DownloadAvailabilityResponse(
                     available=False,
                     message="Could not verify MP4 availability."
                 )
     except Exception as e:
-        print(f"[MUX] Error checking MP4 availability: {e}")
+        logger.debug(f"Error checking MP4 availability: {type(e).__name__}")
         return DownloadAvailabilityResponse(
             available=False,
             message="Unable to verify download availability."
@@ -530,7 +501,7 @@ async def check_asset_exists(
     except HTTPException:
         raise
     except Exception as e:
-        print(f"[MUX] Error checking asset existence: {e}")
+        logger.error(f"Error checking asset existence: {type(e).__name__}")
         raise HTTPException(status_code=500, detail=f"Error checking asset: {str(e)}")
 
 
@@ -584,48 +555,42 @@ async def delete_mux_asset(
         
         if not lessons and not courses and not posts:
             # No lessons, courses, or posts using this asset, but still try to delete from Mux
-            print(f"[MUX] Asset {asset_id} not found in any lessons, courses, or posts, but attempting Mux deletion...")
+            logger.debug(f"Asset {asset_id} not found in any entities")
         
         configuration = _get_mux_configuration()
         api_client = ApiClient(configuration)
         assets_api = AssetsApi(api_client)
         
-        print(f"[MUX] Attempting to delete asset {asset_id} from Mux...")
-        
         # Try to delete asset from Mux
         try:
             assets_api.delete_asset(asset_id)
-            print(f"[MUX] Successfully deleted asset {asset_id} from Mux")
+            logger.info(f"Deleted asset {asset_id} from Mux")
             mux_deleted = True
         except ApiException as api_error:
             # Handle 404 (not found) - asset might already be deleted
             if api_error.status == 404:
-                print(f"[MUX] Asset {asset_id} not found in Mux (already deleted or never existed), clearing from DB only")
+                logger.debug(f"Asset {asset_id} not found in Mux")
                 mux_deleted = False  # Asset already gone, just clear from DB
             else:
-                # Other API errors - re-raise
-                print(f"[MUX] Error deleting asset {asset_id} from Mux: {api_error}")
+                logger.error(f"Error deleting asset: {api_error.status}")
                 raise HTTPException(
                     status_code=api_error.status or 500,
-                    detail=f"Error deleting asset from Mux: {str(api_error)}"
+                    detail="Error deleting video asset"
                 )
         
         # Clear Mux IDs from all lessons using this asset
         for lesson in lessons:
-            print(f"[MUX] Clearing Mux IDs for lesson {lesson.id} (title: {lesson.title})")
             lesson.mux_asset_id = None
             lesson.mux_playback_id = None
             lesson.video_url = ""  # Also clear fallback video URL
         
         # Clear Mux IDs from all courses using this asset for preview
         for course in courses:
-            print(f"[MUX] Clearing Mux preview IDs for course {course.id} (title: {course.title})")
             course.mux_preview_asset_id = None
             course.mux_preview_playback_id = None
         
         # Clear Mux IDs from all posts using this asset
         for post in posts:
-            print(f"[MUX] Clearing Mux IDs for post {post.id} (title: {post.title})")
             post.mux_asset_id = None
             post.mux_playback_id = None
         
@@ -647,12 +612,10 @@ async def delete_mux_asset(
         }
         
     except HTTPException:
-        raise  # Re-raise HTTP exceptions
+        raise
     except Exception as e:
-        print(f"[MUX] Unexpected error deleting asset {asset_id}: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Error deleting asset: {str(e)}")
+        logger.error(f"Error deleting asset: {type(e).__name__}")
+        raise HTTPException(status_code=500, detail="Error deleting asset")
 
 
 @router.post("/check-upload-status")
@@ -748,7 +711,7 @@ async def check_upload_status(
                         "message": "Preview video is still processing or not found"
                     }
             except Exception as e:
-                print(f"[MUX] Error checking course preview upload status: {e}")
+                logger.error(f"Error checking course preview status: {type(e).__name__}")
                 return {
                     "status": "error",
                     "message": f"Error checking status: {str(e)}"
@@ -810,7 +773,7 @@ async def check_upload_status(
                         "message": "Preview video is still processing or not found"
                     }
             except Exception as e:
-                print(f"[MUX] Error checking level preview upload status: {e}")
+                logger.error(f"Error checking level preview status: {type(e).__name__}")
                 return {
                     "status": "error",
                     "message": f"Error checking status: {str(e)}"
@@ -875,7 +838,7 @@ async def check_upload_status(
                         "message": "Video is still processing or not found"
                     }
             except Exception as e:
-                print(f"[MUX] Error checking post upload status: {e}")
+                logger.error(f"Error checking post upload status: {type(e).__name__}")
                 return {
                     "status": "error",
                     "message": f"Error checking status: {str(e)}"
@@ -945,17 +908,15 @@ async def check_upload_status(
                 }
                 
         except Exception as e:
-            print(f"[MUX] Error checking upload status: {e}")
+            logger.error(f"Error checking upload status: {type(e).__name__}")
             return {
                 "status": "error",
                 "message": f"Error checking status: {str(e)}"
             }
             
     except Exception as e:
-        print(f"[MUX] Error in check_upload_status: {e}")
-        import traceback
-        traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Error checking upload status: {str(e)}")
+        logger.error(f"Error in check_upload_status: {type(e).__name__}")
+        raise HTTPException(status_code=500, detail="Error checking upload status")
 
 
 @router.post("/webhook")
@@ -968,53 +929,68 @@ async def mux_webhook_handler(
     Handle Mux webhook events (e.g., when an asset is ready after upload).
     This endpoint should be configured in Mux dashboard webhook settings.
     NOTE: This endpoint is PUBLIC (no auth required) as it's called by Mux servers.
-    Webhook signature verification is optional but recommended for security.
+    Webhook signature verification is REQUIRED in production.
     """
+    import logging
+    logger = logging.getLogger(__name__)
+    
     try:
-        print(f"[MUX WEBHOOK] ===== Webhook received =====")
+        logger.info("Mux webhook received")
         
         # Read body once
         body_bytes = await request.body()
         
-        # Verify webhook signature if webhook secret is configured
-        if settings.MUX_WEBHOOK_SECRET and mux_signature:
-            # Parse signature header (format: "t=timestamp,v1=signature")
-            try:
-                signature_parts = {}
-                for part in mux_signature.split(","):
-                    key, value = part.split("=", 1)
-                    signature_parts[key] = value
-                
-                timestamp = signature_parts.get("t")
-                signature = signature_parts.get("v1")
-                
-                if timestamp and signature:
-                    # Verify signature
-                    payload_string = f"{timestamp}.{body_bytes.decode('utf-8')}"
-                    computed_signature = hmac.new(
-                        settings.MUX_WEBHOOK_SECRET.encode('utf-8'),
-                        payload_string.encode('utf-8'),
-                        hashlib.sha256
-                    ).digest()
-                    computed_signature_b64 = base64.b64encode(computed_signature).decode('utf-8')
+        # Verify webhook signature - REQUIRED in production
+        if settings.MUX_WEBHOOK_SECRET:
+            if not mux_signature:
+                logger.warning("Mux webhook received without signature")
+                if not settings._is_development:
+                    raise HTTPException(status_code=401, detail="Missing webhook signature")
+            else:
+                # Parse signature header (format: "t=timestamp,v1=signature")
+                try:
+                    signature_parts = {}
+                    for part in mux_signature.split(","):
+                        key, value = part.split("=", 1)
+                        signature_parts[key] = value
                     
-                    if not hmac.compare_digest(signature, computed_signature_b64):
-                        print(f"[MUX WEBHOOK] ERROR: Invalid webhook signature!")
-                        raise HTTPException(status_code=401, detail="Invalid webhook signature")
+                    timestamp = signature_parts.get("t")
+                    signature = signature_parts.get("v1")
                     
-                    print(f"[MUX WEBHOOK] Signature verified successfully")
-            except HTTPException:
-                raise  # Re-raise HTTP exceptions
-            except Exception as sig_error:
-                print(f"[MUX WEBHOOK] WARNING: Signature verification failed: {sig_error}")
-                # In development, we can be lenient - in production, should reject
-                # For now, continue even if signature verification fails (for testing)
+                    if not timestamp or not signature:
+                        logger.warning("Invalid Mux signature format")
+                        if not settings._is_development:
+                            raise HTTPException(status_code=401, detail="Invalid webhook signature format")
+                    else:
+                        # Verify signature
+                        payload_string = f"{timestamp}.{body_bytes.decode('utf-8')}"
+                        computed_signature = hmac.new(
+                            settings.MUX_WEBHOOK_SECRET.encode('utf-8'),
+                            payload_string.encode('utf-8'),
+                            hashlib.sha256
+                        ).digest()
+                        computed_signature_b64 = base64.b64encode(computed_signature).decode('utf-8')
+                        
+                        if not hmac.compare_digest(signature, computed_signature_b64):
+                            logger.error("Invalid Mux webhook signature")
+                            raise HTTPException(status_code=401, detail="Invalid webhook signature")
+                        
+                        logger.info("Mux webhook signature verified")
+                except HTTPException:
+                    raise
+                except Exception as sig_error:
+                    logger.error(f"Signature verification error: {type(sig_error).__name__}")
+                    if not settings._is_development:
+                        raise HTTPException(status_code=401, detail="Signature verification failed")
+        elif not settings._is_development:
+            # No webhook secret configured in production - this is a configuration error
+            logger.error("MUX_WEBHOOK_SECRET not configured in production!")
+            raise HTTPException(status_code=500, detail="Webhook not properly configured")
         
         # Parse request body from bytes
-        # json is imported at the top of the file
         body = json.loads(body_bytes.decode('utf-8'))
         event_type = body.get("type")
-        print(f"[MUX WEBHOOK] Event type: {event_type}")
+        logger.info(f"Mux webhook event: {event_type}")
         
         if event_type == "video.asset.ready":
             # Asset is ready - extract playback_id and asset_id
@@ -1022,18 +998,12 @@ async def mux_webhook_handler(
             asset_id = asset_data.get("id")
             playback_ids = asset_data.get("playback_ids", [])
             
-            print(f"[MUX WEBHOOK] Asset ID: {asset_id}")
-            print(f"[MUX WEBHOOK] Playback IDs: {playback_ids}")
-            
             if playback_ids and len(playback_ids) > 0:
                 playback_id = playback_ids[0].get("id")
-                print(f"[MUX WEBHOOK] Using playback ID: {playback_id}")
                 
-                # Extract lesson_id from passthrough data
+                # Extract entity ID from passthrough data
                 passthrough = asset_data.get("passthrough")
-                print(f"[MUX WEBHOOK] Passthrough data: {passthrough}")
                 
-                # If passthrough contains lesson_id or course_id, update accordingly
                 if passthrough:
                     try:
                         passthrough_data = json.loads(passthrough) if isinstance(passthrough, str) else passthrough
@@ -1041,77 +1011,62 @@ async def mux_webhook_handler(
                         course_id = passthrough_data.get("course_id")
                         level_id = passthrough_data.get("level_id")
                         post_id = passthrough_data.get("post_id")
-                        print(f"[MUX WEBHOOK] Lesson ID from passthrough: {lesson_id}")
-                        print(f"[MUX WEBHOOK] Course ID from passthrough: {course_id}")
-                        print(f"[MUX WEBHOOK] Level ID from passthrough: {level_id}")
-                        print(f"[MUX WEBHOOK] Post ID from passthrough: {post_id}")
 
                         if lesson_id:
-                            # Update lesson
                             from models.course import Lesson
                             lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
                             if lesson:
-                                print(f"[MUX WEBHOOK] Found lesson: {lesson.title}")
                                 lesson.mux_asset_id = asset_id
                                 lesson.mux_playback_id = playback_id
                                 db.commit()
-                                print(f"[MUX WEBHOOK] SUCCESS! Updated lesson with playback_id: {playback_id}")
+                                logger.info(f"Updated lesson {lesson_id} with video")
                             else:
-                                print(f"[MUX WEBHOOK] WARNING: Lesson {lesson_id} not found in database")
+                                logger.warning(f"Lesson {lesson_id} not found")
                         elif course_id:
-                            # Update course preview
                             from models.course import World
                             world = db.query(World).filter(World.id == course_id).first()
                             if world:
-                                print(f"[MUX WEBHOOK] Found course: {world.title}")
                                 world.mux_preview_playback_id = playback_id
-                                world.mux_preview_asset_id = asset_id  # Store asset_id for deletion
+                                world.mux_preview_asset_id = asset_id
                                 db.commit()
-                                print(f"[MUX WEBHOOK] SUCCESS! Updated course preview with playback_id: {playback_id}, asset_id: {asset_id}")
+                                logger.info(f"Updated course {course_id} preview")
                             else:
-                                print(f"[MUX WEBHOOK] WARNING: Course {course_id} not found in database")
+                                logger.warning(f"Course {course_id} not found")
                         elif level_id:
-                            # Update level preview (skill tree node)
                             from models.course import Level
                             level = db.query(Level).filter(Level.id == level_id).first()
                             if level:
-                                print(f"[MUX WEBHOOK] Found level: {level.title}")
                                 level.mux_preview_playback_id = playback_id
                                 level.mux_preview_asset_id = asset_id
                                 db.commit()
-                                print(f"[MUX WEBHOOK] SUCCESS! Updated level preview with playback_id: {playback_id}, asset_id: {asset_id}")
+                                logger.info(f"Updated level {level_id} preview")
                             else:
-                                print(f"[MUX WEBHOOK] WARNING: Level {level_id} not found in database")
+                                logger.warning(f"Level {level_id} not found")
                         elif post_id:
-                            # Update community post
                             from models.community import Post
                             post = db.query(Post).filter(Post.id == post_id).first()
                             if post:
-                                print(f"[MUX WEBHOOK] Found post: {post.title}")
                                 post.mux_asset_id = asset_id
                                 post.mux_playback_id = playback_id
                                 db.commit()
-                                print(f"[MUX WEBHOOK] SUCCESS! Updated post with playback_id: {playback_id}, asset_id: {asset_id}")
+                                logger.info(f"Updated post {post_id} with video")
                             else:
-                                print(f"[MUX WEBHOOK] WARNING: Post {post_id} not found in database")
+                                logger.warning(f"Post {post_id} not found")
                         else:
-                            print(f"[MUX WEBHOOK] WARNING: No lesson_id, course_id, level_id, or post_id in passthrough data")
+                            logger.warning("No entity ID in passthrough data")
                     except Exception as e:
-                        print(f"[MUX WEBHOOK] ERROR updating from webhook: {e}")
-                        import traceback
-                        traceback.print_exc()
+                        logger.error(f"Error processing webhook: {type(e).__name__}")
                 else:
-                    print(f"[MUX WEBHOOK] WARNING: No passthrough data in asset")
+                    logger.warning("No passthrough data in asset")
             else:
-                print(f"[MUX WEBHOOK] WARNING: No playback IDs in asset data")
+                logger.warning("No playback IDs in asset data")
         else:
-            print(f"[MUX WEBHOOK] Unhandled event type: {event_type}")
+            logger.debug(f"Unhandled webhook event type: {event_type}")
         
-        print(f"[MUX WEBHOOK] ===========================")
         return {"status": "ok"}
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"[MUX WEBHOOK] ERROR processing webhook: {e}")
-        import traceback
-        traceback.print_exc()
-        return {"status": "error", "message": str(e)}
+        logger.error(f"Webhook processing error: {type(e).__name__}")
+        return {"status": "error", "message": "Internal error"}
 

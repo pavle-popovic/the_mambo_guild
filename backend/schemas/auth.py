@@ -23,6 +23,21 @@ class UserRegisterRequest(BaseModel):
         if not re.match(r'^[a-zA-Z0-9_]+$', v):
             raise ValueError("Username can only contain letters, numbers, and underscores")
         return v.lower()
+    
+    @field_validator('password')
+    @classmethod
+    def validate_password_strength(cls, v: str) -> str:
+        """Validate password meets security requirements."""
+        if len(v) < 8:
+            raise ValueError("Password must be at least 8 characters long")
+        if len(v) > 72:
+            raise ValueError("Password cannot exceed 72 characters")
+        # Check for at least one letter and one number
+        if not re.search(r'[a-zA-Z]', v):
+            raise ValueError("Password must contain at least one letter")
+        if not re.search(r'\d', v):
+            raise ValueError("Password must contain at least one number")
+        return v
 
     @model_validator(mode='after')
     def passwords_match(self):
@@ -108,8 +123,15 @@ class ResetPasswordRequest(BaseModel):
     @field_validator('new_password')
     @classmethod
     def validate_password_strength(cls, v: str) -> str:
+        """Validate password meets security requirements."""
         if len(v) < 8:
             raise ValueError("Password must be at least 8 characters long")
+        if len(v) > 72:
+            raise ValueError("Password cannot exceed 72 characters")
+        if not re.search(r'[a-zA-Z]', v):
+            raise ValueError("Password must contain at least one letter")
+        if not re.search(r'\d', v):
+            raise ValueError("Password must contain at least one number")
         return v
 
 

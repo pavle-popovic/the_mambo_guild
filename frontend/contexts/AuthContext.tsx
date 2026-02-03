@@ -49,7 +49,7 @@ interface AuthContextType {
     last_name: string;
     current_level_tag: string;
   }) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
   waitlistRegister: (email: string, username: string, referrer_code?: string) => Promise<{ referral_code: string; position: number }>;
 }
@@ -79,18 +79,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const checkAuth = async () => {
+      // First, check for localStorage token (backwards compatibility)
       const token = localStorage.getItem("auth_token");
       if (token) {
         apiClient.setToken(token);
-        try {
-          await refreshUser();
-        } catch (error) {
-          // If token is invalid, clear it
-          console.error("Token validation failed:", error);
-          localStorage.removeItem("auth_token");
-          apiClient.setToken(null);
-          setUser(null);
-        }
+      }
+      
+      // Try to fetch user profile - this works with both:
+      // 1. Bearer token from localStorage
+      // 2. httpOnly cookie (new secure method)
+      try {
+        await refreshUser();
+      } catch (error) {
+        // Auth failed - clear any stale localStorage token
+        console.debug("Auth check failed, clearing state");
+        localStorage.removeItem("auth_token");
+        apiClient.setToken(null);
+        setUser(null);
       }
       setLoading(false);
     };
@@ -140,7 +145,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return await apiClient.waitlistRegister(email, username, referrer_code);
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      // Call backend to clear httpOnly cookies
+      await apiClient.logout();
+    } catch (error) {
+      // Continue with local cleanup even if server request fails
+      console.debug("Logout request failed, clearing local state");
+    }
     // Clear token from API client
     apiClient.setToken(null);
     // Clear token from localStorage

@@ -148,7 +148,7 @@ backend/
 - `GET /api/community/search` - Search posts by title/tags
  
  ### AI Concierge (`/api/ai_chat`)
- - `POST /api/ai_chat/chat` - Chat with "Diego" (Google Gemini 2.0 Flash)
+ - `POST /api/ai_chat/chat` - Chat with "Tito P" (Google Gemini 2.0 Flash)
    - Supports streaming responses (server-sent events)
    - Function calling for membership recommendations
  - `GET /api/ai_chat/status` - Check AI service availability

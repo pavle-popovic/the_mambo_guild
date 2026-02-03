@@ -51,14 +51,14 @@ interface UseGeminiReturn {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
 
-const DIEGO_WELCOME_MESSAGE = `Bienvenido to The Mambo Guild! I'm Diego, your concierge. Whether you're taking your first steps or ready to shine on stage, I'm here to guide you. What brings you to salsa today?`;
+const TITO_WELCOME_MESSAGE = `Bienvenido to The Mambo Guild! I'm Tito P, your AI concierge. Whether you're taking your first steps or ready to shine on stage, I'm here to guide you. What brings you to salsa today?`;
 
 export function useGemini(): UseGeminiReturn {
   const [messages, setMessages] = useState<Message[]>([
     {
       id: "welcome",
       role: "model",
-      content: DIEGO_WELCOME_MESSAGE,
+      content: TITO_WELCOME_MESSAGE,
       timestamp: new Date(),
     },
   ]);
@@ -302,7 +302,7 @@ export function useGemini(): UseGeminiReturn {
       {
         id: "welcome",
         role: "model",
-        content: DIEGO_WELCOME_MESSAGE,
+        content: TITO_WELCOME_MESSAGE,
         timestamp: new Date(),
       },
     ]);

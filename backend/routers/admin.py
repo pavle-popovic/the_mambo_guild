@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from pydantic import BaseModel
-from datetime import datetime
+from datetime import datetime, timezone
 from models import get_db
 from models.user import User, UserProfile
 from models.progress import BossSubmission, SubmissionStatus
@@ -63,7 +63,7 @@ async def grade_submission(
     
     submission.instructor_feedback = grade_data.feedback_text
     submission.instructor_video_url = grade_data.feedback_video_url
-    submission.reviewed_at = datetime.utcnow()
+    submission.reviewed_at = datetime.now(timezone.utc)
     submission.reviewed_by = admin_user.id
     
     db.commit()
@@ -107,6 +107,15 @@ class StudentResponse(BaseModel):
         from_attributes = True
 
 
+def escape_like_pattern(pattern: str) -> str:
+    """Escape special characters in LIKE patterns to prevent wildcard abuse."""
+    # Escape backslash first, then other special characters
+    pattern = pattern.replace("\\", "\\\\")
+    pattern = pattern.replace("%", "\\%")
+    pattern = pattern.replace("_", "\\_")
+    return pattern
+
+
 @router.get("/students", response_model=List[StudentResponse])
 async def get_all_students(
     admin_user: User = Depends(get_admin_user),
@@ -121,7 +130,9 @@ async def get_all_students(
     
     # Optional search by name or email
     if search:
-        search_filter = f"%{search}%"
+        # Escape special LIKE characters to prevent wildcard abuse
+        escaped_search = escape_like_pattern(search)
+        search_filter = f"%{escaped_search}%"
         query = query.filter(
             (User.email.ilike(search_filter)) |
             (UserProfile.first_name.ilike(search_filter)) |

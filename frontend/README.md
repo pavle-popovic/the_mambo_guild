@@ -191,11 +191,12 @@ frontend/
  
  ### Special Features
  
- **AI Concierge ("Diego")**:
+ **AI Concierge ("Tito P")**:
  - Floating chat interface available across the site
  - Interactive persona (1920s Havana Concierge)
  - Real-time streaming responses
  - Intelligent membership recommendations
+ - Modern dark glass card UI design
  
  **Constellation / Skill Tree**:
  - Interactive visualization of the learning path
@@ -333,6 +334,20 @@ The application is fully responsive:
 ## 📝 Recent Updates
 
 ### Latest Features
+- ✅ **Landing Page Redesign v2.0** (February 2026) -> *New!*
+  - **NewHero Component**: "Join The Guild" with bullet points and LXD badge
+  - **TrendingModulesSection**: Auto-spinning carousel with content stats
+  - **SkillTreeTeaser**: Interactive skill tree with real API data
+    - Course toggle tabs with gold/amber styling
+    - ReactFlow + Dagre layout matching actual skill tree
+    - Animated GoldEdge component (locked/available/mastered states)
+    - Hover tooltips with Mux animated GIF previews
+    - Auto-navigate to frontier node
+    - Grey-out effect for logged-out state
+  - **Mambobot (Tito P)**: Redesigned AI concierge
+    - Modern dark glass card UI
+    - Zinc/gray color scheme
+    - useGemini hook with streaming
 - ✅ **PalladiumMesh Background** (January 2026)
   - Dark monochrome mesh gradient background component
   - 5 animated blurred circles with Framer Motion

@@ -1,5 +1,5 @@
 import math
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import Session
 from models.user import UserProfile
 
@@ -17,7 +17,7 @@ def update_streak(user_id: str, db: Session) -> int:
     if not profile:
         return 0
 
-    today = datetime.utcnow().date()
+    today = datetime.now(timezone.utc).date()
     last_login = profile.last_login_date.date() if profile.last_login_date else None
     yesterday = (today - timedelta(days=1))
 
@@ -32,7 +32,7 @@ def update_streak(user_id: str, db: Session) -> int:
         profile.streak_count = 1
     # If last_login == today, streak stays the same
 
-    profile.last_login_date = datetime.utcnow()
+    profile.last_login_date = datetime.now(timezone.utc)
     db.commit()
     return profile.streak_count
 

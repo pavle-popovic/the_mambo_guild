@@ -3,7 +3,7 @@ Badge Service - The Gamification Engine
 Handles stat tracking, threshold checking, and badge awarding.
 """
 import logging
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional, Union
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -145,7 +145,7 @@ def award_badge(user_id: str, badge: Union[BadgeDefinition, str], db: Session):
     new_badge = UserBadge(
         user_id=user_id,
         badge_id=badge_def.id,
-        earned_at=datetime.utcnow()
+        earned_at=datetime.now(timezone.utc)
     )
     db.add(new_badge)
     db.flush()
