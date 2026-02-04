@@ -546,15 +546,32 @@ function Mixer({ track, onBack }: { track: Track; onBack: () => void }) {
   );
 }
 
-// Main Component
-export default function DJBoothMixer() {
+// Main Component Props
+interface DJBoothMixerProps {
+  track?: Track | null;
+  onClose?: () => void;
+}
+
+export default function DJBoothMixer({ track: externalTrack, onClose }: DJBoothMixerProps = {}) {
   const [tracks, setTracks] = useState<Track[]>([]);
-  const [selectedTrack, setSelectedTrack] = useState<Track | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedTrack, setSelectedTrack] = useState<Track | null>(externalTrack || null);
+  const [isLoading, setIsLoading] = useState(!externalTrack);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch tracks on mount
+  // Update selected track when external track changes
   useEffect(() => {
+    if (externalTrack) {
+      setSelectedTrack(externalTrack);
+      setIsLoading(false);
+    }
+  }, [externalTrack]);
+
+  // Fetch tracks on mount (only if no external track provided)
+  useEffect(() => {
+    if (externalTrack) {
+      return; // Don't fetch if track is provided externally
+    }
+    
     const fetchTracks = async () => {
       try {
         setIsLoading(true);
@@ -569,7 +586,7 @@ export default function DJBoothMixer() {
     };
 
     fetchTracks();
-  }, []);
+  }, [externalTrack]);
 
   return (
     <div className="bg-gradient-to-br from-gray-900 via-black to-gray-900 rounded-2xl border border-white/10 overflow-hidden">
@@ -584,7 +601,13 @@ export default function DJBoothMixer() {
           </button>
         </div>
       ) : selectedTrack ? (
-        <Mixer track={selectedTrack} onBack={() => setSelectedTrack(null)} />
+        <Mixer 
+          track={selectedTrack} 
+          onBack={() => {
+            setSelectedTrack(null);
+            onClose?.(); // Call onClose if provided
+          }} 
+        />
       ) : (
         <div className="p-6">
           <div className="flex items-center gap-3 mb-6">

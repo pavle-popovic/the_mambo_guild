@@ -27,7 +27,13 @@ export default function DownloadButton({
     limit: number;
   } | null>(null);
 
-  const handleDownload = async () => {
+  const handleDownload = async (e?: React.MouseEvent) => {
+    // Prevent any default navigation
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+    
     // First check status to show remaining downloads
     if (!downloadStatus) {
       try {
@@ -69,7 +75,9 @@ export default function DownloadButton({
       
       // Get auth token for authenticated request
       const token = localStorage.getItem("auth_token");
-      const headers: HeadersInit = {};
+      const headers: HeadersInit = {
+        "Accept": "video/mp4, */*",
+      };
       
       if (token) {
         headers["Authorization"] = `Bearer ${token}`;
@@ -84,13 +92,31 @@ export default function DownloadButton({
       });
       
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ detail: "Download failed" }));
-        throw new Error(errorData.detail || `Download failed: ${response.statusText}`);
+        // Try to get error message from response
+        let errorMessage = `Download failed: ${response.statusText}`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.detail || errorMessage;
+        } catch {
+          // If JSON parsing fails, use status text
+        }
+        throw new Error(errorMessage);
+      }
+      
+      // Check if response is actually a video
+      const contentType = response.headers.get("Content-Type");
+      if (!contentType || !contentType.includes("video")) {
+        throw new Error("Invalid response: expected video file");
       }
       
       // Get the blob from the stream
+      // This will download the entire file into memory, then trigger download
       const blob = await response.blob();
-      const blobUrl = URL.createObjectURL(blob);
+      
+      // Verify blob is valid
+      if (!blob || blob.size === 0) {
+        throw new Error("Downloaded file is empty");
+      }
       
       // Extract filename from Content-Disposition header if available
       const contentDisposition = response.headers.get("Content-Disposition");
@@ -98,20 +124,27 @@ export default function DownloadButton({
       if (contentDisposition) {
         const filenameMatch = contentDisposition.match(/filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/);
         if (filenameMatch && filenameMatch[1]) {
-          filename = filenameMatch[1].replace(/['"]/g, "");
+          filename = filenameMatch[1].replace(/['"]/g, "").trim();
         }
       }
       
       // Create download link and trigger download
+      // This forces the browser to download instead of navigating
+      const blobUrl = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = blobUrl;
       link.download = filename;
+      link.style.display = "none"; // Hide the link
       document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
       
-      // Clean up blob URL after a delay
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 100);
+      // Trigger download
+      link.click();
+      
+      // Clean up
+      setTimeout(() => {
+        document.body.removeChild(link);
+        URL.revokeObjectURL(blobUrl);
+      }, 100);
       
       // Update remaining count from response headers if available
       // (Backend records the download, so we can refresh status)
@@ -125,19 +158,34 @@ export default function DownloadButton({
         // Ignore status update errors
       }
 
+      // Show success message
+      const remainingAfter = downloadStatus?.remaining ? downloadStatus.remaining - 1 : 0;
       toast.success(
         <div className="flex flex-col gap-1">
-          <span className="font-semibold">Download Started!</span>
+          <span className="font-semibold">Download Started! ✓</span>
           <span className="text-sm text-gray-400">
-            {response.downloads_remaining} downloads remaining today
+            The video file is downloading to your device. Check your Downloads folder.
           </span>
-        </div>
+          {remainingAfter > 0 && (
+            <span className="text-xs text-gray-500 mt-1">
+              {remainingAfter} downloads remaining today
+            </span>
+          )}
+        </div>,
+        { duration: 5000 }
       );
     } catch (error: any) {
+      console.error("Download error:", error);
+      
+      // Prevent any navigation - make sure we never navigate to URLs
       if (error.message?.includes("429") || error.message?.includes("limit")) {
         toast.error("Daily download limit reached (5/day). Try again tomorrow!");
+      } else if (error.message?.includes("Failed to fetch") || error.message?.includes("NetworkError")) {
+        toast.error("Network error. Please check your connection and try again.");
+      } else if (error.message?.includes("CORS")) {
+        toast.error("Download failed due to security restrictions. Please contact support.");
       } else {
-        toast.error(error.message || "Failed to start download");
+        toast.error(error.message || "Failed to start download. Please try again.");
       }
     } finally {
       setIsLoading(false);
