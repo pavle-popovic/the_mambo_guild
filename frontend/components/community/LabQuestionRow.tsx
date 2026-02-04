@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { CheckCircle, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
+import GuildMasterBadge from "@/components/ui/GuildMasterBadge";
 
 interface Post {
     id: string;
@@ -12,6 +13,7 @@ interface Post {
         last_name: string;
         avatar_url: string | null;
         is_pro: boolean;
+        is_guild_master?: boolean;
         level: number;
     };
     post_type: "stage" | "lab";
@@ -114,8 +116,9 @@ export default function LabQuestionRow({
 
                 {/* Meta */}
                 <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
-                    <span>
+                    <span className="flex items-center gap-1">
                         {post.user.first_name} {post.user.last_name[0]}.
+                        {post.user.is_guild_master && <GuildMasterBadge size="sm" animate={false} />}
                     </span>
                     <span>•</span>
                     <span>{timeAgo}</span>

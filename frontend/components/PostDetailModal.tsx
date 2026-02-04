@@ -9,6 +9,8 @@ import { useUISound } from "@/hooks/useUISound";
 import { useAuth } from "@/contexts/AuthContext";
 import { GlassCard, GlassPanel } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
+import GuildMasterAvatar, { GuildMasterUsername } from "@/components/ui/GuildMasterAvatar";
+import { GuildMasterTag } from "@/components/ui/GuildMasterBadge";
 
 interface Tag {
   slug: string;
@@ -37,6 +39,7 @@ interface Post {
     last_name: string;
     avatar_url: string | null;
     is_pro: boolean;
+    is_guild_master?: boolean;
     level: number;
   };
   replies?: Array<{
@@ -47,6 +50,7 @@ interface Post {
       last_name: string;
       avatar_url: string | null;
       is_pro: boolean;
+      is_guild_master?: boolean;
       level: number;
     };
     content: string;
@@ -568,28 +572,25 @@ export default function PostDetailModal({
 
                 {/* User Info */}
                 <div className="flex items-center gap-3 mb-4">
-                  <div
-                    className={cn(
-                      "w-12 h-12 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-semibold",
-                      post.user.is_pro && "ring-2 ring-amber-400"
-                    )}
-                  >
-                    {post.user.avatar_url ? (
-                      <img
-                        src={post.user.avatar_url}
-                        alt={post.user.first_name}
-                        className="w-full h-full rounded-full object-cover"
-                      />
-                    ) : (
-                      post.user.first_name[0]
-                    )}
-                  </div>
+                  <GuildMasterAvatar
+                    avatarUrl={post.user.avatar_url}
+                    firstName={post.user.first_name}
+                    lastName={post.user.last_name}
+                    isPro={post.user.is_pro}
+                    isGuildMaster={post.user.is_guild_master}
+                    size="lg"
+                  />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold text-white">
-                        {post.user.first_name} {post.user.last_name}
-                      </span>
-                      {post.user.is_pro && (
+                      <GuildMasterUsername
+                        firstName={post.user.first_name}
+                        lastName={post.user.last_name}
+                        isPro={post.user.is_pro}
+                        isGuildMaster={post.user.is_guild_master}
+                      />
+                      {post.user.is_guild_master ? (
+                        <GuildMasterTag />
+                      ) : post.user.is_pro && (
                         <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200">
                           PRO
                         </span>
@@ -867,29 +868,32 @@ export default function PostDetailModal({
                       {post.replies.map((reply) => {
                         const isOptimistic = reply.id.startsWith("temp-");
                         return (
-                          <GlassCard key={reply.id} className={cn("p-4", isOptimistic && "opacity-70")}>
+                          <GlassCard 
+                            key={reply.id} 
+                            className={cn(
+                              "p-4", 
+                              isOptimistic && "opacity-70",
+                              reply.user.is_guild_master && "guild-master-comment"
+                            )}
+                          >
                             <div className="flex items-start gap-3">
-                              <div
-                                className={cn(
-                                  "w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white text-xs font-semibold",
-                                  reply.user.is_pro && "ring-2 ring-amber-400"
-                                )}
-                              >
-                                {reply.user.avatar_url ? (
-                                  <img
-                                    src={reply.user.avatar_url}
-                                    alt={reply.user.first_name}
-                                    className="w-full h-full rounded-full object-cover"
-                                  />
-                                ) : (
-                                  reply.user.first_name[0]
-                                )}
-                              </div>
+                              <GuildMasterAvatar
+                                avatarUrl={reply.user.avatar_url}
+                                firstName={reply.user.first_name}
+                                lastName={reply.user.last_name}
+                                isPro={reply.user.is_pro}
+                                isGuildMaster={reply.user.is_guild_master}
+                                size="sm"
+                              />
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <span className="font-semibold text-white text-sm">
-                                    {reply.user.first_name} {reply.user.last_name}
-                                  </span>
+                                  <GuildMasterUsername
+                                    firstName={reply.user.first_name}
+                                    lastName={reply.user.last_name}
+                                    isPro={reply.user.is_pro}
+                                    isGuildMaster={reply.user.is_guild_master}
+                                    className="text-sm"
+                                  />
                                   {isOptimistic && (
                                     <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200">
                                       Posting...

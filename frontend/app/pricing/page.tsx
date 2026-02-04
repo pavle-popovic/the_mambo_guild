@@ -87,7 +87,7 @@ function PricingPageContent() {
       await refreshUser();
       await apiClient.updateSubscription(PERFORMER_PRICE_ID);
       await refreshUser();
-      alert("Successfully upgraded to Performer plan!");
+      alert("Successfully upgraded to Guild Master plan!");
       router.push("/courses");
     } catch (error: any) {
       console.error("Failed to upgrade:", error);
@@ -102,7 +102,7 @@ function PricingPageContent() {
       return;
     }
 
-    if (!confirm("Are you sure you want to downgrade to Advanced plan? Your subscription will be updated immediately.")) {
+    if (!confirm("Are you sure you want to downgrade to Pro plan? Your subscription will be updated immediately.")) {
       return;
     }
 
@@ -111,7 +111,7 @@ function PricingPageContent() {
       await refreshUser();
       await apiClient.updateSubscription(ADVANCED_PRICE_ID);
       await refreshUser();
-      alert("Successfully downgraded to Advanced plan!");
+      alert("Successfully downgraded to Pro plan!");
       router.push("/courses");
     } catch (error: any) {
       console.error("Failed to downgrade:", error);
@@ -231,7 +231,7 @@ function PricingPageContent() {
               </HoverCard>
             </StaggerItem>
 
-            {/* Advanced Tier */}
+            {/* Pro Tier */}
             <StaggerItem>
               <HoverCard>
                 <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 z-10 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 shadow-2xl shadow-yellow-900/40`}>
@@ -247,7 +247,7 @@ function PricingPageContent() {
 
                     <div className="mb-4">
                       <span className="text-xs font-bold uppercase tracking-widest text-mambo-gold">
-                        Advanced
+                        Pro
                       </span>
                     </div>
                     <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
@@ -312,7 +312,7 @@ function PricingPageContent() {
               </HoverCard>
             </StaggerItem>
 
-            {/* Performer Tier */}
+            {/* Guild Master Tier */}
             <StaggerItem>
               <HoverCard>
                 <div className={`relative rounded-2xl p-[2px] flex flex-col h-full transition-all duration-300 bg-gray-800`}>
@@ -323,7 +323,7 @@ function PricingPageContent() {
 
                     <div className="mb-4">
                       <span className={`text-xs font-bold uppercase tracking-widest ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`}>
-                        Performer
+                        Guild Master
                       </span>
                     </div>
                     <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
@@ -334,7 +334,7 @@ function PricingPageContent() {
                     <ul className="text-left space-y-4 mb-8 flex-1">
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Everything in Advanced
+                        Everything in Pro
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
@@ -360,7 +360,7 @@ function PricingPageContent() {
                           disabled={loading === PERFORMER_PRICE_ID}
                           className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Performer Access"}
+                          {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Guild Master Access"}
                         </button>
                       ) : isRookie ? (
                         <button
@@ -368,7 +368,7 @@ function PricingPageContent() {
                           disabled={loading === PERFORMER_PRICE_ID}
                           className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Performer Access"}
+                          {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Guild Master Access"}
                         </button>
                       ) : isAdvanced ? (
                         <button

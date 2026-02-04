@@ -25,6 +25,7 @@ interface Post {
         last_name: string;
         avatar_url: string | null;
         is_pro: boolean;
+        is_guild_master?: boolean;
         level: number;
     };
     post_type: "stage" | "lab";

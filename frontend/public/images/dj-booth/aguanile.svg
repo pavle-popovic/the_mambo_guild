@@ -1,0 +1,13 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg3" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#059669"/>
+      <stop offset="100%" style="stop-color:#0891b2"/>
+    </linearGradient>
+  </defs>
+  <rect width="200" height="200" fill="url(#bg3)"/>
+  <circle cx="100" cy="100" r="60" fill="none" stroke="#000" stroke-width="8" opacity="0.2"/>
+  <circle cx="100" cy="100" r="20" fill="#000" opacity="0.3"/>
+  <text x="100" y="170" text-anchor="middle" font-family="serif" font-size="14" fill="#fff" font-weight="bold">Aguanile</text>
+  <text x="100" y="185" text-anchor="middle" font-family="sans-serif" font-size="10" fill="#fff" opacity="0.8">Héctor Lavoe</text>
+</svg>

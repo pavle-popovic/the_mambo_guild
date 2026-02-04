@@ -4,9 +4,10 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FaFire, FaBolt } from "react-icons/fa";
-import { motion } from "framer-motion";
+import { Star, Crown, Headphones, Video, Radio, ChevronDown } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { ClaveWallet } from "./ClaveWallet";
 import { WalletModal } from "./WalletModal";
 import { UISound } from "@/hooks/useUISound";
@@ -20,6 +21,8 @@ interface NavBarProps {
     level?: number;
     streak_count?: number;
     avatar_url?: string | null;
+    tier?: string;
+    role?: string;
   };
 }
 
@@ -27,10 +30,24 @@ export default function NavBar({ user }: NavBarProps) {
   const pathname = usePathname();
   const [mounted, setMounted] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
+  const [isStudioOpen, setIsStudioOpen] = useState(false);
+  const studioDropdownRef = useRef<HTMLDivElement>(null);
   const isAuthenticated = !!user;
+  const isGuildMaster = user?.tier?.toLowerCase() === "performer";
 
   useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (studioDropdownRef.current && !studioDropdownRef.current.contains(event.target as Node)) {
+        setIsStudioOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Palladium Era: Brass nav links with center-expanding underline
@@ -124,7 +141,172 @@ export default function NavBar({ user }: NavBarProps) {
                   />
                 )}
 
-                {/* XP and Streak removed from Navbar as per request (Hidden) */}
+                {/* Studio Dropdown - Available to all authenticated users */}
+                <div className="relative hidden md:block" ref={studioDropdownRef}>
+                  <button
+                    onClick={() => {
+                      setIsStudioOpen(!isStudioOpen);
+                      UISound.click();
+                    }}
+                    onMouseEnter={handleNavHover}
+                    className={cn(
+                      "flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all",
+                      isGuildMaster
+                        ? "bg-gradient-to-r from-amber-500/20 to-yellow-500/20 border border-amber-400/30 hover:from-amber-500/30 hover:to-yellow-500/30"
+                        : "bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-400/30 hover:from-purple-500/30 hover:to-indigo-500/30",
+                      isStudioOpen && "ring-2 ring-white/20"
+                    )}
+                  >
+                    {isGuildMaster ? (
+                      <Crown size={14} className="text-amber-400" />
+                    ) : (
+                      <Star size={14} className="text-purple-400" />
+                    )}
+                    <span className={cn(
+                      "text-xs font-bold",
+                      isGuildMaster ? "text-amber-300" : "text-purple-300"
+                    )}>
+                      Studio
+                    </span>
+                    <ChevronDown 
+                      size={12} 
+                      className={cn(
+                        "transition-transform duration-200",
+                        isGuildMaster ? "text-amber-400" : "text-purple-400",
+                        isStudioOpen && "rotate-180"
+                      )} 
+                    />
+                  </button>
+
+                  {/* Studio Dropdown Menu */}
+                  <AnimatePresence>
+                    {isStudioOpen && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                        transition={{ duration: 0.15, ease: "easeOut" }}
+                        className="absolute right-0 mt-2 w-64 rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 shadow-2xl shadow-black/50 overflow-hidden z-50"
+                      >
+                        <div className="p-2">
+                          {/* DJ Booth */}
+                          <Link
+                            href="/studio/dj-booth"
+                            onClick={() => setIsStudioOpen(false)}
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors group"
+                          >
+                            <div className={cn(
+                              "w-10 h-10 rounded-lg flex items-center justify-center",
+                              isGuildMaster 
+                                ? "bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/30"
+                                : "bg-gray-800 border border-gray-700"
+                            )}>
+                              <Headphones size={18} className={isGuildMaster ? "text-cyan-400" : "text-gray-500"} />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-white">DJ Booth</span>
+                                {!isGuildMaster && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-400">Practice tools & mixer</p>
+                            </div>
+                          </Link>
+
+                          {/* Coaching Corner */}
+                          <Link
+                            href="/studio/coaching"
+                            onClick={() => setIsStudioOpen(false)}
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors group"
+                          >
+                            <div className={cn(
+                              "w-10 h-10 rounded-lg flex items-center justify-center",
+                              isGuildMaster 
+                                ? "bg-gradient-to-br from-pink-500/20 to-rose-500/20 border border-pink-400/30"
+                                : "bg-gray-800 border border-gray-700"
+                            )}>
+                              <Video size={18} className={isGuildMaster ? "text-pink-400" : "text-gray-500"} />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-white">Coaching Corner</span>
+                                {!isGuildMaster && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-400">1-on-1 video feedback</p>
+                            </div>
+                          </Link>
+
+                          {/* Roundtable */}
+                          <Link
+                            href="/studio/roundtable"
+                            onClick={() => setIsStudioOpen(false)}
+                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors group"
+                          >
+                            <div className={cn(
+                              "w-10 h-10 rounded-lg flex items-center justify-center",
+                              isGuildMaster 
+                                ? "bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-400/30"
+                                : "bg-gray-800 border border-gray-700"
+                            )}>
+                              <Radio size={18} className={isGuildMaster ? "text-red-400" : "text-gray-500"} />
+                            </div>
+                            <div className="flex-1">
+                              <div className="flex items-center gap-2">
+                                <span className="text-sm font-semibold text-white">The Roundtable</span>
+                                {!isGuildMaster && (
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>
+                                )}
+                              </div>
+                              <p className="text-xs text-gray-400">Live calls & archives</p>
+                            </div>
+                          </Link>
+                        </div>
+
+                        {/* Guild Master Status */}
+                        <div className={cn(
+                          "px-4 py-3 border-t",
+                          isGuildMaster 
+                            ? "border-amber-500/20 bg-gradient-to-r from-amber-500/10 to-transparent"
+                            : "border-gray-700/50 bg-gray-800/50"
+                        )}>
+                          {isGuildMaster ? (
+                            <div className="flex items-center gap-2">
+                              <Crown size={14} className="text-amber-400" />
+                              <span className="text-xs font-semibold text-amber-300">Guild Master Access</span>
+                            </div>
+                          ) : (
+                            <Link 
+                              href="/pricing"
+                              onClick={() => setIsStudioOpen(false)}
+                              className="flex items-center justify-between group"
+                            >
+                              <span className="text-xs text-gray-400">Unlock all features</span>
+                              <span className="text-xs font-bold text-amber-400 group-hover:text-amber-300 transition-colors">
+                                Upgrade →
+                              </span>
+                            </Link>
+                          )}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Admin Link */}
+                {user.role?.toLowerCase() === "admin" && (
+                  <Link
+                    href="/admin"
+                    className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/20 border border-red-400/30 hover:bg-red-500/30 transition-all"
+                    onMouseEnter={handleNavHover}
+                  >
+                    <span className="text-xs font-bold text-red-300">Admin</span>
+                  </Link>
+                )}
+
+                {/* Profile Avatar */}
                 <MotionDiv
                   {...(mounted ? {
                     whileHover: { scale: 1.1 },
@@ -133,7 +315,17 @@ export default function NavBar({ user }: NavBarProps) {
                   } : {})}
                   onMouseEnter={handleNavHover}
                 >
-                  <Link href="/profile" className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden ring-2 ring-transparent hover:ring-[rgba(212,175,55,0.5)] transition-all flex items-center justify-center">
+                  <Link 
+                    href="/profile" 
+                    className={cn(
+                      "w-10 h-10 rounded-full bg-gray-700 overflow-hidden transition-all flex items-center justify-center",
+                      user.tier?.toLowerCase() === "performer" 
+                        ? "ring-2 ring-amber-400/50 hover:ring-amber-400"
+                        : user.tier?.toLowerCase() === "advanced"
+                        ? "ring-2 ring-blue-400/50 hover:ring-blue-400"
+                        : "ring-2 ring-transparent hover:ring-[rgba(212,175,55,0.5)]"
+                    )}
+                  >
                     {user.avatar_url ? (
                       <Image
                         src={user.avatar_url}

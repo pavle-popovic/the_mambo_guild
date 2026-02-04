@@ -274,3 +274,66 @@ h6 {
 .holographic-card:hover {
   box-shadow: var(--stage-shadow-hover);
 }
+
+/* ===================================
+   Guild Master VIP Styling
+   =================================== */
+
+/* Animated golden glow for Guild Master avatars */
+.guild-master-glow {
+  animation: guildMasterPulse 3s ease-in-out infinite;
+}
+
+@keyframes guildMasterPulse {
+  0%, 100% {
+    box-shadow: 
+      0 0 8px rgba(251, 191, 36, 0.3),
+      0 0 15px rgba(251, 191, 36, 0.2),
+      0 0 25px rgba(251, 191, 36, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 0 12px rgba(251, 191, 36, 0.5),
+      0 0 25px rgba(251, 191, 36, 0.35),
+      0 0 40px rgba(251, 191, 36, 0.2);
+  }
+}
+
+/* Guild Master comment highlight - subtle gold tint */
+.guild-master-comment {
+  background: linear-gradient(135deg, 
+    rgba(251, 191, 36, 0.05) 0%, 
+    rgba(245, 158, 11, 0.03) 100%
+  );
+  border-left: 2px solid rgba(251, 191, 36, 0.4);
+  position: relative;
+}
+
+.guild-master-comment::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(
+    ellipse at top left,
+    rgba(251, 191, 36, 0.08) 0%,
+    transparent 50%
+  );
+  pointer-events: none;
+}
+
+/* Guild Master post card enhancement */
+.guild-master-post {
+  border: 1px solid rgba(251, 191, 36, 0.3) !important;
+  background: linear-gradient(135deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(251, 191, 36, 0.02) 100%
+  );
+}
+
+.guild-master-post:hover {
+  border-color: rgba(251, 191, 36, 0.5) !important;
+  box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
+}

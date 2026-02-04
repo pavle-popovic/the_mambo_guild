@@ -32,7 +32,7 @@ const plans = [
   },
   {
     id: "full-access",
-    name: "Full Access",
+    name: "Pro",
     price: "€29",
     period: "/mo",
     description: "Unlock all courses",
@@ -42,7 +42,7 @@ const plans = [
       { text: "Advanced Partnerwork", included: true },
       { text: "Community Challenges", included: true },
     ],
-    cta: "Start 7-Day Free Trial",
+    cta: "Start Pro Access",
     highlighted: true,
     priceId: ADVANCED_PRICE_ID,
     // Add custom styling for visual emphasis
@@ -51,22 +51,22 @@ const plans = [
   },
   {
     id: "performer",
-    name: "Performer",
+    name: "Guild Master",
     price: "€49",
     period: "/mo",
     description: "For serious students",
     features: [
-      { text: "Everything in Advanced", included: true },
+      { text: "Everything in Pro", included: true },
       { text: "1 Video Review / Month", included: true },
       { text: "Direct Chat with Instructors", included: true },
-      { text: "Certified Badge on Profile", included: true },
+      { text: "Guild Master Badge on Profile", included: true },
       {
         text: "Pro Mastery Features Coming Soon: Practice Playlist Builder, DJ Booth, Smart Looper, Legends Vault, Precision Player",
         included: true,
         isComingSoon: true
       },
     ],
-    cta: "Get Performer Access",
+    cta: "Get Guild Master Access",
     highlighted: false,
     priceId: PERFORMER_PRICE_ID,
   },

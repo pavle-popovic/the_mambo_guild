@@ -5,36 +5,37 @@ import type { MuxVideoPlayerHandle } from "./MuxVideoPlayer";
 import SpeedControl from "./pro-controls/SpeedControl";
 import FrameByFrame from "./pro-controls/FrameByFrame";
 import ABLooper from "./pro-controls/ABLooper";
-import UpgradePrompt from "./pro-controls/UpgradePrompt";
-import { FaCrown, FaRedo } from "react-icons/fa";
+import { FaSlidersH, FaRedo } from "react-icons/fa";
+import { SlidersHorizontal } from "lucide-react";
 
-interface ProVideoControlsProps {
+interface VideoControlsProps {
   playerRef: React.RefObject<MuxVideoPlayerHandle | null>;
-  isPerformer: boolean;
   duration: number;
-  onUpgradeClick?: () => void;
   onCollapse?: () => void;
+  variant?: "sidebar" | "mobile";
 }
 
 // 1 frame at approximately 25fps
 const FRAME_DURATION = 0.04;
 
-export default function ProVideoControls({
+/**
+ * Video Controls - Available to ALL users
+ * Includes: Speed Control, Frame-by-Frame, A-B Looper
+ */
+export default function VideoControls({
   playerRef,
-  isPerformer,
   duration,
-  onUpgradeClick,
   variant = "sidebar",
   onCollapse,
-}: ProVideoControlsProps & { variant?: "sidebar" | "mobile" }) {
+}: VideoControlsProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState<"speed" | "loop" | "frames" | null>(null);
 
-  // Keyboard shortcuts (keep existing logic)
+  // Keyboard shortcuts for frame stepping (available to all users now)
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (!isPerformer || !playerRef.current) return;
+      if (!playerRef.current) return;
       if (document.activeElement?.tagName === "INPUT" || document.activeElement?.tagName === "TEXTAREA") return;
       if (playerRef.current.isPaused()) {
         if (e.key === ",") {
@@ -48,23 +49,13 @@ export default function ProVideoControls({
         }
       }
     },
-    [isPerformer, playerRef]
+    [playerRef]
   );
 
   useEffect(() => {
-    if (isPerformer) {
-      window.addEventListener("keydown", handleKeyDown);
-      return () => window.removeEventListener("keydown", handleKeyDown);
-    }
-  }, [isPerformer, handleKeyDown]);
-
-  if (!isPerformer) {
-    return (
-      <div className="p-4 bg-gray-900 rounded-xl border border-gray-800">
-        <UpgradePrompt onUpgrade={onUpgradeClick} />
-      </div>
-    );
-  }
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleKeyDown]);
 
   // --- MOBILE STICKY LAYOUT ---
   if (variant === "mobile") {
@@ -125,8 +116,8 @@ export default function ProVideoControls({
     <div className="flex flex-col gap-6 w-full">
       <div className="flex items-center justify-between mb-2">
         <div className="flex items-center gap-2">
-          <FaCrown className="text-mambo-gold" />
-          <span className="text-xs font-bold text-mambo-gold uppercase tracking-wider">Pro Controls</span>
+          <SlidersHorizontal size={16} className="text-mambo-blue" />
+          <span className="text-xs font-bold text-white/80 uppercase tracking-wider">Video Controls</span>
         </div>
         {onCollapse && (
           <button

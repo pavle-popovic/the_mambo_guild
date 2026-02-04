@@ -60,12 +60,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
-  const refreshUser = async () => {
+  const refreshUser = async (silent: boolean = false) => {
     try {
       const profile = await apiClient.getProfile();
       setUser(profile);
     } catch (error) {
-      console.error("Failed to refresh user:", error);
+      // Only log errors if we're not in silent mode (i.e., user-initiated refresh)
+      if (!silent) {
+        console.error("Failed to refresh user:", error);
+      }
       setUser(null);
       apiClient.setToken(null);
     }
@@ -88,11 +91,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       // Try to fetch user profile - this works with both:
       // 1. Bearer token from localStorage
       // 2. httpOnly cookie (new secure method)
+      // Use silent mode to suppress expected errors when no user is logged in
       try {
-        await refreshUser();
+        await refreshUser(true); // silent = true for initial check
       } catch (error) {
         // Auth failed - clear any stale localStorage token
-        console.debug("Auth check failed, clearing state");
+        // This is expected when no user is logged in, so we don't log it
         localStorage.removeItem("auth_token");
         apiClient.setToken(null);
         setUser(null);

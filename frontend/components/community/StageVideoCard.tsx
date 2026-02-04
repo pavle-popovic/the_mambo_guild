@@ -6,6 +6,7 @@ import { Heart, MessageCircle, Award, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
 import { UISound } from "@/hooks/useUISound";
+import GuildMasterAvatar from "@/components/ui/GuildMasterAvatar";
 
 interface Post {
     id: string;
@@ -15,6 +16,7 @@ interface Post {
         last_name: string;
         avatar_url: string | null;
         is_pro: boolean;
+        is_guild_master?: boolean;
         level: number;
     };
     post_type: "stage" | "lab";
@@ -159,27 +161,16 @@ export default function StageVideoCard({
                                 </div>
                             </div>
 
-                            {/* User Avatar - Gold Ring */}
-                            <div
-                                className={cn(
-                                    "w-9 h-9 rounded-full overflow-hidden flex items-center justify-center text-black font-bold text-xs border-2 border-[#FCE205] shadow-[0_0_10px_rgba(252,226,5,0.4)]",
-                                    post.user.is_pro && "ring-2 ring-purple-500 ring-offset-1 ring-offset-black"
-                                )}
-                            >
-                                {post.user.avatar_url ? (
-                                    <Image
-                                        src={post.user.avatar_url}
-                                        alt={post.user.first_name}
-                                        width={36}
-                                        height={36}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full bg-gradient-to-br from-[#FCE205] to-[#D4AF37] flex items-center justify-center">
-                                        {post.user.first_name[0]}
-                                    </div>
-                                )}
-                            </div>
+                            {/* User Avatar - Guild Master styling */}
+                            <GuildMasterAvatar
+                                avatarUrl={post.user.avatar_url}
+                                firstName={post.user.first_name}
+                                lastName={post.user.last_name}
+                                isPro={post.user.is_pro}
+                                isGuildMaster={post.user.is_guild_master}
+                                size="sm"
+                                showBadge={true}
+                            />
                         </div>
                     </div>
                 )}

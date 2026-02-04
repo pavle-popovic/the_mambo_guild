@@ -44,7 +44,7 @@ export default function UpgradePrompt({ onUpgrade }: UpgradePromptProps) {
         </div>
         <h3 className="text-lg font-bold text-white mb-1">Unlock Pro Mastery Tools</h3>
         <p className="text-sm text-gray-400">
-          Upgrade to Performer to access advanced video controls
+          Upgrade to Guild Master to access advanced video controls
         </p>
       </div>
 
@@ -78,7 +78,7 @@ export default function UpgradePrompt({ onUpgrade }: UpgradePromptProps) {
           flex items-center justify-center gap-2"
       >
         <FaCrown />
-        Upgrade to Performer
+        Upgrade to Guild Master
       </button>
 
       {/* Subtle hint */}

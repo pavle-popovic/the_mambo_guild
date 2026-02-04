@@ -1,0 +1,243 @@
+{
+  "son-montuno-suave": {
+    "id": "son-montuno-suave",
+    "title": "Son Montuno - Verse (Suave)",
+    "clave_direction": "2-3",
+    "bpm": 90,
+    "description": "The 'Verse' section of a salsa song is where the story begins. The percussionists use wood sounds (cascara on timbales, martillo on bongos) to create a smooth, flowing groove that supports the vocals.",
+    "musical_context": {
+      "genre": ["Salsa", "Son", "Cuban"],
+      "section_usage": ["Verse (Cuerpo)", "Intro", "Bridge"],
+      "dance_feel": "This is the storytelling section. Dancers should feel the smooth, flowing rhythm. The clave is subtle but always present."
+    },
+    "instruments": [
+      {
+        "name": "Timbales (Cascara)",
+        "role": "The Texture",
+        "pattern_description": "Playing on the side of the drum (cascara) creates a wood-like texture. The pattern emphasizes the off-beats.",
+        "tip": "The cascara pattern helps you feel the syncopation. Listen for the 'and' of beats 2 and 4.",
+        "audio_file": "/audio/samples/timbal_verse.wav"
+      },
+      {
+        "name": "Bongo (Martillo)",
+        "role": "The Accent",
+        "pattern_description": "The 'hammer' pattern alternates between high and low bongo drums, creating a constant rhythmic pulse.",
+        "tip": "The bongo martillo is like a metronome - it keeps the tempo steady. Use it to find your '1'.",
+        "audio_file": "/audio/samples/bongo_martillo.wav"
+      },
+      {
+        "name": "Conga (Tumbao)",
+        "role": "The Heartbeat",
+        "pattern_description": "Standard 1-drum tumbao pattern. The 'Slap' is on beat 2, and the 'Open Tones' are on beat 4 and 4-and.",
+        "tip": "Listen to the 'Slap' to find your timing for Copas and checks. The conga is the foundation.",
+        "audio_file": "/audio/samples/conga_tumbao.wav"
+      },
+      {
+        "name": "Piano (Comping)",
+        "role": "The Harmony",
+        "pattern_description": "Simple chord comping that supports the melody. Less syncopated than the montuno section.",
+        "tip": "The piano in the verse is more supportive. Save your energy for when the montuno kicks in!",
+        "audio_file": "/audio/samples/piano_comping.wav"
+      }
+    ],
+    "audio_files": {
+      "full_mix": "/audio/samples/son_montuno_verse_full.wav",
+      "percussion": "/audio/samples/son_montuno_verse_perc.wav"
+    }
+  },
+  "son-montuno-fuerte": {
+    "id": "son-montuno-fuerte",
+    "title": "Son Montuno - Montuno Section (High Energy)",
+    "clave_direction": "2-3",
+    "bpm": 90,
+    "description": "The 'Montuno' is the call-and-response section of a salsa song where the energy peaks. The percussionists switch from wood (cascara) to metal (bells) to drive the dancers.",
+    "musical_context": {
+      "genre": ["Salsa", "Son", "Timba"],
+      "section_usage": ["Coro (Chorus)", "Mambo Section", "Piano Solo"],
+      "dance_feel": "This is when you do your turns and shines. The heavy cowbell marks the beat 1, 3, 5, 7. Energy is high!"
+    },
+    "instruments": [
+      {
+        "name": "Congas (2-Drum Tumbao)",
+        "role": "The Heartbeat",
+        "pattern_description": "More complex tumbao with two drums. The 'Slap' is on beat 2, and the 'Open Tones' are on beat 4 and 4-and.",
+        "tip": "Listen to the 'Slap' to find your timing for Copas and checks. The energy is higher here.",
+        "audio_file": "/audio/samples/conga_montuno.wav"
+      },
+      {
+        "name": "Bongo Bell (Campana)",
+        "role": "The Drive",
+        "pattern_description": "Played by the Bongocero during the chorus. It emphasizes the downbeats (1, 3, 5, 7).",
+        "tip": "If you get lost, find the loud cowbell. It is usually marking the main pulse. This is your anchor!",
+        "audio_file": "/audio/samples/cowbell_montuno.wav"
+      },
+      {
+        "name": "Timbales (Mambo Bell)",
+        "role": "The Energy",
+        "pattern_description": "Switches from cascara to the mambo bell (cowbell) on the timbales. Creates the driving energy.",
+        "tip": "The mambo bell is what makes dancers want to turn and shine. Feel that energy!",
+        "audio_file": "/audio/samples/timbal_mambo_bell.wav"
+      },
+      {
+        "name": "Piano (Montuno)",
+        "role": "The Harmonic Rhythm",
+        "pattern_description": "A syncopated arpeggio that outlines the chords. It creates tension by rarely playing on beat 1.",
+        "tip": "Dancers often mistake the Piano's 'and of 1' for the actual '1'. Be careful! The piano anticipates the beat.",
+        "audio_file": "/audio/samples/piano_montuno.wav"
+      }
+    ],
+    "audio_files": {
+      "full_mix": "/audio/samples/son_montuno_montuno_full.wav",
+      "percussion": "/audio/samples/son_montuno_montuno_perc.wav"
+    }
+  },
+  "cha-cha-cha": {
+    "id": "cha-cha-cha",
+    "title": "Cha Cha Chá",
+    "clave_direction": "2-3",
+    "bpm": 120,
+    "description": "Cha Cha Chá is a Cuban dance rhythm that's slower than salsa but has a distinctive 'cha-cha-cha' pattern. It's perfect for beginners to learn timing.",
+    "musical_context": {
+      "genre": ["Cha Cha Chá", "Cuban", "Latin"],
+      "section_usage": ["All Sections", "Intro", "Verse", "Chorus"],
+      "dance_feel": "Slower and more relaxed than salsa. The 'cha-cha-cha' happens on beats 4-and-1. Perfect for learning the basics."
+    },
+    "instruments": [
+      {
+        "name": "Güiro (Down-Up Stroke)",
+        "role": "The Signature Sound",
+        "pattern_description": "The güiro creates the distinctive 'cha-cha-cha' sound with down-up scraping strokes.",
+        "tip": "The güiro pattern is what makes cha-cha-chá recognizable. Listen for the scraping sound on beats 4-and-1.",
+        "audio_file": "/audio/samples/guiro_cha_cha.wav"
+      },
+      {
+        "name": "Conga (Tumbao - No Slap)",
+        "role": "The Foundation",
+        "pattern_description": "Simpler tumbao pattern without the heavy slap. More open tones for a lighter feel.",
+        "tip": "The conga in cha-cha is lighter than salsa. Focus on the open tones.",
+        "audio_file": "/audio/samples/conga_cha_cha.wav"
+      },
+      {
+        "name": "Timbales (Cha Cha Bell)",
+        "role": "The Pulse",
+        "pattern_description": "Small bell pattern that marks the main beats. Less aggressive than mambo bell.",
+        "tip": "The cha-cha bell is softer than the mambo bell. It marks the tempo without overwhelming.",
+        "audio_file": "/audio/samples/timbal_cha_cha.wav"
+      }
+    ],
+    "audio_files": {
+      "full_mix": "/audio/samples/cha_cha_full.wav",
+      "percussion": "/audio/samples/cha_cha_perc.wav"
+    }
+  },
+  "mambo-classic": {
+    "id": "mambo-classic",
+    "title": "Mambo (Classic Big Band)",
+    "clave_direction": "2-3",
+    "bpm": 200,
+    "description": "Mambo is the fast-paced, high-energy section where horns take over. This is the 'shines' section where dancers show off their footwork.",
+    "musical_context": {
+      "genre": ["Mambo", "Big Band", "Salsa"],
+      "section_usage": ["Mambo Section", "Horn Solos", "Shines"],
+      "dance_feel": "High energy! This is where you do your shines and fancy footwork. The tempo is fast and the horns drive the energy."
+    },
+    "instruments": [
+      {
+        "name": "Sax/Brass (Moñas)",
+        "role": "The Melody",
+        "pattern_description": "Horn riffs (moñas) that create the melodic hooks. These are the 'hooks' that dancers respond to.",
+        "tip": "The horns tell you when to turn and shine. Listen for the melodic phrases.",
+        "audio_file": "/audio/samples/horns_mambo.wav"
+      },
+      {
+        "name": "Timbales (Songo or Mambo Bell)",
+        "role": "The Drive",
+        "pattern_description": "Aggressive bell pattern that drives the energy. Can be songo pattern or straight mambo bell.",
+        "tip": "The timbales in mambo are LOUD. They drive the energy and mark every beat.",
+        "audio_file": "/audio/samples/timbal_mambo.wav"
+      },
+      {
+        "name": "Bass (Syncopated Tumbao)",
+        "role": "The Foundation",
+        "pattern_description": "Syncopated bass line that anticipates the beat. Creates the 'lift' that makes dancers want to move.",
+        "tip": "The bass in mambo is very syncopated. It 'anticipates' the beat, creating forward momentum.",
+        "audio_file": "/audio/samples/bass_mambo.wav"
+      }
+    ],
+    "audio_files": {
+      "full_mix": "/audio/samples/mambo_full.wav",
+      "percussion": "/audio/samples/mambo_perc.wav"
+    }
+  },
+  "bolero": {
+    "id": "bolero",
+    "title": "Bolero / Bachata",
+    "clave_direction": "2-3",
+    "bpm": 70,
+    "description": "Bolero is the romantic, slow section of salsa songs. It's also the foundation of bachata. Perfect for learning timing at a slower pace.",
+    "musical_context": {
+      "genre": ["Bolero", "Bachata", "Romantic"],
+      "section_usage": ["Intro", "Romantic Sections", "Ballads"],
+      "dance_feel": "Slow and romantic. This is the 'close embrace' section. Perfect for beginners to learn the basic step."
+    },
+    "instruments": [
+      {
+        "name": "Conga (Bolero Pattern)",
+        "role": "The Pulse",
+        "pattern_description": "Simplified conga pattern with emphasis on beats 1 and 3. Much slower than salsa tumbao.",
+        "tip": "The bolero conga is slow and steady. Use it to practice your basic step timing.",
+        "audio_file": "/audio/samples/conga_bolero.wav"
+      },
+      {
+        "name": "Maracas (Constant Shaker)",
+        "role": "The Texture",
+        "pattern_description": "Constant shaker pattern that provides texture. Steady and consistent.",
+        "tip": "The maracas provide a steady pulse. They're like a metronome for the slow tempo.",
+        "audio_file": "/audio/samples/maracas_bolero.wav"
+      },
+      {
+        "name": "Bongo (Variations)",
+        "role": "The Accent",
+        "pattern_description": "Varied bongo patterns that add interest without overwhelming the slow tempo.",
+        "tip": "The bongo in bolero is subtle. It adds color without dominating.",
+        "audio_file": "/audio/samples/bongo_bolero.wav"
+      }
+    ],
+    "audio_files": {
+      "full_mix": "/audio/samples/bolero_full.wav",
+      "percussion": "/audio/samples/bolero_perc.wav"
+    }
+  },
+  "afro-6-8": {
+    "id": "afro-6-8",
+    "title": "6/8 (Afro-Cuban Rumba)",
+    "clave_direction": "6-8",
+    "bpm": 120,
+    "description": "6/8 time is the foundation of Afro-Cuban rumba and many folkloric rhythms. It's polyrhythmic and complex, but essential for understanding salsa's roots.",
+    "musical_context": {
+      "genre": ["Rumba", "Afro-Cuban", "Folklore"],
+      "section_usage": ["Intro", "Breaks", "Folkloric Sections"],
+      "dance_feel": "Complex and polyrhythmic. This is the 'roots' of salsa. Feel the 6/8 pulse - it's different from 4/4!"
+    },
+    "instruments": [
+      {
+        "name": "Clave (6/8 Clave)",
+        "role": "The Foundation",
+        "pattern_description": "6/8 clave pattern that creates the polyrhythmic foundation. Different from 2-3 or 3-2 son clave.",
+        "tip": "The 6/8 clave feels different from 4/4. Count it as '1-2-3, 4-5-6' instead of '1-2-3-4'.",
+        "audio_file": "/audio/samples/clave_6_8.wav"
+      },
+      {
+        "name": "Conga (Open Tones - Polyrhythm)",
+        "role": "The Complexity",
+        "pattern_description": "Polyrhythmic conga pattern with open tones that create cross-rhythms against the 6/8 clave.",
+        "tip": "The conga in 6/8 creates polyrhythms. Don't try to count it - just feel it!",
+        "audio_file": "/audio/samples/conga_6_8.wav"
+      }
+    ],
+    "audio_files": {
+      "full_mix": "/audio/samples/afro_6_8_full.wav",
+      "percussion": "/audio/samples/afro_6_8_perc.wav"
+    }
+  }
+}

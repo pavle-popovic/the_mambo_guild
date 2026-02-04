@@ -229,6 +229,12 @@ class ApiClient {
             // If we can't read the text either, use the default message
           }
         }
+        
+        // For 401 errors, use a more user-friendly message
+        if (response.status === 401) {
+          errorMessage = "Authentication required. Please log in.";
+        }
+        
         throw new Error(errorMessage);
       }
 
@@ -978,6 +984,7 @@ class ApiClient {
         last_name: string;
         avatar_url: string | null;
         is_pro: boolean;
+        is_guild_master?: boolean;
         level: number;
       };
       post_type: string;
@@ -1008,6 +1015,7 @@ class ApiClient {
         last_name: string;
         avatar_url: string | null;
         is_pro: boolean;
+        is_guild_master?: boolean;
         level: number;
       };
       post_type: string;
@@ -1030,6 +1038,7 @@ class ApiClient {
           last_name: string;
           avatar_url: string | null;
           is_pro: boolean;
+          is_guild_master?: boolean;
           level: number;
         };
         content: string;
@@ -1212,6 +1221,209 @@ class ApiClient {
 
   async getPublicProfile(username: string) {
     return this.request<UserProfile>(`/api/users/public/${username}`);
+  }
+
+  // ============================================
+  // Secure Downloads API
+  // ============================================
+
+  async getDownloadStatus() {
+    return this.request<{
+      downloads_used: number;
+      downloads_remaining: number;
+      downloads_limit: number;
+    }>("/api/downloads/status");
+  }
+
+  async getLessonDownloadUrl(lessonId: string) {
+    return this.request<{
+      download_url: string;
+      expires_in_seconds: number;
+      downloads_remaining: number;
+      warning: string;
+    }>(`/api/downloads/lesson/${lessonId}`, {
+      method: "POST",
+    });
+  }
+
+  async getCommunityVideoDownloadUrl(postId: string) {
+    return this.request<{
+      download_url: string;
+      expires_in_seconds: number;
+      downloads_remaining: number;
+      warning: string;
+    }>(`/api/downloads/community/${postId}`, {
+      method: "POST",
+    });
+  }
+
+  // ============================================
+  // Streak Freezes API
+  // ============================================
+
+  async getFreezeStatus() {
+    return this.request<{
+      weekly_freebie_available: boolean;
+      inventory_freezes: number;
+      claves_balance: number;
+      can_afford_freeze: boolean;
+      freeze_cost: number;
+      next_weekly_reset: string | null;
+      streak_count: number;
+    }>("/api/claves/freeze-status");
+  }
+
+  async buyStreakFreeze() {
+    return this.request<{
+      success: boolean;
+      message: string;
+      inventory_freezes: number;
+      claves_balance: number | null;
+    }>("/api/claves/buy-freeze", {
+      method: "POST",
+    });
+  }
+
+  async repairStreakWithClaves() {
+    return this.request<{
+      saved: boolean;
+      method: string | null;
+      message: string;
+      streak_count: number;
+    }>("/api/claves/repair-streak", {
+      method: "POST",
+    });
+  }
+
+  // ============================================
+  // Premium (Guild Master) API
+  // ============================================
+
+  // Live Calls (The Roundtable)
+  async getLiveCallStatus() {
+    return this.request<{
+      state: "no_upcoming" | "upcoming" | "live";
+      call: {
+        id: string;
+        title: string;
+        description: string | null;
+        scheduled_at: string;
+        duration_minutes: number;
+        zoom_link: string | null;
+      } | null;
+      countdown_seconds: number | null;
+      message: string;
+    }>("/api/premium/live/status");
+  }
+
+  async getPastRecordings() {
+    return this.request<Array<{
+      id: string;
+      title: string;
+      description: string | null;
+      recorded_at: string;
+      duration_minutes: number;
+      mux_playback_id: string;
+      thumbnail_url: string | null;
+    }>>("/api/premium/live/recordings");
+  }
+
+  // Weekly Archives (Cloudflare R2)
+  async getWeeklyArchives() {
+    return this.request<Array<{
+      id: string;
+      title: string;
+      description: string | null;
+      recorded_at: string;
+      duration_minutes: number | null;
+      topics: string[];
+      thumbnail_url: string | null;
+    }>>("/api/premium/archives");
+  }
+
+  async getArchiveSignedUrl(archiveId: string) {
+    return this.request<{
+      url: string;
+      expires_in: number;
+    }>(`/api/premium/archives/${archiveId}/signed-url`);
+  }
+
+  // Coaching (1-on-1 Feedback)
+  async getCoachingStatus() {
+    return this.request<{
+      can_submit: boolean;
+      current_submission: {
+        id: string;
+        status: string;
+        video_mux_playback_id: string;
+        specific_question: string | null;
+        submitted_at: string;
+        feedback_video_mux_playback_id: string | null;
+        coach_notes: string | null;
+      } | null;
+      next_credit_date: string | null;
+      message: string;
+    }>("/api/premium/coaching/status");
+  }
+
+  async submitCoachingVideo(data: {
+    video_mux_playback_id: string;
+    video_mux_asset_id: string;
+    video_duration_seconds?: number;
+    specific_question?: string;
+    allow_social_share?: boolean;
+  }) {
+    return this.request<{
+      id: string;
+      status: string;
+      submitted_at: string;
+    }>("/api/premium/coaching/submit", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async getMyCoachingSubmissions() {
+    return this.request<Array<{
+      id: string;
+      status: string;
+      video_mux_playback_id: string;
+      specific_question: string | null;
+      submitted_at: string;
+      feedback_video_url: string | null;
+      feedback_notes: string | null;
+    }>>("/api/premium/coaching/my-submissions");
+  }
+
+  // DJ Booth
+  async getDJBoothTracks() {
+    return this.request<Array<{
+      id: string;
+      title: string;
+      artist: string;
+      album: string | null;
+      year: number | null;
+      duration_seconds: number;
+      bpm: number | null;
+      cover_image_url: string | null;
+      full_mix_url: string;
+      percussion_url: string;
+      piano_bass_url: string;
+      vocals_brass_url: string;
+    }>>("/api/premium/dj-booth/tracks");
+  }
+
+  async getDJBoothPreview() {
+    return this.request<Array<{
+      id: string;
+      title: string;
+      artist: string;
+      album: string | null;
+      duration_seconds: number;
+      bpm: number | null;
+      cover_image_url: string | null;
+      is_locked: boolean;
+    }>>("/api/premium/dj-booth/preview");
   }
 }
 

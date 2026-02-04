@@ -4,6 +4,7 @@ import "./globals.css";
 import GlobalAudioPlayer from "@/components/GlobalAudioPlayer";
 import { AuthProvider } from "@/contexts/AuthContext";
 import StarryBackground from "@/components/ui/StarryBackground";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -35,6 +36,7 @@ export default function RootLayout({
         <AuthProvider>
           {children}
           <GlobalAudioPlayer />
+          <Toaster position="top-right" richColors />
         </AuthProvider>
       </body>
     </html>

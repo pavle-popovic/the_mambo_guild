@@ -8,7 +8,8 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import QuestLogSidebar from "@/components/QuestLogSidebar";
 import MuxVideoPlayer, { type MuxVideoPlayerHandle } from "@/components/MuxVideoPlayer";
-import ProVideoControls from "@/components/ProVideoControls";
+import VideoControls from "@/components/ProVideoControls";
+import DownloadButton from "@/components/DownloadButton";
 import SuccessNotification from "@/components/SuccessNotification";
 import AuthPromptModal from "@/components/AuthPromptModal";
 import QuizResultModal from "@/components/QuizResultModal";
@@ -891,6 +892,17 @@ export default function LessonPage() {
                           {lesson.description || "Master the fundamentals of this lesson."}
                         </p>
                       )}
+                      
+                      {/* Download Button - Save bandwidth by downloading for offline practice */}
+                      {lesson.mux_asset_id && (
+                        <div className="mt-6 pt-6 border-t border-gray-800">
+                          <DownloadButton
+                            lessonId={lesson.id}
+                            lessonTitle={lesson.title}
+                            variant="default"
+                          />
+                        </div>
+                      )}
                     </div>
                   )}
                   {activeTab === "discuss" && (
@@ -930,11 +942,9 @@ export default function LessonPage() {
                 <div className="h-full flex flex-col">
                   {isVideoLesson && lesson.mux_playback_id && (
                     <div className="flex-shrink-0 p-4 border-b border-white/10 bg-zinc-900/40 backdrop-blur-md z-20">
-                      <ProVideoControls
+                      <VideoControls
                         playerRef={videoPlayerRef}
-                        isPerformer={user?.tier?.toLowerCase() === "performer"}
                         duration={videoDuration}
-                        onUpgradeClick={() => router.push("/pricing")}
                         variant="sidebar"
                         onCollapse={() => setIsSidebarOpen(false)}
                       />
@@ -1027,11 +1037,9 @@ export default function LessonPage() {
         {/* MOBILE STICKY CONTROLS */}
         {isVideoLesson && lesson.mux_playback_id && (
           <div className="lg:hidden fixed bottom-0 left-0 w-full z-50">
-            <ProVideoControls
+            <VideoControls
               playerRef={videoPlayerRef}
-              isPerformer={user?.tier?.toLowerCase() === "performer"}
               duration={videoDuration}
-              onUpgradeClick={() => router.push("/pricing")}
               variant="mobile"
             />
           </div>

@@ -22,7 +22,7 @@ const testimonials = [
     quote:
       "Having real instructors review my videos changed everything. The personalized feedback accelerated my progress like nothing else.",
     name: "Carlos R.",
-    role: "Performer Tier",
+    role: "Guild Master Tier",
     avatar: null,
     rating: 5,
   },
