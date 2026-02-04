@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Headphones, Lock, Crown, ArrowLeft, Drum } from "lucide-react";
+import { Headphones, Lock, Crown, ArrowLeft, Drum, Volume2, Music } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
