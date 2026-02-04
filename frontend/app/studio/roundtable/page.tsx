@@ -4,8 +4,8 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { 
-  Radio, Calendar, Clock, Play, Pause, Users, Crown, Lock, 
+import {
+  Radio, Calendar, Clock, Play, Pause, Users, Crown, Lock,
   ArrowLeft, ExternalLink, Volume2, VolumeX, Maximize,
   ChevronRight, Tag
 } from "lucide-react";
@@ -34,7 +34,7 @@ interface WeeklyArchive {
   title: string;
   description: string | null;
   recorded_at: string;
-  duration_minutes: number;
+  duration_minutes: number | null;
   topics: string[];
   thumbnail_url: string | null;
 }
@@ -54,11 +54,11 @@ function LockedPage({ user }: { user: any }) {
             <div className="w-24 h-24 rounded-full bg-gradient-to-br from-amber-500/20 to-yellow-500/20 border border-amber-400/30 flex items-center justify-center mx-auto mb-6">
               <Lock size={40} className="text-amber-400" />
             </div>
-            
+
             <h1 className="text-4xl font-bold text-white mb-4">
               The Roundtable is for Guild Masters
             </h1>
-            
+
             <p className="text-lg text-gray-400 mb-8 max-w-md mx-auto">
               Join our exclusive weekly live sessions, access the full archive of past discussions, and connect directly with instructors.
             </p>
@@ -104,7 +104,7 @@ export default function RoundtablePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const isGuildMaster = user?.tier?.toLowerCase() === "performer";
-  
+
   const [liveStatus, setLiveStatus] = useState<LiveCallStatus | null>(null);
   const [archives, setArchives] = useState<WeeklyArchive[]>([]);
   const [selectedArchive, setSelectedArchive] = useState<WeeklyArchive | null>(null);
@@ -112,7 +112,7 @@ export default function RoundtablePage() {
   const [isLoadingArchives, setIsLoadingArchives] = useState(true);
   const [isLoadingVideo, setIsLoadingVideo] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
-  
+
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
@@ -235,7 +235,7 @@ export default function RoundtablePage() {
     const hours = Math.floor((seconds % 86400) / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
-    
+
     if (days > 0) {
       return `${days}d ${hours}h ${mins}m`;
     }
@@ -307,8 +307,8 @@ export default function RoundtablePage() {
               liveStatus?.state === "live"
                 ? "bg-gradient-to-br from-red-500/20 to-orange-500/20 border-red-400/30"
                 : liveStatus?.state === "upcoming"
-                ? "bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border-amber-400/30"
-                : "bg-gray-800/50 border-gray-700"
+                  ? "bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border-amber-400/30"
+                  : "bg-gray-800/50 border-gray-700"
             )}>
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                 <div>
@@ -424,7 +424,7 @@ export default function RoundtablePage() {
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                           <span>{new Date(selectedArchive.recorded_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
                           <span>•</span>
-                          <span>{selectedArchive.duration_minutes} mins</span>
+                          <span>{selectedArchive.duration_minutes ?? '--'} mins</span>
                         </div>
                         {selectedArchive.topics.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-3">
@@ -507,10 +507,10 @@ export default function RoundtablePage() {
                           <Radio size={32} className="text-red-400/50" />
                         </div>
                       )}
-                      
+
                       {/* Duration Badge */}
                       <div className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 text-xs font-mono text-white">
-                        {archive.duration_minutes} min
+                        {archive.duration_minutes ?? '--'} min
                       </div>
 
                       {/* Play Overlay */}
