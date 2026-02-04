@@ -191,8 +191,10 @@ def process_daily_login(user_id: str, db: Session) -> dict:
     profile.last_daily_claim = today
     
     # Update streak (CRITICAL: This increments the streak_count)
+    # Now also handles streak freezes
     from services import gamification_service
-    current_streak = gamification_service.update_streak(user_id, db)
+    streak_result = gamification_service.update_streak(user_id, db)
+    current_streak = streak_result["streak_count"]
     
     # Check for streak bonus
     streak_bonus = None

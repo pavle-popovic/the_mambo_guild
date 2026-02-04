@@ -248,3 +248,56 @@ def get_all_badges_for_user(user_id: str, db: Session):
         -(x['requirement_value'] or 0)
     ))
     return results
+
+
+def award_subscription_badge(user_id: str, tier: str, db: Session):
+    """
+    Award the appropriate subscription badge when user subscribes.
+    Called from payment webhook or subscription creation.
+    
+    Args:
+        user_id: User's UUID
+        tier: 'advanced' or 'performer'
+        db: Database session
+    """
+    badge_id_map = {
+        "advanced": "pro_member",
+        "performer": "guild_master"
+    }
+    
+    badge_id = badge_id_map.get(tier.lower())
+    if not badge_id:
+        logger.warning(f"No badge defined for subscription tier: {tier}")
+        return
+    
+    # Check if badge definition exists
+    badge_def = db.query(BadgeDefinition).filter(BadgeDefinition.id == badge_id).first()
+    if not badge_def:
+        logger.warning(f"Badge definition not found: {badge_id}")
+        return
+    
+    # Check if user already has this badge
+    existing = db.query(UserBadge).filter(
+        UserBadge.user_id == user_id,
+        UserBadge.badge_id == badge_id
+    ).first()
+    
+    if existing:
+        logger.info(f"User {user_id} already has badge {badge_id}")
+        return
+    
+    # Award the badge
+    award_badge(user_id, badge_def, db)
+    logger.info(f"🏆 Awarded subscription badge {badge_id} to user {user_id}")
+    
+    # If user is performer tier, also ensure they have the pro_member badge
+    if tier.lower() == "performer":
+        pro_badge = db.query(BadgeDefinition).filter(BadgeDefinition.id == "pro_member").first()
+        if pro_badge:
+            existing_pro = db.query(UserBadge).filter(
+                UserBadge.user_id == user_id,
+                UserBadge.badge_id == "pro_member"
+            ).first()
+            if not existing_pro:
+                award_badge(user_id, pro_badge, db)
+                logger.info(f"🏆 Also awarded pro_member badge to Guild Master {user_id}")

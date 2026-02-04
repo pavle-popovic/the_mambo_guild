@@ -39,6 +39,12 @@ from models.community import (
     BadgeDefinition, UserBadge,
     CommunityTag
 )
+from models.premium import (
+    LiveCall, LiveCallStatus,
+    WeeklyArchive,
+    CoachingSubmission, CoachingSubmissionStatus,
+    DJBoothTrack
+)
 
 # Dependency to get database session
 def get_db():

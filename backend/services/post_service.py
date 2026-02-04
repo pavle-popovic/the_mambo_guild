@@ -25,13 +25,14 @@ def _get_user_info(user: User, db: Session) -> dict:
     """Build user info dict for responses."""
     profile = user.profile
     is_pro = False
+    is_guild_master = False
     
     # Check subscription
     if user.subscription:
-        is_pro = (
-            user.subscription.status == SubscriptionStatus.ACTIVE and
-            user.subscription.tier in [SubscriptionTier.ADVANCED, SubscriptionTier.PERFORMER]
-        )
+        is_active = user.subscription.status == SubscriptionStatus.ACTIVE
+        is_pro = is_active and user.subscription.tier in [SubscriptionTier.ADVANCED, SubscriptionTier.PERFORMER]
+        # Guild Master = PERFORMER tier (top premium tier)
+        is_guild_master = is_active and user.subscription.tier == SubscriptionTier.PERFORMER
     
     return {
         "id": str(user.id),
@@ -39,6 +40,7 @@ def _get_user_info(user: User, db: Session) -> dict:
         "last_name": profile.last_name if profile else "User",
         "avatar_url": profile.avatar_url if profile else None,
         "is_pro": is_pro,
+        "is_guild_master": is_guild_master,
         "level": profile.level if profile else 1
     }
 

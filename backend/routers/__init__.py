@@ -22,6 +22,12 @@ from .badges import router as badges_router
 # AI Chat Feature
 from .ai_chat import router as ai_chat_router
 
+# Premium Features (Guild Master tier)
+from .premium import router as premium_router
+
+# Secure Downloads
+from .downloads import router as downloads_router
+
 # Register routers
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(courses_router, prefix="/courses", tags=["courses"])
@@ -41,3 +47,9 @@ api_router.include_router(badges_router, prefix="/badges", tags=["badges"])
 
 # AI Chat Feature
 api_router.include_router(ai_chat_router, prefix="/ai", tags=["ai"])
+
+# Premium Features (Guild Master tier)
+api_router.include_router(premium_router, tags=["premium"])
+
+# Secure Downloads
+api_router.include_router(downloads_router, tags=["downloads"])

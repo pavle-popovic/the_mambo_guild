@@ -72,6 +72,15 @@ class UserProfile(Base):
     current_claves = Column(Integer, default=0, nullable=False)
     reputation = Column(Integer, default=0, nullable=False)  # "Maestro Score"
     last_daily_claim = Column(Date, nullable=True)  # Track daily login bonus
+    
+    # Secure Downloads Tracking
+    downloads_today = Column(Integer, default=0, nullable=False)
+    last_download_date = Column(Date, nullable=True)
+    
+    # Streak Freezes System
+    weekly_free_freeze_used = Column(Boolean, default=False, nullable=False)
+    inventory_freezes = Column(Integer, default=0, nullable=False)
+    last_freeze_reset_date = Column(Date, nullable=True)  # Track weekly reset
 
     # Relationships
     user = relationship("User", back_populates="profile")

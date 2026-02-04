@@ -161,6 +161,94 @@ def create_direct_upload(
         }
 
 
+def get_mux_download_url(asset_id: str, quality: str = "high") -> Optional[str]:
+    """
+    Get the download URL for an asset's MP4 rendition from Mux.
+    
+    Args:
+        asset_id: Mux asset ID
+        quality: Quality preference ("high", "medium", "low")
+        
+    Returns:
+        Download URL string or None if not available
+    """
+    if not asset_id:
+        return None
+    
+    try:
+        configuration = _get_mux_configuration()
+        api_client = ApiClient(configuration)
+        assets_api = mux_python.AssetsApi(api_client)
+        
+        # Get the asset details
+        asset = assets_api.get_asset(asset_id)
+        
+        if not asset.data:
+            logger.error(f"Asset {asset_id} not found")
+            return None
+        
+        # Check for static renditions (MP4 downloads)
+        static_renditions = asset.data.static_renditions
+        
+        if not static_renditions or static_renditions.status != "ready":
+            logger.warning(f"Asset {asset_id} has no ready static renditions")
+            return None
+        
+        files = static_renditions.files
+        if not files:
+            logger.warning(f"Asset {asset_id} has no MP4 files")
+            return None
+        
+        # Quality preference mapping
+        quality_priority = {
+            "high": ["high.mp4", "medium.mp4", "low.mp4"],
+            "medium": ["medium.mp4", "high.mp4", "low.mp4"],
+            "low": ["low.mp4", "medium.mp4", "high.mp4"]
+        }
+        
+        priority = quality_priority.get(quality, quality_priority["high"])
+        
+        # Find the best matching quality
+        selected_file = None
+        for pref in priority:
+            for f in files:
+                if f.name == pref:
+                    selected_file = f
+                    break
+            if selected_file:
+                break
+        
+        # Fallback to first available file
+        if not selected_file and files:
+            selected_file = files[0]
+        
+        if not selected_file:
+            logger.warning(f"No suitable MP4 file found for asset {asset_id}")
+            return None
+        
+        # Get playback ID for constructing download URL
+        playback_ids = asset.data.playback_ids
+        if not playback_ids:
+            logger.warning(f"Asset {asset_id} has no playback IDs")
+            return None
+        
+        playback_id = playback_ids[0].id
+        
+        # Construct the download URL
+        # Format: https://stream.mux.com/{PLAYBACK_ID}/{FILENAME}
+        download_url = f"https://stream.mux.com/{playback_id}/{selected_file.name}"
+        
+        logger.info(f"Generated download URL for asset {asset_id}: {selected_file.name}")
+        return download_url
+        
+    except ApiException as e:
+        logger.error(f"Failed to get download URL for asset {asset_id}: {e}")
+        return None
+    except Exception as e:
+        logger.error(f"Error getting download URL for asset {asset_id}: {e}")
+        return None
+
+
 def delete_asset(asset_id: str) -> bool:
     """
     Delete an asset from Mux.

@@ -71,11 +71,19 @@ class Settings:
     MUX_WEBHOOK_SECRET: Optional[str] = os.getenv("MUX_WEBHOOK_SECRET")
 
     # Cloudflare R2 Configuration (S3-compatible)
+    # Legacy AWS naming (for backwards compatibility)
     AWS_ACCESS_KEY_ID: Optional[str] = os.getenv("AWS_ACCESS_KEY_ID")
     AWS_SECRET_ACCESS_KEY: Optional[str] = os.getenv("AWS_SECRET_ACCESS_KEY")
     AWS_ENDPOINT_URL: Optional[str] = os.getenv("AWS_ENDPOINT_URL")
     AWS_BUCKET_NAME: Optional[str] = os.getenv("AWS_BUCKET_NAME")
     R2_PUBLIC_DOMAIN: Optional[str] = os.getenv("R2_PUBLIC_DOMAIN")
+    
+    # R2-specific settings for archives (signed URLs)
+    R2_ACCESS_KEY_ID: Optional[str] = os.getenv("R2_ACCESS_KEY_ID") or os.getenv("AWS_ACCESS_KEY_ID")
+    R2_SECRET_ACCESS_KEY: Optional[str] = os.getenv("R2_SECRET_ACCESS_KEY") or os.getenv("AWS_SECRET_ACCESS_KEY")
+    R2_ACCOUNT_ID: Optional[str] = os.getenv("R2_ACCOUNT_ID")  # Cloudflare account ID
+    R2_BUCKET_NAME: Optional[str] = os.getenv("R2_BUCKET_NAME") or os.getenv("AWS_BUCKET_NAME")
+    R2_PUBLIC_URL: Optional[str] = os.getenv("R2_PUBLIC_URL")  # Optional public URL for thumbnails
 
     # OAuth Configuration
     GOOGLE_CLIENT_ID: Optional[str] = os.getenv("GOOGLE_CLIENT_ID")

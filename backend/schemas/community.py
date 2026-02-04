@@ -101,6 +101,7 @@ class PostUserInfo(BaseModel):
     last_name: str
     avatar_url: Optional[str] = None
     is_pro: bool = False
+    is_guild_master: bool = False  # PERFORMER tier = Guild Master status
     level: int = 1
 
 
@@ -250,6 +251,7 @@ class PublicProfileResponse(BaseModel):
     level: int
     level_title: str  # e.g., "Level 12 Mambo Soldier"
     is_pro: bool = False
+    is_guild_master: bool = False  # PERFORMER tier = Guild Master status
     instagram_url: Optional[str] = None
     stats: PublicProfileStats
     badges: List[BadgeResponse] = []
