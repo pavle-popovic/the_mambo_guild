@@ -169,7 +169,7 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                 <div class="container">
                     <p>Hi {username},</p>
                     
-                    <p>Here is the link to the weekly tutorial: <a href="https://youtu.be/DuPZc3xE0XM" class="link">https://youtu.be/DuPZc3xE0XM</a></p>
+                    <p>Here is the link to the weekly tutorial: <a href="https://youtu.be/RIMp6J02Th0" class="link">https://youtu.be/RIMp6J02Th0</a></p>
 
                     <p>Welcome to The Mambo Guild. I really appreciate your trust in joining this project and I am sure that together, we are going to build a beautiful community. <span class="emoji">🥂</span></p>
 

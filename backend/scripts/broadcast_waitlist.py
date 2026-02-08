@@ -3,6 +3,15 @@ import os
 import time
 import sys
 
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    # Load from project root .env file
+    env_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '.env')
+    load_dotenv(env_path)
+except ImportError:
+    print("⚠️ Warning: 'python-dotenv' not installed. Environment variables must be set manually.")
+
 # Try to import resend, handle if missing
 try:
     import resend
@@ -37,7 +46,7 @@ def get_beautiful_html(username, referral_link):
     text_color = "#333333" # Dark Gray/Black
     
     # TODO: Replace [INSERT URL HERE] with the actual combo URL before sending
-    combo_url = "https://youtu.be/DuPZc3xE0XM"
+    combo_url = "https://youtu.be/RIMp6J02Th0"
     
     return f"""
     <!DOCTYPE html>
@@ -103,7 +112,7 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p>Keeping this one short and sweet.</p>
+            <p>Today we explore some Mambo fused with Afro Cuban steps.</p>
 
             <p>Here is the combo for this week: <a href="{combo_url}" class="link">{combo_url}</a></p>
 
