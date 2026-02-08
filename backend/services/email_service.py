@@ -169,6 +169,8 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                 <div class="container">
                     <p>Hi {username},</p>
                     
+                    <p>Here is the link to the weekly tutorial: <a href="https://youtu.be/DuPZc3xE0XM" class="link">https://youtu.be/DuPZc3xE0XM</a></p>
+
                     <p>Welcome to The Mambo Guild. I really appreciate your trust in joining this project and I am sure that together, we are going to build a beautiful community. <span class="emoji">🥂</span></p>
 
                     <p>Firstly, a quick intro: My name is <strong>Pavle Popovic</strong>, I am a professional dancer and have been devoting the past 10 years of my life mastering the art of training and learning about dancing. I started this project because I wanted to create the dance academy I wish I had when I started. I saw too many students getting stuck because most online classes lack a clear structure and path to mastery.</p>
@@ -177,7 +179,7 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
 
                     <p>To kick things off properly, I want to give you a head start. Here are two critical insights you need to know right now. <span class="emoji">👇</span></p>
 
-                    <h2><span class="emoji">🧠</span> The Science: Why "Segmentation" is Your Superpower</h2>
+                    <h2><span class="emoji">🧠</span> The Science: What is "Segmentation" ?</h2>
                     <p>In cognitive science, there is a concept called <strong>Chunking</strong> (or Segmentation).</p>
                     <p>Your working memory has a limit. If you try to learn the feet, the arms, the timing, and the partner connection all at once, your brain gets "Cognitive Overload." You freeze. <span class="emoji">🥶</span></p>
                     <p>At the Guild, we use <strong>Modular Segmentation</strong>: We break complex patterns into isolated "chunks" so your brain can digest them faster.</p>
@@ -189,9 +191,9 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                     <p>The Result: You learn faster, have more fun, and stop feeling overwhelmed!</p>
 
                     <h2><span class="emoji">📜</span> The History: What are we actually dancing?</h2>
-                    <p>You’ll hear "Salsa" and "Mambo" used interchangeably, but context is everything. Here is the 30-second breakdown:</p>
+                    <p>You'll hear "Salsa" and "Mambo" used interchangeably, but context is everything. Here is the 30-second breakdown:</p>
                     <ul>
-                        <li><span class="emoji">🥁</span> <strong>The Roots (Mambo)</strong>: In the 1950s, the "Mambo Craze" exploded at New York’s Palladium Ballroom. Dancers moved strictly to the rhythm of the conga drum, accenting the "slap" on the second beat.</li>
+                        <li><span class="emoji">🥁</span> <strong>The Roots (Mambo)</strong>: In the 1950s, the "Mambo Craze" exploded at New York's Palladium Ballroom. Dancers moved strictly to the rhythm of the conga drum, accenting the "slap" on the second beat.</li>
                         <li><span class="emoji">🎺</span> <strong>The Evolution (Salsa)</strong>: By the 70s, Latin Jazz music was evolving and starting to become increasingly "popular". The marketing term "Salsa" was born to package this incredible blend of rhythms for the world.</li>
                         <li><span class="emoji">🗽</span> <strong>The Structure (On2)</strong>: While many danced "On1" (following the melody), the legendary Eddie Torres formalized "New York Style On2" to preserve that original Palladium connection to the rhythm section.</li>
                     </ul>

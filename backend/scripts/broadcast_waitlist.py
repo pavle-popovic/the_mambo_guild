@@ -36,6 +36,9 @@ def get_beautiful_html(username, referral_link):
     bg_color = "#F9F7F1"  # Cream/Paper
     text_color = "#333333" # Dark Gray/Black
     
+    # TODO: Replace [INSERT URL HERE] with the actual combo URL before sending
+    combo_url = "https://youtu.be/DuPZc3xE0XM"
+    
     return f"""
     <!DOCTYPE html>
     <html>
@@ -100,40 +103,23 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p>Welcome to The Mambo Guild. I really appreciate your trust in joining this project and I am sure that together, we are going to build a beautiful community. <span class="emoji">🥂</span></p>
+            <p>Keeping this one short and sweet.</p>
 
-            <p>Firstly, a quick intro: My name is <strong>Pavle Popovic</strong>, I am a professional dancer and have been devoting the past 10 years of my life mastering the art of training and learning about dancing. I started this project because I wanted to create the dance academy I wish I had when I started. I saw too many students getting stuck because most online classes lack a clear structure and path to mastery.</p>
+            <p>Here is the combo for this week: <a href="{combo_url}" class="link">{combo_url}</a></p>
 
-            <p>I have studied and hold certifications in Learning Experience Design and Gamification; and decided to apply those scientific principles to this curriculum to ensure you aren't just memorizing steps, but actually <em>learning to dance</em>.</p>
+            <h2>1. The Science: Training on the bus? <span class="emoji">🚌</span></h2>
+            <p>I know life gets busy. But here is a little secret: you don't actually need a studio to train.</p>
+            <p>I use a tool called <strong>Visualization</strong>. Studies show that just imagining a movement vividly activates the same neural pathways as actually doing it physically.</p>
+            <p>So next time you are on the bus or waiting for coffee, close your eyes and run the routine in your head. It's the ultimate portable training tool—and it works.</p>
 
-            <p>To kick things off properly, I want to give you a head start. Here are two critical insights you need to know right now. <span class="emoji">👇</span></p>
+            <h2>2. The History: A Conversation with the Gods</h2>
+            <p>I find this really beautiful, so I wanted to share it with you.</p>
+            <p>The word "Mambo" isn't just a random name. It actually comes from the Kikongo language in the Congo, and it translates to "conversation with the gods" or "sacred words".</p>
+            <p>It was originally a way to connect the physical world with the spiritual world through rhythm. I love thinking about that—it makes every step feel a little more meaningful, doesn't it?</p>
 
-            <h2><span class="emoji">🧠</span> The Science: What is "Segmentation" ?</h2>
-            <p>In cognitive science, there is a concept called <strong>Chunking</strong> (or Segmentation).</p>
-            <p>Your working memory has a limit. If you try to learn the feet, the arms, the timing, and the partner connection all at once, your brain gets "Cognitive Overload." You freeze. <span class="emoji">🥶</span></p>
-            <p>At the Guild, we use <strong>Modular Segmentation</strong>: We break complex patterns into isolated "chunks" so your brain can digest them faster.</p>
-            <ul>
-                <li><span class="emoji">🦶</span> <strong>The Feet</strong>: We isolate the footwork first until it becomes automatic.</li>
-                <li><span class="emoji">👐</span> <strong>The Styling</strong>: We layer on the arm mechanics and styling options which can be applied to all footworks.</li>
-                <li><span class="emoji">🧩</span> <strong>The Integration</strong>: We only combine them once the individual parts are semi-automatic.</li>
-            </ul>
-            <p>The Result: You learn faster, have more fun, and stop feeling overwhelmed!</p>
+            <p>See you in the next one,</p>
 
-            <h2><span class="emoji">📜</span> The History: What are we actually dancing?</h2>
-            <p>You’ll hear "Salsa" and "Mambo" used interchangeably, but context is everything. Here is the 30-second breakdown:</p>
-            <ul>
-                <li><span class="emoji">🥁</span> <strong>The Roots (Mambo)</strong>: In the 1950s, the "Mambo Craze" exploded at New York’s Palladium Ballroom. Dancers moved strictly to the rhythm of the conga drum, accenting the "slap" on the second beat.</li>
-                <li><span class="emoji">🎺</span> <strong>The Evolution (Salsa)</strong>: By the 70s, Latin Jazz music was evolving and starting to become increasingly "popular". The marketing term "Salsa" was born to package this incredible blend of rhythms for the world.</li>
-                <li><span class="emoji">🗽</span> <strong>The Structure (On2)</strong>: While many danced "On1" (following the melody), the legendary Eddie Torres formalized "New York Style On2" to preserve that original Palladium connection to the rhythm section.</li>
-            </ul>
-
-            <p>For more information I strongly recommend the following documentary: <br>
-            <a href="https://www.youtube.com/watch?v=hlYgFQjTyTc" class="link">https://www.youtube.com/watch?v=hlYgFQjTyTc</a></p>
-
-            <p>Keep an eye on your inbox, because I will be sending you free choreographies, full classes, and deep dives into dance science and history every single week.</p>
-
-            <p>Pavle<br>
-            Founder, The Mambo Guild</p>
+            <p>Pavle</p>
 
             <div class="footer">
                 <p>P.S. Want to unlock 'Beta Tester' status early? Invite 3 friends using your unique extraction link:<br>
@@ -179,7 +165,7 @@ def send_broadcast():
         referral_link = f"{base_url}/waitlist?ref={code}"
 
         # 2. Prepare the Email Content
-        subject = "Welcome to The Mambo Guild"
+        subject = "The combo for this week"
         html_content = get_beautiful_html(username, referral_link)
 
         # 3. Send (or Print)
