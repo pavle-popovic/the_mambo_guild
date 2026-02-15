@@ -100,11 +100,14 @@ def attempt_streak_save(user_id: str, db: Session) -> StreakFreezeResult:
     """
     Attempt to save a broken streak using available freeze methods.
     Priority: 1) Weekly Freebie, 2) Inventory Freeze, 3) Auto-buy with Claves
-    
+    Uses SELECT FOR UPDATE to prevent race conditions.
+
     Returns:
         StreakFreezeResult with outcome details
     """
-    profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+    profile = db.query(UserProfile).filter(
+        UserProfile.user_id == user_id
+    ).with_for_update().first()
     if not profile:
         return StreakFreezeResult(
             saved=False,
@@ -126,9 +129,9 @@ def attempt_streak_save(user_id: str, db: Session) -> StreakFreezeResult:
             streak_count=profile.streak_count
         )
     
-    # Method 2: Inventory Freeze
+    # Method 2: Inventory Freeze (with bounds check)
     if profile.inventory_freezes > 0:
-        profile.inventory_freezes -= 1
+        profile.inventory_freezes = max(0, profile.inventory_freezes - 1)
         db.flush()
         logger.info(f"User {user_id} streak saved by inventory freeze. {profile.inventory_freezes} remaining.")
         return StreakFreezeResult(

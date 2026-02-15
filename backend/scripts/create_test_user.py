@@ -78,7 +78,7 @@ def create_test_user():
         db.flush()  # Flush to get the ID
         
         # Update tier using raw SQL - database enum uses uppercase
-        db.execute(text(f"UPDATE subscriptions SET tier = 'ADVANCED' WHERE id = '{subscription.id}'"))
+        db.execute(text("UPDATE subscriptions SET tier = 'ADVANCED' WHERE id = :sub_id"), {"sub_id": str(subscription.id)})
         db.add(subscription)
         
         db.commit()

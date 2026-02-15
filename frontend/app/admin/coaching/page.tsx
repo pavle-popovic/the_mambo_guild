@@ -58,9 +58,6 @@ export default function AdminCoachingPage() {
         `${process.env.NEXT_PUBLIC_API_URL}/api/premium/admin/coaching${params}`,
         {
           credentials: "include",
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-          },
         }
       );
       if (response.ok) {
@@ -86,7 +83,6 @@ export default function AdminCoachingPage() {
           credentials: "include",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
           },
           body: JSON.stringify({
             status: "completed",

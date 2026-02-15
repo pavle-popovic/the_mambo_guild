@@ -56,13 +56,10 @@ export default function CourseDetailPage() {
       setLoading(true);
       setError("");
 
-      const token = localStorage.getItem("auth_token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/courses/worlds/${courseId}/skill-tree`,
         {
-          headers: token
-            ? { Authorization: `Bearer ${token}` }
-            : {},
+          credentials: "include" as RequestCredentials,
         }
       );
 

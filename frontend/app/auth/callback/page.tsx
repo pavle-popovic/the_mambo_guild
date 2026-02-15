@@ -24,34 +24,22 @@ function AuthCallbackContent() {
       processedRef.current = true;
 
       try {
-        // Check for success parameter (new secure OAuth flow with httpOnly cookies)
+        // Check for success parameter (secure OAuth flow with httpOnly cookies)
         let success: string | null = null;
-        let legacyToken: string | null = null;
-        
+
         if (typeof window !== "undefined") {
           const urlParams = new URLSearchParams(window.location.search);
           success = urlParams.get("success");
-          legacyToken = urlParams.get("token"); // Backwards compatibility
-        }
-        
-        // Fallback to searchParams
-        if (!success && !legacyToken) {
-          success = searchParams.get("success");
-          legacyToken = searchParams.get("token");
         }
 
-        // Handle legacy token-in-URL flow (for backwards compatibility during transition)
-        if (legacyToken) {
-          if (typeof window !== "undefined") {
-            localStorage.setItem("auth_token", legacyToken);
-          }
-          const { apiClient } = await import("@/lib/api");
-          apiClient.setToken(legacyToken);
+        // Fallback to searchParams
+        if (!success) {
+          success = searchParams.get("success");
         }
-        
-        // New secure flow: cookies are set automatically by the backend
+
+        // Cookies are set automatically by the backend
         // Just need to verify we can fetch the user profile
-        if (!success && !legacyToken) {
+        if (!success) {
           setError("Authentication failed. Please try again.");
           setLoading(false);
           return;

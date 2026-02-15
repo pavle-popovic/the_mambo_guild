@@ -463,12 +463,11 @@ export default function LessonEditorModal({
   // Function to delete a pending Mux video that wasn't saved
   const deletePendingVideo = async (assetId: string) => {
     try {
-      const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
       await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/mux/asset/${assetId}`,
         {
           method: 'DELETE',
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
+          credentials: 'include' as RequestCredentials,
         }
       );
       console.log('Deleted pending Mux asset:', assetId);

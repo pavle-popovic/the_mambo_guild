@@ -395,11 +395,13 @@ def seed_full_courses():
         with engine.begin() as conn:
             # 1. DELETE EXISTING DATA
             slugs = [c["slug"] for c in courses_data]
-            quoted_slugs = ", ".join([f"'{s}'" for s in slugs])
-            
+
             # Find world IDs to delete dependent data safely (though cascade might handle it)
             logger.info("Cleaning up existing courses...")
-            conn.execute(text(f"DELETE FROM worlds WHERE slug IN ({quoted_slugs})"))
+            # Use parameterized query to prevent SQL injection
+            placeholders = ", ".join([f":slug_{i}" for i in range(len(slugs))])
+            params = {f"slug_{i}": slug for i, slug in enumerate(slugs)}
+            conn.execute(text(f"DELETE FROM worlds WHERE slug IN ({placeholders})"), params)
             
             # 2. INSERT NEW DATA
             for course in courses_data:

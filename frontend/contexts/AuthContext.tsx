@@ -82,22 +82,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
 
     const checkAuth = async () => {
-      // First, check for localStorage token (backwards compatibility)
-      const token = localStorage.getItem("auth_token");
-      if (token) {
-        apiClient.setToken(token);
-      }
-      
-      // Try to fetch user profile - this works with both:
-      // 1. Bearer token from localStorage
-      // 2. httpOnly cookie (new secure method)
-      // Use silent mode to suppress expected errors when no user is logged in
+      // Auth is handled via httpOnly cookies (set automatically by backend)
+      // Try to fetch user profile using the cookie
       try {
         await refreshUser(true); // silent = true for initial check
       } catch (error) {
-        // Auth failed - clear any stale localStorage token
-        // This is expected when no user is logged in, so we don't log it
-        localStorage.removeItem("auth_token");
+        // Auth failed - this is expected when no user is logged in
         apiClient.setToken(null);
         setUser(null);
       }
@@ -105,25 +95,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     checkAuth();
-
-    // Listen for storage changes (e.g., login in another tab)
-    const handleStorageChange = (e: StorageEvent) => {
-      if (e.key === "auth_token") {
-        if (e.newValue) {
-          apiClient.setToken(e.newValue);
-          refreshUser();
-        } else {
-          apiClient.setToken(null);
-          setUser(null);
-        }
-      }
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-
-    return () => {
-      window.removeEventListener("storage", handleStorageChange);
-    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -159,10 +130,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     // Clear token from API client
     apiClient.setToken(null);
-    // Clear token from localStorage
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("auth_token");
-    }
     // Clear user state
     setUser(null);
   };

@@ -34,15 +34,14 @@ function NewLessonMuxUploader({
 
     try {
       // Get upload URL without attaching to a specific lesson
-      const token = localStorage.getItem('auth_token');
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/mux/upload-url`,
         {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
           },
+          credentials: 'include',
           body: JSON.stringify({}), // No lesson_id for new lessons
         }
       );
@@ -71,7 +70,7 @@ function NewLessonMuxUploader({
               const statusRes = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/mux/upload-status/${upload_id}`,
                 {
-                  headers: token ? { Authorization: `Bearer ${token}` } : {},
+                  credentials: 'include' as RequestCredentials,
                 }
               );
 

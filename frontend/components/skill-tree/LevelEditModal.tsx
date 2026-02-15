@@ -88,8 +88,8 @@ export default function LevelEditModal({
                         method: "PUT",
                         headers: {
                             "Content-Type": "application/json",
-                            Authorization: `Bearer ${localStorage.getItem("token")}`,
                         },
+                        credentials: "include" as RequestCredentials,
                         body: JSON.stringify({
                             mux_preview_playback_id: null,
                             mux_preview_asset_id: null,
@@ -121,9 +121,7 @@ export default function LevelEditModal({
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/admin/levels/${level.id}/lessons`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
+                    credentials: "include" as RequestCredentials,
                 }
             );
 
@@ -149,8 +147,8 @@ export default function LevelEditModal({
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
+                    credentials: "include" as RequestCredentials,
                     body: JSON.stringify({
                         title,
                         description,
@@ -203,8 +201,8 @@ export default function LevelEditModal({
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
+                    credentials: "include" as RequestCredentials,
                     body: JSON.stringify({
                         title: "New Lesson",
                         lesson_type: "video",
@@ -230,9 +228,7 @@ export default function LevelEditModal({
                 `${process.env.NEXT_PUBLIC_API_URL}/api/admin/lessons/${lessonId}`,
                 {
                     method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
+                    credentials: "include" as RequestCredentials,
                 }
             );
 

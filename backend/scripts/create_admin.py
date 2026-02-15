@@ -23,22 +23,28 @@ if sys.platform == "win32":
         pass
 
 def create_admin_user():
-    """Create an admin user with email admin@themamboinn.com and password admin123."""
+    """Create an admin user with credentials from environment variables."""
+    admin_email = os.getenv("ADMIN_EMAIL")
+    admin_password = os.getenv("ADMIN_PASSWORD")
+
+    if not admin_email or not admin_password:
+        print("❌ Error: ADMIN_EMAIL and ADMIN_PASSWORD environment variables must be set.")
+        print("   Example: ADMIN_EMAIL=admin@example.com ADMIN_PASSWORD=securepass python scripts/create_admin.py")
+        return
+
     engine = create_engine(settings.DATABASE_URL, echo=False)
-    
+
     try:
         with engine.begin() as conn:
             # Check if admin already exists
-            result = conn.execute(text("SELECT id FROM users WHERE email = 'admin@themamboinn.com'"))
+            result = conn.execute(text("SELECT id FROM users WHERE email = :email"), {"email": admin_email})
             if result.fetchone():
                 print("✅ Admin user already exists!")
-                print("Email: admin@themamboinn.com")
-                print("Password: admin123")
                 return
-            
+
             # Create admin user
             admin_id = uuid.uuid4()
-            hashed_password = get_password_hash("admin123")
+            hashed_password = get_password_hash(admin_password)
             now = datetime.utcnow()
             
             # Insert user
@@ -47,7 +53,7 @@ def create_admin_user():
                 VALUES (:id, :email, :hashed_password, :role, :created_at, :updated_at, :auth_provider, :is_verified)
             """), {
                 "id": str(admin_id),
-                "email": "admin@themamboinn.com",
+                "email": admin_email,
                 "hashed_password": hashed_password,
                 "role": "ADMIN",  # Database enum uses UPPERCASE
                 "created_at": now,
@@ -88,8 +94,7 @@ def create_admin_user():
             })
             
             print("✅ Admin user created successfully!")
-            print("Email: admin@themamboinn.com")
-            print("Password: admin123")
+            print(f"Email: {admin_email}")
             print("Role: ADMIN")
                 
     except Exception as e:

@@ -126,22 +126,26 @@ def spend_claves(
 ) -> Tuple[bool, int]:
     """
     Spend claves for an action.
+    Uses SELECT FOR UPDATE to prevent race conditions.
     Returns: (success: bool, new_balance: int)
     """
     if amount <= 0:
         logger.warning(f"Attempted to spend {amount} claves (must be positive)")
         return (True, get_balance(user_id, db))
-    
-    profile = get_user_profile(user_id, db)
+
+    # Lock the row to prevent concurrent modifications
+    profile = db.query(UserProfile).filter(
+        UserProfile.user_id == user_id
+    ).with_for_update().first()
     if not profile:
         logger.error(f"Profile not found for user {user_id}")
         return (False, 0)
-    
-    # Check balance
+
+    # Check balance (row is locked, so this is safe from TOCTOU)
     if profile.current_claves < amount:
         logger.warning(f"User {user_id} cannot afford {amount} claves (balance: {profile.current_claves})")
         return (False, profile.current_claves)
-    
+
     # Create transaction (negative amount)
     transaction = ClaveTransaction(
         user_id=user_id,
@@ -150,11 +154,11 @@ def spend_claves(
         reference_id=reference_id
     )
     db.add(transaction)
-    
+
     # Update balance
     profile.current_claves -= amount
     db.flush()
-    
+
     logger.info(f"User {user_id} spent {amount} claves ({reason}). New balance: {profile.current_claves}")
     return (True, profile.current_claves)
 
@@ -329,7 +333,18 @@ def award_referral_bonus(referrer_user_id: str, db: Session) -> int:
 def award_accepted_answer(user_id: str, post_id: str, db: Session) -> int:
     """
     Award claves when user's answer is marked as Solution.
+    Idempotent: won't award twice for the same post.
     """
+    # Check if already awarded for this post
+    existing = db.query(ClaveTransaction).filter(
+        ClaveTransaction.user_id == user_id,
+        ClaveTransaction.reference_id == post_id,
+        ClaveTransaction.reason == "accepted_answer"
+    ).first()
+    if existing:
+        logger.info(f"User {user_id} already awarded for accepted answer on post {post_id}")
+        return get_balance(user_id, db)
+
     return earn_claves(user_id, EARN_ACCEPTED_ANSWER, "accepted_answer", db, reference_id=post_id)
 
 
@@ -365,18 +380,26 @@ def process_reaction_refund(post_id: str, post_owner_id: str, db: Session) -> bo
     """
     Process reaction refund (max 5 per video).
     Triggered by ANY reaction type.
+    Uses SELECT FOR UPDATE to prevent race conditions on the refund cap.
     """
+    # Lock the user profile row to serialize refund operations
+    profile = db.query(UserProfile).filter(
+        UserProfile.user_id == post_owner_id
+    ).with_for_update().first()
+    if not profile:
+        return False
+
     # Count existing refunds for this post (reason='reaction_refund')
     existing_refunds = db.query(func.count(ClaveTransaction.id)).filter(
         ClaveTransaction.user_id == post_owner_id,
         ClaveTransaction.reference_id == post_id,
         ClaveTransaction.reason == "reaction_refund"
     ).scalar() or 0
-    
+
     if existing_refunds < EARN_REACTION_REFUND_CAP:
         earn_claves(post_owner_id, EARN_REACTION_REFUND, "reaction_refund", db, reference_id=post_id)
         return True
-    
+
     return False
 
 

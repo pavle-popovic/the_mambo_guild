@@ -145,11 +145,12 @@ export async function POST(request: NextRequest) {
       },
     ];
 
-    // Call Gemini with streaming
-    const response = await fetch(`${GEMINI_API_URL}?key=${apiKey}&alt=sse`, {
+    // Call Gemini with streaming (API key sent via header, not URL)
+    const response = await fetch(`${GEMINI_API_URL}?alt=sse`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
       },
       body: JSON.stringify({
         contents,

@@ -119,13 +119,10 @@ function AdminBuilderPageContent() {
     }
 
     try {
-      const token = localStorage.getItem("auth_token");
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/courses/worlds/${courseId}/skill-tree`,
         {
-          headers: token ? {
-            Authorization: `Bearer ${token}`,
-          } : {},
+          credentials: "include" as RequestCredentials,
         }
       );
 
@@ -517,15 +514,14 @@ function AdminBuilderPageContent() {
 
       // If prerequisites were selected, create edges
       if (newModulePrerequisites.length > 0) {
-        const token = localStorage.getItem("auth_token");
         for (const prereqId of newModulePrerequisites) {
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/admin/worlds/${courseId}/edges`,
             {
               method: "POST",
+              credentials: "include" as RequestCredentials,
               headers: {
                 "Content-Type": "application/json",
-                ...(token ? { Authorization: `Bearer ${token}` } : {}),
               },
               body: JSON.stringify({
                 from_level_id: prereqId,
@@ -1870,12 +1866,11 @@ function AdminBuilderPageContent() {
                               onClick={async () => {
                                 if (!confirm(`Remove "${prereqLevel.title}" as a prerequisite?`)) return;
                                 try {
-                                  const token = localStorage.getItem("auth_token");
                                   const res = await fetch(
                                     `${process.env.NEXT_PUBLIC_API_URL}/api/admin/edges/${edge.id}`,
                                     {
                                       method: "DELETE",
-                                      headers: token ? { Authorization: `Bearer ${token}` } : {},
+                                      credentials: "include" as RequestCredentials,
                                     }
                                   );
                                   if (!res.ok) {
@@ -1908,14 +1903,13 @@ function AdminBuilderPageContent() {
                       if (!prereqId) return;
 
                       try {
-                        const token = localStorage.getItem("auth_token");
                         const res = await fetch(
                           `${process.env.NEXT_PUBLIC_API_URL}/api/admin/worlds/${courseId}/edges`,
                           {
                             method: "POST",
+                            credentials: "include" as RequestCredentials,
                             headers: {
                               "Content-Type": "application/json",
-                              ...(token ? { Authorization: `Bearer ${token}` } : {}),
                             },
                             body: JSON.stringify({
                               from_level_id: prereqId,

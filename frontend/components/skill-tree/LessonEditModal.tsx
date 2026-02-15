@@ -72,9 +72,7 @@ export default function LessonEditModal({
             const response = await fetch(
                 `${process.env.NEXT_PUBLIC_API_URL}/api/admin/lessons/${lessonId}`,
                 {
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
+                    credentials: "include" as RequestCredentials,
                 }
             );
 
@@ -108,8 +106,8 @@ export default function LessonEditModal({
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
+                    credentials: "include" as RequestCredentials,
                     body: JSON.stringify({
                         title,
                         description,

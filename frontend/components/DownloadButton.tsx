@@ -73,22 +73,14 @@ export default function DownloadButton({
       const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
       const streamUrl = `${apiUrl}/api/downloads/lesson/${lessonId}/stream`;
       
-      // Get auth token for authenticated request
-      const token = localStorage.getItem("auth_token");
-      const headers: HeadersInit = {
-        "Accept": "video/mp4, */*",
-      };
-      
-      if (token) {
-        headers["Authorization"] = `Bearer ${token}`;
-      }
-      
-      // Fetch the stream with authentication
+      // Fetch the stream with authentication via httpOnly cookies
       // The backend sends Content-Disposition: attachment header, forcing download
       const response = await fetch(streamUrl, {
         method: "GET",
-        headers,
-        credentials: "include", // Include cookies for httpOnly auth
+        headers: {
+          "Accept": "video/mp4, */*",
+        },
+        credentials: "include",
       });
       
       if (!response.ok) {

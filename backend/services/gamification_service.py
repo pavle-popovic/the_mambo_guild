@@ -70,11 +70,10 @@ def update_streak(user_id: str, db: Session) -> Dict:
             message = result.message
             # Keep streak intact (don't reset)
         else:
-            # Streak is at risk - frontend should prompt for claves repair
-            # For now, mark as needing repair
             message = result.message
-            # Don't reset yet - let the frontend handle the repair prompt
-            # If user doesn't repair, streak resets on next action
+            if result.streak_count == 0:
+                # User can't afford repair - reset streak immediately
+                profile.streak_count = 0
 
     profile.last_login_date = datetime.now(timezone.utc)
     db.flush()
@@ -96,8 +95,14 @@ def update_streak_simple(user_id: str, db: Session) -> int:
     return result["streak_count"]
 
 
+MAX_XP_PER_AWARD = 500  # Maximum XP that can be awarded in a single action
+
+
 def award_xp(user_id: str, xp_amount: int, db: Session) -> dict:
     """Award XP to user and return level up status."""
+    if xp_amount <= 0 or xp_amount > MAX_XP_PER_AWARD:
+        return {"error": f"Invalid XP amount: must be between 1 and {MAX_XP_PER_AWARD}"}
+
     profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
     if not profile:
         return {"error": "Profile not found"}

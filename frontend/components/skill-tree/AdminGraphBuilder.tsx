@@ -117,8 +117,8 @@ export default function AdminGraphBuilder({
                     method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
+                    credentials: "include" as RequestCredentials,
                     body: JSON.stringify({
                         x_position: level.x_position,
                         y_position: level.y_position,
@@ -161,8 +161,8 @@ export default function AdminGraphBuilder({
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
+                    credentials: "include" as RequestCredentials,
                     body: JSON.stringify({
                         from_level_id: connectingFrom,
                         to_level_id: toLevelId,
@@ -188,9 +188,7 @@ export default function AdminGraphBuilder({
                 `${process.env.NEXT_PUBLIC_API_URL}/api/admin/edges/${edgeId}`,
                 {
                     method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
+                    credentials: "include" as RequestCredentials,
                 }
             );
 
@@ -214,8 +212,8 @@ export default function AdminGraphBuilder({
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
                     },
+                    credentials: "include" as RequestCredentials,
                     body: JSON.stringify({
                         title: newLevelTitle.trim(),
                         description: "",
@@ -246,9 +244,7 @@ export default function AdminGraphBuilder({
                 `${process.env.NEXT_PUBLIC_API_URL}/api/admin/levels/${levelId}`,
                 {
                     method: "DELETE",
-                    headers: {
-                        Authorization: `Bearer ${localStorage.getItem("token")}`,
-                    },
+                    credentials: "include" as RequestCredentials,
                 }
             );
 

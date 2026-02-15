@@ -53,11 +53,8 @@ class ApiClient {
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
-    // For backwards compatibility, check localStorage for token
-    // New auth uses httpOnly cookies (more secure)
-    if (typeof window !== "undefined") {
-      this.token = localStorage.getItem("auth_token");
-    }
+    // Auth is handled via httpOnly cookies (set automatically by backend)
+    // In-memory token is only used for the current session after login/register
   }
 
   private getCacheKey(endpoint: string, options: RequestInit): string {
@@ -92,11 +89,6 @@ class ApiClient {
 
   setToken(token: string | null) {
     this.token = token;
-    if (token && typeof window !== "undefined") {
-      localStorage.setItem("auth_token", token);
-    } else if (typeof window !== "undefined") {
-      localStorage.removeItem("auth_token");
-    }
     // Clear cache when token changes (user logged in/out)
     this.clearCache();
   }
@@ -105,14 +97,6 @@ class ApiClient {
     endpoint: string,
     options: RequestInit & { signal?: AbortSignal; forceRefresh?: boolean } = {}
   ): Promise<T> {
-    // Always check localStorage for token (in case it was updated in another tab)
-    if (typeof window !== "undefined") {
-      const storedToken = localStorage.getItem("auth_token");
-      if (storedToken !== this.token) {
-        this.token = storedToken;
-      }
-    }
-
     // Skip cache for non-GET requests or if cache is disabled or if forceRefresh is true
     const method = options.method || "GET";
     const headersObj = options.headers as Record<string, string> | undefined;
@@ -312,7 +296,7 @@ class ApiClient {
         body: JSON.stringify({ email, password }),
       }
     );
-    // Token is also set via httpOnly cookie, but we keep localStorage for backwards compatibility
+    // Keep in-memory token for current session; httpOnly cookie handles persistence
     this.setToken(response.access_token);
     return response;
   }

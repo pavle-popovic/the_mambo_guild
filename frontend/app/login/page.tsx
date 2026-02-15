@@ -20,7 +20,8 @@ export default function LoginPage() {
     if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location.search);
       const redirect = params.get("redirect");
-      if (redirect) {
+      // Only allow relative paths to prevent open redirect attacks
+      if (redirect && redirect.startsWith("/") && !redirect.startsWith("//")) {
         setRedirectPath(redirect);
       }
     }

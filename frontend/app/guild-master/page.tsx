@@ -154,9 +154,6 @@ export default function GuildMasterPage() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/premium/live/status`, {
         credentials: "include",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
       });
       if (response.ok) {
         const data = await response.json();
@@ -176,9 +173,6 @@ export default function GuildMasterPage() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/premium/live/recordings`, {
         credentials: "include",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
       });
       if (response.ok) {
         const data = await response.json();
@@ -194,9 +188,6 @@ export default function GuildMasterPage() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/premium/coaching/status`, {
         credentials: "include",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
       });
       if (response.ok) {
         const data = await response.json();
@@ -213,9 +204,6 @@ export default function GuildMasterPage() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/premium/coaching/my-submissions`, {
         credentials: "include",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
       });
       if (response.ok) {
         const data = await response.json();
@@ -236,7 +224,6 @@ export default function GuildMasterPage() {
         credentials: "include",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
         },
         body: JSON.stringify({
           video_mux_playback_id: uploadedVideo.playbackId,
@@ -271,9 +258,6 @@ export default function GuildMasterPage() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/premium/dj-booth/tracks`, {
         credentials: "include",
-        headers: {
-          Authorization: `Bearer ${localStorage.getItem("auth_token")}`,
-        },
       });
       if (response.ok) {
         const data = await response.json();

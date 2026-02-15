@@ -285,12 +285,10 @@ function ConstellationGraphInner({
       // If unlocked, fetch lessons and navigate to first lesson
       if (level.is_unlocked) {
         try {
-          const token = typeof window !== 'undefined' ? localStorage.getItem('auth_token') : null;
-
           const response = await fetch(
             `${process.env.NEXT_PUBLIC_API_URL}/api/courses/levels/${node.id}/lessons`,
             {
-              headers: token ? { Authorization: `Bearer ${token}` } : {},
+              credentials: "include" as RequestCredentials,
             }
           );
 

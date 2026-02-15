@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
+import DOMPurify from "dompurify";
 
 interface ContentBlock {
   type: "video" | "text" | "image" | "quiz";
@@ -40,7 +41,7 @@ function VideoBlock({ block }: { block: ContentBlock }) {
     return (
       <div
         className="video-container"
-        dangerouslySetInnerHTML={{ __html: block.embed_code }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(block.embed_code, { ADD_TAGS: ["iframe"], ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"] }) }}
       />
     );
   }
@@ -97,7 +98,7 @@ function TextBlock({ block }: { block: ContentBlock }) {
     return (
       <div
         className="prose prose-invert prose-lg max-w-none text-gray-300"
-        dangerouslySetInnerHTML={{ __html: content }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(content) }}
       />
     );
   }
@@ -115,7 +116,7 @@ function TextBlock({ block }: { block: ContentBlock }) {
     return (
       <div
         className="prose prose-invert prose-lg max-w-none text-gray-300"
-        dangerouslySetInnerHTML={{ __html: html }}
+        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(html) }}
       />
     );
   }

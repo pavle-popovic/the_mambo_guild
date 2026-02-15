@@ -48,8 +48,8 @@ export default function LevelPreviewUploader({
             method: "PUT",
             headers: {
               "Content-Type": "application/json",
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
             },
+            credentials: "include" as RequestCredentials,
             body: JSON.stringify({
               mux_preview_playback_id: null,
               mux_preview_asset_id: null,
@@ -90,8 +90,8 @@ export default function LevelPreviewUploader({
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include" as RequestCredentials,
           body: JSON.stringify({
             thumbnail_url: url,
           }),
@@ -113,8 +113,8 @@ export default function LevelPreviewUploader({
           method: "PUT",
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
+          credentials: "include" as RequestCredentials,
           body: JSON.stringify({
             thumbnail_url: null,
           }),

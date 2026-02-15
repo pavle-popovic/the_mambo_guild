@@ -526,10 +526,8 @@ export default function SkillTreeTeaser() {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const token = localStorage.getItem("auth_token");
-        const response = await fetch(`${API_URL}/api/courses/worlds`, { 
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-          credentials: 'include' 
+        const response = await fetch(`${API_URL}/api/courses/worlds`, {
+          credentials: 'include'
         });
         if (response.ok) { 
           const data = await response.json(); 
@@ -551,13 +549,10 @@ export default function SkillTreeTeaser() {
       setTreeLoading(true); 
       setSelectedNode(null);
       try {
-        const token = localStorage.getItem("auth_token");
-        console.log("[SkillTreeTeaser] Fetching skill tree, token exists:", !!token, "user:", user?.username);
-        
         const response = await fetch(
-          `${API_URL}/api/courses/worlds/${selectedCourseId}/skill-tree`, 
-          { 
-            headers: token ? { Authorization: `Bearer ${token}` } : {},
+          `${API_URL}/api/courses/worlds/${selectedCourseId}/skill-tree`,
+          {
+            credentials: 'include',
           }
         );
         
