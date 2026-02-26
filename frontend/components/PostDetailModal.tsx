@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes, FaTrash, FaEdit, FaFire, FaRuler, FaSave } from "react-icons/fa";
 import MuxVideoPlayer from "./MuxVideoPlayer";
 import { apiClient } from "@/lib/api";
@@ -93,6 +93,11 @@ export default function PostDetailModal({
   const [replyContent, setReplyContent] = useState("");
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [playerInitialized, setPlayerInitialized] = useState(false);
+
+  // Reply edit/delete state
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editingReplyContent, setEditingReplyContent] = useState("");
+  const [deletingReplyId, setDeletingReplyId] = useState<string | null>(null);
 
   // Optimistic state management
   const [optimisticReaction, setOptimisticReaction] = useState<{ type: string | null, count: number } | null>(null);
@@ -408,6 +413,29 @@ export default function PostDetailModal({
       onRefresh?.();
     } catch (err: any) {
       setError(err.message || "Failed to mark solution");
+    }
+  };
+
+  const handleUpdateReply = async (replyId: string) => {
+    if (!editingReplyContent.trim()) return;
+    try {
+      await apiClient.updateReply(postId, replyId, editingReplyContent.trim());
+      setEditingReplyId(null);
+      setEditingReplyContent("");
+      await loadPost({ forceRefresh: true });
+    } catch (err: any) {
+      setError(err.message || "Failed to update reply");
+    }
+  };
+
+  const handleDeleteReply = async (replyId: string) => {
+    try {
+      await apiClient.deleteReply(postId, replyId);
+      setDeletingReplyId(null);
+      await loadPost({ forceRefresh: true });
+      onRefresh?.();
+    } catch (err: any) {
+      setError(err.message || "Failed to delete reply");
     }
   };
 
@@ -865,13 +893,24 @@ export default function PostDetailModal({
                       Replies ({post.reply_count})
                     </h3>
                     <div className="space-y-4">
-                      {post.replies.map((reply) => {
+                      <AnimatePresence mode="popLayout">
+                      {post.replies.map((reply, index) => {
                         const isOptimistic = reply.id.startsWith("temp-");
+                        const isReplyOwner = currentUserId && String(currentUserId) === String(reply.user.id);
+                        const isAdmin = user?.role === "admin";
+                        const canEditReply = (isReplyOwner || isAdmin) && !isOptimistic;
                         return (
-                          <GlassCard 
-                            key={reply.id} 
+                          <motion.div
+                            key={reply.id}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 20, height: 0 }}
+                            transition={{ duration: 0.3, delay: index * 0.05 }}
+                            layout
+                          >
+                          <GlassCard
                             className={cn(
-                              "p-4", 
+                              "p-4",
                               isOptimistic && "opacity-70",
                               reply.user.is_guild_master && "guild-master-comment"
                             )}
@@ -913,10 +952,61 @@ export default function PostDetailModal({
                                       ✓ Accept
                                     </button>
                                   )}
+
+                                  {/* Reply Edit/Delete Buttons */}
+                                  {canEditReply && (
+                                    <div className="ml-auto flex items-center gap-1">
+                                      <button
+                                        onClick={() => {
+                                          setEditingReplyId(reply.id);
+                                          setEditingReplyContent(reply.content);
+                                        }}
+                                        className="p-1 rounded hover:bg-white/10 text-white/40 hover:text-white/70 transition"
+                                        title="Edit reply"
+                                      >
+                                        <FaEdit size={12} />
+                                      </button>
+                                      <button
+                                        onClick={() => setDeletingReplyId(reply.id)}
+                                        className="p-1 rounded hover:bg-red-500/20 text-white/40 hover:text-red-400 transition"
+                                        title="Delete reply"
+                                      >
+                                        <FaTrash size={12} />
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
-                                <p className="text-white/80 text-sm whitespace-pre-wrap">
-                                  {reply.content}
-                                </p>
+
+                                {/* Inline Edit or Content */}
+                                {editingReplyId === reply.id ? (
+                                  <div className="space-y-2">
+                                    <textarea
+                                      value={editingReplyContent}
+                                      onChange={(e) => setEditingReplyContent(e.target.value)}
+                                      className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                                      rows={3}
+                                    />
+                                    <div className="flex gap-2">
+                                      <button
+                                        onClick={() => handleUpdateReply(reply.id)}
+                                        className="px-3 py-1 rounded bg-[#D4AF37]/20 text-[#FCE205] text-xs font-bold hover:bg-[#D4AF37]/30 transition"
+                                      >
+                                        Save
+                                      </button>
+                                      <button
+                                        onClick={() => { setEditingReplyId(null); setEditingReplyContent(""); }}
+                                        className="px-3 py-1 rounded text-white/50 text-xs hover:text-white/70 transition"
+                                      >
+                                        Cancel
+                                      </button>
+                                    </div>
+                                  </div>
+                                ) : (
+                                  <p className="text-white/80 text-sm whitespace-pre-wrap">
+                                    {reply.content}
+                                  </p>
+                                )}
+
                                 {reply.mux_playback_id && (
                                   <div className="mt-2">
                                     <MuxVideoPlayer
@@ -931,9 +1021,37 @@ export default function PostDetailModal({
                               </div>
                             </div>
                           </GlassCard>
+                          </motion.div>
                         );
                       })}
+                      </AnimatePresence>
                     </div>
+                  </div>
+                )}
+
+                {/* Reply Delete Confirmation */}
+                {deletingReplyId && (
+                  <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
+                    <GlassCard className="max-w-md w-full p-6 space-y-4">
+                      <h3 className="text-xl font-bold text-white">Delete Reply?</h3>
+                      <p className="text-white/70">
+                        Are you sure you want to delete this reply? This action cannot be undone.
+                      </p>
+                      <div className="flex justify-end gap-3 mt-6">
+                        <button
+                          onClick={() => setDeletingReplyId(null)}
+                          className="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReply(deletingReplyId)}
+                          className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </GlassCard>
                   </div>
                 )}
               </>

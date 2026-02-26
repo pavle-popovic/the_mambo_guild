@@ -32,6 +32,8 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [showSuccess, setShowSuccess] = useState(false);
+
   // Video upload state (Stage only)
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "processing" | "error">("idle");
@@ -42,6 +44,18 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
   const [uploadId, setUploadId] = useState<string | null>(null);
   const [createdPostId, setCreatedPostId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Question slot status (Lab only)
+  const [questionSlots, setQuestionSlots] = useState<{current_slots: number; max_slots: number} | null>(null);
+
+  // Fetch question slot status when modal opens in lab mode
+  useEffect(() => {
+    if (isOpen && mode === "lab") {
+      apiClient.getQuestionSlotStatus().then(status => {
+        setQuestionSlots({ current_slots: status.current_slots, max_slots: status.max_slots });
+      }).catch(() => {});
+    }
+  }, [isOpen, mode]);
 
   // Predefined relevant tags
   const RELEVANT_TAGS: Tag[] = [
@@ -331,10 +345,12 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
         updated_at: new Date().toISOString(),
       });
 
-      // Close modal after a brief delay to show any final state
+      // Show success checkmark then close
+      setShowSuccess(true);
       setTimeout(() => {
+        setShowSuccess(false);
         onClose();
-      }, 100);
+      }, 1200);
     } catch (err: any) {
       console.error("Error creating post:", err);
       // Show user-friendly error message
@@ -663,9 +679,48 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             <p className="text-xs text-white/40 mt-4 text-center">
               {mode === "stage"
                 ? "Costs 15 claves • Video slot required"
-                : "Costs 5 claves"}
+                : `Costs 5 claves${questionSlots ? ` • ${questionSlots.max_slots - questionSlots.current_slots} question slots remaining` : ""}`}
             </p>
           </GlassCard>
+
+          {/* Success Checkmark Overlay */}
+          <AnimatePresence>
+            {showSuccess && (
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-sm rounded-3xl z-50"
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 15 }}
+                  className="w-20 h-20 rounded-full bg-green-500/20 border-2 border-green-400 flex items-center justify-center"
+                >
+                  <motion.svg
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="w-10 h-10 text-green-400"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={3}
+                  >
+                    <motion.path
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M5 13l4 4L19 7"
+                    />
+                  </motion.svg>
+                </motion.div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </motion.div>
       </motion.div>
     </AnimatePresence>

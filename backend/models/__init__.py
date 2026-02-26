@@ -39,6 +39,7 @@ from models.community import (
     BadgeDefinition, UserBadge,
     CommunityTag
 )
+from models.notification import Notification
 from models.premium import (
     LiveCall, LiveCallStatus,
     WeeklyArchive,

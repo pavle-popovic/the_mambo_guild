@@ -46,7 +46,7 @@ def get_beautiful_html(username, referral_link):
     text_color = "#333333" # Dark Gray/Black
     
     # TODO: Replace [INSERT URL HERE] with the actual combo URL before sending
-    combo_url = "https://youtu.be/RIMp6J02Th0"
+    combo_url = "https://youtu.be/5u_56JspFX8"
     
     return f"""
     <!DOCTYPE html>
@@ -112,28 +112,25 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p>Today we explore some Mambo fused with Afro Cuban steps.</p>
-
             <p>Here is the combo for this week: <a href="{combo_url}" class="link">{combo_url}</a></p>
 
-            <h2>1. The Science: Training on the bus? <span class="emoji">🚌</span></h2>
-            <p>I know life gets busy. But here is a little secret: you don't actually need a studio to train.</p>
-            <p>I use a tool called <strong>Visualization</strong>. Studies show that just imagining a movement vividly activates the same neural pathways as actually doing it physically.</p>
-            <p>So next time you are on the bus or waiting for coffee, close your eyes and run the routine in your head. It's the ultimate portable training tool—and it works.</p>
+            <h2><span class="emoji">🧠</span> The Science of Movement: The Variation Hack</h2>
+            <p>If you want to learn footwork faster, you need to stop practicing under the exact same conditions every time.</p>
+            <p>Neuroplasticity (how your brain builds new pathways) thrives on repetition, but it also desperately needs new feedback to adapt. If you always practice staring perfectly at yourself in the mirror, you are using a visual crutch.</p>
+            <p>To speed up your learning, you have to introduce variation into your environment and conditions. Try doing "blind" drills with your eyes closed—this forces your brain to rely on internal sensory data (proprioception) rather than visuals. Turn away from the mirror entirely to build true kinaesthetic awareness, or challenge your mechanics by drilling shines at 110% music speed.</p>
+            <p>By varying the conditions, you force your brain to develop a "super cue"—a neural shortcut that allows for rapid, real-time error correction when you are dancing at high speeds.</p>
 
-            <h2>2. The History: A Conversation with the Gods</h2>
-            <p>I find this really beautiful, so I wanted to share it with you.</p>
-            <p>The word "Mambo" isn't just a random name. It actually comes from the Kikongo language in the Congo, and it translates to "conversation with the gods" or "sacred words".</p>
-            <p>It was originally a way to connect the physical world with the spiritual world through rhythm. I love thinking about that—it makes every step feel a little more meaningful, doesn't it?</p>
+            <h2><span class="emoji">🗽</span> The History: The Nuyorican Mambo Engine</h2>
+            <p>While Mambo's roots are African and Cuban, the aggressive, highly technical style we dance today was forged in New York City's Palladium Ballroom.</p>
+            <p>The culture exploded thanks to a mix of legendary Puerto Rican and Nuyorican talent:</p>
+            <p><strong>The Musician:</strong> Tito Puente ("El Rey") drove dancers to insane technical heights with his percussive intensity, famously playing his timbales standing up at the front of the stage.</p>
+            <p><strong>The Dancer:</strong> "Cuban Pete" (Pedro Aguilar) defined the "street" style of the Palladium, which was improvisational, aggressive, and deeply rhythmic.</p>
+            <p><strong>The Architect:</strong> Eddie Torres, a dancer from the Bronx, took that raw Palladium energy and mathematically codified it into the "Salsa On 2" timing (1-2-3, 5-6-7) so it could be taught to the masses.</p>
 
             <p>See you in the next one,</p>
 
             <p>Pavle</p>
 
-            <div class="footer">
-                <p>P.S. Want to unlock 'Beta Tester' status early? Invite 3 friends using your unique extraction link:<br>
-                <a href="{referral_link}" class="link">{referral_link}</a></p>
-            </div>
         </div>
     </body>
     </html>

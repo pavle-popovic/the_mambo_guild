@@ -19,6 +19,9 @@ from .claves import router as claves_router
 from .community import router as community_router
 from .badges import router as badges_router
 
+# Notifications
+from .notifications import router as notifications_router
+
 # AI Chat Feature
 from .ai_chat import router as ai_chat_router
 
@@ -44,6 +47,9 @@ api_router.include_router(payments_router, tags=["payments"])
 api_router.include_router(claves_router, prefix="/claves", tags=["claves"])
 api_router.include_router(community_router, prefix="/community", tags=["community"])
 api_router.include_router(badges_router, prefix="/badges", tags=["badges"])
+
+# Notifications
+api_router.include_router(notifications_router, prefix="/notifications", tags=["notifications"])
 
 # AI Chat Feature
 api_router.include_router(ai_chat_router, prefix="/ai", tags=["ai"])

@@ -82,6 +82,8 @@ export default function StageVideoCard({
             }}
             onHoverEnd={() => setIsHovered(false)}
             onMouseDown={handleMouseDown}
+            whileHover={!isLocked ? { y: -4 } : undefined}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className={cn(
                 "relative aspect-[9/16] rounded-2xl overflow-hidden cursor-pointer group bg-black shadow-2xl border border-white/10 transition-all duration-300",
                 !isLocked && "hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10",

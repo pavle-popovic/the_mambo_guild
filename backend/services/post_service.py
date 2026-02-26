@@ -13,7 +13,7 @@ import uuid
 from models.user import User, UserProfile, Subscription, SubscriptionTier, SubscriptionStatus
 from models.community import Post, PostReply, PostReaction, CommunityTag
 from services.clave_service import (
-    spend_claves, can_afford, get_video_slot_status,
+    spend_claves, can_afford, get_video_slot_status, get_question_slot_status,
     award_accepted_answer, process_reaction_refund,
     COST_REACTION, COST_COMMENT, COST_POST_QUESTION, COST_POST_VIDEO
 )
@@ -137,7 +137,12 @@ def create_post(
             return {"success": False, "message": slot_status["message"]}
     else:
         cost = COST_POST_QUESTION
-        
+
+        # Check question slot limit
+        q_slot_status = get_question_slot_status(user_id, db)
+        if not q_slot_status["allowed"]:
+            return {"success": False, "message": q_slot_status["message"]}
+
         # Lab posts require body
         if not body or not body.strip():
             return {"success": False, "message": "Question body is required for Lab posts"}
@@ -188,6 +193,7 @@ def create_post(
 def get_feed(
     post_type: str = None,
     tag: str = None,
+    tags: List[str] = None,
     skip: int = 0,
     limit: int = 20,
     current_user_id: str = None,
@@ -195,16 +201,20 @@ def get_feed(
 ) -> List[dict]:
     """
     Get paginated feed of posts.
+    Supports single tag or multi-tag filtering.
     """
-    query = db.query(Post)
-    
+    query = db.query(Post).filter(Post.is_deleted == False)
+
     if post_type:
         query = query.filter(Post.post_type == post_type)
-    
-    if tag:
-        # Use PostgreSQL array contains operator (@>)
+
+    if tags and len(tags) > 0:
+        # Multi-tag filter: post must have ANY of the specified tags
+        from sqlalchemy import or_
+        query = query.filter(or_(*[Post.tags.any(t) for t in tags]))
+    elif tag:
         query = query.filter(Post.tags.any(tag))
-    
+
     posts = query.order_by(desc(Post.created_at)).offset(skip).limit(limit).all()
     
     return [_format_post_response(p, current_user_id, db) for p in posts]
@@ -218,13 +228,14 @@ def get_post_detail(
     """
     Get full post detail with replies.
     """
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
     if not post:
         return None
-    
+
     # Get replies ordered by accepted answer first, then by date
     replies = db.query(PostReply).filter(
-        PostReply.post_id == post_id
+        PostReply.post_id == post_id,
+        PostReply.is_deleted == False
     ).order_by(
         desc(PostReply.is_accepted_answer),
         PostReply.created_at
@@ -245,10 +256,10 @@ def add_reaction(
     """
     Add or change a reaction on a post.
     """
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
     if not post:
         return {"success": False, "message": "Post not found"}
-    
+
     # Check for existing reaction
     existing = db.query(PostReaction).filter(
         PostReaction.post_id == post_id,
@@ -340,10 +351,10 @@ def add_reply(
     """
     Add a reply/comment to a post.
     """
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
     if not post:
         return {"success": False, "message": "Post not found"}
-    
+
     # Check feedback_type - "hype" mode disables comments
     if post.feedback_type == "hype":
         return {"success": False, "message": "Comments are disabled on this post (Hype mode)"}
@@ -392,10 +403,10 @@ def mark_solution(
     Mark a reply as the accepted solution (OP only).
     Awards claves to the helper.
     """
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
     if not post:
         return {"success": False, "message": "Post not found"}
-    
+
     # Only OP can mark solution
     if str(post.user_id) != user_id:
         return {"success": False, "message": "Only the question author can mark a solution"}
@@ -446,18 +457,19 @@ def update_post(
     tags: List[str] = None,
     is_wip: bool = None,
     feedback_type: str = None,
+    is_admin: bool = False,
     db: Session = None
 ) -> dict:
     """
-    Update an existing post (own posts only).
+    Update an existing post (own posts or admin).
     Returns: {success, post, message} or {success: False, message}
     """
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
     if not post:
         return {"success": False, "message": "Post not found"}
-    
-    # Only owner can update
-    if str(post.user_id) != user_id:
+
+    # Owner or admin can update
+    if str(post.user_id) != user_id and not is_admin:
         return {"success": False, "message": "You can only edit your own posts"}
     
     # Update fields if provided
@@ -523,44 +535,31 @@ def delete_post(
     db: Session
 ) -> dict:
     """
-    Delete a post (own posts only).
+    Soft-delete a post (own posts or admin).
     """
-    post = db.query(Post).filter(Post.id == post_id).first()
+    post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
     if not post:
         return {"success": False, "message": "Post not found"}
-    
+
     try:
         # Check ownership or admin status
-        # Local import to assure no circular deps and correct Enum access
         from models.user import User, UserRole
-        
-        # Get user to check role
+
         user = db.query(User).filter(User.id == user_id).first()
         is_admin = False
         if user:
-            # Check against Enum or string value
             is_admin = (user.role == UserRole.ADMIN) or (str(user.role) == "admin")
-        
+
         if str(post.user_id) != user_id and not is_admin:
             return {"success": False, "message": "You can only delete your own posts"}
-        
-        # Delete from Mux if asset ID exists
-        if post.mux_asset_id:
-            try:
-                from services import mux_service
-                logger.info(f"Attempting to delete Mux asset {post.mux_asset_id} for post {post_id}")
-                mux_service.delete_asset(post.mux_asset_id)
-            except Exception as e:
-                # Log but do not block post deletion
-                logger.error(f"Failed to delete Mux asset {post.mux_asset_id} for post {post_id}: {e}")
-        
-        # Delete the post (cascades to reactions and replies)
-        db.delete(post)
-        db.commit() # Commit explicitly
-        
-        logger.info(f"User {user_id} (Admin: {is_admin}) deleted post {post_id}")
+
+        # Soft delete
+        post.is_deleted = True
+        db.flush()
+
+        logger.info(f"User {user_id} (Admin: {is_admin}) soft-deleted post {post_id}")
         return {"success": True, "message": "Post deleted"}
-        
+
     except Exception as e:
         logger.error(f"CRITICAL ERROR deleting post {post_id}: {e}", exc_info=True)
         db.rollback()
@@ -586,21 +585,113 @@ def get_tags(db: Session) -> List[dict]:
 def search_posts(
     query: str,
     post_type: str = None,
+    tag: str = None,
+    tags: List[str] = None,
     skip: int = 0,
     limit: int = 20,
     current_user_id: str = None,
     db: Session = None
 ) -> List[dict]:
     """
-    Search posts by title and tags.
+    Search posts by title and/or tags.
+    Title search uses ILIKE; also matches if query appears in any tag.
+    Additional tag/tags params filter results to specific tags.
     """
+    from sqlalchemy import or_
+
+    # Search by title OR tag content match
     search_query = db.query(Post).filter(
-        Post.title.ilike(f"%{query}%")
+        Post.is_deleted == False,
+        or_(
+            Post.title.ilike(f"%{query}%"),
+            Post.tags.any(query.lower())
+        )
     )
-    
+
     if post_type:
         search_query = search_query.filter(Post.post_type == post_type)
-    
+
+    # Additional tag filtering
+    if tags and len(tags) > 0:
+        search_query = search_query.filter(or_(*[Post.tags.any(t) for t in tags]))
+    elif tag:
+        search_query = search_query.filter(Post.tags.any(tag))
+
     posts = search_query.order_by(desc(Post.created_at)).offset(skip).limit(limit).all()
-    
+
     return [_format_post_response(p, current_user_id, db) for p in posts]
+
+
+def update_reply(
+    post_id: str,
+    reply_id: str,
+    user_id: str,
+    content: str,
+    is_admin: bool = False,
+    db: Session = None
+) -> dict:
+    """
+    Update a reply (owner or admin).
+    """
+    reply = db.query(PostReply).filter(
+        PostReply.id == reply_id,
+        PostReply.post_id == post_id,
+        PostReply.is_deleted == False
+    ).first()
+    if not reply:
+        return {"success": False, "message": "Reply not found"}
+
+    if str(reply.user_id) != user_id and not is_admin:
+        return {"success": False, "message": "You can only edit your own replies"}
+
+    reply.content = content
+    db.flush()
+
+    logger.info(f"User {user_id} (admin={is_admin}) updated reply {reply_id}")
+    return {
+        "success": True,
+        "reply": _format_reply_response(reply, db),
+        "message": "Reply updated successfully"
+    }
+
+
+def delete_reply(
+    post_id: str,
+    reply_id: str,
+    user_id: str,
+    is_admin: bool = False,
+    db: Session = None
+) -> dict:
+    """
+    Soft-delete a reply (owner or admin).
+    Decrements reply_count and unmarks accepted answer if applicable.
+    """
+    reply = db.query(PostReply).filter(
+        PostReply.id == reply_id,
+        PostReply.post_id == post_id,
+        PostReply.is_deleted == False
+    ).first()
+    if not reply:
+        return {"success": False, "message": "Reply not found"}
+
+    if str(reply.user_id) != user_id and not is_admin:
+        return {"success": False, "message": "You can only delete your own replies"}
+
+    # Soft delete
+    reply.is_deleted = True
+
+    # Decrement reply count on parent post
+    post = db.query(Post).filter(Post.id == post_id).first()
+    if post:
+        post.reply_count = max(0, post.reply_count - 1)
+
+        # If this was the accepted answer, unmark it
+        if reply.is_accepted_answer:
+            reply.is_accepted_answer = False
+            post.accepted_answer_id = None
+            post.is_solved = False
+
+    db.flush()
+
+    logger.info(f"User {user_id} (admin={is_admin}) soft-deleted reply {reply_id}")
+    return {"success": True, "message": "Reply deleted"}

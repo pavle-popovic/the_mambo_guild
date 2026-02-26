@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { ClaveWallet } from "./ClaveWallet";
 import { WalletModal } from "./WalletModal";
+import NotificationBell from "./NotificationBell";
 import { UISound } from "@/hooks/useUISound";
 
 interface NavBarProps {
@@ -306,6 +307,9 @@ export default function NavBar({ user }: NavBarProps) {
                   </Link>
                 )}
 
+                {/* Notification Bell */}
+                <NotificationBell />
+
                 {/* Profile Avatar */}
                 <MotionDiv
                   {...(mounted ? {
@@ -315,7 +319,7 @@ export default function NavBar({ user }: NavBarProps) {
                   } : {})}
                   onMouseEnter={handleNavHover}
                 >
-                  <Link 
+                  <Link
                     href="/profile" 
                     className={cn(
                       "w-10 h-10 rounded-full bg-gray-700 overflow-hidden transition-all flex items-center justify-center",

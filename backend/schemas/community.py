@@ -145,6 +145,11 @@ class ReplyCreateRequest(BaseModel):
     mux_playback_id: Optional[str] = None
 
 
+class ReplyUpdateRequest(BaseModel):
+    """Request to update a reply/comment."""
+    content: str = Field(..., min_length=1, max_length=2000)
+
+
 class ReplyResponse(BaseModel):
     """Reply/comment response."""
     id: str

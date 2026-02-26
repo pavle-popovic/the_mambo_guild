@@ -9,10 +9,10 @@ from typing import Optional, List
 from models import get_db
 from models.user import User
 from dependencies import get_current_user
-from services import post_service, badge_service
+from services import post_service, badge_service, notification_service
 from schemas.community import (
     PostCreateRequest, PostUpdateRequest, PostResponse, PostDetailResponse,
-    ReactionRequest, ReplyCreateRequest, ReplyResponse,
+    ReactionRequest, ReplyCreateRequest, ReplyUpdateRequest, ReplyResponse,
     UploadCheckResponse, TagResponse
 )
 
@@ -21,81 +21,67 @@ router = APIRouter(tags=["Community"])
 
 @router.get("/stats")
 async def get_community_stats(
+    period: Optional[str] = Query("all_time", description="weekly, monthly, all_time"),
+    category: Optional[str] = Query("overall", description="overall, helpful, creative, active"),
+    limit: int = Query(10, ge=1, le=50),
     db: Session = Depends(get_db)
 ):
     """
     Get public community stats (no auth required).
-    Returns total member count, active users, and leaderboard.
+    Returns total member count, active users, leaderboard, and hall of fame.
     """
-    from models.user import User, UserProfile
-    from models.community import Post, PostReaction, PostReply
-    from sqlalchemy import func
-    
-    # Count ALL registered accounts (not just paying)
-    total_users = db.query(User).count()
-    
-    # Simulated active users (based on time of day and total users)
+    from models.user import User as UserModel
+    from services import leaderboard_service
     import random
-    base_active = max(5, int(total_users * 0.02))  # ~2% of users online
-    active_now = base_active + random.randint(-3, 5)
-    active_now = max(3, active_now)  # Minimum 3
-    
-    # Get real leaderboard - top 3 users by community activity
-    # Calculate score: posts * 5 + reactions_received * 2 + replies * 3
-    leaderboard_data = []
-    
-    # Get users with most posts and engagement
-    top_users = db.query(
-        User.id,
-        UserProfile.first_name,
-        UserProfile.avatar_url,
-        func.count(Post.id).label('post_count')
-    ).join(
-        UserProfile, User.id == UserProfile.user_id, isouter=True
-    ).join(
-        Post, User.id == Post.user_id, isouter=True
-    ).group_by(
-        User.id, UserProfile.first_name, UserProfile.avatar_url
-    ).having(
-        func.count(Post.id) > 0
-    ).order_by(
-        func.count(Post.id).desc()
-    ).limit(3).all()
-    
-    for idx, user in enumerate(top_users):
-        # Calculate engagement score for this user
-        post_count = user.post_count or 0
-        
-        # Get total reactions on this user's posts
-        reaction_count = db.query(func.count(PostReaction.id)).join(
-            Post, PostReaction.post_id == Post.id
-        ).filter(Post.user_id == user.id).scalar() or 0
-        
-        # Get total replies made by this user
-        reply_count = db.query(PostReply).filter(PostReply.user_id == user.id).count()
-        
-        score = (post_count * 5) + (reaction_count * 2) + (reply_count * 3)
-        
-        leaderboard_data.append({
-            "id": str(user.id),
-            "first_name": user.first_name or "User",
-            "avatar_url": user.avatar_url,
-            "score": score,
-            "rank": idx + 1
-        })
-    
+
+    total_users = db.query(UserModel).count()
+
+    base_active = max(5, int(total_users * 0.02))
+    active_now = max(3, base_active + random.randint(-3, 5))
+
+    leaderboard_data = leaderboard_service.get_leaderboard(
+        period=period or "all_time",
+        category=category or "overall",
+        limit=limit,
+        db=db
+    )
+
+    hall_of_fame = leaderboard_service.get_hall_of_fame(limit=5, db=db)
+
     return {
         "member_count": total_users,
         "active_now": active_now,
-        "leaderboard": leaderboard_data
+        "leaderboard": leaderboard_data,
+        "hall_of_fame": hall_of_fame,
+        "period": period or "all_time",
+        "category": category or "overall"
     }
+
+
+@router.get("/stats/my-rank")
+async def get_my_rank(
+    period: Optional[str] = Query("all_time"),
+    category: Optional[str] = Query("overall"),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get the current user's rank on the leaderboard."""
+    from services import leaderboard_service
+    rank_data = leaderboard_service.get_user_rank(
+        user_id=str(current_user.id),
+        period=period or "all_time",
+        category=category or "overall",
+        db=db
+    )
+    return rank_data
 
 
 
 @router.get("/feed", response_model=List[PostResponse])
 async def get_feed(
     post_type: Optional[str] = Query(None, description="Filter by 'stage' or 'lab'"),
-    tag: Optional[str] = Query(None, description="Filter by tag slug"),
+    tag: Optional[str] = Query(None, description="Filter by single tag slug"),
+    tags: Optional[str] = Query(None, description="Comma-separated tag slugs for multi-tag filter"),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=50),
     current_user: User = Depends(get_current_user),
@@ -106,10 +92,13 @@ async def get_feed(
     - No filter: All posts
     - post_type=stage: Video posts (The Stage)
     - post_type=lab: Q&A posts (The Lab)
+    - tags: Comma-separated tag slugs for multi-tag filter
     """
+    tags_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else None
     posts = post_service.get_feed(
         post_type=post_type,
         tag=tag,
+        tags=tags_list,
         skip=skip,
         limit=limit,
         current_user_id=str(current_user.id),
@@ -227,9 +216,26 @@ async def add_reaction(
     post = db.query(Post).filter(Post.id == post_id).first()
     if post:
         badge_service.increment_reaction_received(str(post.user_id), request.reaction_type, db)
-        
+
+        # Notify post owner about the reaction (don't notify self)
+        if str(post.user_id) != str(current_user.id):
+            emoji_map = {"fire": "🔥", "ruler": "📏", "clap": "👏"}
+            emoji = emoji_map.get(request.reaction_type, "")
+            from models.user import UserProfile
+            profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+            reactor_name = profile.first_name if profile else "Someone"
+            notification_service.create_notification(
+                user_id=str(post.user_id),
+                type="reaction_received",
+                title=f"{emoji} New Reaction",
+                message=f"{reactor_name} reacted {emoji} to your post \"{post.title[:50]}\"",
+                reference_type="post",
+                reference_id=str(post.id),
+                db=db
+            )
+
     db.commit()
-    
+
     return result
 
 
@@ -286,13 +292,30 @@ async def add_reply(
     # The Socialite: Track comments posted
     if result["success"]:
         from sqlalchemy import func
-        from models.community import PostReply
+        from models.community import PostReply, Post
         comment_count = db.query(func.count(PostReply.id)).filter(
             PostReply.user_id == current_user.id
         ).scalar() or 0
         badge_service.check_and_award_badges(str(current_user.id), "comments_posted", comment_count, db)
+
+        # Notify post owner about the reply (don't notify self)
+        post = db.query(Post).filter(Post.id == post_id).first()
+        if post and str(post.user_id) != str(current_user.id):
+            from models.user import UserProfile
+            profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+            replier_name = profile.first_name if profile else "Someone"
+            notification_service.create_notification(
+                user_id=str(post.user_id),
+                type="reply_received",
+                title="💬 New Reply",
+                message=f"{replier_name} replied to your post \"{post.title[:50]}\"",
+                reference_type="post",
+                reference_id=str(post.id),
+                db=db
+            )
+
         db.commit()
-    
+
     return result
 
 
@@ -321,12 +344,82 @@ async def mark_solution(
     db.commit()
     
     # Badge triggers: Helper (El Maestro)
-    from models.community import PostReply
+    from models.community import PostReply, Post
     reply = db.query(PostReply).filter(PostReply.id == reply_id).first()
     if reply:
         badge_service.increment_solution_accepted(str(reply.user_id), db)
+
+        # Notify the helper that their answer was accepted
+        if str(reply.user_id) != str(current_user.id):
+            post = db.query(Post).filter(Post.id == post_id).first()
+            notification_service.create_notification(
+                user_id=str(reply.user_id),
+                type="answer_accepted",
+                title="✅ Answer Accepted!",
+                message=f"Your answer was marked as the solution! (+15 🥢)",
+                reference_type="post",
+                reference_id=str(post_id),
+                db=db
+            )
+
         db.commit()
-    
+
+    return result
+
+
+@router.put("/posts/{post_id}/replies/{reply_id}")
+async def update_reply(
+    post_id: str,
+    reply_id: str,
+    request: ReplyUpdateRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Update a reply (owner or admin).
+    """
+    from models.user import UserRole
+    is_admin = (current_user.role == UserRole.ADMIN) or (str(current_user.role) == "admin")
+    result = post_service.update_reply(
+        post_id=post_id,
+        reply_id=reply_id,
+        user_id=str(current_user.id),
+        content=request.content,
+        is_admin=is_admin,
+        db=db
+    )
+
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result)
+
+    db.commit()
+    return result
+
+
+@router.delete("/posts/{post_id}/replies/{reply_id}")
+async def delete_reply(
+    post_id: str,
+    reply_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Delete a reply (owner or admin).
+    """
+    from models.user import UserRole
+    is_admin = (current_user.role == UserRole.ADMIN) or (str(current_user.role) == "admin")
+    result = post_service.delete_reply(
+        post_id=post_id,
+        reply_id=reply_id,
+        user_id=str(current_user.id),
+        is_admin=is_admin,
+        db=db
+    )
+
+    if not result["success"]:
+        raise HTTPException(status_code=400, detail=result)
+
+    db.commit()
     return result
 
 
@@ -338,9 +431,11 @@ async def update_post(
     db: Session = Depends(get_db)
 ):
     """
-    Update your own post.
+    Update a post (own posts or admin).
     Only title, body, tags, is_wip, and feedback_type can be updated.
     """
+    from models.user import UserRole
+    is_admin = (current_user.role == UserRole.ADMIN) or (str(current_user.role) == "admin")
     result = post_service.update_post(
         post_id=post_id,
         user_id=str(current_user.id),
@@ -349,6 +444,7 @@ async def update_post(
         tags=request.tags,
         is_wip=request.is_wip,
         feedback_type=request.feedback_type,
+        is_admin=is_admin,
         db=db
     )
     
@@ -382,6 +478,20 @@ async def delete_post(
     return result
 
 
+@router.get("/upload-check-lab", response_model=UploadCheckResponse)
+async def check_question_eligibility(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Pre-check to see if user can post a new question.
+    Checks slot limit based on subscription tier.
+    """
+    from services.clave_service import get_question_slot_status
+    status = get_question_slot_status(str(current_user.id), db)
+    return UploadCheckResponse(**status)
+
+
 @router.get("/upload-check", response_model=UploadCheckResponse)
 async def check_upload_eligibility(
     current_user: User = Depends(get_current_user),
@@ -411,17 +521,22 @@ async def get_tags(
 async def search_posts(
     q: str = Query(..., min_length=2, description="Search query"),
     post_type: Optional[str] = Query(None),
+    tag: Optional[str] = Query(None, description="Filter by single tag slug"),
+    tags: Optional[str] = Query(None, description="Comma-separated tag slugs"),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=50),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Search posts by title.
+    Search posts by title and/or tags.
     """
+    tags_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else None
     posts = post_service.search_posts(
         query=q,
         post_type=post_type,
+        tag=tag,
+        tags=tags_list,
         skip=skip,
         limit=limit,
         current_user_id=str(current_user.id),

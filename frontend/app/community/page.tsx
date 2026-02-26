@@ -77,6 +77,7 @@ export default function CommunityPage() {
             const feed = await apiClient.getCommunityFeed({
                 post_type: (viewMode === "saved" || viewMode === "my_posts") ? undefined : viewMode,
                 tag: selectedTopics.length === 1 ? selectedTopics[0] : undefined,
+                tags: selectedTopics.length > 1 ? selectedTopics : undefined,
                 forceRefresh: true,
             });
             setPosts(feed as Post[]);

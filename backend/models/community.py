@@ -83,6 +83,8 @@ class Post(Base):
     reaction_count = Column(Integer, default=0)
     reply_count = Column(Integer, default=0)
     
+    is_deleted = Column(Boolean, default=False, nullable=False)
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
@@ -112,8 +114,10 @@ class PostReply(Base):
     mux_playback_id = Column(String(100), nullable=True)
     
     is_accepted_answer = Column(Boolean, default=False)
-    
+    is_deleted = Column(Boolean, default=False, nullable=False)
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
     # Relationships
     post = relationship("Post", back_populates="replies", foreign_keys=[post_id])

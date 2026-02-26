@@ -40,7 +40,12 @@
       "Bash(docker-compose exec:*)",
       "Bash(pip show:*)",
       "Bash(echo:*)",
-      "Bash(read:*)"
+      "Bash(read:*)",
+      "Bash(git status:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(C:/Users/pavle/Desktop/salsa_lab_v2/backend/venv/Scripts/pip.exe list:*)"
     ]
   }
 }

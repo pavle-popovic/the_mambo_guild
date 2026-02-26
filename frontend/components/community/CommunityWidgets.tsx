@@ -46,21 +46,47 @@ const rankLabels = {
     3: "🥉",
 };
 
+type Period = "weekly" | "monthly" | "all_time";
+type Category = "overall" | "helpful" | "creative" | "active";
+
+const PERIOD_LABELS: Record<Period, string> = {
+    weekly: "This Week",
+    monthly: "This Month",
+    all_time: "All Time",
+};
+
+const CATEGORY_LABELS: Record<Category, string> = {
+    overall: "Overall",
+    helpful: "Helpful",
+    creative: "Creative",
+    active: "Active",
+};
+
 export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) {
     const [memberCount, setMemberCount] = useState(0);
     const [activeNow, setActiveNow] = useState(0);
     const [apiLeaderboard, setApiLeaderboard] = useState<LeaderboardUser[]>([]);
+    const [hallOfFame, setHallOfFame] = useState<LeaderboardUser[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [period, setPeriod] = useState<Period>("all_time");
+    const [category, setCategory] = useState<Category>("overall");
+    const [myRank, setMyRank] = useState<{ rank: number | null; score: number }>({ rank: null, score: 0 });
 
-    // Fetch real stats and leaderboard from API using apiClient
+    // Fetch stats and leaderboard
     useEffect(() => {
         const fetchStats = async () => {
+            setIsLoading(true);
             try {
-                const data = await apiClient.getCommunityStats();
+                const data = await apiClient.getCommunityStats(period, category);
                 setMemberCount(data.member_count || 0);
                 setActiveNow(data.active_now || 0);
                 if (data.leaderboard && data.leaderboard.length > 0) {
                     setApiLeaderboard(data.leaderboard);
+                } else {
+                    setApiLeaderboard([]);
+                }
+                if ((data as any).hall_of_fame) {
+                    setHallOfFame((data as any).hall_of_fame);
                 }
             } catch (err) {
                 console.log("Using fallback stats due to error", err);
@@ -69,7 +95,18 @@ export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) 
             }
         };
         fetchStats();
-    }, []);
+    }, [period, category]);
+
+    // Fetch personal rank
+    useEffect(() => {
+        const fetchRank = async () => {
+            try {
+                const data = await apiClient.getMyLeaderboardRank(period, category);
+                setMyRank(data);
+            } catch {}
+        };
+        fetchRank();
+    }, [period, category]);
 
     // Add slight variance to active users for "live" feel
     useEffect(() => {
@@ -131,12 +168,48 @@ export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) 
 
     return (
         <div className="sticky top-28 h-[calc(100vh-8rem)] bg-[#121212]/60 backdrop-blur-xl border border-white/10 rounded-3xl p-6 flex flex-col gap-6 shadow-2xl relative overflow-hidden">
-            {/* Weekly Leaderboard */}
+            {/* Leaderboard */}
             <div className="flex-1 flex flex-col min-h-0">
-                <div className="pb-4 border-b border-white/10 mb-2 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
+                <div className="pb-3 border-b border-white/10 mb-2">
+                    <div className="flex items-center gap-2 mb-3">
                         <Crown size={20} className="text-[#FCE205]" />
                         <h3 className="font-serif font-bold text-white tracking-wide">High Rollers</h3>
+                    </div>
+
+                    {/* Period Toggle */}
+                    <div className="flex gap-1 mb-2">
+                        {(Object.keys(PERIOD_LABELS) as Period[]).map((p) => (
+                            <button
+                                key={p}
+                                onClick={() => setPeriod(p)}
+                                className={cn(
+                                    "px-2 py-1 rounded-md text-[10px] font-bold transition-all",
+                                    period === p
+                                        ? "bg-[#D4AF37]/20 text-[#FCE205] border border-[#D4AF37]/40"
+                                        : "text-white/40 hover:text-white/60 hover:bg-white/5"
+                                )}
+                            >
+                                {PERIOD_LABELS[p]}
+                            </button>
+                        ))}
+                    </div>
+
+                    {/* Category Tabs */}
+                    <div className="flex gap-1">
+                        {(Object.keys(CATEGORY_LABELS) as Category[]).map((c) => (
+                            <button
+                                key={c}
+                                onClick={() => setCategory(c)}
+                                className={cn(
+                                    "px-2 py-0.5 rounded text-[10px] font-medium transition-all",
+                                    category === c
+                                        ? "bg-white/10 text-white"
+                                        : "text-white/30 hover:text-white/50"
+                                )}
+                            >
+                                {CATEGORY_LABELS[c]}
+                            </button>
+                        ))}
                     </div>
                 </div>
 
@@ -191,7 +264,7 @@ export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) 
                                                 user.rank === 2 ? "text-gray-200" :
                                                     "text-amber-600"
                                         )}>{user.first_name}</span>
-                                        <span className="text-xs text-white/50">Weekly Champion</span>
+                                        <span className="text-xs text-white/50">{PERIOD_LABELS[period]} • {CATEGORY_LABELS[category]}</span>
                                     </div>
                                     <span className="text-white font-bold font-mono text-lg">{user.score}</span>
                                 </motion.div>
@@ -220,15 +293,21 @@ export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) 
                     )}
                 </div>
 
-                {/* Sticky User Rank Bar (Mockup for now as we need current user rank context) */}
+                {/* Personal Rank Bar */}
                 <div className="mt-4 pt-4 border-t border-white/10">
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-purple-900/40 to-blue-900/40 border border-white/10 backdrop-blur-md">
-                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs">You</div>
+                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold text-white">You</div>
                         <div className="flex-1">
-                            <p className="text-white text-sm font-bold">Your Rank</p>
-                            <p className="text-white/50 text-xs">Keep dancing to rise up!</p>
+                            <p className="text-white text-sm font-bold">
+                                {myRank.rank ? `You are #${myRank.rank}` : "Your Rank"}
+                            </p>
+                            <p className="text-white/50 text-xs">
+                                {myRank.rank ? `Score: ${myRank.score}` : "Keep dancing to rise up!"}
+                            </p>
                         </div>
-                        <span className="text-white/40 font-mono">--</span>
+                        <span className="text-[#D4AF37] font-mono font-bold">
+                            {myRank.rank ? `#${myRank.rank}` : "--"}
+                        </span>
                     </div>
                 </div>
             </div>

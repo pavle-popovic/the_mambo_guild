@@ -48,6 +48,8 @@ EARN_SUB_PERFORMER = 20
 # ============================================
 BASE_VIDEO_SLOTS = 5
 PRO_VIDEO_SLOTS = 20
+BASE_QUESTION_SLOTS = 10
+PRO_QUESTION_SLOTS = 50
 
 
 def is_user_pro(user_id: str, db: Session) -> bool:
@@ -308,6 +310,34 @@ def get_video_slot_status(user_id: str, db: Session) -> dict:
     else:
         message = f"You've reached your {limit} video limit. Delete an old video to post a new one."
     
+    return {
+        "allowed": allowed,
+        "current_slots": current,
+        "max_slots": limit,
+        "message": message
+    }
+
+
+def get_question_slot_status(user_id: str, db: Session) -> dict:
+    """
+    Check if user can post a new question (slot limit check).
+    Returns: {allowed, current_slots, max_slots, message}
+    """
+    is_pro = is_user_pro(user_id, db)
+    limit = PRO_QUESTION_SLOTS if is_pro else BASE_QUESTION_SLOTS
+
+    current = db.query(func.count(Post.id)).filter(
+        Post.user_id == user_id,
+        Post.post_type == "lab"
+    ).scalar() or 0
+
+    allowed = current < limit
+
+    if allowed:
+        message = f"You have {current}/{limit} question slots used."
+    else:
+        message = f"You've reached your {limit} question limit. Delete an old question to post a new one."
+
     return {
         "allowed": allowed,
         "current_slots": current,

@@ -150,8 +150,17 @@ def award_badge(user_id: str, badge: Union[BadgeDefinition, str], db: Session):
     db.add(new_badge)
     db.flush()
     
-    # TODO: Create Notification (Toast/Monitor)
-    # create_notification(user_id, "badge_earned", badge.name) - if notification system exists
+    # Create notification for badge earned
+    from services.notification_service import create_notification
+    create_notification(
+        user_id=user_id,
+        type="badge_earned",
+        title="Badge Earned!",
+        message=f"You earned the {badge_def.name} badge!",
+        reference_type="badge",
+        reference_id=badge_def.id,
+        db=db
+    )
 
 
 def get_user_stats(user_id: str, db: Session) -> dict:

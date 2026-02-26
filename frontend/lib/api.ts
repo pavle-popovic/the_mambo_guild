@@ -931,8 +931,8 @@ class ApiClient {
   // Community Endpoints (v4.0)
   // ============================================
 
-  async getCommunityStats() {
-    // This endpoint is public (no auth required)
+  async getCommunityStats(period = "all_time", category = "overall") {
+    const params = new URLSearchParams({ period, category });
     return this.request<{
       member_count: number;
       active_now: number;
@@ -943,19 +943,38 @@ class ApiClient {
         score: number;
         rank: number;
       }>;
-    }>("/api/community/stats");
+      hall_of_fame: Array<{
+        id: string;
+        first_name: string;
+        avatar_url: string | null;
+        score: number;
+        rank: number;
+      }>;
+      period: string;
+      category: string;
+    }>(`/api/community/stats?${params.toString()}`);
+  }
+
+  async getMyLeaderboardRank(period = "all_time", category = "overall") {
+    const params = new URLSearchParams({ period, category });
+    return this.request<{ rank: number | null; score: number }>(`/api/community/stats/my-rank?${params.toString()}`);
   }
 
   async getCommunityFeed(options?: {
     post_type?: 'stage' | 'lab';
     tag?: string;
+    tags?: string[];
     skip?: number;
     limit?: number;
     forceRefresh?: boolean;
   }) {
     const params = new URLSearchParams();
     if (options?.post_type) params.append("post_type", options.post_type);
-    if (options?.tag) params.append("tag", options.tag);
+    if (options?.tags && options.tags.length > 0) {
+      params.append("tags", options.tags.join(","));
+    } else if (options?.tag) {
+      params.append("tag", options.tag);
+    }
     if (options?.skip !== undefined) params.append("skip", String(options.skip));
     if (options?.limit !== undefined) params.append("limit", String(options.limit));
 
@@ -1100,6 +1119,26 @@ class ApiClient {
     });
   }
 
+  async updateReply(postId: string, replyId: string, content: string) {
+    return this.request<{
+      success: boolean;
+      reply?: any;
+      message: string;
+    }>(`/api/community/posts/${postId}/replies/${replyId}`, {
+      method: "PUT",
+      body: JSON.stringify({ content }),
+    });
+  }
+
+  async deleteReply(postId: string, replyId: string) {
+    return this.request<{
+      success: boolean;
+      message: string;
+    }>(`/api/community/posts/${postId}/replies/${replyId}`, {
+      method: "DELETE",
+    });
+  }
+
   async updatePost(postId: string, data: {
     title?: string;
     body?: string;
@@ -1126,6 +1165,15 @@ class ApiClient {
     });
   }
 
+  async getQuestionSlotStatus() {
+    return this.request<{
+      allowed: boolean;
+      current_slots: number;
+      max_slots: number;
+      message: string;
+    }>("/api/community/upload-check-lab");
+  }
+
   async getCommunityTags() {
     return this.request<Array<{
       slug: string;
@@ -1137,15 +1185,55 @@ class ApiClient {
 
   async searchPosts(query: string, options?: {
     post_type?: 'stage' | 'lab';
+    tag?: string;
+    tags?: string[];
     skip?: number;
     limit?: number;
   }) {
     const params = new URLSearchParams({ q: query });
     if (options?.post_type) params.append("post_type", options.post_type);
+    if (options?.tags && options.tags.length > 0) {
+      params.append("tags", options.tags.join(","));
+    } else if (options?.tag) {
+      params.append("tag", options.tag);
+    }
     if (options?.skip !== undefined) params.append("skip", String(options.skip));
     if (options?.limit !== undefined) params.append("limit", String(options.limit));
 
     return this.request<Array<any>>(`/api/community/search?${params.toString()}`);
+  }
+
+  // ============================================
+  // Notification Endpoints
+  // ============================================
+
+  async getNotifications(skip = 0, limit = 20) {
+    return this.request<Array<{
+      id: string;
+      type: string;
+      title: string;
+      message: string;
+      reference_type: string | null;
+      reference_id: string | null;
+      is_read: boolean;
+      created_at: string;
+    }>>(`/api/notifications/?skip=${skip}&limit=${limit}`, { forceRefresh: true });
+  }
+
+  async getUnreadNotificationCount() {
+    return this.request<{ unread_count: number }>("/api/notifications/unread-count", { forceRefresh: true });
+  }
+
+  async markNotificationRead(notificationId: string) {
+    return this.request<{ success: boolean }>(`/api/notifications/${notificationId}/read`, {
+      method: "POST",
+    });
+  }
+
+  async markAllNotificationsRead() {
+    return this.request<{ success: boolean; count: number }>("/api/notifications/read-all", {
+      method: "POST",
+    });
   }
 
   // ============================================
