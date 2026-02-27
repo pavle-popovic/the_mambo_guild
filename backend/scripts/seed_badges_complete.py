@@ -2,7 +2,6 @@
 import os
 import sys
 from dotenv import load_dotenv
-import json
 from datetime import datetime
 
 # Setup path to backend
@@ -37,11 +36,10 @@ def get_badges_list():
             "id": f"{base_id}_{tier}",
             "name": f"{name}",
             "description": f"{desc} {suffix}",
-            "tier": tier.capitalize(),
+            "tier": tier,
             "category": category,
             "requirement_type": req_type,
             "requirement_value": val,
-            "requirements": {"type": req_type, "threshold": val}
         })
 
     # 2. Human Metronome (Received 'Metronome' reactions)
@@ -62,11 +60,10 @@ def get_badges_list():
             "id": f"{base_id}_{tier}",
             "name": f"{name}",
             "description": f"{desc} {suffix}",
-            "tier": tier.capitalize(),
+            "tier": tier,
             "category": category,
             "requirement_type": req_type,
             "requirement_value": val,
-            "requirements": {"type": req_type, "threshold": val}
         })
 
     # 3. Crowd Favorite (Received 'Clap' reactions)
@@ -87,11 +84,10 @@ def get_badges_list():
             "id": f"{base_id}_{tier}",
             "name": f"{name}",
             "description": f"{desc} {suffix}",
-            "tier": tier.capitalize(),
+            "tier": tier,
             "category": category,
             "requirement_type": req_type,
             "requirement_value": val,
-            "requirements": {"type": req_type, "threshold": val}
         })
 
     # 4. Talent Scout (Given reactions to others)
@@ -112,11 +108,10 @@ def get_badges_list():
             "id": f"{base_id}_{tier}",
             "name": f"{name}",
             "description": f"{desc} {suffix}",
-            "tier": tier.capitalize(),
+            "tier": tier,
             "category": category,
             "requirement_type": req_type,
             "requirement_value": val,
-            "requirements": {"type": req_type, "threshold": val}
         })
 
     # 5. Center Stage (Videos Posted)
@@ -137,11 +132,10 @@ def get_badges_list():
             "id": f"{base_id}_{tier}",
             "name": f"{name}",
             "description": f"{desc} {suffix}",
-            "tier": tier.capitalize(),
+            "tier": tier,
             "category": category,
             "requirement_type": req_type,
             "requirement_value": val,
-            "requirements": {"type": req_type, "threshold": val}
         })
 
     # 6. The Professor (Answers marked as 'Accepted Solution')
@@ -162,11 +156,10 @@ def get_badges_list():
             "id": f"{base_id}_{tier}",
             "name": f"{name}",
             "description": f"{desc} {suffix}",
-            "tier": tier.capitalize(),
+            "tier": tier,
             "category": category,
             "requirement_type": req_type,
             "requirement_value": val,
-            "requirements": {"type": req_type, "threshold": val}
         })
 
     # 7. The Socialite (Comments posted)
@@ -187,11 +180,10 @@ def get_badges_list():
             "id": f"{base_id}_{tier}",
             "name": f"{name}",
             "description": f"{desc} {suffix}",
-            "tier": tier.capitalize(),
+            "tier": tier,
             "category": category,
             "requirement_type": req_type,
             "requirement_value": val,
-            "requirements": {"type": req_type, "threshold": val}
         })
 
     # 8. Unstoppable (Daily Login Streak)
@@ -212,11 +204,10 @@ def get_badges_list():
             "id": f"{base_id}_{tier}",
             "name": f"{name}",
             "description": f"{desc} {suffix}",
-            "tier": tier.capitalize(),
+            "tier": tier,
             "category": category,
             "requirement_type": req_type,
             "requirement_value": val,
-            "requirements": {"type": req_type, "threshold": val}
         })
 
     # 9. Curious Mind (Questions Posted in The Lab)
@@ -237,11 +228,10 @@ def get_badges_list():
             "id": f"{base_id}_{tier}",
             "name": f"{name}",
             "description": f"{desc} {suffix}",
-            "tier": tier.capitalize(),
+            "tier": tier,
             "category": category,
             "requirement_type": req_type,
             "requirement_value": val,
-            "requirements": {"type": req_type, "threshold": val}
         })
 
     # 10. Founder Diamond (Legacy Preservation)
@@ -249,23 +239,43 @@ def get_badges_list():
         "id": "founder_diamond",
         "name": "Founder",
         "description": "Original member of The Mambo Guild. Reserved for the first 1000 users.",
-        "tier": "Diamond",
+        "tier": "diamond",
         "category": "special",
         "requirement_type": "manual",
         "requirement_value": 0,
-        "requirements": {"type": "manual"}
     })
 
-    # 10. Beta Tester (Legacy Preservation)
+    # 11. Beta Tester (Legacy Preservation)
     badges.append({
         "id": "beta_tester",
         "name": "Beta Tester",
         "description": "Helped test the platform during early access.",
-        "tier": "Gold",
+        "tier": "gold",
         "category": "special",
         "requirement_type": "manual",
         "requirement_value": 0,
-        "requirements": {"type": "manual"}
+    })
+
+    # 12. Pro Member (Advanced subscription)
+    badges.append({
+        "id": "pro_member",
+        "name": "Pro Member",
+        "description": "Upgraded to Advanced membership. Access to all Pro features.",
+        "tier": "gold",
+        "category": "special",
+        "requirement_type": "subscription",
+        "requirement_value": 0,
+    })
+
+    # 13. Guild Master (Performer subscription)
+    badges.append({
+        "id": "guild_master",
+        "name": "Guild Master",
+        "description": "Elite Performer membership. The highest tier in The Mambo Guild.",
+        "tier": "diamond",
+        "category": "special",
+        "requirement_type": "subscription",
+        "requirement_value": 0,
     })
 
     return badges
@@ -273,60 +283,56 @@ def get_badges_list():
 def seed_badges():
     engine = get_engine()
     badges = get_badges_list()
-    
+
     with engine.connect() as conn:
-        print(f"🚀 Seeding {len(badges)} badges...")
-        
+        print(f"Seeding {len(badges)} badges...")
+
         for badge in badges:
             try:
-                # Prepare JSON serialization for requirements
-                badge_data = badge.copy()
-                badge_data["requirements"] = json.dumps(badge["requirements"])
-                badge_data["created_at"] = datetime.utcnow()
-                badge_data["threshold"] = badge["requirement_value"] # Explicit mapping
-                
-                # Placeholder Icon generation if missing
-                if "icon_url" not in badge_data:
-                    # Use local public assets if they exist
-                    slug = badge_data["id"]
-                    
-                    # Calculate path to frontend public badges to check existence
-                    # project_root is .../backend, so we go up one level to .../ and then to frontend
-                    fs_root = os.path.dirname(project_root)
-                    local_badge_path = os.path.join(fs_root, 'frontend', 'public', 'badges', f"{slug}.png")
-                    
-                    if os.path.exists(local_badge_path):
-                         badge_data["icon_url"] = f"/badges/{slug}.png"
-                         print(f"  -> Found local asset for {slug}")
-                    else:
-                         # Fallback for special badges without local files (like Founder if not present)
-                         badge_data["icon_url"] = f"https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/badges/{slug}.png"
-                         print(f"  -> Using remote fallback for {slug}")
+                badge_data = {
+                    "id": badge["id"],
+                    "name": badge["name"],
+                    "description": badge["description"],
+                    "tier": badge["tier"],
+                    "category": badge["category"],
+                    "requirement_type": badge["requirement_type"],
+                    "threshold": badge["requirement_value"],
+                    "created_at": datetime.utcnow(),
+                }
+
+                # Resolve icon_url from local assets or fallback to CDN
+                slug = badge["id"]
+                fs_root = os.path.dirname(project_root)
+                local_badge_path = os.path.join(fs_root, 'frontend', 'public', 'badges', f"{slug}.png")
+                if os.path.exists(local_badge_path):
+                    badge_data["icon_url"] = f"/badges/{slug}.png"
+                else:
+                    badge_data["icon_url"] = f"https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/badges/{slug}.png"
 
                 conn.execute(text("""
                     INSERT INTO badge_definitions (
-                        id, name, description, icon_url, tier, category, 
-                        requirements, requirement_type, threshold, created_at
+                        id, name, description, icon_url, tier, category,
+                        requirement_type, threshold, created_at
                     )
                     VALUES (
                         :id, :name, :description, :icon_url, :tier, :category,
-                        :requirements, :requirement_type, :threshold, :created_at
+                        :requirement_type, :threshold, :created_at
                     )
                     ON CONFLICT (id) DO UPDATE SET
                         name = EXCLUDED.name,
                         description = EXCLUDED.description,
                         icon_url = EXCLUDED.icon_url,
                         tier = EXCLUDED.tier,
-                        requirements = EXCLUDED.requirements,
+                        requirement_type = EXCLUDED.requirement_type,
                         threshold = EXCLUDED.threshold
                 """), badge_data)
-                print(f"✓ {badge['name']} ({badge['tier']})")
-                
+                print(f"OK: {badge['id']} ({badge['tier']})")
+
             except Exception as e:
-                print(f"❌ Error seeding {badge['name']}: {str(e)}")
-        
+                print(f"ERROR: {badge['id']}: {str(e)}")
+
         conn.commit()
-        print("✅ Badge seeding completed!")
+        print("Badge seeding completed!")
 
 if __name__ == "__main__":
     seed_badges()

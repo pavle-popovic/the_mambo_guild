@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from models.community import UserStats, UserBadge, BadgeDefinition, BadgeTier
-from models.community import Post, PostReaction, ClaveTransaction
+from models.community import Post, PostReply, PostReaction, ClaveTransaction
 from models.user import UserProfile
 
 logger = logging.getLogger(__name__)
@@ -257,6 +257,87 @@ def get_all_badges_for_user(user_id: str, db: Session):
         -(x['requirement_value'] or 0)
     ))
     return results
+
+
+def get_user_badges(user_id: str, db: Session) -> list:
+    """
+    Get only earned badges for a specific user (public profile view).
+    """
+    user_badges = db.query(UserBadge).filter(UserBadge.user_id == user_id).all()
+    results = []
+    for ub in user_badges:
+        bd = db.query(BadgeDefinition).filter(BadgeDefinition.id == ub.badge_id).first()
+        if bd:
+            results.append({
+                "id": bd.id,
+                "name": bd.name,
+                "description": bd.description,
+                "tier": bd.tier,
+                "icon_url": bd.icon_url,
+                "category": bd.category,
+                "requirement_type": bd.requirement_type,
+                "requirement_value": bd.threshold if bd.threshold is not None else 0,
+                "is_earned": True,
+                "earned_at": ub.earned_at,
+                "display_order": ub.display_order or 0,
+            })
+    results.sort(key=lambda x: x["display_order"] if x["display_order"] > 0 else 9999)
+    return results
+
+
+def check_all_badges_for_user(user_id: str, db: Session) -> list:
+    """
+    Check every badge requirement for a user and award any newly earned badges.
+    Returns list of newly awarded badge dicts.
+    Used by the manual /badges/check endpoint.
+    """
+    # Snapshot of badges before check
+    before_ids = {ub.badge_id for ub in db.query(UserBadge).filter(UserBadge.user_id == user_id).all()}
+
+    stats = get_or_create_stats(user_id, db)
+    from models.user import UserProfile
+    profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+
+    fires = db.query(func.count(PostReaction.id)).join(Post).filter(
+        Post.user_id == user_id, PostReaction.reaction_type == "fire"
+    ).scalar() or 0
+    claps = db.query(func.count(PostReaction.id)).join(Post).filter(
+        Post.user_id == user_id, PostReaction.reaction_type == "clap"
+    ).scalar() or 0
+    metronomes = db.query(func.count(PostReaction.id)).join(Post).filter(
+        Post.user_id == user_id, PostReaction.reaction_type == "ruler"
+    ).scalar() or 0
+    videos = db.query(func.count(Post.id)).filter(
+        Post.user_id == user_id, Post.post_type == "stage", Post.mux_asset_id.isnot(None)
+    ).scalar() or 0
+    questions = db.query(func.count(Post.id)).filter(
+        Post.user_id == user_id, Post.post_type == "lab"
+    ).scalar() or 0
+    comments = db.query(func.count(PostReply.id)).filter(
+        PostReply.user_id == user_id
+    ).scalar() or 0
+    streak = profile.streak_count if profile else 0
+
+    checks = [
+        ("reactions_given", stats.reactions_given_count),
+        ("reactions_received", stats.reactions_received_count),
+        ("fires_received", fires),
+        ("claps_received", claps),
+        ("metronomes_received", metronomes),
+        ("solutions_accepted", stats.solutions_accepted_count),
+        ("videos_posted", videos),
+        ("questions_posted", questions),
+        ("comments_posted", comments),
+        ("daily_streak", streak),
+    ]
+
+    for req_type, value in checks:
+        check_and_award_badges(user_id, req_type, value, db)
+
+    # Return newly awarded badges
+    after_badges = db.query(UserBadge).filter(UserBadge.user_id == user_id).all()
+    new_badges = [ub for ub in after_badges if ub.badge_id not in before_ids]
+    return [{"badge_id": ub.badge_id, "earned_at": ub.earned_at} for ub in new_badges]
 
 
 def award_subscription_badge(user_id: str, tier: str, db: Session):

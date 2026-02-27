@@ -24,7 +24,7 @@ async def get_all_badges(
     Get all badge definitions with current user's earned status.
     Perfect for displaying the Trophy Case on profile.
     """
-    badges = badge_service.get_all_badges(str(current_user.id), db)
+    badges = badge_service.get_all_badges_for_user(str(current_user.id), db)
     return badges
 
 
@@ -38,6 +38,7 @@ async def get_user_badges(
     Public endpoint for viewing other users' profiles.
     """
     badges = badge_service.get_user_badges(user_id, db)
+    # Return only earned badges for public profile view
     return badges
 
 
@@ -65,13 +66,13 @@ async def check_my_badges(
     Manually trigger badge eligibility check.
     Returns any newly awarded badges.
     """
-    awarded = badge_service.check_and_award_badges(str(current_user.id), db)
+    awarded = badge_service.check_all_badges_for_user(str(current_user.id), db)
     db.commit()
-    
+
     if awarded:
         return {
             "success": True,
-            "message": f"🏆 {len(awarded)} new badge(s) earned!",
+            "message": f"{len(awarded)} new badge(s) earned!",
             "badges": awarded
         }
     else:
