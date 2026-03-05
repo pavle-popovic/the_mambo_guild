@@ -1409,8 +1409,17 @@ class ApiClient {
       recorded_at: string;
       duration_minutes: number | null;
       topics: string[];
+      youtube_url: string | null;
       thumbnail_url: string | null;
     }>>("/api/premium/archives");
+  }
+
+  async getWeeklyMeetingConfig() {
+    return this.request<{
+      meeting_url: string | null;
+      meeting_notes: string | null;
+      updated_at: string | null;
+    }>("/api/premium/weekly-meeting");
   }
 
   async getArchiveSignedUrl(archiveId: string) {
@@ -1496,6 +1505,139 @@ class ApiClient {
       cover_image_url: string | null;
       is_locked: boolean;
     }>>("/api/premium/dj-booth/preview");
+  }
+
+  // ============================================
+  // Admin — Enhanced Dashboard & Management
+  // ============================================
+
+  async getDashboardStats() {
+    return this.request<{
+      total_users: number;
+      users_this_week: number;
+      users_last_week: number;
+      user_growth_pct: number;
+      active_subscriptions: number;
+      rookie_count: number;
+      advanced_count: number;
+      performer_count: number;
+      canceled_count: number;
+      estimated_mrr: number;
+      tier_prices: { rookie: number; advanced: number; performer: number };
+      pending_submissions: number;
+      approved_this_week: number;
+      rejected_this_week: number;
+      total_submissions: number;
+      boss_pass_rate: number;
+      coaching_pending: number;
+      coaching_completed_month: number;
+      recent_signups: Array<{
+        id: string;
+        email: string;
+        first_name: string;
+        last_name: string;
+        avatar_url: string | null;
+        tier: string | null;
+        sub_status: string | null;
+        created_at: string;
+        xp: number;
+        level: number;
+      }>;
+      top_lessons: Array<{
+        id: string;
+        title: string;
+        is_boss_battle: boolean;
+        level_title: string;
+        world_title: string;
+        completions: number;
+      }>;
+      world_stats: Array<{
+        id: string;
+        title: string;
+        total_lessons: number;
+        total_completions: number;
+        students_started: number;
+        completion_rate: number;
+      }>;
+    }>("/api/admin/dashboard-stats");
+  }
+
+  async getStudentDetail(userId: string) {
+    return this.request<{
+      id: string;
+      email: string;
+      first_name: string;
+      last_name: string;
+      username: string | null;
+      avatar_url: string | null;
+      current_level_tag: string | null;
+      xp: number;
+      level: number;
+      streak_count: number;
+      current_claves: number;
+      reputation: number;
+      inventory_freezes: number;
+      referral_code: string | null;
+      referral_count: number;
+      badges: string;
+      created_at: string;
+      role: string;
+      sub_tier: string | null;
+      sub_status: string | null;
+      sub_period_end: string | null;
+      lessons_completed: number;
+      boss_battles_attempted: number;
+      boss_battles_passed: number;
+      recent_lessons: Array<{
+        lesson_id: string;
+        title: string;
+        completed_at: string | null;
+        xp_value: number;
+        is_boss_battle: boolean;
+      }>;
+    }>(`/api/admin/students/${userId}`);
+  }
+
+  async grantXP(userId: string, amount: number, reason?: string) {
+    return this.request<{
+      success: boolean;
+      new_xp: number;
+      new_level: number;
+      message: string;
+    }>(`/api/admin/students/${userId}/grant-xp`, {
+      method: "POST",
+      body: JSON.stringify({ amount, reason }),
+    });
+  }
+
+  async sendAnnouncement(subject: string, message: string, tierFilter: string = "all") {
+    return this.request<{
+      sent_count: number;
+      failed_count: number;
+      message: string;
+    }>("/api/admin/send-announcement", {
+      method: "POST",
+      body: JSON.stringify({ subject, message, tier_filter: tierFilter }),
+    });
+  }
+
+  async getWeeklyMeetingAdmin() {
+    return this.request<{
+      meeting_url: string | null;
+      meeting_notes: string | null;
+      updated_at: string | null;
+    }>("/api/premium/admin/weekly-meeting");
+  }
+
+  async updateWeeklyMeeting(meetingUrl: string, meetingNotes: string) {
+    return this.request<{
+      meeting_url: string | null;
+      meeting_notes: string | null;
+      updated_at: string | null;
+    }>("/api/premium/admin/weekly-meeting", {
+      method: "PUT",
+      body: JSON.stringify({ meeting_url: meetingUrl, meeting_notes: meetingNotes }),
+    });
   }
 }
 

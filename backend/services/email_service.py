@@ -76,6 +76,223 @@ def send_password_reset_email(email: str, reset_token: str) -> bool:
         return False
 
 
+def send_coaching_feedback_email(student_email: str, student_name: str, feedback_url: str) -> bool:
+    """
+    Send email to student notifying them their coaching feedback video is ready.
+
+    Args:
+        student_email: Student's email address
+        student_name: Student's first name
+        feedback_url: URL to the feedback video (R2 public URL)
+
+    Returns:
+        True if sent successfully, False otherwise
+    """
+    if not resend or not settings.RESEND_API_KEY:
+        logger.error("Resend client not configured. Cannot send coaching feedback email.")
+        return False
+
+    try:
+        from_email = settings.FROM_EMAIL
+        view_url = f"{settings.FRONTEND_URL}/guild-master?tab=coaching"
+
+        result = resend.Emails.send({
+            "from": from_email,
+            "to": [student_email],
+            "subject": "Your video feedback is ready — The Mambo Guild",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {{
+                        font-family: Georgia, 'Times New Roman', Times, serif;
+                        background-color: #F9F7F1;
+                        color: #333333;
+                        margin: 0;
+                        padding: 0;
+                        line-height: 1.8;
+                    }}
+                    .container {{
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 40px 20px;
+                        background-color: #F9F7F1;
+                    }}
+                    .badge {{
+                        display: inline-block;
+                        background-color: #D4AF37;
+                        color: #000;
+                        font-size: 12px;
+                        font-weight: bold;
+                        letter-spacing: 1px;
+                        text-transform: uppercase;
+                        padding: 4px 12px;
+                        border-radius: 2px;
+                        margin-bottom: 24px;
+                        font-family: Arial, sans-serif;
+                    }}
+                    h1 {{
+                        font-family: Georgia, 'Times New Roman', serif;
+                        font-size: 28px;
+                        color: #111;
+                        margin-bottom: 8px;
+                    }}
+                    p {{
+                        font-size: 16px;
+                        margin-bottom: 20px;
+                    }}
+                    .cta-button {{
+                        display: inline-block;
+                        padding: 14px 32px;
+                        background-color: #D4AF37;
+                        color: #000000;
+                        text-decoration: none;
+                        font-family: Arial, sans-serif;
+                        font-weight: bold;
+                        font-size: 15px;
+                        border-radius: 4px;
+                        margin: 24px 0;
+                    }}
+                    .divider {{
+                        border: none;
+                        border-top: 1px solid #e0e0e0;
+                        margin: 32px 0;
+                    }}
+                    .footer {{
+                        font-size: 13px;
+                        color: #888;
+                        font-style: italic;
+                        font-family: Arial, sans-serif;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="badge">Guild Master</div>
+                    <h1>Your feedback is ready, {student_name}.</h1>
+                    <p>Your 1-on-1 video analysis has been reviewed and your personalised feedback video is now waiting for you in the Guild Master Hub.</p>
+                    <p>Head over to your coaching dashboard to watch it — your instructor has recorded a full breakdown just for you.</p>
+                    <a href="{view_url}" class="cta-button">Watch My Feedback</a>
+                    <hr class="divider">
+                    <p class="footer">
+                        You're receiving this because you submitted a coaching video through The Mambo Guild.<br>
+                        &mdash; The Mambo Guild Team
+                    </p>
+                </div>
+            </body>
+            </html>
+            """,
+        })
+
+        logger.info(f"Coaching feedback email sent to {student_email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send coaching feedback email to {student_email}: {str(e)}")
+        return False
+
+
+def send_announcement_email(email: str, name: str, subject: str, message: str) -> bool:
+    """
+    Send a custom announcement email to a student from the admin dashboard.
+
+    Args:
+        email: Recipient email address
+        name: Recipient first name
+        subject: Email subject line
+        message: Plain text message body (will be wrapped in branded HTML)
+
+    Returns:
+        True if sent successfully, False otherwise
+    """
+    if not resend or not settings.RESEND_API_KEY:
+        logger.error("Resend client not configured. Cannot send announcement email.")
+        return False
+
+    try:
+        from_email = settings.FROM_EMAIL
+
+        # Convert newlines to <br> for HTML rendering
+        html_message = message.replace("\n", "<br>")
+
+        result = resend.Emails.send({
+            "from": from_email,
+            "to": [email],
+            "subject": subject,
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {{
+                        font-family: Georgia, 'Times New Roman', Times, serif;
+                        background-color: #F9F7F1;
+                        color: #333333;
+                        margin: 0;
+                        padding: 0;
+                        line-height: 1.8;
+                    }}
+                    .container {{
+                        max-width: 600px;
+                        margin: 0 auto;
+                        padding: 40px 20px;
+                        background-color: #F9F7F1;
+                    }}
+                    .badge {{
+                        display: inline-block;
+                        background-color: #D4AF37;
+                        color: #000;
+                        font-size: 12px;
+                        font-weight: bold;
+                        letter-spacing: 1px;
+                        text-transform: uppercase;
+                        padding: 4px 12px;
+                        border-radius: 2px;
+                        margin-bottom: 24px;
+                        font-family: Arial, sans-serif;
+                    }}
+                    p {{
+                        font-size: 16px;
+                        margin-bottom: 20px;
+                    }}
+                    .divider {{
+                        border: none;
+                        border-top: 1px solid #e0e0e0;
+                        margin: 32px 0;
+                    }}
+                    .footer {{
+                        font-size: 13px;
+                        color: #888;
+                        font-style: italic;
+                        font-family: Arial, sans-serif;
+                    }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="badge">The Mambo Guild</div>
+                    <p>Hi {name},</p>
+                    <p>{html_message}</p>
+                    <hr class="divider">
+                    <p class="footer">
+                        You're receiving this because you're a member of The Mambo Guild.<br>
+                        &mdash; Pavle &amp; The Mambo Guild Team
+                    </p>
+                </div>
+            </body>
+            </html>
+            """,
+        })
+
+        logger.info(f"Announcement email sent to {email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send announcement email to {email}: {str(e)}")
+        return False
+
+
 def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -> bool:
     """
     Send welcome email to new waitlist members.
@@ -169,7 +386,8 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                 <div class="container">
                     <p>Hi {username},</p>
                     
-                    <p>Here is the link to the weekly tutorial: <a href="https://youtu.be/5u_56JspFX8" class="link">https://youtu.be/5u_56JspFX8</a></p>
+                    <p>Here is the link to the weekly tutorial (RanKanKan): <a href="https://youtu.be/57-zwVE1VXI" class="link">https://youtu.be/57-zwVE1VXI</a></p>
+                    <p>14 Moves Breakdown: <a href="https://youtu.be/5u_56JspFX8" class="link">https://youtu.be/5u_56JspFX8</a></p>
                     <p>Salsa Romantica: <a href="https://youtu.be/wcDocNANEVY" class="link">https://youtu.be/wcDocNANEVY</a></p>
                     <p>Afro Mambo Fusion: <a href="https://youtu.be/RIMp6J02Th0" class="link">https://youtu.be/RIMp6J02Th0</a></p>
 
@@ -222,4 +440,5 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
         return True
     except Exception as e:
         logger.error(f"Failed to send waitlist welcome email to {email}: {str(e)}")
+        return False
         return False

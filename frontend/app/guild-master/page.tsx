@@ -3,45 +3,24 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { Video, Calendar, Clock, Play, Lock, Crown, Music, Mic } from "lucide-react";
+import { Video, Calendar, Clock, Play, Crown, Music, Mic, Search, X } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiClient } from "@/lib/api";
-import MuxVideoPlayer from "@/components/MuxVideoPlayer";
 import DJBoothMixer from "@/components/DJBoothMixer";
 import { GuildMasterTag } from "@/components/ui/GuildMasterBadge";
 import { cn } from "@/lib/utils";
 
 // Types
-interface LiveCall {
-  id: string;
-  title: string;
-  description: string | null;
-  scheduled_at: string;
-  duration_minutes: number;
-  status: string;
-  zoom_link: string | null;
-  zoom_meeting_id: string | null;
-  recording_mux_playback_id: string | null;
-  recording_thumbnail_url: string | null;
-}
-
-interface LiveCallStatus {
-  state: "no_upcoming" | "upcoming" | "live";
-  call: LiveCall | null;
-  countdown_seconds: number | null;
-  message: string;
-}
-
-interface PastRecording {
+interface VaultRecording {
   id: string;
   title: string;
   description: string | null;
   recorded_at: string;
-  duration_minutes: number;
-  mux_playback_id: string;
+  duration_minutes: number | null;
+  youtube_url: string | null;
   thumbnail_url: string | null;
+  topics: string[];
 }
 
 interface CoachingStatus {
@@ -88,15 +67,26 @@ export default function GuildMasterPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const [activeTab, setActiveTab] = useState<Tab>("live");
+
+  // Read ?tab= from URL on mount
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get("tab") as Tab;
+    if (tab && (["live", "coaching", "mixer"] as Tab[]).includes(tab)) {
+      setActiveTab(tab);
+    }
+  }, []);
   
-  // Live call state
-  const [liveStatus, setLiveStatus] = useState<LiveCallStatus | null>(null);
-  const [pastRecordings, setPastRecordings] = useState<PastRecording[]>([]);
+  // Live meetings state
+  const [meetingConfig, setMeetingConfig] = useState<{
+    meeting_url: string | null;
+    meeting_notes: string | null;
+  } | null>(null);
+  const [vaultRecordings, setVaultRecordings] = useState<VaultRecording[]>([]);
+  const [vaultSearch, setVaultSearch] = useState("");
+  const [selectedVaultItem, setSelectedVaultItem] = useState<VaultRecording | null>(null);
   const [loadingLive, setLoadingLive] = useState(true);
   const [countdown, setCountdown] = useState<number | null>(null);
-  
-  // Selected recording for playback
-  const [selectedRecording, setSelectedRecording] = useState<PastRecording | null>(null);
 
   // Coaching state
   const [coachingStatus, setCoachingStatus] = useState<CoachingStatus | null>(null);
@@ -131,11 +121,16 @@ export default function GuildMasterPage() {
       return;
     }
     if (user && isGuildMaster) {
-      loadLiveStatus();
-      loadPastRecordings();
+      loadMeetingConfig();
+      loadVaultRecordings();
       loadCoachingStatus();
       loadMySubmissions();
       loadDjTracks();
+
+      // Init countdown to next Wednesday 7pm GMT
+      const target = nextWednesdayGMT();
+      const secs = Math.floor((target.getTime() - Date.now()) / 1000);
+      setCountdown(secs > 0 ? secs : 0);
     }
   }, [user, authLoading, isGuildMaster, router]);
 
@@ -150,36 +145,50 @@ export default function GuildMasterPage() {
     return () => clearInterval(timer);
   }, [countdown]);
 
-  const loadLiveStatus = async () => {
+  function nextWednesdayGMT(): Date {
+    const now = new Date();
+    const daysUntil = ((3 - now.getUTCDay() + 7) % 7) || 7;
+    const d = new Date(now);
+    d.setUTCDate(d.getUTCDate() + daysUntil);
+    d.setUTCHours(19, 0, 0, 0);
+    return d;
+  }
+
+  function getYouTubeId(url: string): string | null {
+    const m = url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+    return m ? m[1] : null;
+  }
+
+  const loadMeetingConfig = async () => {
+    setLoadingLive(true);
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/premium/live/status`, {
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/premium/weekly-meeting`,
+        { credentials: "include" }
+      );
       if (response.ok) {
         const data = await response.json();
-        setLiveStatus(data);
-        if (data.countdown_seconds) {
-          setCountdown(data.countdown_seconds);
-        }
+        setMeetingConfig(data);
       }
     } catch (error) {
-      console.error("Failed to load live status:", error);
+      console.error("Failed to load meeting config:", error);
     } finally {
       setLoadingLive(false);
     }
   };
 
-  const loadPastRecordings = async () => {
+  const loadVaultRecordings = async () => {
     try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/premium/live/recordings`, {
-        credentials: "include",
-      });
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/premium/archives`,
+        { credentials: "include" }
+      );
       if (response.ok) {
         const data = await response.json();
-        setPastRecordings(data);
+        setVaultRecordings(data);
       }
     } catch (error) {
-      console.error("Failed to load recordings:", error);
+      console.error("Failed to load vault recordings:", error);
     }
   };
 
@@ -332,7 +341,6 @@ export default function GuildMasterPage() {
           {[
             { id: "live" as Tab, label: "Weekly Live", icon: Video },
             { id: "coaching" as Tab, label: "1-on-1 Analysis", icon: Mic },
-            { id: "mixer" as Tab, label: "DJ Booth", icon: Music },
           ].map((tab) => (
             <button
               key={tab.id}
@@ -353,134 +361,177 @@ export default function GuildMasterPage() {
         {/* Tab Content */}
         {activeTab === "live" && (
           <div className="space-y-8">
-            {/* Live Status Card */}
+            {/* Next Meeting Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
-              className={cn(
-                "relative rounded-2xl border p-6 overflow-hidden",
-                liveStatus?.state === "live"
-                  ? "border-red-500/50 bg-gradient-to-br from-red-500/10 to-red-900/20"
-                  : liveStatus?.state === "upcoming"
-                  ? "border-amber-500/50 bg-gradient-to-br from-amber-500/10 to-amber-900/20"
-                  : "border-white/10 bg-mambo-panel"
-              )}
+              className="relative rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 to-amber-900/20 p-6 overflow-hidden"
             >
-              {/* Live indicator */}
-              {liveStatus?.state === "live" && (
-                <div className="absolute top-4 right-4 flex items-center gap-2">
-                  <span className="relative flex h-3 w-3">
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75" />
-                    <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500" />
-                  </span>
-                  <span className="text-red-400 font-bold text-sm uppercase tracking-wider">LIVE NOW</span>
-                </div>
-              )}
-
               {loadingLive ? (
                 <div className="flex items-center justify-center py-12">
                   <div className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
-                </div>
-              ) : liveStatus?.state === "no_upcoming" ? (
-                <div className="text-center py-8">
-                  <Calendar className="w-12 h-12 text-white/30 mx-auto mb-4" />
-                  <h3 className="text-xl font-semibold text-white mb-2">No Upcoming Calls</h3>
-                  <p className="text-white/50">Check back soon for the next Roundtable session!</p>
                 </div>
               ) : (
                 <div className="flex flex-col md:flex-row items-center gap-6">
                   <div className="flex-1">
                     <h3 className="text-2xl font-bold text-white mb-2">
-                      {liveStatus?.call?.title}
+                      Weekly VIP Meeting
                     </h3>
-                    {liveStatus?.call?.description && (
-                      <p className="text-white/70 mb-4">{liveStatus.call.description}</p>
-                    )}
-                    <div className="flex flex-wrap items-center gap-4 text-sm text-white/60">
-                      <span className="flex items-center gap-1.5">
-                        <Calendar className="w-4 h-4" />
-                        {liveStatus?.call && formatDate(liveStatus.call.scheduled_at)}
-                      </span>
-                      <span className="flex items-center gap-1.5">
-                        <Clock className="w-4 h-4" />
-                        {liveStatus?.call?.duration_minutes} min
-                      </span>
+                    <div className="flex items-center gap-1.5 text-sm text-white/60">
+                      <Calendar className="w-4 h-4" />
+                      Every Wednesday at 7:00 PM GMT
                     </div>
+                    {meetingConfig?.meeting_notes && (
+                      <p className="mt-3 text-white/70 text-sm">
+                        {meetingConfig.meeting_notes}
+                      </p>
+                    )}
                   </div>
 
                   <div className="flex flex-col items-center gap-3">
-                    {liveStatus?.state === "live" ? (
-                      <a
-                        href={liveStatus.call?.zoom_link || "#"}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="px-8 py-4 bg-gradient-to-r from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white font-bold rounded-xl transition shadow-lg shadow-red-500/30 flex items-center gap-2"
-                      >
-                        <Video className="w-5 h-5" />
-                        JOIN ZOOM ROOM
-                      </a>
-                    ) : liveStatus?.state === "upcoming" && countdown !== null ? (
+                    {countdown !== null && countdown > 0 && (
                       <div className="text-center">
                         <div className="text-3xl font-bold text-amber-400 font-mono mb-1">
                           {formatCountdown(countdown)}
                         </div>
-                        <div className="text-xs text-white/50 uppercase tracking-wider">until live</div>
+                        <div className="text-xs text-white/50 uppercase tracking-wider">
+                          until next meeting
+                        </div>
                       </div>
-                    ) : null}
+                    )}
+                    <a
+                      href={meetingConfig?.meeting_url || "#"}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) =>
+                        !meetingConfig?.meeting_url && e.preventDefault()
+                      }
+                      className={cn(
+                        "px-8 py-4 font-bold rounded-xl transition flex items-center gap-2",
+                        meetingConfig?.meeting_url
+                          ? "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black shadow-lg shadow-amber-500/30"
+                          : "bg-white/10 text-white/30 cursor-not-allowed pointer-events-none"
+                      )}
+                    >
+                      <Video className="w-5 h-5" />
+                      {meetingConfig?.meeting_url ? "Join Meeting" : "Link Coming Soon"}
+                    </a>
                   </div>
                 </div>
               )}
             </motion.div>
 
-            {/* Past Recordings (The Vault) */}
+            {/* Vault */}
             <div>
-              <h2 className="text-xl font-bold text-white mb-4 flex items-center gap-2">
-                <span className="text-2xl">🏛️</span> The Vault
-                <span className="text-sm font-normal text-white/50">Past Recordings</span>
-              </h2>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-4">
+                <h2 className="text-xl font-bold text-white flex items-center gap-2">
+                  <span className="text-2xl">🏛️</span> The Vault
+                  <span className="text-sm font-normal text-white/50">
+                    Past Recordings
+                  </span>
+                </h2>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-white/40" />
+                  <input
+                    type="text"
+                    value={vaultSearch}
+                    onChange={(e) => setVaultSearch(e.target.value)}
+                    placeholder="Search recordings..."
+                    className="pl-9 pr-4 py-2 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 text-sm"
+                  />
+                </div>
+              </div>
 
-              {pastRecordings.length === 0 ? (
-                <div className="bg-mambo-panel border border-white/10 rounded-xl p-8 text-center">
-                  <Video className="w-12 h-12 text-white/30 mx-auto mb-4" />
-                  <p className="text-white/50">No recordings yet. Past sessions will appear here.</p>
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {pastRecordings.map((recording) => (
-                    <motion.div
-                      key={recording.id}
-                      whileHover={{ scale: 1.02 }}
-                      className="bg-mambo-panel border border-white/10 rounded-xl overflow-hidden cursor-pointer group hover:border-amber-500/30 transition"
-                      onClick={() => setSelectedRecording(recording)}
-                    >
-                      <div className="aspect-video relative bg-black/50">
-                        {recording.thumbnail_url ? (
-                          <img
-                            src={recording.thumbnail_url}
-                            alt={recording.title}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <Video className="w-12 h-12 text-white/20" />
+              {(() => {
+                const filtered = vaultRecordings.filter((r) => {
+                  if (!vaultSearch) return true;
+                  const q = vaultSearch.toLowerCase();
+                  return (
+                    r.title.toLowerCase().includes(q) ||
+                    (r.description?.toLowerCase().includes(q) ?? false) ||
+                    r.topics.some((t) => t.toLowerCase().includes(q))
+                  );
+                });
+
+                if (filtered.length === 0) {
+                  return (
+                    <div className="bg-mambo-panel border border-white/10 rounded-xl p-8 text-center">
+                      <Video className="w-12 h-12 text-white/30 mx-auto mb-4" />
+                      <p className="text-white/50">
+                        {vaultSearch
+                          ? "No recordings match your search."
+                          : "No recordings yet. Past sessions will appear here."}
+                      </p>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filtered.map((recording) => {
+                      const ytId = recording.youtube_url
+                        ? getYouTubeId(recording.youtube_url)
+                        : null;
+                      const thumbUrl = ytId
+                        ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
+                        : recording.thumbnail_url;
+
+                      return (
+                        <motion.div
+                          key={recording.id}
+                          whileHover={{ scale: 1.02 }}
+                          className="bg-mambo-panel border border-white/10 rounded-xl overflow-hidden cursor-pointer group hover:border-amber-500/30 transition"
+                          onClick={() => setSelectedVaultItem(recording)}
+                        >
+                          <div className="aspect-video relative bg-black/50">
+                            {thumbUrl ? (
+                              <img
+                                src={thumbUrl}
+                                alt={recording.title}
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <div className="absolute inset-0 flex items-center justify-center">
+                                <Video className="w-12 h-12 text-white/20" />
+                              </div>
+                            )}
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
+                              <div className="w-14 h-14 rounded-full bg-red-600 flex items-center justify-center">
+                                <Play
+                                  className="w-6 h-6 text-white ml-1"
+                                  fill="currentColor"
+                                />
+                              </div>
+                            </div>
                           </div>
-                        )}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition flex items-center justify-center">
-                          <div className="w-14 h-14 rounded-full bg-amber-500 flex items-center justify-center">
-                            <Play className="w-6 h-6 text-black ml-1" fill="currentColor" />
+                          <div className="p-4">
+                            <h4 className="font-semibold text-white truncate">
+                              {recording.title}
+                            </h4>
+                            <p className="text-sm text-white/50">
+                              {new Date(recording.recorded_at).toLocaleDateString()}
+                              {recording.duration_minutes &&
+                                ` • ${recording.duration_minutes} min`}
+                            </p>
+                            {recording.topics.length > 0 && (
+                              <div className="flex flex-wrap gap-1 mt-2">
+                                {recording.topics.slice(0, 3).map((topic) => (
+                                  <span
+                                    key={topic}
+                                    className="text-xs bg-amber-500/20 text-amber-300 px-2 py-0.5 rounded-full"
+                                  >
+                                    {topic}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
                           </div>
-                        </div>
-                      </div>
-                      <div className="p-4">
-                        <h4 className="font-semibold text-white truncate">{recording.title}</h4>
-                        <p className="text-sm text-white/50">
-                          {new Date(recording.recorded_at).toLocaleDateString()} • {recording.duration_minutes} min
-                        </p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
-              )}
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
           </div>
         )}
@@ -522,7 +573,7 @@ export default function GuildMasterPage() {
                     <div className="bg-white/5 rounded-lg p-4 mb-4 text-sm">
                       <p className="text-white/70 mb-2">📋 Requirements:</p>
                       <ul className="text-white/50 space-y-1 ml-4">
-                        <li>• Max duration: 60 seconds</li>
+                        <li>• Max duration: 100 seconds</li>
                         <li>• Max file size: 50MB</li>
                         <li>• Formats: MP4, MOV</li>
                       </ul>
@@ -654,15 +705,23 @@ export default function GuildMasterPage() {
                         
                         {/* Feedback */}
                         {coachingStatus.current_submission.status === "completed" && coachingStatus.current_submission.feedback_video_url && (
-                          <a
-                            href={coachingStatus.current_submission.feedback_video_url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="inline-flex items-center gap-2 mt-3 px-4 py-2 bg-green-500/20 hover:bg-green-500/30 text-green-300 rounded-lg transition text-sm font-medium"
-                          >
-                            <Play className="w-4 h-4" />
-                            Watch Feedback
-                          </a>
+                          <div className="mt-3">
+                            <video
+                              src={coachingStatus.current_submission.feedback_video_url}
+                              controls
+                              className="w-full rounded-lg bg-black"
+                              style={{ maxHeight: "200px" }}
+                            />
+                            <a
+                              href={coachingStatus.current_submission.feedback_video_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 mt-1 text-xs text-white/40 hover:text-white/70 transition"
+                            >
+                              <Play className="w-3 h-3" />
+                              Open in new tab
+                            </a>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -828,28 +887,49 @@ export default function GuildMasterPage() {
         )}
       </div>
 
-      {/* Recording Playback Modal */}
-      {selectedRecording && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90">
-          <div className="relative w-full max-w-4xl">
+      {/* Vault Playback Modal */}
+      {selectedVaultItem && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90"
+          onClick={() => setSelectedVaultItem(null)}
+        >
+          <div
+            className="relative w-full max-w-4xl"
+            onClick={(e) => e.stopPropagation()}
+          >
             <button
-              onClick={() => setSelectedRecording(null)}
-              className="absolute -top-12 right-0 text-white/60 hover:text-white transition"
+              onClick={() => setSelectedVaultItem(null)}
+              className="absolute -top-10 right-0 text-white/60 hover:text-white transition flex items-center gap-2"
             >
-              Close ×
+              <X className="w-5 h-5" /> Close
             </button>
             <div className="bg-mambo-panel rounded-xl overflow-hidden">
-              <MuxVideoPlayer
-                playbackId={selectedRecording.mux_playback_id}
-                metadata={{
-                  video_title: selectedRecording.title,
-                  video_id: selectedRecording.id,
-                }}
-              />
+              {selectedVaultItem.youtube_url &&
+              getYouTubeId(selectedVaultItem.youtube_url) ? (
+                <div className="aspect-video">
+                  <iframe
+                    src={`https://www.youtube.com/embed/${getYouTubeId(selectedVaultItem.youtube_url)}?autoplay=1`}
+                    className="w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                  />
+                </div>
+              ) : (
+                <div className="aspect-video flex items-center justify-center bg-black">
+                  <div className="text-center">
+                    <Video className="w-16 h-16 text-white/20 mx-auto mb-4" />
+                    <p className="text-white/50">No video available for this recording.</p>
+                  </div>
+                </div>
+              )}
               <div className="p-4">
-                <h3 className="text-lg font-bold text-white">{selectedRecording.title}</h3>
-                {selectedRecording.description && (
-                  <p className="text-white/60 text-sm mt-1">{selectedRecording.description}</p>
+                <h3 className="text-lg font-bold text-white">
+                  {selectedVaultItem.title}
+                </h3>
+                {selectedVaultItem.description && (
+                  <p className="text-white/60 text-sm mt-1">
+                    {selectedVaultItem.description}
+                  </p>
                 )}
               </div>
             </div>

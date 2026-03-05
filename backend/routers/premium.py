@@ -16,6 +16,7 @@ from models.user import User, Subscription, SubscriptionTier, SubscriptionStatus
 from models.premium import (
     LiveCall, LiveCallStatus,
     WeeklyArchive,
+    WeeklyMeetingConfig,
     CoachingSubmission, CoachingSubmissionStatus,
     DJBoothTrack
 )
@@ -25,6 +26,8 @@ from schemas.premium import (
     UpcomingCallStatus, PastRecordingResponse,
     # Weekly Archives
     WeeklyArchiveCreate, WeeklyArchiveUpdate, WeeklyArchiveResponse,
+    # Weekly Meeting Config
+    WeeklyMeetingConfigResponse, WeeklyMeetingConfigUpdate,
     # Coaching
     CoachingSubmissionCreate, CoachingSubmissionUpdate,
     CoachingSubmissionResponse, CoachingSubmissionAdminResponse, CoachingStatusResponse,
@@ -33,6 +36,7 @@ from schemas.premium import (
     DJBoothTrackResponse, DJBoothTrackPreview
 )
 from services.r2_service import generate_r2_signed_url
+from services.email_service import send_coaching_feedback_email
 
 router = APIRouter(prefix="/premium", tags=["premium"])
 
@@ -357,11 +361,11 @@ async def submit_coaching_video(
             detail="You have already submitted a coaching video this month."
         )
     
-    # Validate video duration (max 60 seconds)
-    if data.video_duration_seconds and data.video_duration_seconds > 60:
+    # Validate video duration (max 100 seconds)
+    if data.video_duration_seconds and data.video_duration_seconds > 100:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Video must be 60 seconds or less."
+            detail="Video must be 100 seconds or less."
         )
     
     submission = CoachingSubmission(
@@ -506,9 +510,19 @@ async def update_coaching_submission(
     
     db.commit()
     db.refresh(submission)
-    
-    # TODO: Send notification to user that feedback is ready
-    
+
+    # Send notification email to student when feedback is ready
+    if submission.status == CoachingSubmissionStatus.COMPLETED and submission.feedback_video_url:
+        student_user = db.query(User).filter(User.id == submission.user_id).first()
+        student_profile = db.query(UserProfile).filter(UserProfile.user_id == submission.user_id).first()
+        if student_user:
+            student_name = student_profile.first_name if student_profile else "there"
+            send_coaching_feedback_email(
+                student_email=student_user.email,
+                student_name=student_name,
+                feedback_url=submission.feedback_video_url
+            )
+
     return _format_submission_response(submission)
 
 
@@ -684,6 +698,77 @@ async def delete_dj_booth_track(
 
 
 # ============================================
+# Weekly Meeting Config
+# ============================================
+
+@router.get("/weekly-meeting", response_model=WeeklyMeetingConfigResponse)
+async def get_weekly_meeting(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get the weekly meeting link and notes. Guild Master only."""
+    require_guild_master(current_user)
+
+    config = db.query(WeeklyMeetingConfig).filter(WeeklyMeetingConfig.id == 1).first()
+    if not config:
+        return WeeklyMeetingConfigResponse()
+
+    return WeeklyMeetingConfigResponse(
+        meeting_url=config.meeting_url,
+        meeting_notes=config.meeting_notes,
+        updated_at=config.updated_at
+    )
+
+
+@router.get("/admin/weekly-meeting", response_model=WeeklyMeetingConfigResponse)
+async def get_weekly_meeting_admin(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get the weekly meeting config. Admin only."""
+    require_admin(current_user)
+
+    config = db.query(WeeklyMeetingConfig).filter(WeeklyMeetingConfig.id == 1).first()
+    if not config:
+        return WeeklyMeetingConfigResponse()
+
+    return WeeklyMeetingConfigResponse(
+        meeting_url=config.meeting_url,
+        meeting_notes=config.meeting_notes,
+        updated_at=config.updated_at
+    )
+
+
+@router.put("/admin/weekly-meeting", response_model=WeeklyMeetingConfigResponse)
+async def update_weekly_meeting(
+    data: WeeklyMeetingConfigUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Upsert the weekly meeting config (always row id=1). Admin only."""
+    require_admin(current_user)
+
+    config = db.query(WeeklyMeetingConfig).filter(WeeklyMeetingConfig.id == 1).first()
+    if not config:
+        config = WeeklyMeetingConfig(id=1)
+        db.add(config)
+
+    update_dict = data.model_dump(exclude_unset=True)
+    for key, value in update_dict.items():
+        setattr(config, key, value)
+
+    config.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+    db.commit()
+    db.refresh(config)
+
+    return WeeklyMeetingConfigResponse(
+        meeting_url=config.meeting_url,
+        meeting_notes=config.meeting_notes,
+        updated_at=config.updated_at
+    )
+
+
+# ============================================
 # Weekly Archives (Cloudflare R2)
 # ============================================
 
@@ -710,6 +795,7 @@ async def get_weekly_archives(
             recorded_at=archive.recorded_at.isoformat(),
             duration_minutes=archive.duration_minutes,
             topics=archive.topics or [],
+            youtube_url=archive.youtube_url,
             thumbnail_url=archive.thumbnail_url
         )
         for archive in archives
@@ -736,7 +822,13 @@ async def get_archive_signed_url(
     
     if not archive:
         raise HTTPException(status_code=404, detail="Archive not found")
-    
+
+    if not archive.r2_file_key:
+        raise HTTPException(
+            status_code=400,
+            detail="This archive has no R2 file. Use the youtube_url field instead."
+        )
+
     # Generate signed URL (2 hours expiration)
     try:
         signed_url = generate_r2_signed_url(
@@ -765,6 +857,7 @@ async def create_weekly_archive(
         title=archive_data.title,
         description=archive_data.description,
         r2_file_key=archive_data.r2_file_key,
+        youtube_url=archive_data.youtube_url,
         recorded_at=archive_data.recorded_at,
         duration_minutes=archive_data.duration_minutes,
         topics=archive_data.topics or [],
@@ -772,11 +865,11 @@ async def create_weekly_archive(
         is_published=archive_data.is_published if archive_data.is_published is not None else True,
         live_call_id=archive_data.live_call_id
     )
-    
+
     db.add(archive)
     db.commit()
     db.refresh(archive)
-    
+
     return WeeklyArchiveResponse(
         id=str(archive.id),
         title=archive.title,
@@ -784,7 +877,10 @@ async def create_weekly_archive(
         recorded_at=archive.recorded_at.isoformat(),
         duration_minutes=archive.duration_minutes,
         topics=archive.topics or [],
-        thumbnail_url=archive.thumbnail_url
+        youtube_url=archive.youtube_url,
+        thumbnail_url=archive.thumbnail_url,
+        is_published=archive.is_published,
+        r2_file_key=archive.r2_file_key
     )
 
 
@@ -806,6 +902,7 @@ async def get_all_archives_admin(
             recorded_at=archive.recorded_at.isoformat(),
             duration_minutes=archive.duration_minutes,
             topics=archive.topics or [],
+            youtube_url=archive.youtube_url,
             thumbnail_url=archive.thumbnail_url,
             is_published=archive.is_published,
             r2_file_key=archive.r2_file_key
@@ -834,6 +931,8 @@ async def update_weekly_archive(
         archive.description = update_data.description
     if update_data.r2_file_key is not None:
         archive.r2_file_key = update_data.r2_file_key
+    if update_data.youtube_url is not None:
+        archive.youtube_url = update_data.youtube_url
     if update_data.duration_minutes is not None:
         archive.duration_minutes = update_data.duration_minutes
     if update_data.topics is not None:
@@ -842,10 +941,10 @@ async def update_weekly_archive(
         archive.thumbnail_url = update_data.thumbnail_url
     if update_data.is_published is not None:
         archive.is_published = update_data.is_published
-    
+
     db.commit()
     db.refresh(archive)
-    
+
     return WeeklyArchiveResponse(
         id=str(archive.id),
         title=archive.title,
@@ -853,7 +952,10 @@ async def update_weekly_archive(
         recorded_at=archive.recorded_at.isoformat(),
         duration_minutes=archive.duration_minutes,
         topics=archive.topics or [],
-        thumbnail_url=archive.thumbnail_url
+        youtube_url=archive.youtube_url,
+        thumbnail_url=archive.thumbnail_url,
+        is_published=archive.is_published,
+        r2_file_key=archive.r2_file_key
     )
 
 

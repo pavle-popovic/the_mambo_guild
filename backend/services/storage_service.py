@@ -64,6 +64,29 @@ class StorageService:
             "public_url": public_url
         }
     
+    def generate_presigned_url_for_key(self, object_key: str, content_type: str) -> Dict[str, str]:
+        """
+        Generate a presigned URL for a specific object key (for coaching feedback videos).
+
+        Args:
+            object_key: Full R2 object key, e.g. "coaching-feedback/{submission_id}.webm"
+            content_type: MIME type, e.g. "video/webm"
+
+        Returns:
+            Dictionary with upload_url and public_url
+        """
+        upload_url = self.s3_client.generate_presigned_url(
+            'put_object',
+            Params={
+                'Bucket': self.bucket_name,
+                'Key': object_key,
+                'ContentType': content_type,
+            },
+            ExpiresIn=3600
+        )
+        public_url = f"{self.public_domain}/{object_key}" if self.public_domain else f"{settings.AWS_ENDPOINT_URL}/{self.bucket_name}/{object_key}"
+        return {"upload_url": upload_url, "public_url": public_url}
+
     def _get_file_extension(self, file_type: str) -> str:
         """Get file extension from MIME type."""
         mime_to_ext = {
@@ -72,9 +95,12 @@ class StorageService:
             "image/png": ".png",
             "image/gif": ".gif",
             "image/webp": ".webp",
-            "image/svg+xml": ".svg"
+            "image/svg+xml": ".svg",
+            "video/webm": ".webm",
+            "video/mp4": ".mp4",
+            "video/quicktime": ".mov",
         }
-        return mime_to_ext.get(file_type.lower(), ".jpg")
+        return mime_to_ext.get(file_type.lower(), ".bin")
 
 
 # Singleton instance

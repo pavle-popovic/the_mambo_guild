@@ -190,31 +190,6 @@ export default function NavBar({ user }: NavBarProps) {
                         className="absolute right-0 mt-2 w-64 rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 shadow-2xl shadow-black/50 overflow-hidden z-50"
                       >
                         <div className="p-2">
-                          {/* DJ Booth */}
-                          <Link
-                            href="/studio/dj-booth"
-                            onClick={() => setIsStudioOpen(false)}
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors group"
-                          >
-                            <div className={cn(
-                              "w-10 h-10 rounded-lg flex items-center justify-center",
-                              isGuildMaster 
-                                ? "bg-gradient-to-br from-cyan-500/20 to-blue-500/20 border border-cyan-400/30"
-                                : "bg-gray-800 border border-gray-700"
-                            )}>
-                              <Headphones size={18} className={isGuildMaster ? "text-cyan-400" : "text-gray-500"} />
-                            </div>
-                            <div className="flex-1">
-                              <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-white">DJ Booth</span>
-                                {!isGuildMaster && (
-                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>
-                                )}
-                              </div>
-                              <p className="text-xs text-gray-400">Practice tools & mixer</p>
-                            </div>
-                          </Link>
-
                           {/* Coaching Corner */}
                           <Link
                             href="/studio/coaching"

@@ -227,7 +227,8 @@ class WeeklyArchiveCreate(BaseModel):
     """Admin request to create a new weekly archive."""
     title: str = Field(..., max_length=200)
     description: Optional[str] = None
-    r2_file_key: str = Field(..., max_length=500)  # e.g., "archives/week-42.mp4"
+    r2_file_key: Optional[str] = Field(None, max_length=500)  # Optional now; use youtube_url instead
+    youtube_url: Optional[str] = Field(None, max_length=500)
     recorded_at: datetime
     duration_minutes: Optional[int] = Field(None, ge=1, le=180)
     topics: Optional[List[str]] = None  # ['timing', 'styling', 'Q&A']
@@ -241,6 +242,7 @@ class WeeklyArchiveUpdate(BaseModel):
     title: Optional[str] = Field(None, max_length=200)
     description: Optional[str] = None
     r2_file_key: Optional[str] = Field(None, max_length=500)
+    youtube_url: Optional[str] = Field(None, max_length=500)
     duration_minutes: Optional[int] = Field(None, ge=1, le=180)
     topics: Optional[List[str]] = None
     thumbnail_url: Optional[str] = None
@@ -255,6 +257,7 @@ class WeeklyArchiveResponse(BaseModel):
     recorded_at: str  # ISO format
     duration_minutes: Optional[int] = None
     topics: List[str] = []
+    youtube_url: Optional[str] = None
     thumbnail_url: Optional[str] = None
     # Admin-only fields (optional)
     is_published: Optional[bool] = None
@@ -262,3 +265,23 @@ class WeeklyArchiveResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+
+# ============================================
+# Weekly Meeting Config
+# ============================================
+
+class WeeklyMeetingConfigResponse(BaseModel):
+    """Meeting config returned to both guild masters and admins."""
+    meeting_url: Optional[str] = None
+    meeting_notes: Optional[str] = None
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class WeeklyMeetingConfigUpdate(BaseModel):
+    """Admin request to update the meeting link/notes."""
+    meeting_url: Optional[str] = Field(None, max_length=500)
+    meeting_notes: Optional[str] = None

@@ -5,9 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Radio, Calendar, Clock, Play, Pause, Users, Crown, Lock,
-  ArrowLeft, ExternalLink, Volume2, VolumeX, Maximize,
-  ChevronRight, Tag
+  Radio, Calendar, Clock, Play, Users, Crown, Lock,
+  ArrowLeft, ExternalLink, Tag, X
 } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -15,18 +14,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { cn } from "@/lib/utils";
 
-interface LiveCallStatus {
-  state: "no_upcoming" | "upcoming" | "live";
-  call: {
-    id: string;
-    title: string;
-    description: string | null;
-    scheduled_at: string;
-    duration_minutes: number;
-    zoom_link: string | null;
-  } | null;
-  countdown_seconds: number | null;
-  message: string;
+interface MeetingConfig {
+  meeting_url: string | null;
+  meeting_notes: string | null;
+  updated_at: string | null;
 }
 
 interface WeeklyArchive {
@@ -36,7 +27,22 @@ interface WeeklyArchive {
   recorded_at: string;
   duration_minutes: number | null;
   topics: string[];
+  youtube_url: string | null;
   thumbnail_url: string | null;
+}
+
+function getYouTubeId(url: string): string | null {
+  const m = url.match(/(?:v=|youtu\.be\/|embed\/)([a-zA-Z0-9_-]{11})/);
+  return m ? m[1] : null;
+}
+
+function nextWednesdayGMT(): Date {
+  const now = new Date();
+  const daysUntil = ((3 - now.getUTCDay() + 7) % 7) || 7;
+  const d = new Date(now);
+  d.setUTCDate(d.getUTCDate() + daysUntil);
+  d.setUTCHours(19, 0, 0, 0);
+  return d;
 }
 
 // Locked Page Component for non-Guild Masters
@@ -66,7 +72,7 @@ function LockedPage({ user }: { user: any }) {
             <div className="space-y-4 text-left max-w-md mx-auto mb-8">
               <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-800/50 border border-gray-700">
                 <Radio size={20} className="text-red-400" />
-                <span className="text-gray-300">Weekly live Q&A sessions</span>
+                <span className="text-gray-300">Weekly live Q&amp;A sessions</span>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-800/50 border border-gray-700">
                 <Play size={20} className="text-cyan-400" />
@@ -105,19 +111,17 @@ export default function RoundtablePage() {
   const router = useRouter();
   const isGuildMaster = user?.tier?.toLowerCase() === "performer";
 
-  const [liveStatus, setLiveStatus] = useState<LiveCallStatus | null>(null);
+  const [meetingConfig, setMeetingConfig] = useState<MeetingConfig | null>(null);
   const [archives, setArchives] = useState<WeeklyArchive[]>([]);
   const [selectedArchive, setSelectedArchive] = useState<WeeklyArchive | null>(null);
   const [signedVideoUrl, setSignedVideoUrl] = useState<string | null>(null);
+  const [youtubeEmbedUrl, setYoutubeEmbedUrl] = useState<string | null>(null);
   const [isLoadingArchives, setIsLoadingArchives] = useState(true);
   const [isLoadingVideo, setIsLoadingVideo] = useState(false);
   const [countdown, setCountdown] = useState<number | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
-  const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -126,21 +130,17 @@ export default function RoundtablePage() {
     }
   }, [user, loading, router]);
 
-  // Fetch live status and archives
+  // Fetch meeting config and archives
   useEffect(() => {
     if (!user || !isGuildMaster) return;
 
     const fetchData = async () => {
       try {
-        // Fetch live call status
-        const statusData = await apiClient.getLiveCallStatus();
-        setLiveStatus(statusData);
-        if (statusData.countdown_seconds) {
-          setCountdown(statusData.countdown_seconds);
-        }
-
-        // Fetch archives
-        const archivesData = await apiClient.getWeeklyArchives();
+        const [configData, archivesData] = await Promise.all([
+          apiClient.getWeeklyMeetingConfig(),
+          apiClient.getWeeklyArchives(),
+        ]);
+        setMeetingConfig(configData);
         setArchives(archivesData);
       } catch (error) {
         console.error("Failed to fetch roundtable data:", error);
@@ -150,6 +150,11 @@ export default function RoundtablePage() {
     };
 
     fetchData();
+
+    // Init countdown to next Wednesday 7pm GMT
+    const target = nextWednesdayGMT();
+    const secs = Math.floor((target.getTime() - Date.now()) / 1000);
+    setCountdown(secs > 0 ? secs : 0);
   }, [user, isGuildMaster]);
 
   // Countdown timer
@@ -169,12 +174,23 @@ export default function RoundtablePage() {
     return () => clearInterval(timer);
   }, [countdown]);
 
-  // Load signed video URL when archive is selected
+  // Select archive for playback
   const handleSelectArchive = async (archive: WeeklyArchive) => {
     setSelectedArchive(archive);
-    setIsLoadingVideo(true);
     setSignedVideoUrl(null);
+    setYoutubeEmbedUrl(null);
 
+    // YouTube-backed archive: embed directly
+    if (archive.youtube_url) {
+      const ytId = getYouTubeId(archive.youtube_url);
+      if (ytId) {
+        setYoutubeEmbedUrl(`https://www.youtube.com/embed/${ytId}?autoplay=1`);
+        return;
+      }
+    }
+
+    // R2-backed archive: get signed URL
+    setIsLoadingVideo(true);
     try {
       const { url } = await apiClient.getArchiveSignedUrl(archive.id);
       setSignedVideoUrl(url);
@@ -185,63 +201,14 @@ export default function RoundtablePage() {
     }
   };
 
-  // Video controls
-  const togglePlay = () => {
-    if (videoRef.current) {
-      if (isPlaying) {
-        videoRef.current.pause();
-      } else {
-        videoRef.current.play();
-      }
-      setIsPlaying(!isPlaying);
-    }
-  };
-
-  const toggleMute = () => {
-    if (videoRef.current) {
-      videoRef.current.muted = !isMuted;
-      setIsMuted(!isMuted);
-    }
-  };
-
-  const handleTimeUpdate = () => {
-    if (videoRef.current) {
-      setCurrentTime(videoRef.current.currentTime);
-    }
-  };
-
-  const handleLoadedMetadata = () => {
-    if (videoRef.current) {
-      setDuration(videoRef.current.duration);
-    }
-  };
-
-  const handleSeek = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const time = parseFloat(e.target.value);
-    if (videoRef.current) {
-      videoRef.current.currentTime = time;
-      setCurrentTime(time);
-    }
-  };
-
-  const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs.toString().padStart(2, "0")}`;
-  };
-
   const formatCountdown = (seconds: number) => {
     const days = Math.floor(seconds / 86400);
     const hours = Math.floor((seconds % 86400) / 3600);
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
 
-    if (days > 0) {
-      return `${days}d ${hours}h ${mins}m`;
-    }
-    if (hours > 0) {
-      return `${hours}h ${mins}m ${secs}s`;
-    }
+    if (days > 0) return `${days}d ${hours}h ${mins}m`;
+    if (hours > 0) return `${hours}h ${mins}m ${secs}s`;
     return `${mins}m ${secs}s`;
   };
 
@@ -253,14 +220,9 @@ export default function RoundtablePage() {
     );
   }
 
-  if (!user) {
-    return null;
-  }
+  if (!user) return null;
 
-  // Show locked page for non-Guild Masters
-  if (!isGuildMaster) {
-    return <LockedPage user={user} />;
-  }
+  if (!isGuildMaster) return <LockedPage user={user} />;
 
   return (
     <div className="min-h-screen bg-mambo-dark">
@@ -295,80 +257,61 @@ export default function RoundtablePage() {
             </div>
           </motion.div>
 
-          {/* Live Call Status Card */}
+          {/* Next Meeting Card */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
             className="mb-12"
           >
-            <div className={cn(
-              "rounded-2xl p-6 border",
-              liveStatus?.state === "live"
-                ? "bg-gradient-to-br from-red-500/20 to-orange-500/20 border-red-400/30"
-                : liveStatus?.state === "upcoming"
-                  ? "bg-gradient-to-br from-amber-500/10 to-yellow-500/10 border-amber-400/30"
-                  : "bg-gray-800/50 border-gray-700"
-            )}>
-              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="rounded-2xl p-6 border border-amber-400/30 bg-gradient-to-br from-amber-500/10 to-yellow-500/10">
+              <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    {liveStatus?.state === "live" ? (
-                      <>
-                        <span className="relative flex h-3 w-3">
-                          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
-                          <span className="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
-                        </span>
-                        <span className="text-sm font-bold text-red-400 uppercase tracking-wide">Live Now</span>
-                      </>
-                    ) : liveStatus?.state === "upcoming" ? (
-                      <span className="text-sm font-bold text-amber-400 uppercase tracking-wide">Next Session</span>
-                    ) : (
-                      <span className="text-sm font-bold text-gray-500 uppercase tracking-wide">No Upcoming Session</span>
-                    )}
+                  <span className="text-sm font-bold text-amber-400 uppercase tracking-wide">
+                    Weekly VIP Session
+                  </span>
+                  <h2 className="text-2xl font-bold text-white mt-1 mb-2">
+                    Next Meeting
+                  </h2>
+                  <div className="flex items-center gap-1.5 text-sm text-gray-400">
+                    <Calendar size={14} />
+                    <span>Every Wednesday at 7:00 PM GMT</span>
                   </div>
-
-                  {liveStatus?.call ? (
-                    <>
-                      <h2 className="text-2xl font-bold text-white mb-1">{liveStatus.call.title}</h2>
-                      {liveStatus.call.description && (
-                        <p className="text-gray-400 mb-3">{liveStatus.call.description}</p>
-                      )}
-                      <div className="flex items-center gap-4 text-sm text-gray-400">
-                        <div className="flex items-center gap-1.5">
-                          <Calendar size={14} />
-                          <span>{new Date(liveStatus.call.scheduled_at).toLocaleDateString("en-US", { weekday: "long", month: "short", day: "numeric" })}</span>
-                        </div>
-                        <div className="flex items-center gap-1.5">
-                          <Clock size={14} />
-                          <span>{new Date(liveStatus.call.scheduled_at).toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" })}</span>
-                        </div>
-                      </div>
-                    </>
-                  ) : (
-                    <p className="text-gray-400">Check back soon for the next scheduled session.</p>
+                  {meetingConfig?.meeting_notes && (
+                    <p className="text-gray-300 text-sm mt-3">
+                      {meetingConfig.meeting_notes}
+                    </p>
                   )}
                 </div>
 
-                <div className="flex flex-col items-center gap-2">
-                  {liveStatus?.state === "live" && liveStatus?.call?.zoom_link ? (
-                    <a
-                      href={liveStatus.call.zoom_link}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-6 py-3 rounded-xl bg-gradient-to-r from-red-500 to-orange-500 text-white font-bold hover:from-red-400 hover:to-orange-400 transition-all shadow-lg shadow-red-500/25"
-                    >
-                      <ExternalLink size={18} />
-                      Join Zoom Room
-                    </a>
-                  ) : liveStatus?.state === "upcoming" && countdown !== null ? (
+                <div className="flex flex-col items-start md:items-end gap-3">
+                  {countdown !== null && countdown > 0 && (
                     <div className="text-center">
                       <div className="text-3xl font-mono font-bold text-amber-400 mb-1">
                         {formatCountdown(countdown)}
                       </div>
-                      <span className="text-xs text-gray-500 uppercase tracking-wide">until start</span>
+                      <span className="text-xs text-gray-500 uppercase tracking-wide">
+                        until next session
+                      </span>
                     </div>
-                  ) : null}
+                  )}
+                  <a
+                    href={meetingConfig?.meeting_url || "#"}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) =>
+                      !meetingConfig?.meeting_url && e.preventDefault()
+                    }
+                    className={cn(
+                      "flex items-center gap-2 px-6 py-3 rounded-xl font-bold transition-all",
+                      meetingConfig?.meeting_url
+                        ? "bg-gradient-to-r from-amber-500 to-yellow-500 text-black hover:from-amber-400 hover:to-yellow-400 shadow-lg shadow-amber-500/25"
+                        : "bg-gray-700/50 text-gray-500 cursor-not-allowed"
+                    )}
+                  >
+                    <ExternalLink size={18} />
+                    {meetingConfig?.meeting_url ? "Join Meeting" : "Link Coming Soon"}
+                  </a>
                 </div>
               </div>
             </div>
@@ -389,17 +332,21 @@ export default function RoundtablePage() {
                   <div className="relative aspect-video bg-black">
                     {isLoadingVideo ? (
                       <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="animate-spin w-12 h-12 border-3 border-mambo-gold border-t-transparent rounded-full" />
+                        <div className="animate-spin w-12 h-12 border-2 border-amber-400 border-t-transparent rounded-full" />
                       </div>
+                    ) : youtubeEmbedUrl ? (
+                      <iframe
+                        src={youtubeEmbedUrl}
+                        className="w-full h-full"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                      />
                     ) : signedVideoUrl ? (
                       <video
                         ref={videoRef}
                         controls
                         controlsList="nodownload"
-                        poster="/images/roundtable-thumbnail.jpg"
                         className="w-full h-full"
-                        onTimeUpdate={handleTimeUpdate}
-                        onLoadedMetadata={handleLoadedMetadata}
                         onPlay={() => setIsPlaying(true)}
                         onPause={() => setIsPlaying(false)}
                       >
@@ -417,14 +364,28 @@ export default function RoundtablePage() {
                   <div className="p-6">
                     <div className="flex items-start justify-between gap-4">
                       <div>
-                        <h3 className="text-xl font-bold text-white mb-2">{selectedArchive.title}</h3>
+                        <h3 className="text-xl font-bold text-white mb-2">
+                          {selectedArchive.title}
+                        </h3>
                         {selectedArchive.description && (
-                          <p className="text-gray-400 text-sm mb-3">{selectedArchive.description}</p>
+                          <p className="text-gray-400 text-sm mb-3">
+                            {selectedArchive.description}
+                          </p>
                         )}
                         <div className="flex items-center gap-4 text-sm text-gray-500">
-                          <span>{new Date(selectedArchive.recorded_at).toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}</span>
-                          <span>•</span>
-                          <span>{selectedArchive.duration_minutes ?? '--'} mins</span>
+                          <span>
+                            {new Date(selectedArchive.recorded_at).toLocaleDateString("en-US", {
+                              month: "long",
+                              day: "numeric",
+                              year: "numeric",
+                            })}
+                          </span>
+                          {selectedArchive.duration_minutes && (
+                            <>
+                              <span>•</span>
+                              <span>{selectedArchive.duration_minutes} mins</span>
+                            </>
+                          )}
                         </div>
                         {selectedArchive.topics.length > 0 && (
                           <div className="flex flex-wrap gap-2 mt-3">
@@ -441,10 +402,14 @@ export default function RoundtablePage() {
                         )}
                       </div>
                       <button
-                        onClick={() => setSelectedArchive(null)}
-                        className="text-gray-400 hover:text-white transition-colors text-sm"
+                        onClick={() => {
+                          setSelectedArchive(null);
+                          setSignedVideoUrl(null);
+                          setYoutubeEmbedUrl(null);
+                        }}
+                        className="p-1.5 text-gray-400 hover:text-white transition-colors flex-shrink-0"
                       >
-                        Close
+                        <X size={18} />
                       </button>
                     </div>
                   </div>
@@ -464,7 +429,10 @@ export default function RoundtablePage() {
             {isLoadingArchives ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="rounded-xl bg-gray-800/50 border border-gray-700 animate-pulse">
+                  <div
+                    key={i}
+                    className="rounded-xl bg-gray-800/50 border border-gray-700 animate-pulse"
+                  >
                     <div className="aspect-video bg-gray-700 rounded-t-xl" />
                     <div className="p-4">
                       <div className="h-5 bg-gray-700 rounded w-3/4 mb-2" />
@@ -481,67 +449,91 @@ export default function RoundtablePage() {
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {archives.map((archive) => (
-                  <motion.button
-                    key={archive.id}
-                    onClick={() => handleSelectArchive(archive)}
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    className={cn(
-                      "text-left rounded-xl border overflow-hidden transition-all",
-                      selectedArchive?.id === archive.id
-                        ? "bg-gradient-to-br from-red-500/20 to-orange-500/20 border-red-400/50"
-                        : "bg-gray-800/50 border-gray-700 hover:border-gray-600"
-                    )}
-                  >
-                    {/* Thumbnail */}
-                    <div className="relative aspect-video bg-gray-900">
-                      {archive.thumbnail_url ? (
-                        <img
-                          src={archive.thumbnail_url}
-                          alt={archive.title}
-                          className="w-full h-full object-cover"
-                        />
-                      ) : (
-                        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-500/20 to-orange-500/20">
-                          <Radio size={32} className="text-red-400/50" />
-                        </div>
-                      )}
+                {archives.map((archive) => {
+                  const ytId = archive.youtube_url
+                    ? getYouTubeId(archive.youtube_url)
+                    : null;
+                  const thumbSrc = ytId
+                    ? `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`
+                    : archive.thumbnail_url;
 
-                      {/* Duration Badge */}
-                      <div className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 text-xs font-mono text-white">
-                        {archive.duration_minutes ?? '--'} min
+                  return (
+                    <motion.button
+                      key={archive.id}
+                      onClick={() => handleSelectArchive(archive)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      className={cn(
+                        "text-left rounded-xl border overflow-hidden transition-all",
+                        selectedArchive?.id === archive.id
+                          ? "bg-gradient-to-br from-red-500/20 to-orange-500/20 border-red-400/50"
+                          : "bg-gray-800/50 border-gray-700 hover:border-gray-600"
+                      )}
+                    >
+                      {/* Thumbnail */}
+                      <div className="relative aspect-video bg-gray-900">
+                        {thumbSrc ? (
+                          <img
+                            src={thumbSrc}
+                            alt={archive.title}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-red-500/20 to-orange-500/20">
+                            <Radio size={32} className="text-red-400/50" />
+                          </div>
+                        )}
+
+                        {/* Duration Badge */}
+                        {archive.duration_minutes && (
+                          <div className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 text-xs font-mono text-white">
+                            {archive.duration_minutes} min
+                          </div>
+                        )}
+
+                        {/* YouTube badge */}
+                        {ytId && (
+                          <div className="absolute top-2 left-2 px-2 py-0.5 rounded bg-red-600/90 text-[10px] font-bold text-white uppercase tracking-wide">
+                            YouTube
+                          </div>
+                        )}
+
+                        {/* Play Overlay */}
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
+                          <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
+                            <Play size={32} className="text-white ml-1" />
+                          </div>
+                        </div>
                       </div>
 
-                      {/* Play Overlay */}
-                      <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 hover:opacity-100 transition-opacity">
-                        <div className="w-16 h-16 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                          <Play size={32} className="text-white ml-1" />
-                        </div>
+                      {/* Info */}
+                      <div className="p-4">
+                        <h3 className="font-semibold text-white mb-1 line-clamp-1">
+                          {archive.title}
+                        </h3>
+                        <p className="text-sm text-gray-500">
+                          {new Date(archive.recorded_at).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                            year: "numeric",
+                          })}
+                        </p>
+                        {archive.topics.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-2">
+                            {archive.topics.slice(0, 3).map((topic) => (
+                              <span
+                                key={topic}
+                                className="px-1.5 py-0.5 rounded bg-gray-700/50 text-[10px] text-gray-400"
+                              >
+                                {topic}
+                              </span>
+                            ))}
+                          </div>
+                        )}
                       </div>
-                    </div>
-
-                    {/* Info */}
-                    <div className="p-4">
-                      <h3 className="font-semibold text-white mb-1 line-clamp-1">{archive.title}</h3>
-                      <p className="text-sm text-gray-500">
-                        {new Date(archive.recorded_at).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                      </p>
-                      {archive.topics.length > 0 && (
-                        <div className="flex flex-wrap gap-1.5 mt-2">
-                          {archive.topics.slice(0, 3).map((topic) => (
-                            <span
-                              key={topic}
-                              className="px-1.5 py-0.5 rounded bg-gray-700/50 text-[10px] text-gray-400"
-                            >
-                              {topic}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  </motion.button>
-                ))}
+                    </motion.button>
+                  );
+                })}
               </div>
             )}
           </motion.div>

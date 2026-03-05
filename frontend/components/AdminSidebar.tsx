@@ -7,28 +7,32 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   FaChartLine,
   FaLayerGroup,
-  FaGraduationCap,
   FaUsers,
   FaCog,
   FaSignOutAlt,
+  FaVideo,
+  FaUserCheck,
 } from "react-icons/fa";
 
 interface AdminSidebarProps {
-  pendingCount?: number;
+  coachingPendingCount?: number;
 }
 
-export default function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
+export default function AdminSidebar({
+  coachingPendingCount = 0,
+}: AdminSidebarProps) {
   const pathname = usePathname();
   const { logout } = useAuth();
 
   const menuItems = [
     { href: "/admin", icon: FaChartLine, label: "Dashboard" },
+    { href: "/admin/live", icon: FaVideo, label: "Live Meetings" },
     { href: "/admin/builder", icon: FaLayerGroup, label: "Course Builder" },
     {
-      href: "/admin/grading",
-      icon: FaGraduationCap,
-      label: "Grading Queue",
-      badge: pendingCount,
+      href: "/admin/coaching",
+      icon: FaUserCheck,
+      label: "Coaching Queue",
+      badge: coachingPendingCount,
     },
     { href: "/admin/students", icon: FaUsers, label: "Students" },
     { href: "/admin/settings", icon: FaCog, label: "Settings" },
@@ -48,24 +52,30 @@ export default function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
         <span className="font-bold text-lg tracking-wide text-mambo-text">ADMIN</span>
       </div>
 
-      <nav className="flex-1 px-4 space-y-2 mt-4">
+      <nav className="flex-1 px-4 space-y-1 mt-2 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          const isActive = pathname === item.href;
+          // Exact match for dashboard, prefix match for sub-pages
+          const isActive =
+            item.href === "/admin"
+              ? pathname === "/admin"
+              : pathname.startsWith(item.href);
+
           return (
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition ${isActive
-                ? "bg-blue-600/10 text-blue-400 border border-blue-600/20"
-                : "text-gray-400 hover:bg-gray-800 hover:text-mambo-text"
-                }`}
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition ${
+                isActive
+                  ? "bg-blue-600/10 text-blue-400 border border-blue-600/20"
+                  : "text-gray-400 hover:bg-gray-800 hover:text-mambo-text"
+              }`}
             >
-              <Icon className="w-5" />
-              <span>{item.label}</span>
-              {item.badge && item.badge > 0 && (
-                <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                  {item.badge}
+              <Icon className="w-4 h-4 flex-shrink-0" />
+              <span className="text-sm">{item.label}</span>
+              {item.badge != null && item.badge > 0 && (
+                <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center">
+                  {item.badge > 99 ? "99+" : item.badge}
                 </span>
               )}
             </Link>
@@ -76,9 +86,9 @@ export default function AdminSidebar({ pendingCount = 0 }: AdminSidebarProps) {
       <div className="p-4 border-t border-white/10">
         <button
           onClick={logout}
-          className="flex items-center gap-2 text-gray-500 hover:text-mambo-text text-sm w-full"
+          className="flex items-center gap-2 text-gray-500 hover:text-mambo-text text-sm w-full px-2 py-1.5 rounded-lg hover:bg-white/5 transition"
         >
-          <FaSignOutAlt />
+          <FaSignOutAlt className="w-3.5 h-3.5" />
           Logout
         </button>
       </div>

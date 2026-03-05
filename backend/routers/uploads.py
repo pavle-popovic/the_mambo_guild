@@ -5,6 +5,11 @@ from dependencies import get_current_user
 from models.user import User
 from services.storage_service import get_storage_service
 
+
+def _require_admin(user: User):
+    if user.role.value != "admin":
+        raise HTTPException(status_code=403, detail="Admin access required.")
+
 router = APIRouter()
 
 
@@ -43,6 +48,35 @@ async def generate_presigned_url(
         result = storage_service.generate_presigned_url(
             file_type=request.file_type,
             folder=request.folder
+        )
+        return PresignedUrlResponse(**result)
+    except ValueError as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to generate presigned URL: {str(e)}")
+
+
+class CoachingFeedbackUrlRequest(BaseModel):
+    submission_id: str
+
+
+@router.post("/coaching-feedback-url", response_model=PresignedUrlResponse)
+async def generate_coaching_feedback_url(
+    request: CoachingFeedbackUrlRequest,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Generate a presigned PUT URL for uploading a coaching feedback video to R2.
+    Admin only. File is stored at coaching-feedback/{submission_id}.webm.
+    """
+    _require_admin(current_user)
+
+    object_key = f"coaching-feedback/{request.submission_id}.webm"
+    try:
+        storage_service = get_storage_service()
+        result = storage_service.generate_presigned_url_for_key(
+            object_key=object_key,
+            content_type="video/webm"
         )
         return PresignedUrlResponse(**result)
     except ValueError as e:

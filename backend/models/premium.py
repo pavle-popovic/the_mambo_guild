@@ -66,6 +66,26 @@ class LiveCall(Base):
 
 
 # ============================================
+# Weekly Meeting Config (single persistent row)
+# ============================================
+
+class WeeklyMeetingConfig(Base):
+    """
+    Single-row config for the weekly VIP meeting link.
+    Always id=1. Admin edits the URL + notes.
+    """
+    __tablename__ = "weekly_meeting_configs"
+
+    id = Column(Integer, primary_key=True)
+    meeting_url = Column(String(500), nullable=True)
+    meeting_notes = Column(Text, nullable=True)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
+
+    def __repr__(self):
+        return f"<WeeklyMeetingConfig url={self.meeting_url}>"
+
+
+# ============================================
 # Weekly Archives (Cloudflare R2 Storage)
 # ============================================
 
@@ -82,7 +102,8 @@ class WeeklyArchive(Base):
     description = Column(Text, nullable=True)
     
     # R2 Storage
-    r2_file_key = Column(String(500), nullable=False)  # e.g., "archives/week-42-musicality.mp4"
+    r2_file_key = Column(String(500), nullable=True)  # e.g., "archives/week-42-musicality.mp4"
+    youtube_url = Column(String(500), nullable=True)  # Unlisted YouTube URL for playback
     
     # Recording metadata
     recorded_at = Column(DateTime, nullable=False)

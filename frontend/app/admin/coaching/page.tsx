@@ -1,9 +1,21 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion } from "framer-motion";
-import { Play, Clock, CheckCircle, ExternalLink, User } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Play,
+  Clock,
+  CheckCircle,
+  User,
+  Circle,
+  Square,
+  Upload,
+  X,
+  Video,
+  Camera,
+  AlertCircle,
+} from "lucide-react";
 import AdminSidebar from "@/components/AdminSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
@@ -28,16 +40,452 @@ interface CoachingSubmission {
   user_avatar_url: string | null;
 }
 
+type RecordingState = "idle" | "recording" | "stopped" | "uploading" | "done";
+
+// ─── Recording Studio ────────────────────────────────────────────────────────
+
+function ReviewStudio({
+  submission,
+  onClose,
+  onComplete,
+}: {
+  submission: CoachingSubmission;
+  onClose: () => void;
+  onComplete: () => void;
+}) {
+  const studentVideoRef = useRef<HTMLVideoElement>(null);
+  const webcamVideoRef = useRef<HTMLVideoElement>(null);
+  const previewVideoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const animFrameRef = useRef<number>(0);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const chunksRef = useRef<Blob[]>([]);
+  const webcamStreamRef = useRef<MediaStream | null>(null);
+
+  const [recordingState, setRecordingState] = useState<RecordingState>("idle");
+  const [recordedBlob, setRecordedBlob] = useState<Blob | null>(null);
+  const [recordingSeconds, setRecordingSeconds] = useState(0);
+  const [webcamError, setWebcamError] = useState<string | null>(null);
+  const [feedbackNotes, setFeedbackNotes] = useState("");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Student video src (Mux HLS → direct mp4 for canvas CORS compatibility)
+  const studentVideoSrc = `https://stream.mux.com/${submission.video_mux_playback_id}/medium.mp4`;
+
+  // Start webcam on mount
+  useEffect(() => {
+    startWebcam();
+    return () => {
+      stopWebcam();
+      cancelAnimationFrame(animFrameRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
+    };
+  }, []);
+
+  const startWebcam = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 640, height: 480 },
+        audio: true,
+      });
+      webcamStreamRef.current = stream;
+      if (webcamVideoRef.current) {
+        webcamVideoRef.current.srcObject = stream;
+      }
+    } catch (err) {
+      setWebcamError("Could not access webcam/mic. Please allow camera permissions.");
+    }
+  };
+
+  const stopWebcam = () => {
+    webcamStreamRef.current?.getTracks().forEach((t) => t.stop());
+    webcamStreamRef.current = null;
+  };
+
+  // Canvas draw loop — student video left 65%, webcam right 35%
+  const drawFrame = useCallback(() => {
+    const canvas = canvasRef.current;
+    const studentVid = studentVideoRef.current;
+    const webcamVid = webcamVideoRef.current;
+    if (!canvas || !studentVid || !webcamVid) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const W = canvas.width; // 1280
+    const H = canvas.height; // 720
+    const leftW = Math.round(W * 0.65);
+    const rightW = W - leftW;
+
+    ctx.fillStyle = "#000";
+    ctx.fillRect(0, 0, W, H);
+    ctx.drawImage(studentVid, 0, 0, leftW, H);
+    ctx.drawImage(webcamVid, leftW, 0, rightW, H);
+
+    // Label overlays
+    ctx.fillStyle = "rgba(0,0,0,0.55)";
+    ctx.fillRect(8, 8, 130, 28);
+    ctx.fillRect(leftW + 8, 8, 100, 28);
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 14px Arial";
+    ctx.fillText("STUDENT VIDEO", 14, 27);
+    ctx.fillText("INSTRUCTOR", leftW + 14, 27);
+
+    animFrameRef.current = requestAnimationFrame(drawFrame);
+  }, []);
+
+  const startRecording = async () => {
+    if (!canvasRef.current || !webcamStreamRef.current) return;
+
+    chunksRef.current = [];
+
+    // Start drawing
+    animFrameRef.current = requestAnimationFrame(drawFrame);
+
+    // Capture canvas video stream
+    const canvasStream = (canvasRef.current as any).captureStream(25) as MediaStream;
+    const videoTrack = canvasStream.getVideoTracks()[0];
+
+    // Get audio track from webcam
+    const audioTrack = webcamStreamRef.current.getAudioTracks()[0];
+
+    const combinedStream = new MediaStream(
+      audioTrack ? [videoTrack, audioTrack] : [videoTrack]
+    );
+
+    const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9,opus")
+      ? "video/webm;codecs=vp9,opus"
+      : MediaRecorder.isTypeSupported("video/webm")
+      ? "video/webm"
+      : "";
+
+    const recorder = new MediaRecorder(combinedStream, mimeType ? { mimeType } : {});
+    mediaRecorderRef.current = recorder;
+
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunksRef.current.push(e.data);
+    };
+
+    recorder.onstop = () => {
+      const blob = new Blob(chunksRef.current, { type: "video/webm" });
+      setRecordedBlob(blob);
+      if (previewVideoRef.current) {
+        previewVideoRef.current.src = URL.createObjectURL(blob);
+      }
+      cancelAnimationFrame(animFrameRef.current);
+    };
+
+    recorder.start(1000);
+    setRecordingState("recording");
+    setRecordingSeconds(0);
+    timerRef.current = setInterval(() => setRecordingSeconds((s) => s + 1), 1000);
+  };
+
+  const stopRecording = () => {
+    mediaRecorderRef.current?.stop();
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+      timerRef.current = null;
+    }
+    setRecordingState("stopped");
+  };
+
+  const uploadAndComplete = async () => {
+    if (!recordedBlob) return;
+    setRecordingState("uploading");
+    setUploadProgress(0);
+
+    try {
+      // 1. Get presigned URL
+      const urlRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/uploads/coaching-feedback-url`,
+        {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ submission_id: submission.id }),
+        }
+      );
+      if (!urlRes.ok) throw new Error("Failed to get upload URL");
+      const { upload_url, public_url } = await urlRes.json();
+
+      setUploadProgress(20);
+
+      // 2. PUT blob to R2
+      const putRes = await fetch(upload_url, {
+        method: "PUT",
+        headers: { "Content-Type": "video/webm" },
+        body: recordedBlob,
+      });
+      if (!putRes.ok) throw new Error("Failed to upload video to R2");
+
+      setUploadProgress(70);
+
+      // 3. Mark submission as completed
+      const completeRes = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/premium/admin/coaching/${submission.id}`,
+        {
+          method: "PUT",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            status: "completed",
+            feedback_video_url: public_url,
+            feedback_notes: feedbackNotes || null,
+          }),
+        }
+      );
+      if (!completeRes.ok) throw new Error("Failed to mark submission complete");
+
+      setUploadProgress(100);
+      setRecordingState("done");
+      setToast({ type: "success", msg: "Feedback uploaded and student notified!" });
+      setTimeout(() => {
+        onComplete();
+      }, 2000);
+    } catch (err: any) {
+      setToast({ type: "error", msg: err.message || "Upload failed" });
+      setRecordingState("stopped");
+    }
+  };
+
+  const formatTime = (secs: number) => {
+    const m = Math.floor(secs / 60);
+    const s = secs % 60;
+    return `${m}:${s.toString().padStart(2, "0")}`;
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      className="fixed inset-0 z-50 flex flex-col bg-mambo-dark overflow-y-auto"
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-white/10 bg-mambo-panel">
+        <div>
+          <h2 className="text-xl font-bold text-white">Recording Studio</h2>
+          <p className="text-sm text-white/50">
+            {submission.user_first_name} {submission.user_last_name} —{" "}
+            {submission.user_email}
+          </p>
+        </div>
+        <button
+          onClick={onClose}
+          className="p-2 rounded-lg text-white/50 hover:text-white hover:bg-white/10 transition"
+        >
+          <X className="w-5 h-5" />
+        </button>
+      </div>
+
+      <div className="flex-1 p-6 space-y-6 max-w-7xl mx-auto w-full">
+        {/* Question */}
+        {submission.specific_question && (
+          <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
+            <p className="text-sm text-amber-200">
+              <strong>Student's question:</strong> {submission.specific_question}
+            </p>
+          </div>
+        )}
+
+        {/* Video feeds */}
+        <div className="grid grid-cols-1 lg:grid-cols-[65fr_35fr] gap-4">
+          {/* Student video */}
+          <div className="space-y-2">
+            <p className="text-xs text-white/40 uppercase tracking-wider flex items-center gap-1.5">
+              <Video className="w-3 h-3" /> Student Submission
+            </p>
+            <div className="aspect-video rounded-xl overflow-hidden bg-black">
+              <video
+                ref={studentVideoRef}
+                src={studentVideoSrc}
+                crossOrigin="anonymous"
+                controls
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+
+          {/* Webcam */}
+          <div className="space-y-2">
+            <p className="text-xs text-white/40 uppercase tracking-wider flex items-center gap-1.5">
+              <Camera className="w-3 h-3" /> Your Webcam
+              {recordingState === "recording" && (
+                <span className="ml-auto flex items-center gap-1 text-red-400 font-mono text-xs">
+                  <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+                  REC {formatTime(recordingSeconds)}
+                </span>
+              )}
+            </p>
+            <div className="aspect-video rounded-xl overflow-hidden bg-black relative">
+              {webcamError ? (
+                <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 text-center px-4">
+                  <AlertCircle className="w-8 h-8 text-red-400" />
+                  <p className="text-sm text-red-300">{webcamError}</p>
+                </div>
+              ) : (
+                <video
+                  ref={webcamVideoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover scale-x-[-1]"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Hidden canvas for recording */}
+        <canvas
+          ref={canvasRef}
+          width={1280}
+          height={720}
+          className="hidden"
+        />
+
+        {/* Controls */}
+        <div className="bg-mambo-panel border border-white/10 rounded-xl p-4 flex flex-wrap items-center gap-3">
+          {recordingState === "idle" && (
+            <button
+              onClick={startRecording}
+              disabled={!!webcamError}
+              className="flex items-center gap-2 px-5 py-2.5 bg-red-500 hover:bg-red-400 disabled:bg-white/10 disabled:text-white/30 text-white font-bold rounded-lg transition"
+            >
+              <Circle className="w-4 h-4 fill-current" />
+              Start Recording
+            </button>
+          )}
+
+          {recordingState === "recording" && (
+            <button
+              onClick={stopRecording}
+              className="flex items-center gap-2 px-5 py-2.5 bg-white/20 hover:bg-white/30 text-white font-bold rounded-lg transition"
+            >
+              <Square className="w-4 h-4 fill-current" />
+              Stop Recording
+            </button>
+          )}
+
+          {recordingState === "stopped" && (
+            <>
+              <button
+                onClick={() => {
+                  setRecordedBlob(null);
+                  setRecordingState("idle");
+                  setRecordingSeconds(0);
+                }}
+                className="flex items-center gap-2 px-4 py-2.5 bg-white/10 hover:bg-white/20 text-white/70 rounded-lg transition text-sm"
+              >
+                <Circle className="w-4 h-4" />
+                Re-record
+              </button>
+              <button
+                onClick={uploadAndComplete}
+                className="flex items-center gap-2 px-5 py-2.5 bg-green-500 hover:bg-green-400 text-white font-bold rounded-lg transition"
+              >
+                <Upload className="w-4 h-4" />
+                Upload &amp; Send to Student
+              </button>
+            </>
+          )}
+
+          {recordingState === "uploading" && (
+            <div className="flex items-center gap-3 flex-1">
+              <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              <div className="flex-1 bg-white/10 rounded-full h-2 overflow-hidden">
+                <div
+                  className="h-full bg-green-500 transition-all duration-500"
+                  style={{ width: `${uploadProgress}%` }}
+                />
+              </div>
+              <span className="text-white/60 text-sm">{uploadProgress}%</span>
+            </div>
+          )}
+
+          {recordingState === "done" && (
+            <div className="flex items-center gap-2 text-green-400 font-semibold">
+              <CheckCircle className="w-5 h-5" />
+              Done! Student has been notified.
+            </div>
+          )}
+
+          {/* Duration */}
+          {recordingState === "recording" && (
+            <span className="ml-auto font-mono text-red-400 text-sm">
+              {formatTime(recordingSeconds)}
+            </span>
+          )}
+        </div>
+
+        {/* Preview */}
+        {(recordingState === "stopped" || recordingState === "uploading" || recordingState === "done") && recordedBlob && (
+          <div className="space-y-2">
+            <p className="text-xs text-white/40 uppercase tracking-wider">Preview Recording</p>
+            <div className="aspect-video rounded-xl overflow-hidden bg-black max-w-2xl">
+              <video
+                ref={previewVideoRef}
+                controls
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Feedback Notes */}
+        <div>
+          <label className="block text-sm font-medium text-white/70 mb-2">
+            Additional Notes (optional — visible to student)
+          </label>
+          <textarea
+            value={feedbackNotes}
+            onChange={(e) => setFeedbackNotes(e.target.value)}
+            placeholder="Any written feedback or timestamps to highlight..."
+            rows={3}
+            className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-none"
+          />
+        </div>
+      </div>
+
+      {/* Toast */}
+      <AnimatePresence>
+        {toast && (
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 20 }}
+            className={cn(
+              "fixed bottom-6 right-6 px-5 py-3 rounded-xl font-medium shadow-lg text-sm flex items-center gap-2",
+              toast.type === "success"
+                ? "bg-green-500 text-white"
+                : "bg-red-500 text-white"
+            )}
+          >
+            {toast.type === "success" ? (
+              <CheckCircle className="w-4 h-4" />
+            ) : (
+              <AlertCircle className="w-4 h-4" />
+            )}
+            {toast.msg}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
+}
+
+// ─── Main Page ────────────────────────────────────────────────────────────────
+
 export default function AdminCoachingPage() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
-  
+
   const [submissions, setSubmissions] = useState<CoachingSubmission[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedSubmission, setSelectedSubmission] = useState<CoachingSubmission | null>(null);
-  const [feedbackUrl, setFeedbackUrl] = useState("");
-  const [feedbackNotes, setFeedbackNotes] = useState("");
-  const [isSubmittingFeedback, setIsSubmittingFeedback] = useState(false);
+  const [reviewingSubmission, setReviewingSubmission] = useState<CoachingSubmission | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>("pending");
 
   useEffect(() => {
@@ -56,9 +504,7 @@ export default function AdminCoachingPage() {
       const params = statusFilter ? `?status_filter=${statusFilter}` : "";
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/premium/admin/coaching${params}`,
-        {
-          credentials: "include",
-        }
+        { credentials: "include" }
       );
       if (response.ok) {
         const data = await response.json();
@@ -68,44 +514,6 @@ export default function AdminCoachingPage() {
       console.error("Failed to load submissions:", error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleMarkComplete = async () => {
-    if (!selectedSubmission) return;
-    
-    setIsSubmittingFeedback(true);
-    try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/premium/admin/coaching/${selectedSubmission.id}`,
-        {
-          method: "PUT",
-          credentials: "include",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            status: "completed",
-            feedback_video_url: feedbackUrl || null,
-            feedback_notes: feedbackNotes || null,
-          }),
-        }
-      );
-      
-      if (response.ok) {
-        setSelectedSubmission(null);
-        setFeedbackUrl("");
-        setFeedbackNotes("");
-        loadSubmissions();
-      } else {
-        const error = await response.json();
-        alert(error.detail || "Failed to update submission");
-      }
-    } catch (error) {
-      console.error("Failed to submit feedback:", error);
-      alert("Failed to submit feedback. Please try again.");
-    } finally {
-      setIsSubmittingFeedback(false);
     }
   };
 
@@ -123,9 +531,9 @@ export default function AdminCoachingPage() {
 
   return (
     <div className="flex h-screen overflow-hidden bg-mambo-dark">
-      <AdminSidebar pendingCount={submissions.filter(s => s.status === "pending").length} />
+      <AdminSidebar coachingPendingCount={submissions.filter((s) => s.status === "pending").length} />
 
-      <main className="flex-1 overflow-y-auto p-8">
+      <main className="flex-1 overflow-y-auto p-8 ml-64">
         <header className="mb-8">
           <h1 className="text-2xl font-bold text-white">Coaching Queue</h1>
           <p className="text-white/60">Review 1-on-1 video analysis submissions</p>
@@ -133,18 +541,18 @@ export default function AdminCoachingPage() {
 
         {/* Filter Tabs */}
         <div className="flex gap-2 mb-6">
-          {["pending", "in_review", "completed"].map((status) => (
+          {["pending", "in_review", "completed"].map((s) => (
             <button
-              key={status}
-              onClick={() => setStatusFilter(status)}
+              key={s}
+              onClick={() => setStatusFilter(s)}
               className={cn(
                 "px-4 py-2 rounded-lg text-sm font-medium transition",
-                statusFilter === status
+                statusFilter === s
                   ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
                   : "text-white/60 hover:text-white hover:bg-white/5"
               )}
             >
-              {status.charAt(0).toUpperCase() + status.slice(1).replace("_", " ")}
+              {s.charAt(0).toUpperCase() + s.slice(1).replace("_", " ")}
             </button>
           ))}
         </div>
@@ -173,16 +581,6 @@ export default function AdminCoachingPage() {
                       alt="Submission video"
                       className="w-full h-full object-cover"
                     />
-                    <a
-                      href={`https://stream.mux.com/${submission.video_mux_playback_id}.m3u8`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition"
-                    >
-                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center">
-                        <Play className="w-5 h-5 text-black ml-0.5" fill="currentColor" />
-                      </div>
-                    </a>
                     {submission.video_duration_seconds && (
                       <div className="absolute bottom-1 right-1 px-1.5 py-0.5 bg-black/80 rounded text-xs text-white">
                         {submission.video_duration_seconds}s
@@ -239,9 +637,10 @@ export default function AdminCoachingPage() {
 
                   {/* Action */}
                   <button
-                    onClick={() => setSelectedSubmission(submission)}
-                    className="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg transition text-sm font-medium"
+                    onClick={() => setReviewingSubmission(submission)}
+                    className="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 rounded-lg transition text-sm font-medium flex items-center gap-2"
                   >
+                    <Play className="w-4 h-4" />
                     Review
                   </button>
                 </div>
@@ -251,108 +650,19 @@ export default function AdminCoachingPage() {
         )}
       </main>
 
-      {/* Review Modal */}
-      {selectedSubmission && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-          <div className="relative w-full max-w-2xl bg-mambo-panel rounded-2xl border border-white/10 overflow-hidden">
-            <div className="p-6 border-b border-white/10">
-              <h2 className="text-xl font-bold text-white">Complete Review</h2>
-              <p className="text-white/60 text-sm">
-                {selectedSubmission.user_first_name} {selectedSubmission.user_last_name}
-              </p>
-            </div>
-
-            <div className="p-6 space-y-4">
-              {/* Video Preview */}
-              <div className="aspect-video rounded-lg overflow-hidden bg-black">
-                <video
-                  src={`https://stream.mux.com/${selectedSubmission.video_mux_playback_id}/medium.mp4`}
-                  controls
-                  className="w-full h-full"
-                />
-              </div>
-
-              {/* Question */}
-              {selectedSubmission.specific_question && (
-                <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-4">
-                  <p className="text-sm text-amber-200">
-                    <strong>Their question:</strong> {selectedSubmission.specific_question}
-                  </p>
-                </div>
-              )}
-
-              {/* Feedback URL */}
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">
-                  Feedback Video URL (Loom/YouTube link)
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    value={feedbackUrl}
-                    onChange={(e) => setFeedbackUrl(e.target.value)}
-                    placeholder="https://www.loom.com/share/..."
-                    className="flex-1 px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                  />
-                  <a
-                    href="https://www.loom.com/looms/videos"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="px-3 py-3 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg transition"
-                    title="Open Loom"
-                  >
-                    <ExternalLink className="w-5 h-5 text-white/60" />
-                  </a>
-                </div>
-              </div>
-
-              {/* Feedback Notes */}
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">
-                  Additional Notes (optional)
-                </label>
-                <textarea
-                  value={feedbackNotes}
-                  onChange={(e) => setFeedbackNotes(e.target.value)}
-                  placeholder="Any written feedback..."
-                  rows={3}
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-none"
-                />
-              </div>
-            </div>
-
-            <div className="p-6 border-t border-white/10 flex justify-end gap-3">
-              <button
-                onClick={() => {
-                  setSelectedSubmission(null);
-                  setFeedbackUrl("");
-                  setFeedbackNotes("");
-                }}
-                className="px-4 py-2 text-white/60 hover:text-white transition"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleMarkComplete}
-                disabled={isSubmittingFeedback}
-                className="px-6 py-2 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-400 hover:to-green-500 text-white font-bold rounded-lg transition flex items-center gap-2"
-              >
-                {isSubmittingFeedback ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <CheckCircle className="w-4 h-4" />
-                    Mark as Complete
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
+      {/* Recording Studio overlay */}
+      <AnimatePresence>
+        {reviewingSubmission && (
+          <ReviewStudio
+            submission={reviewingSubmission}
+            onClose={() => setReviewingSubmission(null)}
+            onComplete={() => {
+              setReviewingSubmission(null);
+              loadSubmissions();
+            }}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 }

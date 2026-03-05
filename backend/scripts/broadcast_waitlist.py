@@ -46,7 +46,7 @@ def get_beautiful_html(username, referral_link):
     text_color = "#333333" # Dark Gray/Black
     
     # TODO: Replace [INSERT URL HERE] with the actual combo URL before sending
-    combo_url = "https://youtu.be/5u_56JspFX8"
+    combo_url = "https://youtu.be/57-zwVE1VXI"
     
     return f"""
     <!DOCTYPE html>
@@ -114,18 +114,18 @@ def get_beautiful_html(username, referral_link):
             
             <p>Here is the combo for this week: <a href="{combo_url}" class="link">{combo_url}</a></p>
 
-            <h2><span class="emoji">🧠</span> The Science of Movement: The Variation Hack</h2>
-            <p>If you want to learn footwork faster, you need to stop practicing under the exact same conditions every time.</p>
-            <p>Neuroplasticity (how your brain builds new pathways) thrives on repetition, but it also desperately needs new feedback to adapt. If you always practice staring perfectly at yourself in the mirror, you are using a visual crutch.</p>
-            <p>To speed up your learning, you have to introduce variation into your environment and conditions. Try doing "blind" drills with your eyes closed—this forces your brain to rely on internal sensory data (proprioception) rather than visuals. Turn away from the mirror entirely to build true kinaesthetic awareness, or challenge your mechanics by drilling shines at 110% music speed.</p>
-            <p>By varying the conditions, you force your brain to develop a "super cue"—a neural shortcut that allows for rapid, real-time error correction when you are dancing at high speeds.</p>
+            <h2><span class="emoji">🧠</span> The Science of Movement: The Vocalization Hack</h2>
+            <p>If you want to permanently lock a complex rhythm into your body, start making noise. "Scatting" (vocalizing the hits, counts, or instruments like <em>pa-ku-pa</em>) isn't just a stylistic choice—it's a neurological cheat code.</p>
+            <p>By tying your footwork to your voice, you create a rapid feedback loop. If your mouth hits the accent, your feet automatically follow. Plus, singing forces you to breathe consistently, preventing the subconscious breath-holding that causes stiff, heavy movement.</p>
+            <p>Stop counting silently in your head. Scat the conga slaps, sing the clave, and watch your musical reflexes instantly speed up.</p>
 
-            <h2><span class="emoji">🗽</span> The History: The Nuyorican Mambo Engine</h2>
-            <p>While Mambo's roots are African and Cuban, the aggressive, highly technical style we dance today was forged in New York City's Palladium Ballroom.</p>
-            <p>The culture exploded thanks to a mix of legendary Puerto Rican and Nuyorican talent:</p>
-            <p><strong>The Musician:</strong> Tito Puente ("El Rey") drove dancers to insane technical heights with his percussive intensity, famously playing his timbales standing up at the front of the stage.</p>
-            <p><strong>The Dancer:</strong> "Cuban Pete" (Pedro Aguilar) defined the "street" style of the Palladium, which was improvisational, aggressive, and deeply rhythmic.</p>
-            <p><strong>The Architect:</strong> Eddie Torres, a dancer from the Bronx, took that raw Palladium energy and mathematically codified it into the "Salsa On 2" timing (1-2-3, 5-6-7) so it could be taught to the masses.</p>
+            <h2><span class="emoji">🗽</span> The History: The Haitian Catalyst</h2>
+            <p>Mambo's rhythmic tension actually traces back to the Haitian Revolution of 1791. When refugees fled to Eastern Cuba, they brought a unique mix of elegant European <em>Contredanse</em> and deeply syncopated African rhythms. This collision created a chain reaction:</p>
+            <ul>
+                <li><strong>The Danzón:</strong> These styles merged into the highly structured <em>Danzón</em>, the predecessor to modern Latin dance.</li>
+                <li><strong>The Son:</strong> Concurrently, Spanish guitars and African drums collided to create <em>Cuban Son</em>—the true rhythmic backbone of everything we dance today.</li>
+                <li><strong>The Birth of Mambo:</strong> To hype up the dancers, musicians like Arsenio Rodríguez started adding an explosive, syncopated instrumental section to the very end of their Danzón and Son tracks. They called this section the <em>"mambo"</em>—which eventually broke off to become an entire genre of its own.</li>
+            </ul>
 
             <p>See you in the next one,</p>
 
@@ -159,11 +159,33 @@ def send_broadcast():
     print("-" * 40)
 
     count = 0
+    skipped = 0
+    
+    # Skip list: test accounts and fake/disposable emails
+    SKIP_EMAILS = {
+        "qffgqg@ebhtbt.com",
+        "test@gmail.com",
+        "test@hotmail.com",
+        "test3@hotmail.com",
+        "test4@gmail.com",
+        "yahamo2849@cimario.com",
+        "viwakit677@codgal.com",
+        "lawhitney.lagasse@inboxorigin.com",
+        "nocholas.bradbury@allfreemail.net",
+        "marsp557@allfreemail.net",
+    }
+    
     for user in users:
         # 1. Extract Data safely
         email = user.get('email')
         username = user.get('username', 'Dancer') # Fallback if missing
         code = user.get('referral_code', 'MAMBO2026') # Fallback if missing
+        
+        # Skip test/fake emails
+        if email in SKIP_EMAILS:
+            print(f"   [SKIPPED] {email} (test/fake)")
+            skipped += 1
+            continue
         
         # Construct referral link
         # Ensure helper works with/without trailing slash
@@ -196,7 +218,7 @@ def send_broadcast():
                 print(f"FAILED to send to {email}: {e}")
 
     print("-" * 40)
-    print(f"Job Complete. Total sent: {count}")
+    print(f"Job Complete. Total sent: {count}, Skipped: {skipped}")
     if DRY_RUN:
         print("\n⚠️  This was a DRY RUN. No emails were actually sent.")
         print("   Set DRY_RUN = False in the script to send for real.")
