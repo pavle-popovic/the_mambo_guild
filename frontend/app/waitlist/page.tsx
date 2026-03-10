@@ -164,6 +164,8 @@ export default function WaitlistPage() {
     const [successData, setSuccessData] = useState<{ referral_code: string; position: number } | null>(null);
     const [showStickyBar, setShowStickyBar] = useState(false);
     const [copied, setCopied] = useState(false);
+    const [honeypot, setHoneypot] = useState('');
+    const formMountTime = useRef<number>(Date.now());
 
     const heroRef = useRef<HTMLElement>(null);
 
@@ -197,7 +199,15 @@ export default function WaitlistPage() {
         setIsLoading(true);
 
         try {
-            const result = await waitlistRegister(email, username, referrerCode || undefined);
+            // Timing check: real humans take >3s to fill a form; bots submit instantly
+            const elapsed = Date.now() - formMountTime.current;
+            if (honeypot || elapsed < 3000) {
+                // Fake success — don't reveal detection
+                setSuccessData({ referral_code: 'XXXXXXXX', position: 0 });
+                return;
+            }
+
+            const result = await waitlistRegister(email, username, referrerCode || undefined, honeypot);
             // API returns { referral_code, position } directly on success
             if (result.referral_code) {
                 setSuccessData({
@@ -350,6 +360,17 @@ export default function WaitlistPage() {
                         onSubmit={handleSubmit}
                         className="space-y-3 pt-2 sm:space-y-4 sm:pt-4"
                     >
+                        {/* Honeypot — hidden from humans, filled by bots */}
+                        <input
+                            type="text"
+                            name="website"
+                            value={honeypot}
+                            onChange={(e) => setHoneypot(e.target.value)}
+                            tabIndex={-1}
+                            autoComplete="off"
+                            aria-hidden="true"
+                            style={{ position: 'absolute', opacity: 0, height: 0, width: 0, pointerEvents: 'none' }}
+                        />
                         <input
                             type="email"
                             value={email}

@@ -24,6 +24,31 @@ from authlib.integrations.httpx_client import AsyncOAuth2Client
 from typing import Optional
 import logging
 from pydantic import BaseModel, EmailStr
+import re
+
+# ---------------------------------------------------------------------------
+# Waitlist bot / abuse protection
+# ---------------------------------------------------------------------------
+
+# Known disposable/fake email domains to block.
+# temporarymail.com is intentionally excluded (used for legit testing).
+BLOCKED_EMAIL_DOMAINS = {
+    "ebhtbt.com", "cimario.com", "codgal.com", "inboxorigin.com",
+    "allfreemail.net", "mailinator.com", "guerrillamail.com", "guerrillamail.net",
+    "guerrillamail.org", "guerrillamail.de", "guerrillamail.info", "guerrillamail.biz",
+    "guerrillamailblock.com", "grr.la", "spam4.me", "trashmail.me", "trashmail.at",
+    "trashmail.io", "trashmail.xyz", "dispostable.com", "fakeinbox.com",
+    "throwam.com", "sharklasers.com", "yopmail.com", "getairmail.com",
+    "tempmail.com", "temp-mail.org", "mohmal.com", "maildrop.cc",
+}
+
+def _is_admin_test_account(username: str) -> bool:
+    """Allow admin QA accounts with username pattern test{number} (e.g. test13)."""
+    return bool(re.match(r"^test\d+$", username.lower().strip()))
+
+def _is_blocked_domain(email: str) -> bool:
+    domain = email.split("@")[-1].lower()
+    return domain in BLOCKED_EMAIL_DOMAINS
 
 # Allow HTTP for OAuth ONLY in development (localhost)
 # This must be set before importing oauthlib
@@ -821,10 +846,12 @@ class WaitlistRegisterRequest(BaseModel):
     email: EmailStr
     username: str
     referrer_code: Optional[str] = None
+    hp: Optional[str] = None  # Honeypot — must be empty for real humans
 
 @router.post("/waitlist", status_code=status.HTTP_201_CREATED)
 async def join_waitlist(
     request: WaitlistRegisterRequest,
+    http_request: Request,
     db: Session = Depends(get_db)
 ):
     """
@@ -837,6 +864,23 @@ async def join_waitlist(
     try:
         # Validate Email
         email = request.email.lower().strip()
+
+        # --- Bot / abuse checks ---
+        # 1. IP rate limit: max 5 sign-ups per IP per hour
+        client_ip = http_request.client.host if http_request.client else "unknown"
+        if not check_rate_limit(client_ip, "waitlist_ip", max_requests=5, window_seconds=3600):
+            raise HTTPException(status_code=429, detail="Too many sign-ups from this location. Please try again later.")
+
+        # 2. Block known disposable domains.
+        # Admin test accounts (username = test{number}, e.g. test13) always bypass —
+        # temporarymail.com hands out @allfreemail.net addresses which we use for QA.
+        if not _is_admin_test_account(request.username) and _is_blocked_domain(email):
+            raise HTTPException(status_code=400, detail="This email domain is not accepted. Please use a real email address.")
+
+        # 3. Honeypot: frontend sends hp="" for humans, bots fill it in
+        if getattr(request, "hp", None):
+            # Silently fake success — don't reveal we detected a bot
+            return {"message": "Welcome to the Inner Circle.", "user_id": str(uuid.uuid4()), "referral_code": secrets.token_hex(4).upper(), "position": 1234}
         if db.query(User).filter(User.email == email).first():
             raise HTTPException(status_code=400, detail="This email is already on the list.")
 
