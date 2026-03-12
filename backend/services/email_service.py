@@ -387,6 +387,7 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                     <p>Hi {username},</p>
                     
                     <p>Here is the link to the weekly tutorial (Rankankan Choreography): <a href="https://youtu.be/57-zwVE1VXI" class="link">https://youtu.be/57-zwVE1VXI</a></p>
+                    <p>Baile Inolvidable Choreography: <a href="https://youtu.be/Snk7pqMMczc" class="link">https://youtu.be/Snk7pqMMczc</a></p>
                     <p>14 Moves Breakdown: <a href="https://youtu.be/5u_56JspFX8" class="link">https://youtu.be/5u_56JspFX8</a></p>
                     <p>Salsa Romantica: <a href="https://youtu.be/wcDocNANEVY" class="link">https://youtu.be/wcDocNANEVY</a></p>
                     <p>Afro Mambo Fusion: <a href="https://youtu.be/RIMp6J02Th0" class="link">https://youtu.be/RIMp6J02Th0</a></p>
