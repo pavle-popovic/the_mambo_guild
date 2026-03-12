@@ -46,7 +46,7 @@ def get_beautiful_html(username, referral_link):
     text_color = "#333333" # Dark Gray/Black
     
     # TODO: Replace [INSERT URL HERE] with the actual combo URL before sending
-    combo_url = "https://youtu.be/57-zwVE1VXI"
+    combo_url = "https://youtu.be/Snk7pqMMczc"
     
     return f"""
     <!DOCTYPE html>
@@ -114,18 +114,15 @@ def get_beautiful_html(username, referral_link):
             
             <p>Here is the combo for this week: <a href="{combo_url}" class="link">{combo_url}</a></p>
 
-            <h2><span class="emoji">🧠</span> The Science of Movement: The Vocalization Hack</h2>
-            <p>If you want to permanently lock a complex rhythm into your body, start making noise. "Scatting" (vocalizing the hits, counts, or instruments like <em>pa-ku-pa</em>) isn't just a stylistic choice—it's a neurological cheat code.</p>
-            <p>By tying your footwork to your voice, you create a rapid feedback loop. If your mouth hits the accent, your feet automatically follow. Plus, singing forces you to breathe consistently, preventing the subconscious breath-holding that causes stiff, heavy movement.</p>
-            <p>Stop counting silently in your head. Scat the conga slaps, sing the clave, and watch your musical reflexes instantly speed up.</p>
+            <h2><span class="emoji">🧠</span> The Science: Sleep Is When You Actually Learn</h2>
+            <p>Training provides the stimulus for growth—but rest is when the growth actually occurs.</p>
+            <p>When you sleep, your brain replays and consolidates the motor patterns you drilled that day. Stage 2 sleep (marked by "sleep spindles") is directly linked to what we call "muscle memory." Research shows that a dancer who naps or sleeps well <em>after</em> learning a shine will perform it significantly better the next day than one who stays up late to drill.</p>
+            <p>The takeaway: don't guilt yourself for sleeping in after a hard session. That extra hour isn't laziness—it's your brain filing the choreography permanently. Aim for 7–9 hours, and try a 20-minute nap before your next session to boost motor alertness.</p>
 
-            <h2><span class="emoji">🗽</span> The History: The Haitian Catalyst</h2>
-            <p>Mambo's rhythmic tension actually traces back to the Haitian Revolution of 1791. When refugees fled to Eastern Cuba, they brought a unique mix of elegant European <em>Contredanse</em> and deeply syncopated African rhythms. This collision created a chain reaction:</p>
-            <ul>
-                <li><strong>The Danzón:</strong> These styles merged into the highly structured <em>Danzón</em>, the predecessor to modern Latin dance.</li>
-                <li><strong>The Son:</strong> Concurrently, Spanish guitars and African drums collided to create <em>Cuban Son</em>—the true rhythmic backbone of everything we dance today.</li>
-                <li><strong>The Birth of Mambo:</strong> To hype up the dancers, musicians like Arsenio Rodríguez started adding an explosive, syncopated instrumental section to the very end of their Danzón and Son tracks. They called this section the <em>"mambo"</em>—which eventually broke off to become an entire genre of its own.</li>
-            </ul>
+            <h2><span class="emoji">🎺</span> The History: How "Salsa" Got Its Name</h2>
+            <p>For most of its history, this music was called Mambo, Son, or Latin Jazz. The word "Salsa" is a marketing invention, born on the streets of New York in the 1970s.</p>
+            <p>The story centres on <strong>Johnny Pacheco</strong>, a Dominican flautist who co-founded <strong>Fania Records</strong> in 1964 out of the back of a car. Fania signed the greatest Latino musicians in New York—Celia Cruz, Rubén Blades, Willie Colón—and needed one word to unite the incredible diversity of Cuban Son, Puerto Rican Bomba, Colombian Cumbia, and Jazz their artists were playing. "Salsa" was the answer—shouted by audiences when a song hit its peak, like a cry of <em>"spice it up!"</em></p>
+            <p>Pacheco and Fania turned it into a global brand. The irony: most musicians resisted the label. Tito Puente famously said, <em>"I don't play salsa. I eat it."</em></p>
 
             <p>See you in the next one,</p>
 
@@ -163,16 +160,24 @@ def send_broadcast():
     
     # Skip list: test accounts and fake/disposable emails
     SKIP_EMAILS = {
+        # Obvious test accounts
         "qffgqg@ebhtbt.com",
         "test@gmail.com",
         "test@hotmail.com",
         "test3@hotmail.com",
         "test4@gmail.com",
+        # Disposable/fake domains
         "yahamo2849@cimario.com",
         "viwakit677@codgal.com",
         "lawhitney.lagasse@inboxorigin.com",
+        # allfreemail.net - all disposable
         "nocholas.bradbury@allfreemail.net",
         "marsp557@allfreemail.net",
+        "kimblery.eastburn@allfreemail.net",
+        "carlean.nailor@allfreemail.net",
+        "rahshon.wingate@allfreemail.net",
+        "alanda.fullington@allfreemail.net",
+        "merlee.appell@allfreemail.net",
     }
     
     for user in users:

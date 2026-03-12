@@ -60,7 +60,9 @@
       "Bash(cd:*)",
       "Bash(head:*)",
       "Bash(cd /c/Users/pavle/Desktop/salsa_lab_v2 && docker compose exec frontend npm install recharts 2>&1)",
-      "Bash(docker compose:*)"
+      "Bash(docker compose:*)",
+      "Bash(docker context:*)",
+      "Bash(python3:*)"
     ]
   }
 }
