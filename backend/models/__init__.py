@@ -14,7 +14,15 @@ def get_engine():
     """Get or create the database engine."""
     global _engine
     if _engine is None:
-        _engine = create_engine(settings.DATABASE_URL, echo=False)
+        _engine = create_engine(
+            settings.DATABASE_URL,
+            echo=False,
+            pool_pre_ping=True,       # Test connection before use (fixes stale connections)
+            pool_recycle=300,          # Recycle connections every 5 min (Supabase drops idle)
+            pool_size=5,               # Small pool for NANO compute
+            max_overflow=10,
+            connect_args={"connect_timeout": 10, "sslmode": "require"},
+        )
     return _engine
 
 def get_session_local():
