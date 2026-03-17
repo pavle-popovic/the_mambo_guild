@@ -112,7 +112,7 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p>Here is the combo for this week: <a href="{combo_url}" class="link">{combo_url}</a></p>
+            <p>Here is the combo for this week (Baile Inolvidable): <a href="{combo_url}" class="link">{combo_url}</a></p>
 
             <h2><span class="emoji">🧠</span> The Science: Sleep Is When You Actually Learn</h2>
             <p>Training provides the stimulus for growth—but rest is when the growth actually occurs.</p>
@@ -178,6 +178,10 @@ def send_broadcast():
         "rahshon.wingate@allfreemail.net",
         "alanda.fullington@allfreemail.net",
         "merlee.appell@allfreemail.net",
+        "clorissa.vrieze@allfreemail.net",
+        "margeree.christ@allfreemail.net",
+        "hance.hunkins@allfreemail.net",
+        "ector.ocheltree@allfreemail.net"
     }
     
     for user in users:

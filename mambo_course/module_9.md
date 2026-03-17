@@ -58,3 +58,24 @@ B) The Pachuco Cross
 C) The fundamental basic step
 D) The cross-body lead
 *Correct Answer: B) The Pachuco Cross. It is a highly specific shine designed purely to inject confrontational "flavor" and street attitude into the dance.*
+
+---
+
+## 📺 Watch & Listen
+
+**Willie Colón live — hear the street attitude in the music:**
+🎬 [Willie Colón & Héctor Lavoe – "El Malo" Live](https://www.youtube.com/watch?v=KP_TJdAiGLE)
+
+**The NYC Salsa Community tells their own story:**
+🎬 [NYC Salsa Stories Documentary](https://www.youtube.com/watch?v=b-1rQcsGVOY)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Chapters 6–7 cover the specifically political dimension of 1970s Salsa as a vehicle for Nuyorican identity in a hostile urban environment. |
+| **Vega, Marta Moreno.** *When the Spirits Dance Mambo.* Random House, 2004. | The most personal, poetic account of what growing up in El Barrio to this music physically felt like. Essential emotional context. |
+| **Flores, Juan.** *From Bomba to Hip-Hop.* Columbia University Press, 2000. | A rigorous academic examination of how Salsa served as a cultural "space" for Puerto Rican political identity and resistance. |
+| **Duany, Jorge.** *The Puerto Rican Nation on the Move: Identities on the Island and in the United States.* University of North Carolina Press, 2002. | Broader academic framework for understanding the political context of the Nuyorican generation and why the music was such a powerful identity vehicle. |

@@ -56,3 +56,23 @@ B) Dancing exclusively backwards to avoid hitting your partner.
 C) Stepping on every single beat, including the 4 and the 8.
 D) Dropping heavily on the 1 and bouncing upward on the 2.
 *Correct Answer: A) Executing the break step on the 2 creates a delayed, smooth, continuous momentum that aligns perfectly with Afro-Cuban syncopation.*
+
+---
+
+## 📺 Watch & Listen
+
+**The Mambo King explains his timing:**
+🎬 [Eddie Torres Mambo King Documentary](https://www.youtube.com/watch?v=wwAStiEAdTQ)
+
+**The Master and his Dancers:**
+🎬 [Tito Puente and Eddie Torres Live Performance](https://www.youtube.com/watch?v=vhWAihgtAho)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | An extensive analysis of Eddie Torres' codification of the On2 timing and his critical role in standardizing the syllabus for global export. |
+| **Boggs, Vernon W.** *Salsiology.* Excelsior Music Publishing, 1992. | Provides context on the fragmented state of New York dance before Torres formalized the structure. |
+| **Garcia, David F.** *Arsenio Rodríguez and the Transnational Flows of Latin Popular Music.* Temple University Press, 2006. | Essential for understanding the deep structural mechanics of the Afro-Cuban syncopation that Torres built his syllabus upon. |

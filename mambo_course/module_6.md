@@ -60,3 +60,23 @@ B) The neck.
 C) The actively engaged core (abdominals and lats).
 D) The ankles.
 *Correct Answer: C) The core. By bracing the midsection, the dancer prevents the high-speed energy of the legs from shaking the upper frame.*
+
+---
+
+## 📺 Watch & Listen
+
+**See the biomechanics demonstrated at world-class level:**
+🎬 [Eddie Torres – New York Mambo Fundamentals (Demo)](https://www.youtube.com/watch?v=AQFVCR2v6-w)
+
+**Compare: Classic Cuban Son movement vs. NY Mambo:**
+🎬 [Son Cubano – La Original de Manzanillo (Live)](https://www.youtube.com/watch?v=vq99u23d_2s)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | McMains specifically addresses the biomechanical collision of African and European aesthetics in Cuban social dance in her early theoretical chapters. Essential. |
+| **Drid Williams.** *Anthropology and the Dance: Ten Lectures.* University of Illinois Press, 2004. | Offers a rigorous anthropological framework for understanding how different cultural traditions produce entirely different physical relationships to gravity, rhythm, and movement. |
+| **Gottschild, Brenda Dixon.** *Digging the Africanist Presence in American Performance.* Greenwood Press, 1996. | A landmark text identifying the specific physical traits (bent knees, grounded center of gravity, polyrhythmic isolation) that constitute the "Africanist aesthetic" in American performance. |

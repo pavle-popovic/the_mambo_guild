@@ -62,3 +62,22 @@ B) The Casino follow only dances on the 3.
 C) The New York lead is legally not allowed to touch the follow's hands.
 D) They both only listen to the timbales.
 *Correct Answer: A) The physical mechanics of tension and gravity are entirely incompatible between the linear "snap" of Salsa and the continuous, walking "arc" of Casino.*
+
+---
+
+## 📺 Watch & Listen
+
+**The circular geometry of Casino:**
+🎬 [Rueda de Casino Havana (Archival)](https://www.youtube.com/watch?v=1itW9Y9FEJg)
+
+**The aggressive sound of Timba:**
+🎬 [Los Van Van – Live Havana](https://www.youtube.com/watch?v=Go2iqn8toxY)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **Moore, Robin D.** *Music and Revolution: Cultural Change in Socialist Cuba.* University of California Press, 2006. | Essential reading on how the Cuban Revolution shaped the music internally, leading to the invention of Timba. |
+| **Perna, Vincenzo.** *Timba: The Sound of the Cuban Crisis.* Ashgate Publishing, 2005. | A rigorous musical analysis of Timba, its aggressive structure, and what it demands from the dancer. |

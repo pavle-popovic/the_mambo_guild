@@ -58,3 +58,19 @@ B) Dancesport utilizes a violent "Locked Knee" mechanism to generate hip motion,
 C) Dancesport completely eliminates the use of the arms.
 D) Social Mambo strictly requires dancing on the 1 downbeat, while Dancesport is all danced On2.
 *Correct Answer: B) The Locked Knee vs. The Soft Knee. The state of the knee joint dictates the entire physical interpretation of the music.*
+
+---
+
+## 📺 Watch & Listen
+
+**The mechanical divide made visible:**
+🎬 [International Latin Rumba vs Social Salsa](https://www.youtube.com/watch?v=TuxUKJXOS7A)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Glamour Addiction: Inside the American Ballroom Dance Industry.* Wesleyan University Press, 2006. | Before writing her book on Salsa, McMains wrote the definitive academic critique of the Dancesport industry and how it historically stripped African roots from Latin dances. |
+| **Pietrobruno, Sheenagh.** *Salsa and Its Transnational Moves.* Lexington Books, 2006. | Discusses the ideological friction between institutionalized ballroom "Latin" and authentic street Salsa. |

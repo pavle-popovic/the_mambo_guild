@@ -64,3 +64,24 @@ B) The highly predictable structure allowed dancers to relax and focus on execut
 C) It made the music so fast that dancers were forced to jump.
 D) It completely removed the need for weight transfer and Cuban motion.
 *Correct Answer: B) The predictability allowed the creation of the continuous, complex turn patterns that define the modern social dance floor today.*
+
+---
+
+## 📺 Watch & Listen
+
+**The landmark film that launched Salsa to the world:**
+🎬 [Our Latin Thing (Nuestra Cosa) – Fania All-Stars 1971](https://www.youtube.com/watch?v=W5LAEYGuERo)
+
+**Celia Cruz – The Voice of Fania:**
+🎬 [Celia Cruz & the Fania All-Stars – "Quimbara" (Live)](https://www.youtube.com/watch?v=pTlnXaxuE-k)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | An entire section is dedicated to the Fania Records marketing machine, the etymology of the word "Salsa," and the deliberate standardization of the music's structure. |
+| **Washburne, Christopher.** *Sounding Salsa.* Temple University Press, 2008. | One of the most rigorous academic examinations of what Fania did to the music structurally — how the standardization of song forms, tempos, and vocal formulas was a commercial, not artistic, decision. |
+| **Flores, Juan.** *From Bomba to Hip-Hop: Puerto Rican Culture and Latino Identity.* Columbia University Press, 2000. | Essential for understanding why the Fania branding resonated so deeply with the New York Puerto Rican community as a vehicle for cultural identity. |
+| **Boggs, Vernon W.** *Salsiology.* Excelsior Music Publishing, 1992. | Includes first-person accounts from Fania-era musicians on the specific business decisions made at the label. |

@@ -58,3 +58,22 @@ B) The Bote bounce.
 C) They executed all turns strictly on the heels of their feet.
 D) Relaxing the core completely to allow the arms to do all the work.
 *Correct Answer: A) The Linear Check. Eliminating curves and aggressively hitting the end of the slot builds the physical elastic tension required to "snap" through complex turns.*
+
+---
+
+## 📺 Watch & Listen
+
+**The architects of LA Style:**
+🎬 [Vazquez Brothers Salsa Routine](https://www.youtube.com/watch?v=tFKGrjfkawA)
+
+**The original LA showmen:**
+🎬 [Los Rumberos Dance Company](https://www.youtube.com/watch?v=Mbzb_q7w9C8)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Covers the impact of the Vazquez brothers on formalizing LA Style and exporting it via the global Congress circuit. |
+| **García, Cindy.** *Salsa Crossings: Dancing Latinidad in Los Angeles.* Duke University Press, 2013. | Provides deep context on the LA club environment that incubated this specific, aggressive style of dancing. |

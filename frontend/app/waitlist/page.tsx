@@ -167,6 +167,25 @@ export default function WaitlistPage() {
     const [honeypot, setHoneypot] = useState('');
     const formMountTime = useRef<number>(Date.now());
 
+    // Countdown to launch: April 29, 2026
+    const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
+    useEffect(() => {
+        const launchDate = new Date('2026-04-29T00:00:00').getTime();
+        const tick = () => {
+            const now = Date.now();
+            const diff = Math.max(0, launchDate - now);
+            setCountdown({
+                days: Math.floor(diff / (1000 * 60 * 60 * 24)),
+                hours: Math.floor((diff / (1000 * 60 * 60)) % 24),
+                minutes: Math.floor((diff / (1000 * 60)) % 60),
+                seconds: Math.floor((diff / 1000) % 60),
+            });
+        };
+        tick();
+        const id = setInterval(tick, 1000);
+        return () => clearInterval(id);
+    }, []);
+
     const heroRef = useRef<HTMLElement>(null);
 
     // Get referrer code from URL
@@ -259,10 +278,21 @@ export default function WaitlistPage() {
                     <h1 className="font-serif text-3xl sm:text-4xl text-white">
                         You're In The Guild
                     </h1>
-                    <p className="text-lg text-gray-400">
-                        Welcome, Founder. Your spot is secured.
-                    </p>
 
+                    {/* Email notice */}
+                    <div className="bg-[#D4AF37]/10 p-5 rounded-xl border border-[#D4AF37]/30 space-y-3">
+                        <p className="text-white text-base sm:text-lg font-semibold">
+                            📩 We just sent you an email with links to free classes.
+                        </p>
+                        <p className="text-[#D4AF37] text-sm font-medium">
+                            Check your spam folder if you don't see it!
+                        </p>
+                        <p className="text-gray-400 text-sm">
+                            Every week you'll receive new exclusive content until launch.
+                        </p>
+                    </div>
+
+                    {/* Referral link */}
                     <div className="bg-black/60 p-5 rounded-xl border border-[#D4AF37]/30 space-y-3">
                         <p className="text-xs uppercase tracking-widest text-[#D4AF37]">Your Referral Link</p>
                         <div className="flex items-center gap-2">
@@ -281,14 +311,13 @@ export default function WaitlistPage() {
                         </p>
                     </div>
 
-                    <div className="bg-[#D4AF37]/10 p-4 rounded-xl border border-[#D4AF37]/20">
-                        <p className="text-gray-300 text-sm">
-                            <span className="text-[#39FF14] mr-2">➜</span>
-                            Check your emails for a free tip on training and a brief history class.
-                        </p>
-                    </div>
-
-
+                    {/* Close button */}
+                    <button
+                        onClick={() => setSuccessData(null)}
+                        className="w-full py-3 sm:py-4 bg-gradient-to-r from-[#D4AF37] to-[#B8860B] text-black font-bold text-base sm:text-lg rounded-xl shadow-lg shadow-[#D4AF37]/30 hover:shadow-[#D4AF37]/50 transition-all active:scale-[0.98]"
+                    >
+                        Got It
+                    </button>
                 </motion.div>
             </main>
         );
@@ -301,14 +330,23 @@ export default function WaitlistPage() {
                 <GoldDustCanvas />
 
                 <div className="relative z-20 w-full max-w-md mx-auto text-center space-y-3 sm:space-y-6">
-                    {/* Badge */}
+                    {/* Countdown to Launch */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/40"
+                        className="inline-flex items-center gap-3 sm:gap-4 px-4 py-2 rounded-full bg-[#D4AF37]/10 border border-[#D4AF37]/40"
                     >
-                        <span className="text-[#D4AF37] text-xs sm:text-sm font-medium uppercase tracking-wider">Founder Access</span>
+                        <span className="text-[#D4AF37] text-[10px] sm:text-xs font-medium uppercase tracking-wider">Launch in</span>
+                        <div className="flex items-center gap-1.5 sm:gap-2 font-mono text-sm sm:text-base font-bold text-white">
+                            <span className="bg-black/50 px-1.5 py-0.5 rounded text-[#D4AF37]">{String(countdown.days).padStart(2, '0')}d</span>
+                            <span className="text-gray-600">:</span>
+                            <span className="bg-black/50 px-1.5 py-0.5 rounded text-[#D4AF37]">{String(countdown.hours).padStart(2, '0')}h</span>
+                            <span className="text-gray-600">:</span>
+                            <span className="bg-black/50 px-1.5 py-0.5 rounded text-[#D4AF37]">{String(countdown.minutes).padStart(2, '0')}m</span>
+                            <span className="text-gray-600">:</span>
+                            <span className="bg-black/50 px-1.5 py-0.5 rounded text-[#D4AF37]">{String(countdown.seconds).padStart(2, '0')}s</span>
+                        </div>
                     </motion.div>
 
                     {/* Headline */}
@@ -348,7 +386,7 @@ export default function WaitlistPage() {
                         </li>
 
                         <li className="flex items-center justify-center gap-2">
-                            <Check size={16} className="text-[#39FF14]" /> Learn anytime, anywhere
+                            <Check size={16} className="text-[#39FF14]" /> Free exclusive classes every week until launch
                         </li>
                     </motion.ul>
 

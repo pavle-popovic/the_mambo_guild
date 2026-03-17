@@ -62,3 +62,23 @@ B) Dropping the heels heavily on every single beat of the measure.
 C) Strict isolation, locking the core to separate a quiet, controlled upper body from aggressive, fast footwork.
 D) Releasing the partner completely for the entire duration of the song.
 *Correct Answer: C) Strict isolation. You must brace the core to allow sharp arm lines while the feet move at high speeds underneath.*
+
+---
+
+## 📺 Watch & Listen
+
+**Cuban Pete himself, in his own words:**
+🎬 [Cuban Pete Documentary – The King of Mambo](https://www.youtube.com/watch?v=qfO_OfmGOl0)
+
+**The Palladium Legends performing live:**
+🎬 [Palladium Home of the Mambo](https://www.youtube.com/watch?v=a3i7y9SW3t0)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | A detailed chapter covers the individual dancers of the Palladium hierarchy, including Cuban Pete and the invention of the "Show" aesthetic in the 1950s. |
+| **Boggs, Vernon W.** *Salsiology.* Excelsior Music Publishing, 1992. | First-person interviews with Killer Joe Piro, as well as detailed accounts of the Palladium floor hierarchy and the physical competition between dance crews. |
+| **Delgado, Celeste Fraser and José Esteban Muñoz (eds.).** *Everynight Life: Culture and Dance in Latin/o America.* Duke University Press, 1997. | An academic anthology covering the social and identity politics of Latin social dancing, including specific essays on the Palladium era and the Latino body in performance. |

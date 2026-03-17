@@ -56,3 +56,20 @@ B) Because dancing on the 1 gives the dancers an extra three seconds of rest per
 C) Because it forces the dancer to freeze entirely on the 2, 3, and 4.
 D) Because gravity pushes harder on the 1 than on the 2.
 *Correct Answer: A) The aggressive forward lunge on the downbeat generates massive momentum and rotational power.*
+
+---
+
+## 📺 Watch & Listen
+
+**The aesthetics of early LA Style:**
+🎬 [LA Style Salsa Performance 2000s](https://www.youtube.com/watch?v=uY0ZaJSuy6w)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Contains specific chapters detailing the emergence of Los Angeles Style, its distinct "On1" timing, and its explosive, Hollywood-influenced aesthetic. |
+| **García, Cindy.** *Salsa Crossings: Dancing Latinidad in Los Angeles.* Duke University Press, 2013. | An in-depth ethnographic study of the specific club culture in Los Angeles that gave birth to the fast, hyper-competitive LA Style. |
+| **Hazzard-Donald, Katrina.** *Jookin'.* Temple University Press, 1990. | Provides historical context for how regional dance styles (like the Lindy Hop tricks adapted by LA dancers) mutate and cross over into different communities. |

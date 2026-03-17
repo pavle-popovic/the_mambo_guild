@@ -62,3 +62,24 @@ B) They combined Afro-Cuban rhythms with American big band Jazz harmony and inst
 C) They slowed the tempo down to match the Danzón.
 D) They introduced English lyrics to every song.
 *Correct Answer: B) They combined Afro-Cuban rhythms with American big band Jazz harmony, introducing complex, aggressive arrangements that required sharper dancing.*
+
+---
+
+## 📺 Watch & Listen
+
+**Hear the Cubop fusion that started it all:**
+🎬 [Machito & His Afro-Cubans – "Tanga"](https://www.youtube.com/watch?v=fAh5AuQSPoM)
+
+**The migration story told in depth:**
+🎬 [Salsa NYC Documentary – Origins in East Harlem](https://www.youtube.com/watch?v=pXeDeqSqXnQ)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Chapter 3 specifically covers the NY migration, the formation of El Barrio, and the role of Mario Bauzá and Machito. |
+| **Roberts, John Storm.** *The Latin Tinge.* Oxford University Press, 1999. | Essential for understanding the Cubop synthesis and Machito's role in bridging jazz and Afro-Cuban music. |
+| **Washburne, Christopher.** *Sounding Salsa: Performing Latin Music in New York City.* Temple University Press, 2008. | Offers deep ethnographic insight into the cultural meaning of the music for the Nuyorican community. |
+| **Vega, Marta Moreno.** *When the Spirits Dance Mambo: Growing Up Nuyorican in El Barrio.* Random House, 2004. | A personal, deeply human memoir of what the music and the migration meant to a child growing up in East Harlem. Required reading for the emotional context. |

@@ -58,3 +58,23 @@ B) The "Bote" or bounce, characterized by a rapid, springing micro-bounce on the
 C) Deep, dramatic drops and aerial lifts borrowed from Lindy Hop.
 D) Locking the knees completely straight while dancing in a wide circle.
 *Correct Answer: B) The Bote (the bounce). The light, skipping footwork mechanics on the balls of the feet became a permanent fixture in modern Salsa footwork.*
+
+---
+
+## 📺 Watch & Listen
+
+**Hear the Pachanga rhythm that killed Mambo overnight:**
+🎬 [Johnny Pacheco – "El Güiro de Macorina"](https://www.youtube.com/watch?v=AJRMRfY5hTc)
+
+**History of the embargo's impact on NYC Latin music:**
+🎬 [Cuban Music in New York – History of Salsa Part 2](https://www.youtube.com/watch?v=jhjxrcw5XWY)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Chapter 5 covers the Pachanga Fad in detail, its structural differences from Mambo, and how the charanga format introduced a completely different physical vocabulary. |
+| **Sublette, Ned.** *Cuba and Its Music.* Chicago Review Press, 2004. | An excellent political and musical account of how the Cuban Revolution and the American embargo permanently ruptured the flow of music between Havana and New York. |
+| **Roberts, John Storm.** *The Latin Tinge.* Oxford University Press, 1999. | Covers the specific role of the Charanga format and the flute in reshaping the rhythmic framework of Latin popular dance music in the early 1960s. |

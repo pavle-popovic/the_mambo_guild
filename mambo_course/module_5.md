@@ -62,3 +62,24 @@ B) Standing completely upright and converting the dance into a smooth foxtrot.
 C) Immediately stopping movement and waiting for the singer to return.
 D) Ignoring the music completely and maintaining the exact same energy from start to finish.
 *Correct Answer: A) Dropping into deeper tension and breaking apart. You must physically match the massive energy shift engineered by the band.*
+
+---
+
+## 📺 Watch & Listen
+
+**Tito Puente — live at the Palladium:**
+🎬 [Tito Puente – "Oye Como Va" & Live Timbales (Archival)](https://www.youtube.com/watch?v=Rvfq7Q7_zfA)
+
+**Eddie Torres & Tito Puente collaboration:**
+🎬 [Eddie Torres & Tito Puente – Mambo Madness TV Documentary (2016)](https://www.youtube.com/watch?v=2cLFuX_k4Es)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Discusses the Palladium's musical hierarchy and how the Big Three's rivalry physically accelerated the demands placed on the dancers. |
+| **Sublette, Ned.** *Cuba and Its Music: From the First Drums to the Mambo.* Chicago Review Press, 2004. | A massive, encyclopedic 700-page history of Cuban music. The chapters on Mambo and the Latin Jazz convergence are particularly relevant to understanding the Big Three's sound. |
+| **Roberts, John Storm.** *The Latin Tinge.* Oxford University Press, 1999. | Provides an excellent musicological breakdown of how Tito Puente synthesized Cubop jazz with commercial Mambo production values. |
+| **Loza, Steven.** *Tito Puente and the Making of Latin Music.* University of Illinois Press, 1999. | The definitive academic biography of Tito Puente, with detailed musical analysis of his arrangements and his role in shaping the Palladium era. |

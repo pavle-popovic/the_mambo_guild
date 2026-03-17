@@ -56,3 +56,19 @@ B) The development of Universal Lead-and-Follow Standardization, emphasizing str
 C) Forcing all leads to dance On2 regardless of the music.
 D) Strictly eliminating all spins to avoid collisions.
 *Correct Answer: B) Universal Lead-and-Follow Standardization. It was the only way two strangers from different continents could successfully execute complex turn patterns without communication.*
+
+---
+
+## 📺 Watch & Listen
+
+**The event that changed everything:**
+🎬 [Puerto Rico Salsa Congress 1997](https://www.youtube.com/watch?v=8gjlZxcBXQs)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | The definitive academic account of how the Congress circuit commodified and completely reorganized the transmission of the dance. |
+| **Pietrobruno, Sheenagh.** *Salsa and Its Transnational Moves.* Lexington Books, 2006. | Essential reading on how the global flow of bodies, videos, and capital at Congresses created a standardized, universal Salsa culture. |

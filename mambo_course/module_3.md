@@ -60,3 +60,21 @@ B) It caused dancers to completely stop dancing with a partner and only perform 
 C) It led to the invention of aerial acrobatics and lifting.
 D) It forced dancers to rigidly stop using partner connection.
 *Correct Answer: A) It forced dancers to adopt a linear "slot," leading to the modern Cross-Body Lead technique we use today to save space on crowded floors.*
+
+---
+
+## 📺 Watch & Listen
+
+**The definitive documentary on the Palladium:**
+🎬 [The Palladium: Where Mambo Was King (2023)](https://www.youtube.com/watch?v=hlYgFQjTyTc)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Chapters 3–4 deal directly with the Palladium social hierarchy, the integration of the space, and the physical origin of the linear slot. |
+| **Boggs, Vernon W.** *Salsiology: Afro-Cuban Music and the Evolution of Salsa in New York City.* Excelsior Music Publishing, 1992. | A highly detailed collection of first-person oral histories from Palladium-era dancers, musicians, and promoters. Rare and invaluable primary source material. |
+| **Roberts, John Storm.** *The Latin Tinge.* Oxford University Press, 1999. | Covers the Palladium's social significance as a rare integrated space in the segregated United States. |
+| **Robbins, James.** "The Cuban 'Son' as Form, Genre, and Symbol." *Latin American Music Review*, Vol. 11, No. 2, 1990. | A rigorous academic paper on how Son's structural features shaped the physical vocabulary of Mambo. |

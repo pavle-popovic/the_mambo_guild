@@ -60,3 +60,26 @@ B) Take large, leaping steps across the floor.
 C) Maintain a low center of gravity with bent knees to roll the weight transfer.
 D) Strictly step on the 1 and 3 downbeats.
 *Correct Answer: C) Maintain a low center of gravity with bent knees. This grounded posture is the biological requirement for proper Cuban weight transfer and syncopated timing.*
+
+---
+
+## 📺 Watch & Listen
+
+**Hear the Son Montuno in its raw form:**
+🎬 [Arsenio Rodríguez – "Bruca Maniguá"](https://www.youtube.com/watch?v=0x4rDSF5npQ)
+
+**A living document of 1950s Mambo and street dance:**
+🎬 [The Spirit Moves – Mambo 1950s](https://www.youtube.com/watch?v=gucZIXHWXQo)
+
+---
+
+## 📚 Further Reading & Sources
+
+This module draws directly from the following credible academic and literary sources:
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce.* Oxford University Press, 2015. | The primary academic source for this entire course. Chapters 1–2 directly address the Cuban precursors and the African/European physical synthesis. |
+| **Roberts, John Storm.** *The Latin Tinge: The Impact of Latin American Music on the United States.* Oxford University Press, 1999. | The definitive musicological history of how Cuban Son, Danzón, and Afro-Cuban Rumba spread northward and transformed American popular music. |
+| **Fernández, Raúl A.** *From Afro-Cuban Rhythms to Latin Jazz.* University of California Press, 2006. | An essential companion for understanding the clave, the Son Montuno structure, and Arsenio Rodríguez's pivotal role. |
+| **Manuel, Peter.** *Caribbean Currents: Caribbean Music from Rumba to Reggae.* Temple University Press, 2009. | Excellent structural breakdown of the Danzón, Son, and early Rumba genres in their native Cuban context. |

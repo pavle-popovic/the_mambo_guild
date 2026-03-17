@@ -62,3 +62,19 @@ B) Dancers heavily adopted a "Floating" aesthetic, elevating their center of gra
 C) Dancers returned exclusively to the deep, heavy, grounded squat of traditional Guaguancó.
 D) Dancers permanently adopted heavy tap shoes.
 *Correct Answer: B) The "Floating" aesthetic. Because the camera cannot physically "feel" grounded rhythm, dancers adapted by prioritizing extremely visual, hyper-athletic lines over traditional, grounded mechanics.*
+
+---
+
+## 📺 Watch & Listen
+
+**The modern digital aesthetic:**
+🎬 [Salsa Instagram Dancing Compilation](https://www.youtube.com/watch?v=624n_SNAM1I)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Discusses the digital standardization of the dance and how video sharing erased geographic stylistic differences. |
+| **Various Authors.** *Oxford Handbook of Dance and Ethnicity.* Oxford University Press, 2016. | General reading on how digital media platforms fundamentally alter the transmission of traditional folk and social dances. |

@@ -64,3 +64,23 @@ B) Locking the knees completely straight.
 C) Spotting: isolating the neck to maintain a fixed focal point while the body rapidly rotates beneath it.
 D) Closing the eyes tightly during every turn.
 *Correct Answer: C) Spotting. It is the only physical way a human body can maintain its vertical axis during aggressive, continuous rotation.*
+
+---
+
+## 📺 Watch & Listen
+
+**The invention of the "Show" style:**
+🎬 [Santo Rico Dance Company Performance](https://www.youtube.com/watch?v=fOQNyrv27QY)
+
+**Afro-Cuban body movement meets stage ferocity:**
+🎬 [Abakua Afro-Latin Dance Company Frankie Martinez](https://www.youtube.com/watch?v=sPUcv9ayLXs)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Documents the rise of the amateur-professional dance company in the 1990s and how stage aesthetics permanently altered social floor techniques. |
+| **Pietrobruno, Sheenagh.** *Salsa and Its Transnational Moves.* Lexington Books, 2006. | Discusses the globalization of Salsa and how theatrical performance standards became the normative benchmark for dancers worldwide. |
+| **Drid Williams.** *Anthropology and the Dance.* University of Illinois Press, 2004. | Useful for understanding the biomechanical differences between social, vernacular dance and formalized, theatrical performance (such as the necessity of spotting). |

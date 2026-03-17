@@ -58,3 +58,19 @@ B) They must completely decouple their stage mechanics, heavily softening the co
 C) They are required to dance entirely on their toes with locked knees.
 D) They completely abandon partner connection and only perform shines.
 *Correct Answer: B) Decoupling their stage tension. Dancers must completely soften the core and eliminate massive torque to physically survive dancing for five straight hours.*
+
+---
+
+## 📺 Watch & Listen
+
+**The industrialization of Salsa:**
+🎬 [Albert Torres World Latin Dance Cup](https://www.youtube.com/watch?v=m6Ik1UvYVS8)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | Offers a critical look at how Albert Torres Productions monopolized the global industry and centralized the financial power within the dance. |
+| **Pietrobruno, Sheenagh.** *Salsa and Its Transnational Moves.* Lexington Books, 2006. | Details the shift from local, community-based dance to a globalized, festival-driven sport. |

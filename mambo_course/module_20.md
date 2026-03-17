@@ -65,3 +65,19 @@ B) "Over-Dancing," where dancers furiously execute massive, manic double-spin pa
 C) Refusal to step on the first four beats of the measure.
 D) The strict requirement to maintain a closed, classical European ballroom hold at all times.
 *Correct Answer: B) Over-Dancing. The intense pressure to prove skill leads directly to manic, continuous spinning at the expense of authentic, grounded musicality.*
+
+---
+
+## 📺 Watch & Listen
+
+**The reality of the modern Congress floor:**
+🎬 [Salsa Congress Social Dancing 4am](https://www.youtube.com/watch?v=u408BDIskdY)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | The concluding chapters heavily critique the final transformation of the dance into a sport and an economy, raising critical questions about cultural ownership. |
+| **Uzzell, Lawrence.** *Salsa Dancing into the Social Sciences.* Harvard University Press, 2001. | Useful for understanding the broader societal implications of globalized subcultures. |

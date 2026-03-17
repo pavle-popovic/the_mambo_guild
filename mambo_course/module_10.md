@@ -56,3 +56,23 @@ B) Taking extremely large steps across the floor.
 C) Utilizing "Torso Preparation"—winding the core in the opposite direction immediately prior to initiating the spin.
 D) Dropping the heels heavily on every single downbeat.
 *Correct Answer: C) Torso Preparation. Winding the core in the opposite direction creates the torque and stored energy required for multiple spins.*
+
+---
+
+## 📺 Watch & Listen
+
+**The film that changed everything:**
+🎬 [Saturday Night Fever – Hustle Scenes (1977)](https://www.youtube.com/watch?v=M0AHzh7KcFw)
+
+**Eddie Torres explains the Hustle's influence on his On2 development:**
+🎬 [Eddie Torres Interview – History of New York Mambo](https://www.youtube.com/watch?v=pmgDEcg8QMo)
+
+---
+
+## 📚 Further Reading & Sources
+
+| Source | Notes |
+|---|---|
+| **McMains, Juliet.** *Spinning Mambo into Salsa.* Oxford University Press, 2015. | McMains specifically tracks how the Hustle's linear slot mechanics and rapid spin patterns were absorbed into the New York Salsa vocabulary during the late 1970s. |
+| **Hazzard-Donald, Katrina.** *Jookin': The Rise of Social Dance Formations in African-American Culture.* Temple University Press, 1990. | Essential background for understanding how social dance fads like the Hustle spread rapidly through specific demographic communities and permanently altered adjacent dance styles. |
+| **Washburne, Christopher.** *Sounding Salsa.* Temple University Press, 2008. | Documents how the changing nightclub economy of the late 1970s forced Salsa to compete directly with Disco for the same physical venues, players, and audiences. |
