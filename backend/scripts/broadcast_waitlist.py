@@ -112,22 +112,21 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p>Here is the combo for this week (Baile Inolvidable): <a href="{combo_url}" class="link">{combo_url}</a></p>
+            <p>Hey guys! Since that 16-move Pachanga video has been going crazy this week, I decided to pull one of the official modules straight out of The Mambo Guild premium vault and give it to you for free today.</p>
 
-            <h2><span class="emoji">🧠</span> The Science: Sleep Is When You Actually Learn</h2>
-            <p>Training provides the stimulus for growth—but rest is when the growth actually occurs.</p>
-            <p>When you sleep, your brain replays and consolidates the motor patterns you drilled that day. Stage 2 sleep (marked by "sleep spindles") is directly linked to what we call "muscle memory." Research shows that a dancer who naps or sleeps well <em>after</em> learning a shine will perform it significantly better the next day than one who stays up late to drill.</p>
-            <p>The takeaway: don't guilt yourself for sleeping in after a hard session. That extra hour isn't laziness—it's your brain filing the choreography permanently. Aim for 7–9 hours, and try a 20-minute nap before your next session to boost motor alertness.</p>
+            <p>This is <strong>Module 11: The Kick Tap Chuck</strong>:</p>
 
-            <h2><span class="emoji">🎺</span> The History: How "Salsa" Got Its Name</h2>
-            <p>For most of its history, this music was called Mambo, Son, or Latin Jazz. The word "Salsa" is a marketing invention, born on the streets of New York in the 1970s.</p>
-            <p>The story centres on <strong>Johnny Pacheco</strong>, a Dominican flautist who co-founded <strong>Fania Records</strong> in 1964 out of the back of a car. Fania signed the greatest Latino musicians in New York—Celia Cruz, Rubén Blades, Willie Colón—and needed one word to unite the incredible diversity of Cuban Son, Puerto Rican Bomba, Colombian Cumbia, and Jazz their artists were playing. "Salsa" was the answer—shouted by audiences when a song hit its peak, like a cry of <em>"spice it up!"</em></p>
-            <p>Pacheco and Fania turned it into a global brand. The irony: most musicians resisted the label. Tito Puente famously said, <em>"I don't play salsa. I eat it."</em></p>
+            <p><a href="https://youtu.be/ER1CMXeoAao" class="link">https://youtu.be/ER1CMXeoAao</a></p>
+
+            <p>A 20min Pachanga breakdown where I explain the fundamentals of pachanga and breakdown a small choreo is dropping tomorrow. <strong>DON'T MISS IT!</strong></p>
 
             <p>See you in the next one,</p>
 
             <p>Pavle</p>
 
+            <div style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #ddd;">
+                <p style="font-size: 11px; color: #999;">If you no longer wish to receive these emails, <a href="mailto:pavlepopovic@themamboguild.com?subject=Unsubscribe&body=Please%20remove%20me%20from%20the%20mailing%20list." style="color: #999;">click here to unsubscribe</a>.</p>
+            </div>
         </div>
     </body>
     </html>
@@ -202,7 +201,7 @@ def send_broadcast():
         referral_link = f"{base_url}/waitlist?ref={code}"
 
         # 2. Prepare the Email Content
-        subject = "The combo for this week"
+        subject = "🎁 Free Premium Module: The Kick Tap Chuck (Pachanga)"
         html_content = get_beautiful_html(username, referral_link)
 
         # 3. Send (or Print)

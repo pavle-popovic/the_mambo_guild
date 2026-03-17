@@ -386,6 +386,7 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                 <div class="container">
                     <p>Hi {username},</p>
                     
+                    <p><strong>🎁 Bonus!</strong> I just unlocked Module 11 (The Kick Tap Chuck) from the premium Pachanga curriculum: <a href="https://youtu.be/ER1CMXeoAao" class="link">https://youtu.be/ER1CMXeoAao</a></p>
                     <p>Here is the link to the weekly tutorial (Baile Inolvidable Choreography): <a href="https://youtu.be/Snk7pqMMczc" class="link">https://youtu.be/Snk7pqMMczc</a></p>
                     <p>Rankankan Choreography: <a href="https://youtu.be/57-zwVE1VXI" class="link">https://youtu.be/57-zwVE1VXI</a></p>
                     <p>14 Moves Breakdown: <a href="https://youtu.be/5u_56JspFX8" class="link">https://youtu.be/5u_56JspFX8</a></p>
@@ -430,6 +431,10 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                     <div class="footer">
                         <p>P.S. Want to unlock 'Beta Tester' status early? Invite 3 friends using your unique extraction link:<br>
                         <a href="{referral_link}" class="link">{referral_link}</a></p>
+                    </div>
+
+                    <div style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
+                        <p style="font-size: 11px; color: #999;">If you no longer wish to receive these emails, <a href="mailto:pavlepopovic@themamboguild.com?subject=Unsubscribe&body=Please%20remove%20me%20from%20the%20mailing%20list." style="color: #999;">click here to unsubscribe</a>.</p>
                     </div>
                 </div>
             </body>
