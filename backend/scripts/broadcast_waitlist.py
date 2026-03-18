@@ -112,13 +112,18 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p>Hey guys! Since that 16-move Pachanga video has been going crazy this week, I decided to pull one of the official modules straight out of The Mambo Guild premium vault and give it to you for free today.</p>
+            <p>Here is the class for this week (Pachanga Fundamentals): <a href="https://youtu.be/A12yU-b2O_s" class="link">https://youtu.be/A12yU-b2O_s</a></p>
 
-            <p>This is <strong>Module 11: The Kick Tap Chuck</strong>:</p>
+            <p><strong>🎁 Bonus!</strong> I just unlocked Module 11 (The Kick Tap Chuck) from the premium Pachanga curriculum: <a href="https://youtu.be/ER1CMXeoAao" class="link">https://youtu.be/ER1CMXeoAao</a></p>
 
-            <p><a href="https://youtu.be/ER1CMXeoAao" class="link">https://youtu.be/ER1CMXeoAao</a></p>
+            <h2><span class="emoji">🧠</span> The Science: Why You Should Practice With Your Eyes Closed</h2>
+            <p>Your brain runs three sensory systems when you dance: vision, vestibular (inner ear), and proprioception (your body's internal position sense). The problem? When your eyes are open, vision dominates so heavily that your proprioceptive system never gets properly trained.</p>
+            <p>Close your eyes during basic steps, and your brain is forced to sharpen the other two channels. Research shows this produces up to <strong>46% improvement in proprioceptive accuracy</strong> — and here's the kicker: those gains carry over to eyes-open performance too. You become sharper on a lit stage because your brain is now running on better data from more sources.</p>
+            <p>Try it: 10 minutes of eyes-closed basics per session. Your turns and balance will thank you.</p>
 
-            <p>A 20min Pachanga breakdown where I explain the fundamentals of pachanga and breakdown a small choreo is dropping tomorrow. <strong>DON'T MISS IT!</strong></p>
+            <h2><span class="emoji">🗽</span> The History: How a Crowded Room Invented the Cross-Body Lead</h2>
+            <p>In the late 1940s, the <strong>Palladium Ballroom</strong> on 53rd and Broadway became the epicenter of Mambo. In deeply segregated America, it was a radical anomaly — Jewish, Italian, Irish, Puerto Rican, Cuban, and African American dancers all crammed onto one floor. The only thing that mattered was your ability to dance.</p>
+            <p>The floor was dangerously packed — sometimes a thousand people shoulder-to-shoulder. In Cuba, dancers moved in loose, rotating circles. At the Palladium, that would get you trampled. Out of pure necessity, dancers invented the <strong>linear "slot"</strong>: stepping forward and breaking backward on a single line, with the lead stepping off to let the follow pass. That is the exact birth of the <strong>Cross-Body Lead</strong>.</p>
 
             <p>See you in the next one,</p>
 
@@ -201,7 +206,7 @@ def send_broadcast():
         referral_link = f"{base_url}/waitlist?ref={code}"
 
         # 2. Prepare the Email Content
-        subject = "🎁 Free Premium Module: The Kick Tap Chuck (Pachanga)"
+        subject = "This week's class + the science of blind drills"
         html_content = get_beautiful_html(username, referral_link)
 
         # 3. Send (or Print)

@@ -386,12 +386,13 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                 <div class="container">
                     <p>Hi {username},</p>
                     
-                    <p><strong>🎁 Bonus!</strong> I just unlocked Module 11 (The Kick Tap Chuck) from the premium Pachanga curriculum: <a href="https://youtu.be/ER1CMXeoAao" class="link">https://youtu.be/ER1CMXeoAao</a><br>P.S. A 20min basic Pachanga tutorial is dropping tomorrow — don't miss it!</p>
-                    <p>Here is the link to the weekly tutorial (Baile Inolvidable Choreography): <a href="https://youtu.be/Snk7pqMMczc" class="link">https://youtu.be/Snk7pqMMczc</a></p>
+                    <p>Here is the link to the weekly tutorial (Pachanga Fundamentals): <a href="https://youtu.be/A12yU-b2O_s" class="link">https://youtu.be/A12yU-b2O_s</a></p>
+                    <p>Salsa Choreography (Baile Inolvidable): <a href="https://youtu.be/Snk7pqMMczc" class="link">https://youtu.be/Snk7pqMMczc</a></p>
                     <p>Rankankan Choreography: <a href="https://youtu.be/57-zwVE1VXI" class="link">https://youtu.be/57-zwVE1VXI</a></p>
                     <p>14 Moves Breakdown: <a href="https://youtu.be/5u_56JspFX8" class="link">https://youtu.be/5u_56JspFX8</a></p>
                     <p>Salsa Romantica: <a href="https://youtu.be/wcDocNANEVY" class="link">https://youtu.be/wcDocNANEVY</a></p>
                     <p>Afro Mambo Fusion: <a href="https://youtu.be/RIMp6J02Th0" class="link">https://youtu.be/RIMp6J02Th0</a></p>
+                    <p><strong>🎁 Bonus!</strong> I just unlocked Module 11 (The Kick Tap Chuck) from the premium Pachanga curriculum: <a href="https://youtu.be/ER1CMXeoAao" class="link">https://youtu.be/ER1CMXeoAao</a></p>
 
                     <p>Welcome to The Mambo Guild. I really appreciate your trust in joining this project and I am sure that together, we are going to build a beautiful community. <span class="emoji">🥂</span></p>
 
