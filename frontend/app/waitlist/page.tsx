@@ -439,7 +439,7 @@ export default function WaitlistPage() {
                         </button>
 
                         <p className="text-[10px] sm:text-xs text-gray-500 pt-1">
-                            Reserve your unique username. <span className="text-[#D4AF37]">Capped at 200 members only!</span>
+                            Reserve your unique username. <span className="text-[#D4AF37]">Capped at 500 members only!</span>
                         </p>
                     </motion.form>
                 </div>

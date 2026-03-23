@@ -185,7 +185,14 @@ def send_broadcast():
         "clorissa.vrieze@allfreemail.net",
         "margeree.christ@allfreemail.net",
         "hance.hunkins@allfreemail.net",
-        "ector.ocheltree@allfreemail.net"
+        "ector.ocheltree@allfreemail.net",
+        # New allfreemail.net fakes
+        "dezra.schauer@allfreemail.net",
+        "merrilie.arrant@allfreemail.net",
+        "normalee.kirkley@allfreemail.net",
+        # Typo'd domains - will bounce
+        "daniel.guzman3300@gmail.comd",
+        "wtd2101@me.cim"
     }
     
     for user in users:

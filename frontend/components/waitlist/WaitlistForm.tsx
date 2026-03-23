@@ -90,7 +90,7 @@ const WaitlistForm: React.FC<WaitlistFormProps> = ({ onSuccess }) => {
             </button>
 
             <p className="text-xs text-center text-gray-500 font-sans mt-2">
-                Limited to 200 Maximum. Founder badge secured.
+                Limited to 500 Maximum. Founder badge secured.
             </p>
         </form>
     );
