@@ -112,18 +112,22 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p>Here is the class for this week (Pachanga Fundamentals): <a href="https://youtu.be/A12yU-b2O_s" class="link">https://youtu.be/A12yU-b2O_s</a></p>
-
+            <p>Here is the class for this week (14 Salsa Moves Episode 2): <a href="https://youtu.be/-Y4By7n2KCQ" class="link">https://youtu.be/-Y4By7n2KCQ</a></p>
+            <p>Pachanga Fundamentals: <a href="https://youtu.be/A12yU-b2O_s" class="link">https://youtu.be/A12yU-b2O_s</a></p>
+            <p>Salsa Choreography (Baile Inolvidable): <a href="https://youtu.be/Snk7pqMMczc" class="link">https://youtu.be/Snk7pqMMczc</a></p>
+            <p>Rankankan Choreography: <a href="https://youtu.be/57-zwVE1VXI" class="link">https://youtu.be/57-zwVE1VXI</a></p>
+            <p>14 Salsa Moves Episode 1: <a href="https://youtu.be/5u_56JspFX8" class="link">https://youtu.be/5u_56JspFX8</a></p>
+            <p>Salsa Romantica: <a href="https://youtu.be/wcDocNANEVY" class="link">https://youtu.be/wcDocNANEVY</a></p>
+            <p>Afro Mambo Fusion: <a href="https://youtu.be/RIMp6J02Th0" class="link">https://youtu.be/RIMp6J02Th0</a></p>
             <p><strong>🎁 Bonus!</strong> I just unlocked Module 11 (The Kick Tap Chuck) from the premium Pachanga curriculum: <a href="https://youtu.be/ER1CMXeoAao" class="link">https://youtu.be/ER1CMXeoAao</a></p>
 
-            <h2><span class="emoji">🧠</span> The Science: Why You Should Practice With Your Eyes Closed</h2>
-            <p>Your brain runs three sensory systems when you dance: vision, vestibular (inner ear), and proprioception (your body's internal position sense). The problem? When your eyes are open, vision dominates so heavily that your proprioceptive system never gets properly trained.</p>
-            <p>Close your eyes during basic steps, and your brain is forced to sharpen the other two channels. Research shows this produces up to <strong>46% improvement in proprioceptive accuracy</strong> — and here's the kicker: those gains carry over to eyes-open performance too. You become sharper on a lit stage because your brain is now running on better data from more sources.</p>
-            <p>Try it: 10 minutes of eyes-closed basics per session. Your turns and balance will thank you.</p>
+            <h2><span class="emoji">🧠</span> The Science: Why Talking to Yourself Makes You a Better Dancer</h2>
+            <p>Your auditory cortex and motor cortex aren't separate systems — they share a direct anatomical highway called the <strong>dorsal auditory pathway</strong>. When you vocalize rhythm ("ta-ka-ta") while you dance, you create a closed feedback loop: any timing mismatch between your voice and your feet produces an instant error signal your brain can correct <em>within the same rep</em>.</p>
+            <p>Even crazier: research shows this doesn't just fix timing — it improves <strong>spatial consistency</strong> too. Your footwork paths get cleaner and your body drifts less. Scatting your rhythms isn't a beginner crutch. It's a precision tool the best dancers never stop using.</p>
 
-            <h2><span class="emoji">🗽</span> The History: How a Crowded Room Invented the Cross-Body Lead</h2>
-            <p>In the late 1940s, the <strong>Palladium Ballroom</strong> on 53rd and Broadway became the epicenter of Mambo. In deeply segregated America, it was a radical anomaly — Jewish, Italian, Irish, Puerto Rican, Cuban, and African American dancers all crammed onto one floor. The only thing that mattered was your ability to dance.</p>
-            <p>The floor was dangerously packed — sometimes a thousand people shoulder-to-shoulder. In Cuba, dancers moved in loose, rotating circles. At the Palladium, that would get you trampled. Out of pure necessity, dancers invented the <strong>linear "slot"</strong>: stepping forward and breaking backward on a single line, with the lead stepping off to let the follow pass. That is the exact birth of the <strong>Cross-Body Lead</strong>.</p>
+            <h2><span class="emoji">🗽</span> The History: How Street Survival Created the Salsa Attitude</h2>
+            <p>1970s New York was broke, burning, and hostile. The Latino community in the South Bronx and Spanish Harlem were trapped. <strong>Fania Records</strong> turned that raw struggle into music. Artists like <strong>Willie Colón</strong> ("El Malo") dressed their bands like street hustlers and wrote lyrics about poverty, crime, and cultural survival — no more tropical fantasies.</p>
+            <p>The attitude hit the dance floor hard. Dancers adopted the <strong>Pachuco Cross</strong> — an aggressive shine where you cross one foot deep over the other, roll your shoulders forward, drop your chin, and lock eyes like you're in a street fight. It's the exact opposite of elegant ballroom posture. When Willie Colón's trombones hit, that confrontational frame is the only way to interpret the music.</p>
 
             <p>See you in the next one,</p>
 
@@ -213,7 +217,7 @@ def send_broadcast():
         referral_link = f"{base_url}/waitlist?ref={code}"
 
         # 2. Prepare the Email Content
-        subject = "This week's class + the science of blind drills"
+        subject = "14 Salsa Moves Episode 2 + how street survival shaped Salsa"
         html_content = get_beautiful_html(username, referral_link)
 
         # 3. Send (or Print)
