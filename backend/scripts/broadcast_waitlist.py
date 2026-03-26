@@ -112,14 +112,14 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p>Here is the class for this week (14 Salsa Moves Episode 2): <a href="https://youtu.be/-Y4By7n2KCQ" class="link">https://youtu.be/-Y4By7n2KCQ</a></p>
-            <p>Pachanga Fundamentals: <a href="https://youtu.be/A12yU-b2O_s" class="link">https://youtu.be/A12yU-b2O_s</a></p>
-            <p>Salsa Choreography (Baile Inolvidable): <a href="https://youtu.be/Snk7pqMMczc" class="link">https://youtu.be/Snk7pqMMczc</a></p>
-            <p>Rankankan Choreography: <a href="https://youtu.be/57-zwVE1VXI" class="link">https://youtu.be/57-zwVE1VXI</a></p>
-            <p>14 Salsa Moves Episode 1: <a href="https://youtu.be/5u_56JspFX8" class="link">https://youtu.be/5u_56JspFX8</a></p>
-            <p>Salsa Romantica: <a href="https://youtu.be/wcDocNANEVY" class="link">https://youtu.be/wcDocNANEVY</a></p>
-            <p>Afro Mambo Fusion: <a href="https://youtu.be/RIMp6J02Th0" class="link">https://youtu.be/RIMp6J02Th0</a></p>
-            <p><strong>🎁 Bonus!</strong> I just unlocked Module 11 (The Kick Tap Chuck) from the premium Pachanga curriculum: <a href="https://youtu.be/ER1CMXeoAao" class="link">https://youtu.be/ER1CMXeoAao</a></p>
+            <p>Here is the class for this week (14 Salsa Moves Episode 2): <a href="https://www.youtube.com/watch?v=-Y4By7n2KCQ" class="link">https://www.youtube.com/watch?v=-Y4By7n2KCQ</a></p>
+            <p>Pachanga Fundamentals: <a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">https://www.youtube.com/watch?v=A12yU-b2O_s</a></p>
+            <p>Salsa Choreography (Baile Inolvidable): <a href="https://www.youtube.com/watch?v=Snk7pqMMczc" class="link">https://www.youtube.com/watch?v=Snk7pqMMczc</a></p>
+            <p>Rankankan Choreography: <a href="https://www.youtube.com/watch?v=57-zwVE1VXI" class="link">https://www.youtube.com/watch?v=57-zwVE1VXI</a></p>
+            <p>14 Salsa Moves Episode 1: <a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">https://www.youtube.com/watch?v=5u_56JspFX8</a></p>
+            <p>Salsa Romantica: <a href="https://www.youtube.com/watch?v=wcDocNANEVY" class="link">https://www.youtube.com/watch?v=wcDocNANEVY</a></p>
+            <p>Afro Mambo Fusion: <a href="https://www.youtube.com/watch?v=RIMp6J02Th0" class="link">https://www.youtube.com/watch?v=RIMp6J02Th0</a></p>
+            <p><strong>🎁 Bonus!</strong> I just unlocked Module 11 (The Kick Tap Chuck) from the premium Pachanga curriculum: <a href="https://www.youtube.com/watch?v=ER1CMXeoAao" class="link">https://www.youtube.com/watch?v=ER1CMXeoAao</a></p>
 
             <h2><span class="emoji">🧠</span> The Science: Why Talking to Yourself Makes You a Better Dancer</h2>
             <p>Your auditory cortex and motor cortex aren't separate systems — they share a direct anatomical highway called the <strong>dorsal auditory pathway</strong>. When you vocalize rhythm ("ta-ka-ta") while you dance, you create a closed feedback loop: any timing mismatch between your voice and your feet produces an instant error signal your brain can correct <em>within the same rep</em>.</p>
@@ -196,7 +196,11 @@ def send_broadcast():
         "normalee.kirkley@allfreemail.net",
         # Typo'd domains - will bounce
         "daniel.guzman3300@gmail.comd",
-        "wtd2101@me.cim"
+        "wtd2101@me.cim",
+        # New allfreemail.net fakes (batch 3)
+        "hiroto.shiflett@allfreemail.net",
+        "timnesha.mulholland@allfreemail.net",
+        "eray.ornelas@allfreemail.net"
     }
     
     for user in users:
