@@ -96,9 +96,6 @@ export default function LessonPage() {
   const [videoDuration, setVideoDuration] = useState(0);
 
   useEffect(() => {
-    // Reset practice mode dismissal on lesson change
-    setDismissedPracticeMode(false);
-
     // Wait for auth to finish loading before making any decisions
     if (authLoading) {
       return;
