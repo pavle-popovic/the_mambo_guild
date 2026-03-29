@@ -9,6 +9,9 @@ from schemas.submissions import SubmissionCreateRequest, SubmissionResponse
 from dependencies import get_current_user
 from datetime import datetime
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -26,22 +29,32 @@ async def submit_boss_battle(
     
     if not lesson.is_boss_battle:
         raise HTTPException(status_code=400, detail="This lesson is not a boss battle")
-    
+
+    # Validate that at least one video source was provided
+    if not submission_data.video_url and not submission_data.mux_playback_id:
+        raise HTTPException(
+            status_code=400,
+            detail="Either video_url or mux_playback_id must be provided"
+        )
+
     # Check if submission already exists
     existing = db.query(BossSubmission).filter(
         BossSubmission.user_id == current_user.id,
         BossSubmission.lesson_id == lesson.id
     ).first()
-    
+
     if existing:
         raise HTTPException(status_code=400, detail="Submission already exists for this lesson")
-    
+
+    # Resolve the video URL (Mux stream URL if playback ID provided)
+    video_url = submission_data.get_video_url()
+
     # Create submission
     submission = BossSubmission(
         id=uuid.uuid4(),
         user_id=current_user.id,
         lesson_id=lesson.id,
-        video_url=submission_data.video_url,
+        video_url=video_url,
         status=SubmissionStatus.PENDING
     )
     db.add(submission)

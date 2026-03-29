@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from models import get_db
 from models.user import User, UserRole
 from services.auth_service import decode_access_token
+from services.redis_service import is_token_blacklisted
 import uuid
 
 # OAuth2 scheme - token URL must match the actual endpoint
@@ -46,24 +47,28 @@ def get_current_user(
     token = _extract_token(request, bearer_token)
     if not token:
         raise credentials_exception
-    
+
+    # Reject tokens that were explicitly revoked (e.g. after logout)
+    if is_token_blacklisted(token):
+        raise credentials_exception
+
     payload = decode_access_token(token)
     if payload is None:
         raise credentials_exception
-    
+
     user_id_str: str = payload.get("sub")
     if user_id_str is None:
         raise credentials_exception
-    
+
     try:
         user_id = uuid.UUID(user_id_str)
     except ValueError:
         raise credentials_exception
-    
+
     user = db.query(User).filter(User.id == user_id).first()
     if user is None:
         raise credentials_exception
-    
+
     return user
 
 

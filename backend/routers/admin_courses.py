@@ -351,7 +351,7 @@ async def create_lesson(
         level_id=level.id,
         title=lesson_data.title,
         description=lesson_data.description,
-        video_url=lesson_data.video_url or "https://example.com/video/placeholder",
+        video_url=lesson_data.video_url or "",
         xp_value=lesson_data.xp_value,
         order_index=lesson_data.order_index,
         is_boss_battle=lesson_data.is_boss_battle,

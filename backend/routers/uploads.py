@@ -1,9 +1,12 @@
+import logging
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from dependencies import get_current_user
 from models.user import User
 from services.storage_service import get_storage_service
+
+logger = logging.getLogger(__name__)
 
 
 def _require_admin(user: User):
@@ -51,9 +54,11 @@ async def generate_presigned_url(
         )
         return PresignedUrlResponse(**result)
     except ValueError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Storage configuration error generating presigned URL: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate upload URL. Please try again.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate presigned URL: {str(e)}")
+        logger.error(f"Unexpected error generating presigned URL: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate upload URL. Please try again.")
 
 
 class CoachingFeedbackUrlRequest(BaseModel):
@@ -80,7 +85,9 @@ async def generate_coaching_feedback_url(
         )
         return PresignedUrlResponse(**result)
     except ValueError as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        logger.error(f"Storage configuration error generating presigned URL: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate upload URL. Please try again.")
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Failed to generate presigned URL: {str(e)}")
+        logger.error(f"Unexpected error generating presigned URL: {e}")
+        raise HTTPException(status_code=500, detail="Failed to generate upload URL. Please try again.")
 

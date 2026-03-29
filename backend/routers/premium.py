@@ -3,9 +3,12 @@ Premium Features Router
 Handles Live Calls, Coaching Submissions, and DJ Booth tracks.
 All endpoints require Guild Master (PERFORMER) tier unless noted.
 """
+import logging
 from datetime import datetime, timezone
 from typing import List, Optional
 import uuid
+
+logger = logging.getLogger(__name__)
 
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -837,9 +840,10 @@ async def get_archive_signed_url(
         )
         return {"url": signed_url, "expires_in": 7200}
     except Exception as e:
+        logger.error(f"Failed to generate signed URL for archive: {e}")
         raise HTTPException(
             status_code=500,
-            detail=f"Failed to generate signed URL: {str(e)}"
+            detail="Failed to generate download URL. Please try again."
         )
 
 

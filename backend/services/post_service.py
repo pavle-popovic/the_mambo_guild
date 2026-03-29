@@ -14,8 +14,9 @@ from models.user import User, UserProfile, Subscription, SubscriptionTier, Subsc
 from models.community import Post, PostReply, PostReaction, CommunityTag
 from services.clave_service import (
     spend_claves, can_afford, get_video_slot_status, get_question_slot_status,
-    award_accepted_answer, process_reaction_refund,
-    COST_REACTION, COST_COMMENT, COST_POST_QUESTION, COST_POST_VIDEO
+    award_accepted_answer, process_reaction_refund, claw_back_reaction_refund,
+    COST_REACTION, COST_COMMENT, COST_POST_QUESTION, COST_POST_VIDEO,
+    EARN_REACTION_REFUND_CAP
 )
 
 logger = logging.getLogger(__name__)
@@ -45,20 +46,13 @@ def _get_user_info(user: User, db: Session) -> dict:
     }
 
 
-def _format_post_response(post: Post, current_user_id: str, db: Session) -> dict:
-    """Format a post for API response."""
-    user = db.query(User).filter(User.id == post.user_id).first()
-    
-    # Check if current user has reacted
-    user_reaction = None
-    if current_user_id:
-        reaction = db.query(PostReaction).filter(
-            PostReaction.post_id == post.id,
-            PostReaction.user_id == current_user_id
-        ).first()
-        if reaction:
-            user_reaction = reaction.reaction_type
-    
+def _build_post_dict(
+    post: Post,
+    user: User,
+    user_reaction: str | None,
+    db: Session
+) -> dict:
+    """Build the post response dict from pre-loaded objects."""
     return {
         "id": str(post.id),
         "user": _get_user_info(user, db) if user else None,
@@ -75,21 +69,75 @@ def _format_post_response(post: Post, current_user_id: str, db: Session) -> dict
         "reply_count": post.reply_count,
         "user_reaction": user_reaction,
         "created_at": post.created_at,
-        "updated_at": post.updated_at
+        "updated_at": post.updated_at,
     }
 
 
-def _format_reply_response(reply: PostReply, db: Session) -> dict:
-    """Format a reply for API response."""
-    user = db.query(User).filter(User.id == reply.user_id).first()
-    
+def _format_post_response(post: Post, current_user_id: str, db: Session) -> dict:
+    """Format a single post for API response. For feeds use _format_posts_bulk."""
+    user = db.query(User).filter(User.id == post.user_id).options(
+        joinedload(User.profile), joinedload(User.subscription)
+    ).first()
+    user_reaction = None
+    if current_user_id:
+        reaction = db.query(PostReaction).filter(
+            PostReaction.post_id == post.id,
+            PostReaction.user_id == current_user_id
+        ).first()
+        if reaction:
+            user_reaction = reaction.reaction_type
+    return _build_post_dict(post, user, user_reaction, db)
+
+
+def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
+    """
+    Format a list of posts for API response using batch queries.
+    Avoids N+1: 2 extra queries regardless of how many posts.
+    """
+    if not posts:
+        return []
+
+    # Batch-load all authors in one query (with profile + subscription)
+    user_ids = list({p.user_id for p in posts})
+    users = db.query(User).filter(User.id.in_(user_ids)).options(
+        joinedload(User.profile), joinedload(User.subscription)
+    ).all()
+    user_map = {str(u.id): u for u in users}
+
+    # Batch-load current user's reactions in one query
+    reaction_map: dict = {}
+    if current_user_id:
+        post_ids = [p.id for p in posts]
+        reactions = db.query(PostReaction).filter(
+            PostReaction.post_id.in_(post_ids),
+            PostReaction.user_id == current_user_id
+        ).all()
+        reaction_map = {str(r.post_id): r.reaction_type for r in reactions}
+
+    return [
+        _build_post_dict(
+            p,
+            user_map.get(str(p.user_id)),
+            reaction_map.get(str(p.id)),
+            db,
+        )
+        for p in posts
+    ]
+
+
+def _format_reply_response(reply: PostReply, db: Session, user: User = None) -> dict:
+    """Format a reply for API response. Pass pre-loaded user to avoid extra query."""
+    if user is None:
+        user = db.query(User).filter(User.id == reply.user_id).options(
+            joinedload(User.profile), joinedload(User.subscription)
+        ).first()
     return {
         "id": str(reply.id),
         "user": _get_user_info(user, db) if user else None,
         "content": reply.content,
         "mux_playback_id": reply.mux_playback_id,
         "is_accepted_answer": reply.is_accepted_answer,
-        "created_at": reply.created_at
+        "created_at": reply.created_at,
     }
 
 
@@ -216,8 +264,7 @@ def get_feed(
         query = query.filter(Post.tags.any(tag))
 
     posts = query.order_by(desc(Post.created_at)).offset(skip).limit(limit).all()
-    
-    return [_format_post_response(p, current_user_id, db) for p in posts]
+    return _format_posts_bulk(posts, current_user_id, db)
 
 
 def get_post_detail(
@@ -242,8 +289,18 @@ def get_post_detail(
     ).all()
     
     response = _format_post_response(post, current_user_id, db)
-    response["replies"] = [_format_reply_response(r, db) for r in replies]
-    
+
+    # Batch-load reply authors to avoid N+1
+    reply_user_ids = list({r.user_id for r in replies})
+    reply_users = db.query(User).filter(User.id.in_(reply_user_ids)).options(
+        joinedload(User.profile), joinedload(User.subscription)
+    ).all() if reply_user_ids else []
+    reply_user_map = {str(u.id): u for u in reply_users}
+
+    response["replies"] = [
+        _format_reply_response(r, db, user=reply_user_map.get(str(r.user_id)))
+        for r in replies
+    ]
     return response
 
 
@@ -260,12 +317,16 @@ def add_reaction(
     if not post:
         return {"success": False, "message": "Post not found"}
 
+    # Prevent self-reaction (checked first to avoid bypass via existing reaction)
+    if str(post.user_id) == user_id:
+        return {"success": False, "message": "You cannot react to your own posts"}
+
     # Check for existing reaction
     existing = db.query(PostReaction).filter(
         PostReaction.post_id == post_id,
         PostReaction.user_id == user_id
     ).first()
-    
+
     if existing:
         # Change reaction type (no charge for changing)
         if existing.reaction_type != reaction_type:
@@ -274,10 +335,6 @@ def add_reaction(
             return {"success": True, "message": "Reaction updated"}
         else:
             return {"success": True, "message": "Already reacted"}
-            
-    # Prevent self-reaction
-    if str(post.user_id) == user_id:
-         return {"success": False, "message": "You cannot react to your own posts"}
     
     # New reaction - charge claves
     success, balance = spend_claves(user_id, COST_REACTION, "reaction", db, reference_id=str(post_id))
@@ -330,13 +387,15 @@ def remove_reaction(
     # Get post to update count
     post = db.query(Post).filter(Post.id == post_id).first()
     if post:
+        # Claw back refund if this reaction was within the refund cap
+        # (reaction_count before decrement <= cap means owner earned a refund for it)
+        if post.reaction_count <= EARN_REACTION_REFUND_CAP and str(post.user_id) != user_id:
+            claw_back_reaction_refund(str(post_id), str(post.user_id), db)
         post.reaction_count = max(0, post.reaction_count - 1)
-    
+
     db.delete(reaction)
-    
-    # Note: We don't refund claves for removing reactions (anti-abuse)
     db.flush()
-    
+
     return {"success": True, "message": "Reaction removed"}
 
 
@@ -446,7 +505,7 @@ def mark_solution(
     db.flush()
     
     logger.info(f"Post {post_id} marked reply {reply_id} as solution")
-    return {"success": True, "message": "Solution marked! Helper awarded 10 🥢"}
+    return {"success": True, "message": "Solution marked! Helper awarded 15 🥢"}
 
 
 def update_post(
@@ -548,22 +607,29 @@ def delete_post(
         user = db.query(User).filter(User.id == user_id).first()
         is_admin = False
         if user:
-            is_admin = (user.role == UserRole.ADMIN) or (str(user.role) == "admin")
+            is_admin = user.role == UserRole.ADMIN
 
         if str(post.user_id) != user_id and not is_admin:
             return {"success": False, "message": "You can only delete your own posts"}
 
         # Soft delete
         post.is_deleted = True
+
+        # Decrement tag usage counts so tag stats remain accurate
+        for tag_slug in (post.tags or []):
+            db.query(CommunityTag).filter(
+                CommunityTag.slug == tag_slug
+            ).update({"usage_count": CommunityTag.usage_count - 1})
+
         db.flush()
 
         logger.info(f"User {user_id} (Admin: {is_admin}) soft-deleted post {post_id}")
         return {"success": True, "message": "Post deleted"}
 
     except Exception as e:
-        logger.error(f"CRITICAL ERROR deleting post {post_id}: {e}", exc_info=True)
+        logger.error(f"Error deleting post {post_id}: {e}", exc_info=True)
         db.rollback()
-        return {"success": False, "message": f"Server error while deleting post: {str(e)}"}
+        return {"success": False, "message": "Server error while deleting post"}
 
 
 def get_tags(db: Session) -> List[dict]:
@@ -599,11 +665,14 @@ def search_posts(
     """
     from sqlalchemy import or_
 
+    # Escape ILIKE special characters to prevent wildcard injection
+    escaped_query = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+
     # Search by title OR tag content match
     search_query = db.query(Post).filter(
         Post.is_deleted == False,
         or_(
-            Post.title.ilike(f"%{query}%"),
+            Post.title.ilike(f"%{escaped_query}%"),
             Post.tags.any(query.lower())
         )
     )
@@ -618,8 +687,7 @@ def search_posts(
         search_query = search_query.filter(Post.tags.any(tag))
 
     posts = search_query.order_by(desc(Post.created_at)).offset(skip).limit(limit).all()
-
-    return [_format_post_response(p, current_user_id, db) for p in posts]
+    return _format_posts_bulk(posts, current_user_id, db)
 
 
 def update_reply(

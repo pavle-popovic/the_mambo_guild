@@ -2,6 +2,7 @@
 Community API Endpoints - The Stage & The Lab
 /api/community - Posts, reactions, replies, solutions
 """
+import logging
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Optional, List
@@ -10,6 +11,8 @@ from models import get_db
 from models.user import User
 from dependencies import get_current_user
 from services import post_service, badge_service, notification_service
+
+logger = logging.getLogger(__name__)
 from schemas.community import (
     PostCreateRequest, PostUpdateRequest, PostResponse, PostDetailResponse,
     ReactionRequest, ReplyCreateRequest, ReplyUpdateRequest, ReplyResponse,
@@ -30,14 +33,17 @@ async def get_community_stats(
     Get public community stats (no auth required).
     Returns total member count, active users, leaderboard, and hall of fame.
     """
-    from models.user import User as UserModel
+    from models.user import User as UserModel, UserProfile
     from services import leaderboard_service
-    import random
+    from datetime import datetime, timedelta, timezone
 
     total_users = db.query(UserModel).count()
 
-    base_active = max(5, int(total_users * 0.02))
-    active_now = max(3, base_active + random.randint(-3, 5))
+    # Count users who have logged in within the last 24 hours (real presence)
+    cutoff = datetime.now(timezone.utc) - timedelta(hours=24)
+    active_now = db.query(UserProfile).filter(
+        UserProfile.last_login_date >= cutoff
+    ).count()
 
     leaderboard_data = leaderboard_service.get_leaderboard(
         period=period or "all_time",
@@ -133,7 +139,7 @@ async def create_post(
     - Stage posts cost 15 claves
     - Lab posts cost 5 claves
     """
-    print(f"[COMMUNITY] Creating post - User: {current_user.email}, Type: {request.post_type}, Tags: {request.tags}, Title: {request.title[:50] if request.title else 'None'}")
+    logger.info(f"[COMMUNITY] Creating post - Type: {request.post_type}, Tags: {request.tags}")
     result = post_service.create_post(
         user_id=str(current_user.id),
         post_type=request.post_type,
@@ -379,7 +385,7 @@ async def update_reply(
     Update a reply (owner or admin).
     """
     from models.user import UserRole
-    is_admin = (current_user.role == UserRole.ADMIN) or (str(current_user.role) == "admin")
+    is_admin = current_user.role == UserRole.ADMIN
     result = post_service.update_reply(
         post_id=post_id,
         reply_id=reply_id,
@@ -407,7 +413,7 @@ async def delete_reply(
     Delete a reply (owner or admin).
     """
     from models.user import UserRole
-    is_admin = (current_user.role == UserRole.ADMIN) or (str(current_user.role) == "admin")
+    is_admin = current_user.role == UserRole.ADMIN
     result = post_service.delete_reply(
         post_id=post_id,
         reply_id=reply_id,
@@ -435,7 +441,7 @@ async def update_post(
     Only title, body, tags, is_wip, and feedback_type can be updated.
     """
     from models.user import UserRole
-    is_admin = (current_user.role == UserRole.ADMIN) or (str(current_user.role) == "admin")
+    is_admin = current_user.role == UserRole.ADMIN
     result = post_service.update_post(
         post_id=post_id,
         user_id=str(current_user.id),
@@ -519,7 +525,7 @@ async def get_tags(
 
 @router.get("/search")
 async def search_posts(
-    q: str = Query(..., min_length=2, description="Search query"),
+    q: str = Query(..., min_length=2, max_length=200, description="Search query"),
     post_type: Optional[str] = Query(None),
     tag: Optional[str] = Query(None, description="Filter by single tag slug"),
     tags: Optional[str] = Query(None, description="Comma-separated tag slugs"),

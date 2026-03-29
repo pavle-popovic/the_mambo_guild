@@ -74,29 +74,15 @@ app.add_middleware(
 # Include routers
 app.include_router(api_router, prefix="/api")
 
-# Add webhook endpoints for Mux (support multiple paths)
+# Mux webhook alias — canonical path is /api/mux/webhook (registered in mux router).
+# This alias keeps backward compatibility if an older Mux dashboard config pointed here.
+# Configure the Mux dashboard to use /api/mux/webhook going forward.
 @app.post("/api/webhook")
 async def mux_webhook_alias(
     request: Request,
     db: Session = Depends(get_db),
     mux_signature: Optional[str] = Header(None, alias="Mux-Signature")
 ):
-    """
-    Alias for Mux webhook endpoint.
-    Mux webhooks can be configured to POST to /api/webhook or /api/mux/webhook
-    """
-    return await mux_webhook_handler(request, db, mux_signature)
-
-@app.post("/api/webhooks")
-async def mux_webhooks_alias(
-    request: Request,
-    db: Session = Depends(get_db),
-    mux_signature: Optional[str] = Header(None, alias="Mux-Signature")
-):
-    """
-    Alias for Mux webhook endpoint (plural form).
-    Some Mux configurations may use /api/webhooks
-    """
     return await mux_webhook_handler(request, db, mux_signature)
 
 

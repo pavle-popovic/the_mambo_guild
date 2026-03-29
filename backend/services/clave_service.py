@@ -433,6 +433,40 @@ def process_reaction_refund(post_id: str, post_owner_id: str, db: Session) -> bo
     return False
 
 
+def claw_back_reaction_refund(post_id: str, post_owner_id: str, db: Session) -> bool:
+    """
+    Claw back one reaction refund when a reaction is removed, if any were issued.
+    This reverses the earning that was previously granted to the post owner.
+    Only claws back if there are active refund transactions for this post.
+    """
+    existing_refunds = db.query(func.count(ClaveTransaction.id)).filter(
+        ClaveTransaction.user_id == post_owner_id,
+        ClaveTransaction.reference_id == post_id,
+        ClaveTransaction.reason == "reaction_refund"
+    ).scalar() or 0
+
+    if existing_refunds <= 0:
+        return False
+
+    profile = db.query(UserProfile).filter(
+        UserProfile.user_id == post_owner_id
+    ).with_for_update().first()
+    if not profile:
+        return False
+
+    # Record clawback transaction (negative amount recorded separately)
+    transaction = ClaveTransaction(
+        user_id=post_owner_id,
+        amount=-EARN_REACTION_REFUND,
+        reason="reaction_refund_clawback",
+        reference_id=post_id
+    )
+    db.add(transaction)
+    profile.current_claves = max(0, profile.current_claves - EARN_REACTION_REFUND)
+    db.flush()
+    return True
+
+
 def award_subscription_bonus(user_id: str, tier: SubscriptionTier, db: Session, reference_id: str = None) -> int:
     """
     Award monthly subscription bonus.

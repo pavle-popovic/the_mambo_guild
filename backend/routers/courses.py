@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from typing import List, Dict
 from models import get_db
@@ -148,32 +148,24 @@ async def get_lesson(
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
     
-    # Get the world this lesson belongs to
+    # Get the level and world this lesson belongs to (single lookup used for both access control and navigation)
     level = db.query(Level).filter(Level.id == lesson.level_id).first()
     world = db.query(World).filter(World.id == level.world_id).first() if level else None
-    
+
     if not world:
         raise HTTPException(status_code=404, detail="World not found")
-    
+
     # REFINED ACCESS CONTROL:
     # - Free courses: Accessible to all logged in users
     # - Paid courses: Requires active subscription
-    if world.is_free:
-        # Free course - accessible to all logged in users
-        pass  # Allow access
-    else:
-        # Paid course - requires active subscription
+    if not world.is_free:
         subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
         if not subscription or subscription.status != SubscriptionStatus.ACTIVE:
             raise HTTPException(
-                status_code=403, 
+                status_code=403,
                 detail="Subscription required. Please upgrade to access this course."
             )
-    
-    # Get the world this lesson belongs to
-    level = db.query(Level).filter(Level.id == lesson.level_id).first()
-    world = db.query(World).filter(World.id == level.world_id).first() if level else None
-    
+
     # Get all lessons in the world, sorted by week_number, day_number, and order_index
     all_lessons = []
     if world:
@@ -301,7 +293,9 @@ async def get_world_lessons(
     db: Session = Depends(get_db)
 ):
     """Get all lessons in a world. No prerequisites - all lessons are accessible. Accessible without authentication."""
-    world = db.query(World).filter(World.id == world_id).first()
+    world = db.query(World).filter(World.id == world_id).options(
+        joinedload(World.levels).joinedload(Level.lessons)
+    ).first()
     if not world:
         raise HTTPException(status_code=404, detail="World not found")
     
@@ -372,8 +366,10 @@ async def get_world_skill_tree(
     Each node shows completion percentage and unlock status based on prerequisites.
     """
     from models.course import LevelEdge
-    
-    world = db.query(World).filter(World.id == world_id).first()
+
+    world = db.query(World).filter(World.id == world_id).options(
+        joinedload(World.levels).joinedload(Level.lessons)
+    ).first()
     if not world:
         raise HTTPException(status_code=404, detail="World not found")
     

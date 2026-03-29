@@ -30,6 +30,22 @@ def get_admin_user_from_token_or_query(
 ) -> User:
     """
     Get admin user from Bearer token (preferred) or query param token (fallback for MuxUploader).
+
+    **Security trade-off — JWT in query param:**
+    MuxUploader (the third-party component) cannot set custom request headers; it can only
+    append query parameters to the upload-URL endpoint.  Sending a short-lived access token
+    via `?token=` is therefore unavoidable for that integration path.
+
+    Mitigations in place:
+      - Only admin-role tokens are accepted (non-admin tokens are rejected).
+      - The JWT has a short expiry (ACCESS_TOKEN_EXPIRE_MINUTES from settings).
+      - HTTPS is enforced in production (SECURE_COOKIES / HSTS headers), so the token
+        is not transmitted in plaintext and does not appear in server-side access logs
+        for the sensitive resource itself.
+      - The token is validated with full signature + expiry checks before any DB query.
+
+    If MuxUploader ever gains header-injection support, migrate to Bearer-only auth
+    and remove the `token_query` parameter.
     """
     # Try Bearer token first (standard auth)
     if current_user_opt and current_user_opt.role == UserRole.ADMIN:
@@ -368,99 +384,6 @@ async def get_upload_status(
         raise HTTPException(status_code=500, detail="Error checking upload status")
 
 
-class DownloadUrlResponse(BaseModel):
-    download_url: str
-    resolution: str
-
-
-class DownloadAvailabilityResponse(BaseModel):
-    available: bool
-    download_url: str | None = None
-    resolution: str | None = None
-    message: str | None = None
-
-
-@router.get("/download-url/{playback_id}")
-async def get_download_url(
-    playback_id: str,
-    resolution: str = Query("high", description="Resolution: 'high' for 1080p, 'medium' for 720p"),
-    current_user: User = Depends(get_current_user)
-):
-    """
-    Get a direct MP4 download URL for offline practice.
-    Requires mp4_support to be enabled on the asset (set during upload for lesson videos).
-    """
-    # Validate resolution parameter
-    if resolution not in ["high", "medium"]:
-        raise HTTPException(status_code=400, detail="Resolution must be 'high' or 'medium'")
-
-    # Mux public playback URLs are static and predictable
-    download_url = f"https://stream.mux.com/{playback_id}/{resolution}.mp4"
-
-    return DownloadUrlResponse(
-        download_url=download_url,
-        resolution=resolution
-    )
-
-
-@router.get("/download-available/{playback_id}")
-async def check_download_available(
-    playback_id: str,
-    resolution: str = Query("high", description="Resolution: 'high' for 1080p, 'medium' for 720p"),
-):
-    """
-    Check if MP4 download is available for a video.
-    Makes a GET request with Range header to verify the MP4 exists.
-    Note: Public endpoint since Mux playback URLs are already public.
-    """
-    import httpx
-
-    if resolution not in ["high", "medium", "low"]:
-        raise HTTPException(status_code=400, detail="Resolution must be 'high', 'medium', or 'low'")
-
-    download_url = f"https://stream.mux.com/{playback_id}/{resolution}.mp4"
-
-    try:
-        async with httpx.AsyncClient() as client:
-            # Use GET with Range header instead of HEAD (more reliable for Mux)
-            response = await client.get(
-                download_url,
-                headers={"Range": "bytes=0-0"},  # Request just 1 byte
-                timeout=10.0,
-                follow_redirects=True
-            )
-
-            content_type = response.headers.get("content-type", "")
-
-            # 200 = full content, 206 = partial content (both mean file exists)
-            # Check content-type contains video OR octet-stream (binary)
-            is_video = "video" in content_type or "octet-stream" in content_type
-            is_success = response.status_code in [200, 206]
-
-            if is_success and is_video:
-                return DownloadAvailabilityResponse(
-                    available=True,
-                    download_url=download_url,
-                    resolution=resolution
-                )
-            elif response.status_code == 404 or "application/json" in content_type:
-                return DownloadAvailabilityResponse(
-                    available=False,
-                    message="MP4 download not available for this video."
-                )
-            else:
-                return DownloadAvailabilityResponse(
-                    available=False,
-                    message="Could not verify MP4 availability."
-                )
-    except Exception as e:
-        logger.debug(f"Error checking MP4 availability: {type(e).__name__}")
-        return DownloadAvailabilityResponse(
-            available=False,
-            message="Unable to verify download availability."
-        )
-
-
 class WebhookEvent(BaseModel):
     type: str
     data: dict
@@ -494,15 +417,16 @@ async def check_asset_exists(
             if api_error.status == 404:
                 return {"exists": False, "asset_id": asset_id}
             else:
+                logger.error(f"Mux API error checking asset {asset_id}: {api_error.status}")
                 raise HTTPException(
                     status_code=api_error.status or 500,
-                    detail=f"Error checking asset: {str(api_error)}"
+                    detail="Error checking video asset"
                 )
     except HTTPException:
         raise
     except Exception as e:
         logger.error(f"Error checking asset existence: {type(e).__name__}")
-        raise HTTPException(status_code=500, detail=f"Error checking asset: {str(e)}")
+        raise HTTPException(status_code=500, detail="Error checking video asset")
 
 
 @router.delete("/asset/{asset_id}")
@@ -624,6 +548,7 @@ async def check_upload_status(
     course_id: Optional[str] = Query(None),
     level_id: Optional[str] = Query(None),
     post_id: Optional[str] = Query(None),
+    upload_id: Optional[str] = Query(None, description="Mux direct upload ID for fast direct lookup"),
     current_user_opt: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
@@ -638,6 +563,20 @@ async def check_upload_status(
         from services.mux_service import _get_mux_configuration
         from mux_python import ApiClient
         from models.course import World
+
+        # Fast path: if upload_id provided, resolve asset directly without scanning 50 assets
+        resolved_asset_id = None
+        if upload_id:
+            try:
+                configuration = _get_mux_configuration()
+                api_client = ApiClient(configuration)
+                uploads_api = DirectUploadsApi(api_client)
+                upload_obj = uploads_api.get_direct_upload(upload_id)
+                if upload_obj and upload_obj.data and upload_obj.data.asset_id:
+                    resolved_asset_id = upload_obj.data.asset_id
+                    logger.debug(f"Resolved upload_id {upload_id} → asset_id {resolved_asset_id}")
+            except Exception:
+                logger.debug(f"Could not resolve upload_id {upload_id} directly, falling back to scan")
 
         # Auth check
         if lesson_id or course_id or level_id:
@@ -673,49 +612,38 @@ async def check_upload_status(
             api_client = ApiClient(configuration)
             assets_api = AssetsApi(api_client)
             
-            passthrough_filter = json.dumps({"course_id": course_id})
-            
             try:
-                assets_response = assets_api.list_assets(limit=50)  # Get recent assets
-                
+                # Fast path: use resolved asset_id directly; fallback to 50-asset scan
                 found_asset = None
-                for asset in assets_response.data:
-                    asset_passthrough = asset.passthrough
-                    if asset_passthrough:
+                if resolved_asset_id:
+                    found_asset = assets_api.get_asset(resolved_asset_id).data
+                else:
+                    assets_response = assets_api.list_assets(limit=50)
+                    for asset in assets_response.data:
                         try:
-                            passthrough_data = json.loads(asset_passthrough) if isinstance(asset_passthrough, str) else asset_passthrough
+                            passthrough_data = json.loads(asset.passthrough) if isinstance(asset.passthrough, str) else (asset.passthrough or {})
                             if passthrough_data.get("course_id") == course_id:
                                 found_asset = asset
                                 break
-                        except:
+                        except (json.JSONDecodeError, AttributeError, TypeError):
                             continue
-                
+
                 if found_asset and found_asset.playback_ids and len(found_asset.playback_ids) > 0:
-                    # Asset found and ready!
                     playback_id = found_asset.playback_ids[0].id
-                    
-                    # Update course preview
                     world.mux_preview_playback_id = playback_id
-                    world.mux_preview_asset_id = found_asset.id  # Store asset_id for deletion
+                    world.mux_preview_asset_id = found_asset.id
                     db.commit()
-                    
                     return {
                         "status": "ready",
                         "playback_id": playback_id,
                         "asset_id": found_asset.id,
-                        "message": "Preview video found and course updated"
+                        "message": "Preview video found and course updated",
                     }
                 else:
-                    return {
-                        "status": "processing",
-                        "message": "Preview video is still processing or not found"
-                    }
+                    return {"status": "processing", "message": "Preview video is still processing or not found"}
             except Exception as e:
                 logger.error(f"Error checking course preview status: {type(e).__name__}")
-                return {
-                    "status": "error",
-                    "message": f"Error checking status: {str(e)}"
-                }
+                return {"status": "error", "message": "Error checking upload status"}
 
         # Handle level preview check (skill tree node)
         if level_id:
@@ -732,52 +660,42 @@ async def check_upload_status(
                     "message": "Preview video is already ready"
                 }
 
-            # Try to find the asset by querying Mux API using passthrough
+            # Try to find the asset by querying Mux API
             configuration = _get_mux_configuration()
             api_client = ApiClient(configuration)
             assets_api = AssetsApi(api_client)
 
             try:
-                assets_response = assets_api.list_assets(limit=50)  # Get recent assets
-
                 found_asset = None
-                for asset in assets_response.data:
-                    asset_passthrough = asset.passthrough
-                    if asset_passthrough:
+                if resolved_asset_id:
+                    found_asset = assets_api.get_asset(resolved_asset_id).data
+                else:
+                    assets_response = assets_api.list_assets(limit=50)
+                    for asset in assets_response.data:
                         try:
-                            passthrough_data = json.loads(asset_passthrough) if isinstance(asset_passthrough, str) else asset_passthrough
+                            passthrough_data = json.loads(asset.passthrough) if isinstance(asset.passthrough, str) else (asset.passthrough or {})
                             if passthrough_data.get("level_id") == level_id:
                                 found_asset = asset
                                 break
-                        except:
+                        except (json.JSONDecodeError, AttributeError, TypeError):
                             continue
 
                 if found_asset and found_asset.playback_ids and len(found_asset.playback_ids) > 0:
-                    # Asset found and ready!
                     playback_id = found_asset.playback_ids[0].id
-
-                    # Update level preview
                     level.mux_preview_playback_id = playback_id
                     level.mux_preview_asset_id = found_asset.id
                     db.commit()
-
                     return {
                         "status": "ready",
                         "playback_id": playback_id,
                         "asset_id": found_asset.id,
-                        "message": "Preview video found and level updated"
+                        "message": "Preview video found and level updated",
                     }
                 else:
-                    return {
-                        "status": "processing",
-                        "message": "Preview video is still processing or not found"
-                    }
+                    return {"status": "processing", "message": "Preview video is still processing or not found"}
             except Exception as e:
                 logger.error(f"Error checking level preview status: {type(e).__name__}")
-                return {
-                    "status": "error",
-                    "message": f"Error checking status: {str(e)}"
-                }
+                return {"status": "error", "message": "Error checking upload status"}
 
         # Handle community post check
         if post_id:
@@ -803,46 +721,36 @@ async def check_upload_status(
             passthrough_filter = json.dumps({"post_id": post_id})
             
             try:
-                assets_response = assets_api.list_assets(limit=50)  # Get recent assets
-                
                 found_asset = None
-                for asset in assets_response.data:
-                    asset_passthrough = asset.passthrough
-                    if asset_passthrough:
+                if resolved_asset_id:
+                    found_asset = assets_api.get_asset(resolved_asset_id).data
+                else:
+                    assets_response = assets_api.list_assets(limit=50)
+                    for asset in assets_response.data:
                         try:
-                            passthrough_data = json.loads(asset_passthrough) if isinstance(asset_passthrough, str) else asset_passthrough
+                            passthrough_data = json.loads(asset.passthrough) if isinstance(asset.passthrough, str) else (asset.passthrough or {})
                             if passthrough_data.get("post_id") == post_id:
                                 found_asset = asset
                                 break
-                        except:
+                        except (json.JSONDecodeError, AttributeError, TypeError):
                             continue
-                
+
                 if found_asset and found_asset.playback_ids and len(found_asset.playback_ids) > 0:
-                    # Asset found and ready!
                     playback_id = found_asset.playback_ids[0].id
-                    
-                    # Update post
                     post.mux_playback_id = playback_id
                     post.mux_asset_id = found_asset.id
                     db.commit()
-                    
                     return {
                         "status": "ready",
                         "playback_id": playback_id,
                         "asset_id": found_asset.id,
-                        "message": "Video found and post updated"
+                        "message": "Video found and post updated",
                     }
                 else:
-                    return {
-                        "status": "processing",
-                        "message": "Video is still processing or not found"
-                    }
+                    return {"status": "processing", "message": "Video is still processing or not found"}
             except Exception as e:
                 logger.error(f"Error checking post upload status: {type(e).__name__}")
-                return {
-                    "status": "error",
-                    "message": f"Error checking status: {str(e)}"
-                }
+                return {"status": "error", "message": "Error checking upload status"}
         
         # Handle lesson check (existing logic)
         if not lesson_id:
@@ -870,49 +778,38 @@ async def check_upload_status(
         passthrough_filter = json.dumps({"lesson_id": lesson_id})
         
         try:
-            # List assets and filter by passthrough
-            assets_response = assets_api.list_assets(limit=50)  # Get recent assets
-            
             found_asset = None
-            for asset in assets_response.data:
-                asset_passthrough = asset.passthrough
-                if asset_passthrough:
+            if resolved_asset_id:
+                found_asset = assets_api.get_asset(resolved_asset_id).data
+            else:
+                assets_response = assets_api.list_assets(limit=50)
+                for asset in assets_response.data:
                     try:
-                        passthrough_data = json.loads(asset_passthrough) if isinstance(asset_passthrough, str) else asset_passthrough
+                        passthrough_data = json.loads(asset.passthrough) if isinstance(asset.passthrough, str) else (asset.passthrough or {})
                         if passthrough_data.get("lesson_id") == lesson_id:
                             found_asset = asset
                             break
-                    except:
+                    except (json.JSONDecodeError, AttributeError, TypeError):
                         continue
-            
+
             if found_asset and found_asset.playback_ids and len(found_asset.playback_ids) > 0:
-                # Asset found and ready!
                 asset_id = found_asset.id
                 playback_id = found_asset.playback_ids[0].id
-                
-                # Update lesson
                 lesson.mux_asset_id = asset_id
                 lesson.mux_playback_id = playback_id
                 db.commit()
-                
                 return {
                     "status": "ready",
                     "playback_id": playback_id,
                     "asset_id": asset_id,
-                    "message": "Video found and lesson updated"
+                    "message": "Video found and lesson updated",
                 }
             else:
-                return {
-                    "status": "processing",
-                    "message": "Video is still processing or not found"
-                }
-                
+                return {"status": "processing", "message": "Video is still processing or not found"}
+
         except Exception as e:
-            logger.error(f"Error checking upload status: {type(e).__name__}")
-            return {
-                "status": "error",
-                "message": f"Error checking status: {str(e)}"
-            }
+            logger.error(f"Error checking lesson upload status: {type(e).__name__}")
+            return {"status": "error", "message": "Error checking upload status"}
             
     except Exception as e:
         logger.error(f"Error in check_upload_status: {type(e).__name__}")

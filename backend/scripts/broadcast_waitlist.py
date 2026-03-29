@@ -45,7 +45,6 @@ def get_beautiful_html(username, referral_link):
     bg_color = "#F9F7F1"  # Cream/Paper
     text_color = "#333333" # Dark Gray/Black
     
-    # TODO: Replace [INSERT URL HERE] with the actual combo URL before sending
     combo_url = "https://youtu.be/Snk7pqMMczc"
     
     return f"""

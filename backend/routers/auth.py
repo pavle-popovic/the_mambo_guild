@@ -9,7 +9,7 @@ from schemas.auth import (
     UserRegisterRequest, UserLoginRequest, TokenResponse, UserProfileResponse,
     ForgotPasswordRequest, ResetPasswordRequest
 )
-from services.auth_service import verify_password, get_password_hash, create_access_token, create_refresh_token
+from services.auth_service import verify_password, get_password_hash, create_access_token, create_refresh_token, decode_access_token
 from services.gamification_service import update_streak
 from services.email_service import send_password_reset_email, send_waitlist_welcome_email
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
@@ -381,10 +381,23 @@ async def refresh_access_token(
 
 
 @router.post("/logout")
-async def logout(response: Response):
+async def logout(request: Request, response: Response):
     """
-    Logout user by clearing authentication cookies.
+    Logout user by clearing authentication cookies and blacklisting the access token.
+    The blacklisted token cannot be reused even if a client cached the value.
     """
+    token = request.cookies.get("access_token")
+    if token:
+        try:
+            from services.redis_service import blacklist_token
+            payload = decode_access_token(token)
+            if payload:
+                exp = payload.get("exp")
+                if exp:
+                    remaining_ttl = int(exp - datetime.now(timezone.utc).timestamp())
+                    blacklist_token(token, remaining_ttl)
+        except Exception:
+            pass  # Don't fail logout if blacklisting fails
     _clear_auth_cookies(response)
     return {"message": "Successfully logged out"}
 
@@ -829,10 +842,10 @@ async def reset_password(
         
         return {"message": "Password reset successfully"}
     
+    except HTTPException:
+        raise
     except Exception as e:
-        if isinstance(e, HTTPException):
-            raise
-        logger.error(f"Password reset error: {str(e)}")
+        logger.error(f"Password reset error: {type(e).__name__}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Invalid or expired reset token"

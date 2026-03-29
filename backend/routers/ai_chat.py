@@ -10,7 +10,7 @@ Security Features:
 - No PII in logs
 """
 
-from fastapi import APIRouter, HTTPException, Request
+from fastapi import APIRouter, Depends, HTTPException, Request
 from fastapi.responses import StreamingResponse
 from pydantic import BaseModel, Field, field_validator
 from typing import Optional, List, AsyncGenerator, Literal
@@ -19,6 +19,8 @@ import time
 import json
 import re
 import redis.asyncio as redis
+from sqlalchemy.orm import Session
+from models import get_db
 from config import settings
 
 router = APIRouter()
@@ -250,24 +252,94 @@ def execute_recommend_membership(tier: str, reasoning: str) -> dict:
         "reasoning": reasoning
     }
 
-def execute_search_knowledge_base(query: str) -> dict:
+def execute_search_knowledge_base(query: str, db: Optional[Session] = None) -> dict:
     """
-    Execute the knowledge base search tool.
-    Currently a placeholder - will be connected to Vector DB/RAG later.
+    Search published courses and lessons for content relevant to the query.
+    Returns a concise summary Diego can use to answer a technical dance question.
     """
-    # Placeholder response - will be replaced with actual RAG implementation
-    return {
-        "type": "knowledge_base",
-        "query": query,
-        "result": f"That's a great question about '{query}'! Our detailed knowledge base with step-by-step tutorials is coming soon. In the meantime, I'd recommend checking out our beginner courses which cover the fundamentals thoroughly. Would you like me to tell you more about our course offerings?"
-    }
+    if db is None:
+        return {
+            "type": "knowledge_base",
+            "query": query,
+            "result": "Our detailed course catalogue is loading. Please check /courses for our full course list."
+        }
 
-def execute_tool(name: str, args: dict) -> dict:
+    try:
+        from models.course import World, Lesson
+
+        # Tokenise query into search terms (min 3 chars to avoid noise)
+        terms = [t.lower() for t in query.split() if len(t) >= 3]
+        if not terms:
+            terms = [query.lower()]
+
+        # Search published courses
+        all_worlds = db.query(World).filter(World.is_published == True).all()
+        matching_worlds = [
+            w for w in all_worlds
+            if any(
+                t in (w.title or "").lower() or t in (w.description or "").lower()
+                for t in terms
+            )
+        ]
+
+        # Search lessons (only within published courses)
+        from models.course import Level
+        all_lessons = (
+            db.query(Lesson)
+            .join(Level, Lesson.level_id == Level.id)
+            .join(World, Level.world_id == World.id)
+            .filter(World.is_published == True)
+            .limit(100)
+            .all()
+        )
+        matching_lessons = [
+            l for l in all_lessons
+            if any(
+                t in (l.title or "").lower() or t in (l.description or "").lower()
+                for t in terms
+            )
+        ]
+
+        results: List[str] = []
+        for w in matching_worlds[:3]:
+            desc = (w.description or "").strip()
+            results.append(f"Course — {w.title}: {desc[:120]}" if desc else f"Course — {w.title}")
+        for l in matching_lessons[:5]:
+            desc = (l.description or "").strip()
+            results.append(f"Lesson — {l.title}: {desc[:120]}" if desc else f"Lesson — {l.title}")
+
+        if results:
+            summary = " | ".join(results)
+            return {
+                "type": "knowledge_base",
+                "query": query,
+                "result": f"I found the following relevant content: {summary}"
+            }
+
+        # Nothing matched — give a helpful fallback
+        return {
+            "type": "knowledge_base",
+            "query": query,
+            "result": (
+                f"I don't have a specific lesson on '{query}' in the catalogue yet, "
+                "but our courses cover fundamentals, partnerwork, and choreography. "
+                "Visit /courses for the full list or ask me about a specific course."
+            )
+        }
+    except Exception:
+        return {
+            "type": "knowledge_base",
+            "query": query,
+            "result": "I'm having trouble searching our course catalogue right now. Please check /courses directly."
+        }
+
+
+def execute_tool(name: str, args: dict, db: Optional[Session] = None) -> dict:
     """Route tool execution to the appropriate handler."""
     if name == "recommend_membership":
         return execute_recommend_membership(args.get("tier", "rookie"), args.get("reasoning", ""))
     elif name == "search_knowledge_base":
-        return execute_search_knowledge_base(args.get("query", ""))
+        return execute_search_knowledge_base(args.get("query", ""), db=db)
     else:
         return {"type": "error", "message": f"Unknown tool: {name}"}
 
@@ -343,7 +415,8 @@ def get_gemini_model():
 
 async def stream_gemini_response(
     model,
-    messages: List[ChatMessage]
+    messages: List[ChatMessage],
+    db: Optional[Session] = None,
 ) -> AsyncGenerator[str, None]:
     """
     Stream response from Gemini API with function calling support.
@@ -390,7 +463,7 @@ async def stream_gemini_response(
 
         # If there was a function call, execute it and send the result
         if function_call:
-            tool_result = execute_tool(function_call["name"], function_call["args"])
+            tool_result = execute_tool(function_call["name"], function_call["args"], db=db)
             yield f"data: {json.dumps({'type': 'function_call', 'name': function_call['name'], 'args': function_call['args'], 'result': tool_result, 'done': False})}\n\n"
 
         # Send completion signal
@@ -407,7 +480,11 @@ async def stream_gemini_response(
 # =============================================================================
 
 @router.post("/chat")
-async def chat_endpoint(request: Request, chat_request: ChatRequest):
+async def chat_endpoint(
+    request: Request,
+    chat_request: ChatRequest,
+    db: Session = Depends(get_db),
+):
     """
     Main chat endpoint with streaming and function calling support.
 
@@ -426,7 +503,7 @@ async def chat_endpoint(request: Request, chat_request: ChatRequest):
 
     if chat_request.stream:
         return StreamingResponse(
-            stream_gemini_response(model, chat_request.messages),
+            stream_gemini_response(model, chat_request.messages, db=db),
             media_type="text/event-stream",
             headers={
                 "Cache-Control": "no-cache",
@@ -470,7 +547,7 @@ async def chat_endpoint(request: Request, chat_request: ChatRequest):
             }
 
             if function_call:
-                tool_result = execute_tool(function_call["name"], function_call["args"])
+                tool_result = execute_tool(function_call["name"], function_call["args"], db=db)
                 result["function_call"] = {
                     "name": function_call["name"],
                     "args": function_call["args"],

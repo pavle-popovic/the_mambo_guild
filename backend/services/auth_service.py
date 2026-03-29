@@ -1,8 +1,11 @@
 import bcrypt
+import logging
 from jose import JWTError, jwt
 from datetime import datetime, timedelta, timezone
 from config import settings
 from typing import Optional
+
+logger = logging.getLogger(__name__)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
@@ -25,8 +28,8 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
             hash_bytes = hashed_password
         
         return bcrypt.checkpw(password_bytes, hash_bytes)
-    except Exception:
-        # If hash is invalid or verification fails, return False
+    except Exception as e:
+        logger.warning(f"Password verification error: {type(e).__name__}")
         return False
 
 

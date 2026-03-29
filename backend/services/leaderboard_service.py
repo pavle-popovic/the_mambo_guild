@@ -2,7 +2,7 @@
 Leaderboard Service - Ranking system with periods and categories.
 """
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import Optional, List
 from sqlalchemy.orm import Session
 from sqlalchemy import func, desc, case
@@ -33,7 +33,7 @@ def _get_date_filter(period: str) -> Optional[datetime]:
     days = PERIOD_FILTERS.get(period)
     if days is None:
         return None
-    return datetime.utcnow() - timedelta(days=days)
+    return datetime.now(timezone.utc) - timedelta(days=days)
 
 
 def get_leaderboard(

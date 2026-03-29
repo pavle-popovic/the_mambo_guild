@@ -6,10 +6,10 @@ from models.user import UserProfile
 
 
 def calculate_level(xp: int) -> int:
-    """Calculate user level based on XP: Level = floor(sqrt(XP / 100))"""
+    """Calculate user level based on XP: Level = max(1, floor(sqrt(XP / 100)))"""
     if xp <= 0:
         return 1
-    return int(math.floor(math.sqrt(xp / 100)))
+    return max(1, int(math.floor(math.sqrt(xp / 100))))
 
 
 def update_streak(user_id: str, db: Session) -> Dict:
@@ -77,7 +77,11 @@ def update_streak(user_id: str, db: Session) -> Dict:
 
     profile.last_login_date = datetime.now(timezone.utc)
     db.flush()
-    
+
+    # Check streak badges after updating streak
+    from services.badge_service import check_streak_badges
+    check_streak_badges(user_id, profile.streak_count, db)
+
     return {
         "streak_count": profile.streak_count,
         "streak_saved": streak_saved,
@@ -113,7 +117,6 @@ def award_xp(user_id: str, xp_amount: int, db: Session) -> dict:
     profile.level = new_level
 
     leveled_up = new_level > old_level
-    db.commit()
 
     return {
         "xp_gained": xp_amount,

@@ -2,6 +2,7 @@
 Redis service for caching and OAuth state management.
 """
 import redis
+import hashlib
 from config import settings
 from typing import Optional
 import logging
@@ -224,6 +225,49 @@ def get_cached_feed_page(feed_type: str, page: int) -> Optional[str]:
     except Exception as e:
         logger.error(f"Failed to get cached feed page: {e}")
         return None
+
+
+# ============================================
+# Token Blacklist (for logout / revocation)
+# ============================================
+
+_TOKEN_BLACKLIST_PREFIX = "blacklisted:token:"
+
+
+def blacklist_token(token: str, ttl_seconds: int) -> bool:
+    """
+    Add an access token to the blacklist so it can no longer be used after logout.
+    The entry expires automatically after `ttl_seconds` (the token's own remaining lifetime).
+
+    Returns True on success, False if Redis is unavailable (non-fatal — token expires anyway).
+    """
+    if ttl_seconds <= 0:
+        return True  # Token already expired; nothing to blacklist
+    try:
+        client = get_redis_client()
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        key = f"{_TOKEN_BLACKLIST_PREFIX}{token_hash}"
+        client.setex(key, ttl_seconds, "1")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to blacklist token: {e}")
+        return False
+
+
+def is_token_blacklisted(token: str) -> bool:
+    """
+    Return True if the token has been explicitly revoked (e.g. after logout).
+    Fails *open* on Redis error — if Redis is down we allow the request rather
+    than lock everyone out.
+    """
+    try:
+        client = get_redis_client()
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        key = f"{_TOKEN_BLACKLIST_PREFIX}{token_hash}"
+        return bool(client.exists(key))
+    except Exception as e:
+        logger.error(f"Failed to check token blacklist: {e}")
+        return False  # Fail open
 
 
 def invalidate_feed_cache(feed_type: str = None) -> bool:

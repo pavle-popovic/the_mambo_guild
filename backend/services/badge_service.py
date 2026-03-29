@@ -6,7 +6,7 @@ import logging
 from datetime import datetime, timezone
 from typing import List, Optional, Union
 from sqlalchemy.orm import Session
-from sqlalchemy import func
+from sqlalchemy import func, case
 
 from models.community import UserStats, UserBadge, BadgeDefinition, BadgeTier
 from models.community import Post, PostReply, PostReaction, ClaveTransaction
@@ -166,61 +166,48 @@ def award_badge(user_id: str, badge: Union[BadgeDefinition, str], db: Session):
 def get_user_stats(user_id: str, db: Session) -> dict:
     """
     Calculate and return all badge-related stats for a user.
-    Used for badge progress calculation in the frontend.
+    Consolidated from 7 queries to 3 using conditional aggregation.
     """
     from models.user import UserProfile
-    
-    # Get user profile for streak
+
+    # Query 1: profile + stats (existing rows)
     profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
-    
-    # Get or create UserStats
     stats = get_or_create_stats(user_id, db)
-    
-    # Count specific reaction types received
-    fires_received = db.query(func.count(PostReaction.id)).join(Post).filter(
+
+    # Query 2: all reaction-type counts in one pass over PostReaction JOIN Post
+    reaction_row = db.query(
+        func.count(case((PostReaction.reaction_type == "fire", 1))).label("fires"),
+        func.count(case((PostReaction.reaction_type == "clap", 1))).label("claps"),
+        func.count(case((PostReaction.reaction_type == "ruler", 1))).label("metronomes"),
+    ).join(Post, Post.id == PostReaction.post_id).filter(
         Post.user_id == user_id,
-        PostReaction.reaction_type == "fire"
-    ).scalar() or 0
-    
-    claps_received = db.query(func.count(PostReaction.id)).join(Post).filter(
-        Post.user_id == user_id,
-        PostReaction.reaction_type == "clap"
-    ).scalar() or 0
-    
-    metronomes_received = db.query(func.count(PostReaction.id)).join(Post).filter(
-        Post.user_id == user_id,
-        PostReaction.reaction_type == "ruler"
-    ).scalar() or 0
-    
-    # Count videos posted
-    videos_posted = db.query(func.count(Post.id)).filter(
-        Post.user_id == user_id,
-        Post.post_type == "stage",
-        Post.mux_asset_id.isnot(None)
-    ).scalar() or 0
-    
-    # Count questions posted  
-    questions_posted = db.query(func.count(Post.id)).filter(
-        Post.user_id == user_id,
-        Post.post_type == "lab"
-    ).scalar() or 0
-    
-    # Count comments posted
+        Post.is_deleted == False,
+    ).first()
+
+    # Query 3: post-type counts + comment count in two tiny aggregations
+    post_row = db.query(
+        func.count(case((
+            (Post.post_type == "stage") & Post.mux_asset_id.isnot(None), 1
+        ))).label("videos"),
+        func.count(case((Post.post_type == "lab", 1))).label("questions"),
+    ).filter(Post.user_id == user_id, Post.is_deleted == False).first()
+
     comments_posted = db.query(func.count(PostReply.id)).filter(
-        PostReply.user_id == user_id
+        PostReply.user_id == user_id,
+        PostReply.is_deleted == False,
     ).scalar() or 0
-    
+
     return {
         "reactions_given": stats.reactions_given_count,
         "reactions_received": stats.reactions_received_count,
-        "fires_received": fires_received,
-        "claps_received": claps_received,
-        "metronomes_received": metronomes_received,
+        "fires_received": reaction_row.fires if reaction_row else 0,
+        "claps_received": reaction_row.claps if reaction_row else 0,
+        "metronomes_received": reaction_row.metronomes if reaction_row else 0,
         "solutions_accepted": stats.solutions_accepted_count,
-        "questions_posted": questions_posted,
-        "videos_posted": videos_posted,
+        "questions_posted": post_row.questions if post_row else 0,
+        "videos_posted": post_row.videos if post_row else 0,
         "comments_posted": comments_posted,
-        "current_streak": profile.streak_count if profile else 0
+        "current_streak": profile.streak_count if profile else 0,
     }
 
 
@@ -262,11 +249,18 @@ def get_all_badges_for_user(user_id: str, db: Session):
 def get_user_badges(user_id: str, db: Session) -> list:
     """
     Get only earned badges for a specific user (public profile view).
+    Uses a JOIN to avoid N+1 queries.
     """
-    user_badges = db.query(UserBadge).filter(UserBadge.user_id == user_id).all()
+    from sqlalchemy.orm import joinedload
+    user_badges = (
+        db.query(UserBadge)
+        .filter(UserBadge.user_id == user_id)
+        .options(joinedload(UserBadge.badge))
+        .all()
+    )
     results = []
     for ub in user_badges:
-        bd = db.query(BadgeDefinition).filter(BadgeDefinition.id == ub.badge_id).first()
+        bd = ub.badge
         if bd:
             results.append({
                 "id": bd.id,

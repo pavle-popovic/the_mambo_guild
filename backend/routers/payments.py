@@ -1,11 +1,14 @@
 from typing import Annotated
 import uuid
+import logging
 import stripe
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
+
+logger = logging.getLogger(__name__)
 
 from dependencies import get_db, get_current_user
 from models.user import User, Subscription, SubscriptionStatus, SubscriptionTier
@@ -98,11 +101,13 @@ async def create_checkout_session(
             url=checkout_session.url
         )
     except stripe.error.StripeError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        logger.error(f"Stripe error creating checkout session for user {current_user.id}: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Payment processing error. Please try again.")
     except Exception as e:
+        logger.error(f"Unexpected error creating checkout session for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An unexpected error occurred: {e}"
+            detail="An unexpected error occurred. Please try again."
         )
 
 
@@ -130,11 +135,11 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
             payload, sig_header, settings.STRIPE_WEBHOOK_SECRET
         )
     except ValueError as e:
-        # Invalid payload
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid payload: {e}")
+        logger.warning(f"Invalid Stripe webhook payload: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid payload")
     except stripe.error.SignatureVerificationError as e:
-        # Invalid signature
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f"Invalid signature: {e}")
+        logger.warning(f"Invalid Stripe webhook signature: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid signature")
 
     # Handle the event
     if event["type"] == "invoice.payment_succeeded":
@@ -168,7 +173,7 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                     db_subscription.status = SubscriptionStatus.ACTIVE
                     db_subscription.tier = tier
                     db_subscription.current_period_end = datetime.fromtimestamp(
-                        stripe_subscription.current_period_end
+                        stripe_subscription.current_period_end, tz=timezone.utc
                     )
                     db.commit()
                     db.refresh(db_subscription)
@@ -192,7 +197,7 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                             status=SubscriptionStatus.ACTIVE,
                             tier=tier,
                             current_period_end=datetime.fromtimestamp(
-                                stripe_subscription.current_period_end
+                                stripe_subscription.current_period_end, tz=timezone.utc
                             )
                         )
                         db.add(new_subscription)
@@ -205,16 +210,16 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                         # Award subscription badge
                         award_subscription_badge(str(new_subscription.user_id), tier.value, db)
                     else:
-                        print(f"Warning: Could not find user_id in metadata for new subscription {subscription_id}")
+                        logger.warning(f"Could not find user_id in metadata for new subscription {subscription_id}")
 
             except stripe.error.StripeError as e:
-                print(f"Stripe API error retrieving subscription {subscription_id}: {e}")
+                logger.error(f"Stripe API error retrieving subscription {subscription_id}: {e}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Stripe API error"
                 )
             except Exception as e:
-                print(f"Error processing invoice.payment_succeeded for subscription {subscription_id}: {e}")
+                logger.error(f"Error processing invoice.payment_succeeded for subscription {subscription_id}: {e}")
                 raise HTTPException(
                     status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                     detail="Internal server error"
@@ -231,7 +236,7 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
             db.commit()
             db.refresh(db_subscription)
         else:
-            print(f"Warning: Subscription {stripe_subscription_id} not found in DB for deletion event.")
+            logger.warning(f"Subscription {stripe_subscription_id} not found in DB for deletion event.")
 
     # Other event types can be handled here as needed
 
@@ -305,7 +310,7 @@ async def update_subscription(
         # Update our database
         subscription.tier = new_tier
         subscription.current_period_end = datetime.fromtimestamp(
-            updated_subscription.current_period_end
+            updated_subscription.current_period_end, tz=timezone.utc
         )
         db.commit()
         db.refresh(subscription)
@@ -317,13 +322,15 @@ async def update_subscription(
         )
         
     except stripe.error.StripeError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        logger.error(f"Stripe error updating subscription for user {current_user.id}: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Payment processing error. Please try again.")
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Unexpected error updating subscription for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An unexpected error occurred: {e}"
+            detail="An unexpected error occurred. Please try again."
         )
 
 
@@ -384,11 +391,13 @@ async def cancel_subscription(
         )
         
     except stripe.error.StripeError as e:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        logger.error(f"Stripe error canceling subscription for user {current_user.id}: {e}")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Payment processing error. Please try again.")
     except HTTPException:
         raise
     except Exception as e:
+        logger.error(f"Unexpected error canceling subscription for user {current_user.id}: {e}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"An unexpected error occurred: {e}"
+            detail="An unexpected error occurred. Please try again."
         )

@@ -449,4 +449,3 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
     except Exception as e:
         logger.error(f"Failed to send waitlist welcome email to {email}: {str(e)}")
         return False
-        return False

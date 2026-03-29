@@ -14,8 +14,6 @@ import SuccessNotification from "@/components/SuccessNotification";
 import AuthPromptModal from "@/components/AuthPromptModal";
 import QuizResultModal from "@/components/QuizResultModal";
 import CourseCompletionModal from "@/components/CourseCompletionModal";
-import PracticeModeOverlay from "@/components/PracticeModeOverlay";
-import { useDrillViewCount } from "@/hooks/useDrillViewCount";
 import { FaBolt, FaPlay, FaPause, FaCheck, FaLock, FaArrowRight, FaClipboardList, FaCheckCircle, FaChevronLeft, FaChevronRight, FaCrown } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -94,13 +92,8 @@ export default function LessonPage() {
   const [showCourseCompletion, setShowCourseCompletion] = useState(false);
   const [courseTitle, setCourseTitle] = useState("");
   const navigateToNextLessonRef = useRef<(() => void) | null>(null);
-  const [dismissedPracticeMode, setDismissedPracticeMode] = useState(false);
   const videoPlayerRef = useRef<MuxVideoPlayerHandle>(null);
   const [videoDuration, setVideoDuration] = useState(0);
-
-  // Drill view tracking for cost efficiency (shows download prompt after 3 views)
-  const { viewCount, showPracticeMode, incrementView, markDownloaded, dismissForSession } =
-    useDrillViewCount(lessonId);
 
   useEffect(() => {
     // Reset practice mode dismissal on lesson change
@@ -762,25 +755,12 @@ export default function LessonPage() {
             {/* Video Player - Only show for video lessons with video */}
             {isVideoLesson && hasVideo && (
               <div className="w-full bg-black relative shadow-2xl z-20">
-                {/* Practice Mode Overlay - shows after 3 views to encourage download */}
-                {showPracticeMode && !dismissedPracticeMode && lesson.mux_playback_id && (
-                  <PracticeModeOverlay
-                    playbackId={lesson.mux_playback_id}
-                    onDismiss={() => {
-                      dismissForSession();
-                      setDismissedPracticeMode(true);
-                    }}
-                    onDownloadComplete={markDownloaded}
-                  />
-                )}
-
                 {lesson.mux_playback_id ? (
                   <div className="aspect-video w-full max-h-[75vh]">
                     <MuxVideoPlayer
                       ref={videoPlayerRef}
                       playbackId={lesson.mux_playback_id}
                       onEnded={() => setVideoPlaying(false)}
-                      onPlaying={incrementView}
                       onLoadedMetadata={(duration) => setVideoDuration(duration)}
                       autoPlay={videoPlaying}
                       durationMinutes={lesson.duration_minutes}
@@ -798,7 +778,6 @@ export default function LessonPage() {
                       className="w-full h-full object-contain"
                       src={lesson.video_url}
                       onEnded={() => setVideoPlaying(false)}
-                      onPlaying={incrementView}
                       onClick={() => setVideoPlaying(!videoPlaying)}
                     />
                     {!videoPlaying && (
