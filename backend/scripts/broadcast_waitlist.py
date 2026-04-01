@@ -111,14 +111,18 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p><strong>This week's class — Salsa Bodymovement Musicality: La Gripe:</strong><br>
+            <p><strong>This week's class — Salsa Bodymovement Musicality (La Gripe):</strong><br>
             <a href="{weekly_class_url}" class="link">{weekly_class_url}</a></p>
 
             <p>Previous classes:<br>
             14 Salsa Moves Ep. 2: <a href="https://www.youtube.com/watch?v=-Y4By7n2KCQ" class="link">youtu.be/-Y4By7n2KCQ</a><br>
             Pachanga Fundamentals: <a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">youtu.be/A12yU-b2O_s</a><br>
             Salsa Choreography (Baile Inolvidable): <a href="https://www.youtube.com/watch?v=Snk7pqMMczc" class="link">youtu.be/Snk7pqMMczc</a><br>
-            14 Salsa Moves Ep. 1: <a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">youtu.be/5u_56JspFX8</a></p>
+            Rankankan Choreography: <a href="https://www.youtube.com/watch?v=57-zwVE1VXI" class="link">youtu.be/57-zwVE1VXI</a><br>
+            14 Salsa Moves Ep. 1: <a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">youtu.be/5u_56JspFX8</a><br>
+            Salsa Romantica: <a href="https://www.youtube.com/watch?v=wcDocNANEVY" class="link">youtu.be/wcDocNANEVY</a><br>
+            Afro Mambo Fusion: <a href="https://www.youtube.com/watch?v=RIMp6J02Th0" class="link">youtu.be/RIMp6J02Th0</a><br>
+            🎁 Pachanga Module 11 (The Kick Tap Chuck): <a href="https://www.youtube.com/watch?v=ER1CMXeoAao" class="link">youtu.be/ER1CMXeoAao</a></p>
 
             <h2><span class="emoji">🧠</span> The Science: Why Thinking About Your Body Is Wrecking Your Dancing</h2>
             <p>Here's something that should change how you practice immediately: thinking about your own body during movement — "lift your chest," "bend your knees," "point your toe" — measurably makes your dancing worse. Not a little worse. <em>Measurably</em> worse. When you direct attention to a body part, your slow, deliberate prefrontal cortex decides it needs to get involved — and it starts interfering with movements your cerebellum and basal ganglia were already handling at high speed and precision. It's a nervous student pilot grabbing the controls from a seasoned captain.</p>
@@ -220,7 +224,7 @@ def send_broadcast():
         referral_link = f"{base_url}/waitlist?ref={code}"
 
         # 2. Prepare the Email Content
-        subject = "Salsa Bodymovement: La Gripe + why thinking about your body wrecks your dancing"
+        subject = "Salsa Bodymovement (La Gripe) + why thinking about your body wrecks your dancing"
         html_content = get_beautiful_html(username, referral_link)
 
         # 3. Send (or Print)
