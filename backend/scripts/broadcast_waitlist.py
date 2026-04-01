@@ -45,7 +45,7 @@ def get_beautiful_html(username, referral_link):
     bg_color = "#F9F7F1"  # Cream/Paper
     text_color = "#333333" # Dark Gray/Black
     
-    combo_url = "https://youtu.be/Snk7pqMMczc"
+    weekly_class_url = "https://youtu.be/Ol54zPvVpx0"
     
     return f"""
     <!DOCTYPE html>
@@ -111,22 +111,22 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p>Here is the class for this week (14 Salsa Moves Episode 2): <a href="https://www.youtube.com/watch?v=-Y4By7n2KCQ" class="link">https://www.youtube.com/watch?v=-Y4By7n2KCQ</a></p>
-            <p>Pachanga Fundamentals: <a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">https://www.youtube.com/watch?v=A12yU-b2O_s</a></p>
-            <p>Salsa Choreography (Baile Inolvidable): <a href="https://www.youtube.com/watch?v=Snk7pqMMczc" class="link">https://www.youtube.com/watch?v=Snk7pqMMczc</a></p>
-            <p>Rankankan Choreography: <a href="https://www.youtube.com/watch?v=57-zwVE1VXI" class="link">https://www.youtube.com/watch?v=57-zwVE1VXI</a></p>
-            <p>14 Salsa Moves Episode 1: <a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">https://www.youtube.com/watch?v=5u_56JspFX8</a></p>
-            <p>Salsa Romantica: <a href="https://www.youtube.com/watch?v=wcDocNANEVY" class="link">https://www.youtube.com/watch?v=wcDocNANEVY</a></p>
-            <p>Afro Mambo Fusion: <a href="https://www.youtube.com/watch?v=RIMp6J02Th0" class="link">https://www.youtube.com/watch?v=RIMp6J02Th0</a></p>
-            <p><strong>🎁 Bonus!</strong> I just unlocked Module 11 (The Kick Tap Chuck) from the premium Pachanga curriculum: <a href="https://www.youtube.com/watch?v=ER1CMXeoAao" class="link">https://www.youtube.com/watch?v=ER1CMXeoAao</a></p>
+            <p><strong>This week's class — Salsa Bodymovement Musicality: La Gripe:</strong><br>
+            <a href="{weekly_class_url}" class="link">{weekly_class_url}</a></p>
 
-            <h2><span class="emoji">🧠</span> The Science: Why Talking to Yourself Makes You a Better Dancer</h2>
-            <p>Your auditory cortex and motor cortex aren't separate systems — they share a direct anatomical highway called the <strong>dorsal auditory pathway</strong>. When you vocalize rhythm ("ta-ka-ta") while you dance, you create a closed feedback loop: any timing mismatch between your voice and your feet produces an instant error signal your brain can correct <em>within the same rep</em>.</p>
-            <p>Even crazier: research shows this doesn't just fix timing — it improves <strong>spatial consistency</strong> too. Your footwork paths get cleaner and your body drifts less. Scatting your rhythms isn't a beginner crutch. It's a precision tool the best dancers never stop using.</p>
+            <p>Previous classes:<br>
+            14 Salsa Moves Ep. 2: <a href="https://www.youtube.com/watch?v=-Y4By7n2KCQ" class="link">youtu.be/-Y4By7n2KCQ</a><br>
+            Pachanga Fundamentals: <a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">youtu.be/A12yU-b2O_s</a><br>
+            Salsa Choreography (Baile Inolvidable): <a href="https://www.youtube.com/watch?v=Snk7pqMMczc" class="link">youtu.be/Snk7pqMMczc</a><br>
+            14 Salsa Moves Ep. 1: <a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">youtu.be/5u_56JspFX8</a></p>
 
-            <h2><span class="emoji">🗽</span> The History: How Street Survival Created the Salsa Attitude</h2>
-            <p>1970s New York was broke, burning, and hostile. The Latino community in the South Bronx and Spanish Harlem were trapped. <strong>Fania Records</strong> turned that raw struggle into music. Artists like <strong>Willie Colón</strong> ("El Malo") dressed their bands like street hustlers and wrote lyrics about poverty, crime, and cultural survival — no more tropical fantasies.</p>
-            <p>The attitude hit the dance floor hard. Dancers adopted the <strong>Pachuco Cross</strong> — an aggressive shine where you cross one foot deep over the other, roll your shoulders forward, drop your chin, and lock eyes like you're in a street fight. It's the exact opposite of elegant ballroom posture. When Willie Colón's trombones hit, that confrontational frame is the only way to interpret the music.</p>
+            <h2><span class="emoji">🧠</span> The Science: Why Thinking About Your Body Is Wrecking Your Dancing</h2>
+            <p>Here's something that should change how you practice immediately: thinking about your own body during movement — "lift your chest," "bend your knees," "point your toe" — measurably makes your dancing worse. Not a little worse. <em>Measurably</em> worse. When you direct attention to a body part, your slow, deliberate prefrontal cortex decides it needs to get involved — and it starts interfering with movements your cerebellum and basal ganglia were already handling at high speed and precision. It's a nervous student pilot grabbing the controls from a seasoned captain.</p>
+            <p>The fix is simply redirecting attention to the <em>effect</em> of the movement rather than the mechanism. "Push the floor away" instead of "straighten your knee." "Let the ceiling pull you up" instead of "lift your chest." Same instruction, different target — and research shows the switch produces immediate, measurable improvements in balance, timing, and fluidity. First session. No extra training time required.</p>
+
+            <h2><span class="emoji">🗽</span> The History: Why Three Rivals Made You Break Into Shines</h2>
+            <p>At the Palladium Ballroom in the 1950s, three bandleaders were waging a full-scale musical war. <strong>Machito</strong>, the established heavyweight, fused Afro-Cuban percussion with American jazz brass. <strong>Tito Puente</strong> stood at his timbales and physically attacked them, writing arrangements with terrifying breaks and non-stop percussion solos. <strong>Tito Rodríguez</strong> ran the tightest, most disciplined orchestra in the city. Management booked all three on the same night, at opposite ends of the room. Machito finishes a blistering set — Puente's band on the other side fires up at 200 BPM before dancers can breathe.</p>
+            <p>Because they were competing, the arrangements got absurdly complex: wild tempo changes, sudden breaks, massive instrumental climaxes. And here's the thing — that climax section, the <strong>Mambo section</strong>, became so dense and percussive that dancing in a closed partner frame inside it was physically impossible. The only honest response to Tito Puente's timbale solos was to <em>let go of your partner</em> and match them with your feet. That's shines. Not a style choice — a forced response to a musical arms race that happened 70 years ago in the Bronx.</p>
 
             <p>See you in the next one,</p>
 
@@ -220,7 +220,7 @@ def send_broadcast():
         referral_link = f"{base_url}/waitlist?ref={code}"
 
         # 2. Prepare the Email Content
-        subject = "14 Salsa Moves Episode 2 + how street survival shaped Salsa"
+        subject = "Salsa Bodymovement: La Gripe + why thinking about your body wrecks your dancing"
         html_content = get_beautiful_html(username, referral_link)
 
         # 3. Send (or Print)
