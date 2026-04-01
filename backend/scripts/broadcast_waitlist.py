@@ -200,10 +200,26 @@ def send_broadcast():
         # Typo'd domains - will bounce
         "daniel.guzman3300@gmail.comd",
         "wtd2101@me.cim",
+        "kisslaccer@gmail.co",
         # New allfreemail.net fakes (batch 3)
         "hiroto.shiflett@allfreemail.net",
         "timnesha.mulholland@allfreemail.net",
-        "eray.ornelas@allfreemail.net"
+        "eray.ornelas@allfreemail.net",
+        # New allfreemail.net fakes (batch 4)
+        "nazavier.jaques@allfreemail.net",
+        "faron.zabel@allfreemail.net",
+        "riad.garces@allfreemail.net",
+        "sundai.berthold@allfreemail.net",
+        "tashae.ferranti@allfreemail.net",
+        "vonda.casebolt@allfreemail.net",
+        "paij.huneycutt@allfreemail.net",
+        "melvene.chagnon@allfreemail.net",
+        # duoley.com bot cluster
+        "yewape6701@duoley.com",
+        "yewap26701@duoley.com",
+        "yeaape6701@duoley.com",
+        "yeaapesu6701@duoley.com",
+        "yaape6701@duoley.com",
     }
     
     for user in users:
