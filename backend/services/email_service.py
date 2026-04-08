@@ -386,13 +386,13 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                 <div class="container">
                     <p>Hi {username},</p>
                     
-                    <p><strong>This week's class — Salsa Bodymovement Musicality (La Gripe):</strong><br>
-                    <a href="https://www.youtube.com/watch?v=Ol54zPvVpx0" class="link">https://www.youtube.com/watch?v=Ol54zPvVpx0</a></p>
+                    <p><strong>🏆 Open Challenge — Mambo Gozón Choreo (Win Lifetime VIP Access!):</strong><br>
+                    <a href="https://www.youtube.com/watch?v=omiwxSIxnyc" class="link">https://www.youtube.com/watch?v=omiwxSIxnyc</a></p>
 
-                    <p>Previous classes:<br>
+                    <p><strong>8 Free Classes:</strong><br>
+                    Salsa Bodymovement Musicality (La Gripe): <a href="https://www.youtube.com/watch?v=Ol54zPvVpx0" class="link">https://www.youtube.com/watch?v=Ol54zPvVpx0</a><br>
                     14 Salsa Moves Ep. 2: <a href="https://www.youtube.com/watch?v=-Y4By7n2KCQ" class="link">https://www.youtube.com/watch?v=-Y4By7n2KCQ</a><br>
                     Pachanga Fundamentals: <a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">https://www.youtube.com/watch?v=A12yU-b2O_s</a><br>
-                    Salsa Choreography (Baile Inolvidable): <a href="https://www.youtube.com/watch?v=Snk7pqMMczc" class="link">https://www.youtube.com/watch?v=Snk7pqMMczc</a><br>
                     Rankankan Choreography: <a href="https://www.youtube.com/watch?v=57-zwVE1VXI" class="link">https://www.youtube.com/watch?v=57-zwVE1VXI</a><br>
                     14 Salsa Moves Ep. 1: <a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">https://www.youtube.com/watch?v=5u_56JspFX8</a><br>
                     Salsa Romantica: <a href="https://www.youtube.com/watch?v=wcDocNANEVY" class="link">https://www.youtube.com/watch?v=wcDocNANEVY</a><br>

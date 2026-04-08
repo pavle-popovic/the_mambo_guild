@@ -34,7 +34,11 @@ resend.api_key = os.environ.get("RESEND_API_KEY")
 DRY_RUN = False 
 
 # 4. Email Configuration
-FROM_EMAIL = os.environ.get("FROM_EMAIL", "Mambo Guild <founder@themamboguild.com>")
+raw_from = os.environ.get("FROM_EMAIL", "founder@themamboguild.com")
+if "<" not in raw_from:
+    FROM_EMAIL = f"The Mambo Guild <{raw_from}>"
+else:
+    FROM_EMAIL = raw_from
 FRONTEND_URL = os.environ.get("FRONTEND_URL", "https://themamboguild.com")
 # -----------------------------------------------
 
@@ -111,26 +115,36 @@ def get_beautiful_html(username, referral_link):
         <div class="container">
             <p>Hi {username},</p>
             
-            <p><strong>This week's class — Salsa Bodymovement Musicality (La Gripe):</strong><br>
-            <a href="{weekly_class_url}" class="link">{weekly_class_url}</a></p>
+            <h2>🏆 The Mambo Guild Open Challenge Is Here</h2>
 
-            <p>Previous classes:<br>
+            <p>On April 29th, I am opening the doors to a fully gamified, structured, premium learning platform for Salsa On2. But before we go live, <strong>I am giving away one Lifetime VIP Access pass.</strong></p>
+
+            <h2>THE PRIZE:</h2>
+            <p>Lifetime free access to the entire Mambo Guild platform — 30+ hours of mechanics, practice drills, and full access to our interactive Skill Tree and "Clave" point system.</p>
+
+            <h2>HOW TO ENTER:</h2>
+            <p>1. Learn the Mambo Gozón Choreography — the choreo starts at <strong>13min47</strong>:<br>
+            <a href="https://www.youtube.com/watch?v=omiwxSIxnyc" class="link">https://www.youtube.com/watch?v=omiwxSIxnyc</a></p>
+            <p>2. Film yourself executing the sequence.</p>
+            <p>3. Post your video and <strong>tag me before April 26th</strong>.</p>
+
+            <h2>SUBMISSION RULES:</h2>
+            <p>You can post your video as a <strong>Reel</strong> or an <strong>IG Story</strong>.<br>
+            ⚠️ If you post it as a Story, you <strong>MUST</strong> send the raw video to my DMs after posting. Stories disappear in 24 hours. (Posting a Reel is highly preferred).</p>
+
+            <p>🔥 <strong>Next Monday:</strong> I will be releasing a <strong>beginner challenge</strong> for people who have been dancing less than 1 year. Stay tuned!</p>
+
+            <p>The Guild opens April 29th. Let's go.</p>
+
+            <h2>📚 8 Free Classes:</h2>
+            <p>Salsa Bodymovement Musicality (La Gripe): <a href="{weekly_class_url}" class="link">{weekly_class_url}</a><br>
             14 Salsa Moves Ep. 2: <a href="https://www.youtube.com/watch?v=-Y4By7n2KCQ" class="link">https://www.youtube.com/watch?v=-Y4By7n2KCQ</a><br>
             Pachanga Fundamentals: <a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">https://www.youtube.com/watch?v=A12yU-b2O_s</a><br>
-            Salsa Choreography (Baile Inolvidable): <a href="https://www.youtube.com/watch?v=Snk7pqMMczc" class="link">https://www.youtube.com/watch?v=Snk7pqMMczc</a><br>
             Rankankan Choreography: <a href="https://www.youtube.com/watch?v=57-zwVE1VXI" class="link">https://www.youtube.com/watch?v=57-zwVE1VXI</a><br>
             14 Salsa Moves Ep. 1: <a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">https://www.youtube.com/watch?v=5u_56JspFX8</a><br>
             Salsa Romantica: <a href="https://www.youtube.com/watch?v=wcDocNANEVY" class="link">https://www.youtube.com/watch?v=wcDocNANEVY</a><br>
             Afro Mambo Fusion: <a href="https://www.youtube.com/watch?v=RIMp6J02Th0" class="link">https://www.youtube.com/watch?v=RIMp6J02Th0</a><br>
             🎁 Pachanga Module 11 (The Kick Tap Chuck): <a href="https://www.youtube.com/watch?v=ER1CMXeoAao" class="link">https://www.youtube.com/watch?v=ER1CMXeoAao</a></p>
-
-            <h2><span class="emoji">🧠</span> The Science: Why Thinking About Your Body Is Wrecking Your Dancing</h2>
-            <p>Here's something that should change how you practice immediately: thinking about your own body during movement — "lift your chest," "bend your knees," "point your toe" — measurably makes your dancing worse. Not a little worse. <em>Measurably</em> worse. When you direct attention to a body part, your slow, deliberate prefrontal cortex decides it needs to get involved — and it starts interfering with movements your cerebellum and basal ganglia were already handling at high speed and precision. It's a nervous student pilot grabbing the controls from a seasoned captain.</p>
-            <p>The fix is simply redirecting attention to the <em>effect</em> of the movement rather than the mechanism. "Push the floor away" instead of "straighten your knee." "Let the ceiling pull you up" instead of "lift your chest." Same instruction, different target — and research shows the switch produces immediate, measurable improvements in balance, timing, and fluidity. First session. No extra training time required.</p>
-
-            <h2><span class="emoji">🗽</span> The History: Why Three Rivals Made You Break Into Shines</h2>
-            <p>At the Palladium Ballroom in the 1950s, three bandleaders were waging a full-scale musical war. <strong>Machito</strong>, the established heavyweight, fused Afro-Cuban percussion with American jazz brass. <strong>Tito Puente</strong> stood at his timbales and physically attacked them, writing arrangements with terrifying breaks and non-stop percussion solos. <strong>Tito Rodríguez</strong> ran the tightest, most disciplined orchestra in the city. Management booked all three on the same night, at opposite ends of the room. Machito finishes a blistering set — Puente's band on the other side fires up at 200 BPM before dancers can breathe.</p>
-            <p>Because they were competing, the arrangements got absurdly complex: wild tempo changes, sudden breaks, massive instrumental climaxes. And here's the thing — that climax section, the <strong>Mambo section</strong>, became so dense and percussive that dancing in a closed partner frame inside it was physically impossible. The only honest response to Tito Puente's timbale solos was to <em>let go of your partner</em> and match them with your feet. That's shines. Not a style choice — a forced response to a musical arms race that happened 70 years ago in the Bronx.</p>
 
             <p>See you in the next one,</p>
 
@@ -171,6 +185,9 @@ def send_broadcast():
     
     # Skip list: test accounts and fake/disposable emails
     SKIP_EMAILS = {
+        # Unsubscribed
+        "danielenapoletano92@gmail.com",
+        
         # Obvious test accounts
         "qffgqg@ebhtbt.com",
         "test@gmail.com",
@@ -220,7 +237,12 @@ def send_broadcast():
         "yeaape6701@duoley.com",
         "yeaapesu6701@duoley.com",
         "yaape6701@duoley.com",
+        # Unsubscribed users
+        "malzev1@gmail.com",
+        "lucy.arellano97@gmail.com",
     }
+
+
     
     for user in users:
         # 1. Extract Data safely
@@ -240,7 +262,7 @@ def send_broadcast():
         referral_link = f"{base_url}/waitlist?ref={code}"
 
         # 2. Prepare the Email Content
-        subject = "Salsa Bodymovement (La Gripe) + why thinking about your body wrecks your dancing"
+        subject = "🏆 The Mambo Guild Open Challenge — Win Lifetime VIP Access"
         html_content = get_beautiful_html(username, referral_link)
 
         # 3. Send (or Print)
