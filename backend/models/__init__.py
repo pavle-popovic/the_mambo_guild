@@ -51,7 +51,7 @@ from models.community import (
     ClaveTransaction,
     Post, PostReply, PostReaction,
     BadgeDefinition, UserBadge,
-    CommunityTag, SavedPost
+    CommunityTag
 )
 from models.notification import Notification
 from models.premium import (
