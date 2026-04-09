@@ -16,10 +16,13 @@ class Settings:
     )
 
     # Redis
-    # In Docker, use service name 'redis', otherwise use 'localhost'
+    # Production (Railway/Upstash): set REDIS_URL to the full connection string
+    # including password, e.g. redis://default:pw@host.railway.internal:6379
+    # Local/Docker: set REDIS_HOST (service name 'redis' or 'localhost') and we
+    # build the URL from host+port.  REDIS_URL always wins when set.
     REDIS_HOST: str = os.getenv("REDIS_HOST", "localhost")
     REDIS_PORT: int = int(os.getenv("REDIS_PORT", "6379"))
-    REDIS_URL: str = f"redis://{REDIS_HOST}:{REDIS_PORT}"
+    REDIS_URL: str = os.getenv("REDIS_URL") or f"redis://{REDIS_HOST}:{REDIS_PORT}"
 
     # JWT - SECURITY: SECRET_KEY MUST be set via environment variable in all deployed environments
     # Only local development (ENVIRONMENT=development) allows auto-generated keys
@@ -109,19 +112,19 @@ class Settings:
     ADVANCED_PRICE_ID: str = "price_1SmeXA1a6FlufVwfOLg5SMcc"
     PERFORMER_PRICE_ID: str = "price_1SmeZa1a6FlufVwfrJCJrv94"
 
-    # AI/Gemini Configuration - SECURITY: API key must be set via environment variable
-    _gemini_api_key: Optional[str] = os.getenv("GEMINI_API_KEY")
+    # AI Configuration - SECURITY: API key must be set via environment variable
+    _anthropic_api_key: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
 
     @property
-    def GEMINI_API_KEY(self) -> Optional[str]:
-        """Get Gemini API key. Returns None if not configured (AI features disabled)."""
-        return self._gemini_api_key
+    def ANTHROPIC_API_KEY(self) -> Optional[str]:
+        """Get Anthropic API key. Returns None if not configured (AI features disabled)."""
+        return self._anthropic_api_key
 
-    def require_gemini_api_key(self) -> str:
-        """Get Gemini API key, raising error if not configured."""
-        if not self._gemini_api_key:
-            raise ValueError("GEMINI_API_KEY environment variable is required for AI features")
-        return self._gemini_api_key
+    def require_anthropic_api_key(self) -> str:
+        """Get Anthropic API key, raising error if not configured."""
+        if not self._anthropic_api_key:
+            raise ValueError("ANTHROPIC_API_KEY environment variable is required for AI features")
+        return self._anthropic_api_key
 
     # AI Rate Limiting Configuration
     AI_RATE_LIMIT_REQUESTS: int = int(os.getenv("AI_RATE_LIMIT_REQUESTS", "20"))  # requests per window
