@@ -889,16 +889,20 @@ async def mux_webhook_handler(
                         if not settings._is_development:
                             raise HTTPException(status_code=401, detail="Invalid webhook signature format")
                     else:
-                        # Verify signature
+                        # Verify signature.
+                        # Mux sends `v1=<hex>` — lowercase hex-encoded HMAC-SHA256 over
+                        # the literal string "<timestamp>.<raw_body>" using the webhook
+                        # signing secret.  Comparing against base64 (as this did
+                        # previously) would fail for every legitimate request.
+                        # Docs: https://docs.mux.com/core/listen-for-webhooks#securing-webhooks
                         payload_string = f"{timestamp}.{body_bytes.decode('utf-8')}"
-                        computed_signature = hmac.new(
+                        computed_signature_hex = hmac.new(
                             settings.MUX_WEBHOOK_SECRET.encode('utf-8'),
                             payload_string.encode('utf-8'),
                             hashlib.sha256
-                        ).digest()
-                        computed_signature_b64 = base64.b64encode(computed_signature).decode('utf-8')
-                        
-                        if not hmac.compare_digest(signature, computed_signature_b64):
+                        ).hexdigest()
+
+                        if not hmac.compare_digest(signature, computed_signature_hex):
                             logger.error("Invalid Mux webhook signature")
                             raise HTTPException(status_code=401, detail="Invalid webhook signature")
                         
