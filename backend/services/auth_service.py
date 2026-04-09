@@ -93,6 +93,46 @@ def decode_access_token(token: str) -> Optional[dict]:
         return None
 
 
+# ---------------------------------------------------------------------------
+# Mux upload tokens — narrow-scope, short-lived JWT for the MuxUploader
+# component (which cannot set request headers and must pass auth via query
+# string).  Separate type + audience prevent these tokens from being accepted
+# anywhere standard access tokens are honoured.
+# ---------------------------------------------------------------------------
+
+MUX_UPLOAD_TOKEN_AUDIENCE = "mux-upload"
+MUX_UPLOAD_TOKEN_TTL_MINUTES = 5
+
+
+def create_mux_upload_token(user_id: str) -> str:
+    """Mint a 5-minute, single-audience token for Mux direct uploads."""
+    now = datetime.now(timezone.utc)
+    payload = {
+        "sub": str(user_id),
+        "type": "mux_upload",
+        "aud": MUX_UPLOAD_TOKEN_AUDIENCE,
+        "iat": now,
+        "exp": now + timedelta(minutes=MUX_UPLOAD_TOKEN_TTL_MINUTES),
+    }
+    return jwt.encode(payload, settings.SECRET_KEY, algorithm=settings.ALGORITHM)
+
+
+def decode_mux_upload_token(token: str) -> Optional[dict]:
+    """Decode and validate a Mux upload token (type + audience checked)."""
+    try:
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=[settings.ALGORITHM],
+            audience=MUX_UPLOAD_TOKEN_AUDIENCE,
+        )
+        if payload.get("type") != "mux_upload":
+            return None
+        return payload
+    except JWTError:
+        return None
+
+
 def decode_refresh_token(token: str) -> Optional[dict]:
     """Decode and validate a refresh token."""
     try:

@@ -52,8 +52,8 @@ class UserProfile(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id"), unique=True, nullable=False, index=True)
-    first_name = Column(String, nullable=False)
-    last_name = Column(String, nullable=False)
+    first_name = Column(String(100), nullable=False)
+    last_name = Column(String(100), nullable=False)
     username = Column(String(30), unique=True, index=True, nullable=True)
     avatar_url = Column(String, nullable=True)
     current_level_tag = Column(SQLEnum(CurrentLevelTag), nullable=False)
@@ -81,6 +81,11 @@ class UserProfile(Base):
     weekly_free_freeze_used = Column(Boolean, default=False, nullable=False)
     inventory_freezes = Column(Integer, default=0, nullable=False)
     last_freeze_reset_date = Column(Date, nullable=True)  # Track weekly reset
+
+    # IANA timezone (e.g. "Europe/Paris"). Used to compute streak rollover in
+    # the user's local time instead of server UTC — fixes users in negative
+    # offsets losing streaks mid-afternoon. Default UTC for existing rows.
+    timezone = Column(String, nullable=False, default="UTC", server_default="UTC")
 
     # Relationships
     user = relationship("User", back_populates="profile")

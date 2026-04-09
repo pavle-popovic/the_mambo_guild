@@ -5,6 +5,7 @@ import stripe
 from datetime import datetime, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, status, Request
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 
@@ -12,6 +13,7 @@ logger = logging.getLogger(__name__)
 
 from dependencies import get_db, get_current_user
 from models.user import User, Subscription, SubscriptionStatus, SubscriptionTier
+from models.payment import StripeWebhookEvent
 from services import stripe_service
 from services.clave_service import award_subscription_bonus
 from services.badge_service import award_subscription_badge
@@ -32,7 +34,7 @@ PERFORMER_PRICE_ID = "price_1SmeZa1a6FlufVwfrJCJrv94"
 
 
 @router.post("/create-checkout-session", response_model=CheckoutSessionResponse)
-async def create_checkout_session(
+def create_checkout_session(
     request_data: CheckoutSessionRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -141,6 +143,18 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
         logger.warning(f"Invalid Stripe webhook signature: {e}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid signature")
 
+    # Idempotency guard — Stripe retries webhooks on any 5xx, and replays are
+    # legal. Without this, invoice.payment_succeeded would re-grant XP/bonuses
+    # on every retry. Insert the event id first; if it already exists, we've
+    # already processed this event and should no-op with 200.
+    try:
+        db.add(StripeWebhookEvent(event_id=event["id"], event_type=event["type"]))
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        logger.info(f"Stripe webhook {event['id']} ({event['type']}) already processed — skipping")
+        return {"status": "already_processed"}
+
     # Handle the event
     if event["type"] == "invoice.payment_succeeded":
         invoice = event["data"]["object"]
@@ -244,7 +258,7 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
 
 
 @router.post("/update-subscription", response_model=SubscriptionResponse)
-async def update_subscription(
+def update_subscription(
     request_data: UpdateSubscriptionRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -335,7 +349,7 @@ async def update_subscription(
 
 
 @router.post("/cancel-subscription", response_model=SubscriptionResponse)
-async def cancel_subscription(
+def cancel_subscription(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):

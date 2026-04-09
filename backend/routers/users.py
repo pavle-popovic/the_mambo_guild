@@ -14,17 +14,31 @@ from schemas.gamification import LeaderboardEntry
 
 router = APIRouter(prefix="/users", tags=["users"])
 
-# Allowed domains for avatar URLs
-ALLOWED_AVATAR_DOMAINS = [
-    "pub-",  # Cloudflare R2 public URLs (pub-xxxxx.r2.dev)
-    "r2.dev",
-    "cloudflare",
-    "googleusercontent.com",  # Google profile pictures
-    "lh3.googleusercontent.com",
+# Allowed hosts for avatar URLs.
+#
+# Each entry is a suffix match against the parsed hostname (after a
+# leading-dot comparison). This prevents substring-match bypasses — the
+# previous allowlist had `"cloudflare"` and `"pub-"` which an attacker could
+# satisfy with e.g. `cloudflare.evil.com` or `pub-evil.com`. Suffix matching
+# requires the hostname to literally *end with* `.r2.dev`, `.googleusercontent.com`,
+# etc., which cannot be forged.
+ALLOWED_AVATAR_HOST_SUFFIXES = (
+    ".r2.dev",                    # Cloudflare R2 public buckets (pub-xxx.r2.dev)
+    ".googleusercontent.com",     # Google / OAuth profile pictures
+    ".gravatar.com",
     "gravatar.com",
-    "localhost",  # Development
+)
+ALLOWED_AVATAR_HOST_EXACT = {
+    "localhost",
     "127.0.0.1",
-]
+}
+
+
+def _is_allowed_avatar_host(hostname: str) -> bool:
+    hostname = (hostname or "").lower()
+    if hostname in ALLOWED_AVATAR_HOST_EXACT:
+        return True
+    return any(hostname.endswith(suffix) for suffix in ALLOWED_AVATAR_HOST_SUFFIXES)
 
 
 class UserProfileUpdateRequest(BaseModel):
@@ -50,11 +64,8 @@ class UserProfileUpdateRequest(BaseModel):
         if parsed.scheme == "http" and parsed.hostname not in ("localhost", "127.0.0.1"):
             raise ValueError("Avatar URL must use HTTPS")
         
-        # Check against allowed domains
-        hostname = parsed.hostname or ""
-        is_allowed = any(domain in hostname for domain in ALLOWED_AVATAR_DOMAINS)
-        
-        if not is_allowed:
+        # Check against allowed hosts using suffix matching (not substring)
+        if not _is_allowed_avatar_host(parsed.hostname or ""):
             raise ValueError("Avatar URL domain not allowed")
         
         # Limit URL length

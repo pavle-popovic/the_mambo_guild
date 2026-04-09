@@ -14,14 +14,20 @@ def get_engine():
     """Get or create the database engine."""
     global _engine
     if _engine is None:
+        db_url = settings.DATABASE_URL
+        # Skip SSL for local Docker postgres (service name "postgres" or localhost)
+        is_local = "@postgres:" in db_url or "@localhost:" in db_url or "@127.0.0.1:" in db_url
+        connect_args = {"connect_timeout": 10}
+        if not is_local:
+            connect_args["sslmode"] = "require"
         _engine = create_engine(
-            settings.DATABASE_URL,
+            db_url,
             echo=False,
             pool_pre_ping=True,       # Test connection before use (fixes stale connections)
             pool_recycle=300,          # Recycle connections every 5 min (Supabase drops idle)
             pool_size=5,               # Small pool for NANO compute
             max_overflow=10,
-            connect_args={"connect_timeout": 10, "sslmode": "require"},
+            connect_args=connect_args,
         )
     return _engine
 
@@ -45,7 +51,7 @@ from models.community import (
     ClaveTransaction,
     Post, PostReply, PostReaction,
     BadgeDefinition, UserBadge,
-    CommunityTag
+    CommunityTag, SavedPost
 )
 from models.notification import Notification
 from models.premium import (
@@ -54,6 +60,7 @@ from models.premium import (
     CoachingSubmission, CoachingSubmissionStatus,
     DJBoothTrack
 )
+from models.payment import StripeWebhookEvent, XPAuditLog
 
 # Dependency to get database session
 def get_db():

@@ -1,8 +1,11 @@
 import math
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Dict, Optional
 from sqlalchemy.orm import Session
 from models.user import UserProfile
+from models.payment import XPAuditLog
+from utils.time import user_local_today, user_local_now
 
 
 def calculate_level(xp: int) -> int:
@@ -32,8 +35,17 @@ def update_streak(user_id: str, db: Session) -> Dict:
             "message": "Profile not found"
         }
 
-    today = datetime.now(timezone.utc).date()
-    last_login = profile.last_login_date.date() if profile.last_login_date else None
+    # Compute 'today' in the user's local timezone so a user in UTC-8 doesn't
+    # lose their streak at 4pm local time when the server rolls to UTC midnight.
+    today = user_local_today(profile)
+    # Convert stored UTC last_login to the user's local date for a like-for-like compare.
+    last_login = None
+    if profile.last_login_date:
+        last_login_utc = profile.last_login_date
+        if last_login_utc.tzinfo is None:
+            last_login_utc = last_login_utc.replace(tzinfo=timezone.utc)
+        local_now = user_local_now(profile)
+        last_login = last_login_utc.astimezone(local_now.tzinfo).date()
     yesterday = (today - timedelta(days=1))
 
     streak_saved = False
@@ -100,21 +112,58 @@ def update_streak_simple(user_id: str, db: Session) -> int:
 
 
 MAX_XP_PER_AWARD = 500  # Maximum XP that can be awarded in a single action
+ADMIN_MAX_XP_PER_AWARD = 100_000  # Admin manual grants have a higher ceiling
 
 
-def award_xp(user_id: str, xp_amount: int, db: Session) -> dict:
-    """Award XP to user and return level up status."""
-    if xp_amount <= 0 or xp_amount > MAX_XP_PER_AWARD:
-        return {"error": f"Invalid XP amount: must be between 1 and {MAX_XP_PER_AWARD}"}
+def award_xp(
+    user_id: str,
+    xp_amount: int,
+    db: Session,
+    *,
+    reason: str = "lesson_complete",
+    actor_user_id: Optional[str] = None,
+    allow_admin_ceiling: bool = False,
+) -> dict:
+    """Award XP atomically and return level up status.
 
-    profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
+    Race-safe: locks the user's profile row with SELECT ... FOR UPDATE so
+    concurrent XP grants (lesson complete + admin grant + subscription bonus
+    landing in the same tick) cannot lose writes via read-modify-write.
+
+    Also writes an XPAuditLog entry for every grant so disputes can be
+    traced. `reason` is free-form (`"lesson_complete"`, `"admin_grant"`,
+    `"subscription_bonus"`, etc.); `actor_user_id` is only set for manual
+    admin grants.
+    """
+    ceiling = ADMIN_MAX_XP_PER_AWARD if allow_admin_ceiling else MAX_XP_PER_AWARD
+    if xp_amount <= 0 or xp_amount > ceiling:
+        return {"error": f"Invalid XP amount: must be between 1 and {ceiling}"}
+
+    # Row-level lock — blocks concurrent award_xp for the same user until commit.
+    profile = (
+        db.query(UserProfile)
+        .filter(UserProfile.user_id == user_id)
+        .with_for_update()
+        .first()
+    )
     if not profile:
         return {"error": "Profile not found"}
 
     old_level = profile.level
-    profile.xp += xp_amount
+    profile.xp = (profile.xp or 0) + xp_amount
     new_level = calculate_level(profile.xp)
     profile.level = new_level
+
+    db.add(
+        XPAuditLog(
+            id=uuid.uuid4(),
+            user_id=profile.user_id,
+            delta=xp_amount,
+            reason=reason,
+            actor_user_id=actor_user_id,
+        )
+    )
+    db.flush()
 
     leveled_up = new_level > old_level
 
@@ -122,6 +171,6 @@ def award_xp(user_id: str, xp_amount: int, db: Session) -> dict:
         "xp_gained": xp_amount,
         "new_total_xp": profile.xp,
         "leveled_up": leveled_up,
-        "new_level": new_level
+        "new_level": new_level,
     }
 

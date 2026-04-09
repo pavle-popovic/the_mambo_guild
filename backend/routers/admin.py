@@ -9,6 +9,7 @@ from models.user import User, UserProfile, Subscription, SubscriptionStatus, Sub
 from models.progress import BossSubmission, SubmissionStatus, UserProgress
 from models.course import World, Level, Lesson
 from schemas.submissions import SubmissionResponse, GradeSubmissionRequest
+from services.gamification_service import award_xp
 from dependencies import get_admin_user
 import uuid
 
@@ -18,14 +19,14 @@ router = APIRouter()
 # Tier prices used for estimated MRR (update if pricing changes)
 # ---------------------------------------------------------------------------
 TIER_PRICES: Dict[str, float] = {
-    "rookie": 19.0,
+    "rookie": 0.0,
     "advanced": 39.0,
-    "performer": 79.0,
+    "performer": 59.0,
 }
 
 
 @router.get("/submissions", response_model=List[SubmissionResponse])
-async def get_pending_submissions(
+def get_pending_submissions(
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -46,7 +47,7 @@ async def get_pending_submissions(
 
 
 @router.post("/submissions/{submission_id}/grade")
-async def grade_submission(
+def grade_submission(
     submission_id: str,
     grade_data: GradeSubmissionRequest,
     admin_user: User = Depends(get_admin_user),
@@ -81,7 +82,7 @@ async def grade_submission(
 
 
 @router.get("/stats")
-async def get_admin_stats(
+def get_admin_stats(
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -126,7 +127,7 @@ def escape_like_pattern(pattern: str) -> str:
 
 
 @router.get("/students", response_model=List[StudentResponse])
-async def get_all_students(
+def get_all_students(
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db),
     skip: int = 0,
@@ -173,7 +174,7 @@ async def get_all_students(
 # ===========================================================================
 
 @router.get("/dashboard-stats")
-async def get_dashboard_stats(
+def get_dashboard_stats(
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db),
 ):
@@ -419,7 +420,7 @@ class StudentDetailResponse(BaseModel):
 
 
 @router.get("/students/{user_id}", response_model=StudentDetailResponse)
-async def get_student_detail(
+def get_student_detail(
     user_id: str,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db),
@@ -505,13 +506,21 @@ class GrantXPRequest(BaseModel):
 
 
 @router.post("/students/{user_id}/grant-xp")
-async def grant_xp_to_student(
+def grant_xp_to_student(
     user_id: str,
     data: GrantXPRequest,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db),
 ):
-    """Manually grant XP to a student. Admin only."""
+    """Manually grant XP to a student. Admin only.
+
+    Delegates to `gamification_service.award_xp` so:
+      - level is computed via the canonical `sqrt(xp/100)` formula (the
+        previous inline `xp // 1000` desynced manual grants from every
+        other XP source),
+      - the grant is atomic under `SELECT ... FOR UPDATE`,
+      - an `XPAuditLog` row is written with actor_user_id = this admin.
+    """
     if data.amount <= 0 or data.amount > 10000:
         raise HTTPException(status_code=400, detail="Amount must be between 1 and 10000")
 
@@ -519,14 +528,24 @@ async def grant_xp_to_student(
     if not profile:
         raise HTTPException(status_code=404, detail="Student not found")
 
-    profile.xp += data.amount
-    profile.level = max(1, profile.xp // 1000)
+    result = award_xp(
+        user_id=str(user_id),
+        xp_amount=data.amount,
+        db=db,
+        reason=f"admin_grant:{data.reason or 'unspecified'}",
+        actor_user_id=str(admin_user.id),
+        allow_admin_ceiling=True,
+    )
+    if "error" in result:
+        raise HTTPException(status_code=400, detail=result["error"])
+
     db.commit()
+    db.refresh(profile)
 
     return {
         "success": True,
-        "new_xp": profile.xp,
-        "new_level": profile.level,
+        "new_xp": result["new_total_xp"],
+        "new_level": result["new_level"],
         "message": f"Granted {data.amount} XP to {profile.first_name} {profile.last_name}",
     }
 
@@ -542,7 +561,7 @@ class AnnouncementRequest(BaseModel):
 
 
 @router.post("/send-announcement")
-async def send_announcement(
+def send_announcement(
     data: AnnouncementRequest,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db),
@@ -589,3 +608,119 @@ async def send_announcement(
         "failed_count": failed_count,
         "message": f"Announcement sent to {sent_count} students",
     }
+
+
+# ---------------------------------------------------------------------------
+# Community Moderation (AI Gatekeeper)
+# ---------------------------------------------------------------------------
+
+@router.get("/moderation/flagged")
+def get_flagged_replies(
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Get all replies currently flagged by the AI gatekeeper, pending admin review."""
+    from models.community import PostReply, Post, ModerationStatus
+    from sqlalchemy.orm import joinedload as jl
+
+    flagged = (
+        db.query(PostReply)
+        .filter(
+            PostReply.moderation_status == ModerationStatus.FLAGGED_BY_AI.value,
+            PostReply.is_deleted == False,
+        )
+        .order_by(PostReply.created_at.desc())
+        .all()
+    )
+
+    # Batch-load authors and parent posts
+    user_ids = list({r.user_id for r in flagged})
+    post_ids = list({r.post_id for r in flagged})
+
+    users = (
+        db.query(User).filter(User.id.in_(user_ids))
+        .options(jl(User.profile))
+        .all()
+    ) if user_ids else []
+    user_map = {str(u.id): u for u in users}
+
+    posts = (
+        db.query(Post).filter(Post.id.in_(post_ids)).all()
+    ) if post_ids else []
+    post_map = {str(p.id): p for p in posts}
+
+    results = []
+    for r in flagged:
+        author = user_map.get(str(r.user_id))
+        parent_post = post_map.get(str(r.post_id))
+        profile = author.profile if author else None
+        results.append({
+            "id": str(r.id),
+            "content": r.content,
+            "created_at": r.created_at,
+            "moderation_status": r.moderation_status,
+            "author": {
+                "id": str(r.user_id),
+                "first_name": profile.first_name if profile else "Unknown",
+                "last_name": profile.last_name if profile else "",
+                "avatar_url": profile.avatar_url if profile else None,
+            },
+            "post": {
+                "id": str(r.post_id),
+                "title": parent_post.title if parent_post else "Deleted post",
+                "post_type": parent_post.post_type if parent_post else None,
+            },
+        })
+
+    return {"flagged_replies": results, "count": len(results)}
+
+
+@router.post("/moderation/{reply_id}/approve")
+def approve_reply(
+    reply_id: str,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Approve a flagged reply — sets status to 'active' (publicly visible)."""
+    from models.community import PostReply, Post, ModerationStatus
+
+    reply = db.query(PostReply).filter(
+        PostReply.id == reply_id,
+        PostReply.is_deleted == False,
+    ).first()
+    if not reply:
+        raise HTTPException(status_code=404, detail="Reply not found")
+
+    if reply.moderation_status == ModerationStatus.ACTIVE.value:
+        return {"success": True, "message": "Reply is already active"}
+
+    reply.moderation_status = ModerationStatus.ACTIVE.value
+
+    # Now that the reply is public, increment the parent post's reply_count
+    post = db.query(Post).filter(Post.id == reply.post_id).first()
+    if post:
+        post.reply_count += 1
+
+    db.commit()
+    return {"success": True, "message": "Reply approved and now publicly visible"}
+
+
+@router.post("/moderation/{reply_id}/ghost")
+def ghost_reply(
+    reply_id: str,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Permanently ghost a flagged reply — only the author will ever see it."""
+    from models.community import PostReply, ModerationStatus
+
+    reply = db.query(PostReply).filter(
+        PostReply.id == reply_id,
+        PostReply.is_deleted == False,
+    ).first()
+    if not reply:
+        raise HTTPException(status_code=404, detail="Reply not found")
+
+    reply.moderation_status = ModerationStatus.GHOSTED.value
+    db.commit()
+    return {"success": True, "message": "Reply permanently ghosted"}

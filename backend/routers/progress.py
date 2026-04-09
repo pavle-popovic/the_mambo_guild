@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException, status
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from models import get_db
-from models.user import User
+from models.user import User, UserRole, Subscription, SubscriptionStatus
 from models.progress import UserProgress
-from models.course import Lesson
+from models.course import Lesson, Level, World
 from schemas.gamification import XPGainResponse
 from services.gamification_service import award_xp, update_streak
 from dependencies import get_current_user
@@ -14,16 +14,45 @@ router = APIRouter()
 
 
 @router.post("/lessons/{lesson_id}/complete", response_model=XPGainResponse)
-async def complete_lesson(
+def complete_lesson(
     lesson_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Mark lesson as complete and award XP. No prerequisites - users can complete any lesson."""
-    lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
+    """Mark lesson as complete and award XP.
+
+    Access control mirrors `GET /courses/lessons/{lesson_id}`:
+    - Admins: unrestricted
+    - Lessons in a free world: any authenticated user
+    - Lessons in a paid world: active subscription required
+    Without this check a free user could POST any lesson_id and harvest
+    premium XP even though they can't view the lesson.
+    """
+    lesson = (
+        db.query(Lesson)
+        .options(joinedload(Lesson.level).joinedload(Level.world))
+        .filter(Lesson.id == lesson_id)
+        .first()
+    )
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
-    
+
+    world = lesson.level.world if lesson.level else None
+    if not world:
+        raise HTTPException(status_code=404, detail="Course not found for lesson")
+
+    if current_user.role != UserRole.ADMIN and not world.is_free:
+        subscription = (
+            db.query(Subscription)
+            .filter(Subscription.user_id == current_user.id)
+            .first()
+        )
+        if not subscription or subscription.status != SubscriptionStatus.ACTIVE:
+            raise HTTPException(
+                status_code=403,
+                detail="Subscription required to complete this lesson.",
+            )
+
     # Check if already completed
     existing_progress = db.query(UserProgress).filter(
         UserProgress.user_id == current_user.id,

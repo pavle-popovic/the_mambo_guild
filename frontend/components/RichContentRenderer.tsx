@@ -4,6 +4,61 @@ import { useState } from "react";
 import { FaCheck, FaTimes } from "react-icons/fa";
 import DOMPurify from "dompurify";
 
+// Allowlist of hostnames we accept inside embedded <iframe src=...>.
+// Anything else — including javascript: URIs, data: URIs, and arbitrary
+// third-party sites — gets stripped by sanitizeEmbedHtml().
+const ALLOWED_IFRAME_HOSTS = new Set<string>([
+  "www.youtube.com",
+  "youtube.com",
+  "www.youtube-nocookie.com",
+  "youtube-nocookie.com",
+  "player.vimeo.com",
+  "vimeo.com",
+  "stream.mux.com",
+  "player.mux.com",
+  "iframe.mediadelivery.net",
+]);
+
+function isAllowedIframeSrc(src: string | null): boolean {
+  if (!src) return false;
+  try {
+    const u = new URL(src, window.location.origin);
+    if (u.protocol !== "https:") return false;
+    return ALLOWED_IFRAME_HOSTS.has(u.hostname.toLowerCase());
+  } catch {
+    return false;
+  }
+}
+
+function sanitizeEmbedHtml(rawHtml: string): string {
+  // First pass: DOMPurify restricted to https:// URIs and with iframes allowed.
+  const firstPass = DOMPurify.sanitize(rawHtml, {
+    ADD_TAGS: ["iframe"],
+    ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling", "sandbox", "referrerpolicy"],
+    ALLOWED_URI_REGEXP: /^https:\/\//i,
+  });
+
+  // Second pass: parse and reject any iframe whose src host isn't on our allowlist,
+  // and force sandbox + referrerpolicy on every surviving iframe.
+  if (typeof window === "undefined") return firstPass;
+  const tpl = document.createElement("template");
+  tpl.innerHTML = firstPass;
+  tpl.content.querySelectorAll("iframe").forEach((iframe) => {
+    const src = iframe.getAttribute("src");
+    if (!isAllowedIframeSrc(src)) {
+      iframe.remove();
+      return;
+    }
+    iframe.setAttribute(
+      "sandbox",
+      "allow-scripts allow-same-origin allow-presentation allow-popups",
+    );
+    iframe.setAttribute("referrerpolicy", "no-referrer");
+    iframe.setAttribute("loading", "lazy");
+  });
+  return tpl.innerHTML;
+}
+
 interface ContentBlock {
   type: "video" | "text" | "image" | "quiz";
   id?: string;
@@ -41,7 +96,7 @@ function VideoBlock({ block }: { block: ContentBlock }) {
     return (
       <div
         className="video-container"
-        dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(block.embed_code, { ADD_TAGS: ["iframe"], ADD_ATTR: ["allow", "allowfullscreen", "frameborder", "scrolling"] }) }}
+        dangerouslySetInnerHTML={{ __html: sanitizeEmbedHtml(block.embed_code) }}
       />
     );
   }

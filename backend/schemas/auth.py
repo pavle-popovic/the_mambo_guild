@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, field_validator, model_validator
+from pydantic import BaseModel, EmailStr, Field, field_validator, model_validator
 from typing import Optional, List
 from datetime import datetime
 import re
@@ -9,8 +9,10 @@ class UserRegisterRequest(BaseModel):
     username: str
     password: str
     confirm_password: str
-    first_name: str
-    last_name: str
+    # Cap name fields — prevents 10MB name DoS / DB bloat. Matches the
+    # VARCHAR(100) column constraint applied in the accompanying Supabase migration.
+    first_name: str = Field(..., min_length=1, max_length=100)
+    last_name: str = Field(..., min_length=1, max_length=100)
     current_level_tag: str  # "Beginner", "Novice", "Intermediate", "Advanced"
     
     @field_validator('username')

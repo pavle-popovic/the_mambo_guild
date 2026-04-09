@@ -13,7 +13,7 @@ from services.auth_service import verify_password, get_password_hash, create_acc
 from services.gamification_service import update_streak
 from services.email_service import send_password_reset_email, send_waitlist_welcome_email
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
-from services.clave_service import process_daily_login, award_new_user_bonus
+from services.clave_service import process_daily_login, award_new_user_bonus, award_referral_bonus
 from dependencies import get_current_user
 from config import settings
 import uuid
@@ -77,15 +77,32 @@ def get_google_oauth():
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
-async def register(
+def register(
     response: Response,
+    request: Request,
     user_data: UserRegisterRequest,
     db: Session = Depends(get_db)
 ):
     """
     Register a new user account.
     Industry standard: Email validation, password strength, proper error handling.
+
+    Rate-limited to 5 registrations per IP per hour and 20 per IP per day to
+    block mass account creation / enumeration. Fails open if Redis is down
+    (see services/redis_service.check_rate_limit).
     """
+    client_ip = request.client.host if request.client else "unknown"
+    if not check_rate_limit(client_ip, "register_ip", max_requests=5, window_seconds=3600):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many registration attempts. Please try again later.",
+        )
+    if not check_rate_limit(client_ip, "register_ip_daily", max_requests=20, window_seconds=86400):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Daily registration limit reached. Please try again tomorrow.",
+        )
+
     try:
         # Validate email format (basic check - Pydantic EmailStr handles most validation)
         if "@" not in user_data.email or "." not in user_data.email.split("@")[1]:
@@ -224,7 +241,7 @@ def _clear_auth_cookies(response: Response):
 
 
 @router.post("/token", response_model=TokenResponse)
-async def login(
+def login(
     request: Request,
     response: Response,
     credentials: UserLoginRequest,
@@ -314,7 +331,7 @@ async def login(
 
 
 @router.post("/refresh", response_model=TokenResponse)
-async def refresh_access_token(
+def refresh_access_token(
     request: Request,
     response: Response,
     db: Session = Depends(get_db)
@@ -381,7 +398,7 @@ async def refresh_access_token(
 
 
 @router.post("/logout")
-async def logout(request: Request, response: Response):
+def logout(request: Request, response: Response):
     """
     Logout user by clearing authentication cookies and blacklisting the access token.
     The blacklisted token cannot be reused even if a client cached the value.
@@ -403,7 +420,7 @@ async def logout(request: Request, response: Response):
 
 
 @router.get("/me", response_model=UserProfileResponse)
-async def get_current_user_profile(
+def get_current_user_profile(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -453,7 +470,7 @@ async def get_current_user_profile(
 
 
 # Helper function to create user with profile and subscription (reused for OAuth)
-async def create_user_from_oauth(
+def create_user_from_oauth(
     email: str,
     first_name: str,
     last_name: str,
@@ -683,7 +700,7 @@ async def google_callback(
         else:
             # Create new user
             try:
-                user = await create_user_from_oauth(
+                user = create_user_from_oauth(
                     email=email,
                     first_name=first_name,
                     last_name=last_name,
@@ -730,7 +747,7 @@ async def google_callback(
 
 
 @router.post("/forgot-password", status_code=status.HTTP_200_OK)
-async def forgot_password(
+def forgot_password(
     request_data: ForgotPasswordRequest,
     request: Request,
     db: Session = Depends(get_db)
@@ -788,7 +805,7 @@ async def forgot_password(
 
 
 @router.post("/reset-password", status_code=status.HTTP_200_OK)
-async def reset_password(
+def reset_password(
     request_data: ResetPasswordRequest,
     db: Session = Depends(get_db)
 ):
@@ -862,7 +879,7 @@ class WaitlistRegisterRequest(BaseModel):
     hp: Optional[str] = None  # Honeypot — must be empty for real humans
 
 @router.post("/waitlist", status_code=status.HTTP_201_CREATED)
-async def join_waitlist(
+def join_waitlist(
     request: WaitlistRegisterRequest,
     http_request: Request,
     db: Session = Depends(get_db)
@@ -923,9 +940,8 @@ async def join_waitlist(
             if referrer_profile:
                 # Increment referrer count
                 referrer_profile.referral_count += 1
-                # Track who referred (store code for simple tracking)
-                # Ideally we'd store user_id but for v1 waitlist using code is fine
-                pass
+                # Award referral claves to the referrer (50 claves)
+                award_referral_bonus(str(referrer_profile.user_id), db)
 
         # Generate Referral Code for new user
         # Simple 8 char uppercase alphanumeric

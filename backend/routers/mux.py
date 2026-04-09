@@ -10,7 +10,12 @@ from models.course import Lesson, World, Level
 from models import get_db
 from sqlalchemy.orm import Session
 from services.mux_service import create_direct_upload
-from services.auth_service import decode_access_token
+from services.auth_service import (
+    decode_access_token,
+    decode_mux_upload_token,
+    create_mux_upload_token,
+    MUX_UPLOAD_TOKEN_TTL_MINUTES,
+)
 from config import settings
 import hmac
 import hashlib
@@ -23,56 +28,93 @@ logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
+def _admin_from_mux_upload_token(token_query: str, db: Session) -> Optional[User]:
+    """Validate a narrow-scope Mux upload token and resolve the admin user.
+
+    The token MUST be of type ``mux_upload`` with audience ``mux-upload`` —
+    a general-purpose access token is intentionally *not* accepted here.
+    """
+    payload = decode_mux_upload_token(token_query)
+    if not payload:
+        return None
+    user_id_str = payload.get("sub")
+    if not user_id_str:
+        return None
+    import uuid
+    try:
+        user_id = uuid.UUID(user_id_str)
+    except ValueError:
+        return None
+    user = db.query(User).filter(User.id == user_id).first()
+    if user and user.role == UserRole.ADMIN:
+        return user
+    return None
+
+
 def get_admin_user_from_token_or_query(
     token_query: Optional[str] = Query(None, alias="token"),
     current_user_opt: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ) -> User:
     """
-    Get admin user from Bearer token (preferred) or query param token (fallback for MuxUploader).
+    Get admin user from Bearer cookie (preferred) or query-param token (fallback for MuxUploader).
 
     **Security trade-off — JWT in query param:**
     MuxUploader (the third-party component) cannot set custom request headers; it can only
-    append query parameters to the upload-URL endpoint.  Sending a short-lived access token
-    via `?token=` is therefore unavoidable for that integration path.
+    append query parameters to the upload-URL endpoint.  Passing auth via ``?token=`` is
+    therefore unavoidable on that path.
 
     Mitigations in place:
-      - Only admin-role tokens are accepted (non-admin tokens are rejected).
-      - The JWT has a short expiry (ACCESS_TOKEN_EXPIRE_MINUTES from settings).
-      - HTTPS is enforced in production (SECURE_COOKIES / HSTS headers), so the token
-        is not transmitted in plaintext and does not appear in server-side access logs
-        for the sensitive resource itself.
-      - The token is validated with full signature + expiry checks before any DB query.
+      - The query-param token is a *separate*, narrow-scope JWT minted by
+        ``POST /mux/upload-token``: type="mux_upload", audience="mux-upload",
+        TTL 5 minutes.  A leaked token cannot be used against any other endpoint,
+        and regular access tokens are **not** accepted via ``?token=``.
+      - Only admin users can mint one; only admins are accepted on decode.
+      - HTTPS is enforced in production (SECURE_COOKIES / HSTS), so the token
+        is not transmitted in plaintext.
+      - A logging middleware scrubs ``?token=<…>`` from access logs so tokens
+        cannot leak via Railway log retention.
+      - Full signature + audience + expiry validation before any DB query.
 
-    If MuxUploader ever gains header-injection support, migrate to Bearer-only auth
-    and remove the `token_query` parameter.
+    If MuxUploader ever gains header-injection support, drop the query-param path
+    entirely and use Bearer-only auth.
     """
-    # Try Bearer token first (standard auth)
+    # Try cookie/Bearer token first (standard auth)
     if current_user_opt and current_user_opt.role == UserRole.ADMIN:
         return current_user_opt
-    
-    # Fallback: try token from query params (for MuxUploader compatibility)
+
+    # Fallback: narrow-scope Mux upload token via ?token=
     if token_query:
-        try:
-            payload = decode_access_token(token_query)
-            if payload:
-                user_id_str = payload.get("sub")
-                if user_id_str:
-                    import uuid
-                    try:
-                        user_id = uuid.UUID(user_id_str)
-                        user = db.query(User).filter(User.id == user_id).first()
-                        if user and user.role == UserRole.ADMIN:
-                            return user
-                    except ValueError:
-                        pass
-        except Exception:
-            pass
-    
-    # No valid admin token found
+        user = _admin_from_mux_upload_token(token_query, db)
+        if user:
+            return user
+
     raise HTTPException(
         status_code=401,
         detail="Could not validate admin credentials"
+    )
+
+
+class MuxUploadTokenResponse(BaseModel):
+    token: str
+    expires_in: int
+
+
+@router.post("/upload-token", response_model=MuxUploadTokenResponse)
+def mint_mux_upload_token(
+    current_user: User = Depends(get_admin_user),
+):
+    """Mint a short-lived (5 min), single-audience token for MuxUploader.
+
+    The frontend should call this immediately before opening ``<MuxUploader>``
+    and pass the returned token as ``?token=…`` on the upload-URL endpoint.
+    Do NOT reuse the general-purpose access token — it has broader scope
+    and a longer TTL.
+    """
+    token = create_mux_upload_token(str(current_user.id))
+    return MuxUploadTokenResponse(
+        token=token,
+        expires_in=MUX_UPLOAD_TOKEN_TTL_MINUTES * 60,
     )
 
 
@@ -91,7 +133,7 @@ class CreateUploadResponse(BaseModel):
 
 
 @router.post("/upload-url")
-async def create_mux_upload_url(
+def create_mux_upload_url(
     request: Request,
     request_data: Optional[CreateUploadRequest] = None,  # Accept JSON body (Pydantic model)
     lesson_id: Optional[str] = Query(None),  # Accept from query params for MuxUploader compatibility
@@ -123,24 +165,12 @@ async def create_mux_upload_url(
     if lesson_id_val or course_id_val or level_id_val:
         # Lesson/course uploads require admin
         if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
-            # Try query param token as fallback
+            # Fallback: narrow-scope Mux upload token via ?token= (MuxUploader path)
             token_query = request.query_params.get("token")
             if token_query:
-                try:
-                    payload = decode_access_token(token_query)
-                    if payload:
-                        user_id_str = payload.get("sub")
-                        if user_id_str:
-                            import uuid
-                            try:
-                                user_id = uuid.UUID(user_id_str)
-                                user = db.query(User).filter(User.id == user_id).first()
-                                if user and user.role == UserRole.ADMIN:
-                                    current_user_opt = user
-                            except ValueError:
-                                pass
-                except Exception:
-                    pass
+                scoped_user = _admin_from_mux_upload_token(token_query, db)
+                if scoped_user:
+                    current_user_opt = scoped_user
             if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
                 raise HTTPException(status_code=403, detail="Admin access required for lesson/course video uploads")
     elif post_id_val:
@@ -342,7 +372,7 @@ class UploadStatusResponse(BaseModel):
 
 
 @router.get("/upload-status/{upload_id}")
-async def get_upload_status(
+def get_upload_status(
     upload_id: str,
     current_user: User = Depends(get_current_user)
 ):
@@ -390,7 +420,7 @@ class WebhookEvent(BaseModel):
 
 
 @router.get("/asset/{asset_id}/exists")
-async def check_asset_exists(
+def check_asset_exists(
     asset_id: str,
     admin_user: User = Depends(get_admin_user),
 ):
@@ -430,7 +460,7 @@ async def check_asset_exists(
 
 
 @router.delete("/asset/{asset_id}")
-async def delete_mux_asset(
+def delete_mux_asset(
     asset_id: str,
     current_user_opt: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
@@ -543,7 +573,7 @@ async def delete_mux_asset(
 
 
 @router.post("/check-upload-status")
-async def check_upload_status(
+def check_upload_status(
     lesson_id: Optional[str] = Query(None),
     course_id: Optional[str] = Query(None),
     level_id: Optional[str] = Query(None),

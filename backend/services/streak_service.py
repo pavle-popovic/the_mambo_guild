@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 
 from models.user import UserProfile
 from services.clave_service import spend_claves, earn_claves, get_balance
+from utils.time import user_local_today
 
 logger = logging.getLogger(__name__)
 
@@ -44,8 +45,8 @@ def check_and_reset_weekly_freeze(user_id: str, db: Session) -> bool:
     profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
     if not profile:
         return False
-    
-    today = date.today()
+
+    today = user_local_today(profile)
     this_monday = _get_monday_of_week(today)
     
     # If we haven't reset this week yet (or never reset before)
@@ -79,8 +80,8 @@ def get_freeze_status(user_id: str, db: Session) -> Dict:
     
     # Check and reset weekly freeze if needed
     check_and_reset_weekly_freeze(user_id, db)
-    
-    today = date.today()
+
+    today = user_local_today(profile)
     next_monday = _get_monday_of_week(today) + timedelta(days=7)
     
     claves_balance = profile.current_claves
