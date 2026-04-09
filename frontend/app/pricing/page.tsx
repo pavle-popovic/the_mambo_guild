@@ -12,8 +12,8 @@ import { FadeIn, StaggerContainer, StaggerItem, HoverCard, Clickable } from "@/c
 import AuthPromptModal from "@/components/AuthPromptModal";
 
 // Stripe Price IDs
-const ADVANCED_PRICE_ID = "price_1SmeXA1a6FlufVwfOLg5SMcc";
-const PERFORMER_PRICE_ID = "price_1SmeZa1a6FlufVwfrJCJrv94";
+const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
+const PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml";
 
 function PricingPageContent() {
   const { user, refreshUser } = useAuth();
@@ -160,12 +160,12 @@ function PricingPageContent() {
       <NavBar user={user || undefined} />
 
       <FadeIn>
-        <div className="max-w-7xl mx-auto px-8 py-20 pt-28 text-center">
-          <h1 className="text-5xl md:text-6xl font-extrabold mb-16 text-mambo-text tracking-tight font-serif italic" style={{ fontFamily: '"Playfair Display", serif' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-20 pt-28 text-center">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-10 sm:mb-16 text-mambo-text tracking-tight font-serif italic" style={{ fontFamily: '"Playfair Display", serif' }}>
             We Adapt to <span className="text-mambo-gold">Your Level</span>
           </h1>
 
-          <StaggerContainer className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <StaggerContainer className="grid md:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
             {/* Rookie Tier */}
             <StaggerItem>
               <HoverCard>
@@ -186,19 +186,7 @@ function PricingPageContent() {
                     <ul className="text-left space-y-4 mb-8 flex-1">
                       <li className={`flex gap-3 text-sm leading-relaxed text-gray-300`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${(isRookie && user) ? "text-mambo-gold" : "text-gray-500"}`} />
-                        1 Free Course Access
-                      </li>
-                      <li className={`flex gap-3 text-sm leading-relaxed text-gray-300`}>
-                        <FaCheck className={`shrink-0 mt-0.5 ${(isRookie && user) ? "text-mambo-gold" : "text-gray-500"}`} />
-                        1 Free Workshop / Month
-                      </li>
-                      <li className="flex gap-3 text-sm text-gray-500 line-through leading-relaxed">
-                        <FaTimes className="shrink-0 mt-0.5" />
-                        Advanced Styling
-                      </li>
-                      <li className="flex gap-3 text-sm text-gray-500 line-through leading-relaxed">
-                        <FaTimes className="shrink-0 mt-0.5" />
-                        Instructor Feedback
+                        ChaChaCha Bruno Mars Choreography
                       </li>
                     </ul>
                     <Clickable>
@@ -251,26 +239,22 @@ function PricingPageContent() {
                       </span>
                     </div>
                     <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
-                      €29<span className="text-lg text-gray-400 font-normal">/mo</span>
+                      $39<span className="text-lg text-gray-400 font-normal">/mo</span>
                     </div>
                     <div className="text-sm text-gray-400 mb-8">Billed monthly.</div>
 
                     <ul className="text-left space-y-4 mb-8 flex-1">
                       <li className={`flex gap-3 text-sm leading-relaxed ${isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isAdvanced ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Unlimited Course Access
+                        Full access to Guild courses, choreos & topics
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isAdvanced ? "text-mambo-gold" : "text-gray-500"}`} />
-                        New Workshops Weekly
+                        New choreos bi-weekly
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isAdvanced ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Advanced Partnerwork
-                      </li>
-                      <li className={`flex gap-3 text-sm leading-relaxed ${isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"}`}>
-                        <FaCheck className={`shrink-0 mt-0.5 ${isAdvanced ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Community Challenges
+                        Access to the Guild community
                       </li>
                     </ul>
                     <Clickable>
@@ -327,9 +311,9 @@ function PricingPageContent() {
                       </span>
                     </div>
                     <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
-                      €49<span className="text-lg text-gray-400 font-normal">/mo</span>
+                      $59<span className="text-lg text-gray-400 font-normal">/mo</span>
                     </div>
-                    <div className="text-sm text-gray-400 mb-8">For serious students.</div>
+                    <div className="text-sm text-gray-400 mb-8">Capped at 30 members.</div>
 
                     <ul className="text-left space-y-4 mb-8 flex-1">
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
@@ -338,19 +322,19 @@ function PricingPageContent() {
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
-                        1 Video Review / Month
+                        Monthly 1-on-1 video feedback from Instructors
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Direct Chat with Instructors
+                        Roundtable exclusive Zoom calls
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
-                        "Certified" Badge on Profile
+                        Exclusive Badge
                       </li>
-                      <li className="flex gap-3 text-sm leading-relaxed text-gray-500 italic">
-                        <span className="shrink-0 mt-0.5">🚧</span>
-                        <span>Pro Mastery Features Coming Soon: Practice Playlist Builder, DJ Booth, Smart Looper, Legends Vault, Precision Player</span>
+                      <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
+                        <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
+                        Additional claves for the community
                       </li>
                     </ul>
                     <Clickable>

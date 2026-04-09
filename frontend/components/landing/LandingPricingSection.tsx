@@ -10,8 +10,8 @@ import { apiClient } from "@/lib/api";
 import { HoverCard, Clickable, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
 
-const ADVANCED_PRICE_ID = "price_1SmeXA1a6FlufVwfOLg5SMcc";
-const PERFORMER_PRICE_ID = "price_1SmeZa1a6FlufVwfrJCJrv94";
+const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
+const PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml";
 
 const plans = [
   {
@@ -21,10 +21,7 @@ const plans = [
     period: "Forever",
     description: "Get started with the basics",
     features: [
-      { text: "1 Free Course Access", included: true },
-      { text: "1 Free Workshop / Month", included: true },
-      { text: "Advanced Styling", included: false },
-      { text: "Instructor Feedback", included: false },
+      { text: "ChaChaCha Bruno Mars Choreography", included: true },
     ],
     cta: "Create Free Account",
     highlighted: false,
@@ -33,38 +30,32 @@ const plans = [
   {
     id: "full-access",
     name: "Pro",
-    price: "€29",
+    price: "$39",
     period: "/mo",
-    description: "Unlock all courses",
+    description: "Full access to the Guild",
     features: [
-      { text: "Unlimited Course Access", included: true },
-      { text: "New Workshops Weekly", included: true },
-      { text: "Advanced Partnerwork", included: true },
-      { text: "Community Challenges", included: true },
+      { text: "Full access to Guild courses, choreos & topics", included: true },
+      { text: "New choreos bi-weekly", included: true },
+      { text: "Access to the Guild community", included: true },
     ],
     cta: "Start Pro Access",
     highlighted: true,
     priceId: ADVANCED_PRICE_ID,
-    // Add custom styling for visual emphasis
     customStyle: "border border-mambo-gold/50 shadow-[0_0_30px_rgba(251,191,36,0.15)]",
     cardBg: "bg-gradient-to-b from-[#1a1a1a] to-black"
   },
   {
     id: "performer",
     name: "Guild Master",
-    price: "€49",
+    price: "$59",
     period: "/mo",
-    description: "For serious students",
+    description: "Capped at 30 members",
     features: [
       { text: "Everything in Pro", included: true },
-      { text: "1 Video Review / Month", included: true },
-      { text: "Direct Chat with Instructors", included: true },
-      { text: "Guild Master Badge on Profile", included: true },
-      {
-        text: "Pro Mastery Features Coming Soon: Practice Playlist Builder, DJ Booth, Smart Looper, Legends Vault, Precision Player",
-        included: true,
-        isComingSoon: true
-      },
+      { text: "Monthly 1-on-1 video feedback from Instructors", included: true },
+      { text: "Roundtable exclusive Zoom calls", included: true },
+      { text: "Exclusive Badge", included: true },
+      { text: "Additional claves for the community", included: true },
     ],
     cta: "Get Guild Master Access",
     highlighted: false,

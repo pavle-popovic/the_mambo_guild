@@ -108,9 +108,9 @@ class Settings:
     STRIPE_SECRET_KEY: Optional[str] = os.getenv("STRIPE_SECRET_KEY")
     STRIPE_WEBHOOK_SECRET: Optional[str] = os.getenv("STRIPE_WEBHOOK_SECRET")
 
-    # Stripe Price IDs
-    ADVANCED_PRICE_ID: str = "price_1SmeXA1a6FlufVwfOLg5SMcc"
-    PERFORMER_PRICE_ID: str = "price_1SmeZa1a6FlufVwfrJCJrv94"
+    # Stripe Price IDs (TEST-mode; swap to live IDs at activation)
+    ADVANCED_PRICE_ID: str = "price_1TKKp51a6FlufVwfYgvr192X"
+    PERFORMER_PRICE_ID: str = "price_1TKKwC1a6FlufVwfVmE6uHml"
 
     # AI/Gemini Configuration - SECURITY: API key must be set via environment variable
     _gemini_api_key: Optional[str] = os.getenv("GEMINI_API_KEY")

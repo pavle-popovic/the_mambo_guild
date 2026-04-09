@@ -28,9 +28,12 @@ from schemas.course import (
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
-# Stripe Price IDs - Advanced and Performer tiers
-ADVANCED_PRICE_ID = "price_1SmeXA1a6FlufVwfOLg5SMcc"
-PERFORMER_PRICE_ID = "price_1SmeZa1a6FlufVwfrJCJrv94"
+# Stripe Price IDs - Advanced and Performer (a.k.a. "VIP") tiers.
+# These are TEST-mode Price IDs. Swap to live IDs when activating payments.
+# The display name on Stripe is "VIP" ($59/mo) but the internal enum stays
+# SubscriptionTier.PERFORMER to avoid a DB migration.
+ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X"
+PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml"
 
 
 @router.post("/create-checkout-session", response_model=CheckoutSessionResponse)
@@ -168,11 +171,15 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                 # Get the price lookup_key to determine tier
                 price_lookup_key = stripe_subscription.items.data[0].price.lookup_key
                 
-                # Map Stripe lookup_key to our SubscriptionTier enum
-                # Stripe lookup_key should be "advanced" or "performer" (lowercase)
+                # Map Stripe lookup_key to our SubscriptionTier enum.
+                # Stripe lookup_key should be "advanced", "performer", or "vip"
+                # (lowercase). "vip" is a display-rename alias that still maps
+                # to the internal PERFORMER tier — the DB enum stays PERFORMER
+                # so no migration is needed.
                 tier_mapping = {
                     "advanced": SubscriptionTier.ADVANCED,
                     "performer": SubscriptionTier.PERFORMER,
+                    "vip": SubscriptionTier.PERFORMER,
                 }
                 
                 tier = tier_mapping.get(price_lookup_key.lower() if price_lookup_key else "", SubscriptionTier.ROOKIE)
