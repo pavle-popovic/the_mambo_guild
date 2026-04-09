@@ -67,3 +67,14 @@ Claude.md
 secrets.json
 waitlist_import.json
 waitlist_users.json
+
+# Local debug dumps, scratchpads, and accidental `pip install` output files
+=[0-9]*
+db_inventory.*
+compact_inv.md
+missing.txt
+all_modules.txt
+generated_thumbnails/
+ANTIGRAVITY_THUMBNAIL_PROMPT.md
+SkillTreeUI.png
+skill_tree_builder.html
