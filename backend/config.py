@@ -112,19 +112,19 @@ class Settings:
     ADVANCED_PRICE_ID: str = "price_1SmeXA1a6FlufVwfOLg5SMcc"
     PERFORMER_PRICE_ID: str = "price_1SmeZa1a6FlufVwfrJCJrv94"
 
-    # AI Configuration - SECURITY: API key must be set via environment variable
-    _anthropic_api_key: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
+    # AI/Gemini Configuration - SECURITY: API key must be set via environment variable
+    _gemini_api_key: Optional[str] = os.getenv("GEMINI_API_KEY")
 
     @property
-    def ANTHROPIC_API_KEY(self) -> Optional[str]:
-        """Get Anthropic API key. Returns None if not configured (AI features disabled)."""
-        return self._anthropic_api_key
+    def GEMINI_API_KEY(self) -> Optional[str]:
+        """Get Gemini API key. Returns None if not configured (AI features disabled)."""
+        return self._gemini_api_key
 
-    def require_anthropic_api_key(self) -> str:
-        """Get Anthropic API key, raising error if not configured."""
-        if not self._anthropic_api_key:
-            raise ValueError("ANTHROPIC_API_KEY environment variable is required for AI features")
-        return self._anthropic_api_key
+    def require_gemini_api_key(self) -> str:
+        """Get Gemini API key, raising error if not configured."""
+        if not self._gemini_api_key:
+            raise ValueError("GEMINI_API_KEY environment variable is required for AI features")
+        return self._gemini_api_key
 
     # AI Rate Limiting Configuration
     AI_RATE_LIMIT_REQUESTS: int = int(os.getenv("AI_RATE_LIMIT_REQUESTS", "20"))  # requests per window
