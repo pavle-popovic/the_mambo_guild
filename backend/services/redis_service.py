@@ -13,19 +13,23 @@ logger = logging.getLogger(__name__)
 _redis_client: Optional[redis.Redis] = None
 
 def get_redis_client() -> redis.Redis:
-    """Get or create Redis client."""
+    """Get or create Redis client.
+
+    Uses `settings.REDIS_URL` which is populated from the REDIS_URL env var
+    in production (Railway/Upstash provide a full ``redis://user:pw@host:port``
+    URL including password).  Falls back to a host+port URL in local docker.
+    """
     global _redis_client
     if _redis_client is None:
         try:
-            _redis_client = redis.Redis(
-                host=settings.REDIS_HOST,
-                port=settings.REDIS_PORT,
+            _redis_client = redis.from_url(
+                settings.REDIS_URL,
                 decode_responses=True,
-                socket_connect_timeout=5
+                socket_connect_timeout=5,
             )
             # Test connection
             _redis_client.ping()
-            logger.info("Redis connection established")
+            logger.info(f"Redis connection established to {settings.REDIS_URL.split('@')[-1]}")
         except Exception as e:
             logger.error(f"Failed to connect to Redis: {e}")
             raise
