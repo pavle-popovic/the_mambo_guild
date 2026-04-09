@@ -153,14 +153,14 @@ function PlatformTab() {
         </p>
         <div className="grid grid-cols-3 gap-4">
           {[
-            { tier: "Rookie", price: "$19/mo", color: "#3b82f6", icon: FaStar, desc: "Core course access" },
-            { tier: "Advanced", price: "$39/mo", color: "#a855f7", icon: FaCrown, desc: "Full library + DJ Booth" },
+            { tier: "Rookie", price: "Free", color: "#3b82f6", icon: FaStar, desc: "ChaChaCha choreo" },
+            { tier: "Pro", price: "$39/mo", color: "#a855f7", icon: FaCrown, desc: "Full Guild access" },
             {
               tier: "Guild Master",
-              price: "$79/mo",
+              price: "$59/mo",
               color: "#D4AF37",
               icon: FaBolt,
-              desc: "Live calls + coaching",
+              desc: "1-on-1 feedback + Roundtable",
             },
           ].map((t) => {
             const Icon = t.icon;

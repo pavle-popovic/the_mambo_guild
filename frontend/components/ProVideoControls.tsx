@@ -113,8 +113,8 @@ export default function VideoControls({
 
   // --- DESKTOP SIDEBAR LAYOUT ---
   return (
-    <div className="flex flex-col gap-6 w-full">
-      <div className="flex items-center justify-between mb-2">
+    <div className="flex flex-col gap-3 w-full">
+      <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <SlidersHorizontal size={16} className="text-mambo-blue" />
           <span className="text-xs font-bold text-white/80 uppercase tracking-wider">Video Controls</span>
@@ -133,7 +133,7 @@ export default function VideoControls({
       </div>
 
       {/* Controls Stack */}
-      <div className="space-y-4">
+      <div className="space-y-3">
         {/* Speed */}
         <div>
           <SpeedControl playerRef={playerRef} />

@@ -4,13 +4,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FaFire, FaBolt } from "react-icons/fa";
-import { Star, Crown, Headphones, Video, Radio, ChevronDown } from "lucide-react";
+import { Star, Crown, Headphones, Video, Radio, ChevronDown, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useCallback, useRef } from "react";
 import { ClaveWallet } from "./ClaveWallet";
 import { WalletModal } from "./WalletModal";
 import NotificationBell from "./NotificationBell";
+import LocaleSwitcher from "./LocaleSwitcher";
+import { useTranslations } from "@/i18n/useTranslations";
 import { UISound } from "@/hooks/useUISound";
 
 interface NavBarProps {
@@ -29,9 +31,11 @@ interface NavBarProps {
 
 export default function NavBar({ user }: NavBarProps) {
   const pathname = usePathname();
+  const t = useTranslations('nav');
   const [mounted, setMounted] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [isStudioOpen, setIsStudioOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const studioDropdownRef = useRef<HTMLDivElement>(null);
   const isAuthenticated = !!user;
   const isGuildMaster = user?.tier?.toLowerCase() === "performer";
@@ -63,7 +67,7 @@ export default function NavBar({ user }: NavBarProps) {
       <Link href={href} className="relative group" onMouseEnter={handleNavHover}>
         <motion.span
           className={cn(
-            "text-lg font-bold transition-colors duration-200",
+            "text-sm lg:text-base font-bold transition-colors duration-200 whitespace-nowrap",
             isActive ? "text-[#D4AF37]" : "text-gray-300"
           )}
           whileHover={{ color: "#D4AF37" }}
@@ -98,40 +102,70 @@ export default function NavBar({ user }: NavBarProps) {
   return (
     <>
       <nav className="fixed w-full z-50 glass-nav transition-all duration-300" suppressHydrationWarning>
-        <div className="max-w-7xl mx-auto px-8 py-5 flex justify-between items-center relative">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-5 flex items-center gap-2 sm:gap-4">
           <LogoWrapper
             {...(mounted ? {
               whileHover: { scale: 1.05 },
               transition: { type: "spring", stiffness: 400, damping: 17 }
             } : {})}
           >
-            <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-3">
+            <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-3 shrink-0">
               <Image
                 src="/assets/Logo.png"
                 alt="The Mambo Guild"
                 width={48}
                 height={48}
-                className="h-12 w-auto logo-img"
+                className="h-9 sm:h-12 w-auto logo-img"
                 style={{ mixBlendMode: "screen" }}
               />
-              <span className="font-serif text-xl">
-                <span className="text-gray-400">THE</span>{" "}
+              <span className="font-serif text-sm sm:text-xl">
+                <span className="text-gray-400 hidden sm:inline">THE </span>
                 <span className="text-[#d4af37] font-bold drop-shadow-[0_0_8px_rgba(212,175,55,0.5)]">MAMBO</span>{" "}
-                <span className="text-gray-400">GUILD</span>
+                <span className="text-gray-400 hidden sm:inline">GUILD</span>
               </span>
             </Link>
           </LogoWrapper>
 
           {/* Center: Navigation Links */}
-          <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 hidden md:flex gap-10 items-center">
-            <NavLink href="/">Home</NavLink>
-            <NavLink href="/courses" activePaths={["/courses"]}>Courses</NavLink>
-            <NavLink href="/community" activePaths={["/community"]}>Community</NavLink>
-            <NavLink href="/pricing">Pricing</NavLink>
+          <div className="flex-1 hidden md:flex justify-center gap-4 lg:gap-8 items-center min-w-0">
+            <NavLink href="/">{t('home')}</NavLink>
+            <NavLink href="/courses" activePaths={["/courses"]}>{t('courses')}</NavLink>
+            <NavLink href="/community" activePaths={["/community"]}>{t('community')}</NavLink>
+            <NavLink href="/pricing">{t('pricing')}</NavLink>
             <NavLink href="/instructors">Instructors</NavLink>
           </div>
 
-          <div className="flex gap-4 items-center">
+          {/* Mobile: Hamburger + minimal icons */}
+          <div className="flex md:hidden items-center gap-2 ml-auto">
+            {isAuthenticated && <NotificationBell />}
+            {isAuthenticated && (
+              <Link
+                href="/profile"
+                className={cn(
+                  "w-8 h-8 rounded-full bg-gray-700 overflow-hidden flex items-center justify-center",
+                  "ring-2 ring-transparent"
+                )}
+              >
+                {user?.avatar_url ? (
+                  <Image src={user.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover rounded-full" />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-gradient-to-br from-[#FCE205] to-[#D4AF37] flex items-center justify-center text-black text-xs font-bold">
+                    {(user?.username?.[0] || user?.first_name?.[0] || "U").toUpperCase()}
+                  </div>
+                )}
+              </Link>
+            )}
+            <button
+              className="p-2 text-gray-300 hover:text-white transition-colors"
+              onClick={() => { setIsMobileMenuOpen(!isMobileMenuOpen); UISound.click(); }}
+              aria-label="Toggle menu"
+            >
+              {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
+          </div>
+
+          {/* Desktop right-side items */}
+          <div className="hidden md:flex gap-3 items-center shrink-0">
             {isAuthenticated ? (
               <>
                 {/* Clave Wallet (v4.0) - Only show on Community page */}
@@ -167,7 +201,7 @@ export default function NavBar({ user }: NavBarProps) {
                       "text-xs font-bold",
                       isGuildMaster ? "text-amber-300" : "text-purple-300"
                     )}>
-                      Studio
+                      {t('studio')}
                     </span>
                     <ChevronDown 
                       size={12} 
@@ -320,6 +354,9 @@ export default function NavBar({ user }: NavBarProps) {
                     )}
                   </Link>
                 </MotionDiv>
+
+                {/* Language Switcher - far right */}
+                <LocaleSwitcher compact />
               </>
             ) : (
               <>
@@ -331,7 +368,7 @@ export default function NavBar({ user }: NavBarProps) {
                     href="/login"
                     className="px-6 py-2.5 text-base font-bold text-gray-300 transition-colors"
                   >
-                    Log In
+                    {t('login')}
                   </Link>
                 </motion.div>
                 <MotionDiv
@@ -347,13 +384,92 @@ export default function NavBar({ user }: NavBarProps) {
                     href="/register"
                     className="px-6 py-2.5 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black rounded-full text-base font-bold shadow-lg shadow-[rgba(212,175,55,0.3)]"
                   >
-                    Register
+                    {t('signup')}
                   </Link>
                 </MotionDiv>
+
+                {/* Language Switcher - far right */}
+                <LocaleSwitcher compact />
               </>
             )}
           </div>
         </div>
+
+        {/* Mobile Menu Panel */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              className="md:hidden overflow-hidden border-t border-white/10 bg-black/95 backdrop-blur-xl"
+            >
+              <div className="flex flex-col px-4 py-4 gap-1">
+                {/* Nav Links */}
+                {[
+                  { href: "/", label: t('home') },
+                  { href: "/courses", label: t('courses') },
+                  { href: "/community", label: t('community') },
+                  { href: "/pricing", label: t('pricing') },
+                  { href: "/instructors", label: "Instructors" },
+                ].map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className={cn(
+                      "px-4 py-3 rounded-lg text-base font-bold transition-colors",
+                      pathname === item.href ? "text-[#D4AF37] bg-white/5" : "text-gray-300 hover:text-white hover:bg-white/5"
+                    )}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+
+                {/* Divider */}
+                <div className="h-px bg-white/10 my-2" />
+
+                {isAuthenticated ? (
+                  <>
+                    {/* Studio Links */}
+                    <Link href="/studio/coaching" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 font-semibold flex items-center gap-2">
+                      <Video size={16} /> Coaching Corner
+                      {!isGuildMaster && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>}
+                    </Link>
+                    <Link href="/studio/roundtable" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 font-semibold flex items-center gap-2">
+                      <Radio size={16} /> The Roundtable
+                      {!isGuildMaster && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>}
+                    </Link>
+
+                    {user?.role?.toLowerCase() === "admin" && (
+                      <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-lg text-red-300 hover:text-red-200 hover:bg-red-500/10 font-bold">
+                        Admin
+                      </Link>
+                    )}
+
+                    <div className="h-px bg-white/10 my-2" />
+                    <div className="px-4 py-2">
+                      <LocaleSwitcher compact />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 font-bold">
+                      {t('login')}
+                    </Link>
+                    <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="mx-4 mt-2 py-3 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black rounded-full text-center font-bold shadow-lg">
+                      {t('signup')}
+                    </Link>
+                    <div className="px-4 py-2 mt-2">
+                      <LocaleSwitcher compact />
+                    </div>
+                  </>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* Wallet Modal - Rendered outside nav to avoid stacking context issues */}

@@ -17,6 +17,10 @@ import CourseCompletionModal from "@/components/CourseCompletionModal";
 import { FaBolt, FaPlay, FaPause, FaCheck, FaLock, FaArrowRight, FaClipboardList, FaCheckCircle, FaChevronLeft, FaChevronRight, FaCrown } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import RichContentRenderer from "@/components/RichContentRenderer";
+import LocaleSwitcher from "@/components/LocaleSwitcher";
+import { useTranslations } from "@/i18n/useTranslations";
+import { useLocale } from "@/i18n/client";
 
 interface Lesson {
   id: string;
@@ -58,6 +62,9 @@ export default function LessonPage() {
   const params = useParams();
   const router = useRouter();
   const { user, loading: authLoading, refreshUser } = useAuth();
+  const tLesson = useTranslations('lesson');
+  const tCommon = useTranslations('common');
+  const locale = useLocale();
   const lessonId = params.id as string;
 
   const [lesson, setLesson] = useState<Lesson | null>(null);
@@ -275,27 +282,7 @@ export default function LessonPage() {
         return;
       }
 
-      // If module is complete (all lessons in this level done), navigate to skill tree
-      // The skill tree will automatically center on the next frontier node
-      if (isCourseComplete) {
-        setCompleting(false);
-        // Show a brief success message before navigating?
-        setSuccessData({
-          xpGained: result.xp_gained,
-          leveledUp: result.leveled_up || false,
-          newLevel: result.new_level,
-        });
-
-        // Navigate to skill tree immediately
-        if (worldId) {
-          router.push(`/courses/${worldId}`);
-        } else {
-          router.push("/courses");
-        }
-        return;
-      }
-
-      // Show success notification only if lesson was not already completed
+      // Show success notification for completing lesson
       setSuccessData({
         xpGained: result.xp_gained,
         leveledUp: result.leveled_up || false,
@@ -308,25 +295,18 @@ export default function LessonPage() {
         setShowSuccess(false);
         setSuccessData(null);
 
-        // Navigate immediately (no delay)
-        // Store scroll trigger for next page load
         if (nextLessonId) {
+          // Navigate to next lesson in module
           sessionStorage.setItem('questbar_scroll_trigger', nextLessonId);
           router.push(`/lesson/${nextLessonId}`);
+        } else if (isCourseComplete) {
+          // Module complete — go back to skill tree
+          router.push(worldId ? `/courses/${worldId}` : "/courses");
         }
       };
 
       // Store navigation handler for SuccessNotification
       navigateToNextLessonRef.current = handleNavigate;
-
-      // Auto-navigate after notification timeout (but Continue button will navigate instantly)
-      if (result.leveled_up || nextLessonId) {
-        setTimeout(() => {
-          if (nextLessonId) {
-            handleNavigate();
-          }
-        }, 2300); // 2000ms notification + 300ms fade-out
-      }
     } catch (err: any) {
       // If error is "already completed", just navigate to next lesson silently
       if (err?.message && (err.message.includes("already completed") || err.message.includes("Lesson already completed"))) {
@@ -371,17 +351,25 @@ export default function LessonPage() {
 
   const handleQuizSubmit = () => {
     setQuizSubmitted(true);
-    // Calculate score
-    const quiz = lesson?.content_json?.quiz || [];
+    // Calculate score - support both formats
+    const quiz = lesson?.content_json?.quiz || lesson?.content_json?.questions || [];
     let correct = 0;
-    quiz.forEach((q: QuizQuestion, qIndex: number) => {
+    quiz.forEach((q: any, qIndex: number) => {
       const questionId = q.id || `q-${qIndex}`;
       const selectedIndex = quizAnswers[questionId];
-      if (selectedIndex !== undefined && q.options[selectedIndex]?.isCorrect) {
+      if (selectedIndex === undefined) return;
+
+      if (q.options?.[selectedIndex]?.isCorrect) {
+        // Admin editor format: options = [{text, isCorrect}]
         correct++;
+      } else if (q.answer) {
+        // Script-generated format: answer = "B", options = ["A) ...", "B) ...", "C) ..."]
+        const answerLetter = q.answer.trim().toUpperCase();
+        const selectedLetter = String.fromCharCode(65 + selectedIndex); // 0->A, 1->B, 2->C
+        if (selectedLetter === answerLetter) correct++;
       }
     });
-    const percentage = (correct / quiz.length) * 100;
+    const percentage = quiz.length > 0 ? (correct / quiz.length) * 100 : 0;
     const passed = percentage >= 80;
 
     setQuizIsCorrect(passed);
@@ -543,7 +531,7 @@ export default function LessonPage() {
   if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-mambo-dark flex items-center justify-center">
-        <div className="text-gray-400">Loading lesson...</div>
+        <div className="text-gray-400">{tCommon('loading')}</div>
       </div>
     );
   }
@@ -575,8 +563,14 @@ export default function LessonPage() {
   const currentLesson = levelLessons.find((l) => l.id === lessonId);
   const isCompleted = currentLesson?.is_completed || false;
   const lessonType = lesson.lesson_type || "video"; // Default to "video" for backwards compatibility
-  const hasQuiz = lesson.content_json?.quiz && Array.isArray(lesson.content_json.quiz) && lesson.content_json.quiz.length > 0;
-  const lessonNotes = lesson.content_json?.notes || "";
+  // Support both admin editor format (content_json.quiz) and script-generated format (content_json.questions)
+  // Check for locale-specific translations first
+  const translations = lesson.content_json?.translations || {};
+  const localeContent = locale !== 'en' ? translations[locale] : null;
+  const quizData = localeContent?.quiz || localeContent?.questions || lesson.content_json?.quiz || lesson.content_json?.questions || [];
+  const hasQuiz = Array.isArray(quizData) && quizData.length > 0;
+  // Support both formats: {notes: "..."} and {type: "markdown", content: "..."}
+  const lessonNotes = localeContent?.content || localeContent?.notes || lesson.content_json?.notes || lesson.content_json?.content || "";
 
   // Determine what to show based on lesson type
   const isVideoLesson = lessonType === "video";
@@ -667,93 +661,45 @@ export default function LessonPage() {
         />
       )}
 
-      <div className="h-screen flex flex-col overflow-hidden bg-mambo-dark text-mambo-cream font-sans">
-        {/* Navigation Bar */}
-        <nav className="border-b border-gray-800 bg-mambo-panel flex-none z-20">
-          <div className="px-6 py-3 flex justify-between items-center">
-            <div className="flex items-center gap-4">
-              {worldId ? (
-                <Link
-                  href={`/courses/${worldId}`}
-                  className="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold"
-                >
-                  <FaPlay className="rotate-[-90deg]" /> Back to Skill Tree
-                </Link>
-              ) : (
-                <Link
-                  href="/courses"
-                  className="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold"
-                >
-                  <FaPlay className="rotate-[-90deg]" /> Courses
-                </Link>
-              )}
-              <span className="text-gray-700 text-2xl font-light">|</span>
-              <div className="flex flex-col">
-                <span className="text-[10px] uppercase font-bold text-gray-500 tracking-wider">Current Quest</span>
-                <h1 className="font-bold text-sm md:text-base text-white">
-                  {levelTitle} <span className="text-gray-600 px-1">/</span>{" "}
-                  <span className="text-mambo-gold">{lessonNumber} {lesson.title}</span>
-                </h1>
-              </div>
-            </div>
-
-            {user && (
-              <div className="flex items-center gap-3">
-                {/* Complete Lesson Button in Header */}
-                {!isCompleted &&
-                  !(isQuizLesson && !quizPassed) &&
-                  !(isVideoLesson && hasQuiz && !quizPassed) && (
-                    <button
-                      onClick={handleComplete}
-                      disabled={completing}
-                      className="flex px-3 sm:px-5 py-2 bg-green-600 hover:bg-green-500 text-white text-xs sm:text-sm font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] items-center gap-2 transition transform active:scale-95 border border-green-400/30 group disabled:opacity-50 whitespace-nowrap"
-                    >
-                      <span>Complete Lesson</span>
-                      <FaArrowRight className="group-hover:translate-x-1 transition" />
-                    </button>
-                  )}
-                {isCompleted && (
-                  <div className="hidden sm:flex px-4 py-2 bg-green-900/40 text-green-400 text-sm font-bold rounded-lg items-center gap-2 border border-green-500/30">
-                    <FaCheckCircle />
-                    Completed
-                  </div>
-                )}
-
-                <div className="text-right hidden sm:block">
-                  <div className="text-[10px] font-bold text-mambo-gold uppercase tracking-wider">XP Boost Active</div>
-                  <div className="text-xs font-bold text-white">Level {user.level} • {user.xp.toLocaleString()} XP</div>
-                </div>
-                <Link href="/profile">
-                  <div className="w-10 h-10 rounded-full bg-gray-700 overflow-hidden border border-mambo-gold/50 relative flex items-center justify-center">
-                    {user.avatar_url ? (
-                      <Image
-                        src={user.avatar_url}
-                        alt={`${user.first_name} ${user.last_name}`}
-                        width={40}
-                        height={40}
-                        className="w-full h-full object-cover rounded-full"
-                      />
-                    ) : (
-                      <div className="w-full h-full rounded-full bg-gradient-to-br from-mambo-blue to-purple-600 flex items-center justify-center text-white text-xs font-bold">
-                        {user.first_name[0]?.toUpperCase() || "U"}
-                      </div>
-                    )}
-                    <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-mambo-panel"></div>
-                  </div>
-                </Link>
-              </div>
-            )}
-          </div>
-        </nav>
-
-        <div className="flex flex-1 overflow-hidden relative">
+      <div className="h-[100dvh] flex overflow-hidden bg-mambo-dark text-mambo-cream font-sans">
           {/* LEFT COLUMN: Main Content & Video */}
-          <main className="flex-1 overflow-y-auto bg-black relative flex flex-col scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent pb-32 lg:pb-0">
+          <main className="flex-1 min-h-0 bg-black relative flex flex-col">
+            {/* Minimal nav for non-video lessons */}
+            {!isVideoLesson && (
+              <nav className="border-b border-gray-800 bg-mambo-panel flex-none flex items-center justify-between px-4 py-3">
+                <Link href={worldId ? `/courses/${worldId}` : '/courses'} className="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold">
+                  <FaChevronLeft size={12} /> {tCommon('back')}
+                </Link>
+                <div className="flex items-center gap-3">
+                  <LocaleSwitcher compact />
+                {user && !isCompleted && !(isQuizLesson && !quizPassed) && (
+                  <button onClick={handleComplete} disabled={completing} className="flex px-4 py-2 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-lg items-center gap-2 transition disabled:opacity-50">
+                    {tLesson('markComplete')} <FaArrowRight />
+                  </button>
+                )}
+                {isCompleted && <div className="flex px-4 py-2 bg-green-900/40 text-green-400 text-sm font-bold rounded-lg items-center gap-2 border border-green-500/30"><FaCheckCircle /> {tLesson('completed')}</div>}
+                </div>
+              </nav>
+            )}
             {/* Video Player - Only show for video lessons with video */}
             {isVideoLesson && hasVideo && (
-              <div className="w-full bg-black relative shadow-2xl z-20">
+              <div className="w-full bg-black relative flex-1 min-h-0 flex flex-col">
+
+                {/* Immersive overlay — back arrow + language */}
+                <div className="absolute top-0 left-0 right-0 z-30 px-4 py-3 pointer-events-none flex items-center justify-between">
+                  <Link
+                    href={worldId ? `/courses/${worldId}` : '/courses'}
+                    className="pointer-events-auto flex items-center justify-center w-9 h-9 bg-black/50 hover:bg-black/70 rounded-full backdrop-blur-sm transition text-white"
+                  >
+                    <FaChevronLeft size={14} />
+                  </Link>
+                  <div className="pointer-events-auto">
+                    <LocaleSwitcher compact />
+                  </div>
+                </div>
+
                 {lesson.mux_playback_id ? (
-                  <div className="aspect-video w-full max-h-[75vh]">
+                  <div className="flex-1 min-h-0 w-full">
                     <MuxVideoPlayer
                       ref={videoPlayerRef}
                       playbackId={lesson.mux_playback_id}
@@ -792,132 +738,151 @@ export default function LessonPage() {
               </div>
             )}
 
-            {/* Lesson Content - Descriptions, Tabs, etc. */}
-            <div className="max-w-5xl mx-auto w-full px-6 py-8">
-              <div className="flex flex-col sm:flex-row justify-between items-start gap-4 mb-8">
-                <div>
-                  <h2 className="font-serif text-3xl font-bold mb-2 text-white">{lesson.title}</h2>
-                  <div className="flex items-center gap-3">
-                    <span className="bg-mambo-blue/10 text-mambo-blue text-xs font-bold px-2 py-1 rounded border border-mambo-blue/20">
-                      {isVideoLesson ? "Video Lesson" : isQuizLesson ? "Quiz" : isHistoryLesson ? "History Lesson" : "Lesson"}
-                    </span>
-                    <span className="text-gray-500 text-sm">•</span>
-                    <span className="text-mambo-gold text-sm font-bold flex items-center gap-1">
-                      <FaBolt className="mr-1" /> {lesson.xp_value} XP
-                    </span>
-                    {lesson.duration_minutes && (
-                      <>
-                        <span className="text-gray-500 text-sm">•</span>
-                        <span className="text-gray-400 text-sm">{lesson.duration_minutes} min</span>
-                      </>
+            {/* Content for non-video lessons only */}
+            {!isVideoLesson && (
+              <div className="flex-1 min-h-0 overflow-y-auto">
+              <div className="max-w-5xl mx-auto w-full px-3 sm:px-6 py-4 sm:py-8">
+                {isQuizLesson && hasQuiz && (
+                  <div className="max-w-2xl mx-auto">
+                    <h3 className="text-xl font-bold text-white mb-4 text-center">{tLesson('quiz')}</h3>
+                    <div className="space-y-4">
+                      {quizData.map((q: any, qIndex: number) => {
+                        const questionId = q.id || `q-${qIndex}`;
+                        const selectedIndex = quizAnswers[questionId];
+                        // Determine correct option index for both formats
+                        const isScriptFormat = typeof q.answer === "string";
+                        const correctIndex = isScriptFormat
+                          ? q.answer.trim().toUpperCase().charCodeAt(0) - 65 // "B" -> 1
+                          : q.options?.findIndex((o: any) => o.isCorrect) ?? -1;
+                        const isCorrectAnswer = quizSubmitted && selectedIndex === correctIndex;
+                        const isWrongAnswer = quizSubmitted && selectedIndex !== undefined && selectedIndex !== correctIndex;
+
+                        return (
+                          <div
+                            key={questionId}
+                            className={`bg-mambo-panel border rounded-xl p-4 ${
+                              isCorrectAnswer ? "border-green-500 bg-green-500/10" :
+                              isWrongAnswer ? "border-red-500 bg-red-500/10" :
+                              "border-gray-800"
+                            }`}
+                          >
+                            <h4 className="font-bold text-white mb-3 text-sm">
+                              {qIndex + 1}. {q.question}
+                            </h4>
+                            <div className="space-y-1.5">
+                              {(q.options || []).map((option: any, oIndex: number) => {
+                                const isSelected = selectedIndex === oIndex;
+                                const isCorrectOption = oIndex === correctIndex;
+                                const optionText = typeof option === "string" ? option : option.text;
+
+                                return (
+                                  <button
+                                    key={oIndex}
+                                    onClick={() => handleQuizAnswer(questionId, oIndex)}
+                                    disabled={quizSubmitted}
+                                    className={`w-full text-left p-2.5 rounded-lg border text-sm transition ${
+                                      isSelected
+                                        ? quizSubmitted
+                                          ? isCorrectOption
+                                            ? "bg-green-600/20 border-green-500 text-green-300"
+                                            : "bg-red-600/20 border-red-500 text-red-300"
+                                          : "bg-blue-600/20 border-blue-500 text-blue-300"
+                                        : quizSubmitted && isCorrectOption
+                                          ? "bg-green-600/10 border-green-500/50 text-green-400"
+                                          : "bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600"
+                                    } ${quizSubmitted ? "cursor-default" : "cursor-pointer"}`}
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      {quizSubmitted && isSelected && (
+                                        isCorrectOption
+                                          ? <FaCheck className="text-green-400 flex-shrink-0" />
+                                          : <span className="text-red-400 flex-shrink-0">✗</span>
+                                      )}
+                                      {quizSubmitted && isCorrectOption && !isSelected && (
+                                        <FaCheck className="text-green-400 flex-shrink-0" />
+                                      )}
+                                      <span>{optionText}</span>
+                                    </div>
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    {!quizSubmitted ? (
+                      <button
+                        onClick={handleQuizSubmit}
+                        disabled={Object.keys(quizAnswers).length !== quizData.length}
+                        className="mt-6 w-full py-3 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {tCommon('submit')}
+                      </button>
+                    ) : null}
+                  </div>
+                )}
+                {isQuizLesson && !hasQuiz && (
+                  <div className="bg-mambo-panel border border-gray-800 rounded-xl p-8 text-center max-w-2xl mx-auto">
+                    <h3 className="text-xl font-bold text-white mb-2">Prove Your Knowledge</h3>
+                    <p className="text-gray-400">No quiz questions available yet.</p>
+                  </div>
+                )}
+                {isHistoryLesson && (
+                  <div className="max-w-3xl mx-auto">
+                    {lessonNotes ? (
+                      <div className="summary-notes-content">
+                        <ReactMarkdown remarkPlugins={[remarkGfm]}>{lessonNotes}</ReactMarkdown>
+                      </div>
+                    ) : lesson.content_json?.blocks ? (
+                      <RichContentRenderer contentJson={lesson.content_json} />
+                    ) : lesson.description ? (
+                      <div className="prose prose-invert prose-lg max-w-none text-gray-300">
+                        <p>{lesson.description}</p>
+                      </div>
+                    ) : (
+                      <div className="bg-mambo-panel border border-gray-800 rounded-xl p-8 text-center">
+                        <p className="text-gray-400">No content available yet.</p>
+                      </div>
                     )}
                   </div>
-                </div>
+                )}
               </div>
-
-              {/* Tabs - Only show for video lessons */}
-              {isVideoLesson && (
-                <div className="border-b border-gray-800 mb-6 flex gap-8">
-                  <button
-                    onClick={() => setActiveTab("description")}
-                    className={`pb-3 border-b-2 font-bold text-sm transition ${activeTab === "description"
-                      ? "border-purple-500 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]"
-                      : "border-transparent text-gray-400 hover:text-white"
-                      }`}
-                  >
-                    Description
-                  </button>
-                  <button
-                    onClick={() => setActiveTab("discuss")}
-                    className={`pb-3 border-b-2 font-bold text-sm transition ${activeTab === "discuss"
-                      ? "border-purple-500 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 drop-shadow-[0_0_5px_rgba(168,85,247,0.5)]"
-                      : "border-transparent text-gray-400 hover:text-white"
-                      }`}
-                  >
-                    Discussion (0)
-                  </button>
-                </div>
-              )}
-
-              {/* Content based on lesson type (Tabs content, Quiz, History) */}
-              {isVideoLesson && (
-                <>
-                  {activeTab === "description" && (
-                    <div className="tab-content active prose prose-invert prose-sm max-w-none text-gray-300">
-                      {lessonNotes ? (
-                        <div className="prose prose-invert prose-lg max-w-none">
-                          <ReactMarkdown
-                            remarkPlugins={[remarkGfm]}
-                            components={{
-                              h1: ({ ...props }) => <h1 className="text-3xl font-bold text-white mt-8 mb-4" {...props} />,
-                              h2: ({ ...props }) => <h2 className="text-2xl font-bold text-white mt-6 mb-3" {...props} />,
-                              h3: ({ ...props }) => <h3 className="text-xl font-bold text-white mt-6 mb-3" {...props} />,
-                              p: ({ ...props }) => <p className="text-gray-300 mb-4 leading-relaxed" {...props} />,
-                              ul: ({ ...props }) => <ul className="list-disc list-inside space-y-2 text-gray-300 mb-4 pl-5" {...props} />,
-                              ol: ({ ...props }) => <ol className="list-decimal list-inside space-y-2 text-gray-300 mb-4 pl-5" {...props} />,
-                              li: ({ ...props }) => <li className="text-gray-300" {...props} />,
-                              a: ({ ...props }) => <a className="text-mambo-blue hover:text-blue-400 underline" target="_blank" rel="noopener noreferrer" {...props} />,
-                              blockquote: ({ ...props }) => <blockquote className="border-l-4 border-mambo-blue pl-4 italic text-gray-400 my-4" {...props} />,
-                            }}
-                          >
-                            {lessonNotes}
-                          </ReactMarkdown>
-                        </div>
-                      ) : (
-                        <p className="lead text-lg text-white">
-                          {lesson.description || "Master the fundamentals of this lesson."}
-                        </p>
-                      )}
-                      
-                      {/* Download Button - Save bandwidth by downloading for offline practice */}
-                      {lesson.mux_asset_id && (
-                        <div className="mt-6 pt-6 border-t border-gray-800">
-                          <DownloadButton
-                            lessonId={lesson.id}
-                            lessonTitle={lesson.title}
-                            variant="default"
-                          />
-                        </div>
-                      )}
-                    </div>
-                  )}
-                  {activeTab === "discuss" && (
-                    <div className="tab-content active">
-                      <p className="text-gray-400">Discussion coming soon...</p>
-                    </div>
-                  )}
-                </>
-              )}
-
-              {/* Reuse Quiz/History render logic from original file here (simplified for brevity, assume similar structure) */}
-              {isQuizLesson && (
-                <div className="bg-mambo-panel border border-gray-800 rounded-xl p-8 text-center max-w-2xl mx-auto">
-                  {/* ... Quiz content ... */}
-                  <h3 className="text-xl font-bold text-white mb-2">Prove Your Knowledge</h3>
-                  {/* ... Shortened for brevity ... */}
-                  <p className="text-gray-400 mb-4">Quiz content here</p>
-                </div>
-              )}
-
-              {isHistoryLesson && (
-                <div className="prose prose-invert prose-sm max-w-none text-gray-300">
-                  <p>{lesson.description}</p>
-                </div>
-              )}
-
-            </div>
+              </div>
+            )}
           </main>
 
           {/* RIGHT SIDEBAR (Desktop) */}
           {/* RIGHT SIDEBAR (Desktop) */}
           <aside className="hidden lg:flex flex-row h-full z-30 shadow-2xl transition-all duration-300">
             {/* MAIN PANEL (Collapsible) */}
-            <div className={`${isSidebarOpen ? 'w-[350px] opacity-100 border-l border-white/10' : 'w-0 opacity-0 border-none overflow-hidden'} bg-black flex flex-col transition-all duration-300 ease-in-out`}>
+            <div className={`${isSidebarOpen ? 'w-[280px] opacity-100 border-l border-white/10' : 'w-0 opacity-0 border-none overflow-hidden'} bg-black flex flex-col transition-all duration-300 ease-in-out`}>
+              {/* Complete Lesson button — top of sidebar */}
+              {isSidebarOpen && (
+                <div className="flex-shrink-0 p-3 flex justify-center">
+                  {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
+                    <button
+                      onClick={handleComplete}
+                      disabled={completing}
+                      className="flex w-full px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] items-center justify-center gap-2 transition active:scale-95 border border-green-400/30 disabled:opacity-50 whitespace-nowrap"
+                    >
+                      <span>{tLesson('markComplete')}</span>
+                      <FaArrowRight />
+                    </button>
+                  )}
+                  {isCompleted && (
+                    <div className="flex w-full px-4 py-2.5 bg-green-900/60 text-green-400 text-sm font-bold rounded-lg items-center justify-center gap-2 border border-green-500/30">
+                      <FaCheckCircle /> {tLesson('completed')}
+                    </div>
+                  )}
+                </div>
+              )}
               {sidebarView === 'controls' ? (
                 // Controls View
                 <div className="h-full flex flex-col">
                   {isVideoLesson && lesson.mux_playback_id && (
-                    <div className="flex-shrink-0 p-4 border-b border-white/10 bg-zinc-900/40 backdrop-blur-md z-20">
+                    <div className="flex-shrink-0 p-3 border-b border-white/10 bg-zinc-900/40 backdrop-blur-md z-20">
                       <VideoControls
                         playerRef={videoPlayerRef}
                         duration={videoDuration}
@@ -1008,7 +973,6 @@ export default function LessonPage() {
 
             </div>
           </aside>
-        </div>
 
         {/* MOBILE STICKY CONTROLS */}
         {isVideoLesson && lesson.mux_playback_id && (
@@ -1021,25 +985,6 @@ export default function LessonPage() {
           </div>
         )}
 
-        <style jsx>{`
-        .tab-content {
-          display: none;
-          animation: fadeIn 0.3s ease;
-        }
-        .tab-content.active {
-          display: block;
-        }
-        @keyframes fadeIn {
-          from {
-            opacity: 0;
-            transform: translateY(5px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-      `}</style>
       </div>
     </>
   );

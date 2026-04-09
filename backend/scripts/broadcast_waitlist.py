@@ -34,7 +34,7 @@ resend.api_key = os.environ.get("RESEND_API_KEY")
 DRY_RUN = False 
 
 # 4. Email Configuration
-raw_from = os.environ.get("FROM_EMAIL", "founder@themamboguild.com")
+raw_from = os.environ.get("FROM_EMAIL", "pavlepopovic@themamboguild.com")
 if "<" not in raw_from:
     FROM_EMAIL = f"The Mambo Guild <{raw_from}>"
 else:
@@ -120,13 +120,13 @@ def get_beautiful_html(username, referral_link):
             <p>On April 29th, I am opening the doors to a fully gamified, structured, premium learning platform for Salsa On2. But before we go live, <strong>I am giving away one Lifetime VIP Access pass.</strong></p>
 
             <h2>THE PRIZE:</h2>
-            <p>Lifetime free access to the entire Mambo Guild platform — 30+ hours of mechanics, practice drills, and full access to our interactive Skill Tree and "Clave" point system.</p>
+            <p>The first place, winner of the challenge gets a lifetime free access to the entire Mambo Guild platform — 30+ hours of mechanics, practice drills, and full access to our interactive Skill Tree and "Clave" point system.</p>
 
             <h2>HOW TO ENTER:</h2>
             <p>1. Learn the Mambo Gozón Choreography — the choreo starts at <strong>13min47</strong>:<br>
             <a href="https://www.youtube.com/watch?v=omiwxSIxnyc" class="link">https://www.youtube.com/watch?v=omiwxSIxnyc</a></p>
             <p>2. Film yourself executing the sequence.</p>
-            <p>3. Post your video and <strong>tag me before April 26th</strong>.</p>
+            <p>3. Post your video, follow me on Instagram and <strong>tag me before April 26th</strong>.</p>
 
             <h2>SUBMISSION RULES:</h2>
             <p>You can post your video as a <strong>Reel</strong> or an <strong>IG Story</strong>.<br>
@@ -240,6 +240,9 @@ def send_broadcast():
         # Unsubscribed users
         "malzev1@gmail.com",
         "lucy.arellano97@gmail.com",
+        "alicia.adamfe@gmail.com",
+        "tine.heggernes@gmail.com",
+        "lancekaplan@gmail.com",
     }
 
 

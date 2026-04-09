@@ -337,3 +337,96 @@ h6 {
   border-color: rgba(251, 191, 36, 0.5) !important;
   box-shadow: 0 0 20px rgba(251, 191, 36, 0.15);
 }
+
+/* ── Video captions: transparent background, clean white text, thin outline ── */
+::cue {
+  background-color: transparent !important;
+  background: transparent !important;
+  color: white !important;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+  font-size: 90% !important;
+  text-shadow:
+    -1px -1px 0 rgba(0,0,0,0.9),
+     1px -1px 0 rgba(0,0,0,0.9),
+    -1px  1px 0 rgba(0,0,0,0.9),
+     1px  1px 0 rgba(0,0,0,0.9) !important;
+}
+
+::cue-region {
+  background-color: transparent !important;
+}
+
+/* ===================================
+   Summary Notes Content Styling
+   =================================== */
+.summary-notes-content {
+  color: #d1d5db;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.summary-notes-content em {
+  color: #9ca3af;
+}
+
+.summary-notes-content strong {
+  color: #ffffff;
+  font-weight: 700;
+}
+
+.summary-notes-content ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.summary-notes-content li {
+  margin-bottom: 1.5rem;
+  padding-left: 1rem;
+  border-left: 2px solid rgba(212, 175, 55, 0.3);
+}
+
+.summary-notes-content ol {
+  list-style: decimal;
+  padding-left: 1.5rem;
+  margin: 1rem 0;
+}
+
+.summary-notes-content ol li {
+  border-left: none;
+  padding-left: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.summary-notes-content p {
+  margin-bottom: 1.25rem;
+}
+
+.summary-notes-content h1,
+.summary-notes-content h2,
+.summary-notes-content h3 {
+  color: #ffffff;
+  font-weight: 700;
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.summary-notes-content h1 {
+  font-size: 1.5rem;
+}
+
+.summary-notes-content h2 {
+  font-size: 1.25rem;
+}
+
+.summary-notes-content h3 {
+  font-size: 1.125rem;
+}
+
+.summary-notes-content blockquote {
+  border-left: 3px solid rgba(212, 175, 55, 0.5);
+  padding-left: 1rem;
+  margin: 1.25rem 0;
+  color: #9ca3af;
+  font-style: italic;
+}

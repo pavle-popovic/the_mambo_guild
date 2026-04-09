@@ -121,6 +121,7 @@ class PostResponse(BaseModel):
     reaction_count: int = 0
     reply_count: int = 0
     user_reaction: Optional[str] = None  # Current user's reaction type, if any
+    is_saved: bool = False
     created_at: datetime
     updated_at: datetime
 
@@ -157,6 +158,7 @@ class ReplyResponse(BaseModel):
     content: str
     mux_playback_id: Optional[str] = None
     is_accepted_answer: bool = False
+    moderation_status: str = "active"
     created_at: datetime
 
     class Config:

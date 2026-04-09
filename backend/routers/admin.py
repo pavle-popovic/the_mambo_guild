@@ -611,7 +611,116 @@ def send_announcement(
 
 
 # ---------------------------------------------------------------------------
-# Community Moderation (AI Gatekeeper) — deferred.
-# Ships separately together with the ModerationStatus enum + PostReply
-# moderation_status column (neither currently in main).
+# Community Moderation (AI Gatekeeper)
 # ---------------------------------------------------------------------------
+
+@router.get("/moderation/flagged")
+def get_flagged_replies(
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Get all replies currently flagged by the AI gatekeeper, pending admin review."""
+    from models.community import PostReply, Post, ModerationStatus
+    from sqlalchemy.orm import joinedload as jl
+
+    flagged = (
+        db.query(PostReply)
+        .filter(
+            PostReply.moderation_status == ModerationStatus.FLAGGED_BY_AI.value,
+            PostReply.is_deleted == False,
+        )
+        .order_by(PostReply.created_at.desc())
+        .all()
+    )
+
+    # Batch-load authors and parent posts
+    user_ids = list({r.user_id for r in flagged})
+    post_ids = list({r.post_id for r in flagged})
+
+    users = (
+        db.query(User).filter(User.id.in_(user_ids))
+        .options(jl(User.profile))
+        .all()
+    ) if user_ids else []
+    user_map = {str(u.id): u for u in users}
+
+    posts = (
+        db.query(Post).filter(Post.id.in_(post_ids)).all()
+    ) if post_ids else []
+    post_map = {str(p.id): p for p in posts}
+
+    results = []
+    for r in flagged:
+        author = user_map.get(str(r.user_id))
+        parent_post = post_map.get(str(r.post_id))
+        profile = author.profile if author else None
+        results.append({
+            "id": str(r.id),
+            "content": r.content,
+            "created_at": r.created_at,
+            "moderation_status": r.moderation_status,
+            "author": {
+                "id": str(r.user_id),
+                "first_name": profile.first_name if profile else "Unknown",
+                "last_name": profile.last_name if profile else "",
+                "avatar_url": profile.avatar_url if profile else None,
+            },
+            "post": {
+                "id": str(r.post_id),
+                "title": parent_post.title if parent_post else "Deleted post",
+                "post_type": parent_post.post_type if parent_post else None,
+            },
+        })
+
+    return {"flagged_replies": results, "count": len(results)}
+
+
+@router.post("/moderation/{reply_id}/approve")
+def approve_reply(
+    reply_id: str,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Approve a flagged reply — sets status to 'active' (publicly visible)."""
+    from models.community import PostReply, Post, ModerationStatus
+
+    reply = db.query(PostReply).filter(
+        PostReply.id == reply_id,
+        PostReply.is_deleted == False,
+    ).first()
+    if not reply:
+        raise HTTPException(status_code=404, detail="Reply not found")
+
+    if reply.moderation_status == ModerationStatus.ACTIVE.value:
+        return {"success": True, "message": "Reply is already active"}
+
+    reply.moderation_status = ModerationStatus.ACTIVE.value
+
+    # Now that the reply is public, increment the parent post's reply_count
+    post = db.query(Post).filter(Post.id == reply.post_id).first()
+    if post:
+        post.reply_count += 1
+
+    db.commit()
+    return {"success": True, "message": "Reply approved and now publicly visible"}
+
+
+@router.post("/moderation/{reply_id}/ghost")
+def ghost_reply(
+    reply_id: str,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """Permanently ghost a flagged reply — only the author will ever see it."""
+    from models.community import PostReply, ModerationStatus
+
+    reply = db.query(PostReply).filter(
+        PostReply.id == reply_id,
+        PostReply.is_deleted == False,
+    ).first()
+    if not reply:
+        raise HTTPException(status_code=404, detail="Reply not found")
+
+    reply.moderation_status = ModerationStatus.GHOSTED.value
+    db.commit()
+    return {"success": True, "message": "Reply permanently ghosted"}

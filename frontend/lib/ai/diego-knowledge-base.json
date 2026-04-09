@@ -1,0 +1,373 @@
+{
+  "_meta": {
+    "version": "1.0.0",
+    "lastUpdated": "2026-04-04",
+    "description": "Structured knowledge base for the Diego AI Sales Concierge. Used as context injection for search_knowledge_base tool calls and potential future RAG integration.",
+    "model": "gemini-2.0-flash"
+  },
+
+  "brand": {
+    "name": "The Mambo Guild",
+    "tagline": "Autonomy in practice. Science in technique. Serving over perfection.",
+    "style": "Salsa On2 (New York Style Mambo) — strictly. One style, done deeply.",
+    "founderName": "Pavle Popovic",
+    "founderRole": "Lead instructor, certified Learning Experience Designer (LXD), personal coach for Guild Master members.",
+    "antiValues": [
+      "Elitism and gatekeeping",
+      "Paralyzing perfectionism",
+      "Random, unstructured content dumps",
+      "Shame-based motivation"
+    ],
+    "coreBeliefs": [
+      "The person who makes the most mistakes, most publicly, improves the fastest.",
+      "Motor learning science — not vibes — should drive curriculum design.",
+      "Community accountability accelerates individual growth.",
+      "Dance belongs to everyone willing to work for it."
+    ]
+  },
+
+  "pricing": {
+    "trial": {
+      "price": "$1",
+      "duration": "7 days",
+      "access": "Full platform access — identical to Guild Member tier",
+      "cancelPolicy": "Cancel anytime during or after trial. No commitment.",
+      "cta": "Start your $1 trial"
+    },
+    "tiers": [
+      {
+        "id": "base",
+        "name": "Guild Member",
+        "price": "$39/month",
+        "billingCycle": "monthly",
+        "cancellable": true,
+        "features": [
+          "Full 40-hour Salsa On2 curriculum",
+          "38-tier Skill Tree with all badges",
+          "The Lab — technique Q&A (10 question slots)",
+          "The Stage — video feedback community (5 video slots)",
+          "Full community access",
+          "A/B Loop, Frame-by-Frame, Speed Control (0.25x–2x)",
+          "Claves rewards economy",
+          "Daily login bonuses (4–8 🥢)",
+          "Streak bonus every 5 days (10 🥢)"
+        ]
+      },
+      {
+        "id": "vip",
+        "name": "Guild Master",
+        "price": "$59/month",
+        "billingCycle": "monthly",
+        "cancellable": true,
+        "spotsTotal": 30,
+        "spotsNote": "Capped at 30 active members. When full, a waitlist applies.",
+        "features": [
+          "Everything in Guild Member",
+          "Monthly 1-on-1 video feedback from Pavle (submit 1 video per month, max 100 seconds)",
+          "Private Guild Master Zoom — The Roundtable (weekly live calls with Pavle)",
+          "The Vault — full archive of all past Roundtable recordings",
+          "DJ Booth (Mambo Mixer) — isolated stems: percussion, piano/bass, vocals/brass, full mix",
+          "Priority Lab responses",
+          "20 Stage video slots (vs 5 for base)",
+          "Exclusive Guild Master badge on public profile",
+          "Daily login bonus: 4–8 🥢"
+        ]
+      }
+    ]
+  },
+
+  "curriculum": {
+    "totalHours": 40,
+    "style": "Salsa On2 (New York Style Mambo)",
+    "structure": "World (Course) → Level (Module) → Lesson",
+    "courseTypes": [
+      { "type": "course", "icon": "📚", "description": "Full structured learning paths with weeks and days" },
+      { "type": "choreo", "icon": "💃", "description": "Standalone choreographies — full routines to learn and perform" },
+      { "type": "topic",  "icon": "💡", "description": "Focused deep-dives: training science, mambo history, musicality" }
+    ],
+    "lessonTypes": [
+      { "type": "video",   "description": "Core video instruction with notes and optional quiz" },
+      { "type": "quiz",    "description": "Standalone knowledge check" },
+      { "type": "history", "description": "Theory/history module — reading + multimedia" }
+    ],
+    "specialLessons": {
+      "bossBattle": {
+        "description": "Culminating challenge for each module tier. Student records themselves performing the technique and submits the video for instructor review.",
+        "reward": "Unlocks the next Skill Tree tier",
+        "reviewedBy": "Instructor / admin team"
+      }
+    },
+    "notableTopics": [
+      "Mambo History — based on Juliet McMains' 'Spinning Mambo into Salsa' (20 modules)",
+      "Training Science — cognitive science of motor learning, deliberate practice (18 modules)",
+      "Footwork isolation",
+      "Body mechanics and posture",
+      "Musicality and clave awareness",
+      "Spinning and turn mechanics",
+      "Styling and expression",
+      "Partner connection (connection mechanics, lead/follow)"
+    ]
+  },
+
+  "skillTree": {
+    "name": "The Constellation",
+    "tiers": 38,
+    "visualization": "Interactive star-map — animated gold edges between prerequisite nodes, hover GIF previews, locked/unlocked states",
+    "progression": "Each tier requires completing the module's lessons AND passing the Boss Battle video submission",
+    "xpSystem": "Each lesson awards XP (default 50 XP). XP accumulates to level up your profile."
+  },
+
+  "badges": {
+    "total": 38,
+    "tiers": ["Bronze", "Silver", "Gold", "Diamond"],
+    "categories": ["Course", "Community", "Performance"],
+    "families": [
+      {
+        "name": "Firestarter",
+        "trigger": "Receiving 🔥 Fire reactions on Stage videos",
+        "milestones": [5, 25, 100, 500]
+      },
+      {
+        "name": "The Professor",
+        "trigger": "Getting accepted answers in The Lab",
+        "milestones": [1, 5, 20, 50]
+      },
+      {
+        "name": "Center Stage",
+        "trigger": "Posting homework / Boss Battle videos",
+        "milestones": [1, 5, 20, 50]
+      },
+      {
+        "name": "Unstoppable / Metronome",
+        "trigger": "Maintaining consecutive daily login streaks",
+        "milestones": [7, 30, 100, 365]
+      },
+      {
+        "name": "Curious Mind",
+        "trigger": "Various engagement milestones",
+        "milestones": ["single tier"]
+      },
+      {
+        "name": "Founder",
+        "trigger": "Waitlist / beta tester status; also 3+ referrals",
+        "milestones": ["single tier"]
+      },
+      {
+        "name": "Guild Master",
+        "trigger": "Active Performer (Guild Master) subscription",
+        "milestones": ["single tier"]
+      },
+      {
+        "name": "Pro Member",
+        "trigger": "Active Advanced subscription",
+        "milestones": ["single tier"]
+      }
+    ]
+  },
+
+  "clavesEconomy": {
+    "name": "Claves",
+    "symbol": "🥢",
+    "namingNote": "Named after the clave rhythm instrument — the heartbeat of salsa music.",
+    "philosophy": "Earned through courage. Spent on community participation. The system rewards making mistakes openly.",
+    "starterPack": 15,
+    "earning": [
+      { "action": "New user starter pack",         "amount": 15 },
+      { "action": "Daily login (base tier)",        "amount": "1–3 (RNG)" },
+      { "action": "Daily login (Guild Master)",     "amount": "4–8 (RNG)" },
+      { "action": "Streak bonus every 5 days (base)", "amount": 10 },
+      { "action": "Streak bonus every 5 days (GM)",   "amount": 20 },
+      { "action": "Accepted Lab answer",            "amount": 15 },
+      { "action": "Referral bonus",                 "amount": 50 },
+      { "action": "Reaction refund (up to 5/video)", "amount": 1 },
+      { "action": "Advanced subscription monthly", "amount": 10 },
+      { "action": "Performer subscription monthly","amount": 20 }
+    ],
+    "spending": [
+      { "action": "React to a Stage post",          "cost": 1 },
+      { "action": "Comment on a Stage post",        "cost": 2 },
+      { "action": "Post a question in The Lab",     "cost": 5 },
+      { "action": "Post a video to The Stage",      "cost": 15 },
+      { "action": "Streak freeze repair (emergency)","cost": 10 },
+      { "action": "Buy inventory freeze",           "cost": 10 }
+    ],
+    "slots": {
+      "base": { "videoSlots": 5,  "questionSlots": 10 },
+      "vip":  { "videoSlots": 20, "questionSlots": 50 }
+    }
+  },
+
+  "community": {
+    "theLab": {
+      "type": "Q&A",
+      "model": "Stack Overflow-style",
+      "features": [
+        "Post technical dance questions",
+        "Rich markdown answers",
+        "Solution marking by post author",
+        "Accepted answer = 15 🥢 reward for responder",
+        "Solved/unsolved status",
+        "Tag taxonomy (technique, general, musicality, etc.)"
+      ],
+      "access": "All paid tiers"
+    },
+    "theStage": {
+      "type": "Video feedback community",
+      "model": "Instagram-style video sharing for dance progress",
+      "feedbackTypes": [
+        { "mode": "Hype",   "description": "Reactions only — 🔥 Fire, 📏 Ruler, 👏 Clap" },
+        { "mode": "Coach",  "description": "Reactions + open text comments" }
+      ],
+      "features": [
+        "WIP (Work In Progress) banner for honest rough submissions",
+        "Tag system for categorization",
+        "Public profile integration",
+        "Video reply support"
+      ],
+      "reactions": [
+        { "emoji": "🔥", "name": "Fire",      "meaning": "Energy, passion, presence" },
+        { "emoji": "📏", "name": "Ruler",     "meaning": "Precision, accuracy, technique" },
+        { "emoji": "👏", "name": "Clap",      "meaning": "Encouragement, effort, growth" }
+      ],
+      "access": "All paid tiers"
+    },
+    "leaderboard": {
+      "categories": ["Overall", "Helpful", "Creative", "Active"],
+      "periods": ["Weekly", "Monthly", "All-time"],
+      "hallOfFame": "All-time top 5 across all categories"
+    }
+  },
+
+  "proControls": {
+    "available": "All paid tiers",
+    "tools": [
+      {
+        "name": "A/B Loop",
+        "description": "Set a start and end point on the video timeline. The player loops that section automatically — drill a 3-second movement segment on infinite repeat without touching the scrubber."
+      },
+      {
+        "name": "Frame-by-Frame",
+        "description": "Step through video one frame at a time. Essential for analysing foot placement, hip movement, or arm styling at sub-second resolution."
+      },
+      {
+        "name": "Speed Control",
+        "description": "Playback from 0.25x to 2x speed, with pitch preservation. Watch a fast spin at quarter speed to catch what's actually happening in the body."
+      }
+    ]
+  },
+
+  "streakSystem": {
+    "mechanic": "Increment on daily login. Reset if a day is missed (unless a freeze is used).",
+    "protection": [
+      { "type": "Weekly freebie",      "cost": "Free (resets every Monday)" },
+      { "type": "Inventory freeze",    "cost": "10 🥢 each — buy in advance" },
+      { "type": "Emergency repair",    "cost": "10 🥢 — repair after breaking (confirmation required)" }
+    ],
+    "badgeFamily": "Metronome / Unstoppable — Bronze at 7 days, Silver at 30, Gold at 100, Diamond at 365"
+  },
+
+  "guildMasterHub": {
+    "theRoundtable": {
+      "description": "Weekly live Zoom calls hosted by Pavle for Guild Master members.",
+      "features": [
+        "Live Q&A on technique, training, music",
+        "Real-time feedback on student questions",
+        "Guest instructors occasionally"
+      ],
+      "archiving": "All sessions recorded and stored in The Vault"
+    },
+    "coaching": {
+      "description": "Monthly personal video feedback from Pavle.",
+      "limit": "1 submission per month",
+      "maxLength": "100 seconds",
+      "howItWorks": [
+        "Student uploads dance video through the platform",
+        "Optional: include one specific question (140 characters)",
+        "Optional: consent to use clip for social media (+50 XP if yes)",
+        "Pavle reviews and records a video feedback response",
+        "Student receives email notification when feedback is ready",
+        "Watch feedback via secure link in the Guild Master hub"
+      ],
+      "statusFlow": "pending → in_review → completed / expired"
+    },
+    "djBooth": {
+      "description": "Real salsa tracks with professionally separated audio stems.",
+      "stems": ["Full Mix", "Percussion (congas, timbales, bongo)", "Piano / Bass", "Vocals / Brass"],
+      "useCase": "Practice dancing to just the clave and congas to develop rhythmic independence. Or isolate the piano guajeo to train musicality."
+    },
+    "theVault": {
+      "description": "Archive of all past Roundtable recording sessions.",
+      "features": [
+        "Topic and tag filtering",
+        "YouTube unlisted URLs for playback",
+        "Time-limited signed access links"
+      ]
+    }
+  },
+
+  "faqs": [
+    {
+      "question": "Is this for complete beginners?",
+      "answer": "Yes. The Skill Tree starts at ground zero — weight transfer, timing basics, the clave. You don't need any prior dance experience. The system is designed to give you a clear path whether you've never danced or you've been dancing for years."
+    },
+    {
+      "question": "Do I need a partner to benefit from this?",
+      "answer": "No. The majority of the curriculum is solo — footwork, body mechanics, styling, musicality. Having a partner helps you apply what you learn, but it's not a prerequisite to getting value from the platform."
+    },
+    {
+      "question": "Why On2 specifically? Why not On1?",
+      "answer": "On2 (New York Style Mambo) is the style with the richest musical relationship to the clave — the heartbeat of Afro-Cuban music. It's where the music and movement align most truthfully. We chose depth over breadth. One style, done right."
+    },
+    {
+      "question": "Can I cancel anytime?",
+      "answer": "Yes. No contracts, no cancellation fees. Cancel from your profile or subscription settings page. If you cancel during the $1 trial you won't be charged anything."
+    },
+    {
+      "question": "What's the difference between Guild Member and Guild Master?",
+      "answer": "Guild Member gives you the full curriculum, skill tree, community, and pro tools. Guild Master adds the monthly 1-on-1 video coaching with Pavle, access to weekly live Zoom calls (The Roundtable), the full archive (The Vault), and the DJ Booth stem isolation tool. It's capped at 30 spots to maintain the quality of the personal coaching."
+    },
+    {
+      "question": "How does the $1 trial work?",
+      "answer": "You get full Guild Member access for 7 days for $1. After 7 days, your card is charged $39/month unless you cancel. There's no locked-in period — cancel anytime before the 7 days are up and you pay only $1 total."
+    },
+    {
+      "question": "What are Claves (🥢)?",
+      "answer": "Claves are the in-platform currency, named after the percussion instrument at the heart of salsa music. You earn them by showing up daily, posting your dancing, helping others in The Lab, and maintaining streaks. You spend them to participate in the community. The system is designed so that courage — putting your imperfect dancing out there — is rewarded."
+    },
+    {
+      "question": "How is this different from YouTube tutorials?",
+      "answer": "Three things: structure, accountability, and community. YouTube gives you fragments. The Guild gives you a system — a 38-tier path with clear prerequisites, Boss Battle checkpoints, and a community that gives you real feedback. The A/B Loop and frame-by-frame tools alone are worth more than any random tutorial."
+    },
+    {
+      "question": "I've been dancing for 3 years. Is this too basic for me?",
+      "answer": "Almost certainly not. The Skill Tree has 38 tiers. Most self-taught dancers with 3 years of experience have significant gaps in body mechanics, musicality, or both — they just don't know what they don't know. The Lab and Boss Battle system are particularly valuable for intermediate dancers."
+    },
+    {
+      "question": "Who is Pavle Popovic?",
+      "answer": "Pavle is the founder and lead instructor of The Mambo Guild. He's a certified Learning Experience Designer (LXD) with deep expertise in dance pedagogy and training science. Guild Master members work with him directly through the monthly 1-on-1 coaching."
+    }
+  ],
+
+  "objectionHandling": [
+    {
+      "objection": "I learn better in person",
+      "response": "In-person learning is irreplaceable for partner dynamics — full stop. But motor learning science is clear: the volume of repetitions, the ability to slow technique to 25% speed and loop it 40 times, the structured feedback loop — video instruction wins in those dimensions. The Guild is built to complement in-person lessons, not replace them. Most members use both."
+    },
+    {
+      "objection": "It's too expensive",
+      "response": "$39/month is $1.30 a day. One in-person group class is $20–30. The Guild gives you 40 hours of structured content, daily — with tools, community, and a skill map. The $1 trial costs less than a cup of coffee and gives you 7 days to decide for yourself."
+    },
+    {
+      "objection": "I don't have time",
+      "response": "Lessons are modular — 5 to 20 minutes each. You don't need an hour. You need a lunch break and an A/B loop. The streak system is designed for real life — with one free weekly freeze built in."
+    },
+    {
+      "objection": "I'm not sure I'm ready",
+      "response": "That feeling is the point. The platform was built for people who feel not ready. The Skill Tree shows you exactly where to start. The Boss Battle tells you when you're actually ready to move forward — not when you think you look good enough."
+    },
+    {
+      "objection": "I tried online learning and it didn't work",
+      "response": "Was it structured? Did it tell you where you stood, what to work on next, and give you community accountability? Most online dance content is a pile of fragments without a roadmap. That's the problem The Guild was built to solve."
+    }
+  ]
+}

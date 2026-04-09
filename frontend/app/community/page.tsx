@@ -12,7 +12,6 @@ import CommunitySidebar from "@/components/community/CommunitySidebar";
 import CommunityWidgets from "@/components/community/CommunityWidgets";
 import StageVideoCard from "@/components/community/StageVideoCard";
 import LabQuestionRow from "@/components/community/LabQuestionRow";
-import ActivityTicker from "@/components/community/ActivityTicker";
 import PreviewCTABar from "@/components/community/PreviewCTABar";
 import CreatePostModal from "@/components/CreatePostModal";
 import PostDetailModal from "@/components/PostDetailModal";
@@ -40,6 +39,7 @@ interface Post {
     reaction_count: number;
     reply_count: number;
     user_reaction: string | null;
+    is_saved?: boolean;
     has_instructor_comment?: boolean;
     created_at: string;
     updated_at: string;
@@ -74,16 +74,20 @@ export default function CommunityPage() {
         setIsLoading(true);
         setError(null);
         try {
-            const feed = await apiClient.getCommunityFeed({
-                post_type: (viewMode === "saved" || viewMode === "my_posts") ? undefined : viewMode,
-                tag: selectedTopics.length === 1 ? selectedTopics[0] : undefined,
-                tags: selectedTopics.length > 1 ? selectedTopics : undefined,
-                forceRefresh: true,
-            });
-            setPosts(feed as Post[]);
+            let feed: Post[];
+            if (viewMode === "saved") {
+                feed = (await apiClient.getSavedPosts()) as Post[];
+            } else {
+                feed = (await apiClient.getCommunityFeed({
+                    post_type: viewMode === "my_posts" ? undefined : viewMode,
+                    tag: selectedTopics.length === 1 ? selectedTopics[0] : undefined,
+                    tags: selectedTopics.length > 1 ? selectedTopics : undefined,
+                    forceRefresh: true,
+                })) as Post[];
+            }
+            setPosts(feed);
         } catch (err: any) {
             console.error("Failed to load community feed:", err);
-            // In preview mode, show sample content on error
             if (isPreviewMode) {
                 setPosts([]);
             } else {
@@ -334,7 +338,7 @@ export default function CommunityPage() {
             {!isPreviewMode && (
                 <motion.button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="fixed bottom-8 right-8 w-16 h-16 bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full shadow-[0_0_30px_rgba(219,39,119,0.5)] flex items-center justify-center z-50 border border-white/20"
+                    className="fixed bottom-6 right-4 sm:bottom-8 sm:right-8 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full shadow-[0_0_30px_rgba(219,39,119,0.5)] flex items-center justify-center z-50 border border-white/20"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ opacity: 0, y: 50 }}

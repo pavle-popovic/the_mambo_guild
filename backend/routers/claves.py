@@ -46,7 +46,7 @@ class RepairStreakResponse(BaseModel):
 
 
 @router.get("/wallet", response_model=WalletResponse)
-async def get_wallet(
+def get_wallet(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -58,7 +58,7 @@ async def get_wallet(
 
 
 @router.post("/daily-claim", response_model=DailyClaimResponse)
-async def claim_daily_claves(
+def claim_daily_claves(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -79,7 +79,7 @@ async def claim_daily_claves(
 
 
 @router.get("/balance-check/{amount}", response_model=ClaveBalanceCheck)
-async def check_balance(
+def check_balance(
     amount: int,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -99,7 +99,7 @@ async def check_balance(
 
 
 @router.get("/slot-status")
-async def get_slot_status(
+def get_slot_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -114,7 +114,7 @@ async def get_slot_status(
 # ============================================
 
 @router.get("/freeze-status", response_model=FreezeStatusResponse)
-async def get_freeze_status(
+def get_freeze_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -127,7 +127,7 @@ async def get_freeze_status(
 
 
 @router.post("/buy-freeze", response_model=FreezeActionResponse)
-async def buy_streak_freeze(
+def buy_streak_freeze(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -156,7 +156,7 @@ async def buy_streak_freeze(
 
 
 @router.post("/repair-streak", response_model=RepairStreakResponse)
-async def repair_streak_with_claves(
+def repair_streak_with_claves(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

@@ -19,6 +19,8 @@ import SkillNode from "./SkillNode";
 import GoldEdge from "./GoldEdge";
 import StarryBackground from "../ui/StarryBackground";
 import NodeTooltip from "./NodeTooltip";
+import { useAuth } from "@/contexts/AuthContext";
+import AuthPromptModal from "@/components/AuthPromptModal";
 
 // Your backend data types
 interface Level {
@@ -67,6 +69,8 @@ interface ConstellationGraphProps {
   edges: EdgeData[];
   onNodeClick?: (levelId: string) => void;
   courseId: string;
+  courseTitle?: string;
+  isCourseLocked?: boolean;
   isAdminMode?: boolean; // Disable scroll capture in admin mode
 }
 
@@ -151,9 +155,14 @@ function ConstellationGraphInner({
   edges,
   onNodeClick,
   courseId,
+  courseTitle,
+  isCourseLocked = false,
   isAdminMode = false,
 }: ConstellationGraphProps) {
   const router = useRouter();
+  const { user } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredNode, setHoveredNode] = useState<HoveredNode | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -282,6 +291,18 @@ function ConstellationGraphInner({
         return;
       }
 
+      // Require login to access lessons
+      if (!user) {
+        setShowAuthModal(true);
+        return;
+      }
+
+      // Require subscription for paid courses
+      if (isCourseLocked) {
+        setShowSubscribeModal(true);
+        return;
+      }
+
       // If unlocked, fetch lessons and navigate to first lesson
       if (level.is_unlocked) {
         try {
@@ -291,6 +312,12 @@ function ConstellationGraphInner({
               credentials: "include" as RequestCredentials,
             }
           );
+
+          if (response.status === 403) {
+            // Subscription required
+            setShowSubscribeModal(true);
+            return;
+          }
 
           if (response.ok) {
             const lessons = await response.json();
@@ -310,19 +337,32 @@ function ConstellationGraphInner({
       }
       // If locked, tooltip already shows the message
     },
-    [levels, courseId, router, onNodeClick, isAdminMode]
+    [levels, courseId, router, onNodeClick, isAdminMode, isCourseLocked, user]
   );
 
-  // Create nodes and edges, then apply dagre layout
+  // Create nodes and edges — use stored positions when available, dagre as fallback
   const { nodes: flowNodes, edges: flowEdges } = useMemo(() => {
-    // Create initial nodes (positions will be calculated by dagre)
+    // Scale factor: DB stores 0-100 positions, convert to pixel coords for ReactFlow
+    // Needs to be large enough that nodes (90x100px) don't overlap at 10-unit y spacing
+    const POS_SCALE = 20;
+
+    // Check if levels have meaningful stored positions (not all zero/default)
+    const hasStoredPositions = levels.some(
+      (l) => l.x_position > 0 || l.y_position > 0
+    );
+
     // With BT (Bottom-to-Top) layout:
     // - Edges exit from TOP of source nodes (lower in tree, going up)
     // - Edges enter at BOTTOM of target nodes (higher in tree)
     const initialNodes = levels.map((level) => ({
       id: level.id,
       type: "skill",
-      position: { x: 0, y: 0 }, // Placeholder, dagre will set this
+      position: hasStoredPositions
+        ? {
+            x: (level.x_position - 50) * POS_SCALE,
+            y: level.y_position * POS_SCALE,
+          }
+        : { x: 0, y: 0 },
       sourcePosition: Position.Top,    // Edges exit from top
       targetPosition: Position.Bottom, // Edges enter from bottom
       data: {
@@ -350,7 +390,10 @@ function ConstellationGraphInner({
       };
     });
 
-    // Apply dagre layout
+    // Use stored positions if available, otherwise fall back to dagre auto-layout
+    if (hasStoredPositions) {
+      return { nodes: initialNodes, edges: initialEdges };
+    }
     return getLayoutedElements(initialNodes, initialEdges);
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
 
@@ -632,6 +675,21 @@ function ConstellationGraphInner({
           </div>
         </div>
       )}
+
+      {/* Auth prompt for logged-out users clicking on nodes */}
+      <AuthPromptModal
+        isOpen={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        type="login"
+      />
+
+      {/* Subscribe prompt for users without subscription */}
+      <AuthPromptModal
+        isOpen={showSubscribeModal}
+        onClose={() => setShowSubscribeModal(false)}
+        type="subscribe"
+        courseTitle={courseTitle}
+      />
     </div>
   );
 }

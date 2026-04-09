@@ -45,7 +45,7 @@ class DownloadUrlResponse(BaseModel):
 
 
 @router.get("/status", response_model=DownloadStatusResponse)
-async def get_user_download_status(
+def get_user_download_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -57,7 +57,7 @@ async def get_user_download_status(
 
 
 @router.post("/lesson/{lesson_id}", response_model=DownloadUrlResponse)
-async def get_lesson_download_url(
+def get_lesson_download_url(
     lesson_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -135,7 +135,7 @@ async def get_lesson_download_url(
 
 
 @router.post("/community/{post_id}", response_model=DownloadUrlResponse)
-async def get_community_video_download_url(
+def get_community_video_download_url(
     post_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)

@@ -165,7 +165,7 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user} />
 
-      <div className="max-w-5xl mx-auto px-8 py-12 pt-28">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-8 sm:py-12 pt-24 sm:pt-28">
         <div className="flex flex-col md:flex-row items-center md:items-start gap-10 mb-16">
           <div className="flex flex-col items-center gap-4">
             <div className="relative group cursor-pointer">
@@ -293,7 +293,7 @@ export default function ProfilePage() {
                 </div>
               ) : (
                 <div className="flex items-center gap-3 group/username">
-                  <h1 className="text-3xl font-bold text-mambo-text">
+                  <h1 className="text-xl sm:text-3xl font-bold text-mambo-text break-all">
                     @{user.username || `${user.first_name}${user.last_name}`}
                   </h1>
                   <button
@@ -326,7 +326,7 @@ export default function ProfilePage() {
             </div>
             <p className="text-gray-400 mb-8">Mambo Engineer • Member since 2024</p>
 
-            <div className="flex flex-wrap justify-center md:justify-start gap-4">
+            <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-4">
               <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
                 <FaFire className="text-orange-500" />
                 <div>

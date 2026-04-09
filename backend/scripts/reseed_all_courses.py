@@ -251,45 +251,90 @@ def seed_full_courses():
     ]
 
     # 4. PACHANGA (OPEN LEVEL)
+    # Skill tree: 3 branches from Basic Pachanga, all converge at Pachanga Syncopations → boss
     pachanga_nodes = [
-        # P1
-        {"id": "p_intro", "title": "History & Intro", "week": 1, "x": 50, "y": 90, "type": "skill"},
-        {"id": "p_bounce", "title": "Bounce & Timing", "week": 1, "x": 50, "y": 80, "type": "skill_track"},
-        {"id": "p_angles", "title": "Angles", "week": 1, "x": 50, "y": 70, "type": "skill"},
-        {"id": "p_basic", "title": "Basic Pachanga 1", "week": 1, "x": 50, "y": 60, "type": "skill"},
-        {"id": "p_ssd", "title": "Single Single Double", "week": 1, "x": 50, "y": 50, "type": "skill_track"},
-        {"id": "p_walking", "title": "Walking Pachanga", "week": 1, "x": 50, "y": 40, "type": "skill"},
-        {"id": "p_checkpoint1", "title": "MINI COMBO: CHARLESTON", "week": 1, "x": 50, "y": 30, "type": "combo"},
+        # Linear entry path
+        {"id": "pc_intro",        "title": "Intro",                  "week": 1, "x": 50, "y": 95, "type": "skill"},
+        {"id": "pc_history1",     "title": "History 1",              "week": 1, "x": 50, "y": 88, "type": "skill"},
+        {"id": "pc_bounce",       "title": "Bounce",                 "week": 1, "x": 50, "y": 81, "type": "skill"},
+        {"id": "pc_angles",       "title": "Angles",                 "week": 1, "x": 50, "y": 74, "type": "skill"},
+        {"id": "pc_basic",        "title": "Basic Pachanga",         "week": 1, "x": 50, "y": 67, "type": "skill"},
 
-        # P2
-        {"id": "p_style", "title": "Styling", "week": 2, "x": 20, "y": 30, "type": "skill_track"},
-        {"id": "p_kicks", "title": "Pachanga Kicks", "week": 2, "x": 40, "y": 20, "type": "skill"},
-        {"id": "p_taps", "title": "Pachanga Taps", "week": 2, "x": 60, "y": 20, "type": "skill"},
-        {"id": "p_jumps", "title": "Pachanga Jumps 1 & 2", "week": 2, "x": 40, "y": 10, "type": "skill"},
-        {"id": "p_sync", "title": "Syncopated Pachanga", "week": 2, "x": 60, "y": 10, "type": "skill"},
-        {"id": "p_glides", "title": "Glides & Shuffles", "week": 2, "x": 50, "y": 5, "type": "skill"},
-        {"id": "p_final_combo", "title": "FINAL PACHANGA COMBO", "week": 2, "x": 50, "y": 0, "type": "combo"},
+        # Row 6: three branches
+        {"id": "pc_ssd",          "title": "Single Single Double",   "week": 1, "x": 20, "y": 58, "type": "skill"},
+        {"id": "pc_history2",     "title": "History 2",              "week": 1, "x": 50, "y": 58, "type": "skill"},
+        {"id": "pc_basic_to_p",   "title": "Basic to Pachanga",      "week": 1, "x": 80, "y": 58, "type": "skill_track"},
+
+        # Row 7
+        {"id": "pc_walking",      "title": "Walking Pachanga",       "week": 2, "x": 20, "y": 50, "type": "skill"},
+        {"id": "pc_charleston_p", "title": "Charleston Pachanga",    "week": 2, "x": 50, "y": 50, "type": "skill"},
+
+        # Row 8
+        {"id": "pc_kick_tap",     "title": "Kick Tap Chuck",         "week": 2, "x": 20, "y": 42, "type": "skill"},
+        {"id": "pc_charleston_s", "title": "Charleston SSD",         "week": 2, "x": 50, "y": 42, "type": "skill"},
+
+        # Row 9
+        {"id": "pc_hops",         "title": "Pachanga Hops",          "week": 2, "x": 20, "y": 34, "type": "skill"},
+        {"id": "pc_jump",         "title": "Pachanga Jump",          "week": 2, "x": 50, "y": 34, "type": "skill"},
+        {"id": "pc_skip",         "title": "Pachanga Skip",          "week": 2, "x": 80, "y": 34, "type": "skill_track"},
+
+        # Row 10
+        {"id": "pc_ronde",        "title": "Pachanga Ronde",         "week": 2, "x": 20, "y": 26, "type": "skill"},
+        {"id": "pc_kicks",        "title": "Pachanga Kicks",         "week": 2, "x": 50, "y": 26, "type": "skill"},
+
+        # Row 11: convergence
+        {"id": "pc_synco",        "title": "Pachanga Syncopations",  "week": 2, "x": 50, "y": 16, "type": "skill"},
+
+        # Row 12: final boss
+        {"id": "pc_choreo",       "title": "Choreo Smooth Criminal", "week": 2, "x": 50, "y": 6,  "type": "combo"},
     ]
 
     pachanga_edges = [
-        # P1
-        ("p_intro", "p_bounce"),
-        ("p_bounce", "p_angles"),
-        ("p_angles", "p_basic"),
-        ("p_basic", "p_ssd"),
-        ("p_ssd", "p_walking"),
-        ("p_walking", "p_checkpoint1"),
+        # Linear entry path
+        ("pc_intro",        "pc_history1"),
+        ("pc_history1",     "pc_bounce"),
+        ("pc_bounce",       "pc_angles"),
+        ("pc_angles",       "pc_basic"),
 
-        # P2
-        ("p_ssd", "p_style"), # Bypass
-        ("p_checkpoint1", "p_kicks"),
-        ("p_checkpoint1", "p_taps"),
-        ("p_kicks", "p_jumps"),
-        ("p_taps", "p_sync"),
-        ("p_jumps", "p_glides"),
-        ("p_sync", "p_glides"),
-        ("p_glides", "p_final_combo"),
-        ("p_style", "p_final_combo"),
+        # Basic Pachanga → SSD → Walking Pachanga
+        ("pc_basic",        "pc_ssd"),
+        ("pc_ssd",          "pc_walking"),
+
+        # Basic Pachanga → Charleston Pachanga → Charleston SSD (prerequisite for Charleston SSD)
+        ("pc_basic",        "pc_charleston_p"),
+        ("pc_charleston_p", "pc_charleston_s"),
+
+        # Walking Pachanga also feeds Charleston SSD
+        ("pc_walking",      "pc_charleston_s"),
+
+        # Charleston SSD → Final Boss (short-circuit path)
+        ("pc_charleston_s", "pc_choreo"),
+
+        # Walking Pachanga → Kick Tap Chuck
+        ("pc_walking",      "pc_kick_tap"),
+
+        # Kick Tap Chuck splits into Hops and Skips
+        ("pc_kick_tap",     "pc_hops"),
+        ("pc_kick_tap",     "pc_skip"),
+
+        # Skips → Ronde, Jump, and Kicks
+        ("pc_skip",         "pc_ronde"),
+        ("pc_skip",         "pc_jump"),
+        ("pc_skip",         "pc_kicks"),
+
+        # Hops → Kicks
+        ("pc_hops",         "pc_kicks"),
+
+        # Ronde → Syncopations
+        ("pc_ronde",        "pc_synco"),
+
+        # All leaves (no further outgoing edges) → Final Boss
+        ("pc_synco",        "pc_choreo"),
+        ("pc_kicks",        "pc_choreo"),
+        ("pc_jump",         "pc_choreo"),
+        # History 2 and Basic to Pachanga are standalone nodes with no incoming path
+        ("pc_history2",     "pc_choreo"),
+        ("pc_basic_to_p",   "pc_choreo"),
     ]
 
     # 5. BODYMOVEMENT (OPEN LEVEL)
@@ -366,9 +411,9 @@ def seed_full_courses():
             "order": 3
         },
         {
-            "slug": "pachanga-foundations",
-            "title": "Pachanga Foundations",
-            "description": "Master the groove of Pachanga. From the basic bounce to fancy footwork, kicks, and glides.",
+            "slug": "pachanga",
+            "title": "Pachanga",
+            "description": "Master the groove of Pachanga. From the basic bounce and history to fancy footwork, Charleston rhythms, and the Smooth Criminal choreo.",
             "difficulty": "OPEN", # OPEN LEVEL
             "course_type": "course", # or choreo? Keeping as course for now
             "nodes": pachanga_nodes,

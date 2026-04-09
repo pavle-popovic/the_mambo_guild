@@ -4,8 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import { HoverCard } from "@/components/ui/motion";
-import AuthPromptModal from "@/components/AuthPromptModal";
 import { Clock, CheckCircle, Sparkles } from "lucide-react";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface CourseCardProps {
   course: {
@@ -32,9 +32,8 @@ interface CourseCardProps {
 
 export default function CourseCard({ course, index, user, onCourseClick }: CourseCardProps) {
   const router = useRouter();
+  const tCourses = useTranslations('courses');
   const [isHovering, setIsHovering] = useState(false);
-  const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
 
   // Static thumbnail URL
   const thumbnailUrl = course.thumbnail_url || course.image_url || "/assets/Mambo_image_1.png";
@@ -66,17 +65,6 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
 
   const handleCourseClickInternal = () => {
     onCourseClick(course);
-
-    if (!user) {
-      setShowAuthModal(true);
-      return;
-    }
-
-    if (course.is_locked) {
-      setShowSubscribeModal(true);
-      return;
-    }
-
     router.push(`/courses/${course.id}`);
   };
 
@@ -119,8 +107,7 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
           onClick={handleCourseClickInternal}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          className={`relative bg-zinc-900 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 group cursor-pointer ${course.is_locked || !user ? "opacity-90" : "hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
-            }`}
+          className="relative bg-zinc-900 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 group cursor-pointer hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
         >
           {/* Image/Preview section */}
           <div className="relative aspect-[16/9]">
@@ -160,7 +147,7 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
             )}
 
             {/* Lock Badge - Top Right */}
-            {(course.is_locked || !user) && (
+            {course.is_locked && (
               <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md p-1.5 rounded-full text-mambo-gold z-20">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
@@ -173,7 +160,7 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
             <div className="absolute bottom-0 left-0 right-0 px-4 pt-4 pb-0 z-10">
               {/* Title + Level + Type on same line */}
               <div className="flex items-baseline gap-3 flex-wrap mb-0.5">
-                <h3 className="gold-shimmer-text font-bold text-xl tracking-wide drop-shadow-md">{course.title}</h3>
+                <h3 className="gold-shimmer-text font-bold text-base sm:text-xl tracking-wide drop-shadow-md line-clamp-2">{course.title}</h3>
                 <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider font-semibold">
                   <span className={`${course.difficulty === 'Beginner' ? 'text-green-400' : course.difficulty === 'Intermediate' ? 'text-yellow-400' : course.difficulty === 'Advanced' ? 'text-red-400' : 'text-purple-400'}`}>
                     {course.difficulty || "All Levels"}
@@ -194,13 +181,13 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
                 className="w-full py-2.5 bg-gradient-to-r from-mambo-gold/20 to-yellow-600/20 hover:from-mambo-gold/30 hover:to-yellow-600/30 text-mambo-gold font-bold text-sm uppercase tracking-wider rounded-lg border border-mambo-gold/40 transition-all duration-300"
               >
                 <span className="flex items-center justify-center gap-2">
-                  <i className="fa-solid fa-play text-xs"></i> Start Course
+                  <i className="fa-solid fa-play text-xs"></i> {tCourses('startCourse')}
                 </span>
               </button>
             ) : course.progress_percentage >= 100 ? (
               // 100% - Completed Badge
               <div className="w-full py-2.5 bg-gradient-to-r from-green-500/20 to-emerald-500/20 text-green-400 font-bold text-sm uppercase tracking-wider rounded-lg border border-green-500/40 flex items-center justify-center gap-2">
-                <i className="fa-solid fa-check-circle"></i> Completed
+                <i className="fa-solid fa-check-circle"></i> {tCourses('completed')}
               </div>
             ) : (
               // 1-99% - Progress Bar
@@ -245,21 +232,6 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
       </HoverCard>
 
 
-      {/* Auth Prompt Modal */}
-      <AuthPromptModal
-        isOpen={showAuthModal}
-        onClose={() => setShowAuthModal(false)}
-        type="login"
-        courseTitle={course.title}
-      />
-
-      {/* Subscribe Prompt Modal */}
-      <AuthPromptModal
-        isOpen={showSubscribeModal}
-        onClose={() => setShowSubscribeModal(false)}
-        type="subscribe"
-        courseTitle={course.title}
-      />
     </>
   );
 }

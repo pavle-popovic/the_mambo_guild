@@ -293,6 +293,103 @@ def send_announcement_email(email: str, name: str, subject: str, message: str) -
         return False
 
 
+def send_bug_report_email(
+    message: str,
+    reporter_email: Optional[str],
+    reporter_name: Optional[str],
+    page_url: str,
+    user_agent: str,
+    device_info: dict,
+    screenshot_urls: list,
+) -> bool:
+    """
+    Send a bug report email to support@themamboguild.com.
+
+    Args:
+        message: User's description of the bug
+        reporter_email: User's email (optional, from auth context)
+        reporter_name: User's name (optional)
+        page_url: URL where the bug occurred
+        user_agent: Browser user agent string
+        device_info: Dict with screen size, viewport, platform, language, timezone
+        screenshot_urls: List of public R2 URLs to attached screenshots/images
+
+    Returns:
+        True if sent successfully, False otherwise
+    """
+    if not resend or not settings.RESEND_API_KEY:
+        logger.error("Resend client not configured. Cannot send bug report email.")
+        return False
+
+    try:
+        from_email = settings.FROM_EMAIL
+        support_email = "support@themamboguild.com"
+
+        # Escape user-provided content to avoid HTML injection
+        from html import escape
+        safe_message = escape(message).replace("\n", "<br>")
+        safe_page_url = escape(page_url)
+        safe_ua = escape(user_agent)
+        safe_reporter = escape(reporter_email or "anonymous")
+        safe_name = escape(reporter_name or "—")
+
+        screenshots_html = ""
+        if screenshot_urls:
+            thumbs = "".join(
+                f'<a href="{escape(url)}" target="_blank" style="display:inline-block;margin:8px 8px 0 0;">'
+                f'<img src="{escape(url)}" alt="screenshot" style="max-width:280px;border:1px solid #ddd;border-radius:4px;"/>'
+                f"</a>"
+                for url in screenshot_urls
+            )
+            screenshots_html = f"<h3 style='margin-top:24px;'>Screenshots</h3>{thumbs}"
+
+        device_rows = "".join(
+            f"<tr><td style='padding:4px 12px;color:#666;'>{escape(str(k))}</td>"
+            f"<td style='padding:4px 12px;font-family:monospace;'>{escape(str(v))}</td></tr>"
+            for k, v in device_info.items()
+        )
+
+        reply_to = reporter_email if reporter_email else from_email
+
+        result = resend.Emails.send({
+            "from": from_email,
+            "to": [support_email],
+            "reply_to": reply_to,
+            "subject": f"[Bug Report] {message[:60]}{'...' if len(message) > 60 else ''}",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family: -apple-system, Segoe UI, Arial, sans-serif; color:#222; max-width:720px; margin:0 auto; padding:24px;">
+                <h2 style="border-bottom:2px solid #D4AF37; padding-bottom:8px;">New Bug Report</h2>
+                <table style="border-collapse:collapse; margin-bottom:16px;">
+                    <tr><td style="padding:4px 12px;color:#666;">From</td><td style="padding:4px 12px;">{safe_name} &lt;{safe_reporter}&gt;</td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Page</td><td style="padding:4px 12px;"><a href="{safe_page_url}">{safe_page_url}</a></td></tr>
+                </table>
+
+                <h3>Message</h3>
+                <div style="background:#f9f7f1; border-left:3px solid #D4AF37; padding:12px 16px; white-space:pre-wrap;">{safe_message}</div>
+
+                {screenshots_html}
+
+                <h3 style="margin-top:24px;">Device / Browser</h3>
+                <table style="border-collapse:collapse; font-size:13px;">
+                    <tr><td style="padding:4px 12px;color:#666;">User Agent</td><td style="padding:4px 12px;font-family:monospace;word-break:break-all;">{safe_ua}</td></tr>
+                    {device_rows}
+                </table>
+
+                <p style="color:#888; font-size:12px; margin-top:32px;">Sent automatically by The Mambo Guild bug report widget. Reply to this email to contact the reporter directly.</p>
+            </body>
+            </html>
+            """,
+        })
+
+        logger.info(f"Bug report email sent to {support_email} (reporter: {reporter_email})")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send bug report email: {str(e)}")
+        return False
+
+
 def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -> bool:
     """
     Send welcome email to new waitlist members.

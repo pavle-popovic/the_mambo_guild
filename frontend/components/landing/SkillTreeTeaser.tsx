@@ -442,11 +442,18 @@ function SkillTreeGraphInner({ levels, edges: edgeData, onNodeSelect, selectedNo
   }, [levels, onNodeSelect]);
 
   const { nodes, edges } = useMemo(() => {
+    const POS_SCALE = 20;
+    const hasStoredPositions = levels.some((l) => l.x_position > 0 || l.y_position > 0);
     const flowNodes = levels.map((level) => ({
-      id: level.id, type: 'skill', position: { x: 0, y: 0 }, sourcePosition: Position.Top, targetPosition: Position.Bottom,
+      id: level.id, type: 'skill',
+      position: hasStoredPositions
+        ? { x: (level.x_position - 50) * POS_SCALE, y: level.y_position * POS_SCALE }
+        : { x: 0, y: 0 },
+      sourcePosition: Position.Top, targetPosition: Position.Bottom,
       data: { id: level.id, title: level.title, status: getNodeStatus(level), progress: level.completion_percentage, isSelected: selectedNodeId === level.id, isLoggedOut },
     }));
     const flowEdges = edgeData.map((edge) => ({ id: edge.id, source: edge.from_level_id, target: edge.to_level_id, type: 'gold', data: { status: getEdgeStatus(edge.from_level_id, edge.to_level_id), isLoggedOut } }));
+    if (hasStoredPositions) return { nodes: flowNodes, edges: flowEdges };
     return getLayoutedElements(flowNodes, flowEdges);
   }, [levels, edgeData, selectedNodeId, getNodeStatus, getEdgeStatus, isLoggedOut]);
 

@@ -23,7 +23,7 @@ router = APIRouter(tags=["Community"])
 
 
 @router.get("/stats")
-async def get_community_stats(
+def get_community_stats(
     period: Optional[str] = Query("all_time", description="weekly, monthly, all_time"),
     category: Optional[str] = Query("overall", description="overall, helpful, creative, active"),
     limit: int = Query(10, ge=1, le=50),
@@ -65,7 +65,7 @@ async def get_community_stats(
 
 
 @router.get("/stats/my-rank")
-async def get_my_rank(
+def get_my_rank(
     period: Optional[str] = Query("all_time"),
     category: Optional[str] = Query("overall"),
     current_user: User = Depends(get_current_user),
@@ -84,7 +84,7 @@ async def get_my_rank(
 
 
 @router.get("/feed", response_model=List[PostResponse])
-async def get_feed(
+def get_feed(
     post_type: Optional[str] = Query(None, description="Filter by 'stage' or 'lab'"),
     tag: Optional[str] = Query(None, description="Filter by single tag slug"),
     tags: Optional[str] = Query(None, description="Comma-separated tag slugs for multi-tag filter"),
@@ -114,7 +114,7 @@ async def get_feed(
 
 
 @router.get("/posts/{post_id}")
-async def get_post_detail(
+def get_post_detail(
     post_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -129,7 +129,7 @@ async def get_post_detail(
 
 
 @router.post("/posts")
-async def create_post(
+def create_post(
     request: PostCreateRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -191,7 +191,7 @@ async def create_post(
 
 
 @router.post("/posts/{post_id}/react")
-async def add_reaction(
+def add_reaction(
     post_id: str,
     request: ReactionRequest,
     current_user: User = Depends(get_current_user),
@@ -246,7 +246,7 @@ async def add_reaction(
 
 
 @router.delete("/posts/{post_id}/react")
-async def remove_reaction(
+def remove_reaction(
     post_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -269,7 +269,7 @@ async def remove_reaction(
 
 
 @router.post("/posts/{post_id}/replies")
-async def add_reply(
+def add_reply(
     post_id: str,
     request: ReplyCreateRequest,
     current_user: User = Depends(get_current_user),
@@ -326,7 +326,7 @@ async def add_reply(
 
 
 @router.post("/posts/{post_id}/replies/{reply_id}/accept")
-async def mark_solution(
+def mark_solution(
     post_id: str,
     reply_id: str,
     current_user: User = Depends(get_current_user),
@@ -374,7 +374,7 @@ async def mark_solution(
 
 
 @router.put("/posts/{post_id}/replies/{reply_id}")
-async def update_reply(
+def update_reply(
     post_id: str,
     reply_id: str,
     request: ReplyUpdateRequest,
@@ -403,7 +403,7 @@ async def update_reply(
 
 
 @router.delete("/posts/{post_id}/replies/{reply_id}")
-async def delete_reply(
+def delete_reply(
     post_id: str,
     reply_id: str,
     current_user: User = Depends(get_current_user),
@@ -430,7 +430,7 @@ async def delete_reply(
 
 
 @router.put("/posts/{post_id}")
-async def update_post(
+def update_post(
     post_id: str,
     request: PostUpdateRequest,
     current_user: User = Depends(get_current_user),
@@ -462,7 +462,7 @@ async def update_post(
 
 
 @router.delete("/posts/{post_id}")
-async def delete_post(
+def delete_post(
     post_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -484,8 +484,88 @@ async def delete_post(
     return result
 
 
+@router.post("/posts/{post_id}/save")
+def save_post(
+    post_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Bookmark a post. Idempotent — saving twice is a no-op."""
+    from models.community import Post, SavedPost
+
+    post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    existing = db.query(SavedPost).filter(
+        SavedPost.user_id == current_user.id,
+        SavedPost.post_id == post_id
+    ).first()
+    if existing:
+        return {"success": True, "message": "Already saved"}
+
+    db.add(SavedPost(user_id=current_user.id, post_id=post_id))
+    db.commit()
+    return {"success": True, "message": "Post saved"}
+
+
+@router.delete("/posts/{post_id}/save")
+def unsave_post(
+    post_id: str,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Remove a bookmark from a post."""
+    from models.community import SavedPost
+
+    saved = db.query(SavedPost).filter(
+        SavedPost.user_id == current_user.id,
+        SavedPost.post_id == post_id
+    ).first()
+    if not saved:
+        return {"success": True, "message": "Not saved"}
+
+    db.delete(saved)
+    db.commit()
+    return {"success": True, "message": "Post unsaved"}
+
+
+@router.get("/saved")
+def get_saved_posts(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(20, ge=1, le=50),
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """Get the current user's saved/bookmarked posts."""
+    from models.community import Post, SavedPost
+
+    saved_post_ids = (
+        db.query(SavedPost.post_id)
+        .filter(SavedPost.user_id == current_user.id)
+        .order_by(SavedPost.created_at.desc())
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
+    post_ids = [row[0] for row in saved_post_ids]
+    if not post_ids:
+        return []
+
+    posts = db.query(Post).filter(
+        Post.id.in_(post_ids),
+        Post.is_deleted == False
+    ).all()
+
+    # Preserve saved order
+    post_map = {p.id: p for p in posts}
+    ordered = [post_map[pid] for pid in post_ids if pid in post_map]
+
+    return post_service.format_posts_bulk_public(ordered, str(current_user.id), db)
+
+
 @router.get("/upload-check-lab", response_model=UploadCheckResponse)
-async def check_question_eligibility(
+def check_question_eligibility(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -499,7 +579,7 @@ async def check_question_eligibility(
 
 
 @router.get("/upload-check", response_model=UploadCheckResponse)
-async def check_upload_eligibility(
+def check_upload_eligibility(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -513,7 +593,7 @@ async def check_upload_eligibility(
 
 
 @router.get("/tags", response_model=List[TagResponse])
-async def get_tags(
+def get_tags(
     db: Session = Depends(get_db)
 ):
     """
@@ -524,7 +604,7 @@ async def get_tags(
 
 
 @router.get("/search")
-async def search_posts(
+def search_posts(
     q: str = Query(..., min_length=2, max_length=200, description="Search query"),
     post_type: Optional[str] = Query(None),
     tag: Optional[str] = Query(None, description="Filter by single tag slug"),

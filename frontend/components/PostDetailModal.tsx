@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaTrash, FaEdit, FaFire, FaRuler, FaSave } from "react-icons/fa";
+import { FaTimes, FaTrash, FaEdit, FaFire, FaRuler, FaSave, FaBookmark, FaRegBookmark } from "react-icons/fa";
 import MuxVideoPlayer from "./MuxVideoPlayer";
 import { apiClient } from "@/lib/api";
 import { useUISound } from "@/hooks/useUISound";
@@ -33,6 +33,7 @@ interface Post {
   reaction_count: number;
   reply_count: number;
   user_reaction: "fire" | "ruler" | "clap" | null;
+  is_saved?: boolean;
   user: {
     id: string;
     first_name: string;
@@ -439,14 +440,30 @@ export default function PostDetailModal({
     }
   };
 
+  const handleToggleSave = async () => {
+    if (!post) return;
+    try {
+      if (post.is_saved) {
+        await apiClient.unsavePost(postId);
+        setPost((prev) => prev ? { ...prev, is_saved: false } : null);
+      } else {
+        await apiClient.savePost(postId);
+        setPost((prev) => prev ? { ...prev, is_saved: true } : null);
+      }
+      UISoundClick();
+    } catch (err) {
+      console.error("Failed to toggle save:", err);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 to-black/95 rounded-2xl border border-white/10 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm">
+      <div className="relative w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 to-black/95 rounded-xl sm:rounded-2xl border border-white/10 shadow-2xl">
         {/* Header */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-4 bg-black/60 backdrop-blur-md border-b border-white/10">
-          <h2 className="text-xl font-semibold text-white">Post Details</h2>
+        <div className="sticky top-0 z-10 flex items-center justify-between p-3 sm:p-4 bg-black/60 backdrop-blur-md border-b border-white/10">
+          <h2 className="text-base sm:text-xl font-semibold text-white">Post Details</h2>
           <div className="flex items-center gap-2">
             {(() => {
               // Proper null checks and normalized comparison
@@ -515,6 +532,21 @@ export default function PostDetailModal({
               </>
             )}
 
+            {post && !isEditing && (
+              <button
+                onClick={handleToggleSave}
+                className={cn(
+                  "p-2 rounded-lg transition",
+                  post.is_saved
+                    ? "text-amber-400 hover:text-amber-300 hover:bg-amber-500/20"
+                    : "text-white/40 hover:text-white hover:bg-white/10"
+                )}
+                title={post.is_saved ? "Remove bookmark" : "Bookmark post"}
+              >
+                {post.is_saved ? <FaBookmark /> : <FaRegBookmark />}
+              </button>
+            )}
+
             <button
               onClick={() => {
                 UISoundClick();
@@ -553,13 +585,14 @@ export default function PostDetailModal({
                       !playerInitialized ? (
                         // Thumbnail with play button (tap-to-play)
                         <div
-                          className="relative aspect-video cursor-pointer group rounded-lg overflow-hidden"
+                          className="relative cursor-pointer group rounded-lg overflow-hidden bg-black flex items-center justify-center"
+                          style={{ maxHeight: "55vh" }}
                           onClick={() => setPlayerInitialized(true)}
                         >
                           <img
                             src={`https://image.mux.com/${post.mux_playback_id}/thumbnail.jpg?width=800&time=1`}
                             alt={post.title}
-                            className="w-full h-full object-cover"
+                            style={{ maxHeight: "55vh", maxWidth: "100%", objectFit: "contain", display: "block" }}
                           />
                           <div className="absolute inset-0 flex items-center justify-center bg-black/30 group-hover:bg-black/40 transition">
                             <div className="w-20 h-20 bg-white/90 rounded-full flex items-center justify-center shadow-lg group-hover:scale-110 transition-transform">
@@ -578,14 +611,20 @@ export default function PostDetailModal({
                         </div>
                       ) : (
                         // Full Mux player (only loads after user taps)
-                        <MuxVideoPlayer
-                          playbackId={post.mux_playback_id}
-                          autoPlay={true}
-                          metadata={{
-                            video_title: post.title,
-                            video_id: post.id,
-                          }}
-                        />
+                        <div
+                          className="relative rounded-lg overflow-hidden bg-black"
+                          style={{ height: "55vh" }}
+                        >
+                          <MuxVideoPlayer
+                            playbackId={post.mux_playback_id}
+                            autoPlay={true}
+                            containFit
+                            metadata={{
+                              video_title: post.title,
+                              video_id: post.id,
+                            }}
+                          />
+                        </div>
                       )
                     ) : (
                       <div className="w-full aspect-video bg-black/30 rounded-lg flex items-center justify-center">

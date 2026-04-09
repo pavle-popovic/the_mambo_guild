@@ -8,6 +8,16 @@ import { GiSaxophone, GiTrumpet, GiGrandPiano } from "react-icons/gi";
 export default function StarryBackground() {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+    const [mounted, setMounted] = useState(false);
+    const notePositions = useRef<Array<{ top: string; left: string }>>([]);
+
+    useEffect(() => {
+        notePositions.current = [...Array(5)].map(() => ({
+            top: `${Math.random() * 80 + 10}%`,
+            left: `${Math.random() * 80 + 10}%`,
+        }));
+        setMounted(true);
+    }, []);
 
     // Jazz Constellation Elements (Floating Icons)
     // We'll overlay these using Framer Motion for smoother complex movement than canvas if we want interaction,
@@ -203,17 +213,14 @@ export default function StarryBackground() {
                     </motion.div>
                 ))}
 
-                {/* Random Notes */}
-                {[...Array(5)].map((_, i) => (
+                {/* Random Notes — only rendered client-side to avoid hydration mismatch */}
+                {mounted && notePositions.current.map((pos, i) => (
                     <motion.div
                         key={`note-${i}`}
                         animate={{ y: [0, -30, 0], opacity: [0.1, 0.3, 0.1] }}
                         transition={{ duration: 5 + i, repeat: Infinity, ease: "easeInOut", delay: i * 1.5 }}
                         className="absolute text-mambo-text text-4xl blur-[1px]"
-                        style={{
-                            top: `${Math.random() * 80 + 10}%`,
-                            left: `${Math.random() * 80 + 10}%`
-                        }}
+                        style={pos}
                     >
                         <FaMusic />
                     </motion.div>

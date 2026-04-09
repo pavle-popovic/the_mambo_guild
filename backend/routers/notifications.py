@@ -15,7 +15,7 @@ router = APIRouter(tags=["Notifications"])
 
 
 @router.get("/")
-async def get_notifications(
+def get_notifications(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=50),
     current_user: User = Depends(get_current_user),
@@ -31,7 +31,7 @@ async def get_notifications(
 
 
 @router.get("/unread-count")
-async def get_unread_count(
+def get_unread_count(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -41,7 +41,7 @@ async def get_unread_count(
 
 
 @router.post("/{notification_id}/read")
-async def mark_notification_read(
+def mark_notification_read(
     notification_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -55,7 +55,7 @@ async def mark_notification_read(
 
 
 @router.post("/read-all")
-async def mark_all_read(
+def mark_all_read(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

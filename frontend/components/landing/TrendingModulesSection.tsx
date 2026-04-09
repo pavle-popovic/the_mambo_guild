@@ -1,74 +1,29 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaPlay, FaLock, FaFire, FaBookOpen, FaMusic, FaHistory, FaBrain, FaTheaterMasks } from "react-icons/fa";
+import { FaPlay, FaFire, FaBookOpen, FaMusic, FaHistory, FaBrain, FaTheaterMasks } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi";
 import Link from "next/link";
 
-// Mock trending modules data
-const TRENDING_MODULES = [
-    {
-        id: "1",
-        title: "Basic Step Foundations",
-        thumbnail: "/assets/course_thumbnails/basics.jpg",
-        previewGif: null,
-        lessonCount: 12,
-        duration: "45 min",
-        xp: 150,
-        trending: true,
-    },
-    {
-        id: "2",
-        title: "Musicality Mastery",
-        thumbnail: "/assets/course_thumbnails/musicality.jpg",
-        previewGif: null,
-        lessonCount: 8,
-        duration: "30 min",
-        xp: 120,
-        trending: true,
-    },
-    {
-        id: "3",
-        title: "Spin Technique",
-        thumbnail: "/assets/course_thumbnails/spins.jpg",
-        previewGif: null,
-        lessonCount: 10,
-        duration: "40 min",
-        xp: 200,
-        trending: true,
-    },
-    {
-        id: "4",
-        title: "Body Movement & Styling",
-        thumbnail: "/assets/course_thumbnails/styling.jpg",
-        previewGif: null,
-        lessonCount: 15,
-        duration: "55 min",
-        xp: 180,
-        trending: true,
-    },
-    {
-        id: "5",
-        title: "Partner Connection",
-        thumbnail: "/assets/course_thumbnails/leadfollow.jpg",
-        previewGif: null,
-        lessonCount: 6,
-        duration: "25 min",
-        xp: 100,
-        trending: true,
-    },
-    {
-        id: "6",
-        title: "Rhythm & Timing",
-        thumbnail: "/assets/course_thumbnails/rhythm.jpg",
-        previewGif: null,
-        lessonCount: 8,
-        duration: "35 min",
-        xp: 140,
-        trending: true,
-    },
-];
+const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+
+interface Level {
+    id: string;
+    title: string;
+    lesson_count: number;
+    duration_minutes?: number;
+    total_xp?: number;
+    mux_preview_playback_id?: string | null;
+    world_id: string;
+}
+
+interface WorldWithLevels {
+    id: string;
+    title: string;
+    slug: string;
+    levels: Level[];
+}
 
 // Content stats
 const CONTENT_STATS = [
@@ -82,7 +37,7 @@ const CONTENT_STATS = [
 ];
 
 interface ModuleCardProps {
-    module: typeof TRENDING_MODULES[0];
+    module: Level;
     isHovered: boolean;
     onHover: (id: string | null) => void;
 }
@@ -91,95 +46,157 @@ function ModuleCard({ module, isHovered, onHover }: ModuleCardProps) {
     const [showPreview, setShowPreview] = useState(false);
 
     useEffect(() => {
-        if (isHovered) {
+        if (isHovered && module.mux_preview_playback_id) {
             const timer = setTimeout(() => setShowPreview(true), 300);
             return () => clearTimeout(timer);
         } else {
             setShowPreview(false);
         }
-    }, [isHovered]);
+    }, [isHovered, module.mux_preview_playback_id]);
 
-    // Animated GIF preview URL (using Mux pattern, but with static fallback)
-    const displayUrl = showPreview && module.previewGif 
-        ? module.previewGif 
-        : module.thumbnail;
+    const thumbnailUrl = module.mux_preview_playback_id
+        ? `https://image.mux.com/${module.mux_preview_playback_id}/thumbnail.webp?width=640&height=400&fit_mode=smartcrop`
+        : null;
+
+    const gifUrl = module.mux_preview_playback_id
+        ? `https://image.mux.com/${module.mux_preview_playback_id}/animated.gif?width=640&height=400&fps=12`
+        : null;
+
+    const displayUrl = showPreview && gifUrl ? gifUrl : thumbnailUrl;
+
+    const xp = module.total_xp || module.lesson_count * 25;
+    const duration = module.duration_minutes
+        ? `${module.duration_minutes} min`
+        : `${Math.max(5, module.lesson_count * 5)} min`;
 
     return (
-        <motion.div
-            className="relative flex-shrink-0 w-64 sm:w-72 md:w-80 aspect-[16/10] rounded-xl overflow-hidden cursor-pointer group border border-white/10 bg-zinc-900/80"
-            onMouseEnter={() => onHover(module.id)}
-            onMouseLeave={() => onHover(null)}
-            whileHover={{ scale: 1.02, zIndex: 10 }}
-            transition={{ duration: 0.2 }}
-        >
-            {/* Background Image/Preview */}
-            <div className="absolute inset-0">
-                <div 
-                    className="absolute inset-0 bg-cover bg-center transition-all duration-500"
-                    style={{ 
-                        backgroundImage: `url(${displayUrl})`,
-                        filter: isHovered ? 'brightness(0.7)' : 'brightness(0.5)',
-                    }}
-                />
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-            </div>
+        <Link href={`/courses/${module.world_id}`}>
+            <motion.div
+                className="relative flex-shrink-0 w-64 sm:w-72 md:w-80 aspect-[16/10] rounded-xl overflow-hidden cursor-pointer group border border-white/10 bg-zinc-900/80"
+                onMouseEnter={() => onHover(module.id)}
+                onMouseLeave={() => onHover(null)}
+                whileHover={{ scale: 1.02, zIndex: 10 }}
+                transition={{ duration: 0.2 }}
+            >
+                {/* Background Image/Preview */}
+                <div className="absolute inset-0">
+                    {displayUrl ? (
+                        <div
+                            className="absolute inset-0 bg-cover bg-center transition-all duration-500"
+                            style={{
+                                backgroundImage: `url(${displayUrl})`,
+                                filter: isHovered ? 'brightness(0.7)' : 'brightness(0.5)',
+                            }}
+                        />
+                    ) : (
+                        <div className="absolute inset-0 bg-gradient-to-br from-zinc-800 to-zinc-900" />
+                    )}
+                    {/* Gradient overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
+                </div>
 
-            {/* Trending Badge */}
-            {module.trending && (
+                {/* Trending Badge */}
                 <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-orange-500/90 to-red-500/90 rounded-full text-[10px] font-bold text-white shadow-lg backdrop-blur-sm">
                     <FaFire className="text-yellow-300" />
                     Trending
                 </div>
-            )}
 
-            {/* XP Badge */}
-            <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/60 backdrop-blur-sm rounded-full text-[10px] font-bold text-mambo-gold">
-                +{module.xp} XP
-            </div>
-
-            {/* Play Button (appears on hover) */}
-            <AnimatePresence>
-                {isHovered && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.8 }}
-                        className="absolute inset-0 flex items-center justify-center"
-                    >
-                        <div className="w-14 h-14 bg-mambo-gold/90 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.5)]">
-                            <FaPlay className="text-black ml-1 text-lg" />
-                        </div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
-
-            {/* Bottom Content */}
-            <div className="absolute bottom-0 left-0 right-0 p-4">
-                <h4 className="text-white font-bold text-sm md:text-base mb-2 line-clamp-1 drop-shadow-lg">
-                    {module.title}
-                </h4>
-                <div className="flex items-center gap-3 text-[11px] text-gray-300">
-                    <span className="flex items-center gap-1">
-                        <FaBookOpen className="text-gray-400" />
-                        {module.lessonCount} lessons
-                    </span>
-                    <span className="text-gray-500">•</span>
-                    <span>{module.duration}</span>
+                {/* XP Badge */}
+                <div className="absolute top-3 right-3 px-2.5 py-1 bg-black/60 backdrop-blur-sm rounded-full text-[10px] font-bold text-mambo-gold">
+                    +{xp} XP
                 </div>
-            </div>
-        </motion.div>
+
+                {/* Play Button (appears on hover) */}
+                <AnimatePresence>
+                    {isHovered && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.8 }}
+                            animate={{ opacity: 1, scale: 1 }}
+                            exit={{ opacity: 0, scale: 0.8 }}
+                            className="absolute inset-0 flex items-center justify-center"
+                        >
+                            <div className="w-14 h-14 bg-mambo-gold/90 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(212,175,55,0.5)]">
+                                <FaPlay className="text-black ml-1 text-lg" />
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
+
+                {/* Bottom Content */}
+                <div className="absolute bottom-0 left-0 right-0 p-4">
+                    <h4 className="text-white font-bold text-sm md:text-base mb-2 line-clamp-1 drop-shadow-lg">
+                        {module.title}
+                    </h4>
+                    <div className="flex items-center gap-3 text-[11px] text-gray-300">
+                        <span className="flex items-center gap-1">
+                            <FaBookOpen className="text-gray-400" />
+                            {module.lesson_count} lessons
+                        </span>
+                        <span className="text-gray-500">•</span>
+                        <span>{duration}</span>
+                    </div>
+                </div>
+            </motion.div>
+        </Link>
     );
+}
+
+// Seeded shuffle for stable randomness per session
+function shuffleArray<T>(array: T[], seed: number): T[] {
+    const shuffled = [...array];
+    let s = seed;
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        s = (s * 16807 + 0) % 2147483647;
+        const j = s % (i + 1);
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
 }
 
 export default function TrendingModulesSection() {
     const [hoveredModule, setHoveredModule] = useState<string | null>(null);
     const [isPaused, setIsPaused] = useState(false);
+    const [modules, setModules] = useState<Level[]>([]);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    // Fetch real modules from API
+    useEffect(() => {
+        async function fetchModules() {
+            try {
+                // Fetch all courses to get their IDs
+                const res = await fetch(`${API_URL}/api/courses/worlds`, { credentials: "include" });
+                if (!res.ok) return;
+                const worlds: { id: string; course_type: string }[] = await res.json();
+
+                // Fetch skill trees for each course (only "course" type, not choreos)
+                const courseWorlds = worlds.filter(w => w.course_type === "course");
+                const allLevels: Level[] = [];
+
+                await Promise.all(courseWorlds.map(async (world) => {
+                    try {
+                        const treeRes = await fetch(`${API_URL}/api/courses/worlds/${world.id}/skill-tree`, { credentials: "include" });
+                        if (!treeRes.ok) return;
+                        const tree = await treeRes.json();
+                        for (const level of tree.levels || []) {
+                            allLevels.push({ ...level, world_id: world.id });
+                        }
+                    } catch {}
+                }));
+
+                // Pick random 15 using a session-stable seed
+                const seed = Math.floor(Date.now() / (1000 * 60 * 60)); // changes hourly
+                const shuffled = shuffleArray(allLevels.filter(l => l.lesson_count > 0), seed);
+                setModules(shuffled.slice(0, 15));
+            } catch (err) {
+                console.error("Failed to fetch trending modules:", err);
+            }
+        }
+        fetchModules();
+    }, []);
 
     // Auto-scroll carousel
     useEffect(() => {
-        if (isPaused) return;
+        if (isPaused || modules.length === 0) return;
 
         const scrollContainer = scrollRef.current;
         if (!scrollContainer) return;
@@ -189,14 +206,14 @@ export default function TrendingModulesSection() {
 
         const scroll = () => {
             if (!scrollContainer) return;
-            
+
             scrollPosition += 0.5;
-            
+
             // Reset position when reaching the duplicate content
             if (scrollPosition >= scrollContainer.scrollWidth / 2) {
                 scrollPosition = 0;
             }
-            
+
             scrollContainer.scrollLeft = scrollPosition;
             animationId = requestAnimationFrame(scroll);
         };
@@ -206,7 +223,7 @@ export default function TrendingModulesSection() {
         return () => {
             cancelAnimationFrame(animationId);
         };
-    }, [isPaused]);
+    }, [isPaused, modules]);
 
     return (
         <section className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-b from-transparent via-black/50 to-transparent">
@@ -219,7 +236,7 @@ export default function TrendingModulesSection() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-10 md:mb-14"
                 >
-                    <h2 
+                    <h2
                         className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-mambo-text font-serif"
                         style={{ fontFamily: '"Playfair Display", serif' }}
                     >
@@ -231,7 +248,7 @@ export default function TrendingModulesSection() {
                 </motion.div>
 
                 {/* Carousel */}
-                <div 
+                <div
                     className="relative mb-12 md:mb-16"
                     onMouseEnter={() => setIsPaused(true)}
                     onMouseLeave={() => setIsPaused(false)}
@@ -247,7 +264,7 @@ export default function TrendingModulesSection() {
                         style={{ scrollBehavior: 'auto' }}
                     >
                         {/* Duplicate modules for infinite scroll effect */}
-                        {[...TRENDING_MODULES, ...TRENDING_MODULES].map((module, index) => (
+                        {[...modules, ...modules].map((module, index) => (
                             <ModuleCard
                                 key={`${module.id}-${index}`}
                                 module={module}

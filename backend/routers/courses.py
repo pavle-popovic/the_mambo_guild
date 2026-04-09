@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from typing import List, Dict
 from models import get_db
-from models.user import User, Subscription, SubscriptionStatus
+from models.user import User, UserRole, Subscription, SubscriptionStatus
 from models.course import World, Lesson, Level
 from models.progress import UserProgress
 from schemas.course import WorldResponse, LessonResponse, LessonDetailResponse, WorldDetailResponse, LevelResponse, LevelEdgeResponse
@@ -15,7 +15,7 @@ router = APIRouter()
 
 
 @router.get("/worlds", response_model=List[WorldResponse])
-async def get_worlds(
+def get_worlds(
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
@@ -28,7 +28,9 @@ async def get_worlds(
     - Logged in (Rookie/Free): Only free courses unlocked
     - Logged in (Paid): All courses unlocked
     """
-    worlds = db.query(World).filter(World.is_published == True).order_by(World.order_index).all()
+    worlds = db.query(World).filter(World.is_published == True).options(
+        joinedload(World.levels).joinedload(Level.lessons)
+    ).order_by(World.order_index).all()
     
     # Check subscription if user is authenticated
     is_subscribed = False
@@ -81,6 +83,9 @@ async def get_worlds(
         if not current_user:
             # Not logged in - all courses locked (but can see previews)
             is_locked = True
+        elif current_user.role == UserRole.ADMIN:
+            # Admins always have full access
+            is_locked = False
         elif world.is_free:
             # Free course - unlocked for logged in users
             is_locked = False
@@ -133,7 +138,7 @@ async def get_worlds(
 
 
 @router.get("/lessons/{lesson_id}", response_model=LessonDetailResponse)
-async def get_lesson(
+def get_lesson(
     lesson_id: str,
     current_user: User = Depends(get_current_user),  # Requires authentication
     db: Session = Depends(get_db)
@@ -144,21 +149,24 @@ async def get_lesson(
     - Free courses: Accessible to all logged in users
     - Paid courses: Requires active subscription
     """
-    lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
+    lesson = db.query(Lesson).filter(Lesson.id == lesson_id).options(
+        joinedload(Lesson.level).joinedload(Level.world).joinedload(World.levels).joinedload(Level.lessons)
+    ).first()
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
-    
-    # Get the level and world this lesson belongs to (single lookup used for both access control and navigation)
-    level = db.query(Level).filter(Level.id == lesson.level_id).first()
-    world = db.query(World).filter(World.id == level.world_id).first() if level else None
+
+    # Get the level and world this lesson belongs to (already eager-loaded)
+    level = lesson.level
+    world = level.world if level else None
 
     if not world:
         raise HTTPException(status_code=404, detail="World not found")
 
     # REFINED ACCESS CONTROL:
+    # - Admins: Full access to everything
     # - Free courses: Accessible to all logged in users
     # - Paid courses: Requires active subscription
-    if not world.is_free:
+    if current_user.role != UserRole.ADMIN and not world.is_free:
         subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
         if not subscription or subscription.status != SubscriptionStatus.ACTIVE:
             raise HTTPException(
@@ -219,7 +227,7 @@ async def get_lesson(
 
 
 @router.get("/levels/{level_id}/lessons", response_model=List[LessonResponse])
-async def get_level_lessons(
+def get_level_lessons(
     level_id: str,
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
@@ -287,7 +295,7 @@ async def get_level_lessons(
 
 
 @router.get("/worlds/{world_id}/lessons", response_model=List[LessonResponse])
-async def get_world_lessons(
+def get_world_lessons(
     world_id: str,
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
@@ -356,7 +364,7 @@ async def get_world_lessons(
 
 
 @router.get("/worlds/{world_id}/skill-tree", response_model=WorldDetailResponse)
-async def get_world_skill_tree(
+def get_world_skill_tree(
     world_id: str,
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
@@ -481,6 +489,18 @@ async def get_world_skill_tree(
     # Convert difficulty enum to string
     difficulty_str = world.difficulty.value if hasattr(world.difficulty, 'value') else str(world.difficulty)
     
+    # Determine lock status
+    if not current_user:
+        is_locked = True
+    elif current_user.role == UserRole.ADMIN:
+        # Admins always have full access
+        is_locked = False
+    elif world.is_free:
+        is_locked = False
+    else:
+        subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
+        is_locked = not subscription or subscription.status != SubscriptionStatus.ACTIVE
+
     return WorldDetailResponse(
         id=str(world.id),
         title=world.title,
@@ -489,6 +509,7 @@ async def get_world_skill_tree(
         course_type=world.course_type or "course",
         is_free=world.is_free,
         is_published=world.is_published,
+        is_locked=is_locked,
         thumbnail_url=world.thumbnail_url,
         levels=level_responses,
         edges=edge_responses

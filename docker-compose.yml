@@ -1,24 +1,4 @@
 services:
-  postgres:
-    image: postgres:15
-    container_name: salsa_lab_postgres
-    environment:
-      POSTGRES_USER: ${POSTGRES_USER:-admin}
-      POSTGRES_DB: ${POSTGRES_DB:-themamboinn}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-admin}
-    ports:
-      - "${POSTGRES_PORT:-5432}:5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-admin} -d ${POSTGRES_DB:-themamboinn}" ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-    restart: unless-stopped
-    networks:
-      - salsa_lab_network
-
   redis:
     image: redis:7-alpine
     container_name: salsa_lab_redis
@@ -41,7 +21,7 @@ services:
       dockerfile: Dockerfile
     container_name: salsa_lab_backend
     environment:
-      DATABASE_URL: postgresql://${POSTGRES_USER:-admin}:${POSTGRES_PASSWORD:-admin}@postgres:5432/${POSTGRES_DB:-themamboinn}
+      DATABASE_URL: ${DATABASE_URL}
       REDIS_HOST: redis
       REDIS_PORT: 6379
       SECRET_KEY: ${SECRET_KEY:-your-secret-key-change-in-production}
@@ -64,15 +44,12 @@ services:
       PASSWORD_RESET_EXPIRE_MINUTES: ${PASSWORD_RESET_EXPIRE_MINUTES:-60}
       OAUTHLIB_INSECURE_TRANSPORT: ${OAUTHLIB_INSECURE_TRANSPORT:-1}
       ALLOW_ACCOUNT_CLAIM: ${ALLOW_ACCOUNT_CLAIM:-false}
-      # AI/Gemini Configuration
       GEMINI_API_KEY: ${GEMINI_API_KEY:-}
       AI_RATE_LIMIT_REQUESTS: ${AI_RATE_LIMIT_REQUESTS:-20}
       AI_RATE_LIMIT_WINDOW_SECONDS: ${AI_RATE_LIMIT_WINDOW_SECONDS:-60}
     ports:
       - "${BACKEND_PORT:-8000}:8000"
     depends_on:
-      postgres:
-        condition: service_healthy
       redis:
         condition: service_healthy
     volumes:
@@ -107,11 +84,9 @@ services:
     command: sh -c "npm run dev"
 
 volumes:
-  postgres_data:
   redis_data:
   frontend_node_modules:
   frontend_next:
-
 
 networks:
   salsa_lab_network:

@@ -3,7 +3,9 @@ import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
 import GlobalAudioPlayer from "@/components/GlobalAudioPlayer";
 import { AuthProvider } from "@/contexts/AuthContext";
+import LocaleProviderWrapper from "@/components/LocaleProviderWrapper";
 import StarryBackground from "@/components/ui/StarryBackground";
+import BugReportButton from "@/components/BugReportButton";
 import { Toaster } from "sonner";
 
 const inter = Inter({
@@ -30,14 +32,17 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-black`}>
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-black overflow-x-hidden`}>
         {/* Starry Jazz Theme Background */}
         <StarryBackground />
-        <AuthProvider>
-          {children}
-          <GlobalAudioPlayer />
-          <Toaster position="top-right" richColors />
-        </AuthProvider>
+        <LocaleProviderWrapper>
+          <AuthProvider>
+            {children}
+            <GlobalAudioPlayer />
+            <BugReportButton />
+            <Toaster position="top-right" richColors />
+          </AuthProvider>
+        </LocaleProviderWrapper>
       </body>
     </html>
   );

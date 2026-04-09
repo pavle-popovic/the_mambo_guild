@@ -11,7 +11,8 @@ from sqlalchemy.dialects.postgresql import ARRAY
 import uuid
 
 from models.user import User, UserProfile, Subscription, SubscriptionTier, SubscriptionStatus
-from models.community import Post, PostReply, PostReaction, CommunityTag
+from models.community import Post, PostReply, PostReaction, CommunityTag, ModerationStatus, SavedPost
+from services.moderation_service import evaluate_reply
 from services.clave_service import (
     spend_claves, can_afford, get_video_slot_status, get_question_slot_status,
     award_accepted_answer, process_reaction_refund, claw_back_reaction_refund,
@@ -50,7 +51,8 @@ def _build_post_dict(
     post: Post,
     user: User,
     user_reaction: str | None,
-    db: Session
+    db: Session,
+    is_saved: bool = False,
 ) -> dict:
     """Build the post response dict from pre-loaded objects."""
     return {
@@ -68,6 +70,7 @@ def _build_post_dict(
         "reaction_count": post.reaction_count,
         "reply_count": post.reply_count,
         "user_reaction": user_reaction,
+        "is_saved": is_saved,
         "created_at": post.created_at,
         "updated_at": post.updated_at,
     }
@@ -79,6 +82,7 @@ def _format_post_response(post: Post, current_user_id: str, db: Session) -> dict
         joinedload(User.profile), joinedload(User.subscription)
     ).first()
     user_reaction = None
+    is_saved = False
     if current_user_id:
         reaction = db.query(PostReaction).filter(
             PostReaction.post_id == post.id,
@@ -86,7 +90,11 @@ def _format_post_response(post: Post, current_user_id: str, db: Session) -> dict
         ).first()
         if reaction:
             user_reaction = reaction.reaction_type
-    return _build_post_dict(post, user, user_reaction, db)
+        is_saved = db.query(SavedPost).filter(
+            SavedPost.post_id == post.id,
+            SavedPost.user_id == current_user_id
+        ).first() is not None
+    return _build_post_dict(post, user, user_reaction, db, is_saved=is_saved)
 
 
 def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
@@ -104,8 +112,9 @@ def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
     ).all()
     user_map = {str(u.id): u for u in users}
 
-    # Batch-load current user's reactions in one query
+    # Batch-load current user's reactions and saved status in two queries
     reaction_map: dict = {}
+    saved_set: set = set()
     if current_user_id:
         post_ids = [p.id for p in posts]
         reactions = db.query(PostReaction).filter(
@@ -114,12 +123,19 @@ def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
         ).all()
         reaction_map = {str(r.post_id): r.reaction_type for r in reactions}
 
+        saved_rows = db.query(SavedPost.post_id).filter(
+            SavedPost.post_id.in_(post_ids),
+            SavedPost.user_id == current_user_id
+        ).all()
+        saved_set = {str(row[0]) for row in saved_rows}
+
     return [
         _build_post_dict(
             p,
             user_map.get(str(p.user_id)),
             reaction_map.get(str(p.id)),
             db,
+            is_saved=str(p.id) in saved_set,
         )
         for p in posts
     ]
@@ -137,8 +153,14 @@ def _format_reply_response(reply: PostReply, db: Session, user: User = None) -> 
         "content": reply.content,
         "mux_playback_id": reply.mux_playback_id,
         "is_accepted_answer": reply.is_accepted_answer,
+        "moderation_status": reply.moderation_status or "active",
         "created_at": reply.created_at,
     }
+
+
+def format_posts_bulk_public(posts: list, current_user_id: str, db: Session) -> list:
+    """Public wrapper for _format_posts_bulk, used by saved posts endpoint."""
+    return _format_posts_bulk(posts, current_user_id, db)
 
 
 def create_post(
@@ -287,11 +309,18 @@ def get_post_detail(
         desc(PostReply.is_accepted_answer),
         PostReply.created_at
     ).all()
-    
+
+    # Shadowban filter: show flagged/ghosted replies ONLY to their author
+    visible_replies = [
+        r for r in replies
+        if r.moderation_status == ModerationStatus.ACTIVE.value
+        or str(r.user_id) == current_user_id
+    ]
+
     response = _format_post_response(post, current_user_id, db)
 
     # Batch-load reply authors to avoid N+1
-    reply_user_ids = list({r.user_id for r in replies})
+    reply_user_ids = list({r.user_id for r in visible_replies})
     reply_users = db.query(User).filter(User.id.in_(reply_user_ids)).options(
         joinedload(User.profile), joinedload(User.subscription)
     ).all() if reply_user_ids else []
@@ -299,7 +328,7 @@ def get_post_detail(
 
     response["replies"] = [
         _format_reply_response(r, db, user=reply_user_map.get(str(r.user_id)))
-        for r in replies
+        for r in visible_replies
     ]
     return response
 
@@ -428,23 +457,28 @@ def add_reply(
             "balance": balance
         }
     
-    # Create reply
+    # AI Gatekeeper: evaluate reply content before saving
+    moderation_status = evaluate_reply(content)
+
+    # Create reply with moderation status
     reply = PostReply(
         id=uuid.uuid4(),
         post_id=post_id,
         user_id=user_id,
         content=content,
         mux_asset_id=mux_asset_id,
-        mux_playback_id=mux_playback_id
+        mux_playback_id=mux_playback_id,
+        moderation_status=moderation_status,
     )
     db.add(reply)
-    
-    # Update post reply count
-    post.reply_count += 1
-    
+
+    # Only count publicly visible replies toward reply_count
+    if moderation_status == ModerationStatus.ACTIVE.value:
+        post.reply_count += 1
+
     db.flush()
-    
-    logger.info(f"User {user_id} replied to post {post_id}")
+
+    logger.info(f"User {user_id} replied to post {post_id} [moderation={moderation_status}]")
     return {
         "success": True,
         "reply": _format_reply_response(reply, db),

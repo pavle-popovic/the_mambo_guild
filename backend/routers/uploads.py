@@ -27,7 +27,7 @@ class PresignedUrlResponse(BaseModel):
 
 
 @router.post("/presigned-url", response_model=PresignedUrlResponse)
-async def generate_presigned_url(
+def generate_presigned_url(
     request: PresignedUrlRequest,
     current_user: User = Depends(get_current_user)
 ):
@@ -66,7 +66,7 @@ class CoachingFeedbackUrlRequest(BaseModel):
 
 
 @router.post("/coaching-feedback-url", response_model=PresignedUrlResponse)
-async def generate_coaching_feedback_url(
+def generate_coaching_feedback_url(
     request: CoachingFeedbackUrlRequest,
     current_user: User = Depends(get_current_user)
 ):

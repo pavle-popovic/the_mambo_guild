@@ -7,6 +7,7 @@ import { motion } from "framer-motion";
 import NavBar from "@/components/NavBar";
 import { useAuth } from "@/contexts/AuthContext";
 import ConstellationGraph from "@/components/skill-tree/ConstellationGraph";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Level {
   id: string;
@@ -31,6 +32,8 @@ interface SkillTreeData {
   title: string;
   description?: string;
   difficulty: string;
+  is_free: boolean;
+  is_locked: boolean;
   levels: Level[];
   edges: Edge[];
 }
@@ -44,12 +47,14 @@ export default function CourseDetailPage() {
   const [skillTree, setSkillTree] = useState<SkillTreeData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const tCommon = useTranslations('common');
+  const tCourses = useTranslations('courses');
 
+  // Load skill tree immediately (no auth required to view)
+  // Reload when user changes to update progress data
   useEffect(() => {
-    // Wait for auth to complete before loading skill tree
-    if (authLoading) return;
     loadSkillTree();
-  }, [courseId, user, authLoading]);
+  }, [courseId, user]);
 
   const loadSkillTree = async () => {
     try {
@@ -91,10 +96,10 @@ export default function CourseDetailPage() {
     return { progress, completed: completedLessons, total: totalLessons };
   }, [skillTree]);
 
-  if (authLoading || loading) {
+  if (loading) {
     return (
       <div className="min-h-screen bg-mambo-dark flex items-center justify-center">
-        <div className="text-gray-400">Loading skill tree...</div>
+        <div className="text-gray-400">{tCommon('loading')}</div>
       </div>
     );
   }
@@ -110,7 +115,7 @@ export default function CourseDetailPage() {
               href="/courses"
               className="inline-block text-gray-400 hover:text-mambo-text transition"
             >
-              ← Back to Courses
+              {`← ${tCourses('title')}`}
             </Link>
           </div>
         </div>
@@ -128,6 +133,8 @@ export default function CourseDetailPage() {
           levels={skillTree.levels}
           edges={skillTree.edges}
           courseId={courseId}
+          courseTitle={skillTree.title}
+          isCourseLocked={skillTree.is_locked}
         />
       </div>
 
@@ -138,13 +145,13 @@ export default function CourseDetailPage() {
             href="/courses"
             className="text-gray-400 hover:text-mambo-text transition mb-6 inline-block pointer-events-auto bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full border border-gray-800"
           >
-            ← Back to Courses
+            {`← ${tCourses('title')}`}
           </Link>
         </div>
       </div>
 
       {/* Course Progress Widget (Top Right) - Compact */}
-      <div className="absolute top-20 right-4 z-30 w-52 bg-black/70 backdrop-blur-md border border-yellow-900/20 rounded-xl p-3 shadow-xl pointer-events-auto">
+      <div className="absolute top-20 right-2 sm:right-4 z-30 w-40 sm:w-52 bg-black/70 backdrop-blur-md border border-yellow-900/20 rounded-xl p-2 sm:p-3 shadow-xl pointer-events-auto">
         <h2 className="text-sm font-serif font-bold text-white mb-2 truncate">{skillTree.title}</h2>
 
         <div className="flex justify-between items-baseline mb-1">

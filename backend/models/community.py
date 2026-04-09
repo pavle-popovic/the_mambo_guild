@@ -13,6 +13,12 @@ import uuid
 from datetime import datetime
 import enum
 
+
+class ModerationStatus(str, enum.Enum):
+    ACTIVE = "active"
+    FLAGGED_BY_AI = "flagged_by_ai"
+    GHOSTED = "ghosted"
+
 from models import Base
 
 
@@ -112,9 +118,15 @@ class PostReply(Base):
     content = Column(Text, nullable=False)
     mux_asset_id = Column(String(100), nullable=True)  # Optional video reply
     mux_playback_id = Column(String(100), nullable=True)
-    
+
     is_accepted_answer = Column(Boolean, default=False)
     is_deleted = Column(Boolean, default=False, nullable=False)
+    moderation_status = Column(
+        String(20),
+        default=ModerationStatus.ACTIVE.value,
+        nullable=False,
+        index=True
+    )
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
@@ -220,6 +232,28 @@ class UserStats(Base):
 
     # Relationships
     user = relationship("User", backref="stats")
+
+
+# ============================================
+# Saved/Bookmarked Posts
+# ============================================
+
+class SavedPost(Base):
+    """Track which posts each user has bookmarked."""
+    __tablename__ = "saved_posts"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    post_id = Column(UUID(as_uuid=True), ForeignKey("posts.id", ondelete="CASCADE"), nullable=False, index=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Relationships
+    user = relationship("User", backref="saved_posts")
+    post = relationship("Post", backref="saves")
+
+    __table_args__ = (
+        UniqueConstraint("user_id", "post_id", name="unique_user_saved_post"),
+    )
 
 
 # ============================================

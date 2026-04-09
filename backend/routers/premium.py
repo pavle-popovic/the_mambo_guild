@@ -81,7 +81,7 @@ def require_admin(user: User):
 # ============================================
 
 @router.get("/live/status", response_model=UpcomingCallStatus)
-async def get_live_call_status(
+def get_live_call_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -131,7 +131,7 @@ async def get_live_call_status(
 
 
 @router.get("/live/recordings", response_model=List[PastRecordingResponse])
-async def get_past_recordings(
+def get_past_recordings(
     skip: int = 0,
     limit: int = 20,
     current_user: User = Depends(get_current_user),
@@ -184,7 +184,7 @@ def _format_call_response(call: LiveCall, show_zoom: bool = False) -> LiveCallRe
 # ============================================
 
 @router.post("/admin/live", response_model=LiveCallAdminResponse)
-async def create_live_call(
+def create_live_call(
     data: LiveCallCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -211,7 +211,7 @@ async def create_live_call(
 
 
 @router.get("/admin/live", response_model=List[LiveCallAdminResponse])
-async def get_all_live_calls(
+def get_all_live_calls(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -223,7 +223,7 @@ async def get_all_live_calls(
 
 
 @router.put("/admin/live/{call_id}", response_model=LiveCallAdminResponse)
-async def update_live_call(
+def update_live_call(
     call_id: str,
     data: LiveCallUpdate,
     current_user: User = Depends(get_current_user),
@@ -250,7 +250,7 @@ async def update_live_call(
 
 
 @router.delete("/admin/live/{call_id}")
-async def delete_live_call(
+def delete_live_call(
     call_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -292,7 +292,7 @@ def _format_admin_call_response(call: LiveCall) -> LiveCallAdminResponse:
 # ============================================
 
 @router.get("/coaching/status", response_model=CoachingStatusResponse)
-async def get_coaching_status(
+def get_coaching_status(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -336,7 +336,7 @@ async def get_coaching_status(
 
 
 @router.post("/coaching/submit", response_model=CoachingSubmissionResponse)
-async def submit_coaching_video(
+def submit_coaching_video(
     data: CoachingSubmissionCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -397,7 +397,7 @@ async def submit_coaching_video(
 
 
 @router.get("/coaching/my-submissions", response_model=List[CoachingSubmissionResponse])
-async def get_my_coaching_submissions(
+def get_my_coaching_submissions(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -435,7 +435,7 @@ def _format_submission_response(sub: CoachingSubmission) -> CoachingSubmissionRe
 # ============================================
 
 @router.get("/admin/coaching", response_model=List[CoachingSubmissionAdminResponse])
-async def get_coaching_queue(
+def get_coaching_queue(
     status_filter: Optional[str] = None,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -482,7 +482,7 @@ async def get_coaching_queue(
 
 
 @router.put("/admin/coaching/{submission_id}", response_model=CoachingSubmissionResponse)
-async def update_coaching_submission(
+def update_coaching_submission(
     submission_id: str,
     data: CoachingSubmissionUpdate,
     current_user: User = Depends(get_current_user),
@@ -534,7 +534,7 @@ async def update_coaching_submission(
 # ============================================
 
 @router.get("/dj-booth/tracks", response_model=List[DJBoothTrackResponse])
-async def get_dj_booth_tracks(
+def get_dj_booth_tracks(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -568,7 +568,7 @@ async def get_dj_booth_tracks(
 
 
 @router.get("/dj-booth/preview", response_model=List[DJBoothTrackPreview])
-async def get_dj_booth_preview(
+def get_dj_booth_preview(
     db: Session = Depends(get_db)
 ):
     """
@@ -600,7 +600,7 @@ async def get_dj_booth_preview(
 # ============================================
 
 @router.post("/admin/dj-booth", response_model=DJBoothTrackResponse)
-async def create_dj_booth_track(
+def create_dj_booth_track(
     data: DJBoothTrackCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -645,7 +645,7 @@ async def create_dj_booth_track(
 
 
 @router.put("/admin/dj-booth/{track_id}", response_model=DJBoothTrackResponse)
-async def update_dj_booth_track(
+def update_dj_booth_track(
     track_id: str,
     data: DJBoothTrackUpdate,
     current_user: User = Depends(get_current_user),
@@ -682,7 +682,7 @@ async def update_dj_booth_track(
 
 
 @router.delete("/admin/dj-booth/{track_id}")
-async def delete_dj_booth_track(
+def delete_dj_booth_track(
     track_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -705,7 +705,7 @@ async def delete_dj_booth_track(
 # ============================================
 
 @router.get("/weekly-meeting", response_model=WeeklyMeetingConfigResponse)
-async def get_weekly_meeting(
+def get_weekly_meeting(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -724,7 +724,7 @@ async def get_weekly_meeting(
 
 
 @router.get("/admin/weekly-meeting", response_model=WeeklyMeetingConfigResponse)
-async def get_weekly_meeting_admin(
+def get_weekly_meeting_admin(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -743,7 +743,7 @@ async def get_weekly_meeting_admin(
 
 
 @router.put("/admin/weekly-meeting", response_model=WeeklyMeetingConfigResponse)
-async def update_weekly_meeting(
+def update_weekly_meeting(
     data: WeeklyMeetingConfigUpdate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -776,7 +776,7 @@ async def update_weekly_meeting(
 # ============================================
 
 @router.get("/archives", response_model=List[WeeklyArchiveResponse])
-async def get_weekly_archives(
+def get_weekly_archives(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -806,7 +806,7 @@ async def get_weekly_archives(
 
 
 @router.get("/archives/{archive_id}/signed-url")
-async def get_archive_signed_url(
+def get_archive_signed_url(
     archive_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -849,7 +849,7 @@ async def get_archive_signed_url(
 
 # Admin endpoints for managing archives
 @router.post("/admin/archives", response_model=WeeklyArchiveResponse)
-async def create_weekly_archive(
+def create_weekly_archive(
     archive_data: WeeklyArchiveCreate,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -889,7 +889,7 @@ async def create_weekly_archive(
 
 
 @router.get("/admin/archives", response_model=List[WeeklyArchiveResponse])
-async def get_all_archives_admin(
+def get_all_archives_admin(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -916,7 +916,7 @@ async def get_all_archives_admin(
 
 
 @router.put("/admin/archives/{archive_id}", response_model=WeeklyArchiveResponse)
-async def update_weekly_archive(
+def update_weekly_archive(
     archive_id: str,
     update_data: WeeklyArchiveUpdate,
     current_user: User = Depends(get_current_user),
@@ -964,7 +964,7 @@ async def update_weekly_archive(
 
 
 @router.delete("/admin/archives/{archive_id}")
-async def delete_weekly_archive(
+def delete_weekly_archive(
     archive_id: str,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)

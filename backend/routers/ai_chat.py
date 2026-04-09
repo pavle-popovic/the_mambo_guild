@@ -1,7 +1,7 @@
 """
 Agentic Sales Concierge - Diego
 ================================
-A sophisticated AI concierge using Google Gemini with Function Calling (Tools).
+A sophisticated AI concierge using Anthropic Claude with Tool Use.
 
 Security Features:
 - API key stored server-side only (never exposed to client)
@@ -80,7 +80,7 @@ async def check_rate_limit(client_id: str) -> dict:
                 "error": "Rate limit exceeded",
                 "remaining": 0,
                 "reset_in_seconds": reset_in,
-                "message": f"Please wait before sending more messages."
+                "message": "Please wait before sending more messages."
             }
         )
 
@@ -105,10 +105,6 @@ class ChatRequest(BaseModel):
     messages: List[ChatMessage] = Field(..., min_length=1, max_length=50)
     stream: bool = Field(default=True)
 
-class FunctionCallResult(BaseModel):
-    name: str
-    args: dict
-
 # =============================================================================
 # Diego Persona & Tool Definitions
 # =============================================================================
@@ -118,7 +114,7 @@ DIEGO_SYSTEM_PROMPT = """You are 'Diego', the Head Concierge at The Mambo Guild 
 STYLE:
 - Charming, sophisticated, with 1920s Havana flair
 - Warm, authoritative but humble
-- Use occasional Spanish phrases naturally (Hola, mi amigo, magnífico, etc.)
+- Use occasional Spanish phrases naturally (Hola, mi amigo, magnifico, etc.)
 - Think of yourself as a seasoned host at the finest dance club in Havana
 
 MISSION:
@@ -152,12 +148,12 @@ WHEN TO RECOMMEND:
 - If user mentions they dance socially but want to improve -> recommend advanced
 - If user mentions wanting feedback, certification, or professional goals -> recommend performer"""
 
-# Tool definitions for Gemini Function Calling
-TOOL_DEFINITIONS = [
+# Tool definitions in Anthropic format
+ANTHROPIC_TOOLS = [
     {
         "name": "recommend_membership",
         "description": "Call this when you have identified the user's dance level and goals, and want to present a specific membership tier. Only call after asking at least one qualifying question.",
-        "parameters": {
+        "input_schema": {
             "type": "object",
             "properties": {
                 "tier": {
@@ -175,8 +171,8 @@ TOOL_DEFINITIONS = [
     },
     {
         "name": "search_knowledge_base",
-        "description": "Call this when the user asks a specific technical question about salsa steps, techniques, history, or musicality that requires detailed information (e.g., 'How do I do a Copa?', 'What is the history of mambo?', 'How do I improve my body movement?').",
-        "parameters": {
+        "description": "Call this when the user asks a specific technical question about salsa steps, techniques, history, or musicality that requires detailed information.",
+        "input_schema": {
             "type": "object",
             "properties": {
                 "query": {
@@ -194,10 +190,7 @@ TOOL_DEFINITIONS = [
 # =============================================================================
 
 def execute_recommend_membership(tier: str, reasoning: str) -> dict:
-    """
-    Execute the membership recommendation tool.
-    Returns structured data for the frontend to render a card.
-    """
+    """Execute the membership recommendation tool."""
     tier_data = {
         "rookie": {
             "name": "Guest List",
@@ -253,10 +246,7 @@ def execute_recommend_membership(tier: str, reasoning: str) -> dict:
     }
 
 def execute_search_knowledge_base(query: str, db: Optional[Session] = None) -> dict:
-    """
-    Search published courses and lessons for content relevant to the query.
-    Returns a concise summary Diego can use to answer a technical dance question.
-    """
+    """Search published courses and lessons for content relevant to the query."""
     if db is None:
         return {
             "type": "knowledge_base",
@@ -265,14 +255,12 @@ def execute_search_knowledge_base(query: str, db: Optional[Session] = None) -> d
         }
 
     try:
-        from models.course import World, Lesson
+        from models.course import World, Lesson, Level
 
-        # Tokenise query into search terms (min 3 chars to avoid noise)
         terms = [t.lower() for t in query.split() if len(t) >= 3]
         if not terms:
             terms = [query.lower()]
 
-        # Search published courses
         all_worlds = db.query(World).filter(World.is_published == True).all()
         matching_worlds = [
             w for w in all_worlds
@@ -282,8 +270,6 @@ def execute_search_knowledge_base(query: str, db: Optional[Session] = None) -> d
             )
         ]
 
-        # Search lessons (only within published courses)
-        from models.course import Level
         all_lessons = (
             db.query(Lesson)
             .join(Level, Lesson.level_id == Level.id)
@@ -303,10 +289,10 @@ def execute_search_knowledge_base(query: str, db: Optional[Session] = None) -> d
         results: List[str] = []
         for w in matching_worlds[:3]:
             desc = (w.description or "").strip()
-            results.append(f"Course — {w.title}: {desc[:120]}" if desc else f"Course — {w.title}")
+            results.append(f"Course - {w.title}: {desc[:120]}" if desc else f"Course - {w.title}")
         for l in matching_lessons[:5]:
             desc = (l.description or "").strip()
-            results.append(f"Lesson — {l.title}: {desc[:120]}" if desc else f"Lesson — {l.title}")
+            results.append(f"Lesson - {l.title}: {desc[:120]}" if desc else f"Lesson - {l.title}")
 
         if results:
             summary = " | ".join(results)
@@ -316,7 +302,6 @@ def execute_search_knowledge_base(query: str, db: Optional[Session] = None) -> d
                 "result": f"I found the following relevant content: {summary}"
             }
 
-        # Nothing matched — give a helpful fallback
         return {
             "type": "knowledge_base",
             "query": query,
@@ -344,134 +329,142 @@ def execute_tool(name: str, args: dict, db: Optional[Session] = None) -> dict:
         return {"type": "error", "message": f"Unknown tool: {name}"}
 
 # =============================================================================
-# Gemini Model Setup
+# Anthropic Client Setup
 # =============================================================================
 
-def get_gemini_model():
-    """Initialize Gemini model with tools configured."""
-    try:
-        import google.generativeai as genai
-    except ImportError:
-        raise HTTPException(
-            status_code=503,
-            detail="AI service not available. google-generativeai package not installed."
-        )
+_anthropic_client = None
 
-    api_key = settings.GEMINI_API_KEY
-    if not api_key:
-        raise HTTPException(
-            status_code=503,
-            detail="AI service not configured. GEMINI_API_KEY not set."
-        )
+def get_anthropic_client():
+    """Get or create the Anthropic client."""
+    global _anthropic_client
+    if _anthropic_client is None:
+        try:
+            import anthropic
+        except ImportError:
+            raise HTTPException(
+                status_code=503,
+                detail="AI service not available. anthropic package not installed."
+            )
 
-    genai.configure(api_key=api_key)
+        api_key = settings.ANTHROPIC_API_KEY
+        if not api_key:
+            raise HTTPException(
+                status_code=503,
+                detail="AI service not configured. ANTHROPIC_API_KEY not set."
+            )
 
-    # Create tool declarations
-    tools = [
-        genai.protos.Tool(
-            function_declarations=[
-                genai.protos.FunctionDeclaration(
-                    name=tool["name"],
-                    description=tool["description"],
-                    parameters=genai.protos.Schema(
-                        type=genai.protos.Type.OBJECT,
-                        properties={
-                            k: genai.protos.Schema(
-                                type=genai.protos.Type.STRING,
-                                description=v.get("description", ""),
-                                enum=v.get("enum") if "enum" in v else None
-                            )
-                            for k, v in tool["parameters"]["properties"].items()
-                        },
-                        required=tool["parameters"].get("required", [])
-                    )
-                )
-                for tool in TOOL_DEFINITIONS
-            ]
-        )
-    ]
-
-    return genai.GenerativeModel(
-        model_name="gemini-2.0-flash",
-        generation_config={
-            "temperature": 0.8,
-            "top_p": 0.95,
-            "top_k": 40,
-            "max_output_tokens": 1024,
-        },
-        safety_settings=[
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-        ],
-        tools=tools,
-        system_instruction=DIEGO_SYSTEM_PROMPT
-    )
+        _anthropic_client = anthropic.Anthropic(api_key=api_key)
+    return _anthropic_client
 
 # =============================================================================
 # Streaming Response Generator
 # =============================================================================
 
-async def stream_gemini_response(
-    model,
+async def stream_claude_response(
     messages: List[ChatMessage],
     db: Optional[Session] = None,
 ) -> AsyncGenerator[str, None]:
     """
-    Stream response from Gemini API with function calling support.
-    Yields SSE-formatted chunks including function calls.
+    Stream response from Claude API with tool use support.
+    Yields SSE-formatted chunks matching the existing frontend contract.
     """
-    # Build conversation history for Gemini
-    history = []
+    client = get_anthropic_client()
 
-    for msg in messages[:-1]:
-        role = "user" if msg.role == "user" else "model"
-        history.append({"role": role, "parts": [msg.content]})
-
-    # Start chat with history
-    chat = model.start_chat(history=history)
-
-    # Get the last user message
-    last_message = messages[-1].content
+    # Build messages for Claude (system prompt is separate)
+    claude_messages = []
+    for msg in messages:
+        role = "user" if msg.role == "user" else "assistant"
+        claude_messages.append({"role": role, "content": msg.content})
 
     try:
-        # Send message with streaming
-        response = await chat.send_message_async(last_message, stream=True)
+        # First call - may return text or tool_use
+        with client.messages.stream(
+            model="claude-sonnet-4-20250514",
+            max_tokens=1024,
+            system=DIEGO_SYSTEM_PROMPT,
+            messages=claude_messages,
+            tools=ANTHROPIC_TOOLS,
+            temperature=0.8,
+        ) as stream:
+            accumulated_text = ""
+            tool_use_block = None
 
-        accumulated_text = ""
-        function_call = None
+            for event in stream:
+                if event.type == "content_block_start":
+                    if event.content_block.type == "tool_use":
+                        tool_use_block = {
+                            "id": event.content_block.id,
+                            "name": event.content_block.name,
+                            "input_json": ""
+                        }
+                elif event.type == "content_block_delta":
+                    if event.delta.type == "text_delta":
+                        text = event.delta.text
+                        accumulated_text += text
+                        yield f"data: {json.dumps({'type': 'text', 'content': text, 'done': False})}\n\n"
+                    elif event.delta.type == "input_json_delta":
+                        if tool_use_block:
+                            tool_use_block["input_json"] += event.delta.partial_json
+                elif event.type == "content_block_stop":
+                    if tool_use_block:
+                        # Parse tool input and execute
+                        try:
+                            tool_args = json.loads(tool_use_block["input_json"])
+                        except json.JSONDecodeError:
+                            tool_args = {}
 
-        async for chunk in response:
-            # Check for function calls
-            if chunk.candidates:
-                candidate = chunk.candidates[0]
-                if candidate.content and candidate.content.parts:
-                    for part in candidate.content.parts:
-                        # Handle text content
-                        if hasattr(part, 'text') and part.text:
-                            accumulated_text += part.text
-                            yield f"data: {json.dumps({'type': 'text', 'content': part.text, 'done': False})}\n\n"
+                        tool_result = execute_tool(tool_use_block["name"], tool_args, db=db)
+                        yield f"data: {json.dumps({'type': 'function_call', 'name': tool_use_block['name'], 'args': tool_args, 'result': tool_result, 'done': False})}\n\n"
 
-                        # Handle function calls
-                        if hasattr(part, 'function_call') and part.function_call:
-                            fc = part.function_call
-                            function_call = {
-                                "name": fc.name,
-                                "args": dict(fc.args) if fc.args else {}
+                        # Send tool result back to Claude for a follow-up response
+                        followup_messages = claude_messages + [
+                            {
+                                "role": "assistant",
+                                "content": [
+                                    {"type": "text", "text": accumulated_text} if accumulated_text else None,
+                                    {
+                                        "type": "tool_use",
+                                        "id": tool_use_block["id"],
+                                        "name": tool_use_block["name"],
+                                        "input": tool_args,
+                                    }
+                                ]
+                            },
+                            {
+                                "role": "user",
+                                "content": [
+                                    {
+                                        "type": "tool_result",
+                                        "tool_use_id": tool_use_block["id"],
+                                        "content": json.dumps(tool_result),
+                                    }
+                                ]
                             }
+                        ]
+                        # Filter None from assistant content
+                        for m in followup_messages:
+                            if isinstance(m.get("content"), list):
+                                m["content"] = [c for c in m["content"] if c is not None]
 
-        # If there was a function call, execute it and send the result
-        if function_call:
-            tool_result = execute_tool(function_call["name"], function_call["args"], db=db)
-            yield f"data: {json.dumps({'type': 'function_call', 'name': function_call['name'], 'args': function_call['args'], 'result': tool_result, 'done': False})}\n\n"
+                        with client.messages.stream(
+                            model="claude-sonnet-4-20250514",
+                            max_tokens=1024,
+                            system=DIEGO_SYSTEM_PROMPT,
+                            messages=followup_messages,
+                            tools=ANTHROPIC_TOOLS,
+                            temperature=0.8,
+                        ) as followup_stream:
+                            for followup_event in followup_stream:
+                                if followup_event.type == "content_block_delta" and followup_event.delta.type == "text_delta":
+                                    yield f"data: {json.dumps({'type': 'text', 'content': followup_event.delta.text, 'done': False})}\n\n"
 
-        # Send completion signal
+                        tool_use_block = None
+
         yield f"data: {json.dumps({'type': 'done', 'content': '', 'done': True})}\n\n"
 
     except Exception as e:
         error_msg = str(e)
-        if "API key" in error_msg.lower():
+        if "api key" in error_msg.lower() or "authentication" in error_msg.lower():
             error_msg = "AI service configuration error"
         yield f"data: {json.dumps({'type': 'error', 'error': error_msg, 'done': True})}\n\n"
 
@@ -486,7 +479,7 @@ async def chat_endpoint(
     db: Session = Depends(get_db),
 ):
     """
-    Main chat endpoint with streaming and function calling support.
+    Main chat endpoint with streaming and tool use support.
 
     Response types in stream:
     - text: Regular text content from Diego
@@ -494,16 +487,12 @@ async def chat_endpoint(
     - done: Stream complete
     - error: An error occurred
     """
-    # Check rate limit
     client_id = get_client_identifier(request)
     rate_info = await check_rate_limit(client_id)
 
-    # Get Gemini model with tools
-    model = get_gemini_model()
-
     if chat_request.stream:
         return StreamingResponse(
-            stream_gemini_response(model, chat_request.messages, db=db),
+            stream_claude_response(chat_request.messages, db=db),
             media_type="text/event-stream",
             headers={
                 "Cache-Control": "no-cache",
@@ -515,31 +504,35 @@ async def chat_endpoint(
     else:
         # Non-streaming response
         try:
-            history = []
-            for msg in chat_request.messages[:-1]:
-                role = "user" if msg.role == "user" else "model"
-                history.append({"role": role, "parts": [msg.content]})
+            client = get_anthropic_client()
 
-            chat = model.start_chat(history=history)
-            last_message = chat_request.messages[-1].content
-            response = await chat.send_message_async(last_message)
+            claude_messages = []
+            for msg in chat_request.messages:
+                role = "user" if msg.role == "user" else "assistant"
+                claude_messages.append({"role": role, "content": msg.content})
 
-            # Check for function calls in response
-            function_call = None
+            response = client.messages.create(
+                model="claude-sonnet-4-20250514",
+                max_tokens=1024,
+                system=DIEGO_SYSTEM_PROMPT,
+                messages=claude_messages,
+                tools=ANTHROPIC_TOOLS,
+                temperature=0.8,
+            )
+
             text_content = ""
+            function_call = None
 
-            if response.candidates:
-                candidate = response.candidates[0]
-                if candidate.content and candidate.content.parts:
-                    for part in candidate.content.parts:
-                        if hasattr(part, 'text') and part.text:
-                            text_content += part.text
-                        if hasattr(part, 'function_call') and part.function_call:
-                            fc = part.function_call
-                            function_call = {
-                                "name": fc.name,
-                                "args": dict(fc.args) if fc.args else {}
-                            }
+            for block in response.content:
+                if block.type == "text":
+                    text_content += block.text
+                elif block.type == "tool_use":
+                    tool_result = execute_tool(block.name, block.input, db=db)
+                    function_call = {
+                        "name": block.name,
+                        "args": block.input,
+                        "result": tool_result
+                    }
 
             result = {
                 "content": text_content,
@@ -547,16 +540,11 @@ async def chat_endpoint(
             }
 
             if function_call:
-                tool_result = execute_tool(function_call["name"], function_call["args"], db=db)
-                result["function_call"] = {
-                    "name": function_call["name"],
-                    "args": function_call["args"],
-                    "result": tool_result
-                }
+                result["function_call"] = function_call
 
             return result
 
-        except Exception as e:
+        except Exception:
             raise HTTPException(
                 status_code=500,
                 detail="Failed to generate response. Please try again."
@@ -565,13 +553,13 @@ async def chat_endpoint(
 @router.get("/status")
 async def ai_status():
     """Check if AI service is available."""
-    available = settings.GEMINI_API_KEY is not None
+    available = settings.ANTHROPIC_API_KEY is not None
 
     return {
         "available": available,
-        "model": "gemini-2.0-flash" if available else None,
+        "model": "claude-sonnet-4-20250514" if available else None,
         "persona": "Diego - Head Concierge",
-        "tools": [t["name"] for t in TOOL_DEFINITIONS] if available else [],
+        "tools": [t["name"] for t in ANTHROPIC_TOOLS] if available else [],
         "rate_limit": {
             "requests_per_window": settings.AI_RATE_LIMIT_REQUESTS,
             "window_seconds": settings.AI_RATE_LIMIT_WINDOW_SECONDS

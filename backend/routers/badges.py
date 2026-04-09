@@ -16,7 +16,7 @@ router = APIRouter(tags=["Badges"])
 
 
 @router.get("/", response_model=List[BadgeResponse])
-async def get_all_badges(
+def get_all_badges(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
@@ -29,7 +29,7 @@ async def get_all_badges(
 
 
 @router.get("/user/{user_id}", response_model=List[BadgeResponse])
-async def get_user_badges(
+def get_user_badges(
     user_id: str,
     db: Session = Depends(get_db)
 ):
@@ -43,7 +43,7 @@ async def get_user_badges(
 
 
 @router.get("/stats/{user_id}", response_model=PublicProfileStats)
-async def get_user_stats(
+def get_user_stats(
     user_id: str,
     db: Session = Depends(get_db)
 ):
@@ -58,7 +58,7 @@ async def get_user_stats(
 
 
 @router.post("/check")
-async def check_my_badges(
+def check_my_badges(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.post("/submit", response_model=SubmissionResponse)
-async def submit_boss_battle(
+def submit_boss_battle(
     submission_data: SubmissionCreateRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
@@ -69,7 +69,7 @@ async def submit_boss_battle(
 
 
 @router.get("/my-submissions", response_model=List[SubmissionResponse])
-async def get_my_submissions(
+def get_my_submissions(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):

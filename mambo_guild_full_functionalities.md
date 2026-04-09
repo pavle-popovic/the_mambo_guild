@@ -1,7 +1,7 @@
 # The Mambo Guild — Complete Codebase Functionality Reference
 
-> **Last Updated**: March 29, 2026  
-> **Status**: Lessons not yet uploaded on MUX (planned for next week)
+> **Last Updated**: April 9, 2026  
+> **Status**: Lessons not yet uploaded on MUX (planned for next week). i18n architecture (13 languages) and Diego AI concierge system prompt generated — awaiting `next-intl` install and `feature/i18n-diego` branch integration. Global in-app **Bug Report Widget** added (Section 36).
 
 ---
 
@@ -41,6 +41,8 @@
 32. [Security Measures](#32-security-measures)
 33. [Performance Optimizations](#33-performance-optimizations)
 34. [Scripts & Utilities](#34-scripts--utilities)
+35. [Global Translation Architecture (i18n)](#35-global-translation-architecture-i18n)
+36. [Bug Report Widget (Global)](#36-bug-report-widget-global)
 
 ---
 
@@ -568,17 +570,53 @@ All premium features require **Performer (Guild Master)** subscription.
 
 ---
 
-## 15. AI Sales Concierge ("Diego" / "Tito P")
+## 15. AI Sales Concierge ("Diego")
 
 ### Architecture
 - **Backend**: Google Gemini 2.0 Flash with Function Calling (Tools)
-- **Frontend**: Pill-shaped collapsed chatbot with dark glass UI
+- **Frontend**: Pill-shaped collapsed chatbot with dark glass UI (`Mambobot.tsx`)
 - **Persona**: "Diego" — 1920s Havana Head Concierge, charming and sophisticated
 
-### Capabilities
-1. **Conversational sales**: Asks 2-3 diagnostic questions about dance experience
-2. **Membership recommendation**: `recommend_membership` tool returns structured card data for frontend
-3. **Knowledge base search**: `search_knowledge_base` tool (placeholder — future RAG integration)
+### Persona & Brand Voice
+- **Name**: Diego (the Guild's Head Concierge)
+- **Tone**: Warmly sophisticated, highly logical, empathetic, slightly scrappy, anti-elitist
+- **Motto**: "Autonomy in practice. Science in technique. Serving over perfection."
+- **Enemies**: Elitism, gatekeeping, paralyzing perfectionism
+- **Core belief**: The person who makes the most mistakes, most publicly, improves fastest
+
+### Conversation Strategy
+1. **Qualify first** — ask 1–2 diagnostic questions before pitching (dance experience, current blockers, previous online learning attempts)
+2. **Personalise** — tailor recommendation to user type (beginner / intermediate / advanced / skeptic / price-sensitive)
+3. **Close with trial** — always end with "$1 for 7 days" as the zero-risk answer to all objections
+
+### Tone Calibration by User Type
+| User | Diego's approach |
+|---|---|
+| Complete beginners | Lead with science and structured path; reassure the Skill Tree was built for "don't know what I don't know" |
+| Intermediate (1–4 yrs) | Ask specific frustrations; show Lab + Boss Battle accountability + Frame-by-Frame tool |
+| Advanced | Skip basics; lead with Guild Master — 1-on-1 coaching, stem isolation, Roundtable community |
+| Skeptics ("I learn in person") | Acknowledge it; pivot to motor learning science advantage of video; offer $1 trial |
+| Price-sensitive | Frame math ($1.30/day); never discount; point to trial |
+
+### Objection Handling (encoded)
+| Objection | Response approach |
+|---|---|
+| "I learn better in person" | Validate partner dynamics; pivot to repetition volume, 25% speed, A/B loop advantage |
+| "Too expensive" | $1.30/day framing; compare to one group class |
+| "No time" | Modular 5–20 min lessons; weekly streak freeze built in |
+| "Not ready yet" | "That feeling is the point" — Skill Tree tells you exactly where to start |
+| "Tried online, didn't work" | Was it structured? Guild = roadmap + accountability + community |
+
+### Capabilities (Tools)
+1. **Conversational sales**: 1–2 diagnostic questions → personalised recommendation
+2. **`recommend_membership(tier, reason, highlights)`**: Returns structured card data (base or vip) with personalised rationale
+3. **`search_knowledge_base(query)`**: Searches structured knowledge base (future RAG integration)
+
+### Knowledge Base Files
+| File | Purpose |
+|---|---|
+| `frontend/lib/ai/diego-system-prompt.ts` | Complete Gemini system prompt (persona, pricing, features, strategy, tone calibration, tool definitions) |
+| `frontend/lib/ai/diego-knowledge-base.json` | Structured JSON knowledge base (brand, pricing, curriculum, badges, Claves economy, community, FAQs, objection handling) |
 
 ### Technical Features
 - **Streaming responses** via SSE (Server-Sent Events)
@@ -653,6 +691,7 @@ All premium features require **Performer (Guild Master)** subscription.
 | **Waitlist Welcome** | New waitlist signup |
 | **Announcement Email** | Admin sends custom announcement |
 | **Waitlist Broadcast** | Mass email to waitlist users |
+| **Bug Report** | User submits via in-app widget → `support@themamboguild.com` with screenshots + device metadata (Section 36) |
 
 ### Design
 - Consistent branded HTML templates
@@ -1166,6 +1205,200 @@ community_tags
 | `verify_founder_logic.py` | Verify founder badge logic |
 | `setup_admin_and_verify.py` | Full admin setup with verification (7KB) |
 | `create_default_courses.py` | Create default course structure |
+
+---
+
+---
+
+## 35. Global Translation Architecture (i18n)
+
+### Overview
+The platform supports **13 languages** via `next-intl` in cookie-based mode. No URL restructuring required — existing routes (`/courses`, `/lesson/[id]`, etc.) are unchanged. Locale is stored in a `NEXT_LOCALE` cookie, read server-side, and forwarded as a request header so both Server and Client Components get the correct locale with no hydration mismatch.
+
+### Why next-intl (not React Context + localStorage)
+| Approach | SSR safe | No hydration flash | SEO crawlable | Server Components |
+|---|---|---|---|---|
+| React Context + localStorage | ❌ | ❌ | ❌ | ❌ |
+| **next-intl (cookie-based)** | ✅ | ✅ | ✅ | ✅ |
+
+### Supported Languages
+| Code | Language | Dir |
+|---|---|---|
+| `en` | English | LTR |
+| `es` | Español | LTR |
+| `pt` | Português (Brasil) | LTR |
+| `fr` | Français | LTR |
+| `de` | Deutsch | LTR |
+| `it` | Italiano | LTR |
+| `ja` | 日本語 | LTR |
+| `ko` | 한국어 | LTR |
+| `zh` | 中文（简体）| LTR |
+| `ru` | Русский | LTR |
+| `pl` | Polski | LTR |
+| `nl` | Nederlands | LTR |
+| `ar` | العربية | **RTL** |
+
+### File Structure
+```
+frontend/
+├── messages/
+│   ├── en.json          ← base (13 namespaces, ~120 keys each)
+│   ├── es.json
+│   ├── pt.json
+│   ├── fr.json
+│   ├── de.json
+│   ├── it.json
+│   ├── ja.json
+│   ├── ko.json
+│   ├── zh.json
+│   ├── ru.json
+│   ├── pl.json
+│   ├── nl.json
+│   └── ar.json
+└── i18n/
+    ├── config.ts        ← locale list, metadata, Mux BCP-47 map
+    ├── request.ts       ← server-side locale resolution (cookie → Accept-Language → en)
+    ├── client.tsx       ← LocaleProvider, useLocale(), useSetLocale()
+    └── SETUP.md         ← step-by-step wiring instructions
+```
+
+### Translation Namespaces (per locale file)
+`nav` · `auth` · `dashboard` · `courses` · `lesson` · `skillTree` · `lab` · `stage` · `claves` · `pricing` · `player` · `common` · `profile` · `onboarding` · `chatbot` · `guildMaster` · `errors`
+
+### Key Components
+| Component | Purpose |
+|---|---|
+| `components/LocaleSwitcher.tsx` | Framer Motion dropdown — flag + native name, RTL-aware, updates cookie + triggers RSC refresh |
+| `components/MuxPlayerWithCC.tsx` | Mux player that auto-switches closed-caption VTT track when global locale changes |
+
+### MuxPlayerWithCC — Caption Sync Flow
+1. Each Mux video asset has VTT subtitle tracks uploaded per language (via Mux Tracks API), tagged with BCP-47 language codes
+2. `useLocale()` hook provides the current locale to the component
+3. `LOCALE_TO_MUX_LANG` map converts locale code → BCP-47 (e.g. `zh` → `zh-Hans`, `pt` → `pt-BR`)
+4. On locale change: iterates `video.textTracks`, sets matching track to `"showing"`, all others to `"hidden"`
+5. Graceful fallback: if no track exists for the requested language, falls back to English and shows a subtle notice
+
+### Locale Switching Flow
+```
+User clicks flag in LocaleSwitcher
+  → writes NEXT_LOCALE=es cookie (1 year, path=/, SameSite=Lax)
+  → sets document.lang + document.dir immediately (instant visual feedback)
+  → router.refresh() triggers RSC re-render
+  → i18n/request.ts reads cookie → loads messages/es.json
+  → NextIntlClientProvider re-hydrates with Spanish messages
+  → MuxPlayerWithCC receives new locale → switches VTT track
+```
+
+### Integration Status
+- **Status**: Files generated, awaiting `npm install next-intl` and branch integration
+- **Branch**: `feature/i18n-diego` (to be created — do NOT merge to `main` until locally verified)
+- **Activation**: Follow `frontend/i18n/SETUP.md` (3 file changes: `next.config.ts`, `app/layout.tsx`, `middleware.ts`)
+- **Risk to live site**: Zero — all new files are inert until imported. `middleware.ts` restored to original waitlist-only version.
+
+### Dependency to install
+```bash
+cd frontend && npm install next-intl
+```
+
+---
+
+## 36. Bug Report Widget (Global)
+
+A lightweight in-app feedback widget mounted globally so users can report bugs from **any page** (authenticated or not) with an auto-captured screenshot, additional attached images, and full device/browser metadata. Reports are emailed to `support@themamboguild.com`.
+
+### Goals
+- **Zero-friction reporting**: one click → screenshot auto-captured → message + send
+- **Work for logged-out visitors** too (landing, pricing, waitlist pages)
+- **Zero performance impact** on pages where it's not used (lazy-loaded)
+- **Rich debug context** so bugs are triageable without back-and-forth
+
+### UX
+- **Trigger**: fixed gold chip button, **top-right of every page** (80px from top to clear the navbar, respects iOS safe-area insets)
+- **Modal**: center dialog on desktop, bottom-sheet on mobile (with safe-area bottom padding)
+- **Auto-screenshot captured before modal opens** (the modal itself is excluded via `data-bug-report-ignore` attribute so it never appears in the screenshot)
+- **Attachment options**: auto screenshot + drag/drop + clipboard paste + file picker (up to 5 images, 2 MB each)
+- **Send button disabled while capturing** ("Capturing…" state with spinner) so reports cannot be submitted before the screenshot is ready
+- **Success state**: 1.5s confirmation then modal auto-closes
+
+### Screenshot Capture — `modern-screenshot`
+Chose **`modern-screenshot@4.6.0`** over `html2canvas` because Tailwind v4's `oklch()` color functions, CSS custom properties, and modern gradients are not parseable by `html2canvas`. `modern-screenshot` uses DOM → SVG `<foreignObject>` serialization which natively handles all modern CSS.
+
+**Loaded lazily from jsDelivr CDN** (zero bundle cost) with three fallback URLs (jsdelivr → unpkg → jsdelivr-latest). Pre-warmed on `requestIdleCallback` so the library + web worker blob are ready the instant the user clicks.
+
+### Performance Optimizations
+Capture time reduced from initial **~40 seconds → ~1-2 seconds** via the following techniques:
+| Optimization | Gain |
+|---|---|
+| **`font: false`** — skip `@font-face` embedding | Biggest single speedup (50-80%); uses system font fallback |
+| **Web Worker** (`workerUrl` as same-origin `Blob` URL, 4 workers desktop / 2 mobile) | 30-50% faster + main-thread stays responsive |
+| **`fetchFn` cross-origin short-circuit** — returns 1×1 placeholder instantly for any non-same-origin resource URL | Eliminated ~30s of failed Mux/R2 image fetch waits |
+| **Element filter** — skips `<video>`, `<iframe>`, `<canvas>`, `<object>`, `<embed>`, and cross-origin `<img>`/`<source>` | Prevents CORS-taint blackouts |
+| **Pre-warm on idle** via `requestIdleCallback` | Eliminates CDN-load latency on click |
+| **Mobile scale 0.75, quality 0.70, 2 workers** | Smaller payloads + lower CPU for older phones |
+| **`drawImageInterval: 100`** (default kept) + **2.5s per-resource timeout** | Fail-fast on any missing asset |
+
+### Blob-URL Worker Trick
+Browsers block `new Worker(crossOriginUrl)` **even when CORS headers are set** (Workers have stricter origin rules than `<script>`). Fix: `fetch()` the worker script as text → wrap in `Blob` → `URL.createObjectURL()` → pass resulting `blob:` URL to `modern-screenshot`. Falls back gracefully to main-thread rendering if the blob can't be created.
+
+### Device Metadata Collected (Client-Side)
+- `navigator.userAgent`
+- `navigator.platform`
+- `navigator.language`
+- `Intl.DateTimeFormat().resolvedOptions().timeZone`
+- `window.screen.{width, height}`
+- `window.innerWidth × innerHeight` (viewport)
+- `window.devicePixelRatio`
+- Current `window.location.href`
+- Logged-in user ID + name (from `AuthContext`), if available
+
+### Backend Endpoint — `POST /api/support/bug-report`
+**Unauthenticated** (intentional — logged-out users must be able to report bugs on landing/pricing pages). Defined in `backend/routers/support.py`.
+
+**Pydantic validation**: `message` (3-5000 chars), `page_url`, `user_agent`, `device` object, optional `reporter_email`/`reporter_name`, `screenshots` (list of base64 data URIs, max 5).
+
+**Flow**:
+1. **IP extraction** — respects `X-Forwarded-For` header (Railway/Cloudflare proxy aware)
+2. **Rate limit check** via `redis_service.check_rate_limit()` — **5 reports per IP per hour**; fails open if Redis is down; returns HTTP 429 with friendly message if exceeded
+3. **Screenshot upload** — validates each data URI with regex + base64 decode, enforces 2 MB hard cap per image, uploads to R2 under `bug-reports/{uuid}.{ext}` via `storage_service.s3_client.put_object`
+4. **Email dispatch** via `email_service.send_bug_report_email()` — branded HTML with escaped user content, clickable screenshot thumbnails, device metadata table, client IP, `reply_to` set to reporter's email
+5. Returns `{ status: "ok", screenshots_uploaded: N }`
+
+### Security & Abuse Prevention
+- **HTML escaping** of all user-provided content in the email template (via `html.escape`)
+- **Data URI validation** via regex: only `image/(png|jpeg|jpg|webp)` accepted; base64 strictly validated
+- **Hard size caps**: 2 MB decoded per image, 5 images max, 5000 char message limit
+- **Redis rate limit**: 5/hour per IP (fixed window), fails open
+- **Pydantic field length caps** on every string field
+- **`X-Forwarded-For`** handling so one abuser behind a proxy doesn't share a bucket with everyone
+
+### Storage Lifecycle
+- Screenshots stored in R2 under `bug-reports/` prefix
+- **R2 lifecycle rule**: auto-delete after **30 days** (configured via Cloudflare dashboard, not code)
+- Rationale: if a bug hasn't been triaged within 30 days, the screenshot is unlikely to still be useful; keeps storage bounded at effectively zero cost
+
+### Files
+**Frontend**:
+- `frontend/components/BugReportButton.tsx` — the entire widget (client component, ~380 lines); lazy-loads `modern-screenshot`, handles capture/modal/submit
+- `frontend/app/layout.tsx` — mounts `<BugReportButton />` inside `AuthProvider` so it appears on every page and has access to user context
+- `frontend/lib/api.ts` — `apiClient.submitBugReport()` method
+
+**Backend**:
+- `backend/routers/support.py` — `/bug-report` endpoint, IP extraction, rate limiting, screenshot upload, email dispatch
+- `backend/services/email_service.py` — `send_bug_report_email()` with branded HTML template
+- `backend/routers/__init__.py` — registers `support_router` under `/support`
+
+### Known Limitations & Accepted Tradeoffs
+- **Cross-origin images (Mux thumbnails, etc.) appear as blank areas** in screenshots — intentional, prevents CORS-taint and 30s fetch stalls. Text/layout/colors still render correctly which is sufficient for 90% of UI bugs.
+- **System font rendering** in screenshots instead of Playfair/Inter — intentional (`font: false` is the biggest perf win). Acceptable tradeoff for a bug report.
+- **Screenshots stored with unguessable UUID public URLs** — security through obscurity. Acceptable for current scale; upgrade to private prefix + signed URLs if/when scaling to EU users for GDPR.
+- **No DB record of bug reports** — only live in the support inbox. Acceptable for solo founder / low volume; add a `bug_reports` table when volume or team size warrants it.
+- **Library loaded from public CDN** — acceptable for current setup; when the frontend `package-lock.json` `EBADPLATFORM` issue is resolved, should be migrated to a bundled import with Subresource Integrity hash.
+
+### Deployment Notes
+- **No env vars required** — uses existing `RESEND_API_KEY`, `AWS_*` (R2), `REDIS_HOST/PORT`
+- **No migrations required** — no new DB tables
+- Railway auto-deploys backend on push; Vercel auto-deploys frontend
+- Redis must be reachable (same as existing auth rate limits)
 
 ---
 

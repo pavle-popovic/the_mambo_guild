@@ -123,7 +123,7 @@ class EdgeCreateRequest(BaseModel):
 
 
 @router.get("/courses", response_model=List[WorldResponse])
-async def get_all_courses_admin(
+def get_all_courses_admin(
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
 ):
@@ -149,7 +149,7 @@ async def get_all_courses_admin(
 
 
 @router.post("/courses", response_model=WorldResponse)
-async def create_course(
+def create_course(
     course_data: WorldCreateRequest,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
@@ -204,7 +204,7 @@ async def create_course(
 
 
 @router.put("/courses/{course_id}", response_model=WorldResponse)
-async def update_course(
+def update_course(
     course_id: str,
     course_data: WorldUpdateRequest,
     admin_user: User = Depends(get_admin_user),
@@ -273,7 +273,7 @@ async def update_course(
 
 
 @router.delete("/courses/{course_id}")
-async def delete_course(
+def delete_course(
     course_id: str,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
@@ -296,7 +296,7 @@ async def delete_course(
 
 
 @router.post("/courses/{course_id}/levels", response_model=dict)
-async def create_level(
+def create_level(
     course_id: str,
     level_data: LevelCreateRequest,
     admin_user: User = Depends(get_admin_user),
@@ -326,7 +326,7 @@ async def create_level(
 
 
 @router.post("/levels/{level_id}/lessons", response_model=dict)
-async def create_lesson(
+def create_lesson(
     level_id: str,
     lesson_data: LessonCreateRequest,
     admin_user: User = Depends(get_admin_user),
@@ -379,7 +379,7 @@ async def create_lesson(
 
 
 @router.put("/lessons/{lesson_id}", response_model=dict)
-async def update_lesson(
+def update_lesson(
     lesson_id: str,
     lesson_data: LessonUpdateRequest,
     admin_user: User = Depends(get_admin_user),
@@ -439,7 +439,7 @@ async def update_lesson(
 
 
 @router.delete("/lessons/{lesson_id}")
-async def delete_lesson(
+def delete_lesson(
     lesson_id: str,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
@@ -456,7 +456,7 @@ async def delete_lesson(
 
 
 @router.get("/courses/{course_id}/full", response_model=dict)
-async def get_course_full_details(
+def get_course_full_details(
     course_id: str,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
@@ -540,7 +540,7 @@ async def get_course_full_details(
 
 
 @router.get("/levels/{level_id}/lessons", response_model=List[LessonResponse])
-async def get_level_lessons(
+def get_level_lessons(
     level_id: str,
     db: Session = Depends(get_db)
 ):
@@ -605,7 +605,7 @@ async def get_level_lessons(
 
 
 @router.put("/levels/{level_id}/position")
-async def update_level_position(
+def update_level_position(
     level_id: str,
     position_data: LevelPositionRequest,
     admin_user: User = Depends(get_admin_user),
@@ -627,7 +627,7 @@ async def update_level_position(
 
 
 @router.post("/worlds/{world_id}/edges")
-async def create_edge(
+def create_edge(
     world_id: str,
     edge_data: EdgeCreateRequest,
     admin_user: User = Depends(get_admin_user),
@@ -672,7 +672,7 @@ async def create_edge(
 
 
 @router.delete("/edges/{edge_id}")
-async def delete_edge(
+def delete_edge(
     edge_id: str,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
@@ -691,7 +691,7 @@ async def delete_edge(
 
 
 @router.get("/levels/{level_id}")
-async def get_level(
+def get_level(
     level_id: str,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
@@ -718,7 +718,7 @@ async def get_level(
 
 
 @router.put("/levels/{level_id}")
-async def update_level(
+def update_level(
     level_id: str,
     level_data: LevelUpdateRequest,
     admin_user: User = Depends(get_admin_user),
@@ -771,7 +771,7 @@ async def update_level(
 
 
 @router.delete("/levels/{level_id}")
-async def delete_level(
+def delete_level(
     level_id: str,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
@@ -799,7 +799,7 @@ async def delete_level(
 
 
 @router.get("/lessons/{lesson_id}")
-async def get_lesson(
+def get_lesson(
     lesson_id: str,
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db)
@@ -831,7 +831,7 @@ async def get_lesson(
 
 
 @router.post("/worlds/{world_id}/levels")
-async def create_level_in_world(
+def create_level_in_world(
     world_id: str,
     level_data: LevelCreateInWorldRequest,
     admin_user: User = Depends(get_admin_user),

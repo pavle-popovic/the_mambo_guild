@@ -34,10 +34,6 @@ EARN_STREAK_INTERVAL = 5      # Every 5 consecutive days
 EARN_ACCEPTED_ANSWER = 15
 EARN_REACTION_REFUND = 1          # Refund when post gets ANY reaction (capped)
 EARN_REACTION_REFUND_CAP = 5      # Max refunds per video
-EARN_CHOREO_COMPLETE = 0
-EARN_WEEK_COMPLETE = 0
-EARN_COURSE_COMPLETE = 0
-EARN_LEVEL_UP = 0
 EARN_REFERRAL_BONUS = 50
 EARN_NEW_USER_STARTER = 15
 EARN_SUB_ADVANCED = 10
@@ -376,34 +372,6 @@ def award_accepted_answer(user_id: str, post_id: str, db: Session) -> int:
         return get_balance(user_id, db)
 
     return earn_claves(user_id, EARN_ACCEPTED_ANSWER, "accepted_answer", db, reference_id=post_id)
-
-
-def award_level_up(user_id: str, new_level: int, db: Session) -> int:
-    """
-    Award claves for leveling up.
-    """
-    return earn_claves(user_id, EARN_LEVEL_UP, f"level_up_{new_level}", db)
-
-
-def award_course_milestone(
-    user_id: str,
-    milestone_type: str,
-    reference_id: str,
-    db: Session
-) -> int:
-    """
-    Award claves for course milestones.
-    milestone_type: 'choreo_complete', 'week_complete', 'course_complete'
-    """
-    amounts = {
-        "choreo_complete": EARN_CHOREO_COMPLETE,
-        "week_complete": EARN_WEEK_COMPLETE,
-        "course_complete": EARN_COURSE_COMPLETE
-    }
-    amount = amounts.get(milestone_type, 0)
-    if amount > 0:
-        return earn_claves(user_id, amount, milestone_type, db, reference_id=reference_id)
-    return get_balance(user_id, db)
 
 
 def process_reaction_refund(post_id: str, post_owner_id: str, db: Session) -> bool:

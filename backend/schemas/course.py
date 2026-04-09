@@ -153,6 +153,7 @@ class WorldDetailResponse(BaseModel):
     course_type: str = "course"
     is_free: bool
     is_published: bool
+    is_locked: bool = False
     thumbnail_url: Optional[str] = None
     levels: List[LevelResponse] = []
     edges: List[LevelEdgeResponse] = []

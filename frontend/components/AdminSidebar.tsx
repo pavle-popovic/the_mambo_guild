@@ -12,14 +12,17 @@ import {
   FaSignOutAlt,
   FaVideo,
   FaUserCheck,
+  FaShieldAlt,
 } from "react-icons/fa";
 
 interface AdminSidebarProps {
   coachingPendingCount?: number;
+  moderationPendingCount?: number;
 }
 
 export default function AdminSidebar({
   coachingPendingCount = 0,
+  moderationPendingCount = 0,
 }: AdminSidebarProps) {
   const pathname = usePathname();
   const { logout } = useAuth();
@@ -33,6 +36,12 @@ export default function AdminSidebar({
       icon: FaUserCheck,
       label: "Coaching Queue",
       badge: coachingPendingCount,
+    },
+    {
+      href: "/admin/moderation",
+      icon: FaShieldAlt,
+      label: "Moderation",
+      badge: moderationPendingCount,
     },
     { href: "/admin/students", icon: FaUsers, label: "Students" },
     { href: "/admin/settings", icon: FaCog, label: "Settings" },

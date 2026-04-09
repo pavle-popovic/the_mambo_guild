@@ -482,6 +482,32 @@ class ApiClient {
     });
   }
 
+  // Bug report submission (global widget)
+  async submitBugReport(payload: {
+    message: string;
+    page_url: string;
+    user_agent: string;
+    device: {
+      platform: string;
+      language: string;
+      timezone: string;
+      screen: string;
+      viewport: string;
+      pixel_ratio: number;
+    };
+    reporter_email: string | null;
+    reporter_name: string | null;
+    screenshots: string[];
+  }) {
+    return this.request<{ status: string; screenshots_uploaded: number }>(
+      "/api/support/bug-report",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
   // Image upload endpoints (R2 presigned URLs)
   async getPresignedUploadUrl(fileType: string, folder: "avatars" | "thumbnails") {
     return this.request<{
@@ -1622,6 +1648,70 @@ class ApiClient {
       method: "PUT",
       body: JSON.stringify({ meeting_url: meetingUrl, meeting_notes: meetingNotes }),
     });
+  }
+
+  // ============================================
+  // Admin: Community Moderation
+  // ============================================
+
+  async getFlaggedReplies() {
+    return this.request<{
+      flagged_replies: Array<{
+        id: string;
+        content: string;
+        created_at: string;
+        moderation_status: string;
+        author: {
+          id: string;
+          first_name: string;
+          last_name: string;
+          avatar_url: string | null;
+        };
+        post: {
+          id: string;
+          title: string;
+          post_type: string | null;
+        };
+      }>;
+      count: number;
+    }>("/api/admin/moderation/flagged");
+  }
+
+  async approveReply(replyId: string) {
+    return this.request<{ success: boolean; message: string }>(
+      `/api/admin/moderation/${replyId}/approve`,
+      { method: "POST" }
+    );
+  }
+
+  async ghostReply(replyId: string) {
+    return this.request<{ success: boolean; message: string }>(
+      `/api/admin/moderation/${replyId}/ghost`,
+      { method: "POST" }
+    );
+  }
+
+  // ============================================
+  // Community: Saved/Bookmarked Posts
+  // ============================================
+
+  async savePost(postId: string) {
+    return this.request<{ success: boolean; message: string }>(
+      `/api/community/posts/${postId}/save`,
+      { method: "POST" }
+    );
+  }
+
+  async unsavePost(postId: string) {
+    return this.request<{ success: boolean; message: string }>(
+      `/api/community/posts/${postId}/save`,
+      { method: "DELETE" }
+    );
+  }
+
+  async getSavedPosts(skip = 0, limit = 20) {
+    const params = new URLSearchParams({ skip: String(skip), limit: String(limit) });
+    return this.request<any[]>(`/api/community/saved?${params.toString()}`);
   }
 }
 
