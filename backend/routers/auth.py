@@ -14,6 +14,7 @@ from services.gamification_service import update_streak
 from services.email_service import send_password_reset_email, send_waitlist_welcome_email
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
 from services.clave_service import process_daily_login, award_new_user_bonus, award_referral_bonus
+from utils.request import client_ip as get_client_ip
 from dependencies import get_current_user
 from config import settings
 import uuid
@@ -91,7 +92,7 @@ def register(
     block mass account creation / enumeration. Fails open if Redis is down
     (see services/redis_service.check_rate_limit).
     """
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = get_client_ip(request)
     if not check_rate_limit(client_ip, "register_ip", max_requests=5, window_seconds=3600):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -255,7 +256,7 @@ def login(
     try:
         # Rate limiting by email and IP
         email = credentials.email.lower().strip()
-        client_ip = request.client.host if request.client else "unknown"
+        client_ip = get_client_ip(request)
         
         # Check rate limit (5 attempts per 5 minutes per email)
         if not check_rate_limit(email, "login", max_requests=5, window_seconds=300):
@@ -759,7 +760,7 @@ def forgot_password(
     """
     # Rate limit by email and IP to prevent abuse
     email_normalized = request_data.email.lower().strip()
-    client_ip = request.client.host if request.client else "unknown"
+    client_ip = get_client_ip(request)
     
     if not check_rate_limit(email_normalized, "forgot_password", max_requests=5, window_seconds=300):
         return {"message": "If the email exists, a password reset link has been sent."}
@@ -897,7 +898,7 @@ def join_waitlist(
 
         # --- Bot / abuse checks ---
         # 1. IP rate limit: max 5 sign-ups per IP per hour
-        client_ip = http_request.client.host if http_request.client else "unknown"
+        client_ip = get_client_ip(http_request)
         if not check_rate_limit(client_ip, "waitlist_ip", max_requests=5, window_seconds=3600):
             raise HTTPException(status_code=429, detail="Too many sign-ups from this location. Please try again later.")
 
