@@ -403,21 +403,28 @@ function ConstellationGraphInner({
   const [isPositioned, setIsPositioned] = useState(false);
 
   // Wait for ReactFlow to measure all node DOM elements, THEN fitView.
-  // useNodesInitialized returns true only after every node has a measured width/height,
-  // which guarantees fitView can compute the correct bounding box.
+  // Double-rAF ensures the browser has completed layout AND paint so the
+  // ReactFlow container has its final pixel dimensions when fitView reads them.
   useEffect(() => {
     if (nodesInitialized && !isPositioned) {
-      fitView({ padding: 0.3, duration: 0, maxZoom: 1.0, minZoom: 0.3 });
-      requestAnimationFrame(() => setIsPositioned(true));
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          fitView({ padding: 0.25, duration: 0 });
+          setIsPositioned(true);
+        });
+      });
     }
   }, [nodesInitialized, fitView, isPositioned]);
 
   // Safety net: force visible after 3s even if nodes never initialize
   useEffect(() => {
     if (isPositioned) return;
-    const fallback = setTimeout(() => setIsPositioned(true), 3000);
+    const fallback = setTimeout(() => {
+      fitView({ padding: 0.25, duration: 0 });
+      setIsPositioned(true);
+    }, 3000);
     return () => clearTimeout(fallback);
-  }, [isPositioned]);
+  }, [isPositioned, fitView]);
 
   return (
     <div
@@ -667,9 +674,11 @@ function ConstellationGraphInner({
 }
 
 // Wrapper component with ReactFlowProvider for proper hook access
+// key={courseId} forces a full remount on client-side navigation between courses,
+// ensuring ReactFlow starts with a fresh instance (no stale viewport state).
 export default function ConstellationGraph(props: ConstellationGraphProps) {
   return (
-    <ReactFlowProvider>
+    <ReactFlowProvider key={props.courseId}>
       <ConstellationGraphInner {...props} />
     </ReactFlowProvider>
   );
