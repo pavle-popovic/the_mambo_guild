@@ -121,6 +121,10 @@ export default function CourseDetailPage() {
 
   return (
     <div className="relative min-h-screen bg-black overflow-hidden">
+      {/* TEMPORARY DEBUG — remove after fixing */}
+      <div className="fixed top-0 left-0 z-[99999] bg-red-600 text-white text-[11px] font-mono p-2 rounded-br" style={{ opacity: 0.95 }}>
+        PAGE: levels={skillTree.levels.length} edges={skillTree.edges.length} courseId={courseId} authLoading={String(authLoading)} userId={user?.id ?? "none"}
+      </div>
       <NavBar user={user ? { ...user, avatar_url: user.avatar_url || undefined } : undefined} />
 
       {/* Full Screen Constellation Graph */}

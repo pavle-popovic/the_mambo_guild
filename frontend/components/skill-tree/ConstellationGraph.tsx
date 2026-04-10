@@ -477,6 +477,11 @@ function ConstellationGraphInner({
   }, [isPositioned]);
 
   return (
+    <>
+      {/* TEMPORARY DEBUG — OUTSIDE opacity container so always visible */}
+      <div className="fixed top-12 left-2 z-[99999] bg-green-700 text-white text-[10px] font-mono p-2 rounded max-w-[90vw] break-all pointer-events-none" style={{ opacity: 0.95 }}>
+        GRAPH: nodes:{flowNodes.length} | edges:{flowEdges.length} | rfReady:{String(rfReady)} | positioned:{String(isPositioned)} | container:{containerSize.w}x{containerSize.h} | {debugInfo}
+      </div>
     <div
       ref={containerRef}
       className={`relative w-full h-full transition-opacity duration-500 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
@@ -485,10 +490,6 @@ function ConstellationGraphInner({
         isolation: 'isolate'
       }}
     >
-      {/* TEMPORARY DEBUG — remove after fixing */}
-      <div className="absolute top-2 left-2 z-[9999] bg-red-600 text-white text-[10px] font-mono p-2 rounded max-w-[90vw] break-all pointer-events-none" style={{ opacity: 0.95 }}>
-        nodes:{flowNodes.length} | edges:{flowEdges.length} | rfReady:{String(rfReady)} | positioned:{String(isPositioned)} | container:{containerSize.w}x{containerSize.h} | {debugInfo}
-      </div>
       {/* Night Sky Background Layer */}
       {!isAdminMode && (
         <div className="absolute inset-0 z-0">
@@ -725,6 +726,7 @@ function ConstellationGraphInner({
         courseTitle={courseTitle}
       />
     </div>
+    </>
   );
 }
 
