@@ -166,7 +166,7 @@ function ConstellationGraphInner({
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredNode, setHoveredNode] = useState<HoveredNode | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const { fitView, setCenter } = useReactFlow();
+  const { setCenter } = useReactFlow();
 
   // Determine node status
   const getNodeStatus = useCallback(
@@ -403,6 +403,32 @@ function ConstellationGraphInner({
     return result;
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
 
+  // Navigate to the frontier node after mount — mirrors SkillTreeTeaser approach.
+  // setCenter is more reliable than fitView because it only needs the container
+  // dimensions (not node measurements). defaultViewport starts zoomed out so all
+  // nodes are immediately visible, then we animate to the frontier.
+  const [hasCentered, setHasCentered] = useState(false);
+  useEffect(() => {
+    if (levels.length > 0 && flowNodes.length > 0 && !hasCentered) {
+      const timer = setTimeout(() => {
+        const targetLevel =
+          levels.find((l) => l.is_unlocked && l.completion_percentage < 100) ||
+          levels.filter((l) => l.is_unlocked).pop() ||
+          levels[0];
+        const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
+        if (targetNode && setCenter) {
+          // +45/+50 to center on the node (dagre position is top-left of 90×100 node)
+          setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
+            zoom: 0.75,
+            duration: 800,
+          });
+          setTimeout(() => setHasCentered(true), 100);
+        }
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [levels, flowNodes, setCenter, hasCentered]);
+
   return (
     <div
       ref={containerRef}
@@ -554,13 +580,11 @@ function ConstellationGraphInner({
           onNodeClick={handleNodeClick}
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
-          fitView
-          fitViewOptions={{ padding: 0.2, maxZoom: 0.85 }}
-          onInit={(instance) => {
-            // Belt-and-suspenders: call fitView again after init in case
-            // the built-in fitView fired before nodes were measured.
-            setTimeout(() => instance.fitView({ padding: 0.2, maxZoom: 0.85 }), 200);
-          }}
+          // Start zoomed-out so all nodes centered at (0,0) are visible immediately.
+          // Graph is centered at origin by dagre; at zoom 0.45 with x/y offset,
+          // the full tree is visible on any screen ≥ 1024px wide.
+          // setCenter (in the effect above) then animates to the frontier node.
+          defaultViewport={{ x: 600, y: 400, zoom: 0.45 }}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{
