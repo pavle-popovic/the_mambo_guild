@@ -50,20 +50,6 @@ export default function CourseDetailPage() {
   const tCommon = useTranslations('common');
   const tCourses = useTranslations('courses');
 
-  // TEMPORARY DEBUG — auto-removes after 15s. Screenshot on mobile when blank.
-  useEffect(() => {
-    const el = document.createElement('div');
-    el.style.cssText = 'position:fixed;top:0;left:0;right:0;z-index:999999;background:red;color:white;font-size:10px;font-family:monospace;padding:4px;pointer-events:none;word-break:break-all;';
-    document.body.appendChild(el);
-    const update = () => {
-      el.textContent = `L=${initialLoading} E=${!!error} T=${skillTree?.levels?.length ?? 'null'} A=${authLoading} U=${user?.id?.slice(0,6) ?? '-'} C=${courseId.slice(0,6)}`;
-    };
-    update();
-    const iv = setInterval(update, 300);
-    const rm = setTimeout(() => { clearInterval(iv); el.remove(); }, 15000);
-    return () => { clearInterval(iv); clearTimeout(rm); el.remove(); };
-  }, [initialLoading, error, skillTree, authLoading, user, courseId]);
-
   // Load skill tree on mount. Only depends on courseId — NOT on user.
   // When user auth resolves, a second fetch updates progress silently.
   const hasFetchedForUser = useRef(false);
