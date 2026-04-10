@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -50,12 +50,26 @@ export default function CourseDetailPage() {
   const tCommon = useTranslations('common');
   const tCourses = useTranslations('courses');
 
-  // Load skill tree immediately (no auth required to view).
-  // Re-fetch when user changes to get progress data, but DON'T show the
-  // loading spinner on re-fetches — that would unmount ConstellationGraph
-  // and kill the centering animation mid-flight.
+  // TEMPORARY DEBUG — DOM-level, always visible regardless of render path
+  const debugRef = useRef<HTMLDivElement | null>(null);
   useEffect(() => {
-    let cancelled = false;
+    const el = document.createElement('div');
+    el.style.cssText = 'position:fixed;top:0;left:0;z-index:999999;background:red;color:white;font-size:11px;font-family:monospace;padding:4px 8px;pointer-events:none;white-space:nowrap;';
+    document.body.appendChild(el);
+    debugRef.current = el;
+    return () => { el.remove(); debugRef.current = null; };
+  }, []);
+  // Update on every render
+  useEffect(() => {
+    if (debugRef.current) {
+      debugRef.current.textContent = `loading=${initialLoading} err=${!!error} tree=${skillTree?.levels?.length ?? 'null'} auth=${authLoading} user=${user?.id?.slice(0,8) ?? 'none'} course=${courseId.slice(0,8)}`;
+    }
+  });
+
+  // Load skill tree on mount. Only depends on courseId — NOT on user.
+  // When user auth resolves, a second fetch updates progress silently.
+  const hasFetchedForUser = useRef(false);
+  useEffect(() => {
     async function load() {
       try {
         const response = await fetch(
@@ -64,19 +78,30 @@ export default function CourseDetailPage() {
         );
         if (!response.ok) throw new Error("Failed to load skill tree");
         const data = await response.json();
-        if (!cancelled) setSkillTree(data);
+        setSkillTree(data);
       } catch (err: any) {
-        if (!cancelled) {
-          console.error("Failed to load skill tree:", err);
-          setError(err.message || "Failed to load skill tree");
-        }
+        console.error("Failed to load skill tree:", err);
+        setError(err.message || "Failed to load skill tree");
       } finally {
-        if (!cancelled) setInitialLoading(false);
+        setInitialLoading(false);
       }
     }
     load();
-    return () => { cancelled = true; };
-  }, [courseId, user?.id]);
+  }, [courseId]);
+
+  // Silent re-fetch when user changes (to get progress data)
+  useEffect(() => {
+    if (!user?.id || !skillTree) return;
+    if (hasFetchedForUser.current) return;
+    hasFetchedForUser.current = true;
+    fetch(
+      `${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/courses/worlds/${courseId}/skill-tree`,
+      { credentials: "include" as RequestCredentials }
+    )
+      .then(r => r.ok ? r.json() : null)
+      .then(data => { if (data) setSkillTree(data); })
+      .catch(() => {});
+  }, [user?.id, skillTree, courseId]);
 
   // Calculate overall course progress and stats
   const stats = useMemo(() => {
@@ -121,10 +146,6 @@ export default function CourseDetailPage() {
 
   return (
     <div className="relative min-h-screen bg-black overflow-hidden">
-      {/* TEMPORARY DEBUG — remove after fixing */}
-      <div className="fixed top-0 left-0 z-[99999] bg-red-600 text-white text-[11px] font-mono p-2 rounded-br" style={{ opacity: 0.95 }}>
-        PAGE: levels={skillTree.levels.length} edges={skillTree.edges.length} courseId={courseId} authLoading={String(authLoading)} userId={user?.id ?? "none"}
-      </div>
       <NavBar user={user ? { ...user, avatar_url: user.avatar_url || undefined } : undefined} />
 
       {/* Full Screen Constellation Graph */}
