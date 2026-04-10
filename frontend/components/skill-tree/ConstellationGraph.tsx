@@ -403,13 +403,25 @@ function ConstellationGraphInner({
     return result;
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
 
-  // Center on the frontier node — mirrors the working SkillTreeTeaser pattern.
-  // useState (not useRef) ensures state resets on remount during soft navigation.
-  // Opacity gating hides the graph until centering starts.
+  // ---------- ReactFlow initialization & centering ----------
+  // ReactFlow's internal ResizeObserver can miss the container during
+  // Next.js soft navigation (container already has final dimensions,
+  // so there's no "change" to observe). Dispatching a resize event
+  // forces ReactFlow to measure the container and render nodes.
+  const [rfReady, setRfReady] = useState(false);
   const [isPositioned, setIsPositioned] = useState(false);
 
+  // Force ReactFlow to detect container dimensions on soft navigation
   useEffect(() => {
-    if (levels.length > 0 && flowNodes.length > 0 && !isPositioned) {
+    const t = setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+    return () => clearTimeout(t);
+  }, []);
+
+  const handleInit = useCallback(() => setRfReady(true), []);
+
+  // Center on the frontier node once ReactFlow is actually ready
+  useEffect(() => {
+    if (rfReady && levels.length > 0 && flowNodes.length > 0 && !isPositioned) {
       const timer = setTimeout(() => {
         const targetLevel =
           levels.find((l) => l.is_unlocked && l.completion_percentage < 100) ||
@@ -417,25 +429,22 @@ function ConstellationGraphInner({
           levels[0];
         const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
         if (targetNode) {
-          // +45/+50 to center on the node (dagre position is top-left of 90×100 node)
-          // zoom 0.55 shows the frontier node plus surrounding context
           setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
             zoom: 0.55,
             duration: 800,
           });
         }
-        // Always reveal after centering attempt, even if target wasn't found
         setTimeout(() => setIsPositioned(true), 100);
-      }, 200);
+      }, 100);
       return () => clearTimeout(timer);
     }
-  }, [levels, flowNodes, setCenter, isPositioned]);
+  }, [rfReady, levels, flowNodes, setCenter, isPositioned]);
 
-  // Safety: always reveal after 1s even if centering fails
+  // Safety: always reveal after 1.5s even if ReactFlow never fires onInit
   useEffect(() => {
     const safety = setTimeout(() => {
       if (!isPositioned) setIsPositioned(true);
-    }, 1000);
+    }, 1500);
     return () => clearTimeout(safety);
   }, [isPositioned]);
 
@@ -590,8 +599,7 @@ function ConstellationGraphInner({
           onNodeClick={handleNodeClick}
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
-          // Graph is centered at (0,0) by dagre. Container is opacity-0 until
-          // the useEffect positions the viewport, so initial coords don't matter.
+          onInit={handleInit}
           defaultViewport={{ x: 0, y: 0, zoom: 0.75 }}
           minZoom={0.2}
           maxZoom={1.5}
