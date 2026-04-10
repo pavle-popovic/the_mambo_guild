@@ -51,6 +51,7 @@ function SkillNode({ data }: NodeProps) {
       className={`relative select-none ${isNodeLocked ? 'cursor-not-allowed' : 'cursor-pointer'}`}
       style={{ width: outerRingSize, height: outerRingSize }}
       whileHover={hoverAnimation}
+      whileTap={isNodeLocked ? {} : { scale: 0.95 }}
       transition={hoverTransition}
     >
       {/* Connection Handles (invisible, for React Flow edges)

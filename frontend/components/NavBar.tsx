@@ -221,7 +221,7 @@ export default function NavBar({ user }: NavBarProps) {
                         animate={{ opacity: 1, y: 0, scale: 1 }}
                         exit={{ opacity: 0, y: -10, scale: 0.95 }}
                         transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute right-0 mt-2 w-64 rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 shadow-2xl shadow-black/50 overflow-hidden z-50"
+                        className="absolute right-0 mt-2 w-56 sm:w-64 max-w-[calc(100vw-2rem)] rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 shadow-2xl shadow-black/50 overflow-hidden z-50"
                       >
                         <div className="p-2">
                           {/* Coaching Corner */}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { useState, useEffect } from "react";
 import {
   FaChartLine,
   FaLayerGroup,
@@ -13,6 +14,8 @@ import {
   FaVideo,
   FaUserCheck,
   FaShieldAlt,
+  FaBars,
+  FaTimes,
 } from "react-icons/fa";
 
 interface AdminSidebarProps {
@@ -26,6 +29,22 @@ export default function AdminSidebar({
 }: AdminSidebarProps) {
   const pathname = usePathname();
   const { logout } = useAuth();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Close drawer on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [pathname]);
+
+  // Prevent body scroll when drawer is open
+  useEffect(() => {
+    if (mobileOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileOpen]);
 
   const menuItems = [
     { href: "/admin", icon: FaChartLine, label: "Dashboard" },
@@ -47,24 +66,33 @@ export default function AdminSidebar({
     { href: "/admin/settings", icon: FaCog, label: "Settings" },
   ];
 
-  return (
-    <aside className="w-64 bg-mambo-panel border-r border-white/10 flex flex-col fixed left-0 top-0 h-screen z-10">
-      <div className="p-6 flex items-center gap-3">
-        <Image
-          src="/assets/Logo.png"
-          alt="The Mambo Guild"
-          width={24}
-          height={24}
-          className="h-6 w-auto logo-img"
-          style={{ mixBlendMode: "screen" }}
-        />
-        <span className="font-bold text-lg tracking-wide text-mambo-text">ADMIN</span>
+  const sidebarContent = (
+    <>
+      <div className="p-6 flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Image
+            src="/assets/Logo.png"
+            alt="The Mambo Guild"
+            width={24}
+            height={24}
+            className="h-6 w-auto logo-img"
+            style={{ mixBlendMode: "screen" }}
+          />
+          <span className="font-bold text-lg tracking-wide text-mambo-text">ADMIN</span>
+        </div>
+        {/* Close button — mobile only */}
+        <button
+          onClick={() => setMobileOpen(false)}
+          className="lg:hidden p-2 text-gray-400 hover:text-white"
+          aria-label="Close menu"
+        >
+          <FaTimes className="w-5 h-5" />
+        </button>
       </div>
 
       <nav className="flex-1 px-4 space-y-1 mt-2 overflow-y-auto">
         {menuItems.map((item) => {
           const Icon = item.icon;
-          // Exact match for dashboard, prefix match for sub-pages
           const isActive =
             item.href === "/admin"
               ? pathname === "/admin"
@@ -74,7 +102,7 @@ export default function AdminSidebar({
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition ${
+              className={`flex items-center gap-3 px-4 py-2.5 rounded-xl font-medium transition min-h-[44px] ${
                 isActive
                   ? "bg-blue-600/10 text-blue-400 border border-blue-600/20"
                   : "text-gray-400 hover:bg-gray-800 hover:text-mambo-text"
@@ -95,12 +123,45 @@ export default function AdminSidebar({
       <div className="p-4 border-t border-white/10">
         <button
           onClick={logout}
-          className="flex items-center gap-2 text-gray-500 hover:text-mambo-text text-sm w-full px-2 py-1.5 rounded-lg hover:bg-white/5 transition"
+          className="flex items-center gap-2 text-gray-500 hover:text-mambo-text text-sm w-full px-2 py-1.5 rounded-lg hover:bg-white/5 transition min-h-[44px]"
         >
           <FaSignOutAlt className="w-3.5 h-3.5" />
           Logout
         </button>
       </div>
-    </aside>
+    </>
+  );
+
+  return (
+    <>
+      {/* Mobile hamburger button — fixed top-left */}
+      <button
+        onClick={() => setMobileOpen(true)}
+        className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-mambo-panel border border-white/10 rounded-lg text-gray-300 hover:text-white"
+        aria-label="Open admin menu"
+      >
+        <FaBars className="w-5 h-5" />
+      </button>
+
+      {/* Mobile backdrop overlay */}
+      {mobileOpen && (
+        <div
+          className="lg:hidden fixed inset-0 bg-black/60 z-40"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+
+      {/* Sidebar — hidden on mobile, slide-in drawer when open */}
+      <aside
+        className={`
+          w-64 bg-mambo-panel border-r border-white/10 flex flex-col fixed left-0 top-0 h-screen z-50
+          transition-transform duration-300 ease-in-out
+          ${mobileOpen ? "translate-x-0" : "-translate-x-full"}
+          lg:translate-x-0 lg:z-10
+        `}
+      >
+        {sidebarContent}
+      </aside>
+    </>
   );
 }

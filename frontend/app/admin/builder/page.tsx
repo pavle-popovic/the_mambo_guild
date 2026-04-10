@@ -604,7 +604,7 @@ function AdminBuilderPageContent() {
     return (
       <div className="min-h-screen bg-mambo-dark relative">
         <AdminSidebar />
-        <div className="pt-8 px-8 pb-8 ml-64">
+        <div className="pt-16 px-4 pb-8 lg:pt-8 lg:px-8 ml-0 lg:ml-64">
           <div className="max-w-6xl mx-auto">
             <h1 className="text-3xl font-bold text-white mb-2">Select a Course</h1>
             <p className="text-gray-400 mb-8">Choose a course to edit or add lessons to.</p>
@@ -726,7 +726,7 @@ function AdminBuilderPageContent() {
     return (
       <div className="flex h-screen overflow-hidden bg-mambo-dark">
         <AdminSidebar />
-        <main className="flex-1 overflow-y-auto p-10 ml-64">
+        <main className="flex-1 overflow-y-auto p-4 pt-16 lg:pt-10 lg:p-10 ml-0 lg:ml-64">
           <div className="flex justify-between items-center mb-6">
             <div>
               <h1 className="text-3xl font-bold text-mambo-text mb-2">Course Builder</h1>
@@ -861,8 +861,8 @@ function AdminBuilderPageContent() {
 
       <AdminSidebar />
 
-      {/* ml-64 offsets for the fixed AdminSidebar (w-64 = 256px) */}
-      <main className="flex-1 overflow-y-auto relative ml-64">
+      {/* Responsive sidebar offset: hidden on mobile, ml-64 on lg+ */}
+      <main className="flex-1 overflow-y-auto relative ml-0 pt-14 lg:pt-0 lg:ml-64">
         <div className="max-w-5xl mx-auto p-10">
           <div className="flex justify-between items-center mb-10">
             <div className="flex items-center gap-4">

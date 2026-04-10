@@ -1,17 +1,60 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
+import { useEffect, useState } from "react";
 
 /**
  * PalladiumMesh - Dark monochrome mesh gradient background
  * Creates a subtle, drifting "smoke-like" effect with blurred circles
  * 90% black background with 10% subtle mesh elements
+ * On mobile: renders only 2 static circles (no animation) to save GPU/battery
  */
 export default function PalladiumMesh() {
-  // Animation variants for each circle - long, slow, drifting motion
+  const prefersReduced = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // On mobile or reduced-motion: render 2 static blurred circles, no animation
+  if (isMobile || prefersReduced) {
+    return (
+      <div className="fixed inset-0 bg-black pointer-events-none -z-10">
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: 400,
+            height: 400,
+            backgroundColor: "#1a1a1a",
+            filter: "blur(100px)",
+            opacity: 0.25,
+            top: "15%",
+            left: "10%",
+          }}
+        />
+        <div
+          className="absolute rounded-full"
+          style={{
+            width: 350,
+            height: 350,
+            backgroundColor: "#2e2e2e",
+            filter: "blur(100px)",
+            opacity: 0.2,
+            bottom: "20%",
+            right: "15%",
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Desktop: full animated mesh
   const circleVariants = [
     {
-      // Circle 1: Dark Grey (#1a1a1a)
       initial: { x: 0, y: 0, scale: 1 },
       animate: {
         x: [0, 120, -80, 60, 0],
@@ -26,7 +69,6 @@ export default function PalladiumMesh() {
       },
     },
     {
-      // Circle 2: Medium Charcoal (#2e2e2e)
       initial: { x: 0, y: 0, scale: 1 },
       animate: {
         x: [0, -150, 100, -70, 0],
@@ -41,7 +83,6 @@ export default function PalladiumMesh() {
       },
     },
     {
-      // Circle 3: Dark Grey (#1a1a1a)
       initial: { x: 0, y: 0, scale: 1 },
       animate: {
         x: [0, 90, -120, 40, 0],
@@ -56,7 +97,6 @@ export default function PalladiumMesh() {
       },
     },
     {
-      // Circle 4: Medium Charcoal (#2e2e2e)
       initial: { x: 0, y: 0, scale: 1 },
       animate: {
         x: [0, -110, 130, -45, 0],
@@ -71,7 +111,6 @@ export default function PalladiumMesh() {
       },
     },
     {
-      // Circle 5: Palladium Grey (#4a4a4a) - used sparingly
       initial: { x: 0, y: 0, scale: 1 },
       animate: {
         x: [0, 70, -90, 30, 0],
@@ -87,38 +126,12 @@ export default function PalladiumMesh() {
     },
   ];
 
-  // Circle configurations: color, size, position
   const circles = [
-    {
-      color: "#1a1a1a", // Dark Grey
-      size: 600,
-      position: { top: "10%", left: "15%" },
-      variant: circleVariants[0],
-    },
-    {
-      color: "#2e2e2e", // Medium Charcoal
-      size: 550,
-      position: { top: "60%", right: "20%" },
-      variant: circleVariants[1],
-    },
-    {
-      color: "#1a1a1a", // Dark Grey
-      size: 580,
-      position: { bottom: "20%", left: "25%" },
-      variant: circleVariants[2],
-    },
-    {
-      color: "#2e2e2e", // Medium Charcoal
-      size: 520,
-      position: { top: "40%", right: "10%" },
-      variant: circleVariants[3],
-    },
-    {
-      color: "#4a4a4a", // Palladium Grey (sparingly)
-      size: 480,
-      position: { top: "50%", left: "50%" },
-      variant: circleVariants[4],
-    },
+    { color: "#1a1a1a", size: 600, position: { top: "10%", left: "15%" }, variant: circleVariants[0] },
+    { color: "#2e2e2e", size: 550, position: { top: "60%", right: "20%" }, variant: circleVariants[1] },
+    { color: "#1a1a1a", size: 580, position: { bottom: "20%", left: "25%" }, variant: circleVariants[2] },
+    { color: "#2e2e2e", size: 520, position: { top: "40%", right: "10%" }, variant: circleVariants[3] },
+    { color: "#4a4a4a", size: 480, position: { top: "50%", left: "50%" }, variant: circleVariants[4] },
   ];
 
   return (
@@ -132,9 +145,9 @@ export default function PalladiumMesh() {
             height: `${circle.size}px`,
             backgroundColor: circle.color,
             filter: "blur(100px)",
-            opacity: 0.25, // Very subtle - 90% black, 10% mesh
+            opacity: 0.25,
             ...circle.position,
-            willChange: "transform", // Performance optimization
+            willChange: "transform",
           }}
           initial={circle.variant.initial}
           animate={circle.variant.animate}

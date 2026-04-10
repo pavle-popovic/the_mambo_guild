@@ -448,8 +448,8 @@ export default function ProfilePage() {
                   href={course.nextLessonId ? `/lesson/${course.nextLessonId}` : `/courses/${course.id}`}
                   className="block bg-mambo-panel border border-gray-800 rounded-xl p-6 hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
                 >
-                  <div className="flex gap-6 items-center">
-                    <div className="w-32 h-20 bg-gray-800 rounded-lg overflow-hidden shrink-0 relative">
+                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
+                    <div className="w-full sm:w-32 h-36 sm:h-20 bg-gray-800 rounded-lg overflow-hidden shrink-0 relative">
                       {course.thumbnail_url || course.image_url ? (
                         <Image
                           src={course.thumbnail_url || course.image_url || ""}

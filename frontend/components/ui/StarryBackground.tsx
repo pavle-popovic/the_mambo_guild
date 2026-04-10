@@ -140,14 +140,16 @@ export default function StarryBackground() {
             stars = [];
             nebulas = []; // Reset on resize
 
-            // Create Stars
-            for (let i = 0; i < 200; i++) {
+            // Fewer particles on mobile for battery savings
+            const isMobile = canvas!.width < 768;
+            const starCount = isMobile ? 80 : 200;
+            const nebulaCount = isMobile ? 2 : 5;
+
+            for (let i = 0; i < starCount; i++) {
                 stars.push(new Star());
             }
 
-            // Create Nebulas (Mambo Blue & Brass)
-            // Create Nebulas (Mambo Blue & Brass) - More Gas!
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < nebulaCount; i++) {
                 nebulas.push(new Nebula(colors.mamboBlue));
                 nebulas.push(new Nebula(colors.brass));
             }
@@ -195,8 +197,8 @@ export default function StarryBackground() {
         <div className="fixed inset-0 z-[-1] overflow-hidden bg-mambo-dark">
             <canvas ref={canvasRef} className="absolute inset-0 opacity-80" />
 
-            {/* Art Deco Floating Elements (Constellations) */}
-            <div className="absolute inset-0 pointer-events-none opacity-20">
+            {/* Art Deco Floating Elements — hidden on mobile for performance */}
+            <div className="absolute inset-0 pointer-events-none opacity-20 hidden md:block">
                 {floatingIcons.map((item, index) => (
                     <motion.div
                         key={index}

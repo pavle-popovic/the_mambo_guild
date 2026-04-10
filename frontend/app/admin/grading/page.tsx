@@ -97,7 +97,7 @@ export default function AdminGradingPage() {
     <div className="flex h-screen overflow-hidden bg-mambo-dark">
       <AdminSidebar />
 
-      <main className="flex-1 flex overflow-hidden ml-64">
+      <main className="flex-1 flex overflow-hidden ml-0 pt-14 lg:pt-0 lg:ml-64">
         <div className="w-80 border-r border-gray-800 bg-black flex flex-col">
           <div className="p-5 border-b border-gray-800">
             <h2 className="font-bold text-mambo-text">

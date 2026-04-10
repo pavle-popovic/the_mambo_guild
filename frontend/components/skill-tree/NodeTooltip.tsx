@@ -2,7 +2,8 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Clock, Zap, BookOpen, Lock, Trophy } from "lucide-react";
+import { Clock, Zap, BookOpen, Lock, Trophy, ChevronRight } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface NodeTooltipProps {
   levelId: string;
@@ -24,10 +25,10 @@ interface NodeTooltipProps {
   isAdminMode?: boolean;  // In admin mode, don't show locked state
 }
 
-// Tooltip dimensions (approximate)
-const TOOLTIP_WIDTH = 320;  // w-80 = 20rem = 320px
-const TOOLTIP_HEIGHT = 380; // Approximate height with video preview
-const PADDING = 16;         // Minimum distance from viewport edge
+// Tooltip dimensions — clamped to viewport on small screens
+const TOOLTIP_MAX_WIDTH = 320;
+const TOOLTIP_HEIGHT = 380;
+const PADDING = 12;
 
 export default function NodeTooltip({
   levelId,
@@ -60,14 +61,14 @@ export default function NodeTooltip({
     const calculatePosition = () => {
       const viewportWidth = window.innerWidth;
       const viewportHeight = window.innerHeight;
+      const tooltipWidth = Math.min(TOOLTIP_MAX_WIDTH, viewportWidth - PADDING * 2);
 
       let x = position.x;
       let y = position.y;
 
-      // Check right edge - if tooltip would overflow, position to the left of the node
-      if (x + TOOLTIP_WIDTH + PADDING > viewportWidth) {
-        // Position to the left of the original position (node)
-        x = Math.max(PADDING, position.x - TOOLTIP_WIDTH - 100);
+      // Check right edge
+      if (x + tooltipWidth + PADDING > viewportWidth) {
+        x = Math.max(PADDING, position.x - tooltipWidth - 100);
       }
 
       // Check left edge
@@ -75,7 +76,7 @@ export default function NodeTooltip({
         x = PADDING;
       }
 
-      // Check bottom edge - if tooltip would overflow, position above
+      // Check bottom edge
       if (y + TOOLTIP_HEIGHT + PADDING > viewportHeight) {
         y = viewportHeight - TOOLTIP_HEIGHT - PADDING;
       }
@@ -149,7 +150,7 @@ export default function NodeTooltip({
       onMouseLeave={onClose}
     >
       <div
-        className={`w-80 rounded-xl overflow-hidden backdrop-blur-xl border shadow-2xl ${
+        className={`w-[calc(100vw-24px)] max-w-80 rounded-xl overflow-hidden backdrop-blur-xl border shadow-2xl ${
           displayLocked
             ? "bg-gray-900/95 border-gray-700/50"
             : isCompleted
@@ -286,12 +287,17 @@ export default function NodeTooltip({
               </p>
             </div>
           ) : (
-            /* Click hint for unlocked nodes */
-            <div className="text-center mt-3">
-              <span className="text-[10px] text-gray-500 uppercase tracking-wider">
-                {isAdminMode ? "Click to edit lessons" : "Click to start lessons"}
-              </span>
-            </div>
+            /* Tappable "View Module" button — works as click hint on desktop too */
+            <button
+              onClick={() => {
+                onClose();
+                window.location.href = `/courses/${courseId}?level=${levelId}`;
+              }}
+              className="w-full mt-3 py-2.5 px-4 rounded-lg bg-gradient-to-r from-yellow-700/40 to-amber-700/30 border border-yellow-700/40 text-yellow-300 text-sm font-medium flex items-center justify-center gap-2 hover:border-yellow-600/60 transition min-h-[44px]"
+            >
+              <ChevronRight className="w-4 h-4" />
+              {isAdminMode ? "Edit Lessons" : "View Module"}
+            </button>
           )}
         </div>
       </div>

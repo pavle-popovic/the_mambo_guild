@@ -73,7 +73,7 @@ export default function ModerationPage() {
     <div className="min-h-screen bg-black text-white">
       <AdminSidebar moderationPendingCount={flaggedReplies.length} />
 
-      <main className="ml-64 p-8">
+      <main className="ml-0 lg:ml-64 p-4 pt-16 lg:pt-8 lg:p-8">
         <div className="max-w-4xl">
           {/* Header */}
           <div className="flex items-center gap-3 mb-8">

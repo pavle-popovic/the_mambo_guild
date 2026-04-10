@@ -14,7 +14,7 @@ export default function InstructorsPage() {
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user || undefined} />
 
-      <div className="max-w-7xl mx-auto px-8 py-20 pt-28">
+      <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 sm:py-20 pt-24 sm:pt-28">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-extrabold mb-6 text-mambo-text">
             Meet Your Instructors
@@ -27,7 +27,7 @@ export default function InstructorsPage() {
         <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
           {/* Main Instructor Card */}
           <div className="bg-mambo-panel border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition">
-            <div className="relative h-80 bg-gradient-to-br from-mambo-blue/20 to-purple-600/20 overflow-hidden">
+            <div className="relative h-64 sm:h-80 bg-gradient-to-br from-mambo-blue/20 to-purple-600/20 overflow-hidden">
               <Image
                 src="/assets/Personal_Pic.jpg"
                 alt="Pavle Popovic"

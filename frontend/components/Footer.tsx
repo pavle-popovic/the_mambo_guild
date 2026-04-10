@@ -8,7 +8,7 @@ interface FooterProps {
 export default function Footer({ className = "" }: FooterProps) {
   return (
     <footer className={`border-t border-gray-800 bg-black pt-16 pb-8 mt-20 ${className}`}>
-      <div className="max-w-7xl mx-auto px-6 grid md:grid-cols-4 gap-12 mb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 grid md:grid-cols-4 gap-6 md:gap-12 mb-12">
         <div className="col-span-1 md:col-span-2">
           <Link href="/" className="text-xl font-bold tracking-tight flex items-center gap-2 mb-4">
             <Image
@@ -81,7 +81,7 @@ export default function Footer({ className = "" }: FooterProps) {
           </ul>
         </div>
       </div>
-      <div className="max-w-7xl mx-auto px-6 border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between text-xs text-gray-600">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between text-xs text-gray-600">
         <p>&copy; 2024 The Mambo Guild. Keep dancing.</p>
         <div className="flex gap-4 mt-2 md:mt-0">
           <Link href="#">Privacy Policy</Link>

@@ -125,7 +125,7 @@ export default function CoursesPage() {
             <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
 
               {/* Search Pill */}
-              <div className="relative group min-w-[200px]">
+              <div className="relative group min-w-[140px] sm:min-w-[200px]">
                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-mambo-gold transition-colors text-sm" />
                 <input
                   type="text"

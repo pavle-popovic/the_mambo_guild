@@ -168,6 +168,16 @@ function ConstellationGraphInner({
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { setCenter } = useReactFlow();
 
+  // Detect touch-primary devices to skip hover tooltips
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: none) and (pointer: coarse)");
+    setIsTouchDevice(mq.matches);
+    const handler = (e: MediaQueryListEvent) => setIsTouchDevice(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+
   // Determine node status
   const getNodeStatus = useCallback(
     (level: Level): "locked" | "available" | "mastered" | "boss" | "boss_locked" => {
@@ -229,9 +239,12 @@ function ConstellationGraphInner({
     [levels, isAdminMode]
   );
 
-  // Handle node hover - show tooltip
+  // Handle node hover - show tooltip (desktop only, skip on touch devices)
   const handleNodeMouseEnter: NodeMouseHandler = useCallback(
     (event, node) => {
+      // On touch devices, skip tooltip — tap goes directly to click handler
+      if (isTouchDevice) return;
+
       // Clear any pending timeout
       if (hoverTimeoutRef.current) {
         clearTimeout(hoverTimeoutRef.current);
@@ -265,15 +278,16 @@ function ConstellationGraphInner({
         status: level.status,
       });
     },
-    [levels]
+    [levels, isTouchDevice]
   );
 
   // Handle node hover leave - hide tooltip with delay
   const handleNodeMouseLeave: NodeMouseHandler = useCallback(() => {
+    if (isTouchDevice) return;
     hoverTimeoutRef.current = setTimeout(() => {
       setHoveredNode(null);
     }, 150);
-  }, []);
+  }, [isTouchDevice]);
 
   // Handle node click - navigate directly to first lesson of the module
   const handleNodeClick: NodeMouseHandler = useCallback(

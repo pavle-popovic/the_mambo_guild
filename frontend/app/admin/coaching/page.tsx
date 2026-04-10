@@ -533,7 +533,7 @@ export default function AdminCoachingPage() {
     <div className="flex h-screen overflow-hidden bg-mambo-dark">
       <AdminSidebar coachingPendingCount={submissions.filter((s) => s.status === "pending").length} />
 
-      <main className="flex-1 overflow-y-auto p-8 ml-64">
+      <main className="flex-1 overflow-y-auto p-4 pt-16 lg:pt-8 lg:p-8 ml-0 lg:ml-64">
         <header className="mb-8">
           <h1 className="text-2xl font-bold text-white">Coaching Queue</h1>
           <p className="text-white/60">Review 1-on-1 video analysis submissions</p>

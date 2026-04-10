@@ -189,7 +189,7 @@ export default function AdminDashboardPage() {
     <div className="flex h-screen overflow-hidden bg-mambo-dark">
       <AdminSidebar coachingPendingCount={stats?.coaching_pending ?? 0} />
 
-      <main className="flex-1 overflow-y-auto p-8 ml-64">
+      <main className="flex-1 overflow-y-auto p-4 pt-16 lg:pt-8 lg:p-8 ml-0 lg:ml-64">
         {/* Header */}
         <motion.header
           initial={{ opacity: 0, y: -12 }}
@@ -216,7 +216,7 @@ export default function AdminDashboardPage() {
         </motion.header>
 
         {/* ── Row 1: 6 Stat Cards ────────────────────────────────────────── */}
-        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-6">
           <StatCard
             label="Total Students"
             value={(stats?.total_users ?? 0).toLocaleString()}

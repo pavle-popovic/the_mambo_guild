@@ -634,7 +634,7 @@ export default function AdminSettingsPage() {
     <div className="flex h-screen overflow-hidden bg-mambo-dark">
       <AdminSidebar />
 
-      <main className="flex-1 overflow-y-auto p-8 ml-64">
+      <main className="flex-1 overflow-y-auto p-4 pt-16 lg:pt-8 lg:p-8 ml-0 lg:ml-64">
         <motion.header
           initial={{ opacity: 0, y: -12 }}
           animate={{ opacity: 1, y: 0 }}
