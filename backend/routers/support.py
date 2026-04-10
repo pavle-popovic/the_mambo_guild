@@ -104,15 +104,15 @@ def submit_bug_report(payload: BugReportRequest, request: Request):
     """
     Receive a bug report from the in-app widget and forward it to support@themamboguild.com.
 
-    Rate-limited to 5 reports per IP per hour to prevent abuse / email-quota exhaustion.
+    Rate-limited to 30 reports per IP per hour to prevent abuse / email-quota exhaustion.
     """
     client_ip = _client_ip(request)
 
-    # 5 reports per IP per hour. Fails open if Redis is down.
+    # 30 reports per IP per hour (generous for beta testing). Fails open if Redis is down.
     if not check_rate_limit(
         identifier=client_ip,
         action="bug_report",
-        max_requests=5,
+        max_requests=30,
         window_seconds=3600,
     ):
         logger.warning(f"Bug report rate limit exceeded for IP {client_ip}")
