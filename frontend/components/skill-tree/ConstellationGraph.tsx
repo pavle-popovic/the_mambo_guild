@@ -167,7 +167,6 @@ function ConstellationGraphInner({
   const [hoveredNode, setHoveredNode] = useState<HoveredNode | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { fitView, setCenter } = useReactFlow();
-  const [isVisible, setIsVisible] = useState(false);
 
   // Determine node status
   const getNodeStatus = useCallback(
@@ -313,6 +312,12 @@ function ConstellationGraphInner({
             }
           );
 
+          if (response.status === 401) {
+            // Token expired — prompt login instead of silently failing
+            setShowAuthModal(true);
+            return;
+          }
+
           if (response.status === 403) {
             // Subscription required
             setShowSubscribeModal(true);
@@ -341,8 +346,7 @@ function ConstellationGraphInner({
   );
 
   // Create nodes and edges — use stored positions when available, dagre as fallback
-  // Also return graph bounds for computing the initial viewport.
-  const { nodes: flowNodes, edges: flowEdges, graphBounds } = useMemo(() => {
+  const { nodes: flowNodes, edges: flowEdges } = useMemo(() => {
     // Scale factor: DB stores 0-100 positions, convert to pixel coords for ReactFlow
     // Needs to be large enough that nodes (90x100px) don't overlap at 10-unit y spacing
     const POS_SCALE = 20;
@@ -396,45 +400,13 @@ function ConstellationGraphInner({
       ? { nodes: initialNodes, edges: initialEdges }
       : getLayoutedElements(initialNodes, initialEdges);
 
-    // Compute graph bounding box from final positions
-    const NODE_W = 90, NODE_H = 100;
-    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
-    for (const n of result.nodes) {
-      minX = Math.min(minX, n.position.x);
-      maxX = Math.max(maxX, n.position.x + NODE_W);
-      minY = Math.min(minY, n.position.y);
-      maxY = Math.max(maxY, n.position.y + NODE_H);
-    }
-
-    return {
-      ...result,
-      graphBounds: { minX, maxX, minY, maxY, width: maxX - minX, height: maxY - minY },
-    };
+    return result;
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
-
-  // Compute defaultViewport from graph bounds so all nodes are visible on the
-  // very first frame — no DOM measurement, no timing dependency.
-  const initialViewport = useMemo(() => {
-    if (!graphBounds || graphBounds.width === 0) return { x: 0, y: 0, zoom: 0.5 };
-
-    const vw = typeof window !== 'undefined' ? window.innerWidth : 1920;
-    const vh = typeof window !== 'undefined' ? window.innerHeight : 1080;
-    const pad = 0.15; // 15% padding on each side
-
-    const scaleX = (vw * (1 - pad * 2)) / graphBounds.width;
-    const scaleY = (vh * (1 - pad * 2)) / graphBounds.height;
-    const zoom = Math.min(scaleX, scaleY, 1.0);
-
-    const cx = (graphBounds.minX + graphBounds.maxX) / 2;
-    const cy = (graphBounds.minY + graphBounds.maxY) / 2;
-
-    return { x: vw / 2 - cx * zoom, y: vh / 2 - cy * zoom, zoom };
-  }, [graphBounds]);
 
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-full transition-opacity duration-500 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
+      className="relative w-full h-full"
       style={{
         overflow: 'hidden',
         isolation: 'isolate'
@@ -582,8 +554,13 @@ function ConstellationGraphInner({
           onNodeClick={handleNodeClick}
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
-          defaultViewport={initialViewport}
-          onInit={() => setIsVisible(true)}
+          fitView
+          fitViewOptions={{ padding: 0.2, maxZoom: 0.85 }}
+          onInit={(instance) => {
+            // Belt-and-suspenders: call fitView again after init in case
+            // the built-in fitView fired before nodes were measured.
+            setTimeout(() => instance.fitView({ padding: 0.2, maxZoom: 0.85 }), 200);
+          }}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{

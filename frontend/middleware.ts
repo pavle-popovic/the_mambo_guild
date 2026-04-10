@@ -64,17 +64,26 @@ export async function middleware(request: NextRequest) {
         }
     }
 
-    // --- Admin route guard (P1.5) -----------------------------------------
-    // Defence in depth: backend endpoints are already protected with
-    // `get_admin_user`, but without this guard a non-admin can briefly see
-    // the admin shell flashes before the client-side useEffect bounces them.
+    // --- Admin route guard (best-effort) ------------------------------------
+    // Backend endpoints are always protected with `get_admin_user`.
+    // This guard is cosmetic (prevents a non-admin flash of the admin shell).
+    // It can only work when the access_token cookie is visible to the Edge
+    // middleware. In production the cookie is set on the Railway domain and is
+    // NOT forwarded through Vercel — so we fail-open: if we can't determine
+    // the role, we let the request through and rely on client-side + backend
+    // guards.
     if (path.startsWith('/admin')) {
-        const role = await fetchUserRole(request);
-        if (role !== 'admin') {
-            const loginUrl = new URL('/login', request.url);
-            loginUrl.searchParams.set('redirect', path);
-            return NextResponse.redirect(loginUrl);
+        const cookie = request.headers.get('cookie') || '';
+        if (cookie.includes('access_token=')) {
+            const role = await fetchUserRole(request);
+            // Only redirect if we POSITIVELY know the user is NOT admin
+            if (role !== null && role !== 'admin') {
+                const loginUrl = new URL('/login', request.url);
+                loginUrl.searchParams.set('redirect', path);
+                return NextResponse.redirect(loginUrl);
+            }
         }
+        // If no cookie or role unknown — pass through (backend protects admin API)
     }
 
     return NextResponse.next();
