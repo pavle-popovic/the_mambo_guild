@@ -49,7 +49,7 @@ interface UseGeminiReturn {
   stopGenerating: () => void;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 const TITO_WELCOME_MESSAGE = `Bienvenido to The Mambo Guild! I'm Tito P, your AI concierge. Whether you're taking your first steps or ready to shine on stage, I'm here to guide you. What brings you to salsa today?`;
 

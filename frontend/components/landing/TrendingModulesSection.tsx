@@ -6,7 +6,7 @@ import { FaPlay, FaFire, FaBookOpen, FaMusic, FaHistory, FaBrain, FaTheaterMasks
 import { HiSparkles } from "react-icons/hi";
 import Link from "next/link";
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
 interface Level {
     id: string;

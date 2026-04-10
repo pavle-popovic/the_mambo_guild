@@ -70,7 +70,7 @@ export default function DownloadButton({
 
       // Use the streaming endpoint which forces download via Content-Disposition header
       // This is the state-of-the-art approach - server handles everything with proper headers
-      const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000";
+      const apiUrl = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
       const streamUrl = `${apiUrl}/api/downloads/lesson/${lessonId}/stream`;
       
       // Fetch the stream with authentication via httpOnly cookies

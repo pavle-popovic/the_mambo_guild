@@ -107,7 +107,7 @@ export default function LoginPage() {
             </div>
 
             <a
-              href={`${process.env.NEXT_PUBLIC_API_URL || "http://localhost:8000"}/api/auth/login/google`}
+              href={`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/auth/login/google`}
               className="flex items-center justify-center gap-2 bg-white hover:bg-gray-100 text-gray-900 font-semibold py-2.5 rounded-lg transition border border-gray-300"
             >
               <svg className="w-5 h-5" viewBox="0 0 24 24">

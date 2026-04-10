@@ -26,7 +26,7 @@ const nextConfig: NextConfig = {
   // across page refreshes. Server-side code (middleware) uses API_DIRECT_URL
   // to call Railway directly.
   async rewrites() {
-    const backendUrl = process.env.API_DIRECT_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    const backendUrl = process.env.API_DIRECT_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
     return [
       {
         source: '/api/:path*',
