@@ -26,20 +26,41 @@ async function fetchUserRole(request: NextRequest): Promise<string | null> {
     }
 }
 
+// Routes accessible even when the waitlist velvet rope is up.
+// Auth routes must be reachable so beta testers can claim accounts.
+const PUBLIC_WHEN_WAITLIST = [
+    '/waitlist', '/api', '/_next', '/favicon.ico',
+    '/login', '/register', '/forgot-password', '/reset-password',
+    '/beta', // magic-link landing that sets the bypass cookie
+];
+
 export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
 
-    // --- Waitlist mode (pre-existing behavior) ----------------------------
+    // --- Waitlist velvet rope with beta bypass ----------------------------
     const isWaitlistMode = process.env.NEXT_PUBLIC_WAITLIST_MODE === 'true';
     if (isWaitlistMode) {
-        if (
-            !path.startsWith('/waitlist') &&
-            !path.startsWith('/api') &&
-            !path.startsWith('/_next') &&
-            !path.startsWith('/favicon.ico') &&
-            !path.includes('.')
-        ) {
-            return NextResponse.redirect(new URL('/waitlist', request.url));
+        const isPublicPath =
+            PUBLIC_WHEN_WAITLIST.some(p => path.startsWith(p)) || path.includes('.');
+
+        if (!isPublicPath) {
+            const cookieHeader = request.headers.get('cookie') || '';
+            const betaKey = process.env.BETA_ACCESS_KEY;
+
+            // Bypass 1: magic-link cookie (set via GET /beta?key=...)
+            const hasBetaCookie =
+                !!betaKey && cookieHeader.includes(`beta_access=${betaKey}`);
+
+            // Bypass 2: authenticated admin (avoids backend call if cookie passed)
+            let isAdmin = false;
+            if (!hasBetaCookie && cookieHeader.includes('access_token=')) {
+                const role = await fetchUserRole(request);
+                isAdmin = role === 'admin';
+            }
+
+            if (!hasBetaCookie && !isAdmin) {
+                return NextResponse.redirect(new URL('/waitlist', request.url));
+            }
         }
     }
 
