@@ -406,44 +406,19 @@ function ConstellationGraphInner({
   // ---------- ReactFlow initialization & centering ----------
   const [rfReady, setRfReady] = useState(false);
   const [isPositioned, setIsPositioned] = useState(false);
-  const [debugInfo, setDebugInfo] = useState("mount");
-  const [containerSize, setContainerSize] = useState({ w: 0, h: 0 });
-
-  // Track container dimensions
-  useEffect(() => {
-    const el = containerRef.current;
-    if (!el) return;
-    const check = () => {
-      const rect = el.getBoundingClientRect();
-      setContainerSize({ w: Math.round(rect.width), h: Math.round(rect.height) });
-    };
-    check();
-    const t = setInterval(check, 500);
-    return () => clearInterval(t);
-  }, []);
 
   // Force ReactFlow to detect container dimensions on soft navigation
   useEffect(() => {
-    const t1 = setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-      setDebugInfo(prev => prev + " | resize@50ms");
-    }, 50);
-    const t2 = setTimeout(() => {
-      window.dispatchEvent(new Event('resize'));
-      setDebugInfo(prev => prev + " | resize@300ms");
-    }, 300);
+    const t1 = setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
+    const t2 = setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
     return () => { clearTimeout(t1); clearTimeout(t2); };
   }, []);
 
-  const handleInit = useCallback(() => {
-    setRfReady(true);
-    setDebugInfo(prev => prev + " | onInit");
-  }, []);
+  const handleInit = useCallback(() => setRfReady(true), []);
 
   // Center on the frontier node once ReactFlow is actually ready
   useEffect(() => {
     if (rfReady && levels.length > 0 && flowNodes.length > 0 && !isPositioned) {
-      setDebugInfo(prev => prev + " | centering");
       const timer = setTimeout(() => {
         const targetLevel =
           levels.find((l) => l.is_unlocked && l.completion_percentage < 100) ||
@@ -455,9 +430,6 @@ function ConstellationGraphInner({
             zoom: 0.55,
             duration: 800,
           });
-          setDebugInfo(prev => prev + " | setCenter OK");
-        } else {
-          setDebugInfo(prev => prev + " | NO target node");
         }
         setTimeout(() => setIsPositioned(true), 100);
       }, 100);
@@ -468,20 +440,12 @@ function ConstellationGraphInner({
   // Safety: always reveal after 1.5s even if ReactFlow never fires onInit
   useEffect(() => {
     const safety = setTimeout(() => {
-      if (!isPositioned) {
-        setIsPositioned(true);
-        setDebugInfo(prev => prev + " | SAFETY reveal");
-      }
+      if (!isPositioned) setIsPositioned(true);
     }, 1500);
     return () => clearTimeout(safety);
   }, [isPositioned]);
 
   return (
-    <>
-      {/* TEMPORARY DEBUG — OUTSIDE opacity container so always visible */}
-      <div className="fixed top-12 left-2 z-[99999] bg-green-700 text-white text-[10px] font-mono p-2 rounded max-w-[90vw] break-all pointer-events-none" style={{ opacity: 0.95 }}>
-        GRAPH: nodes:{flowNodes.length} | edges:{flowEdges.length} | rfReady:{String(rfReady)} | positioned:{String(isPositioned)} | container:{containerSize.w}x{containerSize.h} | {debugInfo}
-      </div>
     <div
       ref={containerRef}
       className={`relative w-full h-full transition-opacity duration-500 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
@@ -726,7 +690,6 @@ function ConstellationGraphInner({
         courseTitle={courseTitle}
       />
     </div>
-    </>
   );
 }
 
