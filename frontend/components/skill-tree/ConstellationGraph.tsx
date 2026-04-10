@@ -306,7 +306,7 @@ function ConstellationGraphInner({
       if (level.is_unlocked) {
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/api/courses/levels/${node.id}/lessons`,
+            `${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/courses/levels/${node.id}/lessons`,
             {
               credentials: "include" as RequestCredentials,
             }
@@ -418,22 +418,24 @@ function ConstellationGraphInner({
         const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
         if (targetNode) {
           // +45/+50 to center on the node (dagre position is top-left of 90×100 node)
+          // zoom 0.55 shows the frontier node plus surrounding context
           setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
-            zoom: 0.75,
+            zoom: 0.55,
             duration: 800,
           });
-          setTimeout(() => setIsPositioned(true), 100);
         }
+        // Always reveal after centering attempt, even if target wasn't found
+        setTimeout(() => setIsPositioned(true), 100);
       }, 200);
       return () => clearTimeout(timer);
     }
   }, [levels, flowNodes, setCenter, isPositioned]);
 
-  // Safety: always reveal after 2s even if centering fails
+  // Safety: always reveal after 1s even if centering fails
   useEffect(() => {
     const safety = setTimeout(() => {
       if (!isPositioned) setIsPositioned(true);
-    }, 2000);
+    }, 1000);
     return () => clearTimeout(safety);
   }, [isPositioned]);
 

@@ -45,42 +45,38 @@ export default function CourseDetailPage() {
   const courseId = params.id as string;
 
   const [skillTree, setSkillTree] = useState<SkillTreeData | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState("");
   const tCommon = useTranslations('common');
   const tCourses = useTranslations('courses');
 
-  // Load skill tree immediately (no auth required to view)
-  // Reload when user changes to update progress data
+  // Load skill tree immediately (no auth required to view).
+  // Re-fetch when user changes to get progress data, but DON'T show the
+  // loading spinner on re-fetches — that would unmount ConstellationGraph
+  // and kill the centering animation mid-flight.
   useEffect(() => {
-    loadSkillTree();
-  }, [courseId, user]);
-
-  const loadSkillTree = async () => {
-    try {
-      setLoading(true);
-      setError("");
-
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/courses/worlds/${courseId}/skill-tree`,
-        {
-          credentials: "include" as RequestCredentials,
+    let cancelled = false;
+    async function load() {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/courses/worlds/${courseId}/skill-tree`,
+          { credentials: "include" as RequestCredentials }
+        );
+        if (!response.ok) throw new Error("Failed to load skill tree");
+        const data = await response.json();
+        if (!cancelled) setSkillTree(data);
+      } catch (err: any) {
+        if (!cancelled) {
+          console.error("Failed to load skill tree:", err);
+          setError(err.message || "Failed to load skill tree");
         }
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to load skill tree");
+      } finally {
+        if (!cancelled) setInitialLoading(false);
       }
-
-      const data = await response.json();
-      setSkillTree(data);
-    } catch (err: any) {
-      console.error("Failed to load skill tree:", err);
-      setError(err.message || "Failed to load skill tree");
-    } finally {
-      setLoading(false);
     }
-  };
+    load();
+    return () => { cancelled = true; };
+  }, [courseId, user?.id]);
 
   // Calculate overall course progress and stats
   const stats = useMemo(() => {
@@ -96,7 +92,7 @@ export default function CourseDetailPage() {
     return { progress, completed: completedLessons, total: totalLessons };
   }, [skillTree]);
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="min-h-screen bg-mambo-dark flex items-center justify-center">
         <div className="text-gray-400">{tCommon('loading')}</div>
