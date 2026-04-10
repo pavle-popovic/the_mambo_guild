@@ -403,36 +403,35 @@ function ConstellationGraphInner({
     return result;
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
 
-  // Navigate to the frontier node after mount — mirrors SkillTreeTeaser approach.
-  // setCenter is more reliable than fitView because it only needs the container
-  // dimensions (not node measurements). defaultViewport starts zoomed out so all
-  // nodes are immediately visible, then we animate to the frontier.
-  const [hasCentered, setHasCentered] = useState(false);
-  useEffect(() => {
-    if (levels.length > 0 && flowNodes.length > 0 && !hasCentered) {
-      const timer = setTimeout(() => {
-        const targetLevel =
-          levels.find((l) => l.is_unlocked && l.completion_percentage < 100) ||
-          levels.filter((l) => l.is_unlocked).pop() ||
-          levels[0];
-        const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
-        if (targetNode && setCenter) {
-          // +45/+50 to center on the node (dagre position is top-left of 90×100 node)
-          setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
-            zoom: 0.75,
-            duration: 800,
-          });
-          setTimeout(() => setHasCentered(true), 100);
-        }
-      }, 300);
-      return () => clearTimeout(timer);
+  // Navigate to the frontier node once ReactFlow is initialized.
+  // onInit fires when the container is measured — far more reliable than setTimeout
+  // which can miss on Vercel cold starts. Opacity gates the graph until positioned
+  // to prevent a flash of the default (wrong) viewport.
+  const [isPositioned, setIsPositioned] = useState(false);
+
+  const handleInit = useCallback(() => {
+    if (levels.length === 0 || flowNodes.length === 0) return;
+
+    const targetLevel =
+      levels.find((l) => l.is_unlocked && l.completion_percentage < 100) ||
+      levels.filter((l) => l.is_unlocked).pop() ||
+      levels[0];
+    const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
+    if (targetNode) {
+      // +45/+50 to center on the node (dagre position is top-left of 90×100 node)
+      setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
+        zoom: 0.75,
+        duration: 800,
+      });
     }
-  }, [levels, flowNodes, setCenter, hasCentered]);
+    // Reveal the graph after a short delay so the animation starts from the right spot
+    setTimeout(() => setIsPositioned(true), 50);
+  }, [levels, flowNodes, setCenter]);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full"
+      className={`relative w-full h-full transition-opacity duration-500 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
       style={{
         overflow: 'hidden',
         isolation: 'isolate'
@@ -580,11 +579,11 @@ function ConstellationGraphInner({
           onNodeClick={handleNodeClick}
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
-          // Start zoomed-out so all nodes centered at (0,0) are visible immediately.
-          // Graph is centered at origin by dagre; at zoom 0.45 with x/y offset,
-          // the full tree is visible on any screen ≥ 1024px wide.
-          // setCenter (in the effect above) then animates to the frontier node.
-          defaultViewport={{ x: 600, y: 400, zoom: 0.45 }}
+          onInit={handleInit}
+          // Graph is centered at origin by dagre. Start at (0,0) — the container
+          // is opacity-0 until onInit fires and setCenter positions the viewport,
+          // so the initial coordinates don't matter visually.
+          defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{
