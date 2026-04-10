@@ -98,6 +98,40 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Silent token refresh every 25 min (access token expires at 30 min).
+  // Also refresh on tab re-focus so returning users don't hit a stale token.
+  useEffect(() => {
+    if (!user) return;
+
+    const REFRESH_INTERVAL = 25 * 60 * 1000; // 25 minutes
+
+    const silentRefresh = async () => {
+      try {
+        await apiClient.refreshToken();
+        await refreshUser(true);
+      } catch {
+        // Refresh token expired (7 days) — user must re-login
+        setUser(null);
+        apiClient.setToken(null);
+      }
+    };
+
+    const interval = setInterval(silentRefresh, REFRESH_INTERVAL);
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        silentRefresh();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id]);
+
   const login = async (email: string, password: string) => {
     await apiClient.login(email, password);
     await refreshUser();

@@ -9,7 +9,7 @@ from typing import Optional, List
 
 from models import get_db
 from models.user import User
-from dependencies import get_current_user
+from dependencies import get_current_user, get_current_user_optional
 from services import post_service, badge_service, notification_service
 
 logger = logging.getLogger(__name__)
@@ -90,7 +90,7 @@ def get_feed(
     tags: Optional[str] = Query(None, description="Comma-separated tag slugs for multi-tag filter"),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=50),
-    current_user: User = Depends(get_current_user),
+    current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
     """
@@ -101,13 +101,15 @@ def get_feed(
     - tags: Comma-separated tag slugs for multi-tag filter
     """
     tags_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else None
+    # Unauthenticated visitors get a 3-post preview for the community landing
+    effective_limit = 3 if current_user is None else limit
     posts = post_service.get_feed(
         post_type=post_type,
         tag=tag,
         tags=tags_list,
         skip=skip,
-        limit=limit,
-        current_user_id=str(current_user.id),
+        limit=effective_limit,
+        current_user_id=str(current_user.id) if current_user else None,
         db=db
     )
     return posts

@@ -417,28 +417,32 @@ function ConstellationGraphInner({
         const targetFlowNode = flowNodes.find(n => n.id === targetNode?.id);
 
         if (targetFlowNode && targetFlowNode.position && setCenter) {
-          // With BT layout and flipped tree:
-          // - Root is at bottom (high Y value in graph coords)
-          // - Boss nodes are at top (low Y value in graph coords)
-          // We want frontier node visible and not covered by overlays:
-          // - Progress widget is top-right
-          // - Legend is bottom-right
-          // So we offset LEFT (negative X) and CENTER vertically
           const zoom = 0.9;
-
           setCenter(
-            targetFlowNode.position.x + 250, // Offset right in graph coords = view shifts LEFT
-            targetFlowNode.position.y - 80,  // Slight offset to show node in lower-center
+            targetFlowNode.position.x + 250,
+            targetFlowNode.position.y - 80,
             { zoom, duration: 0 }
           );
-
-          // Allow a brief moment for the render to catch up before showing
+          requestAnimationFrame(() => setIsPositioned(true));
+        } else {
+          // Fallback: if centering fails, fitView and show anyway
+          fitView({ padding: 0.4, duration: 0 });
           requestAnimationFrame(() => setIsPositioned(true));
         }
       }, 100);
       return () => clearTimeout(timer);
     }
-  }, [isReady, levels, flowNodes, setCenter, isPositioned]);
+  }, [isReady, levels, flowNodes, setCenter, fitView, isPositioned]);
+
+  // Safety net: if ReactFlow never fires onInit (e.g. rendering edge case),
+  // force the graph visible after 3 seconds so the user isn't stuck on blank.
+  useEffect(() => {
+    if (isPositioned) return;
+    const fallback = setTimeout(() => {
+      if (!isPositioned) setIsPositioned(true);
+    }, 3000);
+    return () => clearTimeout(fallback);
+  }, [isPositioned]);
 
   return (
     <div

@@ -88,9 +88,7 @@ export default function CommunityPage() {
             setPosts(feed);
         } catch (err: any) {
             console.error("Failed to load community feed:", err);
-            if (isPreviewMode) {
-                setPosts([]);
-            } else {
+            if (!isPreviewMode) {
                 setError(err.message || "Failed to load posts");
             }
         } finally {
@@ -203,40 +201,7 @@ export default function CommunityPage() {
                                     Retry
                                 </button>
                             </div>
-                        ) : isPreviewMode ? (
-                            /* Preview Mode CTA - Centered in Feed */
-                            <div className="flex flex-col items-center justify-center py-20 text-center">
-                                <div
-                                    className="relative overflow-hidden rounded-2xl border-2 border-amber-400/50 p-8 max-w-lg"
-                                    style={{
-                                        background: "linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(20,20,20,0.9) 100%)",
-                                        backdropFilter: "blur(20px)",
-                                        boxShadow: "0 0 40px rgba(251, 191, 36, 0.15), 0 20px 40px rgba(0, 0, 0, 0.5)",
-                                    }}
-                                >
-                                    {/* Decorative corners */}
-                                    <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-amber-400/60 rounded-tl-xl" />
-                                    <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-amber-400/60 rounded-tr-xl" />
-                                    <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-amber-400/60 rounded-bl-xl" />
-                                    <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-amber-400/60 rounded-br-xl" />
-
-                                    <h2 className="text-2xl font-serif font-bold text-white mb-3">
-                                        Join The <span className="text-amber-400">Mambo Guild</span>
-                                    </h2>
-                                    <p className="text-white/70 mb-6">
-                                        Connect with dancers worldwide. Share videos, ask questions, and level up together.
-                                    </p>
-                                    <motion.a
-                                        href="/pricing"
-                                        className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 text-black font-bold rounded-lg shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-shadow"
-                                        whileHover={{ scale: 1.05 }}
-                                        whileTap={{ scale: 0.98 }}
-                                    >
-                                        <span className="font-serif tracking-wide">Become a Member</span>
-                                    </motion.a>
-                                </div>
-                            </div>
-                        ) : filteredPosts.length === 0 ? (
+                        ) : filteredPosts.length === 0 && !isPreviewMode ? (
                             <div className="text-center py-16">
                                 <p className="text-white/50 mb-4">
                                     {viewMode === "stage"
@@ -277,7 +242,7 @@ export default function CommunityPage() {
                                         </div>
 
                                         {/* Fade gradient for preview mode - starts after 2nd row (6 items for 3 cols) */}
-                                        {isPreviewMode && filteredPosts.length > 3 && (
+                                        {isPreviewMode && filteredPosts.length > 0 && (
                                             <div
                                                 className="absolute bottom-0 left-0 right-0 h-[60%] pointer-events-none"
                                                 style={{
@@ -311,8 +276,7 @@ export default function CommunityPage() {
                                             </AnimatePresence>
                                         </div>
 
-                                        {/* Fade gradient for preview mode - starts after 3rd item */}
-                                        {isPreviewMode && filteredPosts.length > 3 && (
+                                        {isPreviewMode && filteredPosts.length > 0 && (
                                             <div
                                                 className="absolute bottom-0 left-0 right-0 h-[50%] pointer-events-none"
                                                 style={{
@@ -321,6 +285,40 @@ export default function CommunityPage() {
                                                 }}
                                             />
                                         )}
+                                    </div>
+                                )}
+
+                                {/* Preview Mode CTA — appears below the post preview */}
+                                {isPreviewMode && (
+                                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                                        <div
+                                            className="relative overflow-hidden rounded-2xl border-2 border-amber-400/50 p-8 max-w-lg"
+                                            style={{
+                                                background: "linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(20,20,20,0.9) 100%)",
+                                                backdropFilter: "blur(20px)",
+                                                boxShadow: "0 0 40px rgba(251, 191, 36, 0.15), 0 20px 40px rgba(0, 0, 0, 0.5)",
+                                            }}
+                                        >
+                                            <div className="absolute top-0 left-0 w-8 h-8 border-l-2 border-t-2 border-amber-400/60 rounded-tl-xl" />
+                                            <div className="absolute top-0 right-0 w-8 h-8 border-r-2 border-t-2 border-amber-400/60 rounded-tr-xl" />
+                                            <div className="absolute bottom-0 left-0 w-8 h-8 border-l-2 border-b-2 border-amber-400/60 rounded-bl-xl" />
+                                            <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-amber-400/60 rounded-br-xl" />
+
+                                            <h2 className="text-2xl font-serif font-bold text-white mb-3">
+                                                Join The <span className="text-amber-400">Mambo Guild</span>
+                                            </h2>
+                                            <p className="text-white/70 mb-6">
+                                                Connect with dancers worldwide. Share videos, ask questions, and level up together.
+                                            </p>
+                                            <motion.a
+                                                href="/pricing"
+                                                className="inline-flex items-center gap-2 px-8 py-3 bg-gradient-to-r from-amber-400 via-amber-500 to-orange-500 text-black font-bold rounded-lg shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-shadow"
+                                                whileHover={{ scale: 1.05 }}
+                                                whileTap={{ scale: 0.98 }}
+                                            >
+                                                <span className="font-serif tracking-wide">Become a Member</span>
+                                            </motion.a>
+                                        </div>
                                     </div>
                                 )}
                             </>

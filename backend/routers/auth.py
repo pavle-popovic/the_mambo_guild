@@ -855,7 +855,12 @@ def reset_password(
             user.auth_provider = "email"
             user.is_verified = True
             logger.info(f"User {user.id} claimed account and converted from waitlist to email.")
-            
+            # Award starter claves (same as regular registration)
+            try:
+                award_new_user_bonus(str(user.id), db)
+            except Exception as e:
+                logger.warning(f"Failed to award claim bonus for {user.id}: {e}")
+
         db.commit()
         
         return {"message": "Password reset successfully"}

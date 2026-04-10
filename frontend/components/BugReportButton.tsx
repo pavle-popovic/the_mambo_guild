@@ -375,14 +375,12 @@ export default function BugReportButton() {
         onClick={openAndCapture}
         aria-label="Report a bug"
         style={{
-          // 5rem (80px) on top clears the main navbar; safe-area for iOS notch
-          top: "calc(env(safe-area-inset-top, 0px) + 5rem)",
-          right: "calc(env(safe-area-inset-right, 0px) + 1rem)",
+          top: "calc(env(safe-area-inset-top, 0px) + 0.5rem)",
+          right: "calc(env(safe-area-inset-right, 0px) + 0.5rem)",
         }}
-        className="fixed z-[9998] group flex items-center gap-2 rounded-full bg-black/80 backdrop-blur-md border border-[#D4AF37]/40 px-3 py-2 sm:px-3.5 sm:py-2 text-[#D4AF37] shadow-lg shadow-black/40 active:scale-95 hover:bg-[#D4AF37] hover:text-black transition-all duration-200 hover:scale-105"
+        className="fixed z-[9998] flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white/40 hover:text-[#D4AF37] hover:border-[#D4AF37]/40 hover:bg-black/80 active:scale-95 transition-all duration-200"
       >
         <Bug className="h-3.5 w-3.5" />
-        <span className="text-[10px] font-semibold tracking-wider uppercase hidden sm:inline">Report a bug</span>
       </button>
 
       {/* Modal */}
