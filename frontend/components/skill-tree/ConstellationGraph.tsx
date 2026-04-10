@@ -7,7 +7,6 @@ import {
   Controls,
   ConnectionMode,
   useReactFlow,
-  useNodesInitialized,
   Position,
   type NodeMouseHandler,
 } from "@xyflow/react";
@@ -168,8 +167,7 @@ function ConstellationGraphInner({
   const [hoveredNode, setHoveredNode] = useState<HoveredNode | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { fitView, setCenter } = useReactFlow();
-  const [isReady, setIsReady] = useState(false);
-  const nodesInitialized = useNodesInitialized();
+  const [isVisible, setIsVisible] = useState(false);
 
   // Determine node status
   const getNodeStatus = useCallback(
@@ -343,7 +341,8 @@ function ConstellationGraphInner({
   );
 
   // Create nodes and edges — use stored positions when available, dagre as fallback
-  const { nodes: flowNodes, edges: flowEdges } = useMemo(() => {
+  // Also return graph bounds for computing the initial viewport.
+  const { nodes: flowNodes, edges: flowEdges, graphBounds } = useMemo(() => {
     // Scale factor: DB stores 0-100 positions, convert to pixel coords for ReactFlow
     // Needs to be large enough that nodes (90x100px) don't overlap at 10-unit y spacing
     const POS_SCALE = 20;
@@ -393,43 +392,49 @@ function ConstellationGraphInner({
     });
 
     // Use stored positions if available, otherwise fall back to dagre auto-layout
-    if (hasStoredPositions) {
-      return { nodes: initialNodes, edges: initialEdges };
+    const result = hasStoredPositions
+      ? { nodes: initialNodes, edges: initialEdges }
+      : getLayoutedElements(initialNodes, initialEdges);
+
+    // Compute graph bounding box from final positions
+    const NODE_W = 90, NODE_H = 100;
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+    for (const n of result.nodes) {
+      minX = Math.min(minX, n.position.x);
+      maxX = Math.max(maxX, n.position.x + NODE_W);
+      minY = Math.min(minY, n.position.y);
+      maxY = Math.max(maxY, n.position.y + NODE_H);
     }
-    return getLayoutedElements(initialNodes, initialEdges);
+
+    return {
+      ...result,
+      graphBounds: { minX, maxX, minY, maxY, width: maxX - minX, height: maxY - minY },
+    };
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
 
-  // State to track if we have performed the initial centering
-  const [isPositioned, setIsPositioned] = useState(false);
+  // Compute defaultViewport from graph bounds so all nodes are visible on the
+  // very first frame — no DOM measurement, no timing dependency.
+  const initialViewport = useMemo(() => {
+    if (!graphBounds || graphBounds.width === 0) return { x: 0, y: 0, zoom: 0.5 };
 
-  // Wait for ReactFlow to measure all node DOM elements, THEN fitView.
-  // Double-rAF ensures the browser has completed layout AND paint so the
-  // ReactFlow container has its final pixel dimensions when fitView reads them.
-  useEffect(() => {
-    if (nodesInitialized && !isPositioned) {
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          fitView({ padding: 0.25, duration: 0 });
-          setIsPositioned(true);
-        });
-      });
-    }
-  }, [nodesInitialized, fitView, isPositioned]);
+    const vw = typeof window !== 'undefined' ? window.innerWidth : 1920;
+    const vh = typeof window !== 'undefined' ? window.innerHeight : 1080;
+    const pad = 0.15; // 15% padding on each side
 
-  // Safety net: force visible after 3s even if nodes never initialize
-  useEffect(() => {
-    if (isPositioned) return;
-    const fallback = setTimeout(() => {
-      fitView({ padding: 0.25, duration: 0 });
-      setIsPositioned(true);
-    }, 3000);
-    return () => clearTimeout(fallback);
-  }, [isPositioned, fitView]);
+    const scaleX = (vw * (1 - pad * 2)) / graphBounds.width;
+    const scaleY = (vh * (1 - pad * 2)) / graphBounds.height;
+    const zoom = Math.min(scaleX, scaleY, 1.0);
+
+    const cx = (graphBounds.minX + graphBounds.maxX) / 2;
+    const cy = (graphBounds.minY + graphBounds.maxY) / 2;
+
+    return { x: vw / 2 - cx * zoom, y: vh / 2 - cy * zoom, zoom };
+  }, [graphBounds]);
 
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-full transition-opacity duration-700 ease-out ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
+      className={`relative w-full h-full transition-opacity duration-500 ease-out ${isVisible ? 'opacity-100' : 'opacity-0'}`}
       style={{
         overflow: 'hidden',
         isolation: 'isolate'
@@ -577,7 +582,8 @@ function ConstellationGraphInner({
           onNodeClick={handleNodeClick}
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
-          onInit={() => setIsReady(true)}
+          defaultViewport={initialViewport}
+          onInit={() => setIsVisible(true)}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{
