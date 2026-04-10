@@ -170,10 +170,10 @@ export default function CommunityPage() {
             <NavBar user={user || undefined} />
 
             {/* Main Content - 3 Column Grid */}
-            <div className="max-w-7xl mx-auto px-4 pb-32 pt-24 relative">
-                <div className="grid grid-cols-12 gap-6">
-                    {/* Left Sidebar */}
-                    <div className="col-span-12 lg:col-span-2">
+            <div className="max-w-7xl mx-auto px-4 pb-20 sm:pb-32 pt-20 sm:pt-24 relative">
+                <div className="grid grid-cols-12 gap-4 lg:gap-6">
+                    {/* Left Sidebar — pushed below feed on mobile via order */}
+                    <div className="col-span-12 lg:col-span-2 order-2 lg:order-1">
                         <CommunitySidebar
                             viewMode={viewMode}
                             onViewModeChange={setViewMode}
@@ -185,8 +185,8 @@ export default function CommunityPage() {
                         />
                     </div>
 
-                    {/* Main Feed */}
-                    <div className="col-span-12 lg:col-span-7 relative">
+                    {/* Main Feed — comes first on mobile */}
+                    <div className="col-span-12 lg:col-span-7 relative order-1 lg:order-2">
                         {isLoading ? (
                             <div className="flex justify-center py-16">
                                 <div className="w-10 h-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
@@ -290,9 +290,9 @@ export default function CommunityPage() {
 
                                 {/* Preview Mode CTA — appears below the post preview */}
                                 {isPreviewMode && (
-                                    <div className="flex flex-col items-center justify-center py-12 text-center">
+                                    <div className="flex flex-col items-center justify-center py-6 sm:py-12 text-center">
                                         <div
-                                            className="relative overflow-hidden rounded-2xl border-2 border-amber-400/50 p-8 max-w-lg"
+                                            className="relative overflow-hidden rounded-2xl border-2 border-amber-400/50 p-5 sm:p-8 max-w-lg"
                                             style={{
                                                 background: "linear-gradient(135deg, rgba(0,0,0,0.8) 0%, rgba(20,20,20,0.9) 100%)",
                                                 backdropFilter: "blur(20px)",
@@ -326,7 +326,7 @@ export default function CommunityPage() {
                     </div>
 
                     {/* Right Widgets */}
-                    <div className="col-span-12 lg:col-span-3">
+                    <div className="col-span-12 lg:col-span-3 order-3">
                         <CommunityWidgets posts={posts} />
                     </div>
                 </div>

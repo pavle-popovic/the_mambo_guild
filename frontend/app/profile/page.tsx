@@ -165,12 +165,12 @@ export default function ProfilePage() {
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user} />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-8 sm:py-12 pt-24 sm:pt-28">
-        <div className="flex flex-col md:flex-row items-center md:items-start gap-10 mb-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-8 py-4 sm:py-12 pt-20 sm:pt-28">
+        <div className="flex flex-col md:flex-row items-center md:items-start gap-5 sm:gap-10 mb-8 sm:mb-16">
           <div className="flex flex-col items-center gap-4">
             <div className="relative group cursor-pointer">
               {user.avatar_url ? (
-                <div className="w-32 h-32 rounded-full shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
+                <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
                   <Image
                     src={user.avatar_url}
                     alt={user.username || `${user.first_name} ${user.last_name}`}
@@ -369,24 +369,24 @@ export default function ProfilePage() {
 
         {/* Detailed Stats Row */}
         {user.stats && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-            <div className="bg-mambo-panel border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-              <span className="text-gray-400 text-sm font-medium">Reactions Given</span>
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
+            <div className="bg-mambo-panel border border-gray-800 p-2.5 sm:p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-0.5">
+              <span className="text-gray-400 text-[11px] sm:text-sm font-medium">Reactions Given</span>
               <span className="text-white font-bold text-lg">{user.stats.reactions_given}</span>
             </div>
-            <div className="bg-mambo-panel border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-              <span className="text-gray-400 text-sm font-medium">Reactions Received</span>
+            <div className="bg-mambo-panel border border-gray-800 p-2.5 sm:p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-0.5">
+              <span className="text-gray-400 text-[11px] sm:text-sm font-medium">Reactions Received</span>
               <span className="text-white font-bold text-lg">{user.stats.reactions_received}</span>
             </div>
-            <div className="bg-mambo-panel border border-gray-800 p-4 rounded-xl flex items-center justify-between">
-              <span className="text-gray-400 text-sm font-medium">Solutions Accepted</span>
+            <div className="bg-mambo-panel border border-gray-800 p-2.5 sm:p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-0.5">
+              <span className="text-gray-400 text-[11px] sm:text-sm font-medium">Solutions Accepted</span>
               <span className="text-white font-bold text-lg">{user.stats.solutions_accepted}</span>
             </div>
           </div>
         )}
 
         {/* Level Progress */}
-        <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6 mb-8">
+        <div className="bg-mambo-panel border border-gray-800 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
           <div className="flex justify-between items-center mb-2">
             <h2 className="text-xl font-bold text-mambo-text">Level Progress</h2>
             <span className="text-gray-400 text-sm">
@@ -446,10 +446,10 @@ export default function ProfilePage() {
                 <Link
                   key={course.id}
                   href={course.nextLessonId ? `/lesson/${course.nextLessonId}` : `/courses/${course.id}`}
-                  className="block bg-mambo-panel border border-gray-800 rounded-xl p-6 hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
+                  className="block bg-mambo-panel border border-gray-800 rounded-xl p-4 sm:p-6 hover:border-blue-500/60 hover:shadow-lg hover:shadow-blue-500/20 transition-all duration-300 group"
                 >
-                  <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 items-start sm:items-center">
-                    <div className="w-full sm:w-32 h-36 sm:h-20 bg-gray-800 rounded-lg overflow-hidden shrink-0 relative">
+                  <div className="flex flex-row gap-4 sm:gap-6 items-center">
+                    <div className="w-24 sm:w-32 h-16 sm:h-20 bg-gray-800 rounded-lg overflow-hidden shrink-0 relative">
                       {course.thumbnail_url || course.image_url ? (
                         <Image
                           src={course.thumbnail_url || course.image_url || ""}
@@ -501,7 +501,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Badge Trophy Case */}
-        <div className="mt-8">
+        <div className="mt-5 sm:mt-8">
           <BadgeTrophyCase
             initialBadges={user.badges}
             streakCount={user.streak_count}
@@ -510,7 +510,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Referral Section */}
-        <div className="mt-8">
+        <div className="mt-5 sm:mt-8">
           <ReferralSection />
         </div>
       </div>

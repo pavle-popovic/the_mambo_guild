@@ -102,7 +102,7 @@ export default function NavBar({ user }: NavBarProps) {
   return (
     <>
       <nav className="fixed w-full z-50 glass-nav transition-all duration-300" suppressHydrationWarning>
-        <div className="max-w-[1440px] mx-auto px-3 sm:px-4 lg:px-8 py-3 sm:py-5 flex items-center gap-2 sm:gap-4">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-4 lg:px-8 py-2 sm:py-3 md:py-5 flex items-center gap-2 sm:gap-4">
           <LogoWrapper
             {...(mounted ? {
               whileHover: { scale: 1.05 },

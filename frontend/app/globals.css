@@ -430,3 +430,33 @@ h6 {
   color: #9ca3af;
   font-style: italic;
 }
+
+/* ===================================
+   Mobile Landscape → Desktop-Scale Layout
+   When phone is tilted, scale everything down
+   to show the desktop layout like a native app.
+   =================================== */
+@media (orientation: landscape) and (max-height: 500px) {
+  html {
+    font-size: 13px; /* Scale all rem values down ~19% */
+  }
+
+  /* Tighten the nav for landscape */
+  .glass-nav {
+    backdrop-filter: blur(8px);
+  }
+
+  /* Ensure scrollbar doesn't eat space */
+  body {
+    scrollbar-width: thin;
+  }
+}
+
+/* Hide scrollbar utility for filter pill rows */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}

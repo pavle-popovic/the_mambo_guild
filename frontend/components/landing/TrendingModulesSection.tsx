@@ -226,7 +226,7 @@ export default function TrendingModulesSection() {
     }, [isPaused, modules]);
 
     return (
-        <section className="relative py-16 md:py-24 overflow-hidden bg-gradient-to-b from-transparent via-black/50 to-transparent">
+        <section className="relative py-8 sm:py-16 md:py-24 overflow-hidden bg-gradient-to-b from-transparent via-black/50 to-transparent">
             <div className="max-w-7xl mx-auto px-4 sm:px-6">
                 {/* Section Header */}
                 <motion.div
@@ -234,7 +234,7 @@ export default function TrendingModulesSection() {
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                     transition={{ duration: 0.6 }}
-                    className="text-center mb-10 md:mb-14"
+                    className="text-center mb-6 md:mb-14"
                 >
                     <h2
                         className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-mambo-text font-serif"

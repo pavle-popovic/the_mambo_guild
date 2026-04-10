@@ -43,7 +43,7 @@ const testimonials = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="relative py-32 px-6 bg-mambo-dark z-10 overflow-hidden">
+    <section className="relative py-12 sm:py-20 md:py-32 px-4 sm:px-6 bg-mambo-dark z-10 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
@@ -51,7 +51,7 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-8 sm:mb-16"
         >
           <h2
             className="text-4xl md:text-5xl font-bold mb-12 text-mambo-text tracking-tight font-serif italic"

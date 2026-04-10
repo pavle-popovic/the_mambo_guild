@@ -160,8 +160,8 @@ function PricingPageContent() {
       <NavBar user={user || undefined} />
 
       <FadeIn>
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-12 sm:py-20 pt-28 text-center">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-10 sm:mb-16 text-mambo-text tracking-tight font-serif italic" style={{ fontFamily: '"Playfair Display", serif' }}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-20 pt-20 sm:pt-28 text-center">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-6 sm:mb-16 text-mambo-text tracking-tight font-serif italic" style={{ fontFamily: '"Playfair Display", serif' }}>
             We Adapt to <span className="text-mambo-gold">Your Level</span>
           </h1>
 

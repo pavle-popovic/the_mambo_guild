@@ -126,7 +126,7 @@ export default function LandingPricingSection() {
   const currentTier = user?.tier?.toLowerCase() || "rookie";
 
   return (
-    <section className="relative py-32 px-6 bg-transparent z-10">
+    <section className="relative py-12 sm:py-20 md:py-32 px-4 sm:px-6 bg-transparent z-10">
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
@@ -134,7 +134,7 @@ export default function LandingPricingSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16"
+          className="text-center mb-8 sm:mb-16"
         >
           <h2
             className="text-4xl md:text-5xl font-bold mb-8 text-mambo-text tracking-tight font-serif italic"
@@ -145,7 +145,7 @@ export default function LandingPricingSection() {
         </motion.div>
 
         {/* Pricing grid */}
-        <StaggerContainer className="grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+        <StaggerContainer className="grid md:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
           {plans.map((plan) => {
             const isCurrentPlan = currentTier === plan.id;
             const isHighlighted = plan.highlighted && !user;
@@ -160,7 +160,7 @@ export default function LandingPricingSection() {
                       }`}
                   >
                     <div
-                      className={`relative rounded-2xl p-8 flex flex-col h-full transition-all duration-300 ${
+                      className={`relative rounded-2xl p-5 sm:p-8 flex flex-col h-full transition-all duration-300 ${
                         // Use custom background if defined, otherwise dark
                         (plan as any).cardBg || "bg-[#111111]"
                         } ${!isHighlighted && !isCurrentPlan ? "border border-gray-800 hover:border-gray-700 hover:bg-[#161616]" : ""} ${(plan as any).customStyle || ""}`}

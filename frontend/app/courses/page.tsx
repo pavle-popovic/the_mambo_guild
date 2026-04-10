@@ -173,7 +173,7 @@ export default function CoursesPage() {
         </div>
 
         {/* Main Grid Content */}
-        <div className="max-w-[1600px] mx-auto px-3 sm:px-6 py-6 sm:py-8">
+        <div className="max-w-[1600px] mx-auto px-3 sm:px-6 py-3 sm:py-8">
           {loading ? (
             <div className="text-center py-20">
               <div className="animate-spin w-8 h-8 border-2 border-mambo-gold border-t-transparent rounded-full mx-auto mb-4" />
@@ -188,7 +188,7 @@ export default function CoursesPage() {
               </button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6">
               {filteredCourses.map((course, index) => (
                 <CourseCard
                   key={course.id}

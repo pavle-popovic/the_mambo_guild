@@ -95,7 +95,7 @@ export default function CommunitySidebar({
     };
 
     return (
-        <div className="sticky top-28 h-[calc(100vh-8rem)] bg-[#121212]/60 backdrop-blur-xl border border-white/10 rounded-3xl p-6 flex flex-col gap-8 shadow-2xl">
+        <div className="lg:sticky lg:top-28 lg:h-[calc(100vh-8rem)] bg-[#121212]/60 backdrop-blur-xl border border-white/10 rounded-2xl lg:rounded-3xl p-4 lg:p-6 flex flex-col gap-4 lg:gap-8 shadow-2xl">
             {/* Navigation */}
             <div>
                 <nav className="space-y-2">

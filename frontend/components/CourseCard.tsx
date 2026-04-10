@@ -109,8 +109,8 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
           onMouseLeave={handleMouseLeave}
           className="relative bg-zinc-900 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 group cursor-pointer hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
         >
-          {/* Image/Preview section */}
-          <div className="relative aspect-[16/9]">
+          {/* Image/Preview section — wider ratio on mobile for compact cards */}
+          <div className="relative aspect-[2/1] sm:aspect-[16/9]">
             <Image
               src={displayUrl}
               alt={course.title}
@@ -124,23 +124,23 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
 
             {/* Stats Badge - Top Left */}
             {(moduleCount > 0 || lessonCount > 0 || duration) && (
-              <div className="absolute top-1 left-1 flex items-center gap-2 z-20">
+              <div className="absolute top-1 left-1 flex items-center gap-1 sm:gap-2 z-20">
                 {moduleCount > 0 && (
-                  <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2.5 py-1 border border-white/10">
-                    <span className="text-sm font-bold text-mambo-gold">{moduleCount}</span>
-                    <span className="text-[10px] text-gray-400 ml-1 uppercase">Modules</span>
+                  <div className="bg-black/70 backdrop-blur-sm rounded-lg px-1.5 sm:px-2.5 py-0.5 sm:py-1 border border-white/10">
+                    <span className="text-xs sm:text-sm font-bold text-mambo-gold">{moduleCount}</span>
+                    <span className="text-[9px] sm:text-[10px] text-gray-400 ml-0.5 sm:ml-1 uppercase">Modules</span>
                   </div>
                 )}
                 {lessonCount > 0 && (
-                  <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2.5 py-1 border border-white/10">
-                    <span className="text-sm font-bold text-cyan-400">{lessonCount}</span>
-                    <span className="text-[10px] text-gray-400 ml-1 uppercase">Lessons</span>
+                  <div className="bg-black/70 backdrop-blur-sm rounded-lg px-1.5 sm:px-2.5 py-0.5 sm:py-1 border border-white/10">
+                    <span className="text-xs sm:text-sm font-bold text-cyan-400">{lessonCount}</span>
+                    <span className="text-[9px] sm:text-[10px] text-gray-400 ml-0.5 sm:ml-1 uppercase">Lessons</span>
                   </div>
                 )}
                 {duration && (
-                  <div className="bg-black/70 backdrop-blur-sm rounded-lg px-2.5 py-1 border border-white/10 flex items-center gap-1.5">
-                    <Clock className="w-3 h-3 text-purple-400" />
-                    <span className="text-[11px] font-bold text-purple-100 uppercase tracking-wide">{duration}</span>
+                  <div className="bg-black/70 backdrop-blur-sm rounded-lg px-1.5 sm:px-2.5 py-0.5 sm:py-1 border border-white/10 flex items-center gap-1">
+                    <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-purple-400" />
+                    <span className="text-[10px] sm:text-[11px] font-bold text-purple-100 uppercase tracking-wide">{duration}</span>
                   </div>
                 )}
               </div>

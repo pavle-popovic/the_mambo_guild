@@ -143,40 +143,37 @@ export default function CourseDetailPage() {
         />
       </div>
 
-      {/* Overlays */}
-      <div className="relative z-10 pointer-events-none">
-        <div className="max-w-7xl mx-auto px-8 pt-28">
+      {/* Top bar — back button + progress widget in one slim row */}
+      <div className="absolute top-14 sm:top-16 left-0 right-0 z-30 pointer-events-none">
+        <div className="flex items-center justify-between px-3 sm:px-6 py-1">
+          {/* Back link */}
           <Link
             href="/courses"
-            className="text-gray-400 hover:text-mambo-text transition mb-6 inline-block pointer-events-auto bg-black/30 backdrop-blur-sm px-3 py-1 rounded-full border border-gray-800"
+            className="text-gray-400 hover:text-mambo-text transition pointer-events-auto bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full border border-gray-800 text-sm"
           >
             {`← ${tCourses('title')}`}
           </Link>
-        </div>
-      </div>
 
-      {/* Course Progress Widget (Top Right) - Compact */}
-      <div className="absolute top-20 right-2 sm:right-4 z-30 w-40 sm:w-52 bg-black/70 backdrop-blur-md border border-yellow-900/20 rounded-xl p-2 sm:p-3 shadow-xl pointer-events-auto">
-        <h2 className="text-sm font-serif font-bold text-white mb-2 truncate">{skillTree.title}</h2>
+          {/* Course Progress Widget — compact inline */}
+          <div className="pointer-events-auto bg-black/70 backdrop-blur-md border border-yellow-900/20 rounded-xl p-2 sm:p-3 shadow-xl max-w-[55%] sm:max-w-52">
+            <h2 className="text-xs sm:text-sm font-serif font-bold text-white mb-1 truncate">{skillTree.title}</h2>
 
-        <div className="flex justify-between items-baseline mb-1">
-          <span className="text-[10px] font-bold text-gray-500 tracking-wider uppercase">Progress</span>
-          <span className="text-sm font-bold text-mambo-gold">
-            {Math.round(stats.progress)}%
-          </span>
-        </div>
+            <div className="flex items-center gap-2">
+              <div className="flex-1 h-1.5 sm:h-2 bg-gray-900/50 rounded-full overflow-hidden border border-white/10">
+                <div
+                  className="bg-gradient-to-r from-mambo-blue to-purple-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(139,92,246,0.5)]"
+                  style={{ width: `${Math.round(stats.progress)}%` }}
+                />
+              </div>
+              <span className="text-xs font-bold text-mambo-gold whitespace-nowrap">
+                {Math.round(stats.progress)}%
+              </span>
+            </div>
 
-        <div className="h-2 bg-gray-900/50 rounded-full overflow-hidden border border-white/10 mb-1">
-          <div
-            className="bg-gradient-to-r from-mambo-blue to-purple-600 h-full rounded-full transition-all duration-1000 ease-out shadow-[0_0_8px_rgba(139,92,246,0.5)]"
-            style={{
-              width: `${Math.round(stats.progress)}%`
-            }}
-          />
-        </div>
-
-        <div className="text-[10px] text-gray-500">
-          {stats.completed}/{stats.total} lessons
+            <div className="text-[10px] text-gray-500 mt-0.5">
+              {stats.completed}/{stats.total} lessons
+            </div>
+          </div>
         </div>
       </div>
     </div>

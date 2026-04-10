@@ -29,9 +29,9 @@ export default function NewHero() {
     }, []);
 
     return (
-        <section className="relative min-h-screen w-full flex items-center justify-center overflow-hidden bg-transparent pt-16 md:pt-20">
+        <section className="relative min-h-[calc(100vh-60px)] sm:min-h-screen w-full flex items-center justify-center overflow-hidden bg-transparent pt-14 md:pt-20">
             {/* Content Container */}
-            <div className="relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-8 md:gap-12 lg:gap-20">
+            <div className="relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-6 md:gap-12 lg:gap-20">
 
                 {/* Text Side (Left) */}
                 <motion.div
@@ -115,7 +115,7 @@ export default function NewHero() {
                     transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                     className="flex-[1.2] w-full max-w-2xl lg:max-w-3xl"
                 >
-                    <div className="relative aspect-[9/16] sm:aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
+                    <div className="relative aspect-[3/4] sm:aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
                         {/* Thumbnail / Video */}
                         <div className="absolute inset-0">
                             <Image

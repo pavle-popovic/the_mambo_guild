@@ -595,7 +595,7 @@ export default function SkillTreeTeaser() {
   const selectedCourse = courses.find(c => c.id === selectedCourseId);
 
   return (
-    <section className="relative py-12 md:py-20 px-4 sm:px-6 overflow-hidden bg-gradient-to-b from-transparent via-black/60 to-transparent">
+    <section className="relative py-8 sm:py-12 md:py-20 px-4 sm:px-6 overflow-hidden bg-gradient-to-b from-transparent via-black/60 to-transparent">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-6 md:mb-10">
@@ -683,7 +683,7 @@ export default function SkillTreeTeaser() {
             </div>
 
             {/* Tree Container */}
-            <div className="relative h-[500px] md:h-[580px] bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 rounded-2xl border border-zinc-700/50 overflow-hidden shadow-2xl">
+            <div className="relative h-[360px] sm:h-[450px] md:h-[580px] bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 rounded-2xl border border-zinc-700/50 overflow-hidden shadow-2xl">
               {/* Header */}
               <div className="absolute top-0 left-0 right-0 z-20 px-3 py-2 bg-gradient-to-b from-black/90 to-transparent">
                 <div className="flex items-center justify-between">
@@ -737,7 +737,7 @@ export default function SkillTreeTeaser() {
                   <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="mt-2 bg-zinc-900/95 border border-zinc-700/50 rounded-xl overflow-hidden">
                     <div className="flex">
                       {/* Thumbnail / GIF Preview */}
-                      <div className="relative w-36 h-28 flex-shrink-0 overflow-hidden bg-zinc-800">
+                      <div className="relative w-28 h-20 sm:w-36 sm:h-28 flex-shrink-0 overflow-hidden bg-zinc-800">
                         {displayImage ? (
                           <img
                             src={displayImage}
