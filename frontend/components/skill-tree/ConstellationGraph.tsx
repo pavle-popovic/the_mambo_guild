@@ -403,19 +403,12 @@ function ConstellationGraphInner({
     return result;
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
 
-  // Compute a defaultViewport that centers (0,0) on the screen so the graph
-  // is immediately visible (dagre centers the graph at origin). This avoids
-  // the blank-screen problem that occurs when nodes are outside the viewport
-  // and React Flow's virtualization skips rendering them.
-  const initialViewport = useMemo(() => {
-    if (typeof window === 'undefined') return { x: 600, y: 400, zoom: 0.5 };
-    return { x: window.innerWidth / 2, y: window.innerHeight / 2, zoom: 0.5 };
-  }, []);
+  // Center the viewport on the frontier node. Called from both onInit (primary)
+  // and a fallback timeout (safety net if onInit doesn't fire).
+  const hasCentered = useRef(false);
 
-  // Navigate to the frontier node once ReactFlow is initialized.
-  // onInit fires when the container is measured — far more reliable than setTimeout
-  // which can miss on Vercel cold starts.
-  const handleInit = useCallback(() => {
+  const centerOnFrontier = useCallback(() => {
+    if (hasCentered.current) return;
     if (levels.length === 0 || flowNodes.length === 0) return;
 
     const targetLevel =
@@ -424,6 +417,7 @@ function ConstellationGraphInner({
       levels[0];
     const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
     if (targetNode) {
+      hasCentered.current = true;
       // +45/+50 to center on the node (dagre position is top-left of 90×100 node)
       setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
         zoom: 0.75,
@@ -431,6 +425,18 @@ function ConstellationGraphInner({
       });
     }
   }, [levels, flowNodes, setCenter]);
+
+  // Primary: onInit fires when ReactFlow container is measured
+  const handleInit = useCallback(() => {
+    centerOnFrontier();
+  }, [centerOnFrontier]);
+
+  // Fallback: if onInit doesn't fire within 500ms, try centering anyway.
+  // Also handles soft-navigation where onInit may not re-fire.
+  useEffect(() => {
+    const timer = setTimeout(() => centerOnFrontier(), 500);
+    return () => clearTimeout(timer);
+  }, [centerOnFrontier]);
 
   return (
     <div
@@ -584,10 +590,10 @@ function ConstellationGraphInner({
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
           onInit={handleInit}
-          // Graph is centered at origin by dagre. initialViewport puts (0,0)
-          // at the center of the screen so all nodes are visible immediately.
-          // onInit then animates to the frontier node.
-          defaultViewport={initialViewport}
+          // Graph is centered at (0,0) by dagre. This viewport puts the origin
+          // roughly at the center of a typical screen so nodes are visible
+          // immediately while onInit/fallback animates to the frontier node.
+          defaultViewport={{ x: 700, y: 450, zoom: 0.5 }}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{

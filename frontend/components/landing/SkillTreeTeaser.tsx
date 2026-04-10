@@ -319,7 +319,7 @@ function NodeHoverTooltip({ level, position, isLoggedOut }: { level: Level; posi
         {/* Thumbnail / Preview */}
         <div className="relative aspect-video overflow-hidden">
           {displayImage ? (
-            <img src={displayImage} alt={level.title} className={`w-full h-full object-cover ${isLocked || isLoggedOut ? "grayscale opacity-50" : ""}`} />
+            <img src={displayImage} alt={level.title} className={`w-full h-full object-cover ${isLocked || isLoggedOut ? "grayscale opacity-50" : ""}`} onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }} />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
               <Star className="w-10 h-10 text-gray-600" />
