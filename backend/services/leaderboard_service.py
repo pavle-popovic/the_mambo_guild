@@ -140,8 +140,8 @@ def get_leaderboard(
     if weights.get("reactions_given", 0) > 0:
         query = query.outerjoin(reactions_given_q, User.id == reactions_given_q.c.user_id)
 
-    results = query.having(score_expr > 0).group_by(
-        User.id, UserProfile.first_name, UserProfile.avatar_url
+    results = query.filter(
+        score_expr > 0
     ).order_by(desc("score")).limit(limit).all()
 
     return [

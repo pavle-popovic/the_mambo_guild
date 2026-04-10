@@ -407,40 +407,19 @@ function ConstellationGraphInner({
   // Position the frontier node near the BOTTOM of the viewport
   useEffect(() => {
     if (isReady && levels.length > 0 && !isPositioned) {
-      // Small delay to ensure React Flow has rendered nodes and computed bounding boxes
       const timer = setTimeout(() => {
-        // Find the "frontier" node - the earliest available but not complete node
-        const targetNode = levels.find(l => l.is_unlocked && l.completion_percentage < 100)
-          || levels.filter(l => l.is_unlocked).pop()
-          || levels[0];
-
-        const targetFlowNode = flowNodes.find(n => n.id === targetNode?.id);
-
-        if (targetFlowNode && targetFlowNode.position && setCenter) {
-          const zoom = 0.9;
-          setCenter(
-            targetFlowNode.position.x + 250,
-            targetFlowNode.position.y - 80,
-            { zoom, duration: 0 }
-          );
-          requestAnimationFrame(() => setIsPositioned(true));
-        } else {
-          // Fallback: if centering fails, fitView and show anyway
-          fitView({ padding: 0.4, duration: 0 });
-          requestAnimationFrame(() => setIsPositioned(true));
-        }
-      }, 100);
+        // Show the full tree first — users can pan/zoom from there
+        fitView({ padding: 0.3, duration: 0, maxZoom: 1.0, minZoom: 0.3 });
+        requestAnimationFrame(() => setIsPositioned(true));
+      }, 150);
       return () => clearTimeout(timer);
     }
-  }, [isReady, levels, flowNodes, setCenter, fitView, isPositioned]);
+  }, [isReady, levels, fitView, isPositioned]);
 
-  // Safety net: if ReactFlow never fires onInit (e.g. rendering edge case),
-  // force the graph visible after 3 seconds so the user isn't stuck on blank.
+  // Safety net: force visible after 3s even if ReactFlow never fires onInit
   useEffect(() => {
     if (isPositioned) return;
-    const fallback = setTimeout(() => {
-      if (!isPositioned) setIsPositioned(true);
-    }, 3000);
+    const fallback = setTimeout(() => setIsPositioned(true), 3000);
     return () => clearTimeout(fallback);
   }, [isPositioned]);
 
