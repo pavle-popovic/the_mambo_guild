@@ -403,12 +403,18 @@ function ConstellationGraphInner({
     return result;
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
 
+  // Compute a defaultViewport that centers (0,0) on the screen so the graph
+  // is immediately visible (dagre centers the graph at origin). This avoids
+  // the blank-screen problem that occurs when nodes are outside the viewport
+  // and React Flow's virtualization skips rendering them.
+  const initialViewport = useMemo(() => {
+    if (typeof window === 'undefined') return { x: 600, y: 400, zoom: 0.5 };
+    return { x: window.innerWidth / 2, y: window.innerHeight / 2, zoom: 0.5 };
+  }, []);
+
   // Navigate to the frontier node once ReactFlow is initialized.
   // onInit fires when the container is measured — far more reliable than setTimeout
-  // which can miss on Vercel cold starts. Opacity gates the graph until positioned
-  // to prevent a flash of the default (wrong) viewport.
-  const [isPositioned, setIsPositioned] = useState(false);
-
+  // which can miss on Vercel cold starts.
   const handleInit = useCallback(() => {
     if (levels.length === 0 || flowNodes.length === 0) return;
 
@@ -424,14 +430,12 @@ function ConstellationGraphInner({
         duration: 800,
       });
     }
-    // Reveal the graph after a short delay so the animation starts from the right spot
-    setTimeout(() => setIsPositioned(true), 50);
   }, [levels, flowNodes, setCenter]);
 
   return (
     <div
       ref={containerRef}
-      className={`relative w-full h-full transition-opacity duration-500 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
+      className="relative w-full h-full"
       style={{
         overflow: 'hidden',
         isolation: 'isolate'
@@ -580,10 +584,10 @@ function ConstellationGraphInner({
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
           onInit={handleInit}
-          // Graph is centered at origin by dagre. Start at (0,0) — the container
-          // is opacity-0 until onInit fires and setCenter positions the viewport,
-          // so the initial coordinates don't matter visually.
-          defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
+          // Graph is centered at origin by dagre. initialViewport puts (0,0)
+          // at the center of the screen so all nodes are visible immediately.
+          // onInit then animates to the frontier node.
+          defaultViewport={initialViewport}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{
