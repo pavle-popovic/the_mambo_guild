@@ -7,6 +7,7 @@ import {
   Controls,
   ConnectionMode,
   useReactFlow,
+  useNodesInitialized,
   Position,
   type NodeMouseHandler,
 } from "@xyflow/react";
@@ -168,6 +169,7 @@ function ConstellationGraphInner({
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const { fitView, setCenter } = useReactFlow();
   const [isReady, setIsReady] = useState(false);
+  const nodesInitialized = useNodesInitialized();
 
   // Determine node status
   const getNodeStatus = useCallback(
@@ -397,26 +399,20 @@ function ConstellationGraphInner({
     return getLayoutedElements(initialNodes, initialEdges);
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
 
-  // Fit view after initial render - focus on the current frontier node (available/last unlocked)
-  // Fit view after initial render - focus on the current frontier node (available/last unlocked)
   // State to track if we have performed the initial centering
   const [isPositioned, setIsPositioned] = useState(false);
 
-  // Fit view after initial render - focus on the current frontier node (available/last unlocked)
-  // With BT (Bottom-to-Top) layout, the tree grows UPWARD from root at bottom
-  // Position the frontier node near the BOTTOM of the viewport
+  // Wait for ReactFlow to measure all node DOM elements, THEN fitView.
+  // useNodesInitialized returns true only after every node has a measured width/height,
+  // which guarantees fitView can compute the correct bounding box.
   useEffect(() => {
-    if (isReady && levels.length > 0 && !isPositioned) {
-      const timer = setTimeout(() => {
-        // Show the full tree first — users can pan/zoom from there
-        fitView({ padding: 0.3, duration: 0, maxZoom: 1.0, minZoom: 0.3 });
-        requestAnimationFrame(() => setIsPositioned(true));
-      }, 150);
-      return () => clearTimeout(timer);
+    if (nodesInitialized && !isPositioned) {
+      fitView({ padding: 0.3, duration: 0, maxZoom: 1.0, minZoom: 0.3 });
+      requestAnimationFrame(() => setIsPositioned(true));
     }
-  }, [isReady, levels, fitView, isPositioned]);
+  }, [nodesInitialized, fitView, isPositioned]);
 
-  // Safety net: force visible after 3s even if ReactFlow never fires onInit
+  // Safety net: force visible after 3s even if nodes never initialize
   useEffect(() => {
     if (isPositioned) return;
     const fallback = setTimeout(() => setIsPositioned(true), 3000);
@@ -575,13 +571,6 @@ function ConstellationGraphInner({
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
           onInit={() => setIsReady(true)}
-          fitView
-          fitViewOptions={{
-            padding: 0.4,
-            maxZoom: 1.1,
-            minZoom: 0.6,
-          }}
-          defaultViewport={{ x: 0, y: 0, zoom: 1.0 }}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{
