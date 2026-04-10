@@ -218,7 +218,7 @@ def _set_auth_cookies(response: Response, access_token: str, refresh_token: str)
         value=access_token,
         httponly=True,
         secure=settings.SECURE_COOKIES,
-        samesite="none",  # Required for cross-origin (Vercel→Railway) cookie sending
+        samesite="lax",
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         domain=settings.COOKIE_DOMAIN
     )
@@ -228,7 +228,7 @@ def _set_auth_cookies(response: Response, access_token: str, refresh_token: str)
         value=refresh_token,
         httponly=True,
         secure=settings.SECURE_COOKIES,
-        samesite="none",  # Required for cross-origin (Vercel→Railway) cookie sending
+        samesite="lax",
         max_age=settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60,
         path="/api/auth/refresh",  # Only sent to refresh endpoint
         domain=settings.COOKIE_DOMAIN

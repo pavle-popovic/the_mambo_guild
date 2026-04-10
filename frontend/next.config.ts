@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const nextConfig = {
+const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
@@ -21,6 +21,19 @@ const nextConfig = {
     ],
   },
 
+  // Proxy client-side /api/* requests through Vercel to the Railway backend.
+  // This makes cookies same-origin (set on the Vercel domain) so they persist
+  // across page refreshes. Server-side code (middleware) uses API_DIRECT_URL
+  // to call Railway directly.
+  async rewrites() {
+    const backendUrl = process.env.API_DIRECT_URL || process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+    return [
+      {
+        source: '/api/:path*',
+        destination: `${backendUrl}/api/:path*`,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

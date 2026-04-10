@@ -403,45 +403,44 @@ function ConstellationGraphInner({
     return result;
   }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
 
-  // Center the viewport on the frontier node. Called from both onInit (primary)
-  // and a fallback timeout (safety net if onInit doesn't fire).
-  const hasCentered = useRef(false);
+  // Center on the frontier node — mirrors the working SkillTreeTeaser pattern.
+  // useState (not useRef) ensures state resets on remount during soft navigation.
+  // Opacity gating hides the graph until centering starts.
+  const [isPositioned, setIsPositioned] = useState(false);
 
-  const centerOnFrontier = useCallback(() => {
-    if (hasCentered.current) return;
-    if (levels.length === 0 || flowNodes.length === 0) return;
-
-    const targetLevel =
-      levels.find((l) => l.is_unlocked && l.completion_percentage < 100) ||
-      levels.filter((l) => l.is_unlocked).pop() ||
-      levels[0];
-    const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
-    if (targetNode) {
-      hasCentered.current = true;
-      // +45/+50 to center on the node (dagre position is top-left of 90×100 node)
-      setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
-        zoom: 0.75,
-        duration: 800,
-      });
-    }
-  }, [levels, flowNodes, setCenter]);
-
-  // Primary: onInit fires when ReactFlow container is measured
-  const handleInit = useCallback(() => {
-    centerOnFrontier();
-  }, [centerOnFrontier]);
-
-  // Fallback: if onInit doesn't fire within 500ms, try centering anyway.
-  // Also handles soft-navigation where onInit may not re-fire.
   useEffect(() => {
-    const timer = setTimeout(() => centerOnFrontier(), 500);
-    return () => clearTimeout(timer);
-  }, [centerOnFrontier]);
+    if (levels.length > 0 && flowNodes.length > 0 && !isPositioned) {
+      const timer = setTimeout(() => {
+        const targetLevel =
+          levels.find((l) => l.is_unlocked && l.completion_percentage < 100) ||
+          levels.filter((l) => l.is_unlocked).pop() ||
+          levels[0];
+        const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
+        if (targetNode) {
+          // +45/+50 to center on the node (dagre position is top-left of 90×100 node)
+          setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
+            zoom: 0.75,
+            duration: 800,
+          });
+          setTimeout(() => setIsPositioned(true), 100);
+        }
+      }, 200);
+      return () => clearTimeout(timer);
+    }
+  }, [levels, flowNodes, setCenter, isPositioned]);
+
+  // Safety: always reveal after 2s even if centering fails
+  useEffect(() => {
+    const safety = setTimeout(() => {
+      if (!isPositioned) setIsPositioned(true);
+    }, 2000);
+    return () => clearTimeout(safety);
+  }, [isPositioned]);
 
   return (
     <div
       ref={containerRef}
-      className="relative w-full h-full"
+      className={`relative w-full h-full transition-opacity duration-500 ${isPositioned ? 'opacity-100' : 'opacity-0'}`}
       style={{
         overflow: 'hidden',
         isolation: 'isolate'
@@ -589,11 +588,9 @@ function ConstellationGraphInner({
           onNodeClick={handleNodeClick}
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
-          onInit={handleInit}
-          // Graph is centered at (0,0) by dagre. This viewport puts the origin
-          // roughly at the center of a typical screen so nodes are visible
-          // immediately while onInit/fallback animates to the frontier node.
-          defaultViewport={{ x: 700, y: 450, zoom: 0.5 }}
+          // Graph is centered at (0,0) by dagre. Container is opacity-0 until
+          // the useEffect positions the viewport, so initial coords don't matter.
+          defaultViewport={{ x: 0, y: 0, zoom: 0.75 }}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{
