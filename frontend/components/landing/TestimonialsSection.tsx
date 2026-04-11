@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
 import { GlassCard } from "@/components/ui/GlassCard";
 import { FaQuoteLeft, FaStar, FaUserCircle } from "react-icons/fa";
@@ -42,126 +43,146 @@ const testimonials = [
 ];
 
 export default function TestimonialsSection() {
+  const [isPaused, setIsPaused] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll carousel (same pattern as TrendingModulesSection)
+  useEffect(() => {
+    if (isPaused) return;
+
+    const scrollContainer = scrollRef.current;
+    if (!scrollContainer) return;
+
+    let animationId: number;
+    let scrollPosition = scrollContainer.scrollLeft;
+
+    const scroll = () => {
+      if (!scrollContainer) return;
+      scrollPosition += 0.4;
+      if (scrollPosition >= scrollContainer.scrollWidth / 2) {
+        scrollPosition = 0;
+      }
+      scrollContainer.scrollLeft = scrollPosition;
+      animationId = requestAnimationFrame(scroll);
+    };
+
+    animationId = requestAnimationFrame(scroll);
+    return () => cancelAnimationFrame(animationId);
+  }, [isPaused]);
+
+  // Duplicate items for infinite scroll
+  const items = [...testimonials, ...testimonials];
+
   return (
-    <section className="relative py-8 sm:py-16 md:py-32 px-3 sm:px-6 bg-mambo-dark z-10 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
+    <section className="relative py-6 sm:py-16 md:py-24 overflow-hidden bg-mambo-dark z-10">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6">
         {/* Section header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-4 sm:mb-10 md:mb-16"
+          className="text-center mb-4 sm:mb-10 md:mb-14"
         >
           <h2
-            className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-12 text-mambo-text tracking-tight font-serif italic"
+            className="text-xl sm:text-3xl md:text-5xl font-bold mb-2 sm:mb-4 text-mambo-text tracking-tight font-serif italic"
             style={{ fontFamily: '"Playfair Display", serif' }}
           >
             What Dancers <span className="text-mambo-gold drop-shadow-md">Say</span>
           </h2>
-
         </motion.div>
 
-        {/* Horizontal scrolling carousel */}
-        <div className="relative">
+        {/* Auto-scrolling carousel */}
+        <div
+          className="relative"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+          onTouchStart={() => setIsPaused(true)}
+          onTouchEnd={() => setTimeout(() => setIsPaused(false), 3000)}
+        >
           {/* Fade edges */}
-          <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-mambo-dark to-transparent z-10 pointer-events-none" />
-          <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-mambo-dark to-transparent z-10 pointer-events-none" />
+          <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-20 bg-gradient-to-r from-mambo-dark to-transparent z-10 pointer-events-none" />
+          <div className="absolute right-0 top-0 bottom-0 w-8 sm:w-20 bg-gradient-to-l from-mambo-dark to-transparent z-10 pointer-events-none" />
 
-          {/* Carousel container */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-            className="flex gap-3 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 -mx-3 px-3 sm:-mx-6 sm:px-6 scrollbar-hide"
-            style={{
-              scrollbarWidth: "none",
-              msOverflowStyle: "none",
-            }}
+          {/* Scrolling container */}
+          <div
+            ref={scrollRef}
+            className="flex gap-3 sm:gap-5 overflow-x-hidden py-2"
+            style={{ scrollBehavior: "auto" }}
           >
-            {testimonials.map((item, index) => {
+            {items.map((item, index) => {
               // CTA card
               if ("type" in item && item.type === "cta") {
                 return (
-                  <motion.div
-                    key={item.id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.1 }}
-                    className="flex-shrink-0 w-64 sm:w-80 snap-center"
+                  <div
+                    key={`${item.id}-${index}`}
+                    className="flex-shrink-0 w-56 sm:w-72 md:w-80"
                   >
-                    <GlassCard className="p-5 sm:p-8 h-full flex flex-col items-center justify-center text-center min-h-[220px] sm:min-h-[280px]">
-                      <div className="w-16 h-16 rounded-full bg-gradient-to-br from-mambo-blue to-purple-500 flex items-center justify-center mb-6">
-                        <FaUserCircle className="w-8 h-8 text-white" />
+                    <GlassCard className="p-4 sm:p-6 h-full flex flex-col items-center justify-center text-center min-h-[160px] sm:min-h-[220px]">
+                      <div className="w-10 h-10 sm:w-14 sm:h-14 rounded-full bg-gradient-to-br from-mambo-blue to-purple-500 flex items-center justify-center mb-3 sm:mb-5">
+                        <FaUserCircle className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                       </div>
-                      <h3 className="text-xl font-bold text-mambo-text mb-3">
+                      <h3 className="text-sm sm:text-lg font-bold text-mambo-text mb-1.5 sm:mb-3">
                         Be the First
                       </h3>
-                      <p className="text-gray-400 mb-6 text-sm leading-relaxed">
-                        Join our beta program and share your transformation
-                        story.
+                      <p className="text-gray-400 mb-3 sm:mb-5 text-xs sm:text-sm leading-relaxed">
+                        Join our beta program and share your transformation story.
                       </p>
                       <Clickable>
                         <Link
                           href="/register"
-                          className="px-6 py-2.5 bg-gradient-to-r from-mambo-blue to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-full text-sm transition-all shadow-lg shadow-blue-500/25"
+                          className="px-4 sm:px-6 py-2 bg-gradient-to-r from-mambo-blue to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-full text-xs sm:text-sm transition-all shadow-lg shadow-blue-500/25"
                         >
                           Join Beta
                         </Link>
                       </Clickable>
                     </GlassCard>
-                  </motion.div>
+                  </div>
                 );
               }
 
               // Testimonial card
               return (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, scale: 0.9 }}
-                  whileInView={{ opacity: 1, scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  className="flex-shrink-0 w-64 sm:w-80 snap-center"
+                <div
+                  key={`${item.id}-${index}`}
+                  className="flex-shrink-0 w-56 sm:w-72 md:w-80"
                 >
-                  <GlassCard className="p-5 sm:p-8 h-full min-h-[220px] sm:min-h-[280px]">
+                  <GlassCard className="p-4 sm:p-6 h-full min-h-[160px] sm:min-h-[220px]">
                     {/* Quote icon */}
-                    <FaQuoteLeft className="w-6 h-6 text-mambo-blue/50 mb-4" />
+                    <FaQuoteLeft className="w-4 h-4 sm:w-5 sm:h-5 text-mambo-blue/50 mb-2 sm:mb-3" />
 
                     {/* Quote */}
-                    <p className="text-gray-300 leading-relaxed mb-6 text-sm">
+                    <p className="text-gray-300 leading-relaxed mb-3 sm:mb-5 text-xs sm:text-sm line-clamp-4 sm:line-clamp-none">
                       &ldquo;{item.quote}&rdquo;
                     </p>
 
                     {/* Rating */}
-                    <div className="flex gap-1 mb-4">
+                    <div className="flex gap-0.5 sm:gap-1 mb-2 sm:mb-3">
                       {[...Array(item.rating)].map((_, i) => (
                         <FaStar
                           key={i}
-                          className="w-4 h-4 text-mambo-gold"
+                          className="w-3 h-3 sm:w-4 sm:h-4 text-mambo-gold"
                         />
                       ))}
                     </div>
 
                     {/* Author */}
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-gradient-to-br from-mambo-blue to-purple-500 flex items-center justify-center text-white font-bold">
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-full bg-gradient-to-br from-mambo-blue to-purple-500 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
                         {item.name?.[0]}
                       </div>
                       <div>
-                        <p className="font-bold text-mambo-text text-sm">
+                        <p className="font-bold text-mambo-text text-xs sm:text-sm">
                           {item.name}
                         </p>
-                        <p className="text-gray-500 text-xs">{item.role}</p>
+                        <p className="text-gray-500 text-[10px] sm:text-xs">{item.role}</p>
                       </div>
                     </div>
                   </GlassCard>
-                </motion.div>
+                </div>
               );
             })}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

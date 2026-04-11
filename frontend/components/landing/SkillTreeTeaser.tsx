@@ -18,7 +18,7 @@ import "@xyflow/react/dist/style.css";
 import Dagre from "@dagrejs/dagre";
 import { FaStar, FaTrophy, FaChartLine, FaLock, FaPlay, FaCheck, FaSpinner } from "react-icons/fa";
 import { HiSparkles, HiLightningBolt } from "react-icons/hi";
-import { Lock, Star } from "lucide-react";
+import { Lock, Star, ChevronDown } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
@@ -616,78 +616,65 @@ export default function SkillTreeTeaser() {
         <div className="grid lg:grid-cols-6 gap-3 lg:gap-6 items-start">
           {/* Skill Tree - Takes most space (5/6) */}
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="lg:col-span-5 order-2 lg:order-1">
-            {/* Course Tabs - Enhanced */}
-            <div className="flex gap-2 sm:gap-3 mb-3 sm:mb-4 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
-              {loading ? (
-                <div className="flex items-center gap-2 px-4 py-2 text-gray-500"><FaSpinner className="animate-spin" /><span className="text-sm">Loading courses...</span></div>
-              ) : (
-                courses.map((course, index) => {
-                  const isSelected = selectedCourseId === course.id;
-                  
-                  return (
-                    <motion.button 
-                      key={course.id} 
-                      onClick={() => setSelectedCourseId(course.id)}
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: index * 0.1 }}
-                      className={`group relative flex-shrink-0 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold transition-all duration-300 overflow-hidden ${
-                        isSelected 
-                          ? "text-black shadow-lg shadow-mambo-gold/30" 
-                          : "bg-zinc-800/60 text-gray-300 hover:bg-zinc-700/80 hover:text-white border border-zinc-700/50 hover:border-mambo-gold/50"
-                      }`}
-                      whileHover={{ scale: isSelected ? 1.02 : 1.03 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      {/* Selected gold gradient background */}
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-gradient-to-r from-mambo-gold via-amber-400 to-mambo-gold" />
-                      )}
-                      
-                      {/* Shimmer effect for selected */}
-                      {isSelected && (
-                        <motion.div 
-                          className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-                          initial={{ x: '-100%' }}
-                          animate={{ x: '100%' }}
-                          transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }}
-                        />
-                      )}
-                      
-                      {/* Content */}
-                      <span className="relative flex items-center gap-2.5">
-                        {/* Star icon for selected, dot for unselected */}
-                        {isSelected ? (
-                          <Star className="w-4 h-4 fill-black/30" />
-                        ) : (
-                          <span className="w-2 h-2 rounded-full bg-mambo-gold/50 group-hover:bg-mambo-gold transition-colors" />
+            {/* Course Selector — Dropdown on mobile, tabs on desktop */}
+            {loading ? (
+              <div className="flex items-center gap-2 px-4 py-2 text-gray-500 mb-3"><FaSpinner className="animate-spin" /><span className="text-sm">Loading courses...</span></div>
+            ) : (
+              <>
+                {/* Mobile dropdown */}
+                <div className="sm:hidden mb-2 relative">
+                  <select
+                    value={selectedCourseId || ""}
+                    onChange={(e) => setSelectedCourseId(e.target.value)}
+                    className="w-full appearance-none bg-zinc-800/80 border border-mambo-gold/30 text-white text-sm font-semibold rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:border-mambo-gold/60"
+                  >
+                    {courses.map((course) => (
+                      <option key={course.id} value={course.id}>{course.title}{skillTree && selectedCourseId === course.id ? ` (${skillTree.levels.length})` : ""}</option>
+                    ))}
+                  </select>
+                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mambo-gold pointer-events-none" />
+                </div>
+
+                {/* Desktop tabs */}
+                <div className="hidden sm:flex gap-3 mb-4 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
+                  {courses.map((course, index) => {
+                    const isSelected = selectedCourseId === course.id;
+                    return (
+                      <motion.button
+                        key={course.id}
+                        onClick={() => setSelectedCourseId(course.id)}
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: index * 0.1 }}
+                        className={`group relative flex-shrink-0 px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 overflow-hidden ${
+                          isSelected
+                            ? "text-black shadow-lg shadow-mambo-gold/30"
+                            : "bg-zinc-800/60 text-gray-300 hover:bg-zinc-700/80 hover:text-white border border-zinc-700/50 hover:border-mambo-gold/50"
+                        }`}
+                        whileHover={{ scale: isSelected ? 1.02 : 1.03 }}
+                        whileTap={{ scale: 0.98 }}
+                      >
+                        {isSelected && <div className="absolute inset-0 bg-gradient-to-r from-mambo-gold via-amber-400 to-mambo-gold" />}
+                        {isSelected && (
+                          <motion.div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent" initial={{ x: '-100%' }} animate={{ x: '100%' }} transition={{ duration: 2, repeat: Infinity, repeatDelay: 3 }} />
                         )}
-                        <span className="text-xs sm:text-sm">{course.title}</span>
-                        {/* Module count badge */}
-                        {isSelected && skillTree && (
-                          <span className="bg-black/20 text-[10px] px-1.5 py-0.5 rounded-full font-bold">
-                            {skillTree.levels.length}
-                          </span>
+                        <span className="relative flex items-center gap-2.5">
+                          {isSelected ? <Star className="w-4 h-4 fill-black/30" /> : <span className="w-2 h-2 rounded-full bg-mambo-gold/50 group-hover:bg-mambo-gold transition-colors" />}
+                          <span className="text-sm">{course.title}</span>
+                          {isSelected && skillTree && <span className="bg-black/20 text-[10px] px-1.5 py-0.5 rounded-full font-bold">{skillTree.levels.length}</span>}
+                        </span>
+                        {isSelected && (
+                          <motion.div layoutId="courseTabIndicator" className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-black/30" initial={false} transition={{ type: "spring", stiffness: 500, damping: 30 }} />
                         )}
-                      </span>
-                      
-                      {/* Underline indicator for selected */}
-                      {isSelected && (
-                        <motion.div 
-                          layoutId="courseTabIndicator"
-                          className="absolute -bottom-0.5 left-1/2 -translate-x-1/2 w-10 h-1 rounded-full bg-black/30"
-                          initial={false}
-                          transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                        />
-                      )}
-                    </motion.button>
-                  );
-                })
-              )}
-            </div>
+                      </motion.button>
+                    );
+                  })}
+                </div>
+              </>
+            )}
 
             {/* Tree Container */}
-            <div className="relative h-[340px] sm:h-[450px] md:h-[580px] bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 rounded-xl sm:rounded-2xl border border-zinc-700/50 overflow-hidden shadow-2xl">
+            <div className="relative h-[55vh] max-h-[340px] sm:max-h-none sm:h-[450px] md:h-[580px] bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 rounded-xl sm:rounded-2xl border border-zinc-700/50 overflow-hidden shadow-2xl">
               {/* Header */}
               <div className="absolute top-0 left-0 right-0 z-20 px-3 py-2 bg-gradient-to-b from-black/90 to-transparent">
                 <div className="flex items-center justify-between">
