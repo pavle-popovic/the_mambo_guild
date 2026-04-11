@@ -455,11 +455,8 @@ export default function NavBar({ user }: NavBarProps) {
                   </>
                 ) : (
                   <>
-                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 font-bold">
+                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="mx-4 mt-2 py-3 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black rounded-full text-center font-bold shadow-lg shadow-[0_0_20px_rgba(252,226,5,0.4)] ring-2 ring-amber-400/50">
                       {t('login')}
-                    </Link>
-                    <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="mx-4 mt-2 py-3 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black rounded-full text-center font-bold shadow-lg">
-                      {t('signup')}
                     </Link>
                     <div className="px-4 py-2 mt-2">
                       <LocaleSwitcher compact />

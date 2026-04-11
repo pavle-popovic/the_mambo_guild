@@ -170,8 +170,8 @@ export default function NewHero() {
                 </div>
             </motion.div>
 
-            {/* Chatbot - Fixed position at bottom right */}
-            <Mambobot />
+            {/* Chatbot - Disabled for now, will be available in a future update */}
+            {/* <Mambobot /> */}
         </section>
     );
 }

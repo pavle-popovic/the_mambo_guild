@@ -276,8 +276,8 @@ export default function HeroScrollAnimation({ user }: HeroScrollAnimationProps) 
       {/* Bottom Left Mask (Veo) - Persist */}
       <div className="fixed bottom-2 left-2 w-16 h-8 bg-black blur-sm z-20 pointer-events-none" />
 
-      {/* Mambobot covers the Bottom Right (Gemini) watermark */}
-      <Mambobot />
+      {/* Mambobot - Disabled for now, will be available in a future update */}
+      {/* <Mambobot /> */}
 
 
 
