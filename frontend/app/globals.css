@@ -37,7 +37,25 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
+
+  /* Remove lg/xl from auto-generated breakpoints so we can redefine them
+     with landscape-phone awareness. sm, md, 2xl stay as default breakpoints. */
+  --breakpoint-lg: initial;
+  --breakpoint-xl: initial;
 }
+
+/* ─── Landscape-aware breakpoints ─────────────────────────────────────
+   lg: now fires at ≥1024px OR when a phone is held in landscape.
+   The (pointer: coarse) + (max-height: 500px) combo ensures this only
+   targets touch devices in landscape — not a small desktop window.
+   xl: re-declared as a custom variant to preserve cascade order (lg → xl).
+   ──────────────────────────────────────────────────────────────────── */
+@custom-variant lg {
+  @media (min-width: 1024px), ((orientation: landscape) and (max-height: 500px) and (pointer: coarse)) {
+    @slot;
+  }
+}
+@custom-variant xl (@media (min-width: 1280px));
 
 body {
   background: var(--background);
@@ -432,34 +450,32 @@ h6 {
 }
 
 /* ===================================
-   Mobile Landscape → Desktop-Scale Layout
-   When phone is tilted, scale everything down
-   to show the desktop layout like a native app.
+   Mobile Landscape — Supplementary Tweaks
+   The lg: custom-variant handles the layout swap.
+   These rules handle density/sizing adjustments
+   specific to landscape phones (small viewport height).
    =================================== */
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
   html {
-    font-size: 13px; /* Scale all rem values down ~19% */
+    font-size: 13px; /* Scale rem values down ~19% for density */
   }
 
-  /* Tighten the nav for landscape */
   .glass-nav {
     backdrop-filter: blur(8px);
   }
 
-  /* Ensure scrollbar doesn't eat space */
   body {
     scrollbar-width: thin;
   }
 
-  /* Hero: force side-by-side layout in landscape */
-  .hero-content-container {
-    flex-direction: row !important;
-    gap: 2rem;
-  }
-
-  /* Hide sticky mobile CTA in landscape */
+  /* Hide sticky mobile CTA in landscape (desktop nav is visible) */
   .mobile-sticky-cta {
     display: none !important;
+  }
+
+  /* Narrow lesson sidebars so video gets enough space on ~844px screens */
+  .lesson-sidebar {
+    width: 200px !important;
   }
 }
 
