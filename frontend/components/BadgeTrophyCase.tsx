@@ -158,6 +158,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
     }
   };
 
+  const allEarnedBadges = badges.filter((b) => b.is_earned);
   const unearnedBadges = badges.filter((b) => !b.is_earned);
   const canEdit = !userId; // If userId is present, we are viewing someone else
 
@@ -233,8 +234,8 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
         </div>
       </div>
 
-      {/* Featured Section (Draggable) */}
-      <div className="mb-8">
+      {/* Featured Section (Draggable) — Desktop only */}
+      <div className="mb-8 hidden lg:block">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wide flex items-center gap-2">
             <FaStar /> Featured ({featuredBadges.length}/5)
@@ -297,26 +298,28 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
       {/* Collection Grid */}
       <div className="mb-8">
         <h3 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wide">
-          Collection
+          <span className="hidden lg:inline">Collection</span>
+          <span className="lg:hidden">Achievements</span>
         </h3>
-        {collectionBadges.length === 0 && unearnedBadges.length === 0 ? (
+        {allEarnedBadges.length === 0 && unearnedBadges.length === 0 ? (
           <p className="text-white/40 text-sm">No badges earned yet.</p>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {collectionBadges.map((badge) => (
+          <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-4">
+            {/* On mobile: show ALL earned (featured section is hidden). On desktop: only non-featured collection. */}
+            {allEarnedBadges.map((badge) => (
               <motion.div
                 key={badge.id}
                 layoutId={badge.id}
                 whileHover={canEdit ? { scale: 1.02, rotate: 1 } : {}}
                 onClick={() => canEdit && toggleFeature(badge)}
                 className={cn(
-                  "relative p-4 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer transition-colors flex flex-col items-center text-center group",
+                  "relative p-2 lg:p-4 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer transition-colors flex flex-col items-center text-center group",
                   featuredBadges.length < 5 ? "hover:border-amber-400/50" : ""
                 )}
               >
-                <div className="text-5xl mb-3 w-full flex justify-center">
+                <div className="text-3xl lg:text-5xl mb-1.5 lg:mb-3 w-full flex justify-center">
                   {badge.icon_url ? (
-                    <div className="w-24 h-24 rounded-lg overflow-hidden" style={{
+                    <div className="w-14 h-14 lg:w-24 lg:h-24 rounded-lg overflow-hidden" style={{
                       background: badge.id.includes('bronze') ? 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)' :
                         badge.id.includes('silver') ? 'linear-gradient(135deg, #A8A8A8 0%, #C0C0C0 100%)' :
                           badge.id.includes('gold') ? 'linear-gradient(135deg, #DAA520 0%, #FFD700 100%)' :
@@ -336,9 +339,9 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                 </h4>
                 <p className="text-[10px] text-white/50 mt-1 line-clamp-1">{badge.description}</p>
 
-                {/* Add Trigger Hint */}
+                {/* Add Trigger Hint — desktop only (featured section hidden on mobile) */}
                 {canEdit && featuredBadges.length < 5 && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                  <div className="absolute inset-0 hidden lg:flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                     <span className="text-amber-400 text-xs font-bold">Feature +</span>
                   </div>
                 )}
@@ -351,13 +354,12 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
               return (
                 <div
                   key={badge.id}
-                  className="relative p-4 rounded-lg border border-white/5 bg-black/20 flex flex-col items-center text-center group"
+                  className="relative p-2 lg:p-4 rounded-lg border border-white/5 bg-black/20 flex flex-col items-center text-center group"
                 >
                   {/* Badge Icon Background (Dimmed & Blurred) */}
-                  {/* Badge Icon Background (Dimmed & Blurred) */}
-                  <div className="text-6xl mb-3 opacity-40 grayscale blur-[2px] w-full flex justify-center scale-110">
+                  <div className="text-4xl lg:text-6xl mb-1.5 lg:mb-3 opacity-40 grayscale blur-[2px] w-full flex justify-center scale-110">
                     {badge.icon_url ? (
-                      <div className="w-24 h-24 rounded-lg overflow-hidden" style={{
+                      <div className="w-14 h-14 lg:w-24 lg:h-24 rounded-lg overflow-hidden" style={{
                         background: badge.id.includes('bronze') ? 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)' :
                           badge.id.includes('silver') ? 'linear-gradient(135deg, #A8A8A8 0%, #C0C0C0 100%)' :
                             badge.id.includes('gold') ? 'linear-gradient(135deg, #DAA520 0%, #FFD700 100%)' :
@@ -370,8 +372,8 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                   </div>
 
                   {/* Lock Icon Overlay (Absolute Center) */}
-                  <div className="absolute inset-0 flex items-center justify-center -translate-y-4">
-                    <FaLock className="text-white/60 text-5xl shadow-black drop-shadow-xl" />
+                  <div className="absolute inset-0 flex items-center justify-center -translate-y-3 lg:-translate-y-4">
+                    <FaLock className="text-white/60 text-3xl lg:text-5xl shadow-black drop-shadow-xl" />
                   </div>
 
                   <h4 className="font-medium text-white/40 text-xs mb-2 opacity-50 relative z-10">
