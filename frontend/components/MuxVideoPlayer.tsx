@@ -17,6 +17,7 @@ interface MuxVideoPlayerProps {
   durationMinutes?: number | null;
   className?: string;
   containFit?: boolean;
+  onCaptionChange?: (text: string) => void;
   metadata?: {
     video_title?: string;
     video_id?: string;
@@ -50,6 +51,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       durationMinutes,
       className,
       containFit,
+      onCaptionChange,
       metadata,
     },
     ref
@@ -290,6 +292,11 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       return () => cleanupFns.forEach((fn) => fn());
     }, [getVideoElement]);
 
+    // Forward caption text to parent when callback is provided
+    useEffect(() => {
+      if (onCaptionChange) onCaptionChange(captionText);
+    }, [captionText, onCaptionChange]);
+
     const posterUrl =
       poster || (playbackId ? `https://image.mux.com/${playbackId}/thumbnail.png` : undefined);
 
@@ -321,11 +328,11 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           } as any}
         />
 
-        {/* Custom caption overlay — centered at bottom, above controls.
-            On mobile (lg:hidden ProVideoControls bar ~65px), push captions higher. */}
+        {/* Custom caption overlay — hidden on mobile when parent handles captions externally.
+            On desktop, always show here above controls. */}
         {captionText && (
           <div
-            className="absolute inset-x-0 pointer-events-none flex justify-center bottom-[100px] lg:bottom-[48px]"
+            className={`absolute inset-x-0 pointer-events-none flex justify-center bottom-[100px] lg:bottom-[48px] ${onCaptionChange ? 'hidden lg:flex' : ''}`}
             style={{ zIndex: 10, padding: "0 10%" }}
           >
             <span

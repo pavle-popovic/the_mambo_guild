@@ -101,6 +101,7 @@ export default function LessonPage() {
   const navigateToNextLessonRef = useRef<(() => void) | null>(null);
   const videoPlayerRef = useRef<MuxVideoPlayerHandle>(null);
   const [videoDuration, setVideoDuration] = useState(0);
+  const [captionText, setCaptionText] = useState("");
 
   useEffect(() => {
     // Wait for auth to finish loading before making any decisions
@@ -803,20 +804,35 @@ export default function LessonPage() {
                 )}
 
                 {lesson.mux_playback_id ? (
-                  <div className="w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0">
-                    <MuxVideoPlayer
-                      ref={videoPlayerRef}
-                      playbackId={lesson.mux_playback_id}
-                      onEnded={() => setVideoPlaying(false)}
-                      onLoadedMetadata={(duration) => setVideoDuration(duration)}
-                      autoPlay={videoPlaying}
-                      durationMinutes={lesson.duration_minutes}
-                      metadata={{
-                        video_title: lesson.title,
-                        video_id: lesson.id,
-                      }}
-                    />
-                  </div>
+                  <>
+                    <div className="w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0">
+                      <MuxVideoPlayer
+                        ref={videoPlayerRef}
+                        playbackId={lesson.mux_playback_id}
+                        onEnded={() => setVideoPlaying(false)}
+                        onLoadedMetadata={(duration) => setVideoDuration(duration)}
+                        onCaptionChange={setCaptionText}
+                        autoPlay={videoPlaying}
+                        durationMinutes={lesson.duration_minutes}
+                        metadata={{
+                          video_title: lesson.title,
+                          video_id: lesson.id,
+                        }}
+                      />
+                    </div>
+                    {/* External caption display — below video on mobile, hidden on desktop (internal overlay used) */}
+                    {captionText && (
+                      <div className="lg:hidden flex-shrink-0 bg-black px-4 py-2 flex justify-center">
+                        <span
+                          className="text-white text-sm font-medium text-center leading-relaxed"
+                          style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}
+                        >
+                          {captionText}
+                        </span>
+                      </div>
+                    )}
+                  </>
+
                 ) : lesson.video_url ? (
                   <div className="w-full bg-gray-900 relative group aspect-video max-h-[75vh]">
                     <video
