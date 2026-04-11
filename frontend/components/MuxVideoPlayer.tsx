@@ -321,11 +321,12 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           } as any}
         />
 
-        {/* Custom caption overlay — centered at bottom, above controls */}
+        {/* Custom caption overlay — centered at bottom, above controls.
+            On mobile (lg:hidden ProVideoControls bar ~65px), push captions higher. */}
         {captionText && (
           <div
-            className="absolute inset-x-0 pointer-events-none flex justify-center"
-            style={{ bottom: "48px", zIndex: 10, padding: "0 10%" }}
+            className="absolute inset-x-0 pointer-events-none flex justify-center bottom-[100px] lg:bottom-[48px]"
+            style={{ zIndex: 10, padding: "0 10%" }}
           >
             <span
               style={{
