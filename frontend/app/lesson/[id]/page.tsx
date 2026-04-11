@@ -14,7 +14,7 @@ import SuccessNotification from "@/components/SuccessNotification";
 import AuthPromptModal from "@/components/AuthPromptModal";
 import QuizResultModal from "@/components/QuizResultModal";
 import CourseCompletionModal from "@/components/CourseCompletionModal";
-import { FaBolt, FaPlay, FaPause, FaCheck, FaLock, FaArrowRight, FaClipboardList, FaCheckCircle, FaChevronLeft, FaChevronRight, FaCrown, FaSkull } from "react-icons/fa";
+import { FaBolt, FaPlay, FaPause, FaCheck, FaLock, FaArrowRight, FaCheckCircle, FaChevronLeft, FaSkull } from "react-icons/fa";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import RichContentRenderer from "@/components/RichContentRenderer";
@@ -77,8 +77,6 @@ export default function LessonPage() {
   const [videoPlaying, setVideoPlaying] = useState(false); // Controls the overlay play button state
 
   // Sidebar State
-  const [sidebarView, setSidebarView] = useState<'controls' | 'quest'>('controls');
-  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(false);
   const [error, setError] = useState("");
@@ -663,7 +661,44 @@ export default function LessonPage() {
       )}
 
       <div className="h-[100dvh] flex overflow-hidden bg-mambo-dark text-mambo-cream font-sans">
-          {/* LEFT COLUMN: Main Content & Video */}
+
+          {/* LEFT SIDEBAR: Quest Log (Desktop only) */}
+          <aside className="hidden lg:flex flex-col h-full w-[280px] bg-black border-r border-white/10 z-30 flex-shrink-0">
+            {/* Mark Complete button */}
+            <div className="flex-shrink-0 p-3 flex justify-center">
+              {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
+                <button
+                  onClick={handleComplete}
+                  disabled={completing}
+                  className="flex w-full px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] items-center justify-center gap-2 transition active:scale-95 border border-green-400/30 disabled:opacity-50 whitespace-nowrap"
+                >
+                  <span>{tLesson('markComplete')}</span>
+                  <FaArrowRight />
+                </button>
+              )}
+              {isCompleted && (
+                <div className="flex w-full px-4 py-2.5 bg-green-900/60 text-green-400 text-sm font-bold rounded-lg items-center justify-center gap-2 border border-green-500/30">
+                  <FaCheckCircle /> {tLesson('completed')}
+                </div>
+              )}
+            </div>
+            {/* Quest Log header */}
+            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-zinc-900/40 backdrop-blur-md flex-shrink-0">
+              <span className="text-xs font-bold text-mambo-gold uppercase tracking-wider">Quest Log</span>
+              <span className="text-[10px] text-gray-500 font-mono">{Math.round(levelProgress || 0)}%</span>
+            </div>
+            {/* Quest Log content */}
+            <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
+              <QuestLogSidebar
+                currentLessonId={lessonId}
+                lessons={levelLessons}
+                worldTitle={levelTitle}
+                worldProgress={levelProgress}
+              />
+            </div>
+          </aside>
+
+          {/* CENTER COLUMN: Main Content & Video */}
           <main className="flex-1 min-h-0 bg-black relative flex flex-col">
             {/* Minimal nav for non-video lessons */}
             {!isVideoLesson && (
@@ -973,125 +1008,18 @@ export default function LessonPage() {
             )}
           </main>
 
-          {/* RIGHT SIDEBAR (Desktop) */}
-          {/* RIGHT SIDEBAR (Desktop) */}
-          <aside className="hidden lg:flex flex-row h-full z-30 shadow-2xl transition-all duration-300">
-            {/* MAIN PANEL (Collapsible) */}
-            <div className={`${isSidebarOpen ? 'w-[280px] opacity-100 border-l border-white/10' : 'w-0 opacity-0 border-none overflow-hidden'} bg-black flex flex-col transition-all duration-300 ease-in-out`}>
-              {/* Complete Lesson button — top of sidebar */}
-              {isSidebarOpen && (
-                <div className="flex-shrink-0 p-3 flex justify-center">
-                  {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
-                    <button
-                      onClick={handleComplete}
-                      disabled={completing}
-                      className="flex w-full px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] items-center justify-center gap-2 transition active:scale-95 border border-green-400/30 disabled:opacity-50 whitespace-nowrap"
-                    >
-                      <span>{tLesson('markComplete')}</span>
-                      <FaArrowRight />
-                    </button>
-                  )}
-                  {isCompleted && (
-                    <div className="flex w-full px-4 py-2.5 bg-green-900/60 text-green-400 text-sm font-bold rounded-lg items-center justify-center gap-2 border border-green-500/30">
-                      <FaCheckCircle /> {tLesson('completed')}
-                    </div>
-                  )}
-                </div>
-              )}
-              {sidebarView === 'controls' ? (
-                // Controls View
-                <div className="h-full flex flex-col">
-                  {isVideoLesson && lesson.mux_playback_id && (
-                    <div className="flex-shrink-0 p-3 border-b border-white/10 bg-zinc-900/40 backdrop-blur-md z-20">
-                      <VideoControls
-                        playerRef={videoPlayerRef}
-                        duration={videoDuration}
-                        variant="sidebar"
-                        onCollapse={() => setIsSidebarOpen(false)}
-                      />
-                    </div>
-                  )}
-                  {/* Empty space or additional controls could go here */}
-                  <div className="flex-1 bg-black/50 flex items-center justify-center p-8 text-center">
-                    <p className="text-sm text-gray-600">
-                      Focus Mode Active.<br />
-                      Click sidebar strip to view Quest Log.
-                    </p>
-                  </div>
-                </div>
-              ) : (
-                // Quest Log View
-                <div className="h-full flex flex-col relative">
-                  <div className="flex items-center justify-between p-4 border-b border-white/10 bg-zinc-900/40 backdrop-blur-md">
-                    <span className="text-xs font-bold text-mambo-gold uppercase tracking-wider">Quest Log</span>
-                    <button
-                      onClick={() => setIsSidebarOpen(false)}
-                      className="text-gray-500 hover:text-white transition-colors"
-                      title="Minimize Sidebar"
-                    >
-                      <FaChevronRight />
-                    </button>
-                  </div>
-                  <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
-                    <QuestLogSidebar
-                      currentLessonId={lessonId}
-                      lessons={levelLessons}
-                      worldTitle={levelTitle}
-                      worldProgress={levelProgress}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* STRIP (Always Visible - Module Progress Spine) */}
-            <div className="w-16 h-full bg-black border-l border-white/10 relative z-40 select-none transition-all duration-300">
-
-              {/* 1. Vertical Progress Bar (Ascending, Absolute Positioned) */}
-              <div className="absolute left-4 top-20 bottom-20 w-1.5 bg-zinc-800/80 rounded-full overflow-hidden border border-white/10 shadow-inner">
-                <div
-                  className="absolute bottom-0 left-0 w-full transition-all duration-700 ease-out shadow-[0_0_15px_rgba(74,222,128,0.8)]"
-                  style={{
-                    height: `${Math.max(levelProgress || 0, 0)}%`,
-                    backgroundColor: '#4ade80'
-                  }}
+          {/* RIGHT SIDEBAR: Video Controls (Desktop only) */}
+          <aside className="hidden lg:flex flex-col h-full w-[280px] bg-black border-l border-white/10 z-30 flex-shrink-0">
+            {isVideoLesson && lesson.mux_playback_id && (
+              <div className="flex-shrink-0 p-3 bg-zinc-900/40 backdrop-blur-md">
+                <VideoControls
+                  playerRef={videoPlayerRef}
+                  duration={videoDuration}
+                  variant="sidebar"
                 />
               </div>
-
-              {/* 2. Text Label (Rotated, Absolute Positioned) */}
-              <div
-                className="absolute right-3 top-1/2 -translate-y-1/2 w-8 h-[300px] flex items-center justify-center cursor-pointer group"
-                onClick={() => {
-                  setSidebarView('quest');
-                  setIsSidebarOpen(true);
-                }}
-                title={`Expand Module: ${Math.round(levelProgress || 0)}% Complete`}
-              >
-                <div className="rotate-90 whitespace-nowrap flex items-center gap-3 text-[10px] font-bold tracking-[0.2em] text-gray-400 group-hover:text-white transition-colors origin-center">
-                  <span>MODULE PROGRESS</span>
-                  <span className="text-mambo-green font-mono text-xs">{Math.round(levelProgress || 0)}%</span>
-                </div>
-              </div>
-
-              {/* Controls Toggle (Floating Top) */}
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setSidebarView('controls');
-                  setIsSidebarOpen(true);
-                }}
-                className="absolute top-4 left-1/2 -translate-x-1/2 p-2 rounded-full bg-black/80 hover:bg-zinc-800 text-mambo-gold border border-white/10 hover:border-mambo-gold/50 transition-all z-50 shadow-lg"
-                title="Open Controls"
-              >
-                <FaCrown className="text-sm" />
-              </button>
-
-              {/* Bottom Icon (Floating Bottom) */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 pointer-events-none text-gray-700">
-                <FaClipboardList className="text-lg" />
-              </div>
-
-            </div>
+            )}
+            <div className="flex-1" />
           </aside>
 
         {/* MOBILE STICKY CONTROLS */}
