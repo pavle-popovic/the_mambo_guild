@@ -34,6 +34,7 @@ interface StageVideoCardProps {
     onClick: () => void;
     isLocked?: boolean;
     onLockedClick?: () => void;
+    variant?: "default" | "grid-compact";
 }
 
 export default function StageVideoCard({
@@ -41,7 +42,9 @@ export default function StageVideoCard({
     onClick,
     isLocked = false,
     onLockedClick,
+    variant = "default",
 }: StageVideoCardProps) {
+    const isCompact = variant === "grid-compact";
     const [isHovered, setIsHovered] = useState(false);
 
     // Static thumbnail (default) and animated GIF (on hover)
@@ -76,22 +79,25 @@ export default function StageVideoCard({
     return (
         <motion.div
             onClick={handleClick}
-            onHoverStart={() => {
+            onHoverStart={isCompact ? undefined : () => {
                 handleHoverStart();
                 setIsHovered(true);
             }}
-            onHoverEnd={() => setIsHovered(false)}
-            onMouseDown={handleMouseDown}
-            whileHover={!isLocked ? { y: -4 } : undefined}
+            onHoverEnd={isCompact ? undefined : () => setIsHovered(false)}
+            onMouseDown={isCompact ? undefined : handleMouseDown}
+            whileHover={!isLocked && !isCompact ? { y: -4 } : undefined}
             transition={{ type: "spring", stiffness: 300, damping: 20 }}
             className={cn(
-                "relative aspect-[9/16] rounded-2xl overflow-hidden cursor-pointer group bg-black shadow-2xl border border-white/10 transition-all duration-300",
-                !isLocked && "hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10",
+                "relative overflow-hidden cursor-pointer group bg-black",
+                isCompact
+                    ? "aspect-square rounded-sm"
+                    : "aspect-[9/16] rounded-2xl shadow-2xl border border-white/10 transition-all duration-300",
+                !isLocked && !isCompact && "hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10",
                 isLocked && "cursor-pointer"
             )}
         >
             {/* Inner Content Container */}
-            <div className="relative h-full w-full bg-[#0a0a0a] rounded-2xl overflow-hidden">
+            <div className={cn("relative h-full w-full bg-[#0a0a0a] overflow-hidden", isCompact ? "rounded-sm" : "rounded-2xl")}>
                 {/* Video Preview - Static thumbnail, animated GIF on hover */}
                 {displayUrl ? (
                     <Image
@@ -147,8 +153,8 @@ export default function StageVideoCard({
                     </div>
                 )}
 
-                {/* Hover Overlay - only show when not locked */}
-                {!isLocked && (
+                {/* Hover Overlay - only show when not locked and not compact */}
+                {!isLocked && !isCompact && (
                     <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                         {/* Stats */}
                         <div className="flex items-center justify-between">
@@ -177,8 +183,28 @@ export default function StageVideoCard({
                     </div>
                 )}
 
+                {/* Compact: always-visible mini stats at bottom */}
+                {isCompact && !isLocked && (post.reaction_count > 0 || post.reply_count > 0) && (
+                    <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 pb-1 pt-4">
+                        <div className="flex items-center gap-2">
+                            {post.reaction_count > 0 && (
+                                <div className="flex items-center gap-0.5 text-white/90">
+                                    <Heart size={10} className="fill-white/90" />
+                                    <span className="text-[9px] font-bold">{post.reaction_count}</span>
+                                </div>
+                            )}
+                            {post.reply_count > 0 && (
+                                <div className="flex items-center gap-0.5 text-white/90">
+                                    <MessageCircle size={10} />
+                                    <span className="text-[9px] font-bold">{post.reply_count}</span>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
                 {/* Stats always visible when locked */}
-                {isLocked && (
+                {isLocked && !isCompact && (
                     <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black to-transparent p-4">
                         <div className="flex items-center justify-between opacity-60">
                             <div className="flex items-center gap-4">

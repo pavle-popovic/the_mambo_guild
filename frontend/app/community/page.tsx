@@ -1,8 +1,8 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus } from "lucide-react";
+import { Plus, Search, X, Tv, FlaskConical, ChevronDown } from "lucide-react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -59,6 +59,15 @@ export default function CommunityPage() {
     const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
     const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
 
+    // Mobile search & dropdowns
+    const [searchQuery, setSearchQuery] = useState("");
+    const [levelDropdownOpen, setLevelDropdownOpen] = useState(false);
+    const [topicDropdownOpen, setTopicDropdownOpen] = useState(false);
+    const levelDropdownRef = useRef<HTMLDivElement>(null);
+    const topicDropdownRef = useRef<HTMLDivElement>(null);
+    const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [isMobile, setIsMobile] = useState(false);
+
     // Modals
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
@@ -68,6 +77,70 @@ export default function CommunityPage() {
     const userTier = user?.tier?.toLowerCase() || "rookie";
     const isPaidMember = !!user && userTier !== "rookie";
     const isPreviewMode = !isPaidMember;
+
+    // Mobile detection
+    useEffect(() => {
+        const check = () => setIsMobile(window.innerWidth < 1024);
+        check();
+        window.addEventListener("resize", check);
+        return () => window.removeEventListener("resize", check);
+    }, []);
+
+    // Click-outside for mobile dropdowns
+    useEffect(() => {
+        const handleClick = (e: MouseEvent) => {
+            if (levelDropdownRef.current && !levelDropdownRef.current.contains(e.target as Node)) setLevelDropdownOpen(false);
+            if (topicDropdownRef.current && !topicDropdownRef.current.contains(e.target as Node)) setTopicDropdownOpen(false);
+        };
+        document.addEventListener("mousedown", handleClick);
+        return () => document.removeEventListener("mousedown", handleClick);
+    }, []);
+
+    // Debounced search
+    const handleSearch = useCallback((query: string) => {
+        setSearchQuery(query);
+        if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+        if (!query.trim()) return; // will use normal loadPosts via useEffect
+        searchTimerRef.current = setTimeout(async () => {
+            setIsLoading(true);
+            try {
+                const results = await apiClient.searchPosts(query, {
+                    post_type: viewMode === "lab" ? "lab" : viewMode === "stage" ? "stage" : undefined,
+                    tags: selectedTopics.length > 0 ? selectedTopics : undefined,
+                }) as Post[];
+                setPosts(results);
+            } catch (err) {
+                console.error("Search failed:", err);
+            } finally {
+                setIsLoading(false);
+            }
+        }, 300);
+    }, [viewMode, selectedTopics]);
+
+    // When search is cleared, reload normal feed
+    useEffect(() => {
+        if (!searchQuery.trim() && !authLoading) {
+            loadPosts();
+        }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchQuery]);
+
+    // Level/Topic filter constants for mobile dropdowns
+    const levelOptions = [
+        { value: "", label: "All Levels" },
+        { value: "beginner", label: "Beginner" },
+        { value: "intermediate", label: "Intermediate" },
+        { value: "advanced", label: "Advanced" },
+        { value: "master", label: "Master" },
+    ];
+    const topicOptions = [
+        { value: "", label: "All Topics" },
+        { value: "dancing", label: "Dancing" },
+        { value: "expression", label: "Expression" },
+        { value: "musicality", label: "Musicality" },
+        { value: "partnerwork", label: "Partnerwork" },
+        { value: "shines", label: "Shines" },
+    ];
 
     // Load posts - load for everyone including preview mode
     const loadPosts = useCallback(async () => {
@@ -172,8 +245,8 @@ export default function CommunityPage() {
             {/* Main Content - 3 Column Grid */}
             <div className="max-w-7xl mx-auto px-4 pb-20 sm:pb-32 pt-20 sm:pt-24 relative">
                 <div className="grid grid-cols-12 gap-4 lg:gap-6">
-                    {/* Left Sidebar — pushed below feed on mobile via order */}
-                    <div className="col-span-12 lg:col-span-2 order-2 lg:order-1">
+                    {/* Left Sidebar — hidden on mobile, replaced by mobile header */}
+                    <div className="hidden lg:block lg:col-span-2 lg:order-1">
                         <CommunitySidebar
                             viewMode={viewMode}
                             onViewModeChange={setViewMode}
@@ -185,8 +258,137 @@ export default function CommunityPage() {
                         />
                     </div>
 
-                    {/* Main Feed — comes first on mobile */}
-                    <div className="col-span-12 lg:col-span-7 relative order-1 lg:order-2">
+                    {/* Mobile Header — search, toggle, filters */}
+                    <div className="lg:hidden col-span-12 order-1 sticky top-16 z-40 bg-black/80 backdrop-blur-xl -mx-4 px-4 pb-3 pt-2 border-b border-white/10">
+                        {/* Search Bar */}
+                        <div className="relative mb-2.5">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                            <input
+                                type="text"
+                                value={searchQuery}
+                                onChange={(e) => handleSearch(e.target.value)}
+                                placeholder="Search videos & questions..."
+                                className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-8 py-2.5 text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-white/20 transition-all"
+                            />
+                            {searchQuery && (
+                                <button onClick={() => handleSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
+                                    <X className="w-3.5 h-3.5 text-gray-400 hover:text-white transition" />
+                                </button>
+                            )}
+                        </div>
+
+                        {/* Toggle + Filters Row */}
+                        <div className="flex items-center gap-2">
+                            {/* Stage/Lab Toggle */}
+                            <div className="flex bg-white/[0.04] rounded-full p-0.5 border border-white/10 flex-shrink-0">
+                                <button
+                                    onClick={() => { setViewMode("stage"); setSearchQuery(""); }}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
+                                        viewMode === "stage"
+                                            ? "bg-white/10 text-mambo-gold shadow-[0_0_12px_rgba(252,226,5,0.15)]"
+                                            : "text-white/50"
+                                    }`}
+                                >
+                                    <Tv size={12} />
+                                    Stage
+                                </button>
+                                <button
+                                    onClick={() => { setViewMode("lab"); setSearchQuery(""); }}
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
+                                        viewMode === "lab"
+                                            ? "bg-white/10 text-mambo-gold shadow-[0_0_12px_rgba(252,226,5,0.15)]"
+                                            : "text-white/50"
+                                    }`}
+                                >
+                                    <FlaskConical size={12} />
+                                    Lab
+                                </button>
+                            </div>
+
+                            {/* Level Dropdown */}
+                            <div className="relative flex-1" ref={levelDropdownRef}>
+                                <button
+                                    onClick={() => { setLevelDropdownOpen(!levelDropdownOpen); setTopicDropdownOpen(false); }}
+                                    className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
+                                        selectedLevels.length > 0
+                                            ? "bg-amber-500/10 border-amber-500/40"
+                                            : "bg-white/[0.04] border-white/10"
+                                    } ${levelDropdownOpen ? "border-amber-400/60 bg-white/[0.08]" : ""}`}
+                                >
+                                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Level</span>
+                                    <span className={`text-[11px] font-bold ${selectedLevels.length > 0 ? "text-amber-300" : "text-white"}`}>
+                                        {selectedLevels.length > 0
+                                            ? levelOptions.find((o) => o.value === selectedLevels[0])?.label || "All Levels"
+                                            : "All Levels"}
+                                    </span>
+                                    <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 text-gray-400 transition-transform ${levelDropdownOpen ? "rotate-180" : ""}`} />
+                                </button>
+                                {levelDropdownOpen && (
+                                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                                        {levelOptions.map((opt) => (
+                                            <button
+                                                key={opt.value}
+                                                onClick={() => {
+                                                    setSelectedLevels(opt.value ? [opt.value] : []);
+                                                    setLevelDropdownOpen(false);
+                                                }}
+                                                className={`w-full px-3 py-2.5 text-left text-[12px] font-semibold transition-all ${
+                                                    (opt.value === "" && selectedLevels.length === 0) || selectedLevels.includes(opt.value)
+                                                        ? "bg-amber-500/20 text-amber-300"
+                                                        : "text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]"
+                                                }`}
+                                            >
+                                                {opt.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Topic Dropdown */}
+                            <div className="relative flex-1" ref={topicDropdownRef}>
+                                <button
+                                    onClick={() => { setTopicDropdownOpen(!topicDropdownOpen); setLevelDropdownOpen(false); }}
+                                    className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
+                                        selectedTopics.length > 0
+                                            ? "bg-cyan-500/10 border-cyan-500/40"
+                                            : "bg-white/[0.04] border-white/10"
+                                    } ${topicDropdownOpen ? "border-cyan-400/60 bg-white/[0.08]" : ""}`}
+                                >
+                                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Focus</span>
+                                    <span className={`text-[11px] font-bold ${selectedTopics.length > 0 ? "text-cyan-300" : "text-white"}`}>
+                                        {selectedTopics.length > 0
+                                            ? topicOptions.find((o) => o.value === selectedTopics[0])?.label || "All Topics"
+                                            : "All Topics"}
+                                    </span>
+                                    <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 text-gray-400 transition-transform ${topicDropdownOpen ? "rotate-180" : ""}`} />
+                                </button>
+                                {topicDropdownOpen && (
+                                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                                        {topicOptions.map((opt) => (
+                                            <button
+                                                key={opt.value}
+                                                onClick={() => {
+                                                    setSelectedTopics(opt.value ? [opt.value] : []);
+                                                    setTopicDropdownOpen(false);
+                                                }}
+                                                className={`w-full px-3 py-2.5 text-left text-[12px] font-semibold transition-all ${
+                                                    (opt.value === "" && selectedTopics.length === 0) || selectedTopics.includes(opt.value)
+                                                        ? "bg-cyan-500/20 text-cyan-300"
+                                                        : "text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]"
+                                                }`}
+                                            >
+                                                {opt.label}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Main Feed */}
+                    <div className="col-span-12 lg:col-span-7 relative order-2 lg:order-2">
                         {isLoading ? (
                             <div className="flex justify-center py-16">
                                 <div className="w-10 h-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
@@ -218,9 +420,9 @@ export default function CommunityPage() {
                         ) : (
                             <>
                                 {viewMode === "stage" ? (
-                                    /* Stage: Masonry Grid */
+                                    /* Stage: Instagram-style tight grid on mobile, card grid on desktop */
                                     <div className="relative">
-                                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+                                        <div className="grid grid-cols-3 gap-0.5 lg:gap-4">
                                             <AnimatePresence mode="popLayout">
                                                 {filteredPosts.map((post, index) => (
                                                     <motion.div
@@ -235,6 +437,7 @@ export default function CommunityPage() {
                                                             onClick={() => handlePostClick(post.id)}
                                                             isLocked={isPreviewMode}
                                                             onLockedClick={handleLockedClick}
+                                                            variant={isMobile ? "grid-compact" : "default"}
                                                         />
                                                     </motion.div>
                                                 ))}
@@ -325,8 +528,8 @@ export default function CommunityPage() {
                         )}
                     </div>
 
-                    {/* Right Widgets */}
-                    <div className="col-span-12 lg:col-span-3 order-3">
+                    {/* Right Widgets — hidden on mobile */}
+                    <div className="hidden lg:block lg:col-span-3 lg:order-3">
                         <CommunityWidgets posts={posts} />
                     </div>
                 </div>
