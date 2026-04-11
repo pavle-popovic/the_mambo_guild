@@ -123,54 +123,66 @@ export default function CoursesPage() {
         <div className="sticky top-0 z-40 w-full bg-black/60 backdrop-blur-xl border-b border-white/10 pt-20 sm:pt-24 pb-3 sm:pb-4 transition-all duration-300">
           <div className="max-w-[1600px] mx-auto px-3 sm:px-6">
 
-            {/* Mobile: Search + two dropdowns in a compact row */}
-            <div className="flex sm:hidden items-center gap-2 w-full">
+            {/* Mobile: Search row + filter dropdowns */}
+            <div className="flex sm:hidden flex-col gap-2.5 w-full">
               {/* Search */}
-              <div className="relative group flex-1 min-w-0">
-                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-mambo-gold transition-colors text-xs" />
+              <div className="relative group">
+                <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-mambo-gold transition-colors text-xs" />
                 <input
                   type="text"
                   placeholder={tCourses('searchPlaceholder')}
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/5 border border-white/20 rounded-full pl-8 pr-7 py-2 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-mambo-gold/50 focus:bg-black/40 transition-all font-medium"
+                  className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-8 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-mambo-gold/40 focus:bg-white/[0.06] transition-all"
                 />
                 {searchQuery && (
-                  <button onClick={clearSearch} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
-                    <FaTimes className="text-[10px]" />
+                  <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                    <FaTimes className="text-xs" />
                   </button>
                 )}
               </div>
 
-              {/* Type dropdown */}
-              <div className="relative flex-shrink-0">
-                <select
-                  value={typeFilter}
-                  onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
-                  className="appearance-none bg-white/5 border border-white/20 text-white text-xs font-bold rounded-full pl-3 pr-7 py-2 focus:outline-none focus:border-mambo-gold/50"
-                >
-                  <option value="all">{tCourses('filterAll')}</option>
-                  <option value="course">{tCourses('filterCourses')}</option>
-                  <option value="choreo">{tCourses('filterChoreo')}</option>
-                  <option value="topic">{tCourses('filterTopics')}</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
-              </div>
+              {/* Filter dropdowns row */}
+              <div className="flex gap-2">
+                {/* Class Type dropdown */}
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-gray-500 font-semibold pointer-events-none">Type</span>
+                  <select
+                    value={typeFilter}
+                    onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
+                    className={`appearance-none w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-8 text-sm font-bold focus:outline-none transition-all ${
+                      typeFilter !== 'all'
+                        ? 'bg-purple-500/10 border-purple-500/40 text-purple-300'
+                        : 'bg-white/[0.04] border-white/10 text-gray-300'
+                    }`}
+                  >
+                    <option value="all">All Classes</option>
+                    <option value="course">Courses</option>
+                    <option value="choreo">Choreographies</option>
+                    <option value="topic">Topics</option>
+                  </select>
+                  <ChevronDown className={`absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none transition-colors ${typeFilter !== 'all' ? 'text-purple-400' : 'text-gray-500'}`} />
+                </div>
 
-              {/* Level dropdown */}
-              <div className="relative flex-shrink-0">
-                <select
-                  value={difficultyFilter}
-                  onChange={(e) => setDifficultyFilter(e.target.value as DifficultyFilter)}
-                  className="appearance-none bg-white/5 border border-white/20 text-white text-xs font-bold rounded-full pl-3 pr-7 py-2 focus:outline-none focus:border-mambo-gold/50"
-                >
-                  <option value="all">{tCourses('difficultyAll')}</option>
-                  <option value="beginner">{tCourses('difficultyBeginner')}</option>
-                  <option value="intermediate">{tCourses('difficultyIntermediate')}</option>
-                  <option value="advanced">{tCourses('difficultyAdvanced')}</option>
-                  <option value="open">Open</option>
-                </select>
-                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+                {/* Level dropdown */}
+                <div className="relative flex-1">
+                  <span className="absolute left-3 top-1/2 -translate-y-1/2 text-[10px] uppercase tracking-wider text-gray-500 font-semibold pointer-events-none">Level</span>
+                  <select
+                    value={difficultyFilter}
+                    onChange={(e) => setDifficultyFilter(e.target.value as DifficultyFilter)}
+                    className={`appearance-none w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-8 text-sm font-bold focus:outline-none transition-all ${
+                      difficultyFilter !== 'all'
+                        ? 'bg-amber-500/10 border-amber-500/40 text-amber-300'
+                        : 'bg-white/[0.04] border-white/10 text-gray-300'
+                    }`}
+                  >
+                    <option value="all">All Levels</option>
+                    <option value="beginner">Beginner</option>
+                    <option value="intermediate">Intermediate</option>
+                    <option value="advanced">Advanced</option>
+                  </select>
+                  <ChevronDown className={`absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none transition-colors ${difficultyFilter !== 'all' ? 'text-amber-400' : 'text-gray-500'}`} />
+                </div>
               </div>
             </div>
 
@@ -210,7 +222,7 @@ export default function CoursesPage() {
 
               {/* Level Filter Pills */}
               <div className="flex bg-black/30 rounded-full p-1 border border-white/10">
-                {[{ v: 'all', l: tCourses('difficultyAll') }, { v: 'beginner', l: tCourses('difficultyBeginner') }, { v: 'intermediate', l: tCourses('difficultyIntermediate') }, { v: 'advanced', l: tCourses('difficultyAdvanced') }, { v: 'open', l: 'Open' }].map(f => (
+                {[{ v: 'all', l: tCourses('difficultyAll') }, { v: 'beginner', l: tCourses('difficultyBeginner') }, { v: 'intermediate', l: tCourses('difficultyIntermediate') }, { v: 'advanced', l: tCourses('difficultyAdvanced') }].map(f => (
                   <button
                     key={f.v}
                     onClick={() => setDifficultyFilter(f.v as DifficultyFilter)}
