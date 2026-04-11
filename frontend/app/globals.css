@@ -38,18 +38,24 @@
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
 
-  /* Remove lg/xl from auto-generated breakpoints so we can redefine them
-     with landscape-phone awareness. sm, md, 2xl stay as default breakpoints. */
+  /* Remove md/lg/xl from auto-generated breakpoints so we can redefine them
+     with landscape-phone awareness. sm and 2xl stay as default breakpoints. */
+  --breakpoint-md: initial;
   --breakpoint-lg: initial;
   --breakpoint-xl: initial;
 }
 
 /* ─── Landscape-aware breakpoints ─────────────────────────────────────
-   lg: now fires at ≥1024px OR when a phone is held in landscape.
-   The (pointer: coarse) + (max-height: 500px) combo ensures this only
-   targets touch devices in landscape — not a small desktop window.
-   xl: re-declared as a custom variant to preserve cascade order (lg → xl).
+   md: and lg: now fire at their normal widths OR when a phone is held
+   in landscape. The (pointer: coarse) + (max-height: 500px) combo
+   ensures this only targets touch devices — not a small desktop window.
+   All three are declared in cascade order: md → lg → xl.
    ──────────────────────────────────────────────────────────────────── */
+@custom-variant md {
+  @media (min-width: 768px), ((orientation: landscape) and (max-height: 500px) and (pointer: coarse)) {
+    @slot;
+  }
+}
 @custom-variant lg {
   @media (min-width: 1024px), ((orientation: landscape) and (max-height: 500px) and (pointer: coarse)) {
     @slot;
@@ -466,6 +472,12 @@ h6 {
 
   body {
     scrollbar-width: thin;
+  }
+
+  /* Compact navbar: reduce vertical padding for limited screen height */
+  .glass-nav > div {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
   }
 
   /* Hide sticky mobile CTA in landscape (desktop nav is visible) */
