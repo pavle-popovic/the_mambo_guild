@@ -462,7 +462,11 @@ function SkillTreeGraphInner({ levels, edges: edgeData, onNodeSelect, selectedNo
       const timer = setTimeout(() => {
         const targetLevel = levels.find(l => l.is_unlocked && l.completion_percentage < 100) || levels.filter(l => l.is_unlocked).pop() || levels[0];
         const targetNode = nodes.find(n => n.id === targetLevel?.id);
-        if (targetNode && setCenter) { setCenter(targetNode.position.x, targetNode.position.y, { zoom: 0.75, duration: 800 }); setTimeout(() => setIsPositioned(true), 100); }
+        if (targetNode && setCenter) {
+          const isMobile = window.innerWidth < 640;
+          setCenter(targetNode.position.x, targetNode.position.y, { zoom: isMobile ? 0.6 : 0.75, duration: 800 });
+          setTimeout(() => setIsPositioned(true), 100);
+        }
       }, 200);
       return () => clearTimeout(timer);
     }
@@ -595,25 +599,25 @@ export default function SkillTreeTeaser() {
   const selectedCourse = courses.find(c => c.id === selectedCourseId);
 
   return (
-    <section className="relative py-8 sm:py-12 md:py-20 px-4 sm:px-6 overflow-hidden bg-gradient-to-b from-transparent via-black/60 to-transparent">
+    <section className="relative py-8 sm:py-12 md:py-20 px-3 sm:px-6 overflow-hidden bg-gradient-to-b from-transparent via-black/60 to-transparent">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-6 md:mb-10">
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-500/10 border border-purple-500/30 rounded-full mb-4">
+        <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-4 md:mb-10">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-500/10 border border-purple-500/30 rounded-full mb-3 sm:mb-4">
             <FaStar className="text-purple-400 text-xs" />
             <span className="text-xs font-medium text-purple-400">Gamified Learning</span>
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-mambo-text font-serif" style={{ fontFamily: '"Playfair Display", serif' }}>
+          <h2 className="text-xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2 text-mambo-text font-serif" style={{ fontFamily: '"Playfair Display", serif' }}>
             Your <span className="text-mambo-gold italic">Constellation</span> Path
           </h2>
-          <p className="text-gray-400 text-sm max-w-xl mx-auto">Explore our interactive skill trees</p>
+          <p className="text-gray-400 text-xs sm:text-sm max-w-xl mx-auto">Explore our interactive skill trees</p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-6 gap-4 lg:gap-6 items-start">
+        <div className="grid lg:grid-cols-6 gap-3 lg:gap-6 items-start">
           {/* Skill Tree - Takes most space (5/6) */}
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="lg:col-span-5 order-2 lg:order-1">
             {/* Course Tabs - Enhanced */}
-            <div className="flex gap-3 mb-4 overflow-x-auto pb-2 scrollbar-hide">
+            <div className="flex gap-2 sm:gap-3 mb-3 sm:mb-4 overflow-x-auto pb-2 scrollbar-hide no-scrollbar">
               {loading ? (
                 <div className="flex items-center gap-2 px-4 py-2 text-gray-500"><FaSpinner className="animate-spin" /><span className="text-sm">Loading courses...</span></div>
               ) : (
@@ -627,7 +631,7 @@ export default function SkillTreeTeaser() {
                       initial={{ opacity: 0, y: -10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ delay: index * 0.1 }}
-                      className={`group relative flex-shrink-0 px-5 py-2.5 rounded-xl font-semibold transition-all duration-300 overflow-hidden ${
+                      className={`group relative flex-shrink-0 px-3 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold transition-all duration-300 overflow-hidden ${
                         isSelected 
                           ? "text-black shadow-lg shadow-mambo-gold/30" 
                           : "bg-zinc-800/60 text-gray-300 hover:bg-zinc-700/80 hover:text-white border border-zinc-700/50 hover:border-mambo-gold/50"
@@ -658,7 +662,7 @@ export default function SkillTreeTeaser() {
                         ) : (
                           <span className="w-2 h-2 rounded-full bg-mambo-gold/50 group-hover:bg-mambo-gold transition-colors" />
                         )}
-                        <span className="text-sm">{course.title}</span>
+                        <span className="text-xs sm:text-sm">{course.title}</span>
                         {/* Module count badge */}
                         {isSelected && skillTree && (
                           <span className="bg-black/20 text-[10px] px-1.5 py-0.5 rounded-full font-bold">
@@ -683,7 +687,7 @@ export default function SkillTreeTeaser() {
             </div>
 
             {/* Tree Container */}
-            <div className="relative h-[360px] sm:h-[450px] md:h-[580px] bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 rounded-2xl border border-zinc-700/50 overflow-hidden shadow-2xl">
+            <div className="relative h-[340px] sm:h-[450px] md:h-[580px] bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 rounded-xl sm:rounded-2xl border border-zinc-700/50 overflow-hidden shadow-2xl">
               {/* Header */}
               <div className="absolute top-0 left-0 right-0 z-20 px-3 py-2 bg-gradient-to-b from-black/90 to-transparent">
                 <div className="flex items-center justify-between">
@@ -734,10 +738,10 @@ export default function SkillTreeTeaser() {
                 const hasProgress = user && selectedNode.completion_percentage > 0;
                 
                 return (
-                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="mt-2 bg-zinc-900/95 border border-zinc-700/50 rounded-xl overflow-hidden">
+                  <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="mt-2 bg-zinc-900/95 border border-zinc-700/50 rounded-lg sm:rounded-xl overflow-hidden">
                     <div className="flex">
                       {/* Thumbnail / GIF Preview */}
-                      <div className="relative w-28 h-20 sm:w-36 sm:h-28 flex-shrink-0 overflow-hidden bg-zinc-800">
+                      <div className="relative w-24 h-18 sm:w-36 sm:h-28 flex-shrink-0 overflow-hidden bg-zinc-800">
                         {displayImage ? (
                           <img
                             src={displayImage}
@@ -800,20 +804,17 @@ export default function SkillTreeTeaser() {
             </AnimatePresence>
           </motion.div>
 
-          {/* Features - Stacked vertically (1/6) */}
-          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="lg:col-span-1 order-1 lg:order-2 flex lg:flex-col gap-3 overflow-x-auto lg:overflow-visible pb-2 lg:pb-0">
+          {/* Features - Grid on mobile, stacked on desktop */}
+          <motion.div initial={{ opacity: 0, x: 20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} transition={{ delay: 0.2 }} className="lg:col-span-1 order-1 lg:order-2 grid grid-cols-3 lg:grid-cols-1 gap-2 lg:gap-3">
             {FEATURES.map((feature, i) => (
-              <div key={i} className="flex-shrink-0 lg:flex-shrink p-3 rounded-xl border border-zinc-800/50 bg-zinc-900/30 min-w-[140px] lg:min-w-0">
-                <div className={`w-9 h-9 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg mb-2`}>
-                  <feature.icon className="text-white text-sm" />
+              <div key={i} className="p-2 sm:p-3 rounded-xl border border-zinc-800/50 bg-zinc-900/30">
+                <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br ${feature.color} flex items-center justify-center shadow-lg mb-1.5 sm:mb-2`}>
+                  <feature.icon className="text-white text-xs sm:text-sm" />
                 </div>
-                <h4 className="font-bold text-white text-xs mb-0.5">{feature.title}</h4>
-                <p className="text-gray-500 text-[10px] leading-tight">{feature.description}</p>
+                <h4 className="font-bold text-white text-[10px] sm:text-xs mb-0.5">{feature.title}</h4>
+                <p className="text-gray-500 text-[9px] sm:text-[10px] leading-tight hidden sm:block">{feature.description}</p>
               </div>
             ))}
-            <Link href="/register" className="flex-shrink-0 lg:flex-shrink flex items-center justify-center gap-1.5 px-4 py-2.5 bg-white hover:bg-gray-100 text-black font-bold rounded-xl text-xs transition-all min-w-[140px] lg:min-w-0">
-              <HiSparkles className="text-mambo-gold" />Start
-            </Link>
           </motion.div>
         </div>
       </div>

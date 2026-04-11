@@ -43,7 +43,7 @@ const testimonials = [
 
 export default function TestimonialsSection() {
   return (
-    <section className="relative py-12 sm:py-20 md:py-32 px-4 sm:px-6 bg-mambo-dark z-10 overflow-hidden">
+    <section className="relative py-8 sm:py-16 md:py-32 px-3 sm:px-6 bg-mambo-dark z-10 overflow-hidden">
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
@@ -51,10 +51,10 @@ export default function TestimonialsSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-100px" }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-8 sm:mb-16"
+          className="text-center mb-4 sm:mb-10 md:mb-16"
         >
           <h2
-            className="text-4xl md:text-5xl font-bold mb-12 text-mambo-text tracking-tight font-serif italic"
+            className="text-2xl sm:text-4xl md:text-5xl font-bold mb-4 sm:mb-12 text-mambo-text tracking-tight font-serif italic"
             style={{ fontFamily: '"Playfair Display", serif' }}
           >
             What Dancers <span className="text-mambo-gold drop-shadow-md">Say</span>
@@ -74,7 +74,7 @@ export default function TestimonialsSection() {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
-            className="flex gap-6 overflow-x-auto snap-x snap-mandatory pb-4 -mx-6 px-6 scrollbar-hide"
+            className="flex gap-3 sm:gap-6 overflow-x-auto snap-x snap-mandatory pb-4 -mx-3 px-3 sm:-mx-6 sm:px-6 scrollbar-hide"
             style={{
               scrollbarWidth: "none",
               msOverflowStyle: "none",
@@ -90,9 +90,9 @@ export default function TestimonialsSection() {
                     whileInView={{ opacity: 1, scale: 1 }}
                     viewport={{ once: true }}
                     transition={{ delay: index * 0.1 }}
-                    className="flex-shrink-0 w-80 snap-center"
+                    className="flex-shrink-0 w-64 sm:w-80 snap-center"
                   >
-                    <GlassCard className="p-8 h-full flex flex-col items-center justify-center text-center min-h-[280px]">
+                    <GlassCard className="p-5 sm:p-8 h-full flex flex-col items-center justify-center text-center min-h-[220px] sm:min-h-[280px]">
                       <div className="w-16 h-16 rounded-full bg-gradient-to-br from-mambo-blue to-purple-500 flex items-center justify-center mb-6">
                         <FaUserCircle className="w-8 h-8 text-white" />
                       </div>
@@ -124,9 +124,9 @@ export default function TestimonialsSection() {
                   whileInView={{ opacity: 1, scale: 1 }}
                   viewport={{ once: true }}
                   transition={{ delay: index * 0.1 }}
-                  className="flex-shrink-0 w-80 snap-center"
+                  className="flex-shrink-0 w-64 sm:w-80 snap-center"
                 >
-                  <GlassCard className="p-8 h-full min-h-[280px]">
+                  <GlassCard className="p-5 sm:p-8 h-full min-h-[220px] sm:min-h-[280px]">
                     {/* Quote icon */}
                     <FaQuoteLeft className="w-6 h-6 text-mambo-blue/50 mb-4" />
 
