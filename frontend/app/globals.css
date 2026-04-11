@@ -473,16 +473,7 @@ h6 {
     display: none !important;
   }
 
-  /* ── Lesson page: hide sidebars, show mobile UI, maximize video ── */
-  .lesson-sidebar {
-    display: none !important;
-  }
-  .lesson-mobile-nav {
-    display: block !important;
-  }
-  .lesson-mobile-captions {
-    display: flex !important;
-  }
+  /* ── Lesson page: hide mobile-only controls in landscape ── */
   .lesson-mobile-controls {
     display: none !important;
   }
@@ -496,34 +487,32 @@ h6 {
   }
 }
 
-/* ─── Landscape phones wider than 2:1 — overlay sidebars on video black bars ─
-   Sidebars are position:absolute so they sit ON TOP of the video's black
-   bars without squeezing the video container. The video stays full-height
-   and the sidebars automatically fill the leftover space.
-   Sidebar width = (screenWidth − videoHeight × 16÷9) ÷ 2                    */
-@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) and (min-aspect-ratio: 2/1) {
+/* ─── Landscape phones — desktop-style 3-panel flex layout ────────────
+   Sidebars are normal flex items (not absolute overlays). They get a
+   responsive width via clamp() so they're always readable. The video
+   container is flex-1 and fills the remaining centre space.
+   Font-size and padding are scaled down for density on small screens.
+   ──────────────────────────────────────────────────────────────────── */
+@media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) {
   .lesson-sidebar {
     display: flex !important;
-    position: absolute !important;
-    top: 0 !important;
-    bottom: 0 !important;
-    width: calc((100vw - 100dvh * 1.7778) / 2) !important;
-    max-width: 200px !important;
+    position: relative !important;
+    width: clamp(130px, 22vw, 200px) !important;
+    flex-shrink: 0 !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     font-size: 10px !important;
-    z-index: 40 !important;
+    z-index: 30 !important;
     background: black !important;
-    border: none !important;
-  }
-  .lesson-sidebar-left {
-    left: 0 !important;
-  }
-  .lesson-sidebar-right {
-    right: 0 !important;
   }
   .lesson-sidebar * {
     scrollbar-width: none;
+  }
+  /* Scale down sidebar content to fit compact width while keeping
+     the desktop layout proportions. zoom is well-supported on mobile
+     WebKit/Blink and scales layout + text uniformly. */
+  .lesson-sidebar > * {
+    zoom: 0.7;
   }
   /* Desktop sidebars provide back/language/mark-complete — hide mobile dupes */
   .lesson-mobile-nav {
