@@ -699,12 +699,16 @@ export default function LessonPage() {
                   </div>
                 </div>
 
-                {/* MOBILE QUEST BAR — embedded overlay below nav, above video */}
+                {/* MOBILE QUEST BAR — black band between nav and video, never covers video */}
                 {levelLessons.length > 0 && (
-                  <div className="lg:hidden absolute top-14 left-0 right-0 z-30 pointer-events-none">
-                    <div className="pointer-events-auto mx-3 bg-black/70 backdrop-blur-md rounded-xl border border-white/10 px-3 py-2.5">
+                  <div className="lg:hidden flex-shrink-0 bg-black z-20 relative pt-12">
+                    {/* Top divider */}
+                    <div className="h-[1px] bg-white/20" />
+
+                    {/* Quest content */}
+                    <div className="px-3 py-2">
                       {/* Title + progress % + complete button */}
-                      <div className="flex items-center justify-between mb-2">
+                      <div className="flex items-center justify-between mb-1.5">
                         <div className="flex items-center gap-2 min-w-0">
                           <span className="text-xs font-bold text-white truncate max-w-[120px]">{levelTitle}</span>
                           <span className="text-[11px] font-bold text-mambo-gold">{Math.round(levelProgress)}%</span>
@@ -728,7 +732,7 @@ export default function LessonPage() {
                       </div>
 
                       {/* Progress bar */}
-                      <div className="w-full bg-gray-700/60 h-1.5 rounded-full overflow-hidden mb-2.5">
+                      <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mb-2">
                         <div
                           className="h-full rounded-full transition-all duration-500"
                           style={{
@@ -740,8 +744,8 @@ export default function LessonPage() {
                         />
                       </div>
 
-                      {/* Horizontal lesson indicators — bigger dots, more spacing */}
-                      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-0.5">
+                      {/* Horizontal lesson indicators */}
+                      <div className="flex gap-3 overflow-x-auto no-scrollbar py-0.5">
                         {[...levelLessons].sort((a, b) => {
                           const wA = a.week_number ?? 0, wB = b.week_number ?? 0;
                           if (wA !== wB) return wA - wB;
@@ -760,14 +764,14 @@ export default function LessonPage() {
                               onClick={(e) => { if (isLocked) e.preventDefault(); }}
                               className={`flex-shrink-0 flex items-center justify-center rounded-full transition-all ${
                                 isBoss
-                                  ? `w-8 h-8 ${isActive ? 'bg-red-600 ring-2 ring-red-400 scale-110' : isDone ? 'bg-red-800 opacity-60' : 'bg-red-900/50 border border-red-500/30'}`
+                                  ? `w-7 h-7 ${isActive ? 'bg-red-600 border-2 border-red-400' : isDone ? 'bg-red-800 opacity-60' : 'bg-red-900/50 border border-red-500/30'}`
                                   : isActive
-                                    ? 'w-8 h-8 bg-mambo-blue ring-2 ring-blue-400 scale-110 shadow-lg shadow-blue-500/30'
+                                    ? 'w-7 h-7 bg-mambo-blue border-2 border-blue-400 shadow-md shadow-blue-500/30'
                                     : isDone
-                                      ? 'w-6 h-6 bg-green-600'
+                                      ? 'w-7 h-7 bg-green-600'
                                       : isLocked
-                                        ? 'w-6 h-6 bg-gray-800/80 border border-gray-600'
-                                        : 'w-6 h-6 bg-gray-700/80 border border-gray-500 hover:bg-gray-600'
+                                        ? 'w-7 h-7 bg-gray-800 border border-gray-600'
+                                        : 'w-7 h-7 bg-gray-700 border border-gray-500 hover:bg-gray-600'
                               }`}
                               title={l.title}
                             >
@@ -780,13 +784,16 @@ export default function LessonPage() {
                               ) : isLocked ? (
                                 <FaLock className="text-[7px] text-gray-500" />
                               ) : (
-                                <span className="text-[8px] font-bold text-gray-300">{l.order_index}</span>
+                                <span className="text-[9px] font-bold text-gray-300">{l.order_index}</span>
                               )}
                             </Link>
                           );
                         })}
                       </div>
                     </div>
+
+                    {/* Bottom divider */}
+                    <div className="h-[1px] bg-white/20" />
                   </div>
                 )}
 

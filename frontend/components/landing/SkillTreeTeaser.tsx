@@ -531,6 +531,17 @@ export default function SkillTreeTeaser() {
   const [loading, setLoading] = useState(true);
   const [treeLoading, setTreeLoading] = useState(false);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [courseDropdownOpen, setCourseDropdownOpen] = useState(false);
+  const courseDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (courseDropdownRef.current && !courseDropdownRef.current.contains(e.target as Node)) setCourseDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   const isLoggedOut = !user;
 
@@ -621,18 +632,37 @@ export default function SkillTreeTeaser() {
               <div className="flex items-center gap-2 px-4 py-2 text-gray-500 mb-3"><FaSpinner className="animate-spin" /><span className="text-sm">Loading courses...</span></div>
             ) : (
               <>
-                {/* Mobile dropdown */}
-                <div className="sm:hidden mb-2 relative w-fit">
-                  <select
-                    value={selectedCourseId || ""}
-                    onChange={(e) => setSelectedCourseId(e.target.value)}
-                    className="appearance-none bg-zinc-800/80 border border-mambo-gold/30 text-white text-sm font-semibold rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:border-mambo-gold/60"
+                {/* Mobile dropdown — glassmorphism */}
+                <div className="sm:hidden mb-2 relative w-fit" ref={courseDropdownRef}>
+                  <button
+                    onClick={() => setCourseDropdownOpen(!courseDropdownOpen)}
+                    className={`flex items-center gap-2 bg-zinc-800/80 border border-mambo-gold/30 text-white text-sm font-semibold rounded-xl px-4 py-2.5 pr-10 focus:outline-none transition-all relative ${
+                      courseDropdownOpen ? 'border-mambo-gold/60 bg-zinc-700/80' : ''
+                    }`}
                   >
-                    {courses.map((course) => (
-                      <option key={course.id} value={course.id}>{course.title}{skillTree && selectedCourseId === course.id ? ` (${skillTree.levels.length})` : ""}</option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mambo-gold pointer-events-none" />
+                    <span className="truncate max-w-[200px]">
+                      {courses.find(c => c.id === selectedCourseId)?.title || 'Select course'}
+                      {skillTree && selectedCourseId ? ` (${skillTree.levels.length})` : ''}
+                    </span>
+                    <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mambo-gold transition-transform ${courseDropdownOpen ? 'rotate-180' : ''}`} />
+                  </button>
+                  {courseDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-1 z-50 min-w-full bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                      {courses.map((course) => (
+                        <button
+                          key={course.id}
+                          onClick={() => { setSelectedCourseId(course.id); setCourseDropdownOpen(false); }}
+                          className={`w-full px-4 py-2.5 text-left text-[13px] font-semibold transition-all whitespace-nowrap ${
+                            selectedCourseId === course.id
+                              ? 'bg-mambo-gold/20 text-mambo-gold'
+                              : 'text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]'
+                          }`}
+                        >
+                          {course.title}{skillTree && selectedCourseId === course.id ? ` (${skillTree.levels.length})` : ''}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Desktop tabs */}
