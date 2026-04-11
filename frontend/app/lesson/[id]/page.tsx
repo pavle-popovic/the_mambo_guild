@@ -686,8 +686,8 @@ export default function LessonPage() {
             {isVideoLesson && hasVideo && (
               <div className="w-full bg-black relative flex-1 min-h-0 flex flex-col">
 
-                {/* Immersive overlay — back arrow + language */}
-                <div className="absolute top-0 left-0 right-0 z-30 px-4 py-3 pointer-events-none flex items-center justify-between">
+                {/* Immersive overlay — back arrow + language (desktop only, mobile uses quest bar) */}
+                <div className="hidden lg:flex absolute top-0 left-0 right-0 z-30 px-4 py-3 pointer-events-none items-center justify-between">
                   <Link
                     href={worldId ? `/courses/${worldId}` : '/courses'}
                     className="pointer-events-auto flex items-center justify-center w-9 h-9 bg-black/50 hover:bg-black/70 rounded-full backdrop-blur-sm transition text-white"
@@ -699,38 +699,43 @@ export default function LessonPage() {
                   </div>
                 </div>
 
-                {/* MOBILE QUEST BAR — black band between nav and video, never covers video */}
+                {/* MOBILE QUEST BAR — sits above video as flex child, never covers it */}
                 {levelLessons.length > 0 && (
-                  <div className="lg:hidden flex-shrink-0 bg-black z-20 relative pt-12">
+                  <div className="lg:hidden flex-shrink-0 bg-black z-20 relative">
+                    {/* Nav row: back + title + language */}
+                    <div className="flex items-center justify-between px-3 pt-2 pb-1">
+                      <Link
+                        href={worldId ? `/courses/${worldId}` : '/courses'}
+                        className="flex items-center gap-1.5 text-gray-400 hover:text-white transition"
+                      >
+                        <FaChevronLeft size={11} />
+                        <span className="text-xs font-bold truncate max-w-[140px]">{levelTitle}</span>
+                        <span className="text-[11px] font-bold text-mambo-gold ml-1">{Math.round(levelProgress)}%</span>
+                      </Link>
+                      <div className="flex items-center gap-2">
+                        <LocaleSwitcher compact />
+                        {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
+                          <button
+                            onClick={handleComplete}
+                            disabled={completing}
+                            className="flex items-center gap-1 px-2.5 py-1 bg-green-600 hover:bg-green-500 text-white text-[10px] font-bold rounded-full transition disabled:opacity-50"
+                          >
+                            <FaCheck className="text-[8px]" /> {tLesson('markComplete')}
+                          </button>
+                        )}
+                        {isCompleted && (
+                          <div className="flex items-center gap-1 px-2.5 py-1 bg-green-900/40 text-green-400 text-[10px] font-bold rounded-full border border-green-500/30">
+                            <FaCheckCircle className="text-[8px]" /> {tLesson('completed')}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
                     {/* Top divider */}
                     <div className="h-[1px] bg-white/20" />
 
-                    {/* Quest content */}
+                    {/* Progress + lesson dots */}
                     <div className="px-3 py-2">
-                      {/* Title + progress % + complete button */}
-                      <div className="flex items-center justify-between mb-1.5">
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="text-xs font-bold text-white truncate max-w-[120px]">{levelTitle}</span>
-                          <span className="text-[11px] font-bold text-mambo-gold">{Math.round(levelProgress)}%</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
-                            <button
-                              onClick={handleComplete}
-                              disabled={completing}
-                              className="flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-[11px] font-bold rounded-full transition disabled:opacity-50"
-                            >
-                              <FaCheck className="text-[9px]" /> {tLesson('markComplete')}
-                            </button>
-                          )}
-                          {isCompleted && (
-                            <div className="flex items-center gap-1 px-3 py-1.5 bg-green-900/40 text-green-400 text-[11px] font-bold rounded-full border border-green-500/30">
-                              <FaCheckCircle className="text-[9px]" /> {tLesson('completed')}
-                            </div>
-                          )}
-                        </div>
-                      </div>
-
                       {/* Progress bar */}
                       <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mb-2">
                         <div

@@ -636,29 +636,31 @@ export default function SkillTreeTeaser() {
                 <div className="sm:hidden mb-2 relative w-fit" ref={courseDropdownRef}>
                   <button
                     onClick={() => setCourseDropdownOpen(!courseDropdownOpen)}
-                    className={`flex items-center gap-2 bg-zinc-800/80 border border-mambo-gold/30 text-white text-sm font-semibold rounded-xl px-4 py-2.5 pr-10 focus:outline-none transition-all relative ${
-                      courseDropdownOpen ? 'border-mambo-gold/60 bg-zinc-700/80' : ''
+                    className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-8 text-left focus:outline-none transition-all relative ${
+                      courseDropdownOpen
+                        ? 'bg-white/[0.08] border-mambo-gold/60'
+                        : 'bg-white/[0.04] border-white/10'
                     }`}
                   >
-                    <span className="truncate max-w-[200px]">
+                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Course</span>
+                    <span className="text-[11px] font-bold text-white truncate block max-w-[200px]">
                       {courses.find(c => c.id === selectedCourseId)?.title || 'Select course'}
-                      {skillTree && selectedCourseId ? ` (${skillTree.levels.length})` : ''}
                     </span>
-                    <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-mambo-gold transition-transform ${courseDropdownOpen ? 'rotate-180' : ''}`} />
+                    <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 text-mambo-gold transition-transform ${courseDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
                   {courseDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-1 z-50 min-w-full bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                    <div className="absolute top-full left-0 right-0 mt-1 z-50 min-w-[220px] bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
                       {courses.map((course) => (
                         <button
                           key={course.id}
                           onClick={() => { setSelectedCourseId(course.id); setCourseDropdownOpen(false); }}
-                          className={`w-full px-4 py-2.5 text-left text-[13px] font-semibold transition-all whitespace-nowrap ${
+                          className={`w-full px-3 py-2.5 text-left text-[12px] font-semibold transition-all whitespace-nowrap ${
                             selectedCourseId === course.id
                               ? 'bg-mambo-gold/20 text-mambo-gold'
                               : 'text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]'
                           }`}
                         >
-                          {course.title}{skillTree && selectedCourseId === course.id ? ` (${skillTree.levels.length})` : ''}
+                          {course.title}
                         </button>
                       ))}
                     </div>
