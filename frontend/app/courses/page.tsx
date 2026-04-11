@@ -10,6 +10,7 @@ import { StaggerContainer, Clickable } from "@/components/ui/motion";
 import { FadeIn } from "@/components/ui/motion";
 import CourseCard from "@/components/CourseCard";
 import { FaSearch, FaTimes } from "react-icons/fa";
+import { ChevronDown } from "lucide-react";
 import { useTranslations } from "@/i18n/useTranslations";
 
 interface Course {
@@ -119,13 +120,64 @@ export default function CoursesPage() {
 
       <div className="relative min-h-screen">
         {/* Sticky Header Control Bar */}
-        <div className="sticky top-0 z-40 w-full bg-black/60 backdrop-blur-xl border-b border-white/10 pt-24 pb-4 transition-all duration-300">
-          <div className="max-w-[1600px] mx-auto px-3 sm:px-6 flex flex-col md:flex-row items-center gap-1">
-            {/* Controls: Search + Filters */}
-            <div className="flex items-center gap-2 sm:gap-3 w-full md:w-auto overflow-x-auto pb-2 md:pb-0 no-scrollbar">
+        <div className="sticky top-0 z-40 w-full bg-black/60 backdrop-blur-xl border-b border-white/10 pt-20 sm:pt-24 pb-3 sm:pb-4 transition-all duration-300">
+          <div className="max-w-[1600px] mx-auto px-3 sm:px-6">
 
+            {/* Mobile: Search + two dropdowns in a compact row */}
+            <div className="flex sm:hidden items-center gap-2 w-full">
+              {/* Search */}
+              <div className="relative group flex-1 min-w-0">
+                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-mambo-gold transition-colors text-xs" />
+                <input
+                  type="text"
+                  placeholder={tCourses('searchPlaceholder')}
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-white/5 border border-white/20 rounded-full pl-8 pr-7 py-2 text-xs text-white placeholder-gray-400 focus:outline-none focus:border-mambo-gold/50 focus:bg-black/40 transition-all font-medium"
+                />
+                {searchQuery && (
+                  <button onClick={clearSearch} className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                    <FaTimes className="text-[10px]" />
+                  </button>
+                )}
+              </div>
+
+              {/* Type dropdown */}
+              <div className="relative flex-shrink-0">
+                <select
+                  value={typeFilter}
+                  onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
+                  className="appearance-none bg-white/5 border border-white/20 text-white text-xs font-bold rounded-full pl-3 pr-7 py-2 focus:outline-none focus:border-mambo-gold/50"
+                >
+                  <option value="all">{tCourses('filterAll')}</option>
+                  <option value="course">{tCourses('filterCourses')}</option>
+                  <option value="choreo">{tCourses('filterChoreo')}</option>
+                  <option value="topic">{tCourses('filterTopics')}</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+              </div>
+
+              {/* Level dropdown */}
+              <div className="relative flex-shrink-0">
+                <select
+                  value={difficultyFilter}
+                  onChange={(e) => setDifficultyFilter(e.target.value as DifficultyFilter)}
+                  className="appearance-none bg-white/5 border border-white/20 text-white text-xs font-bold rounded-full pl-3 pr-7 py-2 focus:outline-none focus:border-mambo-gold/50"
+                >
+                  <option value="all">{tCourses('difficultyAll')}</option>
+                  <option value="beginner">{tCourses('difficultyBeginner')}</option>
+                  <option value="intermediate">{tCourses('difficultyIntermediate')}</option>
+                  <option value="advanced">{tCourses('difficultyAdvanced')}</option>
+                  <option value="open">Open</option>
+                </select>
+                <ChevronDown className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-400 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Desktop: Original pill layout */}
+            <div className="hidden sm:flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-0 no-scrollbar">
               {/* Search Pill */}
-              <div className="relative group min-w-[140px] sm:min-w-[200px]">
+              <div className="relative group min-w-[200px]">
                 <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-mambo-gold transition-colors text-sm" />
                 <input
                   type="text"
@@ -149,20 +201,20 @@ export default function CoursesPage() {
                   <button
                     key={f.v}
                     onClick={() => setTypeFilter(f.v as TypeFilter)}
-                    className={`px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all border whitespace-nowrap ${typeFilter === f.v ? 'border-purple-500 bg-purple-500/20 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
+                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${typeFilter === f.v ? 'border-purple-500 bg-purple-500/20 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
                   >
                     {f.l}
                   </button>
                 ))}
               </div>
 
-              {/* Level Filter Dropdown Style Pill */}
+              {/* Level Filter Pills */}
               <div className="flex bg-black/30 rounded-full p-1 border border-white/10">
                 {[{ v: 'all', l: tCourses('difficultyAll') }, { v: 'beginner', l: tCourses('difficultyBeginner') }, { v: 'intermediate', l: tCourses('difficultyIntermediate') }, { v: 'advanced', l: tCourses('difficultyAdvanced') }, { v: 'open', l: 'Open' }].map(f => (
                   <button
                     key={f.v}
                     onClick={() => setDifficultyFilter(f.v as DifficultyFilter)}
-                    className={`px-3 sm:px-5 py-1.5 sm:py-2 rounded-full text-xs sm:text-sm font-bold transition-all border whitespace-nowrap ${difficultyFilter === f.v ? 'bg-[#fbbf24] text-black border-[#fbbf24] shadow-[0_0_15px_rgba(251,191,36,0.4)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
+                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${difficultyFilter === f.v ? 'bg-[#fbbf24] text-black border-[#fbbf24] shadow-[0_0_15px_rgba(251,191,36,0.4)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
                   >
                     {f.l}
                   </button>
