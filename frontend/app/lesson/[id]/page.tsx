@@ -803,7 +803,7 @@ export default function LessonPage() {
                 )}
 
                 {lesson.mux_playback_id ? (
-                  <div className="flex-1 min-h-0 w-full">
+                  <div className="w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0">
                     <MuxVideoPlayer
                       ref={videoPlayerRef}
                       playbackId={lesson.mux_playback_id}
