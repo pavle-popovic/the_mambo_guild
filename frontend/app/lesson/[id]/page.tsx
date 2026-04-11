@@ -682,99 +682,6 @@ export default function LessonPage() {
               </nav>
             )}
 
-            {/* MOBILE HORIZONTAL QUEST BAR — above video on portrait */}
-            {levelLessons.length > 0 && (
-              <div className="lg:hidden flex-shrink-0 bg-black/90 backdrop-blur-sm border-b border-white/10 px-3 py-2">
-                {/* Title row + progress */}
-                <div className="flex items-center justify-between mb-1.5">
-                  <Link
-                    href={worldId ? `/courses/${worldId}` : '/courses'}
-                    className="flex items-center gap-1.5 text-gray-400 hover:text-white transition min-w-0"
-                  >
-                    <FaChevronLeft size={10} className="flex-shrink-0" />
-                    <span className="text-[11px] font-bold truncate max-w-[140px]">{levelTitle}</span>
-                  </Link>
-                  <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-bold text-mambo-gold">{Math.round(levelProgress)}%</span>
-                    {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
-                      <button
-                        onClick={handleComplete}
-                        disabled={completing}
-                        className="flex items-center gap-1 px-2.5 py-1 bg-green-600 hover:bg-green-500 text-white text-[10px] font-bold rounded-full transition disabled:opacity-50"
-                      >
-                        <FaCheck className="text-[8px]" /> {tLesson('markComplete')}
-                      </button>
-                    )}
-                    {isCompleted && (
-                      <div className="flex items-center gap-1 px-2.5 py-1 bg-green-900/40 text-green-400 text-[10px] font-bold rounded-full border border-green-500/30">
-                        <FaCheckCircle className="text-[8px]" /> {tLesson('completed')}
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Progress bar */}
-                <div className="w-full bg-gray-800 h-1 rounded-full overflow-hidden mb-2">
-                  <div
-                    className="h-full rounded-full transition-all duration-500"
-                    style={{
-                      width: `${Math.min(100, Math.max(0, levelProgress))}%`,
-                      minWidth: levelProgress > 0 ? '2px' : '0px',
-                      background: 'linear-gradient(to right, #10b981, #059669)',
-                      boxShadow: '0 0 6px rgba(16, 185, 129, 0.4)',
-                    }}
-                  />
-                </div>
-
-                {/* Horizontal lesson indicators */}
-                <div className="flex gap-1 overflow-x-auto no-scrollbar pb-0.5">
-                  {[...levelLessons].sort((a, b) => {
-                    const wA = a.week_number ?? 0, wB = b.week_number ?? 0;
-                    if (wA !== wB) return wA - wB;
-                    const dA = a.day_number ?? 0, dB = b.day_number ?? 0;
-                    if (dA !== dB) return dA - dB;
-                    return a.order_index - b.order_index;
-                  }).map((l) => {
-                    const isActive = l.id === lessonId;
-                    const isDone = l.is_completed;
-                    const isLocked = l.is_locked;
-                    const isBoss = l.is_boss_battle;
-                    return (
-                      <Link
-                        key={l.id}
-                        href={isLocked ? '#' : `/lesson/${l.id}`}
-                        onClick={(e) => { if (isLocked) e.preventDefault(); }}
-                        className={`flex-shrink-0 flex items-center justify-center rounded-full transition-all ${
-                          isBoss
-                            ? `w-7 h-7 ${isActive ? 'bg-red-600 ring-2 ring-red-400 scale-110' : isDone ? 'bg-red-800 opacity-60' : 'bg-red-900/50 border border-red-500/30'}`
-                            : isActive
-                              ? 'w-7 h-7 bg-mambo-blue ring-2 ring-blue-400 scale-110 shadow-lg shadow-blue-500/30'
-                              : isDone
-                                ? 'w-5 h-5 bg-green-600'
-                                : isLocked
-                                  ? 'w-5 h-5 bg-gray-800 border border-gray-700'
-                                  : 'w-5 h-5 bg-gray-700 border border-gray-600 hover:bg-gray-600'
-                        }`}
-                        title={l.title}
-                      >
-                        {isBoss ? (
-                          <FaSkull className="text-[8px] text-red-200" />
-                        ) : isActive ? (
-                          <FaPlay className="text-[7px] text-white ml-px" />
-                        ) : isDone ? (
-                          <FaCheck className="text-[7px] text-white" />
-                        ) : isLocked ? (
-                          <FaLock className="text-[6px] text-gray-600" />
-                        ) : (
-                          <span className="text-[7px] font-bold text-gray-400">{l.order_index}</span>
-                        )}
-                      </Link>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
             {/* Video Player - Only show for video lessons with video */}
             {isVideoLesson && hasVideo && (
               <div className="w-full bg-black relative flex-1 min-h-0 flex flex-col">
@@ -791,6 +698,97 @@ export default function LessonPage() {
                     <LocaleSwitcher compact />
                   </div>
                 </div>
+
+                {/* MOBILE QUEST BAR — embedded overlay below nav, above video */}
+                {levelLessons.length > 0 && (
+                  <div className="lg:hidden absolute top-14 left-0 right-0 z-30 pointer-events-none">
+                    <div className="pointer-events-auto mx-3 bg-black/70 backdrop-blur-md rounded-xl border border-white/10 px-3 py-2.5">
+                      {/* Title + progress % + complete button */}
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-xs font-bold text-white truncate max-w-[120px]">{levelTitle}</span>
+                          <span className="text-[11px] font-bold text-mambo-gold">{Math.round(levelProgress)}%</span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
+                            <button
+                              onClick={handleComplete}
+                              disabled={completing}
+                              className="flex items-center gap-1 px-3 py-1.5 bg-green-600 hover:bg-green-500 text-white text-[11px] font-bold rounded-full transition disabled:opacity-50"
+                            >
+                              <FaCheck className="text-[9px]" /> {tLesson('markComplete')}
+                            </button>
+                          )}
+                          {isCompleted && (
+                            <div className="flex items-center gap-1 px-3 py-1.5 bg-green-900/40 text-green-400 text-[11px] font-bold rounded-full border border-green-500/30">
+                              <FaCheckCircle className="text-[9px]" /> {tLesson('completed')}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Progress bar */}
+                      <div className="w-full bg-gray-700/60 h-1.5 rounded-full overflow-hidden mb-2.5">
+                        <div
+                          className="h-full rounded-full transition-all duration-500"
+                          style={{
+                            width: `${Math.min(100, Math.max(0, levelProgress))}%`,
+                            minWidth: levelProgress > 0 ? '2px' : '0px',
+                            background: 'linear-gradient(to right, #10b981, #059669)',
+                            boxShadow: '0 0 8px rgba(16, 185, 129, 0.5)',
+                          }}
+                        />
+                      </div>
+
+                      {/* Horizontal lesson indicators — bigger dots, more spacing */}
+                      <div className="flex gap-2 overflow-x-auto no-scrollbar pb-0.5">
+                        {[...levelLessons].sort((a, b) => {
+                          const wA = a.week_number ?? 0, wB = b.week_number ?? 0;
+                          if (wA !== wB) return wA - wB;
+                          const dA = a.day_number ?? 0, dB = b.day_number ?? 0;
+                          if (dA !== dB) return dA - dB;
+                          return a.order_index - b.order_index;
+                        }).map((l) => {
+                          const isActive = l.id === lessonId;
+                          const isDone = l.is_completed;
+                          const isLocked = l.is_locked;
+                          const isBoss = l.is_boss_battle;
+                          return (
+                            <Link
+                              key={l.id}
+                              href={isLocked ? '#' : `/lesson/${l.id}`}
+                              onClick={(e) => { if (isLocked) e.preventDefault(); }}
+                              className={`flex-shrink-0 flex items-center justify-center rounded-full transition-all ${
+                                isBoss
+                                  ? `w-8 h-8 ${isActive ? 'bg-red-600 ring-2 ring-red-400 scale-110' : isDone ? 'bg-red-800 opacity-60' : 'bg-red-900/50 border border-red-500/30'}`
+                                  : isActive
+                                    ? 'w-8 h-8 bg-mambo-blue ring-2 ring-blue-400 scale-110 shadow-lg shadow-blue-500/30'
+                                    : isDone
+                                      ? 'w-6 h-6 bg-green-600'
+                                      : isLocked
+                                        ? 'w-6 h-6 bg-gray-800/80 border border-gray-600'
+                                        : 'w-6 h-6 bg-gray-700/80 border border-gray-500 hover:bg-gray-600'
+                              }`}
+                              title={l.title}
+                            >
+                              {isBoss ? (
+                                <FaSkull className="text-[9px] text-red-200" />
+                              ) : isActive ? (
+                                <FaPlay className="text-[8px] text-white ml-px" />
+                              ) : isDone ? (
+                                <FaCheck className="text-[8px] text-white" />
+                              ) : isLocked ? (
+                                <FaLock className="text-[7px] text-gray-500" />
+                              ) : (
+                                <span className="text-[8px] font-bold text-gray-300">{l.order_index}</span>
+                              )}
+                            </Link>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                )}
 
                 {lesson.mux_playback_id ? (
                   <div className="flex-1 min-h-0 w-full">
