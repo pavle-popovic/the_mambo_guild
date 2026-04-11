@@ -37,7 +37,9 @@ export default function RootLayout({
         <StarryBackground />
         <LocaleProviderWrapper>
           <AuthProvider>
-            {children}
+            <div className="relative z-10">
+              {children}
+            </div>
             <GlobalAudioPlayer />
             <BugReportButton />
             <Toaster position="top-right" richColors />
