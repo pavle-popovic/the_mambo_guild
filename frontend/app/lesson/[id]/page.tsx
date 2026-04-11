@@ -15,6 +15,7 @@ import AuthPromptModal from "@/components/AuthPromptModal";
 import QuizResultModal from "@/components/QuizResultModal";
 import CourseCompletionModal from "@/components/CourseCompletionModal";
 import { FaBolt, FaPlay, FaPause, FaCheck, FaLock, FaArrowRight, FaCheckCircle, FaChevronLeft, FaSkull } from "react-icons/fa";
+import { MdScreenRotation } from "react-icons/md";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import RichContentRenderer from "@/components/RichContentRenderer";
@@ -1020,6 +1021,11 @@ export default function LessonPage() {
         {/* MOBILE STICKY CONTROLS */}
         {isVideoLesson && lesson.mux_playback_id && (
           <div className="lg:hidden fixed bottom-0 left-0 w-full z-50 lesson-mobile-controls">
+            {/* Rotate prompt */}
+            <div className="flex items-center justify-center gap-1.5 py-1.5 text-[10px] text-white/30">
+              <MdScreenRotation className="text-xs" />
+              <span>Rotate for full screen</span>
+            </div>
             <VideoControls
               playerRef={videoPlayerRef}
               duration={videoDuration}
