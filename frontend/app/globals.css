@@ -496,20 +496,31 @@ h6 {
   }
 }
 
-/* ─── Landscape phones wider than 2:1 — fit sidebars in video black bars ──
-   The video is 16:9 (1.7778). Phones wider than 2:1 have leftover horizontal
-   space (black bars) when the video fills the viewport height. The sidebars
-   are sized to exactly fill that space so the video remains full-height.
-   Sidebar width = (screenWidth − videoWidth) ÷ 2
-                 = (100vw − 100dvh × 16÷9) ÷ 2                              */
+/* ─── Landscape phones wider than 2:1 — overlay sidebars on video black bars ─
+   Sidebars are position:absolute so they sit ON TOP of the video's black
+   bars without squeezing the video container. The video stays full-height
+   and the sidebars automatically fill the leftover space.
+   Sidebar width = (screenWidth − videoHeight × 16÷9) ÷ 2                    */
 @media (orientation: landscape) and (max-height: 500px) and (pointer: coarse) and (min-aspect-ratio: 2/1) {
   .lesson-sidebar {
     display: flex !important;
+    position: absolute !important;
+    top: 0 !important;
+    bottom: 0 !important;
     width: calc((100vw - 100dvh * 1.7778) / 2) !important;
     max-width: 200px !important;
     overflow-y: auto !important;
     overflow-x: hidden !important;
     font-size: 10px !important;
+    z-index: 40 !important;
+    background: black !important;
+    border: none !important;
+  }
+  .lesson-sidebar-left {
+    left: 0 !important;
+  }
+  .lesson-sidebar-right {
+    right: 0 !important;
   }
   .lesson-sidebar * {
     scrollbar-width: none;

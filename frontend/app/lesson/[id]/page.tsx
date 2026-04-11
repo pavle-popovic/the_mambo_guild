@@ -660,10 +660,10 @@ export default function LessonPage() {
         />
       )}
 
-      <div className="h-[100dvh] flex overflow-hidden bg-mambo-dark text-mambo-cream font-sans">
+      <div className="h-[100dvh] flex overflow-hidden bg-mambo-dark text-mambo-cream font-sans relative">
 
           {/* LEFT SIDEBAR: Quest Log (Desktop only) */}
-          <aside className="hidden lg:flex flex-col h-full w-[280px] bg-black border-r border-white/10 z-30 flex-shrink-0 lesson-sidebar">
+          <aside className="hidden lg:flex flex-col h-full w-[280px] bg-black border-r border-white/10 z-30 flex-shrink-0 lesson-sidebar lesson-sidebar-left">
             {/* Navigation: back + language */}
             <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/10 flex-shrink-0">
               <Link
@@ -985,7 +985,7 @@ export default function LessonPage() {
           </main>
 
           {/* RIGHT SIDEBAR: Mark Complete + Video Controls (Desktop only) */}
-          <aside className="hidden lg:flex flex-col h-full w-[280px] bg-black border-l border-white/10 z-30 flex-shrink-0 lesson-sidebar">
+          <aside className="hidden lg:flex flex-col h-full w-[280px] bg-black border-l border-white/10 z-30 flex-shrink-0 lesson-sidebar lesson-sidebar-right">
             {/* Mark Complete button */}
             <div className="flex-shrink-0 p-3 flex justify-center">
               {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
