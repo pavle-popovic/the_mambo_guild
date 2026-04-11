@@ -6,7 +6,6 @@ import {
     TrendingModulesSection,
     SkillTreeTeaser,
     TestimonialsSection,
-    LandingPricingSection
 } from "@/components/landing";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -53,11 +52,6 @@ export default function HomePage() {
                     <TestimonialsSection />
                 </section>
 
-                {/* Pricing */}
-                <section className="relative z-10">
-                    <LandingPricingSection />
-                </section>
-
                 {/* Footer — add bottom padding on mobile for sticky CTA */}
                 <div className="pb-16">
                     <Footer />
@@ -74,7 +68,7 @@ export default function HomePage() {
                     <div className="bg-black/95 backdrop-blur-md border-t border-white/10 px-4 py-3 flex items-center justify-center gap-4">
                         <Link
                             href="/register"
-                            className="bg-white hover:bg-gray-100 text-black font-extrabold py-2.5 sm:py-3 px-6 sm:px-8 rounded-full text-sm sm:text-base active:scale-95 transition-all text-center"
+                            className="bg-mambo-gold hover:bg-yellow-500 text-black font-extrabold py-2.5 sm:py-3 px-6 sm:px-8 rounded-full text-sm sm:text-base active:scale-95 transition-all text-center"
                         >
                             Get Your 7-Day Trial!
                         </Link>
