@@ -421,12 +421,17 @@ function ConstellationGraphInner({
   const [rfReady, setRfReady] = useState(false);
   const [isPositioned, setIsPositioned] = useState(false);
 
-  // Force ReactFlow to detect container dimensions on soft navigation
+  // Force ReactFlow to detect container dimensions on soft navigation.
+  // Mobile devices are slower to initialize — keep nudging every 100ms
+  // until ReactFlow fires onInit (rfReady), up to 2s max.
   useEffect(() => {
-    const t1 = setTimeout(() => window.dispatchEvent(new Event('resize')), 50);
-    const t2 = setTimeout(() => window.dispatchEvent(new Event('resize')), 300);
-    return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, []);
+    if (rfReady) return;
+    const iv = setInterval(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100);
+    const stop = setTimeout(() => clearInterval(iv), 2000);
+    return () => { clearInterval(iv); clearTimeout(stop); };
+  }, [rfReady]);
 
   const handleInit = useCallback(() => setRfReady(true), []);
 
