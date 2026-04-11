@@ -139,16 +139,16 @@ export default function NewHero() {
                         className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start pt-2 sm:pt-4"
                     >
                         <Link
-                            href="/register"
+                            href="/courses"
                             className="bg-white hover:bg-gray-100 text-black font-extrabold py-3 sm:py-4 px-6 sm:px-8 rounded-full text-sm sm:text-lg shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.3)] transition-all transform hover:-translate-y-1 text-center"
                         >
-                            Start My Free Trial
+                            Start Dancing Now
                         </Link>
                         <Link
-                            href="/courses"
-                            className="bg-zinc-800/80 border-2 border-zinc-600 text-white hover:bg-zinc-700 hover:border-zinc-500 font-bold py-3 sm:py-4 px-6 sm:px-8 rounded-full text-sm sm:text-lg transition-all text-center backdrop-blur-sm"
+                            href="/register"
+                            className="bg-mambo-gold hover:bg-yellow-500 text-black font-extrabold py-3 sm:py-4 px-6 sm:px-8 rounded-full text-sm sm:text-lg transition-all transform hover:-translate-y-1 text-center shadow-[0_0_20px_rgba(212,175,55,0.3)]"
                         >
-                            View Curriculum
+                            Get Your 7-Day Trial!
                         </Link>
                     </motion.div>
                 </motion.div>

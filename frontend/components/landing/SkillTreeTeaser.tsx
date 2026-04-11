@@ -622,11 +622,11 @@ export default function SkillTreeTeaser() {
             ) : (
               <>
                 {/* Mobile dropdown */}
-                <div className="sm:hidden mb-2 relative">
+                <div className="sm:hidden mb-2 relative w-fit">
                   <select
                     value={selectedCourseId || ""}
                     onChange={(e) => setSelectedCourseId(e.target.value)}
-                    className="w-full appearance-none bg-zinc-800/80 border border-mambo-gold/30 text-white text-sm font-semibold rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:border-mambo-gold/60"
+                    className="appearance-none bg-zinc-800/80 border border-mambo-gold/30 text-white text-sm font-semibold rounded-xl px-4 py-2.5 pr-10 focus:outline-none focus:border-mambo-gold/60"
                   >
                     {courses.map((course) => (
                       <option key={course.id} value={course.id}>{course.title}{skillTree && selectedCourseId === course.id ? ` (${skillTree.levels.length})` : ""}</option>
@@ -674,7 +674,7 @@ export default function SkillTreeTeaser() {
             )}
 
             {/* Tree Container */}
-            <div className="relative h-[55vh] max-h-[340px] sm:max-h-none sm:h-[450px] md:h-[580px] bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 rounded-xl sm:rounded-2xl border border-zinc-700/50 overflow-hidden shadow-2xl">
+            <div className="relative h-[60vh] max-h-[420px] sm:max-h-none sm:h-[450px] md:h-[580px] bg-gradient-to-b from-zinc-900/95 via-black/95 to-zinc-900/95 rounded-xl sm:rounded-2xl border border-zinc-700/50 overflow-hidden shadow-2xl">
               {/* Header */}
               <div className="absolute top-0 left-0 right-0 z-20 px-3 py-2 bg-gradient-to-b from-black/90 to-transparent">
                 <div className="flex items-center justify-between">

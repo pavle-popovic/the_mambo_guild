@@ -59,26 +59,22 @@ export default function HomePage() {
                 </section>
 
                 {/* Footer — add bottom padding on mobile for sticky CTA */}
-                <div className="pb-16 sm:pb-0">
+                <div className="pb-16">
                     <Footer />
                 </div>
             </main>
 
-            {/* Sticky bottom CTA — mobile only, appears after scrolling past hero */}
+            {/* Sticky bottom CTA — appears after scrolling past hero */}
             {!user && (
                 <div
-                    className={`mobile-sticky-cta fixed bottom-0 left-0 right-0 z-50 sm:hidden transition-transform duration-300 ${
+                    className={`mobile-sticky-cta fixed bottom-0 left-0 right-0 z-50 transition-transform duration-300 ${
                         showStickyCta ? "translate-y-0" : "translate-y-full"
                     }`}
                 >
-                    <div className="bg-black/95 backdrop-blur-md border-t border-mambo-gold/20 px-4 py-3 flex items-center justify-between gap-3">
-                        <div className="flex-1 min-w-0">
-                            <p className="text-white text-xs font-bold truncate">Start dancing today</p>
-                            <p className="text-gray-400 text-[10px]">7 days free, cancel anytime</p>
-                        </div>
+                    <div className="bg-black/95 backdrop-blur-md border-t border-white/10 px-4 py-3 flex items-center justify-center gap-4">
                         <Link
                             href="/register"
-                            className="flex-shrink-0 bg-gradient-to-r from-mambo-gold to-amber-500 text-black font-extrabold py-2.5 px-5 rounded-full text-sm shadow-[0_0_15px_rgba(212,175,55,0.3)] active:scale-95 transition-transform"
+                            className="bg-white hover:bg-gray-100 text-black font-extrabold py-2.5 sm:py-3 px-6 sm:px-8 rounded-full text-sm sm:text-base active:scale-95 transition-all text-center"
                         >
                             Get Your 7-Day Trial!
                         </Link>
