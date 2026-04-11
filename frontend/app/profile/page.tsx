@@ -7,7 +7,7 @@ import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { FaFire, FaBolt, FaMedal, FaStar, FaCheck, FaCog } from "react-icons/fa";
+import { FaFire, FaBolt, FaMedal, FaStar, FaCheck, FaSignOutAlt } from "react-icons/fa";
 import { apiClient } from "@/lib/api";
 import { BadgeTrophyCase } from "@/components/BadgeTrophyCase";
 import { ReferralSection } from "@/components/ReferralSection";
@@ -260,13 +260,13 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Logout icon */}
+            {/* Logout button */}
             <button
               onClick={() => { logout(); router.push("/"); }}
-              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-white transition shrink-0"
+              className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-400 transition shrink-0"
               title="Log Out"
             >
-              <FaCog className="text-sm" />
+              <FaSignOutAlt className="text-sm" />
             </button>
           </div>
 
