@@ -158,9 +158,11 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
     }
   };
 
+  const [mobileEditMode, setMobileEditMode] = useState(false);
   const allEarnedBadges = badges.filter((b) => b.is_earned);
   const unearnedBadges = badges.filter((b) => !b.is_earned);
   const canEdit = !userId; // If userId is present, we are viewing someone else
+  const isFeatured = (badge: Badge) => featuredBadges.some(b => b.id === badge.id);
 
   const getProgress = (badge: Badge) => {
     if (!badge.requirement_value || !badge.requirement_type) return { current: 0, target: badge.requirement_value || 0, percent: 0 };
@@ -232,7 +234,52 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
             Showcase your achievements
           </p>
         </div>
+        {/* Mobile edit toggle */}
+        {canEdit && (
+          <button
+            onClick={() => setMobileEditMode(!mobileEditMode)}
+            className={cn(
+              "lg:hidden px-3 py-1.5 rounded-lg text-xs font-bold transition-all border",
+              mobileEditMode
+                ? "bg-amber-500/20 border-amber-500/50 text-amber-400"
+                : "bg-white/5 border-white/10 text-white/50"
+            )}
+          >
+            {mobileEditMode ? `Done (${featuredBadges.length}/5)` : "Edit Showcase"}
+          </button>
+        )}
       </div>
+
+      {/* Mobile: Showcase preview row (when not editing) */}
+      {featuredBadges.length > 0 && !mobileEditMode && (
+        <div className="lg:hidden mb-6">
+          <h3 className="text-xs font-semibold text-amber-400 uppercase tracking-wide flex items-center gap-1.5 mb-3">
+            <FaStar className="text-[10px]" /> Showcase ({featuredBadges.length}/5)
+          </h3>
+          <div className="flex gap-2 overflow-x-auto pb-1">
+            {featuredBadges.map((badge) => (
+              <div
+                key={badge.id}
+                className="w-14 h-14 shrink-0 rounded-lg border-2 border-amber-400/60 bg-mambo-panel flex items-center justify-center shadow-[0_0_8px_rgba(251,191,36,0.2)]"
+              >
+                {badge.icon_url ? (
+                  <div className="w-11 h-11 rounded overflow-hidden" style={{
+                    background: badge.id.includes('bronze') ? 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)' :
+                      badge.id.includes('silver') ? 'linear-gradient(135deg, #A8A8A8 0%, #C0C0C0 100%)' :
+                        badge.id.includes('gold') ? 'linear-gradient(135deg, #DAA520 0%, #FFD700 100%)' :
+                          badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
+                            'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
+                  }}>
+                    <img src={badge.icon_url} alt={badge.name} className="w-full h-full object-cover" />
+                  </div>
+                ) : (
+                  <span className="text-xl">🏆</span>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Featured Section (Draggable) — Desktop only */}
       <div className="mb-8 hidden lg:block">
@@ -306,47 +353,86 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
         ) : (
           <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-4">
             {/* On mobile: show ALL earned (featured section is hidden). On desktop: only non-featured collection. */}
-            {allEarnedBadges.map((badge) => (
-              <motion.div
-                key={badge.id}
-                layoutId={badge.id}
-                whileHover={canEdit ? { scale: 1.02, rotate: 1 } : {}}
-                onClick={() => canEdit && toggleFeature(badge)}
-                className={cn(
-                  "relative p-2 lg:p-4 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 cursor-pointer transition-colors flex flex-col items-center text-center group",
-                  featuredBadges.length < 5 ? "hover:border-amber-400/50" : ""
-                )}
-              >
-                <div className="text-3xl lg:text-5xl mb-1.5 lg:mb-3 w-full flex justify-center">
-                  {badge.icon_url ? (
-                    <div className="w-14 h-14 lg:w-24 lg:h-24 rounded-lg overflow-hidden" style={{
-                      background: badge.id.includes('bronze') ? 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)' :
-                        badge.id.includes('silver') ? 'linear-gradient(135deg, #A8A8A8 0%, #C0C0C0 100%)' :
-                          badge.id.includes('gold') ? 'linear-gradient(135deg, #DAA520 0%, #FFD700 100%)' :
-                            badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
-                              'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
-                    }}>
-                      <img src={badge.icon_url} className="w-full h-full object-cover" alt={badge.name} />
+            {allEarnedBadges.map((badge) => {
+              const featured = isFeatured(badge);
+              return (
+                <motion.div
+                  key={badge.id}
+                  layoutId={badge.id}
+                  whileHover={canEdit ? { scale: 1.02, rotate: 1 } : {}}
+                  onClick={() => {
+                    if (canEdit && mobileEditMode) {
+                      toggleFeature(badge);
+                    } else if (canEdit) {
+                      toggleFeature(badge);
+                    }
+                  }}
+                  className={cn(
+                    "relative p-2 lg:p-4 rounded-lg border bg-white/5 hover:bg-white/10 cursor-pointer transition-all flex flex-col items-center text-center group",
+                    featured
+                      ? "border-amber-400/50 ring-1 ring-amber-400/20"
+                      : "border-white/10",
+                    !featured && featuredBadges.length < 5 && "hover:border-amber-400/50",
+                    mobileEditMode && "animate-[wiggle_0.3s_ease-in-out]"
+                  )}
+                >
+                  {/* Featured star indicator */}
+                  {featured && (
+                    <div className="absolute top-1 right-1 z-10">
+                      <FaStar className="text-amber-400 text-[10px] lg:text-xs drop-shadow-[0_0_4px_rgba(251,191,36,0.5)]" />
                     </div>
-                  ) : "🏅"}
-                </div>
-                <h4 className="font-medium text-white text-xs">
-                  {badge.name}
-                  {badge.id.includes('bronze') && " I"}
-                  {badge.id.includes('silver') && " III"}
-                  {badge.id.includes('gold') && " V"}
-                  {badge.id.includes('diamond') && " X"}
-                </h4>
-                <p className="text-[10px] text-white/50 mt-1 line-clamp-1">{badge.description}</p>
+                  )}
 
-                {/* Add Trigger Hint — desktop only (featured section hidden on mobile) */}
-                {canEdit && featuredBadges.length < 5 && (
-                  <div className="absolute inset-0 hidden lg:flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                    <span className="text-amber-400 text-xs font-bold">Feature +</span>
+                  {/* Mobile edit mode overlay */}
+                  {mobileEditMode && (
+                    <div className={cn(
+                      "absolute inset-0 rounded-lg z-10 flex items-center justify-center transition-colors",
+                      featured ? "bg-amber-500/10" : "bg-black/30"
+                    )}>
+                      <span className={cn(
+                        "text-[10px] font-bold px-2 py-0.5 rounded-full",
+                        featured
+                          ? "bg-amber-500/30 text-amber-300 border border-amber-500/40"
+                          : featuredBadges.length >= 5
+                            ? "text-white/30"
+                            : "bg-white/10 text-white/70 border border-white/20"
+                      )}>
+                        {featured ? "★ Featured" : featuredBadges.length >= 5 ? "Full" : "+ Feature"}
+                      </span>
+                    </div>
+                  )}
+
+                  <div className="text-3xl lg:text-5xl mb-1.5 lg:mb-3 w-full flex justify-center">
+                    {badge.icon_url ? (
+                      <div className="w-14 h-14 lg:w-24 lg:h-24 rounded-lg overflow-hidden" style={{
+                        background: badge.id.includes('bronze') ? 'linear-gradient(135deg, #8B4513 0%, #A0522D 100%)' :
+                          badge.id.includes('silver') ? 'linear-gradient(135deg, #A8A8A8 0%, #C0C0C0 100%)' :
+                            badge.id.includes('gold') ? 'linear-gradient(135deg, #DAA520 0%, #FFD700 100%)' :
+                              badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
+                                'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
+                      }}>
+                        <img src={badge.icon_url} className="w-full h-full object-cover" alt={badge.name} />
+                      </div>
+                    ) : "🏅"}
                   </div>
-                )}
-              </motion.div>
-            ))}
+                  <h4 className="font-medium text-white text-xs">
+                    {badge.name}
+                    {badge.id.includes('bronze') && " I"}
+                    {badge.id.includes('silver') && " III"}
+                    {badge.id.includes('gold') && " V"}
+                    {badge.id.includes('diamond') && " X"}
+                  </h4>
+                  <p className="text-[10px] text-white/50 mt-1 line-clamp-1 hidden lg:block">{badge.description}</p>
+
+                  {/* Add Trigger Hint — desktop only */}
+                  {canEdit && !featured && featuredBadges.length < 5 && (
+                    <div className="absolute inset-0 hidden lg:flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
+                      <span className="text-amber-400 text-xs font-bold">Feature +</span>
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
 
             {/* Locked Badges */}
             {unearnedBadges.map((badge) => {
