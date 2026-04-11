@@ -38,24 +38,18 @@
   --font-sans: var(--font-inter);
   --font-serif: var(--font-playfair);
 
-  /* Remove md/lg/xl from auto-generated breakpoints so we can redefine them
-     with landscape-phone awareness. sm and 2xl stay as default breakpoints. */
-  --breakpoint-md: initial;
+  /* Remove lg/xl from auto-generated breakpoints so we can redefine them
+     with landscape-phone awareness. sm, md, 2xl stay as default breakpoints. */
   --breakpoint-lg: initial;
   --breakpoint-xl: initial;
 }
 
 /* ─── Landscape-aware breakpoints ─────────────────────────────────────
-   md: and lg: now fire at their normal widths OR when a phone is held
-   in landscape. The (pointer: coarse) + (max-height: 500px) combo
-   ensures this only targets touch devices — not a small desktop window.
-   All three are declared in cascade order: md → lg → xl.
+   lg: fires at ≥1024px OR when a phone is held in landscape.
+   md: stays at its default (768px) — the navbar relies on md: to
+   stay in hamburger mode on landscape phones where there isn't enough
+   horizontal space for the full desktop nav.
    ──────────────────────────────────────────────────────────────────── */
-@custom-variant md {
-  @media (min-width: 768px), ((orientation: landscape) and (max-height: 500px) and (pointer: coarse)) {
-    @slot;
-  }
-}
 @custom-variant lg {
   @media (min-width: 1024px), ((orientation: landscape) and (max-height: 500px) and (pointer: coarse)) {
     @slot;
@@ -474,20 +468,28 @@ h6 {
     scrollbar-width: thin;
   }
 
-  /* Compact navbar: reduce vertical padding for limited screen height */
-  .glass-nav > div {
-    padding-top: 0.25rem !important;
-    padding-bottom: 0.25rem !important;
-  }
-
-  /* Hide sticky mobile CTA in landscape (desktop nav is visible) */
+  /* Hide sticky mobile CTA in landscape */
   .mobile-sticky-cta {
     display: none !important;
   }
 
-  /* Narrow lesson sidebars so video gets enough space on ~844px screens */
+  /* ── Lesson page: hide sidebars, show mobile UI, maximize video ── */
   .lesson-sidebar {
-    width: 200px !important;
+    display: none !important;
+  }
+  .lesson-mobile-nav {
+    display: block !important;
+  }
+  .lesson-mobile-captions {
+    display: flex !important;
+  }
+  .lesson-mobile-controls {
+    display: block !important;
+  }
+
+  /* ── Landing hero: tighter gap for landscape phone ── */
+  .hero-content-container {
+    gap: 1.5rem !important;
   }
 }
 

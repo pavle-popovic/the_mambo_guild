@@ -713,7 +713,7 @@ export default function LessonPage() {
 
                 {/* MOBILE QUEST BAR — sits above video as flex child, never covers it */}
                 {levelLessons.length > 0 && (
-                  <div className="lg:hidden flex-shrink-0 bg-black z-20 relative">
+                  <div className="lg:hidden flex-shrink-0 bg-black z-20 relative lesson-mobile-nav">
                     {/* Nav row: back + title + language */}
                     <div className="flex items-center justify-between px-3 pt-2 pb-1">
                       <Link
@@ -833,7 +833,7 @@ export default function LessonPage() {
                     </div>
                     {/* External caption display — below video on mobile, hidden on desktop (internal overlay used) */}
                     {captionText && (
-                      <div className="lg:hidden flex-shrink-0 bg-black px-4 py-2 flex justify-center">
+                      <div className="lg:hidden flex-shrink-0 bg-black px-4 py-2 flex justify-center lesson-mobile-captions">
                         <span
                           className="text-white text-sm font-medium text-center leading-relaxed"
                           style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}
@@ -1019,7 +1019,7 @@ export default function LessonPage() {
 
         {/* MOBILE STICKY CONTROLS */}
         {isVideoLesson && lesson.mux_playback_id && (
-          <div className="lg:hidden fixed bottom-0 left-0 w-full z-50">
+          <div className="lg:hidden fixed bottom-0 left-0 w-full z-50 lesson-mobile-controls">
             <VideoControls
               playerRef={videoPlayerRef}
               duration={videoDuration}
