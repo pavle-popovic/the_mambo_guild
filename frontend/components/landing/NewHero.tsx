@@ -146,7 +146,7 @@ export default function NewHero() {
                         </Link>
                         <Link
                             href="/register"
-                            className="bg-mambo-gold hover:bg-yellow-500 text-black font-extrabold py-3 sm:py-4 px-6 sm:px-8 rounded-full text-sm sm:text-lg transition-all transform hover:-translate-y-1 text-center shadow-[0_0_20px_rgba(212,175,55,0.3)]"
+                            className="relative bg-amber-500 hover:bg-amber-400 text-black font-extrabold py-3 sm:py-4 px-6 sm:px-8 rounded-full text-sm sm:text-lg transition-all transform hover:-translate-y-1 text-center shadow-[0_0_25px_rgba(245,158,11,0.5),0_0_50px_rgba(245,158,11,0.2)] hover:shadow-[0_0_35px_rgba(245,158,11,0.7),0_0_70px_rgba(245,158,11,0.3)] ring-2 ring-amber-400/50"
                         >
                             Get Your 7-Day Trial!
                         </Link>
