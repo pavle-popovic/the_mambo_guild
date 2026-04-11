@@ -664,28 +664,15 @@ export default function LessonPage() {
 
           {/* LEFT SIDEBAR: Quest Log (Desktop only) */}
           <aside className="hidden lg:flex flex-col h-full w-[280px] bg-black border-r border-white/10 z-30 flex-shrink-0">
-            {/* Mark Complete button */}
-            <div className="flex-shrink-0 p-3 flex justify-center">
-              {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
-                <button
-                  onClick={handleComplete}
-                  disabled={completing}
-                  className="flex w-full px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] items-center justify-center gap-2 transition active:scale-95 border border-green-400/30 disabled:opacity-50 whitespace-nowrap"
-                >
-                  <span>{tLesson('markComplete')}</span>
-                  <FaArrowRight />
-                </button>
-              )}
-              {isCompleted && (
-                <div className="flex w-full px-4 py-2.5 bg-green-900/60 text-green-400 text-sm font-bold rounded-lg items-center justify-center gap-2 border border-green-500/30">
-                  <FaCheckCircle /> {tLesson('completed')}
-                </div>
-              )}
-            </div>
-            {/* Quest Log header */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-zinc-900/40 backdrop-blur-md flex-shrink-0">
-              <span className="text-xs font-bold text-mambo-gold uppercase tracking-wider">Quest Log</span>
-              <span className="text-[10px] text-gray-500 font-mono">{Math.round(levelProgress || 0)}%</span>
+            {/* Navigation: back + language */}
+            <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/10 flex-shrink-0">
+              <Link
+                href={worldId ? `/courses/${worldId}` : '/courses'}
+                className="flex items-center gap-1.5 text-gray-400 hover:text-white transition text-sm font-bold"
+              >
+                <FaChevronLeft size={12} /> {tCommon('back')}
+              </Link>
+              <LocaleSwitcher compact />
             </div>
             {/* Quest Log content */}
             <div className="flex-1 overflow-y-auto scrollbar-thin scrollbar-thumb-gray-800 scrollbar-track-transparent">
@@ -722,18 +709,7 @@ export default function LessonPage() {
             {isVideoLesson && hasVideo && (
               <div className="w-full bg-black relative flex-1 min-h-0 flex flex-col">
 
-                {/* Immersive overlay — back arrow + language (desktop only, mobile uses quest bar) */}
-                <div className="hidden lg:flex absolute top-0 left-0 right-0 z-30 px-4 py-3 pointer-events-none items-center justify-between">
-                  <Link
-                    href={worldId ? `/courses/${worldId}` : '/courses'}
-                    className="pointer-events-auto flex items-center justify-center w-9 h-9 bg-black/50 hover:bg-black/70 rounded-full backdrop-blur-sm transition text-white"
-                  >
-                    <FaChevronLeft size={14} />
-                  </Link>
-                  <div className="pointer-events-auto">
-                    <LocaleSwitcher compact />
-                  </div>
-                </div>
+                {/* Back arrow + language moved to left sidebar on desktop */}
 
                 {/* MOBILE QUEST BAR — sits above video as flex child, never covers it */}
                 {levelLessons.length > 0 && (
@@ -1008,10 +984,29 @@ export default function LessonPage() {
             )}
           </main>
 
-          {/* RIGHT SIDEBAR: Video Controls (Desktop only) */}
+          {/* RIGHT SIDEBAR: Mark Complete + Video Controls (Desktop only) */}
           <aside className="hidden lg:flex flex-col h-full w-[280px] bg-black border-l border-white/10 z-30 flex-shrink-0">
+            {/* Mark Complete button */}
+            <div className="flex-shrink-0 p-3 flex justify-center">
+              {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (
+                <button
+                  onClick={handleComplete}
+                  disabled={completing}
+                  className="flex w-full px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] items-center justify-center gap-2 transition active:scale-95 border border-green-400/30 disabled:opacity-50 whitespace-nowrap"
+                >
+                  <span>{tLesson('markComplete')}</span>
+                  <FaArrowRight />
+                </button>
+              )}
+              {isCompleted && (
+                <div className="flex w-full px-4 py-2.5 bg-green-900/60 text-green-400 text-sm font-bold rounded-lg items-center justify-center gap-2 border border-green-500/30">
+                  <FaCheckCircle /> {tLesson('completed')}
+                </div>
+              )}
+            </div>
+            {/* Video Controls */}
             {isVideoLesson && lesson.mux_playback_id && (
-              <div className="flex-shrink-0 p-3 bg-zinc-900/40 backdrop-blur-md">
+              <div className="flex-shrink-0 p-3 border-t border-white/10 bg-zinc-900/40 backdrop-blur-md">
                 <VideoControls
                   playerRef={videoPlayerRef}
                   duration={videoDuration}

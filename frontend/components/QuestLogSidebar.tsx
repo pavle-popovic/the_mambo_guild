@@ -128,7 +128,7 @@ export default function QuestLogSidebar({
   }, [currentLessonId, lessons]);
 
   return (
-    <aside className="w-80 bg-mambo-panel border-l border-gray-800 flex-none hidden lg:flex flex-col z-10 shadow-2xl">
+    <aside className="w-full bg-mambo-panel flex flex-col">
       <div className="p-6 border-b border-gray-800 bg-black/20">
         <h3 className="font-bold text-gray-500 text-[10px] uppercase tracking-wider mb-2">
           Current World
