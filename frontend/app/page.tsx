@@ -61,16 +61,16 @@ export default function HomePage() {
             {/* Sticky bottom CTA — appears after scrolling past hero */}
             {!user && (
                 <div
-                    className={`mobile-sticky-cta fixed bottom-0 left-0 right-0 z-50 transition-transform duration-300 ${
-                        showStickyCta ? "translate-y-0" : "translate-y-full"
+                    className={`mobile-sticky-cta fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 ${
+                        showStickyCta ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
                     }`}
                 >
-                    <div className="bg-black/95 backdrop-blur-md border-t border-white/10 px-4 py-3 flex items-center justify-center gap-4">
+                    <div className="bg-mambo-gold px-4 py-3 sm:py-4 flex items-center justify-center">
                         <Link
                             href="/register"
-                            className="bg-mambo-gold hover:bg-yellow-500 text-black font-extrabold py-2.5 sm:py-3 px-6 sm:px-8 rounded-full text-sm sm:text-base active:scale-95 transition-all text-center"
+                            className="w-full max-w-md bg-black hover:bg-zinc-900 text-white font-extrabold py-3.5 sm:py-4 px-8 rounded-full text-base sm:text-lg active:scale-[0.97] transition-all text-center shadow-[0_4px_20px_rgba(0,0,0,0.4)] tracking-wide"
                         >
-                            Get Your 7-Day Trial!
+                            Get Your 7-Day Free Trial!
                         </Link>
                     </div>
                 </div>

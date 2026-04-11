@@ -375,7 +375,7 @@ export default function BugReportButton() {
         onClick={openAndCapture}
         aria-label="Report a bug"
         style={{
-          top: "calc(env(safe-area-inset-top, 0px) + 0.5rem)",
+          bottom: "calc(env(safe-area-inset-bottom, 0px) + 4.5rem)",
           left: "calc(env(safe-area-inset-left, 0px) + 0.5rem)",
         }}
         className="fixed z-[9998] flex items-center justify-center w-8 h-8 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-white/40 hover:text-[#D4AF37] hover:border-[#D4AF37]/40 hover:bg-black/80 active:scale-95 transition-all duration-200"
