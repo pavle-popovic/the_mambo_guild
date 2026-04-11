@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -40,6 +40,20 @@ export default function CoursesPage() {
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [typeDropdownOpen, setTypeDropdownOpen] = useState(false);
+  const [levelDropdownOpen, setLevelDropdownOpen] = useState(false);
+  const typeDropdownRef = useRef<HTMLDivElement>(null);
+  const levelDropdownRef = useRef<HTMLDivElement>(null);
+
+  // Close dropdowns on outside click
+  useEffect(() => {
+    const handleClick = (e: MouseEvent) => {
+      if (typeDropdownRef.current && !typeDropdownRef.current.contains(e.target as Node)) setTypeDropdownOpen(false);
+      if (levelDropdownRef.current && !levelDropdownRef.current.contains(e.target as Node)) setLevelDropdownOpen(false);
+    };
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, []);
 
   useEffect(() => {
     loadCourses();
@@ -145,43 +159,73 @@ export default function CoursesPage() {
               {/* Filter dropdowns row */}
               <div className="flex gap-2">
                 {/* Class Type dropdown */}
-                <div className="relative flex-1">
-                  <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold pointer-events-none">Type</span>
-                  <select
-                    value={typeFilter}
-                    onChange={(e) => setTypeFilter(e.target.value as TypeFilter)}
-                    className={`appearance-none w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-[11px] font-bold focus:outline-none transition-all ${
+                <div className="relative flex-1" ref={typeDropdownRef}>
+                  <button
+                    onClick={() => { setTypeDropdownOpen(!typeDropdownOpen); setLevelDropdownOpen(false); }}
+                    className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
                       typeFilter !== 'all'
-                        ? 'bg-purple-500/10 border-purple-500/40 text-purple-300'
-                        : 'bg-white/[0.04] border-white/10 text-white'
-                    }`}
+                        ? 'bg-purple-500/10 border-purple-500/40'
+                        : 'bg-white/[0.04] border-white/10'
+                    } ${typeDropdownOpen ? 'border-purple-400/60 bg-white/[0.08]' : ''}`}
                   >
-                    <option value="all">All Classes</option>
-                    <option value="course">Courses</option>
-                    <option value="choreo">Choreos</option>
-                    <option value="topic">Topics</option>
-                  </select>
-                  <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 pointer-events-none transition-colors ${typeFilter !== 'all' ? 'text-purple-400' : 'text-gray-500'}`} />
+                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Type</span>
+                    <span className={`text-[11px] font-bold ${typeFilter !== 'all' ? 'text-purple-300' : 'text-white'}`}>
+                      {({ all: 'All Classes', course: 'Courses', choreo: 'Choreos', topic: 'Topics' } as Record<string, string>)[typeFilter]}
+                    </span>
+                    <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 transition-transform ${typeDropdownOpen ? 'rotate-180' : ''} ${typeFilter !== 'all' ? 'text-purple-400' : 'text-gray-500'}`} />
+                  </button>
+                  {typeDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                      {([['all', 'All Classes'], ['course', 'Courses'], ['choreo', 'Choreos'], ['topic', 'Topics']] as const).map(([val, label]) => (
+                        <button
+                          key={val}
+                          onClick={() => { setTypeFilter(val as TypeFilter); setTypeDropdownOpen(false); }}
+                          className={`w-full px-3 py-2.5 text-left text-[12px] font-semibold transition-all ${
+                            typeFilter === val
+                              ? 'bg-purple-500/20 text-purple-300'
+                              : 'text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Level dropdown */}
-                <div className="relative flex-1">
-                  <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold pointer-events-none">Level</span>
-                  <select
-                    value={difficultyFilter}
-                    onChange={(e) => setDifficultyFilter(e.target.value as DifficultyFilter)}
-                    className={`appearance-none w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-[11px] font-bold focus:outline-none transition-all ${
+                <div className="relative flex-1" ref={levelDropdownRef}>
+                  <button
+                    onClick={() => { setLevelDropdownOpen(!levelDropdownOpen); setTypeDropdownOpen(false); }}
+                    className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
                       difficultyFilter !== 'all'
-                        ? 'bg-amber-500/10 border-amber-500/40 text-amber-300'
-                        : 'bg-white/[0.04] border-white/10 text-white'
-                    }`}
+                        ? 'bg-amber-500/10 border-amber-500/40'
+                        : 'bg-white/[0.04] border-white/10'
+                    } ${levelDropdownOpen ? 'border-amber-400/60 bg-white/[0.08]' : ''}`}
                   >
-                    <option value="all">All Levels</option>
-                    <option value="beginner">Beginner</option>
-                    <option value="intermediate">Intermediate</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
-                  <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 pointer-events-none transition-colors ${difficultyFilter !== 'all' ? 'text-amber-400' : 'text-gray-500'}`} />
+                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Level</span>
+                    <span className={`text-[11px] font-bold ${difficultyFilter !== 'all' ? 'text-amber-300' : 'text-white'}`}>
+                      {({ all: 'All Levels', beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' } as Record<string, string>)[difficultyFilter]}
+                    </span>
+                    <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 transition-transform ${levelDropdownOpen ? 'rotate-180' : ''} ${difficultyFilter !== 'all' ? 'text-amber-400' : 'text-gray-500'}`} />
+                  </button>
+                  {levelDropdownOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
+                      {([['all', 'All Levels'], ['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced']] as const).map(([val, label]) => (
+                        <button
+                          key={val}
+                          onClick={() => { setDifficultyFilter(val as DifficultyFilter); setLevelDropdownOpen(false); }}
+                          className={`w-full px-3 py-2.5 text-left text-[12px] font-semibold transition-all ${
+                            difficultyFilter === val
+                              ? 'bg-amber-500/20 text-amber-300'
+                              : 'text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]'
+                          }`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
