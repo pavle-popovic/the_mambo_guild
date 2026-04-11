@@ -484,7 +484,10 @@ h6 {
     display: flex !important;
   }
   .lesson-mobile-controls {
-    display: block !important;
+    display: none !important;
+  }
+  .lesson-mobile-quest-dots {
+    display: none !important;
   }
 
   /* ── Landing hero: tighter gap for landscape phone ── */

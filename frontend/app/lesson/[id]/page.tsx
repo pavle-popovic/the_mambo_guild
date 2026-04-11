@@ -747,7 +747,7 @@ export default function LessonPage() {
                     <div className="h-[1px] bg-white/20" />
 
                     {/* Progress + lesson dots */}
-                    <div className="px-3 py-2">
+                    <div className="px-3 py-2 lesson-mobile-quest-dots">
                       {/* Progress bar */}
                       <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden mb-2">
                         <div
