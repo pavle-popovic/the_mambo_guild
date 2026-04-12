@@ -102,7 +102,7 @@ export default function NavBar({ user }: NavBarProps) {
   return (
     <>
       <nav className="fixed w-full z-50 glass-nav transition-all duration-300" suppressHydrationWarning>
-        <div className="max-w-[1440px] mx-auto px-3 sm:px-4 lg:px-8 py-2 sm:py-3 md:py-5 flex items-center gap-2 sm:gap-4">
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-4 lg:px-8 py-2 sm:py-3 md:py-5 flex items-center gap-4 sm:gap-8 md:gap-10 lg:gap-14">
           <LogoWrapper
             {...(mounted ? {
               whileHover: { scale: 1.05 },
@@ -127,7 +127,7 @@ export default function NavBar({ user }: NavBarProps) {
           </LogoWrapper>
 
           {/* Center: Navigation Links */}
-          <div className="flex-1 hidden md:flex justify-center gap-4 lg:gap-8 items-center min-w-0">
+          <div className="flex-1 hidden md:flex justify-center gap-6 lg:gap-10 items-center min-w-0 md:ml-8 lg:ml-16">
             <NavLink href="/">{t('home')}</NavLink>
             <NavLink href="/courses" activePaths={["/courses"]}>{t('courses')}</NavLink>
             <NavLink href="/community" activePaths={["/community"]}>{t('community')}</NavLink>

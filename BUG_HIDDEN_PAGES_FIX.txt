@@ -1,0 +1,149 @@
+BUG: Pages Hidden Behind Background on Mobile
+================================================
+
+Fixed in commit: c6c2b41
+Date: 2026-04-12
+
+
+SYMPTOMS
+--------
+- On mobile (both vertical and landscape), navigating from /courses to a
+  skill tree page (or back), the entire destination page was invisible.
+  User saw only the starry background — no NavBar, no content, no cards.
+- Desktop worked perfectly. Same code, same routes.
+- Hard refresh on the affected page sometimes made it visible; soft
+  client-side navigation left it hidden.
+- The issue was intermittent but consistently reproducible by navigating
+  between /courses and /courses/[id].
+
+
+ROOT CAUSE
+----------
+File: frontend/app/template.tsx
+
+Next.js App Router templates wrap every page. Ours wrapped children in a
+Framer Motion <motion.div> with an AnimatePresence page transition:
+
+    initial: { opacity: 0, x: 20 }
+    animate: { opacity: 1, x: 0 }
+    exit:    { opacity: 0, x: -20 }
+    mode: "wait"
+
+On mobile, the animate-to-opacity:1 step sometimes never fired. The page
+would mount, children would render correctly, but the parent motion.div
+stayed at opacity: 0 — making the entire page subtree invisible even
+though every element inside it (cards, react-flow viewport, NavBar) was
+computed visible with opacity 1.
+
+Desktop worked because its requestAnimationFrame loop advanced the
+animation reliably. Mobile (Safari and Android Chrome) under the load of
+a soft navigation + AnimatePresence mode="wait" sometimes dropped the
+animate step entirely, stranding the motion.div at its initial state.
+
+
+HOW WE FOUND IT
+---------------
+Three failed attempts chased the wrong layer:
+
+1. Changed StarryBackground's z-[-1] to z-0 + wrapped children in
+   relative z-10.  Assumed negative z-index was being hoisted on mobile.
+   Didn't fix it.
+
+2. Added `isolation: isolate` to <body> and used -z-10 on
+   StarryBackground. Assumed body wasn't a proper stacking context on
+   mobile Safari. Made it worse — broke pages entirely.
+
+3. Removed StarryBackground from root layout entirely. Pages still
+   hidden — confirmed the issue wasn't the starry background at all.
+
+The fix came from building a diagnostic overlay component
+(MobileDebugOverlay) that rendered a red fixed bar at z-index 99999 with
+runtime info:
+- Viewport size, scroll position, body.scrollHeight
+- For each direct child of <body>: tag, size, display, z-index, opacity,
+  visibility, position, className
+- elementFromPoint() at 4 viewport positions (mid/top/bot/left) while
+  temporarily hiding itself — revealed which element actually painted
+  where
+- Lime outlines drawn on all .bg-zinc-900 course cards and magenta
+  outline on .react-flow__viewport — made invisible elements visible
+
+The diagnostic showed:
+- body.kids[2] (the template's motion.div wrapper) at `op:0 v:visible`
+- card0 INSIDE it at `op:1 v:visible trans:none`
+- react-flow__viewport INSIDE it at `op:1`
+- hit-testing at all points returned real page elements
+
+That's when it clicked: the parent was at opacity 0, every child was
+fine. The culprit was a parent we'd never thought to look at — the
+template, not the layout.
+
+
+THE FIX
+-------
+Remove the AnimatePresence + motion.div wrapper from template.tsx.
+Render children directly. Keep NavigationProgress and the whoosh sound.
+
+    export default function Template({ children }) {
+      // ... mounted + whoosh effects ...
+      return (
+        <>
+          <Suspense fallback={null}>
+            <NavigationProgress />
+          </Suspense>
+          {children}
+        </>
+      );
+    }
+
+Lost: the 0.35s slide-in-from-right page transition.
+Gained: pages that are actually visible on mobile.
+
+If the transition is desired later, re-add it as a pure-CSS keyframe
+animation on the children wrapper (no JS animation framework) so there's
+no runtime state to get stuck. Do NOT use Framer Motion's
+AnimatePresence at the template level again — the combination of
+soft-navigation, mode="wait", and rAF timing on mobile is fragile.
+
+
+LESSONS
+-------
+1. When content is "hidden" on mobile but desktop works, check opacity
+   on every ancestor, not just z-index. Opacity 0 hides everything
+   below it and is easy to miss.
+
+2. `elementFromPoint` is the most useful tool for "something is
+   covering my content" debugging. If it returns the content you expect
+   but you can't see it, the parent has opacity 0, visibility hidden, or
+   transform-translate-offscreen.
+
+3. Template-level page transitions with Framer Motion + AnimatePresence
+   + mode="wait" are risky on mobile. Prefer pure CSS or no transition.
+
+4. When fixing mobile-only bugs that desktop doesn't have, don't guess
+   at the stacking model. Ship a diagnostic overlay first. Three failed
+   CSS fixes cost more than one diagnostic commit would have.
+
+
+FILES TOUCHED DURING DEBUG (all reverted except the final fix)
+--------------------------------------------------------------
+- frontend/app/layout.tsx               (multiple attempts, reverted)
+- frontend/components/ui/StarryBackground.tsx (bg-mambo-dark removed temporarily, reverted)
+- frontend/app/template.tsx             (THE FIX — Framer Motion wrapper removed)
+- frontend/components/MobileDebugOverlay.tsx (added during debug, deleted)
+
+
+COMMITS (chronological)
+-----------------------
+87f4610  fix: mobile pages hidden behind starry background (attempt 1, reverted)
+c08f04d  fix: isolate body stacking context (attempt 2, reverted)
+cb3551b  fix: scope StarryBackground to landing page only (attempt 3, reverted)
+14b2daf  Revert "fix: scope StarryBackground to landing page only"
+e11edff  Revert "fix: isolate body stacking context"
+81577e9  Revert "fix: mobile pages hidden behind starry background"
+7a6aa55  debug: add temporary red mobile diagnostic overlay
+28a8e9b  debug: expand overlay — list body children and elementFromPoint samples
+09202f4  fix: remove solid bg-mambo-dark from StarryBackground (wrong theory, harmless)
+f85e8ec  debug: outline cards and react-flow viewport in lime/magenta
+c6c2b41  fix: remove Framer Motion page transition that was stranding mobile pages at opacity 0  ← THE ACTUAL FIX
+22aa167  chore: remove temporary mobile debug overlay
