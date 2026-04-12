@@ -5,7 +5,7 @@ Premium Feature Models for Guild Master (PERFORMER) tier
 - Coaching Submissions (1-on-1 Video Analysis)
 - DJ Booth Tracks (Mambo Mixer)
 """
-from sqlalchemy import Column, String, Integer, DateTime, Boolean, Text, ForeignKey, Enum as SQLEnum
+from sqlalchemy import Column, String, Integer, DateTime, Date, Boolean, Text, ForeignKey, Enum as SQLEnum
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 import uuid
@@ -231,3 +231,33 @@ class DJBoothTrack(Base):
     
     def __repr__(self):
         return f"<DJBoothTrack {self.title} by {self.artist}>"
+
+
+# ============================================
+# Release Schedule (upcoming course & choreo drops)
+# ============================================
+
+class ReleaseScheduleItem(Base):
+    """
+    Upcoming release drop shown on the landing page release calendar.
+    Admin-managed via settings UI. Ordering is by release_date asc.
+    """
+    __tablename__ = "release_schedule_items"
+
+    id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    release_date = Column(Date, nullable=False, index=True)
+    title = Column(String(200), nullable=False)
+    artist = Column(String(200), nullable=True)
+
+    # "choreo" | "course"
+    release_type = Column(String(20), nullable=False, default="choreo")
+    # "beginner" | "intermediate" | "advanced" | "mastery"
+    level = Column(String(20), nullable=False, default="beginner")
+
+    featured = Column(Boolean, default=False, nullable=False)
+
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+    def __repr__(self):
+        return f"<ReleaseScheduleItem {self.release_date} {self.title}>"

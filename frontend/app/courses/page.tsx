@@ -9,6 +9,7 @@ import { apiClient } from "@/lib/api";
 import { StaggerContainer, Clickable } from "@/components/ui/motion";
 import { FadeIn } from "@/components/ui/motion";
 import CourseCard from "@/components/CourseCard";
+import { ReleaseScheduleButton } from "@/components/landing";
 import { FaSearch, FaTimes } from "react-icons/fa";
 import { ChevronDown } from "lucide-react";
 import { useTranslations } from "@/i18n/useTranslations";
@@ -139,6 +140,10 @@ export default function CoursesPage() {
 
             {/* Mobile: Search + filter dropdowns */}
             <div className="flex sm:hidden flex-col gap-2 w-full">
+              {/* Release Calendar pill */}
+              <div className="flex justify-center">
+                <ReleaseScheduleButton />
+              </div>
               {/* Search */}
               <div className="relative group">
                 <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-mambo-gold transition-colors text-sm" />
@@ -275,6 +280,11 @@ export default function CoursesPage() {
                     {f.l}
                   </button>
                 ))}
+              </div>
+
+              {/* Release Calendar — hover on desktop */}
+              <div className="ml-auto">
+                <ReleaseScheduleButton />
               </div>
             </div>
           </div>

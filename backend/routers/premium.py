@@ -21,7 +21,8 @@ from models.premium import (
     WeeklyArchive,
     WeeklyMeetingConfig,
     CoachingSubmission, CoachingSubmissionStatus,
-    DJBoothTrack
+    DJBoothTrack,
+    ReleaseScheduleItem,
 )
 from schemas.premium import (
     # Live Calls
@@ -36,7 +37,9 @@ from schemas.premium import (
     CoachingSubmissionResponse, CoachingSubmissionAdminResponse, CoachingStatusResponse,
     # DJ Booth
     DJBoothTrackCreate, DJBoothTrackUpdate,
-    DJBoothTrackResponse, DJBoothTrackPreview
+    DJBoothTrackResponse, DJBoothTrackPreview,
+    # Release Schedule
+    ReleaseScheduleItemCreate, ReleaseScheduleItemUpdate, ReleaseScheduleItemResponse,
 )
 from services.r2_service import generate_r2_signed_url
 from services.email_service import send_coaching_feedback_email
@@ -987,5 +990,99 @@ def delete_weekly_archive(
     
     db.delete(archive)
     db.commit()
-    
+
     return {"success": True, "message": "Archive deleted"}
+
+
+# ============================================
+# Release Schedule (landing page)
+# ============================================
+
+@router.get("/release-schedule", response_model=List[ReleaseScheduleItemResponse])
+def list_release_schedule_public(db: Session = Depends(get_db)):
+    """Public list of upcoming releases, ordered by date ascending."""
+    items = (
+        db.query(ReleaseScheduleItem)
+        .order_by(ReleaseScheduleItem.release_date.asc())
+        .all()
+    )
+    return items
+
+
+@router.get("/admin/release-schedule", response_model=List[ReleaseScheduleItemResponse])
+def list_release_schedule_admin(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Admin list of all release items."""
+    require_admin(current_user)
+    return (
+        db.query(ReleaseScheduleItem)
+        .order_by(ReleaseScheduleItem.release_date.asc())
+        .all()
+    )
+
+
+@router.post("/admin/release-schedule", response_model=ReleaseScheduleItemResponse)
+def create_release_schedule_item(
+    data: ReleaseScheduleItemCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Create a new release item. Admin only."""
+    require_admin(current_user)
+
+    item = ReleaseScheduleItem(
+        release_date=data.release_date,
+        title=data.title,
+        artist=data.artist,
+        release_type=data.release_type,
+        level=data.level,
+        featured=data.featured,
+    )
+    db.add(item)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.put("/admin/release-schedule/{item_id}", response_model=ReleaseScheduleItemResponse)
+def update_release_schedule_item(
+    item_id: uuid.UUID,
+    data: ReleaseScheduleItemUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Update a release item. Admin only."""
+    require_admin(current_user)
+
+    item = db.query(ReleaseScheduleItem).filter(ReleaseScheduleItem.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Release item not found")
+
+    update_dict = data.model_dump(exclude_unset=True)
+    for key, value in update_dict.items():
+        setattr(item, key, value)
+
+    item.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
+@router.delete("/admin/release-schedule/{item_id}")
+def delete_release_schedule_item(
+    item_id: uuid.UUID,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Delete a release item. Admin only."""
+    require_admin(current_user)
+
+    item = db.query(ReleaseScheduleItem).filter(ReleaseScheduleItem.id == item_id).first()
+    if not item:
+        raise HTTPException(status_code=404, detail="Release item not found")
+
+    db.delete(item)
+    db.commit()
+    return {"success": True, "message": "Release item deleted"}

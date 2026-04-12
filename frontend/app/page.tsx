@@ -5,6 +5,7 @@ import {
     NewHero,
     TrendingModulesSection,
     SkillTreeTeaser,
+    ReleaseScheduleSection,
     TestimonialsSection,
 } from "@/components/landing";
 import NavBar from "@/components/NavBar";
@@ -45,6 +46,11 @@ export default function HomePage() {
                 {/* Skill Tree / Gamification Teaser */}
                 <section className="relative z-10">
                     <SkillTreeTeaser />
+                </section>
+
+                {/* Release Calendar / Upcoming Drops */}
+                <section className="relative z-10">
+                    <ReleaseScheduleSection />
                 </section>
 
                 {/* Testimonials */}

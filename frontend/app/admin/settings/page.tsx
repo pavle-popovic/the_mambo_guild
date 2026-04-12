@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import AdminSidebar from "@/components/AdminSidebar";
 import { useAuth } from "@/contexts/AuthContext";
-import { apiClient } from "@/lib/api";
+import { apiClient, type ReleaseScheduleItemDTO, type ReleaseScheduleItemInput } from "@/lib/api";
 import {
   FaCheckCircle,
   FaExclamationCircle,
@@ -19,12 +19,16 @@ import {
   FaCrown,
   FaStar,
   FaLink,
+  FaPlus,
+  FaTrash,
+  FaSave,
+  FaCalendarAlt,
 } from "react-icons/fa";
 
 // ---------------------------------------------------------------------------
 // Types
 // ---------------------------------------------------------------------------
-type Tab = "platform" | "email" | "meeting";
+type Tab = "platform" | "email" | "meeting" | "releases";
 
 interface WeeklyMeeting {
   meeting_url: string | null;
@@ -601,6 +605,314 @@ function MeetingTab() {
 }
 
 // ---------------------------------------------------------------------------
+// Release Schedule Tab
+// ---------------------------------------------------------------------------
+type DraftItem = {
+  id: string; // client key (server UUID or `new-${n}`)
+  serverId: string | null; // null = unsaved
+  release_date: string;
+  title: string;
+  artist: string;
+  release_type: "choreo" | "course";
+  level: "beginner" | "intermediate" | "advanced" | "mastery";
+  featured: boolean;
+  dirty: boolean;
+};
+
+const LEVEL_LABELS: Record<DraftItem["level"], string> = {
+  beginner: "Beginner",
+  intermediate: "Intermediate",
+  advanced: "Advanced",
+  mastery: "Mastery",
+};
+
+const LEVEL_DOT: Record<DraftItem["level"], string> = {
+  beginner: "bg-emerald-400",
+  intermediate: "bg-cyan-400",
+  advanced: "bg-rose-400",
+  mastery: "bg-amber-300",
+};
+
+function dtoToDraft(dto: ReleaseScheduleItemDTO): DraftItem {
+  return {
+    id: dto.id,
+    serverId: dto.id,
+    release_date: dto.release_date,
+    title: dto.title,
+    artist: dto.artist ?? "",
+    release_type: dto.release_type,
+    level: dto.level,
+    featured: dto.featured,
+    dirty: false,
+  };
+}
+
+function ReleaseScheduleTab() {
+  const [items, setItems] = useState<DraftItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState<string | null>(null);
+  const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
+  const [newCounter, setNewCounter] = useState(0);
+
+  const load = async () => {
+    setLoading(true);
+    try {
+      const data = await apiClient.getReleaseScheduleAdmin();
+      setItems(data.map(dtoToDraft));
+    } catch (err: any) {
+      setToast({ msg: err?.message ?? "Failed to load releases.", type: "error" });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    load();
+  }, []);
+
+  const updateField = <K extends keyof DraftItem>(id: string, field: K, value: DraftItem[K]) => {
+    setItems((prev) =>
+      prev.map((it) => (it.id === id ? { ...it, [field]: value, dirty: true } : it))
+    );
+  };
+
+  const addNew = () => {
+    const tempId = `new-${newCounter}`;
+    setNewCounter((c) => c + 1);
+    const today = new Date().toISOString().slice(0, 10);
+    setItems((prev) => [
+      ...prev,
+      {
+        id: tempId,
+        serverId: null,
+        release_date: today,
+        title: "",
+        artist: "",
+        release_type: "choreo",
+        level: "beginner",
+        featured: false,
+        dirty: true,
+      },
+    ]);
+  };
+
+  const save = async (id: string) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    if (!item.title.trim() || !item.release_date) {
+      setToast({ msg: "Title and date are required.", type: "error" });
+      return;
+    }
+    setSaving(id);
+    try {
+      const payload: ReleaseScheduleItemInput = {
+        release_date: item.release_date,
+        title: item.title.trim(),
+        artist: item.artist.trim() || null,
+        release_type: item.release_type,
+        level: item.level,
+        featured: item.featured,
+      };
+      let saved: ReleaseScheduleItemDTO;
+      if (item.serverId) {
+        saved = await apiClient.updateReleaseScheduleItem(item.serverId, payload);
+      } else {
+        saved = await apiClient.createReleaseScheduleItem(payload);
+      }
+      setItems((prev) => prev.map((i) => (i.id === id ? dtoToDraft(saved) : i)));
+      setToast({ msg: "Release saved.", type: "success" });
+    } catch (err: any) {
+      setToast({ msg: err?.message ?? "Save failed.", type: "error" });
+    } finally {
+      setSaving(null);
+    }
+  };
+
+  const remove = async (id: string) => {
+    const item = items.find((i) => i.id === id);
+    if (!item) return;
+    if (!item.serverId) {
+      setItems((prev) => prev.filter((i) => i.id !== id));
+      return;
+    }
+    if (!confirm(`Delete "${item.title || "this release"}"?`)) return;
+    try {
+      await apiClient.deleteReleaseScheduleItem(item.serverId);
+      setItems((prev) => prev.filter((i) => i.id !== id));
+      setToast({ msg: "Release deleted.", type: "success" });
+    } catch (err: any) {
+      setToast({ msg: err?.message ?? "Delete failed.", type: "error" });
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex justify-center py-12">
+        <div className="w-6 h-6 border-2 border-mambo-gold/30 border-t-mambo-gold rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-5">
+      <div className="bg-mambo-panel border border-white/10 rounded-xl p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-3 mb-1">
+          <div>
+            <h3 className="font-bold text-mambo-text flex items-center gap-2">
+              <FaCalendarAlt className="text-mambo-gold w-4 h-4" />
+              Release Schedule
+            </h3>
+            <p className="text-xs text-gray-500 mt-1">
+              These drops appear on the landing page "Road Ahead" section and in the courses page release calendar popover.
+            </p>
+          </div>
+          <button
+            onClick={addNew}
+            className="flex items-center gap-1.5 px-3 py-2 bg-mambo-gold hover:bg-yellow-400 text-black text-xs font-bold rounded-lg transition flex-shrink-0"
+          >
+            <FaPlus className="w-3 h-3" /> Add Release
+          </button>
+        </div>
+      </div>
+
+      {items.length === 0 && (
+        <div className="bg-mambo-panel border border-white/10 rounded-xl p-10 text-center text-sm text-gray-500">
+          No releases yet. Click "Add Release" to create the first one.
+        </div>
+      )}
+
+      <div className="space-y-3">
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className={`bg-mambo-panel border rounded-xl p-4 transition ${
+              item.dirty ? "border-mambo-gold/50" : "border-white/10"
+            }`}
+          >
+            <div className="grid grid-cols-1 sm:grid-cols-12 gap-3">
+              {/* Date */}
+              <div className="sm:col-span-3">
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  Release Date
+                </label>
+                <input
+                  type="date"
+                  value={item.release_date}
+                  onChange={(e) => updateField(item.id, "release_date", e.target.value)}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-mambo-text text-sm focus:outline-none focus:ring-2 focus:ring-mambo-gold/40"
+                />
+              </div>
+
+              {/* Title */}
+              <div className="sm:col-span-5">
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  Title
+                </label>
+                <input
+                  type="text"
+                  value={item.title}
+                  onChange={(e) => updateField(item.id, "title", e.target.value)}
+                  placeholder="e.g. Soneros de Bailadores"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-mambo-text text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-mambo-gold/40"
+                />
+              </div>
+
+              {/* Artist */}
+              <div className="sm:col-span-4">
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  Artist / Subtitle
+                </label>
+                <input
+                  type="text"
+                  value={item.artist}
+                  onChange={(e) => updateField(item.id, "artist", e.target.value)}
+                  placeholder="e.g. Cheo Feliciano"
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-mambo-text text-sm placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-mambo-gold/40"
+                />
+              </div>
+
+              {/* Type */}
+              <div className="sm:col-span-3">
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  Type
+                </label>
+                <select
+                  value={item.release_type}
+                  onChange={(e) => updateField(item.id, "release_type", e.target.value as DraftItem["release_type"])}
+                  className="w-full px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-mambo-text text-sm focus:outline-none focus:ring-2 focus:ring-mambo-gold/40"
+                >
+                  <option value="choreo">Choreography</option>
+                  <option value="course">Course</option>
+                </select>
+              </div>
+
+              {/* Level */}
+              <div className="sm:col-span-4">
+                <label className="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1">
+                  Level
+                </label>
+                <div className="relative">
+                  <div className={`absolute left-3 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full ${LEVEL_DOT[item.level]}`} />
+                  <select
+                    value={item.level}
+                    onChange={(e) => updateField(item.id, "level", e.target.value as DraftItem["level"])}
+                    className="w-full pl-8 pr-3 py-2 bg-white/5 border border-white/10 rounded-lg text-mambo-text text-sm focus:outline-none focus:ring-2 focus:ring-mambo-gold/40"
+                  >
+                    {Object.entries(LEVEL_LABELS).map(([v, l]) => (
+                      <option key={v} value={v}>{l}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              {/* Featured */}
+              <div className="sm:col-span-2 flex items-end">
+                <label className="flex items-center gap-2 px-3 py-2 bg-white/5 border border-white/10 rounded-lg cursor-pointer w-full">
+                  <input
+                    type="checkbox"
+                    checked={item.featured}
+                    onChange={(e) => updateField(item.id, "featured", e.target.checked)}
+                    className="accent-mambo-gold"
+                  />
+                  <span className="text-xs text-gray-300">Featured</span>
+                </label>
+              </div>
+
+              {/* Actions */}
+              <div className="sm:col-span-3 flex items-end gap-2">
+                <button
+                  onClick={() => save(item.id)}
+                  disabled={!item.dirty || saving === item.id}
+                  className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-mambo-gold hover:bg-yellow-400 disabled:bg-white/10 disabled:text-white/30 text-black text-xs font-bold rounded-lg transition"
+                >
+                  {saving === item.id ? (
+                    <div className="w-3 h-3 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                  ) : (
+                    <FaSave className="w-3 h-3" />
+                  )}
+                  {item.serverId ? "Save" : "Create"}
+                </button>
+                <button
+                  onClick={() => remove(item.id)}
+                  className="p-2 bg-white/5 hover:bg-red-500/20 hover:text-red-400 text-gray-500 rounded-lg transition"
+                  title="Delete"
+                >
+                  <FaTrash className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <AnimatePresence>
+        {toast && <Toast msg={toast.msg} type={toast.type} onClose={() => setToast(null)} />}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ---------------------------------------------------------------------------
 // Main page
 // ---------------------------------------------------------------------------
 export default function AdminSettingsPage() {
@@ -628,6 +940,7 @@ export default function AdminSettingsPage() {
     { id: "platform", label: "Platform" },
     { id: "email", label: "Email Broadcast" },
     { id: "meeting", label: "Weekly Meeting" },
+    { id: "releases", label: "Release Schedule" },
   ];
 
   return (
@@ -674,6 +987,7 @@ export default function AdminSettingsPage() {
             {activeTab === "platform" && <PlatformTab />}
             {activeTab === "email" && <EmailTab />}
             {activeTab === "meeting" && <MeetingTab />}
+            {activeTab === "releases" && <ReleaseScheduleTab />}
           </motion.div>
         </AnimatePresence>
       </main>

@@ -10,5 +10,6 @@ export { default as MaestroSection } from "./MaestroSection";
 export { default as CourseExplorerSection } from "./CourseExplorerSection";
 export { default as TrendingModulesSection } from "./TrendingModulesSection";
 export { default as SkillTreeTeaser } from "./SkillTreeTeaser";
+export { default as ReleaseScheduleSection, ReleaseScheduleButton } from "./ReleaseScheduleSection";
 export { default as Mambobot } from "./Mambobot";
 

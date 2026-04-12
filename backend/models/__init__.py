@@ -58,7 +58,9 @@ from models.premium import (
     LiveCall, LiveCallStatus,
     WeeklyArchive,
     CoachingSubmission, CoachingSubmissionStatus,
-    DJBoothTrack
+    DJBoothTrack,
+    WeeklyMeetingConfig,
+    ReleaseScheduleItem,
 )
 from models.payment import StripeWebhookEvent, XPAuditLog
 

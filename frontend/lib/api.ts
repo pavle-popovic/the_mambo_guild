@@ -8,6 +8,29 @@ export interface ApiError {
   message?: string;
 }
 
+export type ReleaseLevel = "beginner" | "intermediate" | "advanced" | "mastery";
+export type ReleaseType = "choreo" | "course";
+
+export interface ReleaseScheduleItemDTO {
+  id: string;
+  release_date: string; // ISO date (YYYY-MM-DD)
+  title: string;
+  artist: string | null;
+  release_type: ReleaseType;
+  level: ReleaseLevel;
+  featured: boolean;
+  updated_at: string | null;
+}
+
+export interface ReleaseScheduleItemInput {
+  release_date: string;
+  title: string;
+  artist?: string | null;
+  release_type: ReleaseType;
+  level: ReleaseLevel;
+  featured: boolean;
+}
+
 interface CacheEntry {
   data: any;
   timestamp: number;
@@ -1673,6 +1696,39 @@ class ApiClient {
       method: "PUT",
       body: JSON.stringify({ meeting_url: meetingUrl, meeting_notes: meetingNotes }),
     });
+  }
+
+  // ============================================
+  // Release Schedule (landing page)
+  // ============================================
+
+  async getReleaseSchedule() {
+    return this.request<ReleaseScheduleItemDTO[]>("/api/premium/release-schedule");
+  }
+
+  async getReleaseScheduleAdmin() {
+    return this.request<ReleaseScheduleItemDTO[]>("/api/premium/admin/release-schedule");
+  }
+
+  async createReleaseScheduleItem(data: ReleaseScheduleItemInput) {
+    return this.request<ReleaseScheduleItemDTO>("/api/premium/admin/release-schedule", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async updateReleaseScheduleItem(id: string, data: Partial<ReleaseScheduleItemInput>) {
+    return this.request<ReleaseScheduleItemDTO>(`/api/premium/admin/release-schedule/${id}`, {
+      method: "PUT",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async deleteReleaseScheduleItem(id: string) {
+    return this.request<{ success: boolean; message: string }>(
+      `/api/premium/admin/release-schedule/${id}`,
+      { method: "DELETE" }
+    );
   }
 
   // ============================================

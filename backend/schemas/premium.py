@@ -6,7 +6,8 @@ Pydantic schemas for Premium Features (Guild Master tier)
 """
 from pydantic import BaseModel, Field
 from typing import Optional, List, Literal
-from datetime import datetime
+from datetime import datetime, date
+from uuid import UUID
 
 
 # ============================================
@@ -285,3 +286,41 @@ class WeeklyMeetingConfigUpdate(BaseModel):
     """Admin request to update the meeting link/notes."""
     meeting_url: Optional[str] = Field(None, max_length=500)
     meeting_notes: Optional[str] = None
+
+
+# ============================================
+# Release Schedule (landing page upcoming drops)
+# ============================================
+
+ReleaseType = Literal["choreo", "course"]
+ReleaseLevel = Literal["beginner", "intermediate", "advanced", "mastery"]
+
+
+class ReleaseScheduleItemBase(BaseModel):
+    release_date: date
+    title: str = Field(..., max_length=200)
+    artist: Optional[str] = Field(None, max_length=200)
+    release_type: ReleaseType = "choreo"
+    level: ReleaseLevel = "beginner"
+    featured: bool = False
+
+
+class ReleaseScheduleItemCreate(ReleaseScheduleItemBase):
+    pass
+
+
+class ReleaseScheduleItemUpdate(BaseModel):
+    release_date: Optional[date] = None
+    title: Optional[str] = Field(None, max_length=200)
+    artist: Optional[str] = Field(None, max_length=200)
+    release_type: Optional[ReleaseType] = None
+    level: Optional[ReleaseLevel] = None
+    featured: Optional[bool] = None
+
+
+class ReleaseScheduleItemResponse(ReleaseScheduleItemBase):
+    id: UUID
+    updated_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
