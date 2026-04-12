@@ -23,18 +23,30 @@ export default function NotificationBell() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pollInterval = useRef<NodeJS.Timeout | null>(null);
 
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const fetchUnreadCount = useCallback(async () => {
     try {
       const data = await apiClient.getUnreadNotificationCount();
       setUnreadCount(data.unread_count);
-    } catch {}
+    } catch (e) {
+      console.error("[NotificationBell] unread-count failed:", e);
+    }
   }, []);
 
   const fetchNotifications = useCallback(async () => {
+    setIsLoading(true);
+    setLoadError(null);
     try {
       const data = await apiClient.getNotifications();
-      setNotifications(data);
-    } catch {}
+      setNotifications(Array.isArray(data) ? data : []);
+    } catch (e: any) {
+      console.error("[NotificationBell] list failed:", e);
+      setLoadError(e?.message || "Failed to load notifications");
+    } finally {
+      setIsLoading(false);
+    }
   }, []);
 
   // Poll for unread count every 30 seconds
@@ -150,7 +162,13 @@ export default function NotificationBell() {
             </div>
 
             {/* Notification list */}
-            {notifications.length === 0 ? (
+            {isLoading ? (
+              <div className="p-6 text-center text-white/40 text-sm">Loading…</div>
+            ) : loadError ? (
+              <div className="p-6 text-center text-red-400/80 text-xs">
+                {loadError}
+              </div>
+            ) : notifications.length === 0 ? (
               <div className="p-6 text-center text-white/40 text-sm">
                 No notifications yet
               </div>
