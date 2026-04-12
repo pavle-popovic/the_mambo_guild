@@ -62,7 +62,24 @@
       "Bash(cd /c/Users/pavle/Desktop/salsa_lab_v2 && docker compose exec frontend npm install recharts 2>&1)",
       "Bash(docker compose:*)",
       "Bash(docker context:*)",
-      "Bash(python3:*)"
+      "Bash(python3:*)",
+      "Bash(ls frontend/.env*)",
+      "Bash(ls -la .env*)",
+      "mcp__zoho__ZohoMail_getMailAccounts",
+      "mcp__zoho__ZohoMail_SearchEmails",
+      "Bash(npm ls:*)",
+      "WebFetch(domain:www.steezy.co)",
+      "Bash(npx next:*)",
+      "Bash(npm run:*)",
+      "WebFetch(domain:www.themamboguild.com)",
+      "Bash(gh run:*)",
+      "Bash(npx vercel:*)",
+      "Bash(git revert:*)",
+      "Bash(venv/Scripts/python:*)",
+      "Bash(npx --yes tsc --noEmit)",
+      "Bash(ls node_modules/.bin/tsc*)",
+      "Bash(psql --version)",
+      "Bash(ls backend/.env*)"
     ]
   }
 }

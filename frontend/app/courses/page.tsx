@@ -138,14 +138,14 @@ export default function CoursesPage() {
         <div className="sticky top-0 z-40 w-full bg-black/60 backdrop-blur-xl border-b border-white/10 pt-20 sm:pt-24 pb-3 sm:pb-4 transition-all duration-300">
           <div className="max-w-[1600px] mx-auto px-3 sm:px-6">
 
-            {/* Mobile: Search + filter dropdowns */}
-            <div className="flex sm:hidden flex-col gap-2 w-full">
+            {/* Mobile + landscape phones: Search + filter dropdowns */}
+            <div className="flex lg:hidden flex-col landscape:flex-row landscape:items-center gap-2 w-full">
               {/* Release Calendar pill */}
-              <div className="flex justify-center">
+              <div className="flex justify-center landscape:order-last landscape:flex-shrink-0">
                 <ReleaseScheduleButton />
               </div>
               {/* Search */}
-              <div className="relative group">
+              <div className="relative group landscape:flex-1 landscape:min-w-[140px]">
                 <FaSearch className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-mambo-gold transition-colors text-sm" />
                 <input
                   type="text"
@@ -162,9 +162,9 @@ export default function CoursesPage() {
               </div>
 
               {/* Filter dropdowns row */}
-              <div className="flex gap-2">
+              <div className="flex gap-2 landscape:flex-shrink-0 landscape:w-auto">
                 {/* Class Type dropdown */}
-                <div className="relative flex-1" ref={typeDropdownRef}>
+                <div className="relative flex-1 landscape:flex-none landscape:w-[130px]" ref={typeDropdownRef}>
                   <button
                     onClick={() => { setTypeDropdownOpen(!typeDropdownOpen); setLevelDropdownOpen(false); }}
                     className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
@@ -199,7 +199,7 @@ export default function CoursesPage() {
                 </div>
 
                 {/* Level dropdown */}
-                <div className="relative flex-1" ref={levelDropdownRef}>
+                <div className="relative flex-1 landscape:flex-none landscape:w-[130px]" ref={levelDropdownRef}>
                   <button
                     onClick={() => { setLevelDropdownOpen(!levelDropdownOpen); setTypeDropdownOpen(false); }}
                     className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
@@ -236,7 +236,7 @@ export default function CoursesPage() {
             </div>
 
             {/* Desktop: Original pill layout + release calendar pinned right */}
-            <div className="hidden sm:flex items-center gap-3 w-full">
+            <div className="hidden lg:flex items-center gap-3 w-full">
               <div className="flex items-center gap-3 flex-1 min-w-0 overflow-x-auto no-scrollbar pb-0">
                 {/* Search Pill */}
                 <div className="relative group min-w-[200px]">
