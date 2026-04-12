@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import LocaleProviderWrapper from "@/components/LocaleProviderWrapper";
 import StarryBackground from "@/components/ui/StarryBackground";
 import BugReportButton from "@/components/BugReportButton";
+import MobileDebugOverlay from "@/components/MobileDebugOverlay";
 import { Toaster } from "sonner";
 
 const inter = Inter({
@@ -41,6 +42,7 @@ export default function RootLayout({
             <GlobalAudioPlayer />
             <BugReportButton />
             <Toaster position="top-right" richColors />
+            <MobileDebugOverlay />
           </AuthProvider>
         </LocaleProviderWrapper>
       </body>
