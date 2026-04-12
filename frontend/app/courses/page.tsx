@@ -71,8 +71,9 @@ export default function CoursesPage() {
 
       // Type filter
       if (typeFilter !== "all") {
-        const courseType = (course.course_type || "course").toLowerCase();
-        if (courseType !== typeFilter) return false;
+        const raw = (course.course_type || "course").toLowerCase();
+        const normalized = raw === "choreography" ? "choreo" : raw;
+        if (normalized !== typeFilter) return false;
       }
 
       // Difficulty filter
@@ -123,7 +124,8 @@ export default function CoursesPage() {
   const typeCounts = useMemo(() => {
     const counts = { all: courses.length, course: 0, choreo: 0, topic: 0 };
     courses.forEach((c) => {
-      const type = (c.course_type || "course").toLowerCase() as keyof typeof counts;
+      const raw = (c.course_type || "course").toLowerCase();
+      const type = (raw === "choreography" ? "choreo" : raw) as keyof typeof counts;
       if (type in counts) counts[type]++;
     });
     return counts;
