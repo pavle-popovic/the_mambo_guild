@@ -9,6 +9,7 @@ from pydantic import BaseModel
 from models import get_db
 from models.user import User
 from models.course import World, Level, Lesson, Difficulty
+from models.progress import UserProgress, BossSubmission, Comment
 from schemas.course import WorldResponse, LessonResponse
 from dependencies import get_admin_user
 import uuid
@@ -448,7 +449,11 @@ def delete_lesson(
     lesson = db.query(Lesson).filter(Lesson.id == lesson_id).first()
     if not lesson:
         raise HTTPException(status_code=404, detail="Lesson not found")
-    
+
+    db.query(UserProgress).filter(UserProgress.lesson_id == lesson_id).delete(synchronize_session=False)
+    db.query(BossSubmission).filter(BossSubmission.lesson_id == lesson_id).delete(synchronize_session=False)
+    db.query(Comment).filter(Comment.lesson_id == lesson_id).delete(synchronize_session=False)
+
     db.delete(lesson)
     db.commit()
     
