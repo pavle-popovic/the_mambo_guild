@@ -406,17 +406,23 @@ def get_upload_status(
         uploads_api = DirectUploadsApi(api_client)
 
         # Get the upload status from Mux
+        # Mux direct-upload status: "waiting" | "asset_created" | "errored" | "cancelled" | "timed_out"
         upload = uploads_api.get_direct_upload(upload_id)
         upload_data = upload.data
 
-        status = upload_data.status  # "waiting", "asset_created", "ready", "errored"
+        upload_status = upload_data.status
         asset_id = upload_data.asset_id if hasattr(upload_data, 'asset_id') else None
 
-        # If asset exists, get the playback_id
+        # Once an asset exists, switch to the asset's lifecycle ("preparing" -> "ready" | "errored")
+        # and treat that as the authoritative status for callers polling readiness.
+        status = upload_status
         playback_id = None
         if asset_id:
             assets_api = AssetsApi(api_client)
             asset = assets_api.get_asset(asset_id)
+            asset_status = getattr(asset.data, "status", None)
+            if asset_status:
+                status = asset_status  # "preparing" | "ready" | "errored"
             if asset.data.playback_ids and len(asset.data.playback_ids) > 0:
                 playback_id = asset.data.playback_ids[0].id
 

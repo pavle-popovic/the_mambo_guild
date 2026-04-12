@@ -305,16 +305,21 @@ export default function GuildMasterPage() {
         );
         if (!statusRes.ok) throw new Error("Failed to check upload status");
         const data = await statusRes.json();
-        if (data.status === "ready" && data.playback_id && data.asset_id) {
-          setUploadedVideo({
-            playbackId: data.playback_id,
-            assetId: data.asset_id,
-            duration: duration || 0,
-          });
-          setUploadStatus("idle");
-          return;
+        // Ready once the asset exists and Mux has attached a playback id.
+        if (data.playback_id && data.asset_id && (data.status === "ready" || data.status === "preparing")) {
+          if (data.status === "ready") {
+            setUploadedVideo({
+              playbackId: data.playback_id,
+              assetId: data.asset_id,
+              duration: duration || 0,
+            });
+            setUploadStatus("idle");
+            return;
+          }
         }
-        if (data.status === "errored") throw new Error("Mux reported an error processing the video.");
+        if (data.status === "errored" || data.status === "cancelled" || data.status === "timed_out") {
+          throw new Error("Mux reported an error processing the video.");
+        }
         await new Promise((r) => setTimeout(r, 3000));
         return poll();
       };
