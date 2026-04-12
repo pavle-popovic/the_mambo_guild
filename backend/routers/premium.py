@@ -49,13 +49,26 @@ router = APIRouter(prefix="/premium", tags=["premium"])
 # ============================================
 
 def is_guild_master(user: User) -> bool:
-    """Check if user has Guild Master (PERFORMER) tier."""
-    if not user.subscription:
+    """
+    Gate for Guild Master-only perks (1-on-1 feedback, Zoom roundtable, badge,
+    extra claves). Requires an ACTIVE PERFORMER subscription that has not
+    passed its billing period end. The period_end check is defense-in-depth
+    in case a `customer.subscription.deleted` webhook was missed.
+    """
+    sub = user.subscription
+    if not sub:
         return False
-    return (
-        user.subscription.status == SubscriptionStatus.ACTIVE and
-        user.subscription.tier == SubscriptionTier.PERFORMER
-    )
+    if sub.status != SubscriptionStatus.ACTIVE or sub.tier != SubscriptionTier.PERFORMER:
+        return False
+    if sub.current_period_end is not None:
+        from datetime import datetime, timezone
+        now = datetime.now(timezone.utc)
+        end = sub.current_period_end
+        if end.tzinfo is None:
+            end = end.replace(tzinfo=timezone.utc)
+        if end < now:
+            return False
+    return True
 
 
 def require_guild_master(user: User):

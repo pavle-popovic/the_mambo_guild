@@ -1,10 +1,12 @@
-from typing import Annotated, Any, Dict
+from typing import Annotated, Any, Dict, Optional
+from urllib.parse import urlparse
 import uuid
 import logging
 import stripe
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -40,16 +42,106 @@ PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml"
 # and refuse new PERFORMER checkouts when the cap is hit.
 GUILD_MASTER_SEAT_CAP = 30
 
+# Arbitrary int key for the Postgres advisory lock used to serialize the
+# seat-cap read/modify window. Any constant works; pick one unlikely to collide
+# with other advisory locks in the codebase.
+_GUILD_MASTER_LOCK_KEY = 734829_1
+
+
+def _lock_guild_master_seats(db: Session) -> None:
+    """
+    Acquire a transaction-scoped advisory lock that serializes Guild Master
+    seat allocation. Released automatically at commit/rollback. Prevents the
+    read-then-act race between _guild_master_seats_taken() and the Stripe
+    subscription create/modify that consumes a seat. Best-effort on non-PG.
+    """
+    try:
+        db.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": _GUILD_MASTER_LOCK_KEY})
+    except Exception:
+        logger.debug("Advisory lock unavailable — continuing without seat serialization")
+
 
 def _guild_master_seats_taken(db: Session) -> int:
     return (
         db.query(Subscription)
         .filter(
             Subscription.tier == SubscriptionTier.PERFORMER,
-            Subscription.status == SubscriptionStatus.ACTIVE,
+            Subscription.status.in_((SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING)),
         )
         .count()
     )
+
+
+def _validate_return_url(url: str, field_name: str) -> str:
+    """
+    Prevent Stripe Checkout from being abused as an open-redirect phishing
+    vector. The user-controlled success_url/cancel_url must point back at our
+    own frontend. Allow localhost during local dev.
+    """
+    if not url or not isinstance(url, str):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Missing {field_name}.",
+        )
+    try:
+        parsed = urlparse(url)
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid {field_name}.",
+        )
+    if parsed.scheme not in ("http", "https") or not parsed.netloc:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Invalid {field_name}.",
+        )
+
+    allowed_hosts = set()
+    try:
+        frontend_host = urlparse(settings.FRONTEND_URL).netloc
+        if frontend_host:
+            allowed_hosts.add(frontend_host)
+    except Exception:
+        pass
+    try:
+        for origin in settings.CORS_ORIGINS:
+            host = urlparse(origin).netloc
+            if host:
+                allowed_hosts.add(host)
+    except Exception:
+        pass
+
+    if parsed.netloc not in allowed_hosts:
+        logger.warning(
+            f"Rejected {field_name} with disallowed host {parsed.netloc!r} "
+            f"(allowed: {sorted(allowed_hosts)})"
+        )
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"{field_name} must point to this site.",
+        )
+    return url
+
+
+def _email_has_prior_stripe_subscription(email: str) -> bool:
+    """
+    Trial-abuse guard. Even if this UserProfile has has_used_trial=False (new
+    account), we should refuse to grant another 7-day trial if Stripe already
+    knows this email from a previous subscription. Catches the 'sign up again
+    with the same email' loophole. Does NOT catch different-email-same-card —
+    that requires a fingerprint column + migration.
+    """
+    try:
+        customers = stripe.Customer.list(email=email, limit=10)
+        for cust in customers.auto_paging_iter():
+            subs = stripe.Subscription.list(customer=cust.id, status="all", limit=1)
+            if subs.data:
+                return True
+    except stripe.error.StripeError as e:
+        logger.warning(f"Stripe lookup failed for trial eligibility on {email}: {e}")
+        # Fail closed on trial eligibility — if we can't verify, deny the trial.
+        return True
+    return False
 
 
 class GuildMasterSeatsResponse(BaseModel):
@@ -60,10 +152,12 @@ class GuildMasterSeatsResponse(BaseModel):
 
 
 @router.get("/guild-master-seats", response_model=GuildMasterSeatsResponse)
-def guild_master_seats(db: Session = Depends(get_db)):
+def guild_master_seats(response: Response, db: Session = Depends(get_db)):
     """Public endpoint — live remaining seats on the Guild Master tier."""
     taken = _guild_master_seats_taken(db)
     remaining = max(0, GUILD_MASTER_SEAT_CAP - taken)
+    # Short cache so scrapers can't hammer us, but the counter still feels live.
+    response.headers["Cache-Control"] = "public, max-age=30"
     return GuildMasterSeatsResponse(
         total=GUILD_MASTER_SEAT_CAP,
         taken=taken,
@@ -89,7 +183,11 @@ def create_checkout_session(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid price ID. Only Advanced and Performer tiers are available."
             )
-        
+
+        # Open-redirect defense — only allow our own frontend as the return target.
+        safe_success_url = _validate_return_url(request_data.success_url, "success_url")
+        safe_cancel_url = _validate_return_url(request_data.cancel_url, "cancel_url")
+
         # Allow creating checkout session even if user has active subscription
         # (for upgrades/downgrades, we'll use update-subscription endpoint instead)
         # But for new subscriptions, check if they already have one
@@ -105,21 +203,37 @@ def create_checkout_session(
                 detail="User already has an active subscription. Use update-subscription to change plans."
             )
 
-        # Enforce the Guild Master seat cap on new checkouts.
+        # Enforce the Guild Master seat cap on new checkouts. Serialize the
+        # read/modify window with an advisory lock so concurrent checkouts
+        # can't both pass at taken=29.
         if request_data.price_id == PERFORMER_PRICE_ID:
+            _lock_guild_master_seats(db)
             if _guild_master_seats_taken(db) >= GUILD_MASTER_SEAT_CAP:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
                     detail="Guild Master is currently full. Join the waitlist to be notified when a seat opens up.",
                 )
 
-        # Create or retrieve Stripe Customer ID
+        # Create or retrieve Stripe Customer ID. Prefer reusing an existing
+        # Stripe Customer for this email over minting a duplicate — prevents
+        # orphaned customers accumulating on re-signups and keeps the
+        # trial-abuse lookup reliable.
         stripe_customer_id = current_user.subscription.stripe_customer_id if current_user.subscription else None
         if not stripe_customer_id:
-            customer = stripe.Customer.create(
-                email=current_user.email,
-                metadata={"user_id": str(current_user.id)}
-            )
+            existing_customers = stripe.Customer.list(email=current_user.email, limit=1)
+            if existing_customers.data:
+                customer = existing_customers.data[0]
+                # Ensure our user_id metadata is attached for webhook routing.
+                if (customer.metadata or {}).get("user_id") != str(current_user.id):
+                    stripe.Customer.modify(
+                        customer.id,
+                        metadata={"user_id": str(current_user.id)},
+                    )
+            else:
+                customer = stripe.Customer.create(
+                    email=current_user.email,
+                    metadata={"user_id": str(current_user.id)}
+                )
             stripe_customer_id = customer.id
             
             # Update or create subscription record with stripe_customer_id
@@ -137,17 +251,21 @@ def create_checkout_session(
                 current_user.subscription.stripe_customer_id = stripe_customer_id
                 current_user.subscription.status = SubscriptionStatus.INCOMPLETE
             db.commit()
-            db.refresh(current_user)  # Refresh to ensure subscription relationship is updated
+            # Only refresh the subscription relationship — full graph refresh
+            # is expensive and unnecessary here.
+            db.refresh(current_user, attribute_names=["subscription"])
 
         # 7-day free trial is offered once per user, on their first paid
         # subscription attempt. After that (canceled-and-returning customers,
         # upgrades, etc.) they pay from day 0.
         profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
         # Free trial is ADVANCED-tier only. Guild Master (PERFORMER) is a
-        # separate product with no trial.
+        # separate product with no trial. Also refuse a trial if Stripe has
+        # ever seen a subscription on this email (same-email re-signup loop).
         trial_eligible = (
             bool(profile and not profile.has_used_trial)
             and request_data.price_id == ADVANCED_PRICE_ID
+            and not _email_has_prior_stripe_subscription(current_user.email)
         )
         trial_period_days = 7 if trial_eligible else None
 
@@ -155,8 +273,8 @@ def create_checkout_session(
         checkout_session = stripe_service.create_checkout_session(
             customer_id=stripe_customer_id,
             price_id=request_data.price_id,
-            success_url=request_data.success_url,
-            cancel_url=request_data.cancel_url,
+            success_url=safe_success_url,
+            cancel_url=safe_cancel_url,
             metadata={"user_id": str(current_user.id)},
             trial_period_days=trial_period_days,
         )
@@ -218,13 +336,29 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
         logger.info(f"Stripe webhook {event['id']} ({event['type']}) already processed — skipping")
         return {"status": "already_processed"}
 
-    # Map Stripe price lookup_keys to our internal tier enum. Shared by the
-    # subscription.created and invoice.payment_succeeded handlers.
-    tier_mapping = {
+    # Resolve a Stripe subscription payload to our internal tier enum. We
+    # match on price.id against the hard-coded constants first (most robust —
+    # lookup_key is free-text in the Stripe dashboard and a rename would
+    # silently drop users to ROOKIE). Fall back to lookup_key for legacy
+    # prices. Shared by the subscription.* and invoice.payment_succeeded
+    # handlers.
+    _LOOKUP_KEY_FALLBACK = {
         "advanced": SubscriptionTier.ADVANCED,
         "performer": SubscriptionTier.PERFORMER,
         "vip": SubscriptionTier.PERFORMER,
     }
+
+    def _resolve_tier_from_items(items_data: list) -> SubscriptionTier:
+        if not items_data:
+            return SubscriptionTier.ROOKIE
+        first_price = items_data[0].get("price") if hasattr(items_data[0], "get") else items_data[0]["price"]
+        price_id = first_price.get("id") if hasattr(first_price, "get") else first_price["id"]
+        if price_id == ADVANCED_PRICE_ID:
+            return SubscriptionTier.ADVANCED
+        if price_id == PERFORMER_PRICE_ID:
+            return SubscriptionTier.PERFORMER
+        lookup_key = (first_price.get("lookup_key") if hasattr(first_price, "get") else first_price["lookup_key"]) or ""
+        return _LOOKUP_KEY_FALLBACK.get(lookup_key.lower(), SubscriptionTier.ROOKIE)
 
     # Fires at trial start (status=trialing) and again when Stripe flips the
     # subscription to status=active after the first real charge. Handling it
@@ -238,8 +372,7 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
         stripe_status = sub_obj.get("status")  # "trialing", "active", "past_due", ...
 
         items = sub_obj.get("items", {}).get("data", [])
-        price_lookup_key = items[0]["price"].get("lookup_key") if items else None
-        tier = tier_mapping.get((price_lookup_key or "").lower(), SubscriptionTier.ROOKIE)
+        tier = _resolve_tier_from_items(items)
 
         # current_period_end can be on the subscription or on each item
         period_end_ts = sub_obj.get("current_period_end") or (
@@ -262,12 +395,23 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
             Subscription.stripe_customer_id == customer_id
         ).first()
 
-        if db_subscription and db_status in (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE):
+        if db_subscription:
+            # Always mirror the Stripe status, including past_due / canceled /
+            # incomplete. Skipping non-active states leaves us with stale
+            # "ACTIVE" rows after a failed renewal.
             db_subscription.stripe_subscription_id = stripe_sub_id
             db_subscription.status = db_status
-            db_subscription.tier = tier
-            db_subscription.current_period_end = period_end_dt
+            # Only promote tier when the sub is good-standing; on past_due /
+            # canceled the user is effectively losing access, but keep the tier
+            # so we can show "your Pro access is expiring" UX until the final
+            # customer.subscription.deleted lands.
+            if db_status in (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE):
+                db_subscription.tier = tier
+                db_subscription.current_period_end = period_end_dt
             db_subscription.cancel_at_period_end = bool(sub_obj.get("cancel_at_period_end"))
+            if db_status == SubscriptionStatus.CANCELED:
+                db_subscription.tier = SubscriptionTier.ROOKIE
+                db_subscription.cancel_at_period_end = False
             db.commit()
             db.refresh(db_subscription)
 
@@ -297,9 +441,9 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
             try:
                 stripe_subscription = stripe.Subscription.retrieve(subscription_id)
                 
-                # Re-use the tier_mapping defined above for subscription events.
-                price_lookup_key = stripe_subscription["items"]["data"][0]["price"]["lookup_key"]
-                tier = tier_mapping.get(price_lookup_key.lower() if price_lookup_key else "", SubscriptionTier.ROOKIE)
+                # Resolve tier from price.id (robust against lookup_key renames).
+                items_data = stripe_subscription["items"]["data"]
+                tier = _resolve_tier_from_items(items_data)
 
                 # A $0 invoice at trial start or from a 100%-off coupon must
                 # not trigger the one-time XP/badge bonus — those rewards are
@@ -308,12 +452,12 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                 is_paid_invoice = amount_paid > 0
 
                 # Stripe API 2025-08+ moved `current_period_end` off the
-                # Subscription object and onto each item. Read both to stay
-                # compatible with older and newer API versions.
-                item0 = stripe_subscription["items"].data[0] if stripe_subscription["items"].data else None
+                # Subscription root onto each item. Bracket access avoids the
+                # StripeObject.items ↔ dict.items method collision.
+                item0 = items_data[0] if items_data else None
                 period_end_ts = (
-                    getattr(stripe_subscription, "current_period_end", None)
-                    or (getattr(item0, "current_period_end", None) if item0 else None)
+                    stripe_subscription.get("current_period_end")
+                    or (item0.get("current_period_end") if item0 else None)
                 )
                 period_end_dt = (
                     datetime.fromtimestamp(period_end_ts, tz=timezone.utc)
@@ -342,44 +486,76 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                     # or if the initial 'incomplete' record wasn't found.
                     # We should create a new subscription record here.
                     user_id_from_metadata = stripe_subscription.metadata.get("user_id")
-                    if user_id_from_metadata:
-                        new_subscription = Subscription(
-                            id=uuid.uuid4(),
-                            user_id=uuid.UUID(user_id_from_metadata),
-                            stripe_customer_id=customer_id,
-                            stripe_subscription_id=stripe_subscription.id,
-                            status=SubscriptionStatus.ACTIVE,
-                            tier=tier,
-                            current_period_end=period_end_dt,
-                        )
-                        db.add(new_subscription)
-                        db.commit()
-                        db.refresh(new_subscription)
-
-                        if is_paid_invoice:
-                            award_subscription_bonus(str(new_subscription.user_id), tier, db, reference_id=invoice.id)
-                            award_subscription_badge(str(new_subscription.user_id), tier.value, db)
-                    else:
+                    if not user_id_from_metadata:
                         logger.warning(f"Could not find user_id in metadata for new subscription {subscription_id}")
+                    else:
+                        # Validate the metadata-provided user_id against our DB
+                        # before minting a subscription row. Metadata is
+                        # mutable from the Stripe dashboard; do not trust it.
+                        try:
+                            user_uuid = uuid.UUID(user_id_from_metadata)
+                        except (ValueError, TypeError):
+                            logger.warning(f"Invalid user_id in metadata for subscription {subscription_id}: {user_id_from_metadata!r}")
+                            user_uuid = None
+
+                        target_user = (
+                            db.query(User).filter(User.id == user_uuid).first()
+                            if user_uuid else None
+                        )
+                        if not target_user:
+                            logger.warning(f"Metadata user_id {user_id_from_metadata} not found in DB for sub {subscription_id}")
+                        else:
+                            existing = db.query(Subscription).filter(
+                                Subscription.user_id == user_uuid
+                            ).first()
+                            if existing:
+                                # Update the existing row rather than minting a duplicate.
+                                existing.stripe_customer_id = customer_id
+                                existing.stripe_subscription_id = stripe_subscription.id
+                                existing.status = SubscriptionStatus.ACTIVE
+                                existing.tier = tier
+                                existing.current_period_end = period_end_dt
+                                db.commit()
+                                db.refresh(existing)
+                                target_sub = existing
+                            else:
+                                target_sub = Subscription(
+                                    id=uuid.uuid4(),
+                                    user_id=user_uuid,
+                                    stripe_customer_id=customer_id,
+                                    stripe_subscription_id=stripe_subscription.id,
+                                    status=SubscriptionStatus.ACTIVE,
+                                    tier=tier,
+                                    current_period_end=period_end_dt,
+                                )
+                                db.add(target_sub)
+                                db.commit()
+                                db.refresh(target_sub)
+
+                            if is_paid_invoice:
+                                award_subscription_bonus(str(target_sub.user_id), tier, db, reference_id=invoice.id)
+                                award_subscription_badge(str(target_sub.user_id), tier.value, db)
 
             except stripe.error.StripeError as e:
+                # Never raise 5xx from a webhook handler — Stripe will retry
+                # and our idempotency row has already been committed, which
+                # means the retry would be swallowed as "already_processed"
+                # OR (worse) loop forever depending on timing. Log and ack.
                 logger.error(f"Stripe API error retrieving subscription {subscription_id}: {e}")
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Stripe API error"
-                )
+                db.rollback()
             except Exception as e:
-                logger.error(f"Error processing invoice.payment_succeeded for subscription {subscription_id}: {e}")
-                raise HTTPException(
-                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                    detail="Internal server error"
-                )
+                logger.exception(f"Error processing invoice.payment_succeeded for subscription {subscription_id}: {e}")
+                db.rollback()
 
     elif event["type"] == "customer.subscription.deleted":
         subscription = event["data"]["object"]
-        stripe_subscription_id = subscription.id
+        stripe_subscription_id = subscription.get("id")
+        stripe_customer_id = subscription.get("customer")
+        # Match on BOTH sub id and customer id so a stale event for a
+        # replaced subscription id can't flip the wrong user to ROOKIE.
         db_subscription = db.query(Subscription).filter(
-            Subscription.stripe_subscription_id == stripe_subscription_id
+            Subscription.stripe_subscription_id == stripe_subscription_id,
+            Subscription.stripe_customer_id == stripe_customer_id,
         ).first()
         if db_subscription:
             db_subscription.status = SubscriptionStatus.CANCELED
@@ -388,7 +564,10 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
             db.commit()
             db.refresh(db_subscription)
         else:
-            logger.warning(f"Subscription {stripe_subscription_id} not found in DB for deletion event.")
+            logger.warning(
+                f"Subscription {stripe_subscription_id} (customer {stripe_customer_id}) "
+                f"not found in DB for deletion event — ignoring."
+            )
 
     # Other event types can be handled here as needed
 
@@ -443,6 +622,7 @@ def update_subscription(
             request_data.new_price_id == PERFORMER_PRICE_ID
             and subscription.tier != SubscriptionTier.PERFORMER
         ):
+            _lock_guild_master_seats(db)
             if _guild_master_seats_taken(db) >= GUILD_MASTER_SEAT_CAP:
                 raise HTTPException(
                     status_code=status.HTTP_409_CONFLICT,
@@ -452,19 +632,38 @@ def update_subscription(
         # Retrieve the Stripe subscription
         stripe_subscription = stripe.Subscription.retrieve(subscription.stripe_subscription_id)
 
+        # Defense-in-depth — confirm the Stripe sub actually belongs to the
+        # customer we have on file. Guards against a tampered DB row pointing
+        # at someone else's subscription.
+        if stripe_subscription.get("customer") != subscription.stripe_customer_id:
+            logger.error(
+                f"Customer mismatch on update_subscription: user {current_user.id} "
+                f"local customer {subscription.stripe_customer_id} vs stripe "
+                f"{stripe_subscription.get('customer')}"
+            )
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Subscription record is inconsistent. Please contact support.",
+            )
+
         # Get the subscription item ID (there should be one item).
         # Use bracket access: `sub.items` collides with dict.items method.
         subscription_item_id = stripe_subscription["items"]["data"][0]["id"]
 
-        # Build the modify kwargs. Always clear any scheduled cancel — upgrading
-        # is a commitment signal, so we auto-resume if the user had previously
-        # set cancel_at_period_end.
+        # NOTE (security): `always_invoice` on downgrade issues a prorated
+        # credit immediately. A user could theoretically churn
+        # upgrade→downgrade→upgrade to harvest Guild Master perks without
+        # paying full price. Proper fix is to defer downgrades to period end
+        # via stripe.SubscriptionSchedule — tracked as a followup. For now the
+        # one-time `subscription_bonus:<tier>` guard in clave_service prevents
+        # XP farming, and Guild Master seat cap enforcement (#4) keeps repeat
+        # upgrades gated by seat availability.
         modify_kwargs: Dict[str, Any] = {
             "items": [{
                 "id": subscription_item_id,
                 "price": request_data.new_price_id,
             }],
-            "proration_behavior": "always_invoice",  # Prorate the difference
+            "proration_behavior": "always_invoice",
             "cancel_at_period_end": False,
         }
 

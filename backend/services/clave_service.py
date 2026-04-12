@@ -437,14 +437,26 @@ def claw_back_reaction_refund(post_id: str, post_owner_id: str, db: Session) -> 
 
 def award_subscription_bonus(user_id: str, tier: SubscriptionTier, db: Session, reference_id: str = None) -> int:
     """
-    Award monthly subscription bonus.
+    One-time welcome bonus for reaching a paid tier. Guarded so that
+    downgrade → upgrade → downgrade cycles can't farm bonuses: we refuse to
+    grant a second 'subscription_bonus' transaction for the same user + tier.
     """
     amount = 0
     if tier == SubscriptionTier.ADVANCED:
         amount = EARN_SUB_ADVANCED
     elif tier == SubscriptionTier.PERFORMER:
         amount = EARN_SUB_PERFORMER
-        
-    if amount > 0:
-        return earn_claves(user_id, amount, "subscription_bonus", db, reference_id=reference_id)
-    return get_balance(user_id, db)
+
+    if amount <= 0:
+        return get_balance(user_id, db)
+
+    tier_reason = f"subscription_bonus:{tier.value}"
+    already_granted = db.query(ClaveTransaction).filter(
+        ClaveTransaction.user_id == user_id,
+        ClaveTransaction.reason == tier_reason,
+    ).first()
+    if already_granted:
+        logger.info(f"Subscription bonus for {tier.value} already granted to {user_id} — skipping")
+        return get_balance(user_id, db)
+
+    return earn_claves(user_id, amount, tier_reason, db, reference_id=reference_id)
