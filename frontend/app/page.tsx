@@ -9,7 +9,6 @@ import {
 } from "@/components/landing";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
-import StarryBackground from "@/components/ui/StarryBackground";
 import Link from "next/link";
 
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,9 +28,6 @@ export default function HomePage() {
 
     return (
         <>
-            {/* Starry Jazz Background — only on the landing page */}
-            <StarryBackground />
-
             {/* Navigation Bar */}
             <NavBar user={user || undefined} />
 
