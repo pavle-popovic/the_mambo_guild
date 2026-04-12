@@ -477,19 +477,19 @@ def update_subscription(
             tier=new_tier.value
         )
         
-    except stripe.error.StripeError as e:
+    except stripe.error.StripeError:
         logger.exception(f"Stripe error updating subscription for user {current_user.id}")
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=f"Stripe error: {str(e)}",
+            detail="We couldn't reach the payment processor. Please try again.",
         )
     except HTTPException:
         raise
-    except Exception as e:
+    except Exception:
         logger.exception(f"Unexpected error updating subscription for user {current_user.id}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Upgrade failed: {type(e).__name__}: {str(e)}",
+            detail="Something went wrong while updating your subscription. Please try again.",
         )
 
 

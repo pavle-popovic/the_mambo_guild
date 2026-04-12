@@ -10,6 +10,7 @@ import { apiClient } from "@/lib/api";
 import { FaCheck, FaTimes, FaCrown } from "react-icons/fa";
 import { FadeIn, StaggerContainer, StaggerItem, HoverCard, Clickable } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
+import { toast } from "sonner";
 
 // Stripe Price IDs
 const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
@@ -49,7 +50,7 @@ function PricingPageContent() {
         await refreshUser();
       } catch (refreshError) {
         console.error("Failed to refresh user:", refreshError);
-        alert("Your session has expired. Please log in again.");
+        toast.error("Your session has expired. Please log in again.");
         router.push(`/login?redirect=/pricing`);
         setLoading(null);
         return;
@@ -67,10 +68,10 @@ function PricingPageContent() {
       if (error.message?.includes("Could not validate credentials") ||
         error.message?.includes("401") ||
         error.message?.includes("Unauthorized")) {
-        alert("Your session has expired. Please log in again.");
+        toast.error("Your session has expired. Please log in again.");
         router.push(`/login?redirect=/pricing`);
       } else {
-        alert(error.message || "Failed to start checkout. Please try again.");
+        toast.error(error.message || "Failed to start checkout. Please try again.");
       }
       setLoading(null);
     }
@@ -87,62 +88,60 @@ function PricingPageContent() {
       await refreshUser();
       await apiClient.updateSubscription(PERFORMER_PRICE_ID);
       await refreshUser();
-      alert("Successfully upgraded to Guild Master plan!");
+      toast.success("Welcome to Guild Master", {
+        description: "You now have access to every premium feature.",
+        duration: 4500,
+      });
       router.push("/courses");
     } catch (error: any) {
       console.error("Failed to upgrade:", error);
-      alert(error.message || "Failed to upgrade subscription. Please try again.");
+      toast.error("Upgrade failed", {
+        description: error.message || "Please try again in a moment.",
+      });
     } finally {
       setLoading(null);
     }
   };
 
-  const handleDowngrade = async () => {
-    if (!user) {
-      return;
-    }
-
-    if (!confirm("Are you sure you want to downgrade to Pro plan? Your subscription will be updated immediately.")) {
-      return;
-    }
-
+  const performDowngrade = async () => {
     try {
       setLoading("downgrade");
       await refreshUser();
       await apiClient.updateSubscription(ADVANCED_PRICE_ID);
       await refreshUser();
-      alert("Successfully downgraded to Pro plan!");
+      toast.success("Downgraded to Pro", {
+        description: "Your plan change is effective immediately.",
+        duration: 4500,
+      });
       router.push("/courses");
     } catch (error: any) {
       console.error("Failed to downgrade:", error);
-      alert(error.message || "Failed to downgrade subscription. Please try again.");
+      toast.error("Downgrade failed", {
+        description: error.message || "Please try again in a moment.",
+      });
     } finally {
       setLoading(null);
     }
   };
 
-  const handleCancelSubscription = async () => {
-    if (!user) {
-      return;
-    }
+  const handleDowngrade = () => {
+    if (!user) return;
 
-    if (!confirm("Are you sure you want to cancel your subscription? You will lose access to premium features immediately and revert to the free Rookie plan.")) {
-      return;
-    }
-
-    try {
-      setLoading("cancel");
-      await refreshUser();
-      await apiClient.cancelSubscription();
-      await refreshUser();
-      alert("Subscription canceled successfully. You now have access to the free Rookie plan.");
-      router.push("/courses");
-    } catch (error: any) {
-      console.error("Failed to cancel subscription:", error);
-      alert(error.message || "Failed to cancel subscription. Please try again.");
-    } finally {
-      setLoading(null);
-    }
+    toast.warning("Downgrade to Pro?", {
+      description:
+        "You'll lose Guild Master perks (1-on-1 feedback, roundtable Zooms, exclusive badge). The change takes effect immediately.",
+      duration: 10000,
+      action: {
+        label: "Confirm",
+        onClick: () => {
+          void performDowngrade();
+        },
+      },
+      cancel: {
+        label: "Keep Guild Master",
+        onClick: () => {},
+      },
+    });
   };
 
   // Get current user tier (default to "rookie" if not logged in or no tier)
