@@ -355,7 +355,7 @@ def send_bug_report_email(
             "from": from_email,
             "to": [support_email],
             "reply_to": reply_to,
-            "subject": f"[Bug Report] {message[:60]}{'...' if len(message) > 60 else ''}",
+            "subject": f"[Bug Report] {' '.join(message.split())[:60]}{'...' if len(message) > 60 else ''}",
             "html": f"""
             <!DOCTYPE html>
             <html>
