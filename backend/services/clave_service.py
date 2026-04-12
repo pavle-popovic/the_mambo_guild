@@ -52,7 +52,7 @@ def is_user_pro(user_id: str, db: Session) -> bool:
     """Check if user has a pro subscription."""
     subscription = db.query(Subscription).filter(
         Subscription.user_id == user_id,
-        Subscription.status == SubscriptionStatus.ACTIVE,
+        Subscription.status.in_([SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING]),
         Subscription.tier.in_([SubscriptionTier.ADVANCED, SubscriptionTier.PERFORMER])
     ).first()
     return subscription is not None

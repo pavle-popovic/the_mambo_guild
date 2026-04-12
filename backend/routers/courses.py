@@ -36,7 +36,7 @@ def get_worlds(
     is_subscribed = False
     if current_user:
         subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
-        is_subscribed = subscription and subscription.status == SubscriptionStatus.ACTIVE
+        is_subscribed = subscription and subscription.status in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING)
     
     # PERFORMANCE FIX: Pre-fetch all user progress in a single query
     # Build a map of world_id -> (completed_count, total_lessons)
@@ -168,7 +168,7 @@ def get_lesson(
     # - Paid courses: Requires active subscription
     if current_user.role != UserRole.ADMIN and not world.is_free:
         subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
-        if not subscription or subscription.status != SubscriptionStatus.ACTIVE:
+        if not subscription or subscription.status not in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING):
             raise HTTPException(
                 status_code=403,
                 detail="Subscription required. Please upgrade to access this course."
@@ -499,7 +499,7 @@ def get_world_skill_tree(
         is_locked = False
     else:
         subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
-        is_locked = not subscription or subscription.status != SubscriptionStatus.ACTIVE
+        is_locked = not subscription or subscription.status not in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING)
 
     return WorldDetailResponse(
         id=str(world.id),

@@ -1,4 +1,4 @@
-from typing import Annotated
+from typing import Annotated, Any, Dict
 import uuid
 import logging
 import stripe
@@ -12,7 +12,7 @@ from pydantic import BaseModel
 logger = logging.getLogger(__name__)
 
 from dependencies import get_db, get_current_user
-from models.user import User, Subscription, SubscriptionStatus, SubscriptionTier
+from models.user import User, UserProfile, Subscription, SubscriptionStatus, SubscriptionTier
 from models.payment import StripeWebhookEvent
 from services import stripe_service
 from services.clave_service import award_subscription_bonus
@@ -60,7 +60,10 @@ def create_checkout_session(
         existing_subscription = db.query(Subscription).filter(
             Subscription.user_id == current_user.id
         ).first()
-        if existing_subscription and existing_subscription.status == SubscriptionStatus.ACTIVE:
+        if existing_subscription and existing_subscription.status in (
+            SubscriptionStatus.ACTIVE,
+            SubscriptionStatus.TRIALING,
+        ):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="User already has an active subscription. Use update-subscription to change plans."
@@ -92,13 +95,26 @@ def create_checkout_session(
             db.commit()
             db.refresh(current_user)  # Refresh to ensure subscription relationship is updated
 
+        # 7-day free trial is offered once per user, on their first paid
+        # subscription attempt. After that (canceled-and-returning customers,
+        # upgrades, etc.) they pay from day 0.
+        profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+        # Free trial is ADVANCED-tier only. Guild Master (PERFORMER) is a
+        # separate product with no trial.
+        trial_eligible = (
+            bool(profile and not profile.has_used_trial)
+            and request_data.price_id == ADVANCED_PRICE_ID
+        )
+        trial_period_days = 7 if trial_eligible else None
+
         # Create Stripe Checkout Session
         checkout_session = stripe_service.create_checkout_session(
             customer_id=stripe_customer_id,
             price_id=request_data.price_id,
             success_url=request_data.success_url,
             cancel_url=request_data.cancel_url,
-            metadata={"user_id": str(current_user.id)}
+            metadata={"user_id": str(current_user.id)},
+            trial_period_days=trial_period_days,
         )
         
         return CheckoutSessionResponse(
@@ -158,7 +174,70 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
         logger.info(f"Stripe webhook {event['id']} ({event['type']}) already processed — skipping")
         return {"status": "already_processed"}
 
-    # Handle the event
+    # Map Stripe price lookup_keys to our internal tier enum. Shared by the
+    # subscription.created and invoice.payment_succeeded handlers.
+    tier_mapping = {
+        "advanced": SubscriptionTier.ADVANCED,
+        "performer": SubscriptionTier.PERFORMER,
+        "vip": SubscriptionTier.PERFORMER,
+    }
+
+    # Fires at trial start (status=trialing) and again when Stripe flips the
+    # subscription to status=active after the first real charge. Handling it
+    # here is what gives trial users immediate access — the $0 trial invoice
+    # does not reliably fire invoice.payment_succeeded, so we can't rely on
+    # that alone.
+    if event["type"] in ("customer.subscription.created", "customer.subscription.updated"):
+        sub_obj = event["data"]["object"]
+        customer_id = sub_obj.get("customer")
+        stripe_sub_id = sub_obj.get("id")
+        stripe_status = sub_obj.get("status")  # "trialing", "active", "past_due", ...
+
+        items = sub_obj.get("items", {}).get("data", [])
+        price_lookup_key = items[0]["price"].get("lookup_key") if items else None
+        tier = tier_mapping.get((price_lookup_key or "").lower(), SubscriptionTier.ROOKIE)
+
+        # current_period_end can be on the subscription or on each item
+        period_end_ts = sub_obj.get("current_period_end") or (
+            items[0].get("current_period_end") if items else None
+        )
+        period_end_dt = (
+            datetime.fromtimestamp(period_end_ts, tz=timezone.utc) if period_end_ts else None
+        )
+
+        status_mapping = {
+            "trialing": SubscriptionStatus.TRIALING,
+            "active": SubscriptionStatus.ACTIVE,
+            "past_due": SubscriptionStatus.PAST_DUE,
+            "canceled": SubscriptionStatus.CANCELED,
+            "incomplete": SubscriptionStatus.INCOMPLETE,
+        }
+        db_status = status_mapping.get(stripe_status, SubscriptionStatus.INCOMPLETE)
+
+        db_subscription = db.query(Subscription).filter(
+            Subscription.stripe_customer_id == customer_id
+        ).first()
+
+        if db_subscription and db_status in (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE):
+            db_subscription.stripe_subscription_id = stripe_sub_id
+            db_subscription.status = db_status
+            db_subscription.tier = tier
+            db_subscription.current_period_end = period_end_dt
+            db_subscription.cancel_at_period_end = bool(sub_obj.get("cancel_at_period_end"))
+            db.commit()
+            db.refresh(db_subscription)
+
+            # Burn the one-time trial flag the moment Stripe confirms a trial
+            # started for this user. Prevents re-using the 7 free days on a
+            # second checkout after cancelling.
+            if db_status == SubscriptionStatus.TRIALING:
+                user_profile = db.query(UserProfile).filter(
+                    UserProfile.user_id == db_subscription.user_id
+                ).first()
+                if user_profile and not user_profile.has_used_trial:
+                    user_profile.has_used_trial = True
+                    db.commit()
+
     if event["type"] == "invoice.payment_succeeded":
         invoice = event["data"]["object"]
         # Stripe API 2025-08+ moved `subscription` from the top level of the
@@ -174,21 +253,15 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
             try:
                 stripe_subscription = stripe.Subscription.retrieve(subscription_id)
                 
-                # Get the price lookup_key to determine tier
+                # Re-use the tier_mapping defined above for subscription events.
                 price_lookup_key = stripe_subscription.items.data[0].price.lookup_key
-                
-                # Map Stripe lookup_key to our SubscriptionTier enum.
-                # Stripe lookup_key should be "advanced", "performer", or "vip"
-                # (lowercase). "vip" is a display-rename alias that still maps
-                # to the internal PERFORMER tier — the DB enum stays PERFORMER
-                # so no migration is needed.
-                tier_mapping = {
-                    "advanced": SubscriptionTier.ADVANCED,
-                    "performer": SubscriptionTier.PERFORMER,
-                    "vip": SubscriptionTier.PERFORMER,
-                }
-                
                 tier = tier_mapping.get(price_lookup_key.lower() if price_lookup_key else "", SubscriptionTier.ROOKIE)
+
+                # A $0 invoice at trial start or from a 100%-off coupon must
+                # not trigger the one-time XP/badge bonus — those rewards are
+                # reserved for the first real paid conversion.
+                amount_paid = invoice.get("amount_paid", 0) or 0
+                is_paid_invoice = amount_paid > 0
 
                 # Stripe API 2025-08+ moved `current_period_end` off the
                 # Subscription object and onto each item. Read both to stay
@@ -217,11 +290,9 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                     db.commit()
                     db.refresh(db_subscription)
 
-                    # Award subscription bonus (Advanced/Performer)
-                    award_subscription_bonus(str(db_subscription.user_id), tier, db, reference_id=invoice.id)
-
-                    # Award subscription badge (Pro Member / Guild Master)
-                    award_subscription_badge(str(db_subscription.user_id), tier.value, db)
+                    if is_paid_invoice:
+                        award_subscription_bonus(str(db_subscription.user_id), tier, db, reference_id=invoice.id)
+                        award_subscription_badge(str(db_subscription.user_id), tier.value, db)
                 else:
                     # This case might happen if the subscription was created directly in Stripe
                     # or if the initial 'incomplete' record wasn't found.
@@ -240,12 +311,10 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                         db.add(new_subscription)
                         db.commit()
                         db.refresh(new_subscription)
-                        
-                        # Award subscription bonus
-                        award_subscription_bonus(str(new_subscription.user_id), tier, db, reference_id=invoice.id)
-                        
-                        # Award subscription badge
-                        award_subscription_badge(str(new_subscription.user_id), tier.value, db)
+
+                        if is_paid_invoice:
+                            award_subscription_bonus(str(new_subscription.user_id), tier, db, reference_id=invoice.id)
+                            award_subscription_badge(str(new_subscription.user_id), tier.value, db)
                     else:
                         logger.warning(f"Could not find user_id in metadata for new subscription {subscription_id}")
 
@@ -311,7 +380,7 @@ def update_subscription(
                 detail="No subscription found for this user."
             )
         
-        if subscription.status != SubscriptionStatus.ACTIVE:
+        if subscription.status not in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Subscription is not active. Cannot update."
@@ -325,32 +394,70 @@ def update_subscription(
         
         # Retrieve the Stripe subscription
         stripe_subscription = stripe.Subscription.retrieve(subscription.stripe_subscription_id)
-        
+
         # Get the subscription item ID (there should be one item)
         subscription_item_id = stripe_subscription.items.data[0].id
-        
+
+        # Build the modify kwargs. Always clear any scheduled cancel — upgrading
+        # is a commitment signal, so we auto-resume if the user had previously
+        # set cancel_at_period_end.
+        modify_kwargs: Dict[str, Any] = {
+            "items": [{
+                "id": subscription_item_id,
+                "price": request_data.new_price_id,
+            }],
+            "proration_behavior": "always_invoice",  # Prorate the difference
+            "cancel_at_period_end": False,
+        }
+
+        # If the user is currently trialing and is upgrading to Guild Master
+        # (PERFORMER), end the trial immediately. Guild Master is a separate
+        # product with no free trial — upgrading ends the trial and charges
+        # the full Guild Master rate right now.
+        is_upgrade_to_performer = (
+            request_data.new_price_id == PERFORMER_PRICE_ID
+            and subscription.status == SubscriptionStatus.TRIALING
+        )
+        if is_upgrade_to_performer:
+            modify_kwargs["trial_end"] = "now"
+
         # Update the subscription with the new price
         updated_subscription = stripe.Subscription.modify(
             subscription.stripe_subscription_id,
-            items=[{
-                'id': subscription_item_id,
-                'price': request_data.new_price_id,
-            }],
-            proration_behavior='always_invoice',  # Prorate the difference
+            **modify_kwargs,
         )
-        
+
         # Determine the new tier based on price_id
-        tier_mapping = {
+        price_id_to_tier = {
             ADVANCED_PRICE_ID: SubscriptionTier.ADVANCED,
             PERFORMER_PRICE_ID: SubscriptionTier.PERFORMER,
         }
-        new_tier = tier_mapping.get(request_data.new_price_id, SubscriptionTier.ROOKIE)
-        
+        new_tier = price_id_to_tier.get(request_data.new_price_id, SubscriptionTier.ROOKIE)
+
+        # Read current_period_end — Stripe API 2025+ moved this off the
+        # subscription object onto the first subscription item. Fall back to
+        # whichever is present.
+        item0 = (
+            updated_subscription["items"].data[0]
+            if updated_subscription["items"].data
+            else None
+        )
+        period_end_ts = (
+            getattr(updated_subscription, "current_period_end", None)
+            or (getattr(item0, "current_period_end", None) if item0 else None)
+        )
+        period_end_dt = (
+            datetime.fromtimestamp(period_end_ts, tz=timezone.utc)
+            if period_end_ts
+            else subscription.current_period_end
+        )
+
         # Update our database
         subscription.tier = new_tier
-        subscription.current_period_end = datetime.fromtimestamp(
-            updated_subscription.current_period_end, tz=timezone.utc
-        )
+        subscription.current_period_end = period_end_dt
+        subscription.cancel_at_period_end = False
+        if is_upgrade_to_performer:
+            subscription.status = SubscriptionStatus.ACTIVE
         db.commit()
         db.refresh(subscription)
         
@@ -394,7 +501,7 @@ def cancel_subscription(
                 detail="No subscription found for this user."
             )
 
-        if subscription.status != SubscriptionStatus.ACTIVE:
+        if subscription.status not in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Subscription is not active. Nothing to cancel."

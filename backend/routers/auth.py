@@ -436,6 +436,8 @@ def get_current_user_profile(
     tier = subscription.tier if subscription else "rookie"
     cancel_at_period_end = bool(subscription.cancel_at_period_end) if subscription else False
     period_end = subscription.current_period_end if subscription else None
+    sub_status = subscription.status.value if subscription and subscription.status else None
+    has_used_trial = bool(profile.has_used_trial) if hasattr(profile, "has_used_trial") else False
 
     today = datetime.now()
     # Award daily login entries/claves logic if needed here, but it's handled in login
@@ -466,6 +468,8 @@ def get_current_user_profile(
         avatar_url=profile.avatar_url,
         subscription_cancel_at_period_end=cancel_at_period_end,
         subscription_period_end=period_end,
+        subscription_status=sub_status,
+        has_used_trial=has_used_trial,
         current_level_tag=profile.current_level_tag.value if hasattr(profile, 'current_level_tag') else "Beginner",
         reputation=profile.reputation if hasattr(profile, 'reputation') else 0,
         current_claves=profile.current_claves if hasattr(profile, 'current_claves') else 0,

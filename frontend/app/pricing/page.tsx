@@ -205,13 +205,9 @@ function PricingPageContent() {
                           Current Plan
                         </Link>
                       ) : (isAdvanced || isPerformer) ? (
-                        <button
-                          onClick={handleCancelSubscription}
-                          disabled={loading === "cancel"}
-                          className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/20 transition-all duration-300 text-gray-400 shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {loading === "cancel" ? "Loading..." : "Remove Subscription"}
-                        </button>
+                        <p className="block w-full py-3 text-center text-gray-500 text-sm">
+                          Cancel in Profile Page
+                        </p>
                       ) : null}
                     </Clickable>
                   </div>

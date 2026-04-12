@@ -10,24 +10,42 @@ def create_checkout_session(
     price_id: str,
     success_url: str,
     cancel_url: str,
-    metadata: Dict[str, str] = None
+    metadata: Dict[str, str] = None,
+    trial_period_days: int = None,
 ) -> stripe.checkout.Session:
     """
     Creates a Stripe Checkout Session for a new subscription.
+
+    If `trial_period_days` is set, Stripe collects the payment method upfront
+    but charges $0 on day 0 and rolls into a regular paid billing cycle at the
+    end of the trial window. Cancelling during the trial stops conversion.
     """
+    subscription_data: Dict[str, Any] = {
+        "metadata": metadata or {},
+    }
+    if trial_period_days:
+        subscription_data["trial_period_days"] = trial_period_days
+        # If the saved card fails at trial end, cancel the subscription cleanly
+        # instead of carrying a delinquent state.
+        subscription_data["trial_settings"] = {
+            "end_behavior": {"missing_payment_method": "cancel"},
+        }
+
     try:
         checkout_session = stripe.checkout.Session.create(
-            customer=customer_id,  # Use existing customer ID
+            customer=customer_id,
             line_items=[
                 {
-                    'price': price_id,
-                    'quantity': 1,
+                    "price": price_id,
+                    "quantity": 1,
                 },
             ],
-            mode='subscription',
+            mode="subscription",
             success_url=success_url,
             cancel_url=cancel_url,
-            metadata=metadata or {},  # Store user_id and other metadata for webhook processing
+            metadata=metadata or {},
+            subscription_data=subscription_data,
+            payment_method_collection="always" if trial_period_days else "if_required",
         )
         return checkout_session
     except stripe.error.StripeError as e:

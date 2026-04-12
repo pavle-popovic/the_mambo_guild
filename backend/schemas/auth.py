@@ -100,6 +100,8 @@ class UserProfileResponse(BaseModel):
     # Subscription lifecycle (for cancel/resume UI)
     subscription_cancel_at_period_end: bool = False
     subscription_period_end: Optional[datetime] = None
+    subscription_status: Optional[str] = None   # "trialing" | "active" | ...
+    has_used_trial: bool = False
 
     # Gamification v4
     reputation: int = 0

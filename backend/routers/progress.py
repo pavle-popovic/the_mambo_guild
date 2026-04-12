@@ -47,7 +47,7 @@ def complete_lesson(
             .filter(Subscription.user_id == current_user.id)
             .first()
         )
-        if not subscription or subscription.status != SubscriptionStatus.ACTIVE:
+        if not subscription or subscription.status not in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING):
             raise HTTPException(
                 status_code=403,
                 detail="Subscription required to complete this lesson.",

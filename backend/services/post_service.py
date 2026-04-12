@@ -31,7 +31,7 @@ def _get_user_info(user: User, db: Session) -> dict:
     
     # Check subscription
     if user.subscription:
-        is_active = user.subscription.status == SubscriptionStatus.ACTIVE
+        is_active = user.subscription.status in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING)
         is_pro = is_active and user.subscription.tier in [SubscriptionTier.ADVANCED, SubscriptionTier.PERFORMER]
         # Guild Master = PERFORMER tier (top premium tier)
         is_guild_master = is_active and user.subscription.tier == SubscriptionTier.PERFORMER

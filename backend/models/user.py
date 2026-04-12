@@ -79,6 +79,7 @@ class UserProfile(Base):
     
     # Streak Freezes System
     weekly_free_freeze_used = Column(Boolean, default=False, nullable=False)
+    has_used_trial = Column(Boolean, default=False, nullable=False, server_default="false")
     inventory_freezes = Column(Integer, default=0, nullable=False)
     last_freeze_reset_date = Column(Date, nullable=True)  # Track weekly reset
 
