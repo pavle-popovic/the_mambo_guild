@@ -254,7 +254,7 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                 stripe_subscription = stripe.Subscription.retrieve(subscription_id)
                 
                 # Re-use the tier_mapping defined above for subscription events.
-                price_lookup_key = stripe_subscription.items.data[0].price.lookup_key
+                price_lookup_key = stripe_subscription["items"]["data"][0]["price"]["lookup_key"]
                 tier = tier_mapping.get(price_lookup_key.lower() if price_lookup_key else "", SubscriptionTier.ROOKIE)
 
                 # A $0 invoice at trial start or from a 100%-off coupon must
@@ -395,8 +395,9 @@ def update_subscription(
         # Retrieve the Stripe subscription
         stripe_subscription = stripe.Subscription.retrieve(subscription.stripe_subscription_id)
 
-        # Get the subscription item ID (there should be one item)
-        subscription_item_id = stripe_subscription.items.data[0].id
+        # Get the subscription item ID (there should be one item).
+        # Use bracket access: `sub.items` collides with dict.items method.
+        subscription_item_id = stripe_subscription["items"]["data"][0]["id"]
 
         # Build the modify kwargs. Always clear any scheduled cancel — upgrading
         # is a commitment signal, so we auto-resume if the user had previously
