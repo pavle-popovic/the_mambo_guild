@@ -887,6 +887,16 @@ class ApiClient {
     });
   }
 
+  async resumeSubscription() {
+    return this.request<{
+      success: boolean;
+      message: string;
+      tier?: string;
+    }>("/api/payments/resume-subscription", {
+      method: "POST",
+    });
+  }
+
   // ============================================
   // Clave Economy Endpoints (v4.0)
   // ============================================

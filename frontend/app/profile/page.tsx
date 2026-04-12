@@ -11,6 +11,7 @@ import { FaFire, FaBolt, FaMedal, FaStar, FaCheck, FaSignOutAlt } from "react-ic
 import { apiClient } from "@/lib/api";
 import { BadgeTrophyCase } from "@/components/BadgeTrophyCase";
 import { ReferralSection } from "@/components/ReferralSection";
+import SubscriptionManager from "@/components/SubscriptionManager";
 
 interface Course {
   id: string;
@@ -691,6 +692,8 @@ export default function ProfilePage() {
             )}
           </div>
         </div>
+
+        <SubscriptionManager />
       </div>
 
       <Footer />
