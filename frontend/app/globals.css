@@ -485,6 +485,30 @@ h6 {
   .hero-content-container {
     gap: 1.5rem !important;
   }
+
+  /* ── Navbar: compact density so links don't overlap ── */
+  .glass-nav > div {
+    padding-top: 0.25rem !important;
+    padding-bottom: 0.25rem !important;
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    gap: 0.75rem !important;
+  }
+  .glass-nav img.logo-img {
+    height: 1.75rem !important;
+  }
+  .glass-nav a span.font-serif,
+  .glass-nav span.font-serif {
+    font-size: 0.8rem !important;
+  }
+  .glass-nav a,
+  .glass-nav button {
+    font-size: 0.7rem !important;
+  }
+  .glass-nav .flex-1 {
+    gap: 1rem !important;
+    margin-left: 0.5rem !important;
+  }
 }
 
 /* ─── Landscape phones — desktop-style 3-panel flex layout ────────────
