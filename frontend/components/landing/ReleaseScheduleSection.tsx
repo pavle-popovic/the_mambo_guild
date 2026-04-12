@@ -336,7 +336,7 @@ function LandscapeCarousel({ items, nextId }: { items: ReleaseItem[]; nextId: st
     return (
         <div className="relative">
             <div className="pointer-events-none absolute left-0 right-0 top-[68px] h-[2px] bg-gradient-to-r from-transparent via-amber-300/50 to-transparent" />
-            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-3 pt-2 [scrollbar-width:thin]">
+            <div className="flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 pb-4 pt-2 [scrollbar-color:rgba(252,226,5,0.5)_rgba(255,255,255,0.08)] [scrollbar-width:thin] [&::-webkit-scrollbar]:h-2.5 [&::-webkit-scrollbar-track]:bg-white/5 [&::-webkit-scrollbar-track]:rounded-full [&::-webkit-scrollbar-thumb]:bg-amber-300/50 [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-amber-300/80" style={{ touchAction: "pan-x pan-y" }}>
                 {items.map((item, i) => {
                     const isNext = item.date === nextId;
                     const date = parseDate(item.date);
