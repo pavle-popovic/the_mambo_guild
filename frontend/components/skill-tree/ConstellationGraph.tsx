@@ -446,7 +446,7 @@ function ConstellationGraphInner({
         const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
         if (targetNode) {
           setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
-            zoom: 0.55,
+            zoom: 0.85,
             duration: 800,
           });
         }
@@ -616,7 +616,7 @@ function ConstellationGraphInner({
           onNodeMouseEnter={handleNodeMouseEnter}
           onNodeMouseLeave={handleNodeMouseLeave}
           onInit={handleInit}
-          defaultViewport={{ x: 0, y: 0, zoom: 0.75 }}
+          defaultViewport={{ x: 0, y: 0, zoom: 0.85 }}
           minZoom={0.2}
           maxZoom={1.5}
           defaultEdgeOptions={{
