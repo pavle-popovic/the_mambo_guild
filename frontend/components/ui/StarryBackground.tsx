@@ -194,7 +194,7 @@ export default function StarryBackground() {
     ];
 
     return (
-        <div className="fixed inset-0 z-0 overflow-hidden bg-mambo-dark pointer-events-none">
+        <div className="fixed inset-0 z-[-1] overflow-hidden bg-mambo-dark">
             <canvas ref={canvasRef} className="absolute inset-0 opacity-80" />
 
             {/* Art Deco Floating Elements — hidden on mobile for performance */}
