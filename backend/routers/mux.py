@@ -124,6 +124,7 @@ class CreateUploadRequest(BaseModel):
     course_id: Optional[str] = None  # Pass course_id for course preview uploads
     level_id: Optional[str] = None  # Pass level_id for skill tree node preview uploads
     post_id: Optional[str] = None  # Pass post_id for community post uploads
+    coaching_submission: Optional[bool] = None  # Guild Master 1-on-1 coaching video
 
 
 class CreateUploadResponse(BaseModel):
@@ -157,9 +158,10 @@ def create_mux_upload_url(
     course_id_val = request_data.course_id if request_data else None
     level_id_val = request_data.level_id if request_data else None
     post_id_val = post_id or (request_data.post_id if request_data else None)
+    coaching_val = bool(request_data.coaching_submission) if request_data else False
     filename_val = filename or (request_data.filename if request_data else None)
 
-    logger.debug(f"Upload URL request - lesson: {lesson_id_val}, course: {course_id_val}, level: {level_id_val}, post: {post_id_val}")
+    logger.debug(f"Upload URL request - lesson: {lesson_id_val}, course: {course_id_val}, level: {level_id_val}, post: {post_id_val}, coaching: {coaching_val}")
 
     # Auth check: Admin for lessons/courses/levels, authenticated user for community posts
     if lesson_id_val or course_id_val or level_id_val:
@@ -177,6 +179,12 @@ def create_mux_upload_url(
         # Community post uploads require authenticated user
         if not current_user_opt:
             raise HTTPException(status_code=401, detail="Authentication required for community post uploads")
+    elif coaching_val:
+        # Guild Master coaching submission uploads require authenticated Guild Master
+        if not current_user_opt:
+            raise HTTPException(status_code=401, detail="Authentication required for coaching submission uploads")
+        from routers.premium import require_guild_master
+        require_guild_master(current_user_opt)
     else:
         # No entity specified - require admin
         if not current_user_opt or current_user_opt.role != UserRole.ADMIN:
@@ -319,15 +327,23 @@ def create_mux_upload_url(
                     "post_id": post_id_val,
                     "type": "community-post"
                 }
+        elif coaching_val and current_user_opt:
+            external_id = f"coaching-{str(current_user_opt.id)[:8]}"
+            title = f"Coaching Submission - {current_user_opt.email or current_user_opt.id}"
+            creator_id = "coaching-submission"
+            passthrough_data = {
+                "user_id": str(current_user_opt.id),
+                "type": "coaching-submission",
+            }
     except Exception as e:
         logger.debug(f"Error fetching metadata: {type(e).__name__}")
         # Continue without metadata if fetch fails
-    
+
     # Create passthrough JSON string
     if passthrough_data:
         passthrough = json.dumps(passthrough_data)
-    # Community posts get resolution cap (1080p), lesson/course videos get MP4 support
-    is_community_upload = post_id_val is not None
+    # Community posts and coaching submissions get resolution cap (1080p), lesson/course videos get MP4 support
+    is_community_upload = post_id_val is not None or coaching_val
     result = create_direct_upload(
         filename=filename_val,
         test=False,

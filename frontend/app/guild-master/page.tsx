@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { Video, Calendar, Clock, Play, Crown, Music, Mic, Search, X } from "lucide-react";
@@ -102,6 +102,10 @@ export default function GuildMasterPage() {
     assetId: string;
     duration: number;
   } | null>(null);
+  const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "processing" | "error">("idle");
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const coachingFileInputRef = useRef<HTMLInputElement | null>(null);
 
   // DJ Booth state
   const [djTracks, setDjTracks] = useState<DJBoothTrack[]>([]);
@@ -220,6 +224,105 @@ export default function GuildMasterPage() {
       }
     } catch (error) {
       console.error("Failed to load submissions:", error);
+    }
+  };
+
+  const getVideoDuration = (file: File): Promise<number> =>
+    new Promise((resolve) => {
+      const url = URL.createObjectURL(file);
+      const videoEl = document.createElement("video");
+      videoEl.preload = "metadata";
+      videoEl.onloadedmetadata = () => {
+        URL.revokeObjectURL(url);
+        resolve(Math.round(videoEl.duration || 0));
+      };
+      videoEl.onerror = () => {
+        URL.revokeObjectURL(url);
+        resolve(0);
+      };
+      videoEl.src = url;
+    });
+
+  const handleCoachingFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    // Reset the input so selecting the same file again still fires onChange
+    e.target.value = "";
+
+    if (file.size > 50 * 1024 * 1024) {
+      setUploadError("File is larger than 50MB.");
+      setUploadStatus("error");
+      return;
+    }
+
+    const duration = await getVideoDuration(file);
+    if (duration && duration > 100) {
+      setUploadError("Video must be 100 seconds or less.");
+      setUploadStatus("error");
+      return;
+    }
+
+    setUploadError(null);
+    setUploadStatus("uploading");
+    setUploadProgress(0);
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/mux/upload-url`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ coaching_submission: true, filename: file.name }),
+      });
+      if (!res.ok) throw new Error("Failed to get upload URL");
+      const json = await res.json();
+      const uploadUrl = json.upload_url || json.url;
+      const uploadId = json.upload_id || json.uploadId;
+      if (!uploadUrl || !uploadId) throw new Error("Invalid upload URL response");
+
+      await new Promise<void>((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open("PUT", uploadUrl, true);
+        xhr.upload.onprogress = (ev) => {
+          if (ev.lengthComputable) {
+            setUploadProgress(Math.round((ev.loaded / ev.total) * 100));
+          }
+        };
+        xhr.onload = () => (xhr.status === 200 ? resolve() : reject(new Error(`Upload failed (${xhr.status})`)));
+        xhr.onerror = () => reject(new Error("Upload network error"));
+        xhr.send(file);
+      });
+
+      setUploadStatus("processing");
+
+      const pollStart = Date.now();
+      const poll = async (): Promise<void> => {
+        if (Date.now() - pollStart > 5 * 60 * 1000) {
+          throw new Error("Video is still processing. Please try again in a minute.");
+        }
+        const statusRes = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/api/mux/upload-status/${uploadId}`,
+          { credentials: "include" }
+        );
+        if (!statusRes.ok) throw new Error("Failed to check upload status");
+        const data = await statusRes.json();
+        if (data.status === "ready" && data.playback_id && data.asset_id) {
+          setUploadedVideo({
+            playbackId: data.playback_id,
+            assetId: data.asset_id,
+            duration: duration || 0,
+          });
+          setUploadStatus("idle");
+          return;
+        }
+        if (data.status === "errored") throw new Error("Mux reported an error processing the video.");
+        await new Promise((r) => setTimeout(r, 3000));
+        return poll();
+      };
+      await poll();
+    } catch (err: any) {
+      console.error("Coaching upload error:", err);
+      setUploadError(err?.message || "Upload failed. Please try again.");
+      setUploadStatus("error");
     }
   };
 
@@ -579,13 +682,45 @@ export default function GuildMasterPage() {
                       </ul>
                     </div>
 
-                    {/* Video Upload Area - Placeholder for MuxUploader */}
+                    {/* Video Upload Area */}
+                    <input
+                      ref={coachingFileInputRef}
+                      type="file"
+                      accept="video/mp4,video/quicktime,video/*"
+                      className="hidden"
+                      onChange={handleCoachingFileChange}
+                    />
                     {!uploadedVideo ? (
-                      <div className="border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-amber-500/50 transition cursor-pointer">
-                        <Video className="w-12 h-12 text-white/30 mx-auto mb-3" />
-                        <p className="text-white/50 mb-2">Drop your video here or click to upload</p>
-                        <p className="text-xs text-white/30">Video upload will use Mux for processing</p>
-                        {/* TODO: Integrate MuxUploader component here */}
+                      <div>
+                        <button
+                          type="button"
+                          onClick={() => coachingFileInputRef.current?.click()}
+                          disabled={uploadStatus === "uploading" || uploadStatus === "processing"}
+                          className="w-full border-2 border-dashed border-white/20 rounded-xl p-8 text-center hover:border-amber-500/50 transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                        >
+                          <Video className="w-12 h-12 text-white/30 mx-auto mb-3" />
+                          {uploadStatus === "uploading" ? (
+                            <>
+                              <p className="text-white/80 mb-2">Uploading… {uploadProgress}%</p>
+                              <div className="w-full bg-white/10 rounded-full h-2 mt-2">
+                                <div
+                                  className="bg-amber-500 h-2 rounded-full transition-all"
+                                  style={{ width: `${uploadProgress}%` }}
+                                />
+                              </div>
+                            </>
+                          ) : uploadStatus === "processing" ? (
+                            <p className="text-white/80">Processing video… this can take up to a minute.</p>
+                          ) : (
+                            <>
+                              <p className="text-white/50 mb-2">Drop your video here or click to upload</p>
+                              <p className="text-xs text-white/30">Video upload will use Mux for processing</p>
+                            </>
+                          )}
+                        </button>
+                        {uploadStatus === "error" && uploadError && (
+                          <p className="mt-2 text-sm text-red-400">{uploadError}</p>
+                        )}
                       </div>
                     ) : (
                       <div className="bg-green-500/10 border border-green-500/30 rounded-xl p-4 flex items-center gap-4">
@@ -631,7 +766,6 @@ export default function GuildMasterPage() {
                       />
                       <div>
                         <span className="text-white/80">Allow The Mambo Guild to feature this review on social media</span>
-                        <p className="text-xs text-amber-400 mt-0.5">+50 XP bonus if selected!</p>
                       </div>
                     </label>
 

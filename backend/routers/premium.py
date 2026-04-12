@@ -398,11 +398,7 @@ def submit_coaching_video(
     )
     
     db.add(submission)
-    
-    # Award XP for social share consent
-    if data.allow_social_share and current_user.profile:
-        current_user.profile.xp += 50
-    
+
     db.commit()
     db.refresh(submission)
     
