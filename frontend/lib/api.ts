@@ -897,6 +897,15 @@ class ApiClient {
     });
   }
 
+  async getGuildMasterSeats() {
+    return this.request<{
+      total: number;
+      taken: number;
+      remaining: number;
+      is_full: boolean;
+    }>("/api/payments/guild-master-seats");
+  }
+
   // ============================================
   // Clave Economy Endpoints (v4.0)
   // ============================================

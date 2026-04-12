@@ -23,6 +23,27 @@ function PricingPageContent() {
   const [loading, setLoading] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showDowngradeModal, setShowDowngradeModal] = useState(false);
+  const [guildMasterSeats, setGuildMasterSeats] = useState<{
+    total: number;
+    taken: number;
+    remaining: number;
+    is_full: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiClient
+      .getGuildMasterSeats()
+      .then((s) => {
+        if (!cancelled) setGuildMasterSeats(s);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch Guild Master seats:", err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   // Handle success/cancel redirects from Stripe
   useEffect(() => {
@@ -295,7 +316,27 @@ function PricingPageContent() {
                     <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
                       $59<span className="text-lg text-gray-400 font-normal">/mo</span>
                     </div>
-                    <div className="text-sm text-gray-400 mb-8">Capped at 30 members.</div>
+                    {guildMasterSeats ? (
+                      <div className="mb-8">
+                        <div className="flex items-baseline gap-2 mb-2">
+                          <span className={`text-sm font-bold ${guildMasterSeats.is_full ? "text-red-400" : "text-mambo-gold"}`}>
+                            {guildMasterSeats.is_full
+                              ? "Fully booked"
+                              : `${guildMasterSeats.remaining} of ${guildMasterSeats.total} seats left`}
+                          </span>
+                        </div>
+                        <div className="h-1.5 w-full rounded-full bg-gray-800 overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all duration-700 ${guildMasterSeats.is_full ? "bg-red-500" : "bg-gradient-to-r from-mambo-gold to-orange-500"}`}
+                            style={{
+                              width: `${Math.min(100, (guildMasterSeats.taken / guildMasterSeats.total) * 100)}%`,
+                            }}
+                          />
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="text-sm text-gray-400 mb-8">Capped at 30 members.</div>
+                    )}
 
                     <ul className="text-left space-y-4 mb-8 flex-1">
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
@@ -320,38 +361,53 @@ function PricingPageContent() {
                       </li>
                     </ul>
                     <Clickable>
-                      {!user ? (
-                        <button
-                          onClick={() => handleSubscribe(PERFORMER_PRICE_ID, "performer")}
-                          disabled={loading === PERFORMER_PRICE_ID}
-                          className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Guild Master Access"}
-                        </button>
-                      ) : isRookie ? (
-                        <button
-                          onClick={() => handleSubscribe(PERFORMER_PRICE_ID, "performer")}
-                          disabled={loading === PERFORMER_PRICE_ID}
-                          className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Guild Master Access"}
-                        </button>
-                      ) : isAdvanced ? (
-                        <button
-                          onClick={handleUpgrade}
-                          disabled={loading === "upgrade"}
-                          className="block w-full py-4 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black rounded-lg font-bold transition-all duration-300 shadow-lg shadow-yellow-500/25 hover:shadow-xl hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {loading === "upgrade" ? "Loading..." : "Upgrade"}
-                        </button>
-                      ) : isPerformer ? (
-                        <button
-                          disabled
-                          className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 cursor-default"
-                        >
-                          Current Plan
-                        </button>
-                      ) : null}
+                      {(() => {
+                        const gmFull = guildMasterSeats?.is_full === true;
+                        // Already Guild Master — always show Current Plan.
+                        if (isPerformer) {
+                          return (
+                            <button
+                              disabled
+                              className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 cursor-default"
+                            >
+                              Current Plan
+                            </button>
+                          );
+                        }
+                        // Seat cap hit — lock the button with a waitlist CTA.
+                        if (gmFull) {
+                          return (
+                            <button
+                              disabled
+                              className="block w-full py-4 bg-gray-800/60 border border-gray-700 text-gray-500 rounded-lg font-bold cursor-not-allowed"
+                            >
+                              Fully Booked — Join Waitlist
+                            </button>
+                          );
+                        }
+                        // Logged-in Pro user — upgrade path.
+                        if (isAdvanced) {
+                          return (
+                            <button
+                              onClick={handleUpgrade}
+                              disabled={loading === "upgrade"}
+                              className="block w-full py-4 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black rounded-lg font-bold transition-all duration-300 shadow-lg shadow-yellow-500/25 hover:shadow-xl hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {loading === "upgrade" ? "Loading..." : "Upgrade"}
+                            </button>
+                          );
+                        }
+                        // Rookie or logged-out — start checkout.
+                        return (
+                          <button
+                            onClick={() => handleSubscribe(PERFORMER_PRICE_ID, "performer")}
+                            disabled={loading === PERFORMER_PRICE_ID}
+                            className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Guild Master Access"}
+                          </button>
+                        );
+                      })()}
                     </Clickable>
                   </div>
                 </div>

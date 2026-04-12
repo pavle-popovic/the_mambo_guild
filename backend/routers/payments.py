@@ -35,6 +35,42 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X"
 PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml"
 
+# Guild Master (PERFORMER) is an intentionally scarce tier capped at 30 seats.
+# We surface live remaining-seats to the pricing page so prospects see urgency,
+# and refuse new PERFORMER checkouts when the cap is hit.
+GUILD_MASTER_SEAT_CAP = 30
+
+
+def _guild_master_seats_taken(db: Session) -> int:
+    return (
+        db.query(Subscription)
+        .filter(
+            Subscription.tier == SubscriptionTier.PERFORMER,
+            Subscription.status == SubscriptionStatus.ACTIVE,
+        )
+        .count()
+    )
+
+
+class GuildMasterSeatsResponse(BaseModel):
+    total: int
+    taken: int
+    remaining: int
+    is_full: bool
+
+
+@router.get("/guild-master-seats", response_model=GuildMasterSeatsResponse)
+def guild_master_seats(db: Session = Depends(get_db)):
+    """Public endpoint — live remaining seats on the Guild Master tier."""
+    taken = _guild_master_seats_taken(db)
+    remaining = max(0, GUILD_MASTER_SEAT_CAP - taken)
+    return GuildMasterSeatsResponse(
+        total=GUILD_MASTER_SEAT_CAP,
+        taken=taken,
+        remaining=remaining,
+        is_full=remaining == 0,
+    )
+
 
 @router.post("/create-checkout-session", response_model=CheckoutSessionResponse)
 def create_checkout_session(
@@ -68,6 +104,14 @@ def create_checkout_session(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="User already has an active subscription. Use update-subscription to change plans."
             )
+
+        # Enforce the Guild Master seat cap on new checkouts.
+        if request_data.price_id == PERFORMER_PRICE_ID:
+            if _guild_master_seats_taken(db) >= GUILD_MASTER_SEAT_CAP:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Guild Master is currently full. Join the waitlist to be notified when a seat opens up.",
+                )
 
         # Create or retrieve Stripe Customer ID
         stripe_customer_id = current_user.subscription.stripe_customer_id if current_user.subscription else None
@@ -391,7 +435,20 @@ def update_subscription(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No Stripe subscription ID found. Cannot update."
             )
-        
+
+        # If this user is upgrading *into* Guild Master, enforce the seat cap.
+        # Their current tier being PERFORMER already means they occupy a seat,
+        # so only count the cap when they're NOT already PERFORMER.
+        if (
+            request_data.new_price_id == PERFORMER_PRICE_ID
+            and subscription.tier != SubscriptionTier.PERFORMER
+        ):
+            if _guild_master_seats_taken(db) >= GUILD_MASTER_SEAT_CAP:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="Guild Master is currently full. Join the waitlist to be notified when a seat opens up.",
+                )
+
         # Retrieve the Stripe subscription
         stripe_subscription = stripe.Subscription.retrieve(subscription.stripe_subscription_id)
 

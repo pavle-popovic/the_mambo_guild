@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -68,6 +68,27 @@ export default function LandingPricingSection() {
   const router = useRouter();
   const [loading, setLoading] = useState<string>(""); // Initialize as empty string to avoid null === null match
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [guildMasterSeats, setGuildMasterSeats] = useState<{
+    total: number;
+    taken: number;
+    remaining: number;
+    is_full: boolean;
+  } | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    apiClient
+      .getGuildMasterSeats()
+      .then((s) => {
+        if (!cancelled) setGuildMasterSeats(s);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch Guild Master seats:", err);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleSubscribe = async (priceId: string | null, planId: string) => {
     // Free plan - redirect to register
@@ -204,9 +225,29 @@ export default function LandingPricingSection() {
                           </span>
                         )}
                       </div>
-                      <div className="text-sm text-gray-500 mb-8">
-                        {plan.description}
-                      </div>
+                      {plan.id === "performer" && guildMasterSeats ? (
+                        <div className="mb-8">
+                          <div className="flex items-baseline gap-2 mb-2">
+                            <span className={`text-sm font-bold ${guildMasterSeats.is_full ? "text-red-400" : "text-mambo-gold"}`}>
+                              {guildMasterSeats.is_full
+                                ? "Fully booked"
+                                : `${guildMasterSeats.remaining} of ${guildMasterSeats.total} seats left`}
+                            </span>
+                          </div>
+                          <div className="h-1.5 w-full rounded-full bg-gray-800 overflow-hidden">
+                            <div
+                              className={`h-full rounded-full transition-all duration-700 ${guildMasterSeats.is_full ? "bg-red-500" : "bg-gradient-to-r from-mambo-gold to-orange-500"}`}
+                              style={{
+                                width: `${Math.min(100, (guildMasterSeats.taken / guildMasterSeats.total) * 100)}%`,
+                              }}
+                            />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="text-sm text-gray-500 mb-8">
+                          {plan.description}
+                        </div>
+                      )}
 
                       {/* Features */}
                       <ul className="text-left space-y-4 mb-8 flex-1">
@@ -254,6 +295,13 @@ export default function LandingPricingSection() {
                           >
                             Current Plan
                           </Link>
+                        ) : plan.id === "performer" && guildMasterSeats?.is_full ? (
+                          <button
+                            disabled
+                            className="block w-full py-4 bg-gray-800/60 border border-gray-700 text-gray-500 rounded-lg font-bold cursor-not-allowed"
+                          >
+                            Fully Booked — Join Waitlist
+                          </button>
                         ) : (
                           <button
                             onClick={() => handleSubscribe(plan.priceId, plan.id)}
