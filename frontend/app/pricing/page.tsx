@@ -99,6 +99,17 @@ function PricingPageContent() {
     }
   };
 
+  // Refresh the Guild Master seat counter after any tier change so the
+  // in-place cards reflect reality without a manual page reload.
+  const refreshSeats = async () => {
+    try {
+      const s = await apiClient.getGuildMasterSeats();
+      setGuildMasterSeats(s);
+    } catch (err) {
+      console.error("Failed to refresh Guild Master seats:", err);
+    }
+  };
+
   const handleUpgrade = async () => {
     if (!user) {
       setShowAuthModal(true);
@@ -107,14 +118,12 @@ function PricingPageContent() {
 
     try {
       setLoading("upgrade");
-      await refreshUser();
       await apiClient.updateSubscription(PERFORMER_PRICE_ID);
-      await refreshUser();
+      await Promise.all([refreshUser(), refreshSeats()]);
       toast.success("Welcome to Guild Master", {
         description: "You now have access to every premium feature.",
         duration: 4500,
       });
-      router.push("/courses");
     } catch (error: any) {
       console.error("Failed to upgrade:", error);
       toast.error("Upgrade failed", {
@@ -129,14 +138,12 @@ function PricingPageContent() {
     try {
       setLoading("downgrade");
       setShowDowngradeModal(false);
-      await refreshUser();
       await apiClient.updateSubscription(ADVANCED_PRICE_ID);
-      await refreshUser();
+      await Promise.all([refreshUser(), refreshSeats()]);
       toast.success("Downgraded to Pro", {
         description: "Your plan change is effective immediately.",
         duration: 4500,
       });
-      router.push("/courses");
     } catch (error: any) {
       console.error("Failed to downgrade:", error);
       toast.error("Downgrade failed", {
