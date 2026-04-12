@@ -6,6 +6,52 @@ import Image from "next/image";
 import { HoverCard } from "@/components/ui/motion";
 import { Clock, CheckCircle, Sparkles } from "lucide-react";
 import { useTranslations } from "@/i18n/useTranslations";
+import { apiClient } from "@/lib/api";
+
+type CourseTypeKey = "course" | "choreo" | "topic";
+
+function resolveCourseType(raw?: string): CourseTypeKey {
+  if (raw === "choreo") return "choreo";
+  if (raw === "topic") return "topic";
+  return "course";
+}
+
+const COURSE_TYPE_STYLES: Record<
+  CourseTypeKey,
+  {
+    label: string;
+    labelText: string;
+    border: string;
+    hoverBorder: string;
+    hoverShadow: string;
+    accentBar: string;
+  }
+> = {
+  course: {
+    label: "Course",
+    labelText: "text-emerald-300",
+    border: "border-emerald-500/20",
+    hoverBorder: "hover:border-emerald-400/60",
+    hoverShadow: "hover:shadow-emerald-500/20",
+    accentBar: "bg-gradient-to-r from-emerald-500 via-green-400 to-emerald-500",
+  },
+  choreo: {
+    label: "Choreo",
+    labelText: "text-rose-300",
+    border: "border-rose-500/20",
+    hoverBorder: "hover:border-rose-400/60",
+    hoverShadow: "hover:shadow-rose-500/20",
+    accentBar: "bg-gradient-to-r from-rose-500 via-red-400 to-rose-500",
+  },
+  topic: {
+    label: "Topic",
+    labelText: "text-sky-300",
+    border: "border-sky-500/20",
+    hoverBorder: "hover:border-sky-400/60",
+    hoverShadow: "hover:shadow-sky-500/20",
+    accentBar: "bg-gradient-to-r from-sky-500 via-blue-400 to-sky-500",
+  },
+};
 
 interface CourseCardProps {
   course: {
@@ -34,6 +80,10 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
   const router = useRouter();
   const tCourses = useTranslations('courses');
   const [isHovering, setIsHovering] = useState(false);
+  const [isResolvingChoreo, setIsResolvingChoreo] = useState(false);
+
+  const typeKey = resolveCourseType(course.course_type);
+  const typeStyle = COURSE_TYPE_STYLES[typeKey];
 
   // Static thumbnail URL
   const thumbnailUrl = course.thumbnail_url || course.image_url || "/assets/Mambo_image_1.png";
@@ -63,8 +113,27 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
     setIsHovering(true);
   };
 
-  const handleCourseClickInternal = () => {
+  const handleCourseClickInternal = async () => {
+    if (isResolvingChoreo) return;
     onCourseClick(course);
+
+    // Choreographies have a single lesson — jump straight into it.
+    if (typeKey === "choreo" && !course.is_locked) {
+      try {
+        setIsResolvingChoreo(true);
+        const lessons = await apiClient.getWorldLessons(course.id);
+        const firstUnlocked = lessons.find((l) => !l.is_locked) || lessons[0];
+        if (firstUnlocked) {
+          router.push(`/lesson/${firstUnlocked.id}`);
+          return;
+        }
+      } catch (err) {
+        console.error("Failed to resolve choreo lesson, falling back:", err);
+      } finally {
+        setIsResolvingChoreo(false);
+      }
+    }
+
     router.push(`/courses/${course.id}`);
   };
 
@@ -107,8 +176,10 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
           onClick={handleCourseClickInternal}
           onMouseEnter={handleMouseEnter}
           onMouseLeave={handleMouseLeave}
-          className="relative bg-zinc-900 border border-white/10 rounded-xl overflow-hidden transition-all duration-300 group cursor-pointer hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
+          className={`relative bg-zinc-900 border ${typeStyle.border} rounded-xl overflow-hidden transition-all duration-300 group cursor-pointer ${typeStyle.hoverBorder} hover:shadow-2xl ${typeStyle.hoverShadow} hover:scale-[1.02] z-0 hover:z-10`}
         >
+          {/* Top accent bar — colored by course type */}
+          <div className={`absolute top-0 left-0 right-0 h-[3px] z-30 ${typeStyle.accentBar}`} />
           {/* Image/Preview section — wider ratio on mobile for compact cards */}
           <div className="relative aspect-[2/1] sm:aspect-[16/9]">
             <Image
@@ -146,6 +217,13 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
               </div>
             )}
 
+            {/* Choreo loading overlay — while we resolve the single lesson */}
+            {isResolvingChoreo && (
+              <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                <div className="w-8 h-8 border-2 border-rose-400/30 border-t-rose-400 rounded-full animate-spin" />
+              </div>
+            )}
+
             {/* Lock Badge - Top Right */}
             {course.is_locked && (
               <div className="absolute top-3 right-3 bg-black/60 backdrop-blur-md p-1.5 rounded-full text-mambo-gold z-20">
@@ -166,7 +244,7 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
                     {course.difficulty || "All Levels"}
                   </span>
                   <span className="text-gray-500">•</span>
-                  <span className="text-cyan-300">{course.course_type === 'choreo' ? 'Choreo' : course.course_type === 'topic' ? 'Topic' : 'Course'}</span>
+                  <span className={typeStyle.labelText}>{typeStyle.label}</span>
                 </div>
               </div>
 
