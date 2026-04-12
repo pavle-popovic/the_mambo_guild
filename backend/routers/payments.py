@@ -434,18 +434,27 @@ def update_subscription(
         }
         new_tier = price_id_to_tier.get(request_data.new_price_id, SubscriptionTier.ROOKIE)
 
-        # Read current_period_end — Stripe API 2025+ moved this off the
-        # subscription object onto the first subscription item. Fall back to
-        # whichever is present.
-        item0 = (
-            updated_subscription["items"].data[0]
-            if updated_subscription["items"].data
-            else None
-        )
-        period_end_ts = (
-            getattr(updated_subscription, "current_period_end", None)
-            or (getattr(item0, "current_period_end", None) if item0 else None)
-        )
+        # Read current_period_end defensively. Stripe API 2025+ moved this
+        # field off the Subscription root onto the first subscription item,
+        # and stripe-python's modify() response hydrates `items` inconsistently
+        # (dict-method collision). We try the root, then a `.get()` path that
+        # is safe regardless of shape. If neither works, we leave period_end
+        # alone and let the `customer.subscription.updated` webhook correct it.
+        period_end_ts = getattr(updated_subscription, "current_period_end", None)
+        if not period_end_ts:
+            try:
+                items_field = updated_subscription.get("items") or {}
+                items_data = items_field.get("data") if hasattr(items_field, "get") else None
+                if items_data:
+                    first = items_data[0]
+                    period_end_ts = (
+                        first.get("current_period_end")
+                        if hasattr(first, "get")
+                        else getattr(first, "current_period_end", None)
+                    )
+            except Exception:
+                period_end_ts = None
+
         period_end_dt = (
             datetime.fromtimestamp(period_end_ts, tz=timezone.utc)
             if period_end_ts
