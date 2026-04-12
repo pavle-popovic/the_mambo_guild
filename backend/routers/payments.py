@@ -479,7 +479,7 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                     db.refresh(db_subscription)
 
                     if is_paid_invoice:
-                        award_subscription_bonus(str(db_subscription.user_id), tier, db, reference_id=invoice.id)
+                        award_subscription_bonus(str(db_subscription.user_id), tier, db)
                         award_subscription_badge(str(db_subscription.user_id), tier.value, db)
                 else:
                     # This case might happen if the subscription was created directly in Stripe
@@ -533,7 +533,7 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                                 db.refresh(target_sub)
 
                             if is_paid_invoice:
-                                award_subscription_bonus(str(target_sub.user_id), tier, db, reference_id=invoice.id)
+                                award_subscription_bonus(str(target_sub.user_id), tier, db)
                                 award_subscription_badge(str(target_sub.user_id), tier.value, db)
 
             except stripe.error.StripeError as e:
