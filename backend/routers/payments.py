@@ -468,15 +468,18 @@ def update_subscription(
         )
         
     except stripe.error.StripeError as e:
-        logger.error(f"Stripe error updating subscription for user {current_user.id}: {e}")
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Payment processing error. Please try again.")
+        logger.exception(f"Stripe error updating subscription for user {current_user.id}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=f"Stripe error: {str(e)}",
+        )
     except HTTPException:
         raise
     except Exception as e:
-        logger.error(f"Unexpected error updating subscription for user {current_user.id}: {e}")
+        logger.exception(f"Unexpected error updating subscription for user {current_user.id}")
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="An unexpected error occurred. Please try again."
+            detail=f"Upgrade failed: {type(e).__name__}: {str(e)}",
         )
 
 
