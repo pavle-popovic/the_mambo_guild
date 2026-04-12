@@ -66,11 +66,39 @@ export default function MobileDebugOverlay() {
       if (el.getAttribute("data-debug-overlay") === "1") return;
       const r = el.getBoundingClientRect();
       const cs = getComputedStyle(el);
-      const cls = (el.className || "").toString().slice(0, 30);
+      const cls = (el.className || "").toString().slice(0, 24);
       lines.push(
-        `[${i}]${el.tagName.toLowerCase()} ${Math.round(r.width)}x${Math.round(r.height)} d:${cs.display[0]} z:${cs.zIndex} p:${cs.position[0]} "${cls}"`
+        `[${i}]${el.tagName.toLowerCase()} ${Math.round(r.width)}x${Math.round(r.height)} d:${cs.display[0]} z:${cs.zIndex} p:${cs.position[0]} op:${cs.opacity} v:${cs.visibility[0]} "${cls}"`
       );
     });
+
+    // Find candidate page-content elements (cards + skill-tree pane) and report their aggregate state
+    const cards = document.querySelectorAll<HTMLElement>('[class*="bg-zinc-900"]');
+    const rfPane = document.querySelector<HTMLElement>(".react-flow__pane");
+    const rfViewport = document.querySelector<HTMLElement>(".react-flow__viewport");
+    lines.push(`cards:${cards.length} rfPane:${rfPane ? "yes" : "no"} rfVp:${rfViewport ? "yes" : "no"}`);
+    if (cards.length > 0) {
+      const first = cards[0];
+      const r = first.getBoundingClientRect();
+      const cs = getComputedStyle(first);
+      lines.push(
+        `card0: ${Math.round(r.width)}x${Math.round(r.height)} @${Math.round(r.left)},${Math.round(r.top)} op:${cs.opacity} v:${cs.visibility[0]} trans:${cs.transform.slice(0, 20)}`
+      );
+      // Highlight every card with a bright lime outline so we can SEE them visually
+      cards.forEach((el) => {
+        el.style.outline = "3px solid lime";
+        el.style.outlineOffset = "-3px";
+      });
+    }
+    if (rfViewport) {
+      const r = rfViewport.getBoundingClientRect();
+      const cs = getComputedStyle(rfViewport);
+      lines.push(
+        `rfVp: ${Math.round(r.width)}x${Math.round(r.height)} @${Math.round(r.left)},${Math.round(r.top)} op:${cs.opacity} v:${cs.visibility[0]} trans:${cs.transform.slice(0, 20)}`
+      );
+      rfViewport.style.outline = "3px solid magenta";
+      rfViewport.style.outlineOffset = "-3px";
+    }
 
     // What element is painted at 4 sample points? Temporarily hide overlay
     const overlay = document.querySelector<HTMLElement>('[data-debug-overlay="1"]');
