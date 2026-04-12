@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Flame, Zap, Award, Star, Lock } from "lucide-react";
 import { apiClient, type UserProfile } from "@/lib/api";
@@ -263,13 +262,6 @@ export default function UserProfileModal({ isOpen, onClose, username }: UserProf
                       <Stat icon={<Star className="h-4 w-4 text-sky-400" />} label="Badges" value={earnedBadges.length} />
                     </section>
 
-                    <Link
-                      href={`/u/${profile.username}`}
-                      onClick={onClose}
-                      className="mt-1 block w-full rounded-lg border border-mambo-gold/40 bg-mambo-gold/10 py-2 text-center text-sm font-semibold text-mambo-gold transition hover:bg-mambo-gold/20"
-                    >
-                      View full profile →
-                    </Link>
                   </div>
                 </div>
               )}

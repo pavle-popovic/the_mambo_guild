@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, X, Tv, FlaskConical, ChevronDown } from "lucide-react";
+import { Plus, Search, X, Tv, FlaskConical, ChevronDown, Bookmark } from "lucide-react";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -303,6 +303,17 @@ export default function CommunityPage() {
                                     <FlaskConical size={12} />
                                     Lab
                                 </button>
+                                <button
+                                    onClick={() => { setViewMode("my_posts"); setSearchQuery(""); }}
+                                    className={`portrait:flex landscape:hidden items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
+                                        viewMode === "my_posts"
+                                            ? "bg-white/10 text-mambo-gold shadow-[0_0_12px_rgba(252,226,5,0.15)]"
+                                            : "text-white/50"
+                                    }`}
+                                >
+                                    <Bookmark size={12} />
+                                    Mine
+                                </button>
                             </div>
 
                             {/* Level Dropdown */}
@@ -389,6 +400,25 @@ export default function CommunityPage() {
 
                     {/* Main Feed */}
                     <div className="col-span-12 lg:col-span-7 relative order-2 lg:order-2">
+                        {/* Desktop Search Bar */}
+                        <div className="hidden lg:block mb-4">
+                            <div className="relative">
+                                <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => handleSearch(e.target.value)}
+                                    placeholder="Search videos & questions..."
+                                    className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-10 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400/40 focus:bg-white/[0.06] transition-all"
+                                />
+                                {searchQuery && (
+                                    <button onClick={() => handleSearch("")} className="absolute right-3.5 top-1/2 -translate-y-1/2">
+                                        <X className="w-4 h-4 text-gray-400 hover:text-white transition" />
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+
                         {isLoading ? (
                             <div className="flex justify-center py-16">
                                 <div className="w-10 h-10 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />

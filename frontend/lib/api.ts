@@ -376,6 +376,7 @@ class ApiClient {
         description: string | null;
         image_url: string | null;
         difficulty: string;
+        course_type?: string;
         progress_percentage: number;
         is_locked: boolean;
       }>

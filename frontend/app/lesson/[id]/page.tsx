@@ -73,6 +73,9 @@ export default function LessonPage() {
   const [levelTitle, setLevelTitle] = useState("Loading...");
   const [levelId, setLevelId] = useState<string | null>(null);
   const [worldId, setWorldId] = useState<string | null>(null);
+  const [courseType, setCourseType] = useState<string | null>(null);
+  const isChoreo = courseType === "choreo" || courseType === "choreography";
+  const backHref = isChoreo ? "/courses" : (worldId ? `/courses/${worldId}` : "/courses");
   const [levelProgress, setLevelProgress] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [videoPlaying, setVideoPlaying] = useState(false); // Controls the overlay play button state
@@ -172,6 +175,7 @@ export default function LessonPage() {
           if (levelLessons.find(l => l.id === lessonId)) {
             setWorldId(world.id);
             setCourseTitle(world.title);
+            setCourseType((world as any).course_type || null);
             break;
           }
         }
@@ -189,6 +193,7 @@ export default function LessonPage() {
             setLevelTitle(worldsData[i].title);
             setWorldId(worldsData[i].id);
             setCourseTitle(worldsData[i].title);
+            setCourseType((worldsData[i] as any).course_type || null);
 
             const updatedLessons = allLessonsArrays[i].map(l => {
               const isCompletedInStorage = sessionStorage.getItem(`lesson_completed_${l.id}`) === 'true';
@@ -300,8 +305,8 @@ export default function LessonPage() {
           sessionStorage.setItem('questbar_scroll_trigger', nextLessonId);
           router.push(`/lesson/${nextLessonId}`);
         } else if (isCourseComplete) {
-          // Module complete — go back to skill tree
-          router.push(worldId ? `/courses/${worldId}` : "/courses");
+          // Module complete — go back to skill tree (or courses grid for choreos)
+          router.push(backHref);
         }
       };
 
@@ -630,11 +635,7 @@ export default function LessonPage() {
         courseId={worldId || undefined}
         onClose={() => {
           setShowCourseCompletion(false);
-          if (worldId) {
-            router.push(`/courses/${worldId}`);  // Navigate back to skill tree
-          } else {
-            router.push("/courses");
-          }
+          router.push(backHref);
         }}
       />
 
@@ -668,7 +669,7 @@ export default function LessonPage() {
             {/* Navigation: back + language */}
             <div className="flex items-center justify-between px-3 py-2.5 border-b border-white/10 flex-shrink-0">
               <Link
-                href={worldId ? `/courses/${worldId}` : '/courses'}
+                href={backHref}
                 className="flex items-center gap-1.5 text-gray-400 hover:text-white transition text-sm font-bold"
               >
                 <FaChevronLeft size={12} /> {tCommon('back')}
@@ -691,7 +692,7 @@ export default function LessonPage() {
             {/* Minimal nav for non-video lessons */}
             {!isVideoLesson && (
               <nav className="border-b border-gray-800 bg-mambo-panel flex-none flex items-center justify-between px-4 py-3">
-                <Link href={worldId ? `/courses/${worldId}` : '/courses'} className="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold">
+                <Link href={backHref} className="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold">
                   <FaChevronLeft size={12} /> {tCommon('back')}
                 </Link>
                 <div className="flex items-center gap-3">
@@ -718,7 +719,7 @@ export default function LessonPage() {
                     {/* Nav row: back + title + language */}
                     <div className="flex items-center justify-between px-3 pt-2 pb-1">
                       <Link
-                        href={worldId ? `/courses/${worldId}` : '/courses'}
+                        href={backHref}
                         className="flex items-center gap-1.5 text-gray-400 hover:text-white transition"
                       >
                         <FaChevronLeft size={11} />
