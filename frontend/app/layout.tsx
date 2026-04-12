@@ -32,12 +32,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-black overflow-x-hidden`}>
-        {/* Starry Jazz Theme Background */}
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-black overflow-x-hidden isolate`}>
+        {/* Starry Jazz Theme Background — sits behind everything inside the isolated body stacking context */}
         <StarryBackground />
         <LocaleProviderWrapper>
           <AuthProvider>
-            <div className="relative z-10">
+            <div className="relative z-10 min-h-screen">
               {children}
             </div>
             <GlobalAudioPlayer />
