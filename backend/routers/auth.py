@@ -466,6 +466,7 @@ def get_current_user_profile(
         tier=tier,
         role=current_user.role.value,
         avatar_url=profile.avatar_url,
+        instagram_url=profile.instagram_url,
         subscription_cancel_at_period_end=cancel_at_period_end,
         subscription_period_end=period_end,
         subscription_status=sub_status,

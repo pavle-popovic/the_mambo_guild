@@ -344,6 +344,7 @@ class ApiClient {
       tier: string;
       role: string;
       avatar_url: string | null;
+      instagram_url: string | null;
       reputation: number;
       current_claves: number;
       badges: Array<{
@@ -521,6 +522,8 @@ class ApiClient {
   }
 
   async updateProfile(data: { avatar_url?: string; username?: string; instagram_url?: string | null }) {
+    // Profile mutations must invalidate any cached /api/auth/me or public profile responses
+    this.clearCache();
     return this.request<{
       id: string;
       first_name: string;
@@ -532,6 +535,7 @@ class ApiClient {
       tier: string;
       role: string;
       avatar_url: string | null;
+      instagram_url: string | null;
     }>("/api/users/me", {
       method: "PATCH",
       body: JSON.stringify(data),
