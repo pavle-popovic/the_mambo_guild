@@ -189,7 +189,21 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                 }
                 
                 tier = tier_mapping.get(price_lookup_key.lower() if price_lookup_key else "", SubscriptionTier.ROOKIE)
-                
+
+                # Stripe API 2025-08+ moved `current_period_end` off the
+                # Subscription object and onto each item. Read both to stay
+                # compatible with older and newer API versions.
+                item0 = stripe_subscription["items"].data[0] if stripe_subscription["items"].data else None
+                period_end_ts = (
+                    getattr(stripe_subscription, "current_period_end", None)
+                    or (getattr(item0, "current_period_end", None) if item0 else None)
+                )
+                period_end_dt = (
+                    datetime.fromtimestamp(period_end_ts, tz=timezone.utc)
+                    if period_end_ts
+                    else None
+                )
+
                 # Find the user's subscription in our DB
                 db_subscription = db.query(Subscription).filter(
                     Subscription.stripe_customer_id == customer_id
@@ -199,15 +213,13 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                     db_subscription.stripe_subscription_id = stripe_subscription.id
                     db_subscription.status = SubscriptionStatus.ACTIVE
                     db_subscription.tier = tier
-                    db_subscription.current_period_end = datetime.fromtimestamp(
-                        stripe_subscription.current_period_end, tz=timezone.utc
-                    )
+                    db_subscription.current_period_end = period_end_dt
                     db.commit()
                     db.refresh(db_subscription)
-                    
+
                     # Award subscription bonus (Advanced/Performer)
                     award_subscription_bonus(str(db_subscription.user_id), tier, db, reference_id=invoice.id)
-                    
+
                     # Award subscription badge (Pro Member / Guild Master)
                     award_subscription_badge(str(db_subscription.user_id), tier.value, db)
                 else:
@@ -223,9 +235,7 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                             stripe_subscription_id=stripe_subscription.id,
                             status=SubscriptionStatus.ACTIVE,
                             tier=tier,
-                            current_period_end=datetime.fromtimestamp(
-                                stripe_subscription.current_period_end, tz=timezone.utc
-                            )
+                            current_period_end=period_end_dt,
                         )
                         db.add(new_subscription)
                         db.commit()
