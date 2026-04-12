@@ -14,7 +14,7 @@ from services import notification_service
 router = APIRouter(tags=["Notifications"])
 
 
-@router.get("/")
+@router.get("")
 def get_notifications(
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=50),
