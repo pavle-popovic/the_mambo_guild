@@ -139,7 +139,7 @@ export default function CoursesPage() {
           <div className="max-w-[1600px] mx-auto px-3 sm:px-6">
 
             {/* Mobile + landscape phones: Search + filter dropdowns */}
-            <div className="flex lg:hidden flex-col landscape:flex-row landscape:items-center gap-2 w-full">
+            <div className="flex xl:hidden flex-col landscape:flex-row landscape:items-center gap-2 w-full">
               {/* Release Calendar pill */}
               <div className="flex justify-center landscape:order-last landscape:flex-shrink-0">
                 <ReleaseScheduleButton />
@@ -236,7 +236,7 @@ export default function CoursesPage() {
             </div>
 
             {/* Desktop: Original pill layout + release calendar pinned right */}
-            <div className="hidden lg:flex items-center gap-3 w-full">
+            <div className="hidden xl:flex items-center gap-3 w-full">
               <div className="flex items-center gap-3 flex-1 min-w-0 overflow-x-auto no-scrollbar pb-0">
                 {/* Search Pill */}
                 <div className="relative group min-w-[200px]">

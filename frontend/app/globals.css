@@ -468,11 +468,6 @@ h6 {
     scrollbar-width: thin;
   }
 
-  /* Hide sticky mobile CTA in landscape */
-  .mobile-sticky-cta {
-    display: none !important;
-  }
-
   /* ── Lesson page: hide mobile-only controls in landscape ── */
   .lesson-mobile-controls {
     display: none !important;

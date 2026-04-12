@@ -121,7 +121,7 @@ function useLayoutMode(): "desktop" | "portrait" | "landscape" {
         const update = () => {
             const w = window.innerWidth;
             const h = window.innerHeight;
-            if (w >= 1024) setMode("desktop");
+            if (w >= 1280) setMode("desktop");
             else if (w > h) setMode("landscape");
             else setMode("portrait");
         };
