@@ -47,6 +47,26 @@ export default function ProfilePage() {
   const [updatingUsername, setUpdatingUsername] = useState(false);
   const [usernameError, setUsernameError] = useState("");
 
+  // Instagram URL Editing
+  const [isEditingInstagram, setIsEditingInstagram] = useState(false);
+  const [newInstagram, setNewInstagram] = useState("");
+  const [updatingInstagram, setUpdatingInstagram] = useState(false);
+  const [instagramError, setInstagramError] = useState("");
+
+  const handleUpdateInstagram = async () => {
+    setUpdatingInstagram(true);
+    setInstagramError("");
+    try {
+      await apiClient.updateProfile({ instagram_url: newInstagram.trim() || null });
+      await refreshUser();
+      setIsEditingInstagram(false);
+    } catch (error: any) {
+      setInstagramError(error?.message || "Failed to update Instagram link");
+    } finally {
+      setUpdatingInstagram(false);
+    }
+  };
+
   const handleUpdateUsername = async () => {
     if (!newUsername || newUsername.length < 3) {
       setUsernameError("Username must be at least 3 characters");
@@ -498,7 +518,77 @@ export default function ProfilePage() {
                   </button>
                 </div>
               </div>
-              <p className="text-gray-400 mb-8">Mambo Engineer • Member since 2024</p>
+              <p className="text-gray-400 mb-4">Mambo Engineer • Member since 2024</p>
+
+              {/* Instagram Link */}
+              <div className="mb-6">
+                {isEditingInstagram ? (
+                  <div className="flex flex-col gap-2 max-w-md">
+                    <div className="flex items-center gap-2">
+                      <input
+                        type="text"
+                        value={newInstagram}
+                        onChange={(e) => setNewInstagram(e.target.value)}
+                        placeholder="@handle or https://instagram.com/handle"
+                        className="flex-1 bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none"
+                        autoFocus
+                      />
+                      <button
+                        onClick={handleUpdateInstagram}
+                        disabled={updatingInstagram}
+                        className="px-3 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg font-bold transition disabled:opacity-50"
+                      >
+                        {updatingInstagram ? "…" : "Save"}
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsEditingInstagram(false);
+                          setNewInstagram(user.instagram_url || "");
+                          setInstagramError("");
+                        }}
+                        className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg transition"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    {instagramError && <div className="text-red-500 text-xs">{instagramError}</div>}
+                    <span className="text-xs text-gray-500">Leave empty to remove the link.</span>
+                  </div>
+                ) : user.instagram_url ? (
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={user.instagram_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-gradient-to-r from-pink-500/20 via-fuchsia-500/20 to-amber-500/20 border border-pink-400/30 text-pink-200 text-sm font-semibold hover:from-pink-500/30 hover:via-fuchsia-500/30 hover:to-amber-500/30 transition"
+                    >
+                      <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                        <path d="M12 2.2c3.2 0 3.58 0 4.85.07 1.17.05 1.8.25 2.22.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.05.41 2.22.07 1.27.07 1.65.07 4.85s0 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.22-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.05.36-2.22.41-1.27.07-1.65.07-4.85.07s-3.58 0-4.85-.07c-1.17-.05-1.8-.25-2.22-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.05-.41-2.22C2.2 15.58 2.2 15.2 2.2 12s0-3.58.07-4.85c.05-1.17.25-1.8.41-2.22.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.05-.36 2.22-.41C8.42 2.2 8.8 2.2 12 2.2zm0 2c-3.14 0-3.5 0-4.74.07-.98.04-1.51.21-1.86.35-.47.18-.8.4-1.15.75-.35.35-.57.68-.75 1.15-.14.35-.31.88-.35 1.86C3.2 9.5 3.2 9.86 3.2 13s0 3.5.07 4.74c.04.98.21 1.51.35 1.86.18.47.4.8.75 1.15.35.35.68.57 1.15.75.35.14.88.31 1.86.35 1.24.07 1.6.07 4.74.07s3.5 0 4.74-.07c.98-.04 1.51-.21 1.86-.35.47-.18.8-.4 1.15-.75.35-.35.57-.68.75-1.15.14-.35.31-.88.35-1.86.07-1.24.07-1.6.07-4.74s0-3.5-.07-4.74c-.04-.98-.21-1.51-.35-1.86a3.1 3.1 0 0 0-.75-1.15 3.1 3.1 0 0 0-1.15-.75c-.35-.14-.88-.31-1.86-.35C15.5 4.2 15.14 4.2 12 4.2zm0 3.4a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8zm0 2a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8zm5-2.7a1.05 1.05 0 1 1 0 2.1 1.05 1.05 0 0 1 0-2.1z"/>
+                      </svg>
+                      Connect on Instagram
+                    </a>
+                    <button
+                      onClick={() => {
+                        setNewInstagram(user.instagram_url || "");
+                        setIsEditingInstagram(true);
+                      }}
+                      className="text-xs text-gray-400 hover:text-white underline"
+                    >
+                      Edit
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setNewInstagram("");
+                      setIsEditingInstagram(true);
+                    }}
+                    className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-300 text-xs font-semibold hover:bg-white/10 transition"
+                  >
+                    + Add Instagram
+                  </button>
+                )}
+              </div>
 
               <div className="flex flex-wrap justify-center md:justify-start gap-2 sm:gap-4">
                 <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">

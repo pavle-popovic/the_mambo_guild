@@ -14,6 +14,7 @@ interface User {
   tier: string;
   role: string;
   avatar_url: string | null;
+  instagram_url?: string | null;
   is_pro?: boolean;
   subscription_cancel_at_period_end?: boolean;
   subscription_period_end?: string | null;

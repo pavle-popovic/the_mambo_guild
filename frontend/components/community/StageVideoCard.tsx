@@ -7,11 +7,13 @@ import { cn } from "@/lib/utils";
 import { useCallback, useState } from "react";
 import { UISound } from "@/hooks/useUISound";
 import GuildMasterAvatar from "@/components/ui/GuildMasterAvatar";
+import UserProfileModal from "@/components/UserProfileModal";
 
 interface Post {
     id: string;
     user: {
         id: string;
+        username?: string;
         first_name: string;
         last_name: string;
         avatar_url: string | null;
@@ -46,6 +48,7 @@ export default function StageVideoCard({
 }: StageVideoCardProps) {
     const isCompact = variant === "grid-compact";
     const [isHovered, setIsHovered] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
 
     // Static thumbnail (default) and animated GIF (on hover)
     const thumbnailUrl = post.mux_playback_id
@@ -77,6 +80,7 @@ export default function StageVideoCard({
     }, []);
 
     return (
+        <>
         <motion.div
             onClick={handleClick}
             onHoverStart={isCompact ? undefined : () => {
@@ -170,15 +174,25 @@ export default function StageVideoCard({
                             </div>
 
                             {/* User Avatar - Guild Master styling */}
-                            <GuildMasterAvatar
-                                avatarUrl={post.user.avatar_url}
-                                firstName={post.user.first_name}
-                                lastName={post.user.last_name}
-                                isPro={post.user.is_pro}
-                                isGuildMaster={post.user.is_guild_master}
-                                size="sm"
-                                showBadge={true}
-                            />
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    if (post.user.username) setShowProfileModal(true);
+                                }}
+                                className="rounded-full transition hover:ring-2 hover:ring-mambo-gold/60 focus:outline-none focus:ring-2 focus:ring-mambo-gold/60"
+                                aria-label={`View ${post.user.first_name}'s profile`}
+                            >
+                                <GuildMasterAvatar
+                                    avatarUrl={post.user.avatar_url}
+                                    firstName={post.user.first_name}
+                                    lastName={post.user.last_name}
+                                    isPro={post.user.is_pro}
+                                    isGuildMaster={post.user.is_guild_master}
+                                    size="sm"
+                                    showBadge={true}
+                                />
+                            </button>
                         </div>
                     </div>
                 )}
@@ -222,5 +236,11 @@ export default function StageVideoCard({
                 )}
             </div>
         </motion.div>
+        <UserProfileModal
+            isOpen={showProfileModal}
+            username={post.user.username || null}
+            onClose={() => setShowProfileModal(false)}
+        />
+        </>
     );
 }

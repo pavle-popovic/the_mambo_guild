@@ -44,6 +44,7 @@ def _is_allowed_avatar_host(hostname: str) -> bool:
 class UserProfileUpdateRequest(BaseModel):
     avatar_url: Optional[str] = None
     username: Optional[str] = None
+    instagram_url: Optional[str] = None
 
     @field_validator('avatar_url')
     @classmethod
@@ -87,6 +88,36 @@ class UserProfileUpdateRequest(BaseModel):
             raise ValueError("Username can only contain letters, numbers, and underscores")
         return v.lower()
 
+    @field_validator('instagram_url')
+    @classmethod
+    def validate_instagram_url(cls, v: Optional[str]) -> Optional[str]:
+        # Empty string clears the field
+        if v is None or v == "":
+            return None
+
+        # Accept either a bare handle ("@diego" / "diego") or a full URL
+        v = v.strip()
+        handle_match = re.match(r'^@?([a-zA-Z0-9_.]{1,30})$', v)
+        if handle_match:
+            return f"https://instagram.com/{handle_match.group(1)}"
+
+        # Otherwise must be a https instagram.com URL
+        try:
+            parsed = urlparse(v)
+        except Exception:
+            raise ValueError("Invalid Instagram URL")
+        if parsed.scheme != "https":
+            raise ValueError("Instagram URL must use HTTPS")
+        host = (parsed.hostname or "").lower()
+        if host not in ("instagram.com", "www.instagram.com"):
+            raise ValueError("URL must point to instagram.com")
+        if len(v) > 255:
+            raise ValueError("Instagram URL too long")
+        # Must have a path (i.e. a handle)
+        if not parsed.path or parsed.path == "/":
+            raise ValueError("Instagram URL must include a handle")
+        return v
+
 
 @router.get("/me", response_model=UserProfileResponse)
 def read_users_me(
@@ -125,6 +156,7 @@ def read_users_me(
         tier=subscription_tier,
         role=current_user.role,
         avatar_url=current_user.profile.avatar_url,
+        instagram_url=current_user.profile.instagram_url,
         current_level_tag=current_user.profile.current_level_tag.value,
         reputation=current_user.profile.reputation,
         current_claves=current_user.profile.current_claves,
@@ -148,6 +180,10 @@ def update_user_profile(
     # Update avatar_url if provided
     if profile_data.avatar_url is not None:
         current_user.profile.avatar_url = profile_data.avatar_url
+
+    # Update instagram_url if provided (validator normalizes/returns None to clear)
+    if "instagram_url" in profile_data.model_fields_set:
+        current_user.profile.instagram_url = profile_data.instagram_url
 
     # Update username if provided
     if profile_data.username is not None:
@@ -192,6 +228,7 @@ def update_user_profile(
         tier=subscription_tier,
         role=current_user.role,
         avatar_url=current_user.profile.avatar_url,
+        instagram_url=current_user.profile.instagram_url,
         current_level_tag=current_user.profile.current_level_tag.value,
         reputation=current_user.profile.reputation,
         current_claves=current_user.profile.current_claves,
@@ -245,6 +282,7 @@ def get_public_profile(
         # Role logic: if we want to hide role or not. Let's expose it.
         role=user.role, 
         avatar_url=profile.avatar_url,
+        instagram_url=profile.instagram_url,
         current_level_tag=profile.current_level_tag.value,
         reputation=profile.reputation,
         current_claves=profile.current_claves,

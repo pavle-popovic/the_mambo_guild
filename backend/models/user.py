@@ -56,6 +56,7 @@ class UserProfile(Base):
     last_name = Column(String(100), nullable=False)
     username = Column(String(30), unique=True, index=True, nullable=True)
     avatar_url = Column(String, nullable=True)
+    instagram_url = Column(String(255), nullable=True)
     current_level_tag = Column(SQLEnum(CurrentLevelTag), nullable=False)
     xp = Column(Integer, default=0, nullable=False)
     level = Column(Integer, default=1, nullable=False)

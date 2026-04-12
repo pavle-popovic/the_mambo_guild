@@ -24,6 +24,7 @@ export interface UserProfile {
   tier: string;
   role: string;
   avatar_url: string | null;
+  instagram_url?: string | null;
   reputation: number;
   current_claves: number;
   badges: Array<{
@@ -519,7 +520,7 @@ class ApiClient {
     });
   }
 
-  async updateProfile(data: { avatar_url?: string; username?: string }) {
+  async updateProfile(data: { avatar_url?: string; username?: string; instagram_url?: string | null }) {
     return this.request<{
       id: string;
       first_name: string;

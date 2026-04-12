@@ -11,6 +11,7 @@ import { GlassCard, GlassPanel } from "@/components/ui/GlassCard";
 import { cn } from "@/lib/utils";
 import GuildMasterAvatar, { GuildMasterUsername } from "@/components/ui/GuildMasterAvatar";
 import { GuildMasterTag } from "@/components/ui/GuildMasterBadge";
+import UserProfileModal from "@/components/UserProfileModal";
 
 interface Tag {
   slug: string;
@@ -36,6 +37,7 @@ interface Post {
   is_saved?: boolean;
   user: {
     id: string;
+    username?: string;
     first_name: string;
     last_name: string;
     avatar_url: string | null;
@@ -47,6 +49,7 @@ interface Post {
     id: string;
     user: {
       id: string;
+      username?: string;
       first_name: string;
       last_name: string;
       avatar_url: string | null;
@@ -94,6 +97,7 @@ export default function PostDetailModal({
   const [replyContent, setReplyContent] = useState("");
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [playerInitialized, setPlayerInitialized] = useState(false);
+  const [profileModalUsername, setProfileModalUsername] = useState<string | null>(null);
 
   // Reply edit/delete state
   const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
@@ -336,6 +340,7 @@ export default function PostDetailModal({
       content: replyText,
       user: user ? {
         id: user.id,
+        username: (user as any).username || "",
         first_name: user.first_name || "You",
         last_name: user.last_name || "",
         avatar_url: user.avatar_url || null,
@@ -343,6 +348,7 @@ export default function PostDetailModal({
         level: user.level || 1,
       } : {
         id: currentUserId || "",
+        username: "",
         first_name: "You",
         last_name: "",
         avatar_url: null,
@@ -638,7 +644,11 @@ export default function PostDetailModal({
                 )}
 
                 {/* User Info */}
-                <div className="flex items-center gap-3 mb-4">
+                <button
+                  type="button"
+                  onClick={() => post.user.username && setProfileModalUsername(post.user.username)}
+                  className="flex items-center gap-3 mb-4 rounded-lg p-1 -m-1 text-left transition hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-mambo-gold/50"
+                >
                   <GuildMasterAvatar
                     avatarUrl={post.user.avatar_url}
                     firstName={post.user.first_name}
@@ -665,7 +675,7 @@ export default function PostDetailModal({
                     </div>
                     <span className="text-xs text-white/50">Level {post.user.level}</span>
                   </div>
-                </div>
+                </button>
 
                 {/* Title */}
                 {isEditing ? (
@@ -955,23 +965,36 @@ export default function PostDetailModal({
                             )}
                           >
                             <div className="flex items-start gap-3">
-                              <GuildMasterAvatar
-                                avatarUrl={reply.user.avatar_url}
-                                firstName={reply.user.first_name}
-                                lastName={reply.user.last_name}
-                                isPro={reply.user.is_pro}
-                                isGuildMaster={reply.user.is_guild_master}
-                                size="sm"
-                              />
+                              <button
+                                type="button"
+                                onClick={() => reply.user.username && setProfileModalUsername(reply.user.username)}
+                                className="rounded-full transition hover:ring-2 hover:ring-mambo-gold/50 focus:outline-none focus:ring-2 focus:ring-mambo-gold/50"
+                                aria-label={`View ${reply.user.first_name}'s profile`}
+                              >
+                                <GuildMasterAvatar
+                                  avatarUrl={reply.user.avatar_url}
+                                  firstName={reply.user.first_name}
+                                  lastName={reply.user.last_name}
+                                  isPro={reply.user.is_pro}
+                                  isGuildMaster={reply.user.is_guild_master}
+                                  size="sm"
+                                />
+                              </button>
                               <div className="flex-1">
                                 <div className="flex items-center gap-2 mb-1">
-                                  <GuildMasterUsername
-                                    firstName={reply.user.first_name}
-                                    lastName={reply.user.last_name}
-                                    isPro={reply.user.is_pro}
-                                    isGuildMaster={reply.user.is_guild_master}
-                                    className="text-sm"
-                                  />
+                                  <button
+                                    type="button"
+                                    onClick={() => reply.user.username && setProfileModalUsername(reply.user.username)}
+                                    className="rounded transition hover:opacity-80 focus:outline-none"
+                                  >
+                                    <GuildMasterUsername
+                                      firstName={reply.user.first_name}
+                                      lastName={reply.user.last_name}
+                                      isPro={reply.user.is_pro}
+                                      isGuildMaster={reply.user.is_guild_master}
+                                      className="text-sm"
+                                    />
+                                  </button>
                                   {isOptimistic && (
                                     <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200">
                                       Posting...
@@ -1124,6 +1147,11 @@ export default function PostDetailModal({
           )}
         </div >
       </div >
+      <UserProfileModal
+        isOpen={profileModalUsername !== null}
+        username={profileModalUsername}
+        onClose={() => setProfileModalUsername(null)}
+      />
     </div >
   );
 }

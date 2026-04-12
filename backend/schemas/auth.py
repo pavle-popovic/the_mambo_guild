@@ -95,6 +95,7 @@ class UserProfileResponse(BaseModel):
     tier: str
     role: str
     avatar_url: Optional[str] = None
+    instagram_url: Optional[str] = None
     current_level_tag: Optional[str] = None
 
     # Subscription lifecycle (for cancel/resume UI)

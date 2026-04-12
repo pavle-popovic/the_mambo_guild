@@ -38,6 +38,7 @@ def _get_user_info(user: User, db: Session) -> dict:
     
     return {
         "id": str(user.id),
+        "username": profile.username if profile else "",
         "first_name": profile.first_name if profile else "Unknown",
         "last_name": profile.last_name if profile else "User",
         "avatar_url": profile.avatar_url if profile else None,
