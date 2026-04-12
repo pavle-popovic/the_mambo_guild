@@ -445,8 +445,9 @@ function ConstellationGraphInner({
           levels[0];
         const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
         if (targetNode) {
+          const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
           setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
-            zoom: 0.85,
+            zoom: isMobile ? 0.6 : 0.85,
             duration: 800,
           });
         }
