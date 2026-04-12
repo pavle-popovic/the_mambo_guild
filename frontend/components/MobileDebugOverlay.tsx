@@ -55,21 +55,57 @@ export default function MobileDebugOverlay() {
     };
 
     describe("nav", navbar as HTMLElement | null);
-    describe("main", main as HTMLElement | null);
-    describe("body>1st", firstPageDiv);
     describe("starry", starry);
+
+    // List direct body children (elements only, skip script/style/our overlay)
+    const bodyKids = Array.from(document.body.children).filter(
+      (c) => !["SCRIPT", "STYLE"].includes(c.tagName)
+    ) as HTMLElement[];
+    lines.push(`body.kids:${bodyKids.length}`);
+    bodyKids.slice(0, 8).forEach((el, i) => {
+      if (el.getAttribute("data-debug-overlay") === "1") return;
+      const r = el.getBoundingClientRect();
+      const cs = getComputedStyle(el);
+      const cls = (el.className || "").toString().slice(0, 30);
+      lines.push(
+        `[${i}]${el.tagName.toLowerCase()} ${Math.round(r.width)}x${Math.round(r.height)} d:${cs.display[0]} z:${cs.zIndex} p:${cs.position[0]} "${cls}"`
+      );
+    });
+
+    // What element is painted at 4 sample points? Temporarily hide overlay
+    const overlay = document.querySelector<HTMLElement>('[data-debug-overlay="1"]');
+    const prev = overlay?.style.pointerEvents;
+    if (overlay) overlay.style.display = "none";
+    const pts: [number, number, string][] = [
+      [vw / 2, vh * 0.4, "mid"],
+      [vw / 2, 20, "top"],
+      [vw / 2, vh - 20, "bot"],
+      [20, vh / 2, "left"],
+    ];
+    pts.forEach(([x, y, label]) => {
+      const el = document.elementFromPoint(x, y) as HTMLElement | null;
+      if (!el) {
+        lines.push(`@${label}: null`);
+        return;
+      }
+      const cls = (el.className || "").toString().slice(0, 28);
+      const cs = getComputedStyle(el);
+      lines.push(
+        `@${label}(${Math.round(x)},${Math.round(y)}):${el.tagName.toLowerCase()} "${cls}" bg:${cs.backgroundColor.slice(0, 20)}`
+      );
+    });
+    if (overlay) overlay.style.display = "";
 
     // Body + html computed
     const bcs = getComputedStyle(document.body);
-    const hcs = getComputedStyle(document.documentElement);
     lines.push(`body: bg:${bcs.backgroundColor} iso:${bcs.isolation} of:${bcs.overflow}`);
-    lines.push(`html: bg:${hcs.backgroundColor}`);
 
     setInfo(lines);
   }, [pathname, tick]);
 
   return (
     <div
+      data-debug-overlay="1"
       style={{
         position: "fixed",
         top: 0,
