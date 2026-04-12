@@ -4,7 +4,6 @@ import "./globals.css";
 import GlobalAudioPlayer from "@/components/GlobalAudioPlayer";
 import { AuthProvider } from "@/contexts/AuthContext";
 import LocaleProviderWrapper from "@/components/LocaleProviderWrapper";
-import StarryBackground from "@/components/ui/StarryBackground";
 import BugReportButton from "@/components/BugReportButton";
 import { Toaster } from "sonner";
 
@@ -32,14 +31,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-black overflow-x-hidden isolate`}>
-        {/* Starry Jazz Theme Background — sits behind everything inside the isolated body stacking context */}
-        <StarryBackground />
+      <body className={`${inter.variable} ${playfair.variable} font-sans antialiased bg-black overflow-x-hidden`}>
         <LocaleProviderWrapper>
           <AuthProvider>
-            <div className="relative z-10 min-h-screen">
-              {children}
-            </div>
+            {children}
             <GlobalAudioPlayer />
             <BugReportButton />
             <Toaster position="top-right" richColors />
