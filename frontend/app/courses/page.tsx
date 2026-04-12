@@ -235,55 +235,57 @@ export default function CoursesPage() {
               </div>
             </div>
 
-            {/* Desktop: Original pill layout */}
-            <div className="hidden sm:flex items-center gap-3 w-full md:w-auto overflow-x-auto pb-0 no-scrollbar">
-              {/* Search Pill */}
-              <div className="relative group min-w-[200px]">
-                <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-mambo-gold transition-colors text-sm" />
-                <input
-                  type="text"
-                  placeholder={tCourses('searchPlaceholder')}
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full bg-white/5 border border-white/20 rounded-full pl-9 pr-8 py-2.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-mambo-gold/50 focus:bg-black/40 transition-all font-medium"
-                />
-                {searchQuery && (
-                  <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
-                    <FaTimes className="text-xs" />
-                  </button>
-                )}
+            {/* Desktop: Original pill layout + release calendar pinned right */}
+            <div className="hidden sm:flex items-center gap-3 w-full">
+              <div className="flex items-center gap-3 flex-1 min-w-0 overflow-x-auto no-scrollbar pb-0">
+                {/* Search Pill */}
+                <div className="relative group min-w-[200px]">
+                  <FaSearch className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-mambo-gold transition-colors text-sm" />
+                  <input
+                    type="text"
+                    placeholder={tCourses('searchPlaceholder')}
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-white/5 border border-white/20 rounded-full pl-9 pr-8 py-2.5 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-mambo-gold/50 focus:bg-black/40 transition-all font-medium"
+                  />
+                  {searchQuery && (
+                    <button onClick={clearSearch} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white">
+                      <FaTimes className="text-xs" />
+                    </button>
+                  )}
+                </div>
+
+                <div className="h-6 w-px bg-white/10 mx-1 hidden md:block" />
+
+                {/* Type Filter Pills */}
+                <div className="flex bg-black/30 rounded-full p-1 border border-white/10">
+                  {[{ v: 'all', l: tCourses('filterAll') }, { v: 'course', l: tCourses('filterCourses') }, { v: 'choreo', l: tCourses('filterChoreo') }, { v: 'topic', l: tCourses('filterTopics') }].map(f => (
+                    <button
+                      key={f.v}
+                      onClick={() => setTypeFilter(f.v as TypeFilter)}
+                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${typeFilter === f.v ? 'border-purple-500 bg-purple-500/20 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
+                    >
+                      {f.l}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Level Filter Pills */}
+                <div className="flex bg-black/30 rounded-full p-1 border border-white/10">
+                  {[{ v: 'all', l: tCourses('difficultyAll') }, { v: 'beginner', l: tCourses('difficultyBeginner') }, { v: 'intermediate', l: tCourses('difficultyIntermediate') }, { v: 'advanced', l: tCourses('difficultyAdvanced') }].map(f => (
+                    <button
+                      key={f.v}
+                      onClick={() => setDifficultyFilter(f.v as DifficultyFilter)}
+                      className={`px-5 py-2 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${difficultyFilter === f.v ? 'bg-[#fbbf24] text-black border-[#fbbf24] shadow-[0_0_15px_rgba(251,191,36,0.4)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
+                    >
+                      {f.l}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              <div className="h-6 w-px bg-white/10 mx-1 hidden md:block" />
-
-              {/* Type Filter Pills */}
-              <div className="flex bg-black/30 rounded-full p-1 border border-white/10">
-                {[{ v: 'all', l: tCourses('filterAll') }, { v: 'course', l: tCourses('filterCourses') }, { v: 'choreo', l: tCourses('filterChoreo') }, { v: 'topic', l: tCourses('filterTopics') }].map(f => (
-                  <button
-                    key={f.v}
-                    onClick={() => setTypeFilter(f.v as TypeFilter)}
-                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${typeFilter === f.v ? 'border-purple-500 bg-purple-500/20 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-400 shadow-[0_0_15px_rgba(168,85,247,0.3)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
-                  >
-                    {f.l}
-                  </button>
-                ))}
-              </div>
-
-              {/* Level Filter Pills */}
-              <div className="flex bg-black/30 rounded-full p-1 border border-white/10">
-                {[{ v: 'all', l: tCourses('difficultyAll') }, { v: 'beginner', l: tCourses('difficultyBeginner') }, { v: 'intermediate', l: tCourses('difficultyIntermediate') }, { v: 'advanced', l: tCourses('difficultyAdvanced') }].map(f => (
-                  <button
-                    key={f.v}
-                    onClick={() => setDifficultyFilter(f.v as DifficultyFilter)}
-                    className={`px-5 py-2 rounded-full text-sm font-bold transition-all border whitespace-nowrap ${difficultyFilter === f.v ? 'bg-[#fbbf24] text-black border-[#fbbf24] shadow-[0_0_15px_rgba(251,191,36,0.4)]' : 'text-gray-400 border-transparent hover:text-white hover:bg-white/5'}`}
-                  >
-                    {f.l}
-                  </button>
-                ))}
-              </div>
-
-              {/* Release Calendar — hover on desktop */}
-              <div className="ml-auto">
+              {/* Release Calendar — pinned right, outside scroll so popover isn't clipped */}
+              <div className="flex-shrink-0">
                 <ReleaseScheduleButton />
               </div>
             </div>

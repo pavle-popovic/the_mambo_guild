@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef, useLayoutEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -483,6 +483,43 @@ export function ReleaseScheduleButton() {
     const target = useMemo(() => parseDate(next.date), [next.date]);
     const { days } = useCountdown(target);
 
+    const buttonRef = useRef<HTMLButtonElement>(null);
+    const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const [mounted, setMounted] = useState(false);
+    const [anchor, setAnchor] = useState<{ top: number; right: number } | null>(null);
+
+    useEffect(() => setMounted(true), []);
+
+    const cancelClose = () => {
+        if (closeTimer.current) {
+            clearTimeout(closeTimer.current);
+            closeTimer.current = null;
+        }
+    };
+    const scheduleClose = () => {
+        cancelClose();
+        closeTimer.current = setTimeout(() => setHovered(false), 120);
+    };
+
+    const updateAnchor = () => {
+        const el = buttonRef.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        setAnchor({ top: r.bottom + 10, right: Math.max(8, window.innerWidth - r.right) });
+    };
+
+    useLayoutEffect(() => {
+        if (!hovered || isMobile) return;
+        updateAnchor();
+        const onScrollOrResize = () => updateAnchor();
+        window.addEventListener("scroll", onScrollOrResize, true);
+        window.addEventListener("resize", onScrollOrResize);
+        return () => {
+            window.removeEventListener("scroll", onScrollOrResize, true);
+            window.removeEventListener("resize", onScrollOrResize);
+        };
+    }, [hovered, isMobile]);
+
     useEffect(() => {
         if (!open) return;
         const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);
@@ -499,61 +536,77 @@ export function ReleaseScheduleButton() {
         };
     }, [open, isMobile]);
 
-    const showPopover = !isMobile && hovered;
+    useEffect(() => () => cancelClose(), []);
+
+    const showPopover = !isMobile && hovered && anchor !== null;
+
+    const popoverNode =
+        mounted && showPopover
+            ? createPortal(
+                  <AnimatePresence>
+                      <motion.div
+                          key="release-popover"
+                          initial={{ opacity: 0, y: 8, scale: 0.98 }}
+                          animate={{ opacity: 1, y: 0, scale: 1 }}
+                          exit={{ opacity: 0, y: 8, scale: 0.98 }}
+                          transition={{ duration: 0.18 }}
+                          style={{ position: "fixed", top: anchor!.top, right: anchor!.right, zIndex: 100 }}
+                          className="w-[min(92vw,560px)] origin-top-right"
+                          onMouseEnter={cancelClose}
+                          onMouseLeave={scheduleClose}
+                      >
+                          <div className="overflow-hidden rounded-2xl border border-amber-300/30 bg-black/90 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.7),0_0_50px_rgba(252,226,5,0.15)] backdrop-blur-xl">
+                              <div className="mb-4 text-center">
+                                  <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-amber-200">
+                                      <HiSparkles /> Upcoming Drops
+                                  </div>
+                                  <h4
+                                      className="mt-2 text-lg italic text-white"
+                                      style={{ fontFamily: '"Playfair Display", serif' }}
+                                  >
+                                      Next: {next.title}
+                                  </h4>
+                                  <p className="text-xs text-gray-400">
+                                      in {days} days • {fmtFull(target)}
+                                  </p>
+                              </div>
+                              <div className="-mr-1 max-h-[60vh] space-y-2 overflow-y-auto pr-1">
+                                  {items.map((item, i) => (
+                                      <PopoverRow key={i} item={item} isNext={item.date === next.date} />
+                                  ))}
+                              </div>
+                          </div>
+                      </motion.div>
+                  </AnimatePresence>,
+                  document.body
+              )
+            : null;
 
     return (
         <>
-            <div
-                className="relative inline-block"
-                onMouseEnter={() => !isMobile && setHovered(true)}
-                onMouseLeave={() => !isMobile && setHovered(false)}
+            <button
+                ref={buttonRef}
+                type="button"
+                onClick={() => isMobile && setOpen(true)}
+                onMouseEnter={() => {
+                    if (isMobile) return;
+                    cancelClose();
+                    setHovered(true);
+                }}
+                onMouseLeave={() => {
+                    if (isMobile) return;
+                    scheduleClose();
+                }}
+                className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-amber-300/40 bg-gradient-to-r from-amber-500/20 via-amber-400/10 to-amber-500/20 px-3.5 py-2 text-[11px] font-black uppercase tracking-wider text-amber-200 shadow-[0_0_20px_rgba(252,226,5,0.2)] transition-all hover:border-amber-300/80 hover:text-amber-100 hover:shadow-[0_0_30px_rgba(252,226,5,0.4)] sm:px-4 sm:text-xs"
             >
-                <button
-                    type="button"
-                    onClick={() => isMobile && setOpen(true)}
-                    className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-amber-300/40 bg-gradient-to-r from-amber-500/20 via-amber-400/10 to-amber-500/20 px-3.5 py-2 text-[11px] font-black uppercase tracking-wider text-amber-200 shadow-[0_0_20px_rgba(252,226,5,0.2)] transition-all hover:border-amber-300/80 hover:text-amber-100 hover:shadow-[0_0_30px_rgba(252,226,5,0.4)] sm:px-4 sm:text-xs"
-                >
-                    <HiSparkles className="animate-pulse" />
-                    <span className="whitespace-nowrap">Release Calendar</span>
-                    <span className="hidden rounded-full bg-amber-300/30 px-2 py-0.5 text-[9px] tabular-nums text-amber-100 md:inline">
-                        Next in {days}d
-                    </span>
-                </button>
+                <HiSparkles className="animate-pulse" />
+                <span className="whitespace-nowrap">Release Calendar</span>
+                <span className="hidden rounded-full bg-amber-300/30 px-2 py-0.5 text-[9px] tabular-nums text-amber-100 md:inline">
+                    Next in {days}d
+                </span>
+            </button>
 
-                <AnimatePresence>
-                    {showPopover && (
-                        <motion.div
-                            initial={{ opacity: 0, y: 8, scale: 0.98 }}
-                            animate={{ opacity: 1, y: 0, scale: 1 }}
-                            exit={{ opacity: 0, y: 8, scale: 0.98 }}
-                            transition={{ duration: 0.2 }}
-                            className="absolute right-0 top-full z-[60] mt-3 w-[min(92vw,560px)] origin-top-right"
-                        >
-                            <div className="overflow-hidden rounded-2xl border border-amber-300/30 bg-black/90 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.7),0_0_50px_rgba(252,226,5,0.15)] backdrop-blur-xl">
-                                <div className="mb-4 text-center">
-                                    <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-amber-200">
-                                        <HiSparkles /> Upcoming Drops
-                                    </div>
-                                    <h4
-                                        className="mt-2 text-lg italic text-white"
-                                        style={{ fontFamily: '"Playfair Display", serif' }}
-                                    >
-                                        Next: {next.title}
-                                    </h4>
-                                    <p className="text-xs text-gray-400">
-                                        in {days} days • {fmtFull(target)}
-                                    </p>
-                                </div>
-                                <div className="-mr-1 max-h-[60vh] space-y-2 overflow-y-auto pr-1">
-                                    {items.map((item, i) => (
-                                        <PopoverRow key={i} item={item} isNext={item.date === next.date} />
-                                    ))}
-                                </div>
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
-            </div>
+            {popoverNode}
 
             <MobileModal open={isMobile && open} onClose={() => setOpen(false)} next={next} items={items} />
         </>
