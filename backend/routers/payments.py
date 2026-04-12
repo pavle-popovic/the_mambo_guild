@@ -161,7 +161,13 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
     # Handle the event
     if event["type"] == "invoice.payment_succeeded":
         invoice = event["data"]["object"]
-        subscription_id = invoice.get("subscription")
+        # Stripe API 2025-08+ moved `subscription` from the top level of the
+        # invoice to `parent.subscription_details.subscription`. Read both so
+        # the handler works on old and new API versions.
+        subscription_id = (
+            invoice.get("subscription")
+            or (invoice.get("parent") or {}).get("subscription_details", {}).get("subscription")
+        )
         customer_id = invoice.get("customer")
 
         if subscription_id and customer_id:
@@ -254,6 +260,8 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
         ).first()
         if db_subscription:
             db_subscription.status = SubscriptionStatus.CANCELED
+            db_subscription.tier = SubscriptionTier.ROOKIE
+            db_subscription.cancel_at_period_end = False
             db.commit()
             db.refresh(db_subscription)
         else:
@@ -361,54 +369,56 @@ def cancel_subscription(
     db: Session = Depends(get_db),
 ):
     """
-    Cancel an active subscription. Sets the subscription to cancel at period end.
-    User will retain access until the end of the billing period, then revert to Rookie tier.
+    Schedule a subscription to cancel at the end of the current billing period.
+    User retains full tier access until `current_period_end`, then the
+    `customer.subscription.deleted` webhook drops them to Rookie.
     """
     try:
-        # Get user's subscription
         subscription = db.query(Subscription).filter(
             Subscription.user_id == current_user.id
         ).first()
-        
+
         if not subscription:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="No subscription found for this user."
             )
-        
+
         if subscription.status != SubscriptionStatus.ACTIVE:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Subscription is not active. Nothing to cancel."
             )
-        
+
         if not subscription.stripe_subscription_id:
-            # If no Stripe subscription, just update our DB
+            # No Stripe record — drop to Rookie immediately.
             subscription.status = SubscriptionStatus.CANCELED
             subscription.tier = SubscriptionTier.ROOKIE
+            subscription.cancel_at_period_end = False
             db.commit()
             db.refresh(subscription)
-            
             return SubscriptionResponse(
                 success=True,
-                message="Subscription canceled successfully.",
+                message="Subscription canceled.",
                 tier="rookie"
             )
-        
-        # Cancel the Stripe subscription immediately
-        # This will trigger a customer.subscription.deleted webhook
-        stripe.Subscription.delete(subscription.stripe_subscription_id)
-        
-        # Update our database immediately
-        subscription.status = SubscriptionStatus.CANCELED
-        subscription.tier = SubscriptionTier.ROOKIE
+
+        # Schedule cancellation at period end in Stripe. User keeps access
+        # until then. Stripe will fire customer.subscription.deleted at the
+        # boundary, which the webhook handler translates into tier=ROOKIE.
+        stripe.Subscription.modify(
+            subscription.stripe_subscription_id,
+            cancel_at_period_end=True,
+        )
+
+        subscription.cancel_at_period_end = True
         db.commit()
         db.refresh(subscription)
-        
+
         return SubscriptionResponse(
             success=True,
-            message="Subscription canceled successfully. You now have access to the Rookie plan.",
-            tier="rookie"
+            message="Your subscription will end at the close of this billing period.",
+            tier=subscription.tier.value,
         )
         
     except stripe.error.StripeError as e:
@@ -422,3 +432,44 @@ def cancel_subscription(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred. Please try again."
         )
+
+
+@router.post("/resume-subscription", response_model=SubscriptionResponse)
+def resume_subscription(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Undo a scheduled cancellation. Only valid while the subscription is still
+    active but flagged `cancel_at_period_end=True`.
+    """
+    try:
+        subscription = db.query(Subscription).filter(
+            Subscription.user_id == current_user.id
+        ).first()
+        if not subscription or not subscription.stripe_subscription_id:
+            raise HTTPException(status_code=404, detail="No subscription found.")
+        if not subscription.cancel_at_period_end:
+            raise HTTPException(status_code=400, detail="Subscription is not scheduled to cancel.")
+
+        stripe.Subscription.modify(
+            subscription.stripe_subscription_id,
+            cancel_at_period_end=False,
+        )
+        subscription.cancel_at_period_end = False
+        db.commit()
+        db.refresh(subscription)
+
+        return SubscriptionResponse(
+            success=True,
+            message="Subscription resumed. Welcome back!",
+            tier=subscription.tier.value,
+        )
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error resuming subscription for user {current_user.id}: {e}")
+        raise HTTPException(status_code=400, detail="Payment processing error. Please try again.")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error resuming subscription for user {current_user.id}: {e}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")

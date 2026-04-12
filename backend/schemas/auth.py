@@ -96,7 +96,11 @@ class UserProfileResponse(BaseModel):
     role: str
     avatar_url: Optional[str] = None
     current_level_tag: Optional[str] = None
-    
+
+    # Subscription lifecycle (for cancel/resume UI)
+    subscription_cancel_at_period_end: bool = False
+    subscription_period_end: Optional[datetime] = None
+
     # Gamification v4
     reputation: int = 0
     current_claves: int = 0

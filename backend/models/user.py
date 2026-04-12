@@ -127,6 +127,7 @@ class Subscription(Base):
         nullable=False
     )
     current_period_end = Column(DateTime, nullable=True)
+    cancel_at_period_end = Column(Boolean, default=False, nullable=False, server_default="false")
 
     # Relationships
     user = relationship("User", back_populates="subscription")
