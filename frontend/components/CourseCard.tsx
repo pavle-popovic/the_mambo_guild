@@ -11,8 +11,10 @@ import { apiClient } from "@/lib/api";
 type CourseTypeKey = "course" | "choreo" | "topic";
 
 function resolveCourseType(raw?: string): CourseTypeKey {
-  if (raw === "choreo") return "choreo";
-  if (raw === "topic") return "topic";
+  const v = (raw || "").toLowerCase();
+  // Backend seeds store the long form "choreography"; accept both.
+  if (v === "choreo" || v === "choreography") return "choreo";
+  if (v === "topic") return "topic";
   return "course";
 }
 
