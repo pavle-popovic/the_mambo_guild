@@ -22,6 +22,7 @@ function PricingPageContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const [showDowngradeModal, setShowDowngradeModal] = useState(false);
 
   // Handle success/cancel redirects from Stripe
   useEffect(() => {
@@ -106,6 +107,7 @@ function PricingPageContent() {
   const performDowngrade = async () => {
     try {
       setLoading("downgrade");
+      setShowDowngradeModal(false);
       await refreshUser();
       await apiClient.updateSubscription(ADVANCED_PRICE_ID);
       await refreshUser();
@@ -126,22 +128,7 @@ function PricingPageContent() {
 
   const handleDowngrade = () => {
     if (!user) return;
-
-    toast.warning("Downgrade to Pro?", {
-      description:
-        "You'll lose Guild Master perks (1-on-1 feedback, roundtable Zooms, exclusive badge). The change takes effect immediately.",
-      duration: 10000,
-      action: {
-        label: "Confirm",
-        onClick: () => {
-          void performDowngrade();
-        },
-      },
-      cancel: {
-        label: "Keep Guild Master",
-        onClick: () => {},
-      },
-    });
+    setShowDowngradeModal(true);
   };
 
   // Get current user tier (default to "rookie" if not logged in or no tier)
@@ -387,6 +374,72 @@ function PricingPageContent() {
         onClose={() => setShowAuthModal(false)}
         type="login"
       />
+
+      {/* Downgrade Confirmation Modal */}
+      {showDowngradeModal && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowDowngradeModal(false)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-2xl bg-mambo-panel border border-gray-800 p-6 sm:p-8 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowDowngradeModal(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-gray-300 text-xl leading-none"
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <h2 className="text-2xl font-serif font-bold text-mambo-text mb-2">
+              Downgrade to <span className="text-amber-300">Pro</span>?
+            </h2>
+            <p className="text-gray-400 mb-5">
+              You&apos;ll lose Guild Master perks immediately:
+            </p>
+            <ul className="space-y-3 mb-6">
+              <li className="flex items-start gap-3 text-sm text-gray-300">
+                <span className="text-red-400 mt-0.5">✕</span>
+                <span>Monthly 1-on-1 video feedback from instructors</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-gray-300">
+                <span className="text-red-400 mt-0.5">✕</span>
+                <span>Roundtable exclusive Zoom calls</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-gray-300">
+                <span className="text-red-400 mt-0.5">✕</span>
+                <span>Exclusive Guild Master badge</span>
+              </li>
+              <li className="flex items-start gap-3 text-sm text-gray-300">
+                <span className="text-red-400 mt-0.5">✕</span>
+                <span>Additional claves for the community</span>
+              </li>
+            </ul>
+            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 mb-6">
+              <p className="text-sm text-amber-100/80 leading-relaxed">
+                Your plan will change to Pro right now. Stripe will credit the unused portion of
+                your Guild Master month against your next Pro bill — no refund to your card.
+              </p>
+            </div>
+            <div className="flex flex-col gap-3">
+              <button
+                onClick={() => setShowDowngradeModal(false)}
+                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold shadow-lg shadow-amber-500/20 hover:scale-[1.02] transition"
+              >
+                Keep Guild Master
+              </button>
+              <button
+                onClick={performDowngrade}
+                disabled={loading === "downgrade"}
+                className="w-full py-2 text-xs text-gray-600 hover:text-gray-400 underline underline-offset-4 transition disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                {loading === "downgrade" ? "Downgrading..." : "I understand, downgrade to Pro"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
