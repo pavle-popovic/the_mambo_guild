@@ -112,6 +112,9 @@ class Settings:
     ADVANCED_PRICE_ID: str = "price_1TKKp51a6FlufVwfYgvr192X"
     PERFORMER_PRICE_ID: str = "price_1TKKwC1a6FlufVwfVmE6uHml"
 
+    # Anthropic (Claude) API - used by moderation_service and ai_chat
+    ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
+
     # AI/Gemini Configuration - SECURITY: API key must be set via environment variable
     _gemini_api_key: Optional[str] = os.getenv("GEMINI_API_KEY")
 
