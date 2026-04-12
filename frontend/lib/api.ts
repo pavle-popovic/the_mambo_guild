@@ -1252,7 +1252,7 @@ class ApiClient {
       reference_id: string | null;
       is_read: boolean;
       created_at: string;
-    }>>(`/api/notifications/?skip=${skip}&limit=${limit}`, { forceRefresh: true });
+    }>>(`/api/notifications?skip=${skip}&limit=${limit}`, { forceRefresh: true });
   }
 
   async getUnreadNotificationCount() {
