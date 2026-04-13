@@ -123,6 +123,45 @@ def _ensure_tables() -> None:
         logging.getLogger("uvicorn.error").warning(
             "create_all skipped: %s", exc
         )
+        return
+
+    # Seed release_schedule_items with the launch lineup so the admin
+    # editor and the landing page agree on day one. Only inserts when
+    # the table is empty — never overwrites later edits.
+    try:
+        from datetime import date as _date
+        from models import get_session_local
+        from models.premium import ReleaseScheduleItem
+        SessionLocal = get_session_local()
+
+        seed = [
+            (_date(2026, 5, 6),  "Soneros de Bailadores", "Cheo Feliciano",        "choreo", "advanced",     False),
+            (_date(2026, 5, 20), "Rebelión",              "Gilberto Santa Rosa",   "choreo", "intermediate", False),
+            (_date(2026, 6, 3),  "Ella",                  "La Sra Tomasa",         "choreo", "beginner",     False),
+            (_date(2026, 6, 17), "Full Body Movement Mastery", None,               "course", "mastery",      True),
+            (_date(2026, 7, 1),  "Los Dinteles",          "Juan Luis Guerra",      "choreo", "advanced",     False),
+            (_date(2026, 7, 15), "Because of You",        "Ne-Yo",                 "choreo", "intermediate", False),
+            (_date(2026, 7, 29), "Baile Inolvidable",     "Bad Bunny",             "choreo", "beginner",     False),
+            (_date(2026, 8, 12), "Full Jazz Course",      "feat. Alexander McCormack", "course", "mastery",  True),
+        ]
+
+        with SessionLocal() as session:
+            existing = session.query(ReleaseScheduleItem).count()
+            if existing == 0:
+                for d, title, artist, rtype, level, featured in seed:
+                    session.add(ReleaseScheduleItem(
+                        release_date=d,
+                        title=title,
+                        artist=artist,
+                        release_type=rtype,
+                        level=level,
+                        featured=featured,
+                    ))
+                session.commit()
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning(
+            "release schedule seed skipped: %s", exc
+        )
 
 
 # Include routers

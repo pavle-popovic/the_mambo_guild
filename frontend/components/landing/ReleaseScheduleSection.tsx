@@ -46,6 +46,9 @@ function dtoToItem(dto: ReleaseScheduleItemDTO): ReleaseItem {
 }
 
 function useReleaseSchedule(): ReleaseItem[] {
+    // DB is the source of truth (seeded on first boot from RELEASE_SCHEDULE_FALLBACK
+    // by the backend). The fallback only paints during the initial fetch and on
+    // outright API failure so the landing page never looks empty.
     const [items, setItems] = useState<ReleaseItem[]>(RELEASE_SCHEDULE_FALLBACK);
     useEffect(() => {
         let cancelled = false;
@@ -53,7 +56,7 @@ function useReleaseSchedule(): ReleaseItem[] {
             .getReleaseSchedule()
             .then((data) => {
                 if (cancelled) return;
-                if (Array.isArray(data) && data.length > 0) {
+                if (Array.isArray(data)) {
                     setItems(data.map(dtoToItem));
                 }
             })
