@@ -114,27 +114,36 @@ def get_beautiful_html(username, referral_link):
     <body>
         <div class="container">
             <p>Hi {username},</p>
-            
-            <h2>🏆 The Mambo Guild Open Challenge Is Here</h2>
 
-            <p>On April 29th, I am opening the doors to a fully gamified, structured, premium learning platform for Salsa On2. But before we go live, <strong>I am giving away one Lifetime VIP Access pass.</strong></p>
+            <h2>🌱 Welcome to The Mambo Guild Beginner Challenge</h2>
+
+            <p>This Challenge is for dancers that have been dancing salsa for <strong>less than 2 years</strong>! Obviously, this is not rocket science, but if you are a more experienced dancer please share this with someone that is getting started!</p>
+
+            <p>On April 29th, I am opening the doors to a fully gamified, structured, premium learning platform for Salsa On2. But before we go live, <strong>I am giving away one Lifetime Access pass.</strong></p>
 
             <h2>THE PRIZE:</h2>
-            <p>The first place, winner of the challenge gets a lifetime free access to the entire Mambo Guild platform — 30+ hours of mechanics, practice drills, and full access to our interactive Skill Tree and "Clave" point system.</p>
+            <p>The first place, winner of the challenge gets a lifetime free access to the entire Mambo Guild platform. That means 30+ hours of mechanics, practice drills, and full access to our interactive Skill Tree and "Clave" point system.</p>
 
             <h2>HOW TO ENTER:</h2>
-            <p>1. Learn the Mambo Gozón Choreography — the choreo starts at <strong>13min47</strong>:<br>
-            <a href="https://www.youtube.com/watch?v=omiwxSIxnyc" class="link">https://www.youtube.com/watch?v=omiwxSIxnyc</a></p>
+            <p>1. Learn this choreo (Mambo Inn):<br>
+            <a href="https://www.youtube.com/watch?v=ticP-zMdeUk" class="link">https://www.youtube.com/watch?v=ticP-zMdeUk</a></p>
             <p>2. Film yourself executing the sequence.</p>
-            <p>3. Post your video, follow me on Instagram and <strong>tag me before April 26th</strong>.</p>
+            <p>3. Post your video and <strong>tag me before April 26th</strong>.</p>
 
             <h2>SUBMISSION RULES:</h2>
             <p>You can post your video as a <strong>Reel</strong> or an <strong>IG Story</strong>.<br>
-            ⚠️ If you post it as a Story, you <strong>MUST</strong> send the raw video to my DMs after posting. Stories disappear in 24 hours. (Posting a Reel is highly preferred).</p>
+            ⚠️ <strong>Crucial:</strong> If you post it as a Story, you <strong>MUST</strong> send the raw video to my DMs after posting. Stories disappear in 24 hours. (Posting a Reel is highly preferred).</p>
 
-            <p>🔥 <strong>Next Monday:</strong> I will be releasing a <strong>beginner challenge</strong> for people who have been dancing less than 1 year. Stay tuned!</p>
+            <p>The Guild opens April 29th.</p>
 
-            <p>The Guild opens April 29th. Let's go.</p>
+            <p>💪 Feel like you're more advanced? The <strong>Open Challenge</strong> below is for you — check it out.</p>
+
+            <h2>🏆 The Mambo Guild Open Challenge — Mambo Gozón</h2>
+
+            <p>Same prize, same rules, same deadline (<strong>April 26th</strong>) — just a harder choreo for the more experienced dancers. Learn the <strong>Mambo Gozón</strong> Choreography (the choreo starts at <strong>13min47</strong>):<br>
+            <a href="https://www.youtube.com/watch?v=omiwxSIxnyc" class="link">https://www.youtube.com/watch?v=omiwxSIxnyc</a></p>
+
+            <p>Film it, follow me on Instagram, tag me, and you're in. Let's go.</p>
 
             <h2>📚 8 Free Classes:</h2>
             <p>Salsa Bodymovement Musicality (La Gripe): <a href="{weekly_class_url}" class="link">{weekly_class_url}</a><br>

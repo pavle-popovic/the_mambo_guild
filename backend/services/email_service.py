@@ -483,7 +483,10 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                 <div class="container">
                     <p>Hi {username},</p>
                     
-                    <p><strong>🏆 Open Challenge — Mambo Gozón Choreo (Win Lifetime VIP Access!):</strong><br>
+                    <p><strong>🌱 Beginner Challenge — Mambo Inn (less than 2 years dancing, Win Lifetime Access!):</strong><br>
+                    <a href="https://www.youtube.com/watch?v=ticP-zMdeUk" class="link">https://www.youtube.com/watch?v=ticP-zMdeUk</a></p>
+
+                    <p><strong>🏆 Open Challenge — Mambo Gozón Choreo (more advanced, Win Lifetime Access!):</strong><br>
                     <a href="https://www.youtube.com/watch?v=omiwxSIxnyc" class="link">https://www.youtube.com/watch?v=omiwxSIxnyc</a></p>
 
                     <p><strong>8 Free Classes:</strong><br>
