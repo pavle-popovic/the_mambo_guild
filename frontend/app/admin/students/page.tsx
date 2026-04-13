@@ -125,6 +125,8 @@ function StudentSlideOver({
   const [loading, setLoading] = useState(true);
   const [xpAmount, setXpAmount] = useState("");
   const [granting, setGranting] = useState(false);
+  const [clavesAmount, setClavesAmount] = useState("");
+  const [grantingClaves, setGrantingClaves] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
 
   useEffect(() => {
@@ -159,6 +161,27 @@ function StudentSlideOver({
       setToast({ msg: err?.message ?? "Failed to grant XP", type: "error" });
     } finally {
       setGranting(false);
+    }
+  };
+
+  const handleGrantClaves = async () => {
+    const amount = parseInt(clavesAmount, 10);
+    if (!amount || amount <= 0 || amount > 100000) {
+      setToast({ msg: "Enter a valid amount (1–100000)", type: "error" });
+      return;
+    }
+    setGrantingClaves(true);
+    try {
+      const res = await apiClient.grantClaves(userId, amount);
+      setToast({ msg: res.message, type: "success" });
+      setClavesAmount("");
+      if (detail) {
+        setDetail({ ...detail, current_claves: res.new_claves });
+      }
+    } catch (err: any) {
+      setToast({ msg: err?.message ?? "Failed to grant claves", type: "error" });
+    } finally {
+      setGrantingClaves(false);
     }
   };
 
@@ -380,6 +403,31 @@ function StudentSlideOver({
                   className="px-4 py-2 bg-mambo-gold hover:bg-yellow-400 disabled:bg-white/10 disabled:text-white/30 text-black font-bold rounded-lg text-sm transition"
                 >
                   {granting ? "…" : "Grant"}
+                </button>
+              </div>
+            </div>
+
+            {/* Grant Claves */}
+            <div className="bg-white/5 rounded-xl p-4">
+              <h4 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-3 flex items-center gap-1.5">
+                <FaCoins className="text-mambo-gold" /> Grant Claves (Admin)
+              </h4>
+              <div className="flex gap-2">
+                <input
+                  type="number"
+                  value={clavesAmount}
+                  onChange={(e) => setClavesAmount(e.target.value)}
+                  placeholder="Amount (1–100000)"
+                  min={1}
+                  max={100000}
+                  className="flex-1 px-3 py-2 bg-white/5 border border-white/10 rounded-lg text-mambo-text placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-mambo-gold/40 text-sm"
+                />
+                <button
+                  onClick={handleGrantClaves}
+                  disabled={grantingClaves || !clavesAmount}
+                  className="px-4 py-2 bg-mambo-gold hover:bg-yellow-400 disabled:bg-white/10 disabled:text-white/30 text-black font-bold rounded-lg text-sm transition"
+                >
+                  {grantingClaves ? "…" : "Grant"}
                 </button>
               </div>
             </div>

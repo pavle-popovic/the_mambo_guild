@@ -551,6 +551,46 @@ def grant_xp_to_student(
 
 
 # ===========================================================================
+# GRANT CLAVES — manually award claves (in-app currency) to a student
+# ===========================================================================
+
+class GrantClavesRequest(BaseModel):
+    amount: int
+    reason: Optional[str] = None
+
+
+@router.post("/students/{user_id}/grant-claves")
+def grant_claves_to_student(
+    user_id: str,
+    data: GrantClavesRequest,
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db),
+):
+    """Manually grant claves to a student. Admin only."""
+    if data.amount <= 0 or data.amount > 100000:
+        raise HTTPException(status_code=400, detail="Amount must be between 1 and 100000")
+
+    profile = (
+        db.query(UserProfile)
+        .filter(UserProfile.user_id == user_id)
+        .with_for_update()
+        .first()
+    )
+    if not profile:
+        raise HTTPException(status_code=404, detail="Student not found")
+
+    profile.current_claves = (profile.current_claves or 0) + data.amount
+    db.commit()
+    db.refresh(profile)
+
+    return {
+        "success": True,
+        "new_claves": profile.current_claves,
+        "message": f"Granted {data.amount} claves to {profile.first_name} {profile.last_name}",
+    }
+
+
+# ===========================================================================
 # SEND ANNOUNCEMENT — broadcast email to students
 # ===========================================================================
 

@@ -111,6 +111,20 @@ app.add_middleware(
     expose_headers=["*"],
 )
 
+# Ensure newly added tables exist on startup. SQLAlchemy create_all is
+# idempotent — only missing tables are issued. Existing tables are untouched,
+# so this is safe to run on the production DB.
+@app.on_event("startup")
+def _ensure_tables() -> None:
+    try:
+        from models import Base, get_engine
+        Base.metadata.create_all(bind=get_engine())
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning(
+            "create_all skipped: %s", exc
+        )
+
+
 # Include routers
 app.include_router(api_router, prefix="/api")
 

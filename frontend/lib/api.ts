@@ -1668,6 +1668,17 @@ class ApiClient {
     });
   }
 
+  async grantClaves(userId: string, amount: number, reason?: string) {
+    return this.request<{
+      success: boolean;
+      new_claves: number;
+      message: string;
+    }>(`/api/admin/students/${userId}/grant-claves`, {
+      method: "POST",
+      body: JSON.stringify({ amount, reason }),
+    });
+  }
+
   async sendAnnouncement(subject: string, message: string, tierFilter: string = "all") {
     return this.request<{
       sent_count: number;
