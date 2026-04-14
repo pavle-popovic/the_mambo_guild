@@ -7,6 +7,7 @@ from models.user import User, UserRole, Subscription, SubscriptionStatus
 from models.course import World, Lesson, Level
 from models.progress import UserProgress
 from schemas.course import WorldResponse, LessonResponse, LessonDetailResponse, WorldDetailResponse, LevelResponse, LevelEdgeResponse
+from services.skill_tree_access import compute_level_unlock_map, is_lesson_accessible
 from dependencies import get_current_user, get_current_user_optional
 from typing import Optional
 from datetime import datetime
@@ -166,13 +167,17 @@ def get_lesson(
     # - Admins: Full access to everything
     # - Free courses: Accessible to all logged in users
     # - Paid courses: Requires active subscription
-    if current_user.role != UserRole.ADMIN and not world.is_free:
-        subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
-        if not subscription or subscription.status not in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING):
+    accessible, reason = is_lesson_accessible(db, lesson, current_user)
+    if not accessible:
+        if reason == "subscription":
             raise HTTPException(
                 status_code=403,
                 detail="Subscription required. Please upgrade to access this course."
             )
+        raise HTTPException(
+            status_code=403,
+            detail="Lesson locked. Complete prerequisites to unlock."
+        )
 
     # Get all lessons in the world, sorted by week_number, day_number, and order_index
     all_lessons = []
@@ -418,34 +423,14 @@ def get_world_skill_tree(
             completed_count = sum(1 for lesson in level.lessons if str(lesson.id) in completed_lesson_ids)
             level_completion_map[str(level.id)] = (completed_count / total_lessons) * 100
     
-    # Determine which levels are unlocked
-    # A level is unlocked if ALL its prerequisites are 100% completed
-    level_unlocked_map: Dict[str, bool] = {}
-    
-    def is_level_unlocked(level_id: str) -> bool:
-        if level_id in level_unlocked_map:
-            return level_unlocked_map[level_id]
-        
-        # No prerequisites? It's unlocked
-        prereqs = prerequisites_map.get(level_id, [])
-        if not prereqs:
-            level_unlocked_map[level_id] = True
-            return True
-        
-        # Check if all prerequisites are completed (100%)
-        all_prereqs_complete = all(
-            level_completion_map.get(prereq_id, 0.0) >= 100.0
-            for prereq_id in prereqs
-        )
-        
-        level_unlocked_map[level_id] = all_prereqs_complete
-        return all_prereqs_complete
-    
+    # Determine which levels are unlocked (shared logic with get_lesson access check)
+    level_unlocked_map = compute_level_unlock_map(db, world, current_user)
+
     # Build level responses
     level_responses = []
     for level in world.levels:
         level_id = str(level.id)
-        is_unlocked = is_level_unlocked(level_id)
+        is_unlocked = level_unlocked_map.get(level_id, False)
         completion_pct = level_completion_map.get(level_id, 0.0)
         
         # Calculate total XP from lessons if not set on level

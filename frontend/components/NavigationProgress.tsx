@@ -15,24 +15,36 @@ export function NavigationProgress() {
   const [progress, setProgress] = useState(0);
   const previousPath = useRef<string | null>(null);
   const progressInterval = useRef<NodeJS.Timeout | null>(null);
+  const lastTriggerRef = useRef<number>(0);
 
   // Handle link clicks to start progress
   useEffect(() => {
     const handleLinkClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       const anchor = target.closest("a");
-      
+
       if (!anchor) return;
-      
+
       const href = anchor.getAttribute("href");
       if (!href) return;
-      
+
       // Only handle internal links
       const isInternal = href.startsWith("/") && !href.startsWith("//");
       const isHashOnly = href.startsWith("#");
       const isNewTab = anchor.target === "_blank";
       const hasModifier = e.metaKey || e.ctrlKey || e.shiftKey;
-      
+
+      // Skip when the link would navigate to the current page — clicking the
+      // logo on the landing page should not flicker a loading bar (bug 04).
+      const targetPath = href.split(/[?#]/)[0];
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+      if (isInternal && targetPath === currentPath) return;
+
+      // Debounce rapid repeat clicks (e.g. logo spam) within 150ms.
+      const now = Date.now();
+      if (now - lastTriggerRef.current < 150) return;
+      lastTriggerRef.current = now;
+
       if (isInternal && !isHashOnly && !isNewTab && !hasModifier) {
         // Start progress animation
         setIsNavigating(true);

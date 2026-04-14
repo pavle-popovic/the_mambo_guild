@@ -55,7 +55,9 @@ export default function InstructorsPage() {
                     <FaInstagram />
                   </a>
                   <a
-                    href="#"
+                    href="https://www.youtube.com/@TheMamboGuild"
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-mambo-blue transition"
                     aria-label="YouTube"
                   >

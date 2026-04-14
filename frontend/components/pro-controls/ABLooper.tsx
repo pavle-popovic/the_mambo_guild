@@ -44,11 +44,18 @@ export default function ABLooper({ playerRef, duration }: ABLooperProps) {
     return () => clearInterval(interval);
   }, [playerRef]);
 
+  // Enabled state mirror so the interval callback always reads the latest
+  // value — avoids a race where a pending seek fires after the user has
+  // toggled the loop off (bug 09).
+  const enabledRef = useRef(enabled);
+  useEffect(() => { enabledRef.current = enabled; }, [enabled]);
+
   // Loop logic
   useEffect(() => {
     if (!enabled || !playerRef.current) return;
 
     const checkLoop = () => {
+      if (!enabledRef.current) return;
       if (playerRef.current) {
         const time = playerRef.current.getCurrentTime();
         if (time >= endTime) {
@@ -149,12 +156,18 @@ export default function ABLooper({ playerRef, duration }: ABLooperProps) {
   const endPercent = duration > 0 ? (endTime / duration) * 100 : 100;
   const currentPercent = duration > 0 ? (currentTime / duration) * 100 : 0;
 
-  // Jump to loop start when enabling
+  // Jump to loop start when enabling; when disabling, ensure playback
+  // continues past the previous end point (bug 09).
   const toggleLoop = () => {
-    if (!enabled && playerRef.current) {
+    const next = !enabled;
+    if (next && playerRef.current) {
       playerRef.current.setCurrentTime(startTime);
     }
-    setEnabled(!enabled);
+    enabledRef.current = next;
+    setEnabled(next);
+    if (!next && playerRef.current) {
+      try { playerRef.current.play(); } catch {}
+    }
   };
 
   // Set A point at current position
@@ -201,15 +214,18 @@ export default function ABLooper({ playerRef, duration }: ABLooperProps) {
         </button>
       </div>
 
-      {/* Slider */}
+      {/* Slider — handles sit above the rail (bug 12) */}
       <div
         ref={sliderRef}
-        className="relative h-10 bg-gray-800 rounded-lg cursor-pointer select-none"
+        className="relative h-14 pt-6 cursor-pointer select-none"
       >
+        {/* Rail */}
+        <div className="absolute inset-x-0 bottom-0 h-8 bg-gray-800 rounded-lg" />
+
         {/* Active region highlight */}
         <div
           className={`
-            absolute top-0 h-full rounded-lg transition-colors duration-200
+            absolute bottom-0 h-8 rounded-lg transition-colors duration-200
             ${enabled ? "bg-blue-500/30" : "bg-gray-700/50"}
           `}
           style={{
@@ -220,15 +236,15 @@ export default function ABLooper({ playerRef, duration }: ABLooperProps) {
 
         {/* Current time indicator */}
         <div
-          className="absolute top-0 h-full w-0.5 bg-white/50 pointer-events-none"
+          className="absolute bottom-0 h-8 w-0.5 bg-white/50 pointer-events-none"
           style={{ left: `${currentPercent}%` }}
         />
 
-        {/* Handle A (Start) */}
+        {/* Handle A (Start) — anchored to top of rail, pointing down */}
         <div
           className={`
-            absolute top-1/2 -translate-y-1/2 -translate-x-1/2
-            w-5 h-8 rounded-md cursor-grab active:cursor-grabbing
+            absolute bottom-6 -translate-x-1/2
+            w-6 h-7 rounded-t-md cursor-grab active:cursor-grabbing
             flex items-center justify-center
             transition-colors duration-200 touch-none
             ${isDraggingA ? "bg-green-400 scale-110" : enabled ? "bg-green-500" : "bg-gray-500"}
@@ -249,8 +265,8 @@ export default function ABLooper({ playerRef, duration }: ABLooperProps) {
         {/* Handle B (End) */}
         <div
           className={`
-            absolute top-1/2 -translate-y-1/2 -translate-x-1/2
-            w-5 h-8 rounded-md cursor-grab active:cursor-grabbing
+            absolute bottom-6 -translate-x-1/2
+            w-6 h-7 rounded-t-md cursor-grab active:cursor-grabbing
             flex items-center justify-center
             transition-colors duration-200 touch-none
             ${isDraggingB ? "bg-red-400 scale-110" : enabled ? "bg-red-500" : "bg-gray-500"}

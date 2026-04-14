@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { apiClient } from "@/lib/api";
 
 interface User {
@@ -63,10 +63,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
+  const lastRefreshAtRef = useRef<number>(0);
+
   const refreshUser = async (silent: boolean = false) => {
     try {
       const profile = await apiClient.getProfile();
-      setUser(profile);
+      lastRefreshAtRef.current = Date.now();
+      // Preserve object reference if the payload is unchanged so downstream
+      // effects don't re-run on every tab focus (bugs 13, 14).
+      setUser((prev) => {
+        if (prev && JSON.stringify(prev) === JSON.stringify(profile)) {
+          return prev;
+        }
+        return profile;
+      });
     } catch (error) {
       // Only log errors if we're not in silent mode (i.e., user-initiated refresh)
       if (!silent) {
@@ -121,10 +131,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     const interval = setInterval(silentRefresh, REFRESH_INTERVAL);
 
+    const VISIBILITY_DEBOUNCE_MS = 5 * 60 * 1000; // 5 minutes
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        silentRefresh();
-      }
+      if (document.visibilityState !== 'visible') return;
+      // Skip refresh unless the last one was more than 5 minutes ago —
+      // prevents tab switches from remounting lesson players (bugs 13, 14).
+      if (Date.now() - lastRefreshAtRef.current < VISIBILITY_DEBOUNCE_MS) return;
+      silentRefresh();
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 

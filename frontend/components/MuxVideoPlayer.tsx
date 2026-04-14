@@ -58,6 +58,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
   ) {
     const muxPlayerRef = useRef<MuxPlayerElement>(null);
     const [captionText, setCaptionText] = useState<string>("");
+    const [nativeCaptionsActive, setNativeCaptionsActive] = useState<boolean>(false);
 
     // Get the underlying video element from Mux Player
     const getVideoElement = useCallback((): HTMLVideoElement | null => {
@@ -186,14 +187,54 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       };
     }, [containFit, getVideoElement, playbackId]);
 
-    // Hide native browser ::cue captions by injecting a <style> into the
-    // shadow root that contains the <video> element. This is the only
-    // reliable way to override native caption rendering inside Mux's
-    // nested shadow DOM (external CSS and CSS custom properties cannot
-    // reach it because the gerwig theme re-sets them internally).
+    // Hide native browser ::cue captions in normal mode (we render our own
+    // overlay DIV). In fullscreen or picture-in-picture, the overlay DIV is
+    // not promoted with the <video>, so we must let native ::cue captions
+    // render. This effect injects a style into the shadow root and toggles
+    // its content based on fullscreen/PiP state (bugs 01, 06).
     useEffect(() => {
       let injectedStyle: HTMLStyleElement | null = null;
       let shadowRoot: ShadowRoot | null = null;
+
+      const SUPPRESS_STYLE = `
+        video::cue {
+          color: transparent !important;
+          background: transparent !important;
+          text-shadow: none !important;
+          outline: none !important;
+          opacity: 0 !important;
+        }
+        video::-webkit-media-text-track-container {
+          visibility: hidden !important;
+        }
+        video::-webkit-media-text-track-display {
+          visibility: hidden !important;
+        }
+      `;
+
+      const NATIVE_STYLE = `
+        video::cue {
+          color: white !important;
+          background: rgba(0, 0, 0, 0.6) !important;
+          text-shadow: -1px -1px 0 rgba(0,0,0,0.95), 1px -1px 0 rgba(0,0,0,0.95), -1px 1px 0 rgba(0,0,0,0.95), 1px 1px 0 rgba(0,0,0,0.95) !important;
+          font-family: "Helvetica Neue", Helvetica, Arial, sans-serif !important;
+          font-weight: 500 !important;
+        }
+      `;
+
+      const isNativeNeeded = (): boolean => {
+        if (typeof document !== "undefined" && document.fullscreenElement) return true;
+        const video = getVideoElement();
+        if (video && (document as any).pictureInPictureElement === video) return true;
+        return false;
+      };
+
+      const apply = () => {
+        if (!injectedStyle) return;
+        const nativeOn = isNativeNeeded();
+        injectedStyle.textContent = nativeOn ? NATIVE_STYLE : SUPPRESS_STYLE;
+        setNativeCaptionsActive(nativeOn);
+      };
 
       const inject = (): boolean => {
         const video = getVideoElement();
@@ -202,32 +243,49 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
         if (!(root instanceof ShadowRoot)) return false;
         shadowRoot = root;
         injectedStyle = document.createElement("style");
-        injectedStyle.textContent = `
-          video::cue {
-            color: transparent !important;
-            background: transparent !important;
-            text-shadow: none !important;
-            outline: none !important;
-            opacity: 0 !important;
-          }
-          video::-webkit-media-text-track-container {
-            visibility: hidden !important;
-          }
-          video::-webkit-media-text-track-display {
-            visibility: hidden !important;
-          }
-        `;
+        injectedStyle.textContent = SUPPRESS_STYLE;
         shadowRoot.appendChild(injectedStyle);
         return true;
       };
 
+      const onFsChange = () => apply();
+      const onPipEnter = () => apply();
+      const onPipLeave = () => apply();
+
+      const attachListeners = () => {
+        document.addEventListener("fullscreenchange", onFsChange);
+        document.addEventListener("webkitfullscreenchange", onFsChange);
+        const video = getVideoElement();
+        if (video) {
+          video.addEventListener("enterpictureinpicture", onPipEnter);
+          video.addEventListener("leavepictureinpicture", onPipLeave);
+        }
+      };
+
+      let retryTimer: ReturnType<typeof setTimeout> | null = null;
       if (!inject()) {
-        // Retry — Mux player may not be ready yet
-        const t1 = setTimeout(() => { if (!inject()) setTimeout(inject, 1500); }, 500);
-        return () => clearTimeout(t1);
+        retryTimer = setTimeout(() => {
+          if (!inject()) {
+            retryTimer = setTimeout(() => {
+              if (inject()) attachListeners();
+            }, 1500);
+          } else {
+            attachListeners();
+          }
+        }, 500);
+      } else {
+        attachListeners();
       }
 
       return () => {
+        if (retryTimer) clearTimeout(retryTimer);
+        document.removeEventListener("fullscreenchange", onFsChange);
+        document.removeEventListener("webkitfullscreenchange", onFsChange);
+        const video = getVideoElement();
+        if (video) {
+          video.removeEventListener("enterpictureinpicture", onPipEnter);
+          video.removeEventListener("leavepictureinpicture", onPipLeave);
+        }
         if (injectedStyle && shadowRoot) {
           try { shadowRoot.removeChild(injectedStyle); } catch {}
         }
@@ -309,6 +367,8 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           autoPlay={autoPlay}
           poster={posterUrl}
           primaryColor="#3b82f6"
+          secondaryColor="#4b5563"
+          playbackRates={[] as any}
           metadata={{
             video_title: metadata?.video_title || undefined,
             video_id: metadata?.video_id || playbackId,
@@ -330,7 +390,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
 
         {/* Custom caption overlay — hidden on mobile when parent handles captions externally.
             On desktop, always show here above controls. */}
-        {captionText && (
+        {captionText && !nativeCaptionsActive && (
           <div
             className={`absolute inset-x-0 pointer-events-none flex justify-center bottom-[100px] lg:bottom-[48px] ${onCaptionChange ? 'hidden lg:flex' : ''}`}
             style={{ zIndex: 10, padding: "0 10%" }}

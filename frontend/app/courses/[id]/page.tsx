@@ -155,8 +155,8 @@ export default function CourseDetailPage() {
           </Link>
 
           {/* Course Progress Widget — compact inline */}
-          <div className="pointer-events-auto bg-black/70 backdrop-blur-md border border-yellow-900/20 rounded-xl p-2 sm:p-3 shadow-xl max-w-[55%] sm:max-w-52">
-            <h2 className="text-xs sm:text-sm font-serif font-bold text-white mb-1 truncate">{skillTree.title}</h2>
+          <div className="pointer-events-auto bg-black/70 backdrop-blur-md border border-yellow-900/20 rounded-xl p-2 sm:p-3 shadow-xl max-w-[55%] sm:max-w-64 xl:max-w-md 2xl:max-w-lg">
+            <h2 className="text-xs sm:text-sm font-serif font-bold text-white mb-1 break-words">{skillTree.title}</h2>
 
             <div className="flex items-center gap-2">
               <div className="flex-1 h-1.5 sm:h-2 bg-gray-900/50 rounded-full overflow-hidden border border-white/10">

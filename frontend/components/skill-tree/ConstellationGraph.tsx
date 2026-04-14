@@ -435,6 +435,19 @@ function ConstellationGraphInner({
 
   const handleInit = useCallback(() => setRfReady(true), []);
 
+  // Compute a translate extent that prevents infinite pan (bug 17) and
+  // picks a default zoom that adapts to the display size (bug 22).
+  const translateExtent = useMemo<[[number, number], [number, number]] | undefined>(() => {
+    if (flowNodes.length === 0) return undefined;
+    const xs = flowNodes.map((n) => n.position.x);
+    const ys = flowNodes.map((n) => n.position.y);
+    const pad = 800;
+    return [
+      [Math.min(...xs) - pad, Math.min(...ys) - pad],
+      [Math.max(...xs) + pad + 200, Math.max(...ys) + pad + 200],
+    ];
+  }, [flowNodes]);
+
   // Center on the frontier node once ReactFlow is actually ready
   useEffect(() => {
     if (rfReady && levels.length > 0 && flowNodes.length > 0 && !isPositioned) {
@@ -445,9 +458,13 @@ function ConstellationGraphInner({
           levels[0];
         const targetNode = flowNodes.find((n) => n.id === targetLevel?.id);
         if (targetNode) {
-          const isMobile = typeof window !== "undefined" && window.innerWidth < 768;
+          const vw = typeof window !== "undefined" ? window.innerWidth : 1280;
+          const isMobile = vw < 768;
+          // Scale default zoom up on high-res displays so nodes are
+          // readable on 2K/4K monitors (bug 22).
+          const zoom = isMobile ? 0.6 : vw >= 2400 ? 1.4 : vw >= 1800 ? 1.1 : 0.85;
           setCenter(targetNode.position.x + 45, targetNode.position.y + 50, {
-            zoom: isMobile ? 0.6 : 0.85,
+            zoom,
             duration: 800,
           });
         }
@@ -619,7 +636,8 @@ function ConstellationGraphInner({
           onInit={handleInit}
           defaultViewport={{ x: 0, y: 0, zoom: 0.85 }}
           minZoom={0.2}
-          maxZoom={1.5}
+          maxZoom={2.0}
+          translateExtent={translateExtent}
           defaultEdgeOptions={{
             type: "gold",
           }}

@@ -120,7 +120,10 @@ export default function LessonPage() {
 
     // User exists, load the lesson
     loadLesson();
-  }, [lessonId, user, authLoading, router]);
+    // Narrow deps to primitives so setUser reference churn from silent
+    // refresh on tab focus doesn't re-trigger loadLesson (bugs 13, 14).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lessonId, user?.id, authLoading]);
 
   const loadLesson = async () => {
     try {
@@ -217,9 +220,30 @@ export default function LessonPage() {
         }
       }
     } catch (err: any) {
+      const msg: string = err?.message || "";
+      const lowered = msg.toLowerCase();
+      // Prerequisite-locked lesson → bounce back to the course skill tree
+      if (lowered.includes("prerequisite")) {
+        try {
+          const worldsData = await apiClient.getWorlds();
+          for (const w of worldsData) {
+            const wl = await apiClient.getWorldLessons(w.id);
+            if (wl.find((l) => l.id === lessonId)) {
+              router.push(`/courses/${w.id}`);
+              return;
+            }
+          }
+        } catch {}
+        router.push("/courses");
+        return;
+      }
+      if (lowered.includes("subscription required")) {
+        setShowSubscribeModal(true);
+        return;
+      }
       // Don't set error if it's about lesson already completed - allow viewing completed lessons
-      if (!err.message || !err.message.includes("already completed")) {
-        setError(err.message || "Failed to load lesson");
+      if (!msg || !msg.includes("already completed")) {
+        setError(msg || "Failed to load lesson");
       }
     } finally {
       setLoading(false);
@@ -986,8 +1010,10 @@ export default function LessonPage() {
             )}
           </main>
 
-          {/* RIGHT SIDEBAR: Mark Complete + Video Controls (Desktop only) */}
-          <aside className="hidden lg:flex flex-col h-full w-[280px] bg-black border-l border-white/10 z-30 flex-shrink-0 lesson-sidebar lesson-sidebar-right">
+          {/* RIGHT SIDEBAR: Mark Complete + Video Controls (Desktop only).
+              Only rendered for video lessons — for non-video lessons the
+              sidebar contained only a redundant Mark Complete button (bug 07). */}
+          <aside className={`${isVideoLesson ? 'hidden lg:flex' : 'hidden'} flex-col h-full w-[280px] bg-black border-l border-white/10 z-30 flex-shrink-0 lesson-sidebar lesson-sidebar-right`}>
             {/* Mark Complete button */}
             <div className="flex-shrink-0 p-3 flex justify-center">
               {user && !isCompleted && !(isQuizLesson && !quizPassed) && !(isVideoLesson && hasQuiz && !quizPassed) && (

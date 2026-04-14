@@ -78,6 +78,15 @@ export function LocaleProvider({
         'SameSite=Lax',
       ].join('; ');
 
+      // Also persist in localStorage as a fallback for Safari private mode
+      // and other environments where cookies can be purged aggressively
+      // (bug 18 — Spanish stuck on iOS Safari).
+      try {
+        window.localStorage.setItem(LOCALE_COOKIE, next);
+      } catch {
+        // Private mode throws on setItem; cookie alone is the fallback.
+      }
+
       // Set <html lang> and dir immediately for instant visual feedback
       // (server will confirm on next request)
       document.documentElement.lang = next;
