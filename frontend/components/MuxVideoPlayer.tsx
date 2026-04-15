@@ -141,53 +141,85 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       }
     }, [onLoadedMetadata, getVideoElement]);
 
-// Inject player color override into shadow DOM — CSS vars on <mux-player>
-    // don't cascade through media-chrome's internals, so we target the shadow
-    // root directly with !important to turn the dark-red buffered/loading bar
-    // grey. Also re-asserts the played/rail colors for safety.
+// Force the dark-red buffered segment of the Mux/media-chrome time range
+    // to grey. media-chrome's time-range lives in a *nested* shadow root, so
+    // a single injection into mux-player's top shadow root isn't enough — we
+    // recursively walk every shadow root inside the player and append the
+    // override into each one. Re-runs on a MutationObserver so it sticks
+    // when media-chrome re-renders its internals.
     useEffect(() => {
-      let injectedStyle: HTMLStyleElement | null = null;
-      let shadowRoot: ShadowRoot | null = null;
-
       const COLOR_STYLE = `
-        :host, * {
+        :host, :root, * {
           --media-range-buffered-color: #6b7280 !important;
           --media-time-range-buffered-color: #6b7280 !important;
           --media-range-track-buffered-color: #6b7280 !important;
+          --media-range-bar-color: #ff0000 !important;
           --media-primary-color: #ff0000 !important;
           --media-secondary-color: #6b7280 !important;
-        }
-        media-time-range, mxp-time-range, [part~="time-range"] {
-          --media-range-buffered-color: #6b7280 !important;
-          --media-time-range-buffered-color: #6b7280 !important;
-          --media-range-track-buffered-color: #6b7280 !important;
+          --media-range-track-background: #8c8c8c !important;
         }
       `;
+      const STYLE_MARKER = "data-mux-color-fix";
 
-      const inject = (): boolean => {
+      const injected = new WeakSet<ShadowRoot>();
+      const injectInto = (root: ShadowRoot) => {
+        if (injected.has(root)) return;
+        const el = document.createElement("style");
+        el.setAttribute(STYLE_MARKER, "1");
+        el.textContent = COLOR_STYLE;
+        root.appendChild(el);
+        injected.add(root);
+      };
+
+      const walkShadows = (node: Node) => {
+        if (node instanceof Element && (node as HTMLElement).shadowRoot) {
+          const sr = (node as HTMLElement).shadowRoot!;
+          injectInto(sr);
+          sr.querySelectorAll("*").forEach(walkShadows);
+        }
+        if (node instanceof Element) {
+          node.querySelectorAll("*").forEach((child) => {
+            const cr = (child as HTMLElement).shadowRoot;
+            if (cr) {
+              injectInto(cr);
+              cr.querySelectorAll("*").forEach(walkShadows);
+            }
+          });
+        }
+      };
+
+      let pollTimer: ReturnType<typeof setInterval> | null = null;
+
+      const run = () => {
         const video = getVideoElement();
         if (!video) return false;
-        const root = video.getRootNode();
-        if (!(root instanceof ShadowRoot)) return false;
-        shadowRoot = root;
-        injectedStyle = document.createElement("style");
-        injectedStyle.textContent = COLOR_STYLE;
-        shadowRoot.appendChild(injectedStyle);
+        // Start from mux-player element (two levels up from video)
+        let top: Node = video;
+        while (top.parentNode) top = top.parentNode;
+        // top is now document or a ShadowRoot; walk back down from mux-player
+        const muxPlayer = document.querySelector("mux-player");
+        if (!muxPlayer) return false;
+        walkShadows(muxPlayer);
         return true;
       };
 
-      let retryTimer: ReturnType<typeof setTimeout> | null = null;
-      if (!inject()) {
-        retryTimer = setTimeout(() => {
-          if (!inject()) retryTimer = setTimeout(inject, 1500);
-        }, 500);
+      // Initial + retries
+      if (!run()) {
+        pollTimer = setInterval(() => {
+          if (run()) {
+            if (pollTimer) clearInterval(pollTimer);
+            pollTimer = null;
+          }
+        }, 400);
       }
 
+      // Re-apply periodically for 5s in case media-chrome hot-swaps nodes
+      const reapplyTimer = setInterval(run, 1000);
+      setTimeout(() => clearInterval(reapplyTimer), 10000);
+
       return () => {
-        if (retryTimer) clearTimeout(retryTimer);
-        if (injectedStyle && shadowRoot) {
-          try { shadowRoot.removeChild(injectedStyle); } catch {}
-        }
+        if (pollTimer) clearInterval(pollTimer);
+        clearInterval(reapplyTimer);
       };
     }, [getVideoElement, playbackId]);
 
