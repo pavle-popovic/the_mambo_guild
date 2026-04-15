@@ -5,12 +5,15 @@ import type { MuxVideoPlayerHandle } from "./MuxVideoPlayer";
 import SpeedControl from "./pro-controls/SpeedControl";
 import FrameByFrame from "./pro-controls/FrameByFrame";
 import { SlidersHorizontal } from "lucide-react";
+import { FaRedo } from "react-icons/fa";
 
 interface VideoControlsProps {
   playerRef: React.RefObject<MuxVideoPlayerHandle | null>;
   duration: number;
   onCollapse?: () => void;
   variant?: "sidebar" | "mobile";
+  abEnabled?: boolean;
+  onToggleAB?: () => void;
 }
 
 // 1 frame at approximately 25fps
@@ -20,6 +23,8 @@ export default function VideoControls({
   playerRef,
   variant = "sidebar",
   onCollapse,
+  abEnabled = false,
+  onToggleAB,
 }: VideoControlsProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<"speed" | "frames" | null>(null);
 
@@ -70,6 +75,17 @@ export default function VideoControls({
             <span className="text-xl">⏯</span>
             <span className="text-[10px] uppercase font-bold tracking-wider">Frames</span>
           </button>
+
+          {/* A/B Loop toggle */}
+          {onToggleAB && (
+            <button
+              onClick={onToggleAB}
+              className={`flex flex-col items-center gap-1 ${abEnabled ? "text-mambo-gold" : "text-gray-300"}`}
+            >
+              <FaRedo className={`text-xl ${abEnabled ? "animate-spin" : ""}`} style={{ animationDuration: "2s" }} />
+              <span className="text-[10px] uppercase font-bold tracking-wider">A/B Loop</span>
+            </button>
+          )}
         </div>
 
         {/* Mobile Expanded Menus */}
@@ -123,6 +139,28 @@ export default function VideoControls({
         <div>
           <FrameByFrame playerRef={playerRef} />
         </div>
+
+        {/* A/B Loop toggle — big, obvious, shows overlay on video when enabled */}
+        {onToggleAB && (
+          <div className="pt-3 border-t border-white/5">
+            <button
+              onClick={onToggleAB}
+              className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg font-bold text-sm transition-all ${
+                abEnabled
+                  ? "bg-mambo-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.4)] hover:brightness-110"
+                  : "bg-white/10 text-white hover:bg-white/15 border border-white/20"
+              }`}
+            >
+              <FaRedo className={abEnabled ? "animate-spin" : ""} style={{ animationDuration: "2s" }} />
+              <span>{abEnabled ? "A/B Loop ON" : "Enable A/B Loop"}</span>
+            </button>
+            {abEnabled && (
+              <p className="text-[10px] text-gray-400 text-center mt-1.5">
+                Drag the A and B markers on the video to set the loop.
+              </p>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

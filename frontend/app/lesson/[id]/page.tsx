@@ -9,6 +9,8 @@ import { apiClient } from "@/lib/api";
 import QuestLogSidebar from "@/components/QuestLogSidebar";
 import MuxVideoPlayer, { type MuxVideoPlayerHandle } from "@/components/MuxVideoPlayer";
 import VideoControls from "@/components/ProVideoControls";
+import ABLoopBar from "@/components/ABLoopBar";
+import { useABLoop } from "@/hooks/useABLoop";
 import DownloadButton from "@/components/DownloadButton";
 import SuccessNotification from "@/components/SuccessNotification";
 import AuthPromptModal from "@/components/AuthPromptModal";
@@ -105,6 +107,7 @@ export default function LessonPage() {
   const [videoDuration, setVideoDuration] = useState(0);
   const [captionText, setCaptionText] = useState("");
   const [videoEnded, setVideoEnded] = useState(false);
+  const abLoop = useABLoop(videoPlayerRef, videoDuration);
 
   useEffect(() => {
     // Wait for auth to finish loading before making any decisions
@@ -857,67 +860,84 @@ export default function LessonPage() {
                           video_title: lesson.title,
                           video_id: lesson.id,
                         }}
+                        overlay={(() => {
+                          const sorted = [...levelLessons].sort((a, b) => a.order_index - b.order_index);
+                          const idx = sorted.findIndex((l) => l.id === lessonId);
+                          const prevL = idx > 0 ? sorted[idx - 1] : null;
+                          const nextL = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null;
+                          return (
+                            <>
+                              {/* Prev/Next lesson side buttons — always visible, more prominent */}
+                              {prevL && (
+                                <button
+                                  onClick={() => router.push(`/lesson/${prevL.id}`)}
+                                  title={`${tLesson('previousLesson') || 'Previous'}: ${prevL.title}`}
+                                  className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/40 hover:border-white backdrop-blur-sm transition-all hover:scale-110 shadow-lg"
+                                  aria-label="Previous lesson"
+                                >
+                                  <FaChevronLeft className="text-xl md:text-2xl" />
+                                </button>
+                              )}
+                              {nextL && (
+                                <button
+                                  onClick={() => router.push(`/lesson/${nextL.id}`)}
+                                  title={`${tLesson('nextLesson') || 'Next'}: ${nextL.title}`}
+                                  className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/40 hover:border-white backdrop-blur-sm transition-all hover:scale-110 shadow-lg"
+                                  aria-label="Next lesson"
+                                >
+                                  <FaArrowRight className="text-xl md:text-2xl" />
+                                </button>
+                              )}
+
+                              {/* A/B loop overlay — only on desktop/landscape; mobile portrait shows it below */}
+                              {abLoop.enabled && (
+                                <div
+                                  className="hidden md:block absolute inset-x-0 px-20 pointer-events-none"
+                                  style={{ bottom: 44, zIndex: 15 }}
+                                >
+                                  <div className="pointer-events-auto">
+                                    <ABLoopBar state={abLoop} duration={videoDuration} />
+                                  </div>
+                                </div>
+                              )}
+
+                              {/* End-of-video "Mark complete & next" overlay */}
+                              {videoEnded && (
+                                <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+                                  <div className="flex flex-col items-center gap-4 px-6">
+                                    <button
+                                      onClick={handleComplete}
+                                      disabled={completing}
+                                      className="px-8 py-4 bg-green-500 hover:bg-green-400 disabled:opacity-60 text-black text-lg font-bold rounded-xl shadow-[0_0_30px_rgba(34,197,94,0.6)] hover:shadow-[0_0_40px_rgba(34,197,94,0.8)] transition-all hover:scale-105 flex items-center gap-3"
+                                    >
+                                      <FaCheck />
+                                      <span>{tLesson('markCompleteAndNext') || 'Mark complete & next lesson'}</span>
+                                      <FaArrowRight />
+                                    </button>
+                                    <button
+                                      onClick={() => {
+                                        setVideoEnded(false);
+                                        videoPlayerRef.current?.setCurrentTime(0);
+                                        videoPlayerRef.current?.play();
+                                      }}
+                                      className="text-white/80 hover:text-white text-sm underline underline-offset-2"
+                                    >
+                                      {tLesson('replay') || 'Replay'}
+                                    </button>
+                                  </div>
+                                </div>
+                              )}
+                            </>
+                          );
+                        })()}
                       />
-
-                      {/* Prev/Next lesson side buttons — pinned to letterbox negative space */}
-                      {(() => {
-                        const sorted = [...levelLessons].sort((a, b) => a.order_index - b.order_index);
-                        const idx = sorted.findIndex((l) => l.id === lessonId);
-                        const prevL = idx > 0 ? sorted[idx - 1] : null;
-                        const nextL = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null;
-                        return (
-                          <>
-                            {prevL && (
-                              <button
-                                onClick={() => router.push(`/lesson/${prevL.id}`)}
-                                title={`${tLesson('previousLesson') || 'Previous'}: ${prevL.title}`}
-                                className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 w-11 h-11 items-center justify-center rounded-full bg-black/50 hover:bg-black/80 text-white/80 hover:text-white border border-white/20 hover:border-white/40 backdrop-blur-sm transition-all hover:scale-110"
-                                aria-label="Previous lesson"
-                              >
-                                <FaChevronLeft className="text-lg" />
-                              </button>
-                            )}
-                            {nextL && (
-                              <button
-                                onClick={() => router.push(`/lesson/${nextL.id}`)}
-                                title={`${tLesson('nextLesson') || 'Next'}: ${nextL.title}`}
-                                className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 w-11 h-11 items-center justify-center rounded-full bg-black/50 hover:bg-black/80 text-white/80 hover:text-white border border-white/20 hover:border-white/40 backdrop-blur-sm transition-all hover:scale-110"
-                                aria-label="Next lesson"
-                              >
-                                <FaArrowRight className="text-lg" />
-                              </button>
-                            )}
-                          </>
-                        );
-                      })()}
-
-                      {/* End-of-video "Mark complete & next" overlay */}
-                      {videoEnded && (
-                        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-                          <div className="flex flex-col items-center gap-4 px-6">
-                            <button
-                              onClick={handleComplete}
-                              disabled={completing}
-                              className="px-8 py-4 bg-green-500 hover:bg-green-400 disabled:opacity-60 text-black text-lg font-bold rounded-xl shadow-[0_0_30px_rgba(34,197,94,0.6)] hover:shadow-[0_0_40px_rgba(34,197,94,0.8)] transition-all hover:scale-105 flex items-center gap-3"
-                            >
-                              <FaCheck />
-                              <span>{tLesson('markCompleteAndNext') || 'Mark complete & next lesson'}</span>
-                              <FaArrowRight />
-                            </button>
-                            <button
-                              onClick={() => {
-                                setVideoEnded(false);
-                                videoPlayerRef.current?.setCurrentTime(0);
-                                videoPlayerRef.current?.play();
-                              }}
-                              className="text-white/70 hover:text-white text-sm underline underline-offset-2"
-                            >
-                              {tLesson('replay') || 'Replay'}
-                            </button>
-                          </div>
-                        </div>
-                      )}
                     </div>
+                    {/* Mobile portrait: AB loop bar above captions, below video */}
+                    {abLoop.enabled && (
+                      <div className="md:hidden flex-shrink-0 bg-black px-4 py-2 border-t border-white/5">
+                        <ABLoopBar state={abLoop} duration={videoDuration} />
+                      </div>
+                    )}
                     {/* External caption display — below video on mobile, hidden on desktop (internal overlay used) */}
                     {captionText && (
                       <div className="lg:hidden flex-shrink-0 bg-black px-4 py-2 flex justify-center lesson-mobile-captions">
@@ -1100,6 +1120,8 @@ export default function LessonPage() {
                   playerRef={videoPlayerRef}
                   duration={videoDuration}
                   variant="sidebar"
+                  abEnabled={abLoop.enabled}
+                  onToggleAB={abLoop.toggle}
                 />
               </div>
             )}
@@ -1118,6 +1140,8 @@ export default function LessonPage() {
               playerRef={videoPlayerRef}
               duration={videoDuration}
               variant="mobile"
+              abEnabled={abLoop.enabled}
+              onToggleAB={abLoop.toggle}
             />
           </div>
         )}
