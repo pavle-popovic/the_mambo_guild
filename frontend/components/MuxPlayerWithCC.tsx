@@ -284,6 +284,8 @@ const MuxPlayerWithCC = forwardRef<MuxPlayerWithCCHandle, MuxPlayerWithCCProps>(
           onLoadedMetadata={handleLoadedMetadata}
           style={{
             "--controls-background-color": "rgba(0,0,0,0.8)",
+            "--media-range-buffered-color": "#6b7280",
+            "--media-range-track-buffered-color": "#6b7280",
             "--media-cue-background-color": "transparent",
             "--media-captions-background-color": "transparent",
             "--media-text-display-background-color": "transparent",

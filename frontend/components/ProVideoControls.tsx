@@ -152,7 +152,7 @@ export default function VideoControls({
               }`}
             >
               <FaRedo className={abEnabled ? "animate-spin" : ""} style={{ animationDuration: "2s" }} />
-              <span>{abEnabled ? "A/B Loop ON" : "Enable A/B Loop"}</span>
+              <span>{abEnabled ? "Turn OFF A/B Loop" : "Enable A/B Loop"}</span>
             </button>
             {abEnabled && (
               <p className="text-[10px] text-gray-400 text-center mt-1.5">

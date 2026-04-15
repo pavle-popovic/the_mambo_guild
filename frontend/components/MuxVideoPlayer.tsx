@@ -386,6 +386,8 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           onLoadedMetadata={handleLoadedMetadata}
           style={{
             "--controls-background-color": "rgba(0, 0, 0, 0.8)",
+            "--media-range-buffered-color": "#6b7280",
+            "--media-range-track-buffered-color": "#6b7280",
             display: "block",
             height: "100%",
             width: "100%",
