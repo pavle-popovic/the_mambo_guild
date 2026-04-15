@@ -145,13 +145,13 @@ export default function VideoControls({
           <div className="pt-3 border-t border-white/5">
             <button
               onClick={onToggleAB}
-              className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg font-extrabold text-sm uppercase tracking-wide transition-all ${
+              className={`w-full flex items-center justify-center gap-2 px-3 py-3 rounded-lg font-extrabold text-[11px] uppercase tracking-wide whitespace-nowrap transition-all ${
                 abEnabled
                   ? "bg-mambo-gold text-black border-2 border-yellow-200 shadow-[0_0_25px_rgba(212,175,55,1)] hover:brightness-110 animate-pulse-glow-gold"
                   : "bg-white/10 text-white hover:bg-white/15 border border-white/20"
               }`}
             >
-              <FaRedo className={abEnabled ? "animate-spin" : ""} style={{ animationDuration: "2s" }} />
+              <FaRedo className={`shrink-0 ${abEnabled ? "animate-spin" : ""}`} style={{ animationDuration: "2s" }} />
               <span>{abEnabled ? "Turn OFF A/B Loop" : "Enable A/B Loop"}</span>
             </button>
             {abEnabled && (

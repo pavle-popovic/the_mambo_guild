@@ -141,7 +141,57 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       }
     }, [onLoadedMetadata, getVideoElement]);
 
-// Force object-fit: contain on the video element inside Shadow DOM
+// Inject player color override into shadow DOM — CSS vars on <mux-player>
+    // don't cascade through media-chrome's internals, so we target the shadow
+    // root directly with !important to turn the dark-red buffered/loading bar
+    // grey. Also re-asserts the played/rail colors for safety.
+    useEffect(() => {
+      let injectedStyle: HTMLStyleElement | null = null;
+      let shadowRoot: ShadowRoot | null = null;
+
+      const COLOR_STYLE = `
+        :host, * {
+          --media-range-buffered-color: #6b7280 !important;
+          --media-time-range-buffered-color: #6b7280 !important;
+          --media-range-track-buffered-color: #6b7280 !important;
+          --media-primary-color: #ff0000 !important;
+          --media-secondary-color: #6b7280 !important;
+        }
+        media-time-range, mxp-time-range, [part~="time-range"] {
+          --media-range-buffered-color: #6b7280 !important;
+          --media-time-range-buffered-color: #6b7280 !important;
+          --media-range-track-buffered-color: #6b7280 !important;
+        }
+      `;
+
+      const inject = (): boolean => {
+        const video = getVideoElement();
+        if (!video) return false;
+        const root = video.getRootNode();
+        if (!(root instanceof ShadowRoot)) return false;
+        shadowRoot = root;
+        injectedStyle = document.createElement("style");
+        injectedStyle.textContent = COLOR_STYLE;
+        shadowRoot.appendChild(injectedStyle);
+        return true;
+      };
+
+      let retryTimer: ReturnType<typeof setTimeout> | null = null;
+      if (!inject()) {
+        retryTimer = setTimeout(() => {
+          if (!inject()) retryTimer = setTimeout(inject, 1500);
+        }, 500);
+      }
+
+      return () => {
+        if (retryTimer) clearTimeout(retryTimer);
+        if (injectedStyle && shadowRoot) {
+          try { shadowRoot.removeChild(injectedStyle); } catch {}
+        }
+      };
+    }, [getVideoElement, playbackId]);
+
+    // Force object-fit: contain on the video element inside Shadow DOM
     // when containFit is enabled (for community post modals with mixed aspect ratios).
     // Uses the same proven shadow DOM style injection as the caption hiding below.
     useEffect(() => {
