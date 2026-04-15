@@ -141,27 +141,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       }
     }, [onLoadedMetadata, getVideoElement]);
 
-    // Fullscreen swap — desktop: if Mux fullscreens the <video>, swap to
-    // fullscreening the wrapper div so React overlays (captions, AB loop)
-    // remain visible. iOS Safari cannot fullscreen non-video elements so this
-    // is a no-op there.
-    useEffect(() => {
-      const onFsChange = () => {
-        const fsEl = document.fullscreenElement;
-        if (!fsEl || !wrapperRef.current) return;
-        if (fsEl === wrapperRef.current) return;
-        if (wrapperRef.current.contains(fsEl as Node)) {
-          document
-            .exitFullscreen()
-            .then(() => wrapperRef.current?.requestFullscreen())
-            .catch(() => {});
-        }
-      };
-      document.addEventListener("fullscreenchange", onFsChange);
-      return () => document.removeEventListener("fullscreenchange", onFsChange);
-    }, []);
-
-    // Force object-fit: contain on the video element inside Shadow DOM
+// Force object-fit: contain on the video element inside Shadow DOM
     // when containFit is enabled (for community post modals with mixed aspect ratios).
     // Uses the same proven shadow DOM style injection as the caption hiding below.
     useEffect(() => {

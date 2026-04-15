@@ -872,7 +872,7 @@ export default function LessonPage() {
                                 <button
                                   onClick={() => router.push(`/lesson/${prevL.id}`)}
                                   title={`${tLesson('previousLesson') || 'Previous'}: ${prevL.title}`}
-                                  className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/40 hover:border-white backdrop-blur-sm transition-all hover:scale-110 shadow-lg"
+                                  className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
                                   aria-label="Previous lesson"
                                 >
                                   <FaChevronLeft className="text-xl md:text-2xl" />
@@ -882,7 +882,7 @@ export default function LessonPage() {
                                 <button
                                   onClick={() => router.push(`/lesson/${nextL.id}`)}
                                   title={`${tLesson('nextLesson') || 'Next'}: ${nextL.title}`}
-                                  className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/70 hover:bg-black/90 text-white border border-white/40 hover:border-white backdrop-blur-sm transition-all hover:scale-110 shadow-lg"
+                                  className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
                                   aria-label="Next lesson"
                                 >
                                   <FaArrowRight className="text-xl md:text-2xl" />
@@ -1101,7 +1101,7 @@ export default function LessonPage() {
                 <button
                   onClick={handleComplete}
                   disabled={completing}
-                  className="flex w-full px-4 py-2.5 bg-green-600 hover:bg-green-500 text-white text-sm font-bold rounded-lg shadow-[0_0_15px_rgba(22,163,74,0.4)] items-center justify-center gap-2 transition active:scale-95 border border-green-400/30 disabled:opacity-50 whitespace-nowrap"
+                  className="flex w-full px-4 py-3 bg-green-500 hover:bg-green-400 text-white text-sm font-extrabold uppercase tracking-wide rounded-lg shadow-[0_0_25px_rgba(34,197,94,0.9)] hover:shadow-[0_0_35px_rgba(34,197,94,1)] items-center justify-center gap-2 transition-all active:scale-95 border-2 border-green-300 disabled:opacity-50 whitespace-nowrap animate-pulse-glow-green"
                 >
                   <span>{tLesson('markComplete')}</span>
                   <FaArrowRight />

@@ -145,9 +145,9 @@ export default function VideoControls({
           <div className="pt-3 border-t border-white/5">
             <button
               onClick={onToggleAB}
-              className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg font-bold text-sm transition-all ${
+              className={`w-full flex items-center justify-center gap-3 px-4 py-3 rounded-lg font-extrabold text-sm uppercase tracking-wide transition-all ${
                 abEnabled
-                  ? "bg-mambo-gold text-black shadow-[0_0_15px_rgba(212,175,55,0.4)] hover:brightness-110"
+                  ? "bg-mambo-gold text-black border-2 border-yellow-200 shadow-[0_0_25px_rgba(212,175,55,1)] hover:brightness-110 animate-pulse-glow-gold"
                   : "bg-white/10 text-white hover:bg-white/15 border border-white/20"
               }`}
             >
