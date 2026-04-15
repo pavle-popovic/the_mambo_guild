@@ -104,6 +104,7 @@ export default function LessonPage() {
   const videoPlayerRef = useRef<MuxVideoPlayerHandle>(null);
   const [videoDuration, setVideoDuration] = useState(0);
   const [captionText, setCaptionText] = useState("");
+  const [videoEnded, setVideoEnded] = useState(false);
 
   useEffect(() => {
     // Wait for auth to finish loading before making any decisions
@@ -842,11 +843,12 @@ export default function LessonPage() {
 
                 {lesson.mux_playback_id ? (
                   <>
-                    <div className="w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0">
+                    <div className="relative w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0">
                       <MuxVideoPlayer
                         ref={videoPlayerRef}
                         playbackId={lesson.mux_playback_id}
-                        onEnded={() => setVideoPlaying(false)}
+                        onEnded={() => { setVideoPlaying(false); setVideoEnded(true); }}
+                        onPlay={() => setVideoEnded(false)}
                         onLoadedMetadata={(duration) => setVideoDuration(duration)}
                         onCaptionChange={setCaptionText}
                         autoPlay={videoPlaying}
@@ -856,6 +858,65 @@ export default function LessonPage() {
                           video_id: lesson.id,
                         }}
                       />
+
+                      {/* Prev/Next lesson side buttons — pinned to letterbox negative space */}
+                      {(() => {
+                        const sorted = [...levelLessons].sort((a, b) => a.order_index - b.order_index);
+                        const idx = sorted.findIndex((l) => l.id === lessonId);
+                        const prevL = idx > 0 ? sorted[idx - 1] : null;
+                        const nextL = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null;
+                        return (
+                          <>
+                            {prevL && (
+                              <button
+                                onClick={() => router.push(`/lesson/${prevL.id}`)}
+                                title={`${tLesson('previousLesson') || 'Previous'}: ${prevL.title}`}
+                                className="hidden md:flex absolute left-2 top-1/2 -translate-y-1/2 z-20 w-11 h-11 items-center justify-center rounded-full bg-black/50 hover:bg-black/80 text-white/80 hover:text-white border border-white/20 hover:border-white/40 backdrop-blur-sm transition-all hover:scale-110"
+                                aria-label="Previous lesson"
+                              >
+                                <FaChevronLeft className="text-lg" />
+                              </button>
+                            )}
+                            {nextL && (
+                              <button
+                                onClick={() => router.push(`/lesson/${nextL.id}`)}
+                                title={`${tLesson('nextLesson') || 'Next'}: ${nextL.title}`}
+                                className="hidden md:flex absolute right-2 top-1/2 -translate-y-1/2 z-20 w-11 h-11 items-center justify-center rounded-full bg-black/50 hover:bg-black/80 text-white/80 hover:text-white border border-white/20 hover:border-white/40 backdrop-blur-sm transition-all hover:scale-110"
+                                aria-label="Next lesson"
+                              >
+                                <FaArrowRight className="text-lg" />
+                              </button>
+                            )}
+                          </>
+                        );
+                      })()}
+
+                      {/* End-of-video "Mark complete & next" overlay */}
+                      {videoEnded && (
+                        <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+                          <div className="flex flex-col items-center gap-4 px-6">
+                            <button
+                              onClick={handleComplete}
+                              disabled={completing}
+                              className="px-8 py-4 bg-green-500 hover:bg-green-400 disabled:opacity-60 text-black text-lg font-bold rounded-xl shadow-[0_0_30px_rgba(34,197,94,0.6)] hover:shadow-[0_0_40px_rgba(34,197,94,0.8)] transition-all hover:scale-105 flex items-center gap-3"
+                            >
+                              <FaCheck />
+                              <span>{tLesson('markCompleteAndNext') || 'Mark complete & next lesson'}</span>
+                              <FaArrowRight />
+                            </button>
+                            <button
+                              onClick={() => {
+                                setVideoEnded(false);
+                                videoPlayerRef.current?.setCurrentTime(0);
+                                videoPlayerRef.current?.play();
+                              }}
+                              className="text-white/70 hover:text-white text-sm underline underline-offset-2"
+                            >
+                              {tLesson('replay') || 'Replay'}
+                            </button>
+                          </div>
+                        </div>
+                      )}
                     </div>
                     {/* External caption display — below video on mobile, hidden on desktop (internal overlay used) */}
                     {captionText && (

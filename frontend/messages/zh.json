@@ -130,6 +130,8 @@
     "nextLesson": "下一课",
     "previousLesson": "上一课",
     "markComplete": "标记为完成",
+    "markCompleteAndNext": "完成并进入下一课",
+    "replay": "重新播放",
     "completed": "已完成",
     "bossBattle": "首领挑战",
     "submitHomework": "提交作业",

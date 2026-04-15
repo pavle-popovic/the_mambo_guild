@@ -130,6 +130,8 @@
     "nextLesson": "次のレッスン",
     "previousLesson": "前へ",
     "markComplete": "完了としてマーク",
+    "markCompleteAndNext": "完了して次のレッスンへ",
+    "replay": "もう一度再生",
     "completed": "完了",
     "bossBattle": "ボスバトル",
     "submitHomework": "宿題を提出",

@@ -130,6 +130,8 @@
     "nextLesson": "다음 레슨",
     "previousLesson": "이전",
     "markComplete": "완료로 표시",
+    "markCompleteAndNext": "완료하고 다음 레슨으로",
+    "replay": "다시 재생",
     "completed": "완료",
     "bossBattle": "보스 배틀",
     "submitHomework": "과제 제출",

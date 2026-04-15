@@ -130,6 +130,8 @@
     "nextLesson": "Next Lesson",
     "previousLesson": "Previous",
     "markComplete": "Mark Complete",
+    "markCompleteAndNext": "Mark complete & next lesson",
+    "replay": "Replay",
     "completed": "Completed",
     "bossBattle": "Boss Battle",
     "submitHomework": "Submit Homework",

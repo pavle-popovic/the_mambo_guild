@@ -130,6 +130,8 @@
     "nextLesson": "Следующий урок",
     "previousLesson": "Предыдущий",
     "markComplete": "Отметить как пройденный",
+    "markCompleteAndNext": "Завершить и следующий урок",
+    "replay": "Повторить",
     "completed": "Пройден",
     "bossBattle": "Битва с боссом",
     "submitHomework": "Сдать задание",

@@ -1,11 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useCallback, useState } from "react";
+import { useEffect, useCallback, useState } from "react";
 import type { MuxVideoPlayerHandle } from "./MuxVideoPlayer";
 import SpeedControl from "./pro-controls/SpeedControl";
 import FrameByFrame from "./pro-controls/FrameByFrame";
-import ABLooper from "./pro-controls/ABLooper";
-import { FaSlidersH, FaRedo } from "react-icons/fa";
 import { SlidersHorizontal } from "lucide-react";
 
 interface VideoControlsProps {
@@ -18,19 +16,12 @@ interface VideoControlsProps {
 // 1 frame at approximately 25fps
 const FRAME_DURATION = 0.04;
 
-/**
- * Video Controls - Available to ALL users
- * Includes: Speed Control, Frame-by-Frame, A-B Looper
- */
 export default function VideoControls({
   playerRef,
-  duration,
   variant = "sidebar",
   onCollapse,
 }: VideoControlsProps) {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState<"speed" | "loop" | "frames" | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState<"speed" | "frames" | null>(null);
 
   // Keyboard shortcuts for frame stepping (available to all users now)
   const handleKeyDown = useCallback(
@@ -79,15 +70,6 @@ export default function VideoControls({
             <span className="text-xl">⏯</span>
             <span className="text-[10px] uppercase font-bold tracking-wider">Frames</span>
           </button>
-
-          {/* Loop Toggle */}
-          <button
-            onClick={() => setMobileMenuOpen(mobileMenuOpen === "loop" ? null : "loop")}
-            className={`flex flex-col items-center gap-1 ${mobileMenuOpen === "loop" ? "text-mambo-gold" : "text-gray-300"}`}
-          >
-            <FaRedo className="text-xl" />
-            <span className="text-[10px] uppercase font-bold tracking-wider">Loop</span>
-          </button>
         </div>
 
         {/* Mobile Expanded Menus */}
@@ -97,14 +79,12 @@ export default function VideoControls({
               <span className="text-sm font-bold text-white uppercase tracking-wider">
                 {mobileMenuOpen === "speed" && "Playback Speed"}
                 {mobileMenuOpen === "frames" && "Frame Precision"}
-                {mobileMenuOpen === "loop" && "A-B Repeat"}
               </span>
               <button onClick={() => setMobileMenuOpen(null)} className="text-xs text-gray-400 p-2">Close</button>
             </div>
 
             {mobileMenuOpen === "speed" && <SpeedControl playerRef={playerRef} />}
             {mobileMenuOpen === "frames" && <FrameByFrame playerRef={playerRef} />}
-            {mobileMenuOpen === "loop" && <ABLooper playerRef={playerRef} duration={duration} />}
           </div>
         )}
       </div>
@@ -142,11 +122,6 @@ export default function VideoControls({
         {/* Frames */}
         <div>
           <FrameByFrame playerRef={playerRef} />
-        </div>
-
-        {/* Loop */}
-        <div className="pt-2 border-t border-white/5">
-          <ABLooper playerRef={playerRef} duration={duration} />
         </div>
       </div>
     </div>
