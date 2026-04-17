@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import {
     NewHero,
+    FounderAuthorityStrip,
     TrendingModulesSection,
     HowItWorksSection,
     SkillTreeTeaser,
@@ -37,6 +38,11 @@ export default function HomePage() {
                 {/* Hero Section - with chatbot included */}
                 <section className="relative min-h-screen z-10">
                     <NewHero />
+                </section>
+
+                {/* Founder Authority Strip — social proof / credibility */}
+                <section className="relative z-10">
+                    <FounderAuthorityStrip />
                 </section>
 
                 {/* Trending Modules Carousel */}
