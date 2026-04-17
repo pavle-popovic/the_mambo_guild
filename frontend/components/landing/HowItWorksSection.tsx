@@ -29,17 +29,17 @@ const pillars: Pillar[] = [
     eyebrow: "COURSES & CONTENT",
     title: (
       <>
-        A full <span className={gold}>dance school</span>, unlocked on day one
+        A full <span className={gold}>dance school</span>. Day one.
       </>
     ),
     body:
-      "Courses, choreographies, the complete history of salsa, the science of training — every piece built to move you forward. No drip-feed, no upsell: everything explained, from your first basic step to pro-level choreos.",
+      "Courses, choreographies, history of salsa, science of training. No drip-feed. No upsell.",
     bullets: [
       "300+ classes, beginner → pro",
-      "Full choreographies broken down step by step",
-      "History of Salsa — 20 modules of origins & culture",
-      "Science of Effective Training — 18 modules",
-      "Technique deep-dives, styling, musicality, partnering",
+      "Full choreographies, broken down",
+      "History of Salsa — 20 modules",
+      "Science of Training — 18 modules",
+      "Technique, styling, musicality, partnering",
     ],
     images: [
       {
@@ -51,23 +51,22 @@ const pillars: Pillar[] = [
     ],
   },
   {
-    // 2 — Video player: mirrored + back view + all the features
+    // 2 — Video player: mirrored + back view
     eyebrow: "THE VIDEO PLAYER",
     title: (
       <>
         The <span className={gold}>practice room</span> pros have been waiting for
       </>
     ),
-    body:
-      "Every frame, every speed, every angle. Mirrored for zero guessing. Back view for that live-class vibe. 13 languages. Built for obsessive repetition — the way motor learning actually works.",
+    body: "Every angle. Every speed. 13 languages.",
     bullets: [
-      "Mirrored view — zero guessing which side is which",
-      "Back view for that live-class “follow me” feel",
-      "13 languages of captions + narration",
-      "Speed controls (0.25× → 2×) + frame-by-frame",
-      "A/B loop — drill one 2-second bar forever",
-      "Summary notes + quizzes after every lesson",
-      "Course navigation inside the player",
+      "Mirrored view — zero guessing",
+      "Back view — live-class vibe",
+      "13 languages, captions + narration",
+      "0.25× → 2× + frame-by-frame",
+      "A/B loop",
+      "Summary notes + quizzes",
+      "Course nav inside the player",
     ],
     images: [
       {
@@ -91,17 +90,17 @@ const pillars: Pillar[] = [
     eyebrow: "THE SKILL TREE",
     title: (
       <>
-        Everything structured from <span className={gold}>basic</span> to{" "}
+        Structured from <span className={gold}>basic</span> to{" "}
         <span className={gold}>pro</span>
       </>
     ),
     body:
-      "A video-game tech tree for your dancing. Every technique isolated. Every skill in the right order. You always know exactly what to drill next — and you see yourself leveling up.",
+      "A tech tree for your dancing. Every skill in the right order. You always know what to drill next.",
     bullets: [
-      "Constellation-style roadmap from first step to pro choreo",
-      "Built technique-by-technique, prerequisites enforced",
-      "Unlocks as you complete lessons and earn XP",
-      "Never guess what to drill next",
+      "First step to pro choreo",
+      "Technique-by-technique, prerequisites enforced",
+      "Unlocks as you level up",
+      "Never guess what's next",
     ],
     images: [
       {
@@ -120,14 +119,13 @@ const pillars: Pillar[] = [
         Post your videos. <span className={gold}>Don&apos;t dance alone.</span>
       </>
     ),
-    body:
-      "Share your progress, get real feedback, ask questions, help others. A community of dancers who actually train — not another comment section full of ghosts.",
+    body: "Progress videos. Real feedback. Questions answered. Dancers who actually train.",
     bullets: [
-      "The Stage — post progress videos, get reactions & comments",
-      "The Lab — ask & answer technique questions",
-      "Hype or Coach feedback modes",
-      "Earn 38 badges (Bronze → Silver → Gold → Diamond)",
-      "Weekly, monthly and all-time leaderboards",
+      "The Stage — post progress videos",
+      "The Lab — ask & answer questions",
+      "Hype or Coach feedback",
+      "38 badges, Bronze → Diamond",
+      "Weekly & all-time leaderboards",
     ],
     images: [
       {
@@ -147,12 +145,12 @@ const pillars: Pillar[] = [
       </>
     ),
     body:
-      "When you&apos;re serious, Guild Master unlocks the inner circle — personal 1-on-1 video coaching and weekly live Roundtable calls with the Maestro and fellow obsessives. The kind of access that used to cost $200/hour in person.",
+      "1-on-1 coaching and weekly Roundtable calls. Private group. No crowd.",
     bullets: [
-      "Monthly 1-on-1 video coaching with personal feedback",
-      "Weekly live Roundtable calls on Zoom — private group",
-      "DJ Booth — isolated stems from classic tracks",
-      "The Vault — every past Roundtable recording",
+      "Monthly 1-on-1 video coaching",
+      "Weekly Roundtable calls on Zoom",
+      "DJ Booth — isolated stems",
+      "The Vault — every past recording",
     ],
     images: [
       {
@@ -306,7 +304,7 @@ export default function HowItWorksSection() {
             <span className="text-mambo-gold drop-shadow-md">actually get good.</span>
           </h2>
           <p className="max-w-2xl mx-auto mt-5 text-base sm:text-lg text-mambo-text/70 leading-relaxed landscape-phone:text-sm landscape-phone:mt-3">
-            Not another video dump. A complete learning environment — structured, gamified, and built around how dancers actually improve.
+            Not another video dump. Everything below is included, day one.
           </p>
         </motion.div>
 
@@ -393,18 +391,17 @@ export default function HowItWorksSection() {
                 className="text-3xl sm:text-5xl font-bold text-mambo-text tracking-tight italic landscape-phone:text-2xl"
                 style={{ fontFamily: '"Playfair Display", serif' }}
               >
-                If this isn&apos;t worth{" "}
-                <span className="text-mambo-gold drop-shadow-md">$1</span>, we&apos;ll buy you lunch.
+                7 days. <span className="text-mambo-gold drop-shadow-md">On the house.</span>
               </h3>
               <p className="mt-4 max-w-xl mx-auto text-base sm:text-lg text-mambo-text/75 landscape-phone:text-sm landscape-phone:mt-2">
-                Try everything above for 7 days. $1. Cancel in two clicks.
+                Full access. Cancel anytime.
               </p>
               <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 landscape-phone:mt-5">
                 <Link
                   href="/register"
                   className="w-full sm:w-auto bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-8 rounded-full text-base sm:text-lg tracking-wide shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm"
                 >
-                  Start 7-day $1 trial
+                  Start 7-day free trial
                 </Link>
                 <Link
                   href="/beta?key=a7f3e2b1c9d04e6f8a2b3c4d5e1ol86j"
