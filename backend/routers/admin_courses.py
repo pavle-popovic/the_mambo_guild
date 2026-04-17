@@ -5,7 +5,7 @@ Inspired by professional platforms like Steezy and Brenda Liew Online.
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from models import get_db
 from models.user import User
 from models.course import World, Level, Lesson, Difficulty
@@ -121,6 +121,15 @@ class EdgeCreateRequest(BaseModel):
     """Create request for edge between levels."""
     from_level_id: str
     to_level_id: str
+
+    @field_validator("to_level_id")
+    @classmethod
+    def _no_self_loop(cls, v: str, info):
+        # B11: Reject self-prerequisites at the schema layer
+        from_id = info.data.get("from_level_id")
+        if from_id and from_id == v:
+            raise ValueError("A level cannot be its own prerequisite.")
+        return v
 
 
 @router.get("/courses", response_model=List[WorldResponse])
@@ -640,20 +649,34 @@ def create_edge(
 ):
     """Create a new edge between two levels."""
     from models.course import LevelEdge
-    
+
+    # B11: Self-prerequisite would make the level un-passable. Reject explicitly.
+    if edge_data.from_level_id == edge_data.to_level_id:
+        raise HTTPException(
+            status_code=400,
+            detail="A level cannot be its own prerequisite (self-loop edge)."
+        )
+
     # Validate levels exist
     from_level = db.query(Level).filter(Level.id == edge_data.from_level_id).first()
     to_level = db.query(Level).filter(Level.id == edge_data.to_level_id).first()
-    
+
     if not from_level or not to_level:
         raise HTTPException(status_code=404, detail="Level not found")
-    
+
+    # Both endpoints must live in the world this edge is being added to
+    if str(from_level.world_id) != str(world_id) or str(to_level.world_id) != str(world_id):
+        raise HTTPException(
+            status_code=400,
+            detail="Both levels must belong to this world."
+        )
+
     # Check if edge already exists
     existing = db.query(LevelEdge).filter(
         LevelEdge.from_level_id == edge_data.from_level_id,
         LevelEdge.to_level_id == edge_data.to_level_id
     ).first()
-    
+
     if existing:
         raise HTTPException(status_code=400, detail="Edge already exists")
     
@@ -674,6 +697,19 @@ def create_edge(
         "to_level_id": str(edge.to_level_id),
         "world_id": str(edge.world_id)
     }
+
+
+@router.get("/courses/validate-graph")
+def validate_course_graph(
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db)
+):
+    """
+    B14 guardrail: report skill-tree inconsistencies (self-loop edges,
+    backwards prerequisites). Read-only — does not modify any rows.
+    """
+    from services.course_validation import run_startup_sanity_check
+    return run_startup_sanity_check(db)
 
 
 @router.delete("/edges/{edge_id}")

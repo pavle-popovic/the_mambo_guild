@@ -115,7 +115,8 @@ class LevelResponse(BaseModel):
     mux_preview_playback_id: Optional[str] = None  # For hover preview GIF
     is_unlocked: bool = True  # Calculated based on prerequisites
     completion_percentage: float = 0.0  # Based on lesson progress
-    lesson_count: int = 0
+    lesson_count: int = 0  # User-visible (excludes boss-battle, which the sidebar lists separately)
+    total_lesson_count: int = 0  # All lessons including boss-battle (admin/analytics)
     # Module metadata
     outcome: Optional[str] = None  # e.g., "Unlock Stable Turns"
     duration_minutes: int = 0  # Total module duration

@@ -148,6 +148,19 @@ h6 {
   z-index: 0;
 }
 
+/* B16: Some Mux/media-chrome loop buttons inherit a transparent
+   color from cascading text classes and end up showing the border
+   without an icon. Force currentColor + a sane fallback so the icon
+   is always visible regardless of ancestor styling. */
+mux-player::part(loop-button),
+media-loop-button,
+media-controller [aria-label*="loop" i],
+media-controller [aria-label*="repeat" i] {
+  color: currentColor;
+  --media-icon-color: #ffffff;
+  opacity: 1;
+}
+
 /* Hide all Mux player controls for course previews */
 .course-preview-player mux-player {
   --controls: none !important;

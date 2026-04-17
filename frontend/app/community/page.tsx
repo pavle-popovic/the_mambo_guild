@@ -239,11 +239,11 @@ export default function CommunityPage() {
     }
 
     return (
-        <div className="min-h-screen bg-transparent">
+        <div className="min-h-[100dvh] bg-transparent pb-[env(safe-area-inset-bottom)]">
             <NavBar user={user || undefined} />
 
             {/* Main Content - 3 Column Grid */}
-            <div className="max-w-7xl mx-auto px-4 pb-20 sm:pb-32 pt-20 sm:pt-24 relative">
+            <div className="max-w-7xl mx-auto px-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] sm:pb-32 pt-20 sm:pt-24 relative">
                 <div className="grid grid-cols-12 gap-4 lg:gap-6">
                     {/* Left Sidebar — hidden on mobile, replaced by mobile header */}
                     <div className="hidden lg:block lg:col-span-2 lg:order-1">
@@ -560,7 +560,21 @@ export default function CommunityPage() {
 
                     {/* Right Widgets — hidden on mobile */}
                     <div className="hidden lg:block lg:col-span-3 lg:order-3">
-                        <CommunityWidgets posts={posts} />
+                        <CommunityWidgets
+                            posts={posts}
+                            activeTopic={selectedTopics[0]}
+                            onTagClick={(tag) => {
+                                const normalized = tag.replace(/^#/, "").toLowerCase();
+                                const known = topicOptions.some((o) => o.value === normalized);
+                                if (!known) {
+                                    handleSearch(tag);
+                                    return;
+                                }
+                                setSelectedTopics((prev) =>
+                                    prev.length === 1 && prev[0] === normalized ? [] : [normalized]
+                                );
+                            }}
+                        />
                     </div>
                 </div>
             </div>
@@ -569,7 +583,8 @@ export default function CommunityPage() {
             {!isPreviewMode && (
                 <motion.button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="fixed bottom-6 right-4 sm:bottom-8 sm:right-8 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full shadow-[0_0_30px_rgba(219,39,119,0.5)] flex items-center justify-center z-50 border border-white/20"
+                    style={{ bottom: "max(1.5rem, calc(env(safe-area-inset-bottom) + 1rem))" }}
+                    className="fixed right-4 sm:right-8 w-14 h-14 sm:w-16 sm:h-16 bg-gradient-to-br from-purple-600 to-pink-600 hover:from-purple-500 hover:to-pink-500 text-white rounded-full shadow-[0_0_30px_rgba(219,39,119,0.5)] flex items-center justify-center z-50 border border-white/20"
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                     initial={{ opacity: 0, y: 50 }}

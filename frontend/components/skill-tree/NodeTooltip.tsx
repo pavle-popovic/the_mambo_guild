@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Clock, Zap, BookOpen, Lock, Trophy, ChevronRight, Sparkles } from "lucide-react";
+import { Clock, Zap, BookOpen, Lock, Trophy, ChevronRight, Sparkles, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface NodeTooltipProps {
@@ -152,6 +152,15 @@ export default function NodeTooltip({
       transition={{ type: "spring", stiffness: 500, damping: 30 }}
       onMouseLeave={onClose}
     >
+      {/* Close button — required on touch where mouseleave never fires (B9) */}
+      <button
+        type="button"
+        onClick={onClose}
+        aria-label="Close preview"
+        className="absolute -top-2 -right-2 z-10 w-7 h-7 rounded-full bg-black/80 border border-white/20 text-white/80 hover:text-white hover:bg-black flex items-center justify-center shadow-lg"
+      >
+        <X className="w-3.5 h-3.5" />
+      </button>
       <div
         className={`w-[calc(100vw-24px)] max-w-80 rounded-xl overflow-hidden backdrop-blur-xl border shadow-2xl ${
           displayLocked

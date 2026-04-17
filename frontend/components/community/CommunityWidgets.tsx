@@ -24,6 +24,7 @@ interface Post {
 
 interface LeaderboardUser {
     id: string;
+    username?: string | null;
     first_name: string;
     avatar_url: string | null;
     score: number;
@@ -32,6 +33,8 @@ interface LeaderboardUser {
 
 interface CommunityWidgetsProps {
     posts?: Post[];
+    onTagClick?: (tag: string) => void;
+    activeTopic?: string;
 }
 
 const rankStyles = {
@@ -62,7 +65,7 @@ const CATEGORY_LABELS: Record<Category, string> = {
     active: "Active",
 };
 
-export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) {
+export default function CommunityWidgets({ posts = [], onTagClick, activeTopic }: CommunityWidgetsProps) {
     const [memberCount, setMemberCount] = useState(0);
     const [activeNow, setActiveNow] = useState(0);
     const [apiLeaderboard, setApiLeaderboard] = useState<LeaderboardUser[]>([]);
@@ -248,13 +251,13 @@ export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) 
                                         {user.avatar_url ? (
                                             <Image
                                                 src={user.avatar_url}
-                                                alt={user.first_name}
+                                                alt={user.username || "User"}
                                                 width={40}
                                                 height={40}
                                                 className="w-full h-full object-cover"
                                             />
                                         ) : (
-                                            user.first_name[0]
+                                            (user.username || "?")[0].toUpperCase()
                                         )}
                                     </div>
                                     <div className="flex-1 min-w-0">
@@ -263,7 +266,7 @@ export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) 
                                             user.rank === 1 ? "text-[#FCE205]" :
                                                 user.rank === 2 ? "text-gray-200" :
                                                     "text-amber-600"
-                                        )}>{user.first_name}</span>
+                                        )}>{user.username || "Anonymous"}</span>
                                         <span className="text-xs text-white/50">{PERIOD_LABELS[period]} • {CATEGORY_LABELS[category]}</span>
                                     </div>
                                     <span className="text-white font-bold font-mono text-lg">{user.score}</span>
@@ -280,10 +283,10 @@ export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) 
                                     <span className="w-6 text-center text-white/40 font-mono text-sm">#{user.rank}</span>
                                     <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center text-white/80 font-bold text-xs overflow-hidden">
                                         {user.avatar_url ? (
-                                            <Image src={user.avatar_url} alt={user.first_name} width={32} height={32} className="w-full h-full object-cover" />
-                                        ) : user.first_name[0]}
+                                            <Image src={user.avatar_url} alt={user.username || "User"} width={32} height={32} className="w-full h-full object-cover" />
+                                        ) : (user.username || "?")[0].toUpperCase()}
                                     </div>
-                                    <span className="flex-1 text-white/80 font-medium truncate text-sm">{user.first_name}</span>
+                                    <span className="flex-1 text-white/80 font-medium truncate text-sm">{user.username || "Anonymous"}</span>
                                     <span className="text-[#D4AF37] font-bold text-sm">{user.score}</span>
                                 </motion.div>
                             ))}
@@ -316,16 +319,28 @@ export default function CommunityWidgets({ posts = [] }: CommunityWidgetsProps) 
             <div className="border-t border-white/10 pt-4">
                 <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-[0.2em] mb-3 font-serif">Trending</h3>
                 <div className="flex flex-wrap gap-2">
-                    {displayTags.slice(0, 5).map(({ tag, count }) => (
-                        <motion.button
-                            key={tag}
-                            className="px-2 py-1 rounded-md bg-[#00E0FF]/10 text-[#00E0FF] text-xs font-bold border border-[#00E0FF]/30 hover:bg-[#00E0FF]/20 hover:shadow-[0_0_10px_rgba(0,224,255,0.3)] transition-all"
-                            whileHover={{ scale: 1.05 }}
-                            title={`${count} posts`}
-                        >
-                            {tag}
-                        </motion.button>
-                    ))}
+                    {displayTags.slice(0, 5).map(({ tag, count }) => {
+                        const normalized = tag.replace(/^#/, "").toLowerCase();
+                        const isActive = !!activeTopic && activeTopic.toLowerCase() === normalized;
+                        return (
+                            <motion.button
+                                key={tag}
+                                onClick={() => onTagClick?.(tag)}
+                                className={cn(
+                                    "px-2 py-1 rounded-md text-xs font-bold border transition-all",
+                                    isActive
+                                        ? "bg-[#00E0FF]/30 text-white border-[#00E0FF] shadow-[0_0_10px_rgba(0,224,255,0.5)]"
+                                        : "bg-[#00E0FF]/10 text-[#00E0FF] border-[#00E0FF]/30 hover:bg-[#00E0FF]/20 hover:shadow-[0_0_10px_rgba(0,224,255,0.3)]"
+                                )}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.97 }}
+                                title={`${count} posts`}
+                                type="button"
+                            >
+                                {tag}
+                            </motion.button>
+                        );
+                    })}
                 </div>
             </div>
         </div>

@@ -107,7 +107,29 @@ export default function LessonPage() {
   const [videoDuration, setVideoDuration] = useState(0);
   const [captionText, setCaptionText] = useState("");
   const [videoEnded, setVideoEnded] = useState(false);
+  // B20: When the user has watched ≥85% of a desktop video and the lesson
+  // is not yet completed, show a centered "Looks like you finished" prompt
+  // so the Mark Complete button isn't lost in the right rail.
+  const [showCompletePrompt, setShowCompletePrompt] = useState(false);
+  const completePromptDismissedRef = useRef(false);
+  const completePromptHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abLoop = useABLoop(videoPlayerRef, videoDuration);
+
+  // Reset the B20 prompt whenever the user moves to a different lesson
+  useEffect(() => {
+    setShowCompletePrompt(false);
+    completePromptDismissedRef.current = false;
+    if (completePromptHideTimerRef.current) {
+      clearTimeout(completePromptHideTimerRef.current);
+      completePromptHideTimerRef.current = null;
+    }
+    return () => {
+      if (completePromptHideTimerRef.current) {
+        clearTimeout(completePromptHideTimerRef.current);
+        completePromptHideTimerRef.current = null;
+      }
+    };
+  }, [lessonId]);
 
   useEffect(() => {
     // Wait for auth to finish loading before making any decisions
@@ -469,6 +491,11 @@ export default function LessonPage() {
         : null;
       const nextLessonId = nextQuizLesson?.id || null;
 
+      // Diagnostic: hydration race — if lessons aren't loaded yet, we shouldn't be navigating at all
+      if (process.env.NEXT_PUBLIC_DEBUG_BUGS && !nextLessonId && !isCourseComplete && levelLessons.length === 0) {
+        console.warn("[B6] handleQuizContinue: levelLessons empty when computing next lesson", { lessonId, worldId });
+      }
+
       // If already completed, just navigate to next lesson without showing XP/completion animation
       if (alreadyCompleted) {
         // Use requestAnimationFrame to ensure DOM update is visible before navigation
@@ -476,6 +503,9 @@ export default function LessonPage() {
           requestAnimationFrame(() => {
             if (nextLessonId) {
               router.push(`/lesson/${nextLessonId}`);
+            } else {
+              // Fallback: nowhere to go inside the module — exit to parent course
+              router.push(backHref);
             }
           });
         });
@@ -508,6 +538,9 @@ export default function LessonPage() {
         if (nextLessonId) {
           sessionStorage.setItem('questbar_scroll_trigger', nextLessonId);
           router.push(`/lesson/${nextLessonId}`);
+        } else {
+          // No next lesson in module — exit to course page rather than no-op
+          router.push(backHref);
         }
       };
 
@@ -517,9 +550,7 @@ export default function LessonPage() {
       // Auto-navigate after shorter timeout (2 seconds + animation)
       if (result.leveled_up || nextLessonId) {
         setTimeout(() => {
-          if (nextLessonId) {
-            handleNavigate();
-          }
+          handleNavigate();
         }, 2300); // 2000ms notification + 300ms fade-out
       }
     } catch (err: any) {
@@ -720,9 +751,11 @@ export default function LessonPage() {
             {/* Minimal nav for non-video lessons */}
             {!isVideoLesson && (
               <nav className="border-b border-gray-800 bg-mambo-panel flex-none flex items-center justify-between px-4 py-3">
-                <Link href={backHref} className="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold">
+                {/* Back link only on mobile — desktop sidebar already has one */}
+                <Link href={backHref} className="lg:hidden text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-bold">
                   <FaChevronLeft size={12} /> {tCommon('back')}
                 </Link>
+                <span className="hidden lg:block" aria-hidden="true" />
                 <div className="flex items-center gap-3">
                   <LocaleSwitcher compact />
                 {user && !isCompleted && !(isQuizLesson && !quizPassed) && (
@@ -850,10 +883,46 @@ export default function LessonPage() {
                       <MuxVideoPlayer
                         ref={videoPlayerRef}
                         playbackId={lesson.mux_playback_id}
-                        onEnded={() => { setVideoPlaying(false); setVideoEnded(true); }}
+                        onEnded={() => {
+                          setVideoPlaying(false);
+                          setVideoEnded(true);
+                          // B20: also fire the "Mark Complete" prompt at true 100% (onEnded is the canonical end-of-video signal; onTimeUpdate may not hit exactly 1.0)
+                          if (!isCompleted && !completePromptDismissedRef.current) {
+                            setShowCompletePrompt((prev) => {
+                              if (prev) return prev;
+                              if (completePromptHideTimerRef.current) {
+                                clearTimeout(completePromptHideTimerRef.current);
+                              }
+                              completePromptHideTimerRef.current = setTimeout(() => {
+                                setShowCompletePrompt(false);
+                              }, 8000);
+                              return true;
+                            });
+                          }
+                        }}
                         onPlay={() => setVideoEnded(false)}
                         onLoadedMetadata={(duration) => setVideoDuration(duration)}
                         onCaptionChange={setCaptionText}
+                        onTimeUpdate={(t) => {
+                          // B20: surface centre-screen "Mark Complete" prompt at 100%
+                          if (
+                            !isCompleted &&
+                            !completePromptDismissedRef.current &&
+                            videoDuration > 0 &&
+                            t / videoDuration >= 1
+                          ) {
+                            setShowCompletePrompt((prev) => {
+                              if (prev) return prev;
+                              if (completePromptHideTimerRef.current) {
+                                clearTimeout(completePromptHideTimerRef.current);
+                              }
+                              completePromptHideTimerRef.current = setTimeout(() => {
+                                setShowCompletePrompt(false);
+                              }, 8000);
+                              return true;
+                            });
+                          }
+                        }}
                         autoPlay={videoPlaying}
                         durationMinutes={lesson.duration_minutes}
                         metadata={{
@@ -987,13 +1056,33 @@ export default function LessonPage() {
                       {quizData.map((q: any, qIndex: number) => {
                         const questionId = q.id || `q-${qIndex}`;
                         const selectedIndex = quizAnswers[questionId];
+                        const optionsCount = Array.isArray(q.options) ? q.options.length : 0;
                         // Determine correct option index for both formats
                         const isScriptFormat = typeof q.answer === "string";
-                        const correctIndex = isScriptFormat
+                        const rawCorrectIndex = isScriptFormat
                           ? q.answer.trim().toUpperCase().charCodeAt(0) - 65 // "B" -> 1
                           : q.options?.findIndex((o: any) => o.isCorrect) ?? -1;
-                        const isCorrectAnswer = quizSubmitted && selectedIndex === correctIndex;
-                        const isWrongAnswer = quizSubmitted && selectedIndex !== undefined && selectedIndex !== correctIndex;
+                        // Guardrail: only treat as valid if it points to a real option
+                        const correctIndex =
+                          rawCorrectIndex >= 0 && rawCorrectIndex < optionsCount ? rawCorrectIndex : -1;
+                        const answerKeyMissing = quizSubmitted && correctIndex < 0;
+
+                        if (process.env.NEXT_PUBLIC_DEBUG_BUGS && quizSubmitted && correctIndex < 0) {
+                          console.warn("[B12] Quiz question has no valid correctIndex", {
+                            questionId,
+                            rawCorrectIndex,
+                            optionsCount,
+                            answer: q.answer,
+                          });
+                        }
+
+                        const isCorrectAnswer =
+                          quizSubmitted && correctIndex >= 0 && selectedIndex === correctIndex;
+                        const isWrongAnswer =
+                          quizSubmitted &&
+                          correctIndex >= 0 &&
+                          selectedIndex !== undefined &&
+                          selectedIndex !== correctIndex;
 
                         return (
                           <div
@@ -1007,11 +1096,21 @@ export default function LessonPage() {
                             <h4 className="font-bold text-white mb-3 text-sm">
                               {qIndex + 1}. {q.question}
                             </h4>
+                            {answerKeyMissing && (
+                              <p className="mb-3 text-xs text-amber-300/90 bg-amber-500/10 border border-amber-500/30 rounded px-2 py-1">
+                                Answer key unavailable — please report this question to a Maestro.
+                              </p>
+                            )}
                             <div className="space-y-1.5">
                               {(q.options || []).map((option: any, oIndex: number) => {
                                 const isSelected = selectedIndex === oIndex;
-                                const isCorrectOption = oIndex === correctIndex;
+                                const isCorrectOption = correctIndex >= 0 && oIndex === correctIndex;
                                 const optionText = typeof option === "string" ? option : option.text;
+                                // B13: distinguish "you got it right" (green) from
+                                // "this was the correct answer you missed" (amber)
+                                const showAsCorrect = quizSubmitted && isCorrectOption && isSelected;
+                                const showAsMissedCorrect =
+                                  quizSubmitted && isCorrectOption && !isSelected && isWrongAnswer;
 
                                 return (
                                   <button
@@ -1021,25 +1120,32 @@ export default function LessonPage() {
                                     className={`w-full text-left p-2.5 rounded-lg border text-sm transition ${
                                       isSelected
                                         ? quizSubmitted
-                                          ? isCorrectOption
+                                          ? showAsCorrect
                                             ? "bg-green-600/20 border-green-500 text-green-300"
                                             : "bg-red-600/20 border-red-500 text-red-300"
                                           : "bg-blue-600/20 border-blue-500 text-blue-300"
-                                        : quizSubmitted && isCorrectOption
-                                          ? "bg-green-600/10 border-green-500/50 text-green-400"
+                                        : showAsMissedCorrect
+                                          ? "bg-amber-500/15 border-amber-400/50 text-amber-200"
                                           : "bg-gray-800 border-gray-700 text-gray-300 hover:border-gray-600"
                                     } ${quizSubmitted ? "cursor-default" : "cursor-pointer"}`}
                                   >
-                                    <div className="flex items-center gap-3">
-                                      {quizSubmitted && isSelected && (
-                                        isCorrectOption
-                                          ? <FaCheck className="text-green-400 flex-shrink-0" />
-                                          : <span className="text-red-400 flex-shrink-0">✗</span>
+                                    <div className="flex items-center justify-between gap-3">
+                                      <div className="flex items-center gap-3">
+                                        {quizSubmitted && isSelected && (
+                                          showAsCorrect
+                                            ? <FaCheck className="text-green-400 flex-shrink-0" />
+                                            : <span className="text-red-400 flex-shrink-0">✗</span>
+                                        )}
+                                        {showAsMissedCorrect && (
+                                          <FaCheck className="text-amber-300 flex-shrink-0" />
+                                        )}
+                                        <span>{optionText}</span>
+                                      </div>
+                                      {showAsMissedCorrect && (
+                                        <span className="text-[10px] uppercase tracking-wider text-amber-300/80 font-semibold flex-shrink-0">
+                                          Correct answer
+                                        </span>
                                       )}
-                                      {quizSubmitted && isCorrectOption && !isSelected && (
-                                        <FaCheck className="text-green-400 flex-shrink-0" />
-                                      )}
-                                      <span>{optionText}</span>
                                     </div>
                                   </button>
                                 );
@@ -1143,6 +1249,47 @@ export default function LessonPage() {
               abEnabled={abLoop.enabled}
               onToggleAB={abLoop.toggle}
             />
+          </div>
+        )}
+
+        {/* B20: Centred desktop prompt at ≥85% video progress */}
+        {showCompletePrompt && user && !isCompleted && !(isVideoLesson && hasQuiz && !quizPassed) && (
+          <div className="hidden lg:flex fixed inset-x-0 top-24 z-40 justify-center pointer-events-none">
+            <div className="pointer-events-auto bg-black/90 border-2 border-green-400/70 rounded-2xl px-5 py-4 shadow-[0_0_30px_rgba(34,197,94,0.45)] backdrop-blur-md flex items-center gap-4 max-w-md">
+              <div className="flex-1">
+                <p className="text-white text-sm font-bold">Looks like you finished — Mark Complete?</p>
+                <p className="text-white/60 text-xs mt-0.5">You're at the end of this lesson.</p>
+              </div>
+              <button
+                onClick={() => {
+                  completePromptDismissedRef.current = true;
+                  setShowCompletePrompt(false);
+                  if (completePromptHideTimerRef.current) {
+                    clearTimeout(completePromptHideTimerRef.current);
+                    completePromptHideTimerRef.current = null;
+                  }
+                  handleComplete();
+                }}
+                disabled={completing}
+                className="px-4 py-2 bg-green-500 hover:bg-green-400 text-white text-sm font-extrabold uppercase tracking-wide rounded-lg shadow-[0_0_20px_rgba(34,197,94,0.7)] transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
+              >
+                Mark Complete
+              </button>
+              <button
+                onClick={() => {
+                  completePromptDismissedRef.current = true;
+                  setShowCompletePrompt(false);
+                  if (completePromptHideTimerRef.current) {
+                    clearTimeout(completePromptHideTimerRef.current);
+                    completePromptHideTimerRef.current = null;
+                  }
+                }}
+                aria-label="Dismiss"
+                className="text-white/40 hover:text-white text-lg leading-none px-1"
+              >
+                ×
+              </button>
+            </div>
           </div>
         )}
 

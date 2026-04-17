@@ -298,14 +298,44 @@ function ConstellationGraphInner({
       const level = levels.find((l) => l.id === node.id);
       if (!level) return;
 
-      // Clear tooltip
-      setHoveredNode(null);
-
       // In admin mode, just call the callback (opens lesson editor sidebar)
       if (isAdminMode) {
+        setHoveredNode(null);
         onNodeClick?.(node.id);
         return;
       }
+
+      // B9: On touch devices, tapping a LOCKED node should open the tooltip
+      // (which shows the preview + lock message + CTA) instead of doing
+      // nothing. Hover handlers are skipped on touch, so locked previews
+      // would otherwise be invisible on mobile.
+      if (isTouchDevice && !level.is_unlocked) {
+        const nodeElement = event.currentTarget as HTMLElement;
+        const rect = nodeElement.getBoundingClientRect();
+        // Anchor near the top so the clamp logic centers it nicely on phones
+        const tooltipX = Math.max(12, rect.left);
+        const tooltipY = Math.max(80, rect.bottom + 12);
+        setHoveredNode({
+          levelId: level.id,
+          title: level.title,
+          description: level.description,
+          lessonCount: level.lesson_count,
+          completionPercentage: level.completion_percentage,
+          isLocked: true,
+          thumbnailUrl: level.thumbnail_url,
+          muxPreviewPlaybackId: level.mux_preview_playback_id,
+          position: { x: tooltipX, y: tooltipY },
+          outcome: level.outcome,
+          durationMinutes: level.duration_minutes,
+          totalXp: level.total_xp,
+          status: level.status,
+          tldr: level.tldr,
+        });
+        return;
+      }
+
+      // Clear tooltip
+      setHoveredNode(null);
 
       // Require login to access lessons
       if (!user) {

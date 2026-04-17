@@ -29,6 +29,9 @@ function PricingPageContent() {
     remaining: number;
     is_full: boolean;
   } | null>(null);
+  // Bumped after every refreshUser() so derived isRookie/isAdvanced/isPerformer
+  // values in the JSX recompute even if React 18 batched the AuthContext update.
+  const [, setRefreshKey] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -45,19 +48,59 @@ function PricingPageContent() {
     };
   }, []);
 
-  // Handle success/cancel redirects from Stripe
+  // Handle success/cancel redirects from Stripe.
+  // B2: After Stripe checkout, poll refreshUser() for up to ~9s waiting for the
+  // webhook to land before navigating away. Without this the user would briefly
+  // see the old "Current Plan" badge if the webhook hadn't updated their row.
   useEffect(() => {
     const success = searchParams.get("success");
     const canceled = searchParams.get("canceled");
+    const expectedTier = (searchParams.get("tier") || "").toLowerCase();
 
-    if (success === "true") {
-      if (user) {
-        window.location.href = "/courses";
-      }
-    } else if (canceled === "true") {
+    if (canceled === "true") {
       console.log("Payment canceled");
+      return;
     }
-  }, [searchParams, user]);
+
+    if (success !== "true" || !user) return;
+
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 6;
+    const toastId = toast.loading("Updating your subscription…");
+
+    const tick = async () => {
+      if (cancelled) return;
+      attempts += 1;
+      try {
+        await refreshUser();
+      } catch (err) {
+        console.error("refreshUser during success-poll failed", err);
+      }
+      const tierNow = (user?.tier || "").toLowerCase();
+      const matched = expectedTier ? tierNow === expectedTier : tierNow !== "rookie";
+      if (matched || attempts >= maxAttempts) {
+        toast.dismiss(toastId);
+        if (matched) {
+          toast.success("Subscription updated");
+        }
+        // Strip the success/tier params so a refresh doesn't re-trigger the poll
+        try {
+          router.replace("/pricing", { scroll: false });
+        } catch {}
+        return;
+      }
+      setTimeout(tick, 1500);
+    };
+
+    tick();
+
+    return () => {
+      cancelled = true;
+      toast.dismiss(toastId);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   const handleSubscribe = async (priceId: string, tierName: string) => {
     if (!user) {
@@ -120,6 +163,7 @@ function PricingPageContent() {
       setLoading("upgrade");
       await apiClient.updateSubscription(PERFORMER_PRICE_ID);
       await Promise.all([refreshUser(), refreshSeats()]);
+      setRefreshKey((k) => k + 1);
       toast.success("Welcome to Guild Master", {
         description: "You now have access to every premium feature.",
         duration: 4500,
@@ -140,6 +184,7 @@ function PricingPageContent() {
       setShowDowngradeModal(false);
       await apiClient.updateSubscription(ADVANCED_PRICE_ID);
       await Promise.all([refreshUser(), refreshSeats()]);
+      setRefreshKey((k) => k + 1);
       toast.success("Downgraded to Pro", {
         description: "Your plan change is effective immediately.",
         duration: 4500,

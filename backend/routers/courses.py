@@ -471,6 +471,10 @@ def get_world_skill_tree(
 
         tldr = _extract_tldr_for_level(level) if is_topic_world else None
 
+        # B5: Sidebar shows boss-battle lessons separately, so the count
+        # the user sees in the module label must exclude boss-battle.
+        visible_lesson_count = sum(1 for l in level.lessons if not l.is_boss_battle)
+
         level_responses.append(LevelResponse(
             id=level_id,
             title=level.title,
@@ -482,7 +486,8 @@ def get_world_skill_tree(
             mux_preview_playback_id=level.mux_preview_playback_id,
             is_unlocked=is_unlocked,
             completion_percentage=completion_pct,
-            lesson_count=len(level.lessons),
+            lesson_count=visible_lesson_count,
+            total_lesson_count=len(level.lessons),
             # Module metadata
             outcome=level.outcome,
             duration_minutes=duration,

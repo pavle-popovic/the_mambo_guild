@@ -97,9 +97,13 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           return video?.playbackRate || 1;
         },
         setPlaybackRate: (rate: number) => {
+          // B17/B18: 0× collapses Mux's UI and is never useful — clamp out
+          // any non-positive (or absurdly high) rate before applying.
+          if (!Number.isFinite(rate) || rate <= 0) return;
+          const safeRate = Math.min(Math.max(rate, 0.25), 4);
           const video = getVideoElement();
           if (video) {
-            video.playbackRate = rate;
+            video.playbackRate = safeRate;
             if ("preservesPitch" in video) {
               (video as any).preservesPitch = true;
             } else if ("webkitPreservesPitch" in video) {
@@ -454,7 +458,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           poster={posterUrl}
           primaryColor="#ff0000"
           secondaryColor="#8c8c8c"
-          playbackRates={[] as any}
+          playbackRates={[0.5, 0.75, 1, 1.25, 1.5] as any}
           metadata={{
             video_title: metadata?.video_title || undefined,
             video_id: metadata?.video_id || playbackId,

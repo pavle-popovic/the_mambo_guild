@@ -287,9 +287,13 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
             )}
           </div>
 
-          {/* Objectives Section - Expands below on hover */}
+          {/* Objectives Section - Always visible on mobile, hover-expand on desktop */}
           {hasObjectives && (
-            <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isHovering ? 'max-h-60 opacity-100' : 'max-h-0 opacity-0'}`}>
+            <div
+              className={`overflow-hidden transition-all duration-300 ease-in-out max-h-60 opacity-100 lg:opacity-0 lg:max-h-0 ${
+                isHovering ? 'lg:max-h-60 lg:opacity-100' : ''
+              }`}
+            >
               <div className="p-4 pt-0 bg-black border-t border-gray-800">
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles className="w-4 h-4 text-mambo-gold" />

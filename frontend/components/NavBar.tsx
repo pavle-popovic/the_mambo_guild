@@ -55,6 +55,30 @@ export default function NavBar({ user }: NavBarProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Close mobile/tablet menu on route change so it doesn't linger after navigation
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
+
+  // Close menu with Escape and when the viewport grows past xl (where centre nav reappears)
+  useEffect(() => {
+    if (!isMobileMenuOpen) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsMobileMenuOpen(false);
+    };
+    const handleResize = () => {
+      if (typeof window !== "undefined" && window.innerWidth >= 1280) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+    document.addEventListener("keydown", handleKey);
+    window.addEventListener("resize", handleResize);
+    return () => {
+      document.removeEventListener("keydown", handleKey);
+      window.removeEventListener("resize", handleResize);
+    };
+  }, [isMobileMenuOpen]);
+
   // Palladium Era: Brass nav links with center-expanding underline
   const handleNavHover = useCallback(() => {
     UISound.hover();
@@ -126,8 +150,11 @@ export default function NavBar({ user }: NavBarProps) {
             </Link>
           </LogoWrapper>
 
-          {/* Center: Navigation Links */}
-          <div className="flex-1 hidden md:flex justify-center gap-6 lg:gap-10 items-center min-w-0 md:ml-8 lg:ml-16">
+          {/* Center: Navigation Links — only on xl+ so the right-side cluster
+              (Studio, Admin, Wallet, Notifications, Avatar) doesn't collide with
+              the centre links between ~768–1150px. Below xl, nav links are
+              reachable via the hamburger menu. (B3) */}
+          <div className="flex-1 hidden xl:flex justify-center gap-6 lg:gap-10 items-center min-w-0 md:ml-8 lg:ml-16">
             <NavLink href="/">{t('home')}</NavLink>
             <NavLink href="/courses" activePaths={["/courses"]}>{t('courses')}</NavLink>
             <NavLink href="/community" activePaths={["/community"]}>{t('community')}</NavLink>
@@ -164,8 +191,18 @@ export default function NavBar({ user }: NavBarProps) {
             </button>
           </div>
 
+          {/* Tablet hamburger: between md and xl, the centre nav is hidden, so
+              expose a hamburger that opens the existing mobile menu. (B3) */}
+          <button
+            className="hidden md:flex xl:hidden p-2 text-gray-300 hover:text-white transition-colors mr-1"
+            onClick={() => { setIsMobileMenuOpen(!isMobileMenuOpen); UISound.click(); }}
+            aria-label="Toggle navigation menu"
+          >
+            {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+
           {/* Desktop right-side items */}
-          <div className="hidden md:flex gap-3 items-center shrink-0">
+          <div className="hidden md:flex gap-2 lg:gap-3 items-center shrink-0">
             {isAuthenticated ? (
               <>
                 {/* Clave Wallet (v4.0) - Only show on Community page */}
@@ -403,7 +440,7 @@ export default function NavBar({ user }: NavBarProps) {
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeInOut" }}
-              className="md:hidden overflow-hidden border-t border-white/10 bg-black/95 backdrop-blur-xl"
+              className="xl:hidden overflow-hidden border-t border-white/10 bg-black/95 backdrop-blur-xl"
             >
               <div className="flex flex-col px-4 py-4 gap-1">
                 {/* Nav Links */}

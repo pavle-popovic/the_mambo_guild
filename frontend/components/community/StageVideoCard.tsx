@@ -157,9 +157,12 @@ export default function StageVideoCard({
                     </div>
                 )}
 
-                {/* Hover Overlay - only show when not locked and not compact */}
+                {/* Hover Overlay - only show when not locked and not compact.
+                    On mobile (< lg) the overlay is always visible at reduced
+                    opacity so reaction counts and the avatar are reachable
+                    without hover. */}
                 {!isLocked && !isCompact && (
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity duration-300 flex flex-col justify-end p-4">
                         {/* Stats */}
                         <div className="flex items-center justify-between">
                             <div className="flex items-center gap-4">
@@ -181,12 +184,11 @@ export default function StageVideoCard({
                                     if (post.user.username) setShowProfileModal(true);
                                 }}
                                 className="rounded-full transition hover:ring-2 hover:ring-mambo-gold/60 focus:outline-none focus:ring-2 focus:ring-mambo-gold/60"
-                                aria-label={`View ${post.user.first_name}'s profile`}
+                                aria-label={`View ${post.user.username || "user"}'s profile`}
                             >
                                 <GuildMasterAvatar
                                     avatarUrl={post.user.avatar_url}
-                                    firstName={post.user.first_name}
-                                    lastName={post.user.last_name}
+                                    username={post.user.username}
                                     isPro={post.user.is_pro}
                                     isGuildMaster={post.user.is_guild_master}
                                     size="sm"
