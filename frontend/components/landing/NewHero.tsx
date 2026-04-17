@@ -154,22 +154,24 @@ export default function NewHero() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
-                        className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-gradient-to-r from-amber-900/30 to-yellow-900/20 border border-mambo-gold/40 rounded-full backdrop-blur-sm whitespace-nowrap landscape-phone:!py-0.5 landscape-phone:!px-2.5"
+                        className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-900/60 to-yellow-900/40 border border-mambo-gold/60 rounded-full backdrop-blur-sm shadow-[0_0_20px_rgba(212,175,55,0.15)] max-w-full landscape-phone:!py-0.5 landscape-phone:!px-2.5"
                     >
                         <FaCertificate className="text-mambo-gold text-[10px] sm:text-xs flex-shrink-0" />
-                        <span className="text-[11px] sm:text-xs md:text-sm font-medium text-mambo-gold tracking-wide landscape-phone:!text-[10px]">
+                        <span className="text-[10px] sm:text-xs md:text-sm font-medium text-mambo-gold tracking-wide leading-tight landscape-phone:!text-[10px]">
                             Built on Learning Experience Design
                         </span>
                     </motion.div>
 
                     {/* Main Title — structured salsa curriculum positioning */}
-                    <div className="space-y-2.5 md:space-y-3 landscape-phone:!space-y-1.5">
-                        <h1
-                            className="font-bold italic leading-[1.05] tracking-tight text-mambo-text text-balance text-[clamp(1.75rem,3.4vw,3rem)] landscape-phone:!text-2xl"
-                            style={{ fontFamily: '"Playfair Display", serif' }}
-                        >
-                            Every move, every technique.{" "}
-                            <span className="block text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.35)]">
+                    <div className="space-y-2 md:space-y-2.5 landscape-phone:!space-y-1">
+                        <h1 className="leading-[1.05] tracking-tight text-mambo-text">
+                            <span className="block font-extrabold text-[clamp(1.4rem,2.3vw,2.25rem)] landscape-phone:!text-xl">
+                                Every move, every technique.
+                            </span>
+                            <span
+                                className="block font-bold italic text-mambo-gold text-[clamp(1.75rem,3.2vw,3.25rem)] drop-shadow-[0_0_30px_rgba(212,175,55,0.35)] landscape-phone:!text-2xl"
+                                style={{ fontFamily: '"Playfair Display", serif' }}
+                            >
                                 Level 0 to 100.
                             </span>
                         </h1>
@@ -206,24 +208,23 @@ export default function NewHero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.8, duration: 0.6 }}
-                        className="hidden lg:flex flex-col gap-3 items-center lg:items-start pt-2 landscape-phone:!flex landscape-phone:!gap-1.5 landscape-phone:!pt-1 landscape-phone:!items-start"
+                        className="hidden lg:flex flex-col gap-2.5 items-start pt-2 landscape-phone:!flex landscape-phone:!gap-1 landscape-phone:!pt-1"
                     >
+                        <div className="flex items-center gap-2 text-sm text-gray-300 landscape-phone:!text-[11px] landscape-phone:!gap-1.5">
+                            <span className="relative flex h-2 w-2 landscape-phone:!h-1.5 landscape-phone:!w-1.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
+                                <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold landscape-phone:!h-1.5 landscape-phone:!w-1.5"></span>
+                            </span>
+                            <span>
+                                Join <span className="font-bold text-mambo-gold">1,000+ dancers</span> already on the list
+                            </span>
+                        </div>
                         <Link
                             href="/register"
                             className="relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3 px-7 xl:py-3.5 xl:px-8 rounded-full text-sm xl:text-base whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 landscape-phone:!py-2 landscape-phone:!px-4 landscape-phone:!text-[11px]"
                         >
                             Get Your 7-Day Free Trial!
                         </Link>
-                        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-sm landscape-phone:!px-2.5 landscape-phone:!py-1 landscape-phone:!gap-1.5">
-                            <span className="relative flex h-2 w-2 landscape-phone:!h-1.5 landscape-phone:!w-1.5">
-                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
-                                <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold landscape-phone:!h-1.5 landscape-phone:!w-1.5"></span>
-                            </span>
-                            <span className="text-sm sm:text-[15px] landscape-phone:!text-[11px]">
-                                <span className="font-bold text-mambo-gold">1,000+ dancers</span>
-                                <span className="text-gray-300"> already on the list</span>
-                            </span>
-                        </div>
                     </motion.div>
                 </motion.div>
 
@@ -232,24 +233,23 @@ export default function NewHero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.6 }}
-                    className="flex lg:hidden flex-col gap-3 items-center w-full max-w-md order-3 pt-1 landscape-phone:!hidden"
+                    className="flex lg:hidden flex-col gap-2.5 items-center w-full max-w-md order-3 pt-1 landscape-phone:!hidden"
                 >
+                    <div className="flex items-center gap-2 text-sm text-gray-300">
+                        <span className="relative flex h-2 w-2">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold"></span>
+                        </span>
+                        <span>
+                            Join <span className="font-bold text-mambo-gold">1,000+ dancers</span> already on the list
+                        </span>
+                    </div>
                     <Link
                         href="/register"
                         className="w-full relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-6 rounded-full text-sm transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50"
                     >
                         Get Your 7-Day Free Trial!
                     </Link>
-                    <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-sm">
-                        <span className="relative flex h-2 w-2">
-                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
-                            <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold"></span>
-                        </span>
-                        <span className="text-sm">
-                            <span className="font-bold text-mambo-gold">1,000+ dancers</span>
-                            <span className="text-gray-300"> already on the list</span>
-                        </span>
-                    </div>
                 </motion.div>
             </div>
 
