@@ -14,4 +14,5 @@ export { default as ReleaseScheduleSection, ReleaseScheduleButton } from "./Rele
 export { default as Mambobot } from "./Mambobot";
 export { default as FounderAuthorityStrip } from "./FounderAuthorityStrip";
 export { default as FAQSection } from "./FAQSection";
+export { default as LandingSchemas } from "./LandingSchemas";
 

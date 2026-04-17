@@ -13,7 +13,25 @@ import AuthPromptModal from "@/components/AuthPromptModal";
 const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
 const PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml";
 
-const plans = [
+type Plan = {
+  id: string;
+  name: string;
+  price: string;
+  period: string;
+  description: string;
+  features: { text: string; included: boolean }[];
+  cta: string;
+  highlighted: boolean;
+  priceId: string | null;
+  customStyle?: string;
+  cardBg?: string;
+  grandfather?: {
+    nextPrice: string;
+    reason: string;
+  };
+};
+
+const plans: Plan[] = [
   {
     id: "guest-list",
     name: "Guest List",
@@ -37,12 +55,17 @@ const plans = [
       { text: "Full access to Guild courses, choreos & topics", included: true },
       { text: "New choreos bi-weekly", included: true },
       { text: "Access to the Guild community", included: true },
+      { text: "Your $39/mo locked in for life", included: true },
     ],
     cta: "Start Pro Access",
     highlighted: true,
     priceId: ADVANCED_PRICE_ID,
     customStyle: "border border-mambo-gold/50 shadow-[0_0_30px_rgba(251,191,36,0.15)]",
-    cardBg: "bg-gradient-to-b from-[#1a1a1a] to-black"
+    cardBg: "bg-gradient-to-b from-[#1a1a1a] to-black",
+    grandfather: {
+      nextPrice: "$49/mo",
+      reason: "Price increases to $49/mo on August 1, 2026",
+    },
   },
   {
     id: "performer",
@@ -56,10 +79,15 @@ const plans = [
       { text: "Roundtable exclusive Zoom calls", included: true },
       { text: "Exclusive Badge", included: true },
       { text: "Additional claves for the community", included: true },
+      { text: "Your $59/mo locked in for life", included: true },
     ],
     cta: "Get Guild Master Access",
     highlighted: false,
     priceId: PERFORMER_PRICE_ID,
+    grandfather: {
+      nextPrice: "$99/mo",
+      reason: "Price jumps to $99/mo once all 30 founding seats fill",
+    },
   },
 ];
 
@@ -224,7 +252,22 @@ export default function LandingPricingSection() {
                             {plan.period}
                           </span>
                         )}
+                        {plan.grandfather && (
+                          <span className="ml-2 align-middle text-base text-gray-500 font-normal line-through decoration-gray-600">
+                            {plan.grandfather.nextPrice}
+                          </span>
+                        )}
                       </div>
+                      {plan.grandfather && (
+                        <div className="mb-3 flex items-center gap-2 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-2.5 py-1.5">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold whitespace-nowrap">
+                            Founders' Price
+                          </span>
+                          <span className="text-[11px] leading-tight text-white/75">
+                            {plan.grandfather.reason}. Lock it in today — yours for life.
+                          </span>
+                        </div>
+                      )}
                       {plan.id === "performer" && guildMasterSeats ? (
                         <div className="mb-8">
                           <div className="flex items-baseline gap-2 mb-2">
@@ -323,18 +366,39 @@ export default function LandingPricingSection() {
           })}
         </StaggerContainer>
 
-        {/* Bottom note */}
+        {/* Trust bar — cancel-anytime + Stripe + lifetime price lock */}
         <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ delay: 0.4 }}
-          className="mt-16 text-center text-gray-500 text-sm"
+          transition={{ delay: 0.3, duration: 0.5 }}
+          className="mt-10 sm:mt-14"
         >
-          <p>
-            Secure payment powered by Stripe.{" "}
-            <Link href="/pricing" className="text-mambo-blue hover:underline">
-              View full pricing details
+          <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8 text-center sm:text-left">
+            <div className="flex items-center gap-2.5 text-sm text-white/80">
+              <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span><span className="font-semibold text-white">Cancel anytime</span> — two clicks, no commitment</span>
+            </div>
+            <div className="hidden sm:block h-5 w-px bg-white/10" />
+            <div className="flex items-center gap-2.5 text-sm text-white/80">
+              <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                <path d="M5 9V7a5 5 0 0110 0v2h1a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2h1zm8 0V7a3 3 0 10-6 0v2h6z" />
+              </svg>
+              <span><span className="font-semibold text-white">Your price, locked for life</span> — even when rates go up</span>
+            </div>
+            <div className="hidden sm:block h-5 w-px bg-white/10" />
+            <div className="flex items-center gap-2.5 text-sm text-white/80">
+              <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span>Secure <span className="font-semibold text-white">Stripe</span> checkout</span>
+            </div>
+          </div>
+          <p className="mt-5 text-center text-gray-500 text-xs">
+            <Link href="/pricing" className="text-mambo-gold/90 hover:text-mambo-gold underline-offset-4 hover:underline">
+              See full pricing details and FAQ →
             </Link>
           </p>
         </motion.div>

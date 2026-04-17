@@ -9,7 +9,9 @@ import {
     SkillTreeTeaser,
     ReleaseScheduleSection,
     TestimonialsSection,
+    LandingPricingSection,
     FAQSection,
+    LandingSchemas,
 } from "@/components/landing";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -71,10 +73,18 @@ export default function HomePage() {
                     <TestimonialsSection />
                 </section>
 
+                {/* Pricing — conversion close with grandfather urgency + cancel-anytime */}
+                <section className="relative z-10" id="pricing">
+                    <LandingPricingSection />
+                </section>
+
                 {/* FAQ — schema.org FAQPage for GEO + SEO */}
                 <section className="relative z-10">
                     <FAQSection />
                 </section>
+
+                {/* Structured data for GEO: Course + VideoObject + Breadcrumb */}
+                <LandingSchemas />
 
                 {/* Footer — add bottom padding on mobile for sticky CTA */}
                 <div className="pb-16">

@@ -295,8 +295,14 @@ function PricingPageContent() {
                     </div>
                     <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
                       $39<span className="text-lg text-gray-400 font-normal">/mo</span>
+                      <span className="ml-2 align-middle text-base text-gray-500 font-normal line-through decoration-gray-600">$49/mo</span>
                     </div>
-                    <div className="text-sm text-gray-400 mb-8">Billed monthly.</div>
+                    <div className="mb-6 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-3 py-2 text-left">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold mb-0.5">Founders' Price</div>
+                      <div className="text-xs leading-snug text-white/75">
+                        Price increases to $49/mo on August 1, 2026. Lock in $39/mo today — yours for life, as long as you stay subscribed.
+                      </div>
+                    </div>
 
                     <ul className="text-left space-y-4 mb-8 flex-1">
                       <li className={`flex gap-3 text-sm leading-relaxed ${isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"}`}>
@@ -367,6 +373,13 @@ function PricingPageContent() {
                     </div>
                     <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
                       $59<span className="text-lg text-gray-400 font-normal">/mo</span>
+                      <span className="ml-2 align-middle text-base text-gray-500 font-normal line-through decoration-gray-600">$99/mo</span>
+                    </div>
+                    <div className="mb-6 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-3 py-2 text-left">
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold mb-0.5">Founding 30 Seats</div>
+                      <div className="text-xs leading-snug text-white/75">
+                        Price jumps to $99/mo once all 30 founding seats fill. Lock in $59/mo today — yours for life, as long as you stay subscribed.
+                      </div>
                     </div>
                     {guildMasterSeats ? (
                       <div className="mb-8">
@@ -467,10 +480,31 @@ function PricingPageContent() {
             </StaggerItem>
           </StaggerContainer>
 
-          <div className="mt-20 text-gray-400 text-sm leading-relaxed">
-            <p>
-              Secure payment powered by Stripe. <br />
-              Questions? Email support@themamboinn.com
+          <div className="mt-14 sm:mt-20">
+            <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8 text-center sm:text-left">
+              <div className="flex items-center gap-2.5 text-sm text-white/80">
+                <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span><span className="font-semibold text-white">Cancel anytime</span> — two clicks, no commitment</span>
+              </div>
+              <div className="hidden sm:block h-5 w-px bg-white/10" />
+              <div className="flex items-center gap-2.5 text-sm text-white/80">
+                <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                  <path d="M5 9V7a5 5 0 0110 0v2h1a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2h1zm8 0V7a3 3 0 10-6 0v2h6z" />
+                </svg>
+                <span><span className="font-semibold text-white">Your price, locked for life</span></span>
+              </div>
+              <div className="hidden sm:block h-5 w-px bg-white/10" />
+              <div className="flex items-center gap-2.5 text-sm text-white/80">
+                <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>Secure <span className="font-semibold text-white">Stripe</span> checkout</span>
+              </div>
+            </div>
+            <p className="mt-6 text-center text-gray-500 text-sm">
+              Questions? Email <a href="mailto:support@themamboinn.com" className="text-mambo-gold/90 hover:text-mambo-gold">support@themamboinn.com</a>
             </p>
           </div>
         </div>
