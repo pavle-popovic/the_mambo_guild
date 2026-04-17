@@ -18,8 +18,6 @@ interface CommunitySidebarProps {
     onViewModeChange: (mode: ViewMode) => void;
     selectedLevels: string[];
     onLevelsChange: (levels: string[]) => void;
-    selectedTopics: string[];
-    onTopicsChange: (topics: string[]) => void;
     posts?: Post[]; // Pass posts to calculate counts
 }
 
@@ -30,52 +28,31 @@ const levels = [
     { id: "level-4", label: "Master", value: "master", keywords: ["master", "level 4", "level-4", "IV", "expert"] },
 ];
 
-const topics = [
-    { id: "dancing", label: "Dancing", slug: "dancing" },
-    { id: "expression", label: "Expression", slug: "expression" },
-    { id: "musicality", label: "Musicality", slug: "musicality" },
-    { id: "partnerwork", label: "Partnerwork", slug: "partnerwork" },
-    { id: "shines", label: "Shines", slug: "shines" },
-];
-
 export default function CommunitySidebar({
     viewMode,
     onViewModeChange,
     selectedLevels,
     onLevelsChange,
-    selectedTopics,
-    onTopicsChange,
     posts = [],
 }: CommunitySidebarProps) {
     // Calculate counts for each filter
     const filterCounts = useMemo(() => {
         const levelCounts: Record<string, number> = {};
-        const topicCounts: Record<string, number> = {};
 
-        // Initialize counts
         levels.forEach((l) => (levelCounts[l.value] = 0));
-        topics.forEach((t) => (topicCounts[t.slug] = 0));
 
-        // Count posts matching each filter
         posts.forEach((post) => {
             const tagsLower = post.tags.map((t) => t.toLowerCase());
 
-            // Count levels
             levels.forEach((level) => {
                 const matches = level.keywords.some((kw) =>
                     tagsLower.some((tag) => tag.includes(kw.toLowerCase()))
                 );
                 if (matches) levelCounts[level.value]++;
             });
-
-            // Count topics
-            topics.forEach((topic) => {
-                const matches = tagsLower.some((tag) => tag.includes(topic.slug.toLowerCase()));
-                if (matches) topicCounts[topic.slug]++;
-            });
         });
 
-        return { levelCounts, topicCounts };
+        return { levelCounts };
     }, [posts]);
 
     const toggleLevel = (value: string) => {
@@ -83,14 +60,6 @@ export default function CommunitySidebar({
             onLevelsChange(selectedLevels.filter((l) => l !== value));
         } else {
             onLevelsChange([...selectedLevels, value]);
-        }
-    };
-
-    const toggleTopic = (slug: string) => {
-        if (selectedTopics.includes(slug)) {
-            onTopicsChange(selectedTopics.filter((t) => t !== slug));
-        } else {
-            onTopicsChange([...selectedTopics, slug]);
         }
     };
 
@@ -169,59 +138,6 @@ export default function CommunitySidebar({
                                     )}
                                 >
                                     {level.label}
-                                </span>
-                                {count > 0 && (
-                                    <span className="text-xs text-[#D4AF37]/60 font-medium">({count})</span>
-                                )}
-                            </label>
-                        );
-                    })}
-                </div>
-
-                <div className="my-6 h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
-
-                {/* Topic Filter */}
-                <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-[0.2em] mb-4 font-serif pl-2">
-                    Focus Area
-                </h3>
-                <div className="space-y-2 mb-4">
-                    {topics.map((topic) => {
-                        const count = filterCounts.topicCounts[topic.slug] || 0;
-                        return (
-                            <label
-                                key={topic.id}
-                                className="flex items-center gap-3 cursor-pointer group px-2 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
-                                onClick={() => toggleTopic(topic.slug)}
-                            >
-                                <div
-                                    className={cn(
-                                        "w-4 h-4 rounded border flex items-center justify-center transition-all",
-                                        selectedTopics.includes(topic.slug)
-                                            ? "bg-[#D4AF37] border-[#D4AF37]"
-                                            : "border-white/20 group-hover:border-[#D4AF37]/50"
-                                    )}
-                                >
-                                    {selectedTopics.includes(topic.slug) && (
-                                        <svg
-                                            className="w-3 h-3 text-black"
-                                            fill="none"
-                                            viewBox="0 0 24 24"
-                                            stroke="currentColor"
-                                            strokeWidth={3}
-                                        >
-                                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                        </svg>
-                                    )}
-                                </div>
-                                <span
-                                    className={cn(
-                                        "flex-1 text-sm transition-colors",
-                                        selectedTopics.includes(topic.slug)
-                                            ? "text-white font-medium"
-                                            : "text-white/50 group-hover:text-white/80"
-                                    )}
-                                >
-                                    {topic.label}
                                 </span>
                                 {count > 0 && (
                                     <span className="text-xs text-[#D4AF37]/60 font-medium">({count})</span>

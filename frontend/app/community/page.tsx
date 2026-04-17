@@ -62,9 +62,7 @@ export default function CommunityPage() {
     // Mobile search & dropdowns
     const [searchQuery, setSearchQuery] = useState("");
     const [levelDropdownOpen, setLevelDropdownOpen] = useState(false);
-    const [topicDropdownOpen, setTopicDropdownOpen] = useState(false);
     const levelDropdownRef = useRef<HTMLDivElement>(null);
-    const topicDropdownRef = useRef<HTMLDivElement>(null);
     const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [isMobile, setIsMobile] = useState(false);
 
@@ -90,7 +88,6 @@ export default function CommunityPage() {
     useEffect(() => {
         const handleClick = (e: MouseEvent) => {
             if (levelDropdownRef.current && !levelDropdownRef.current.contains(e.target as Node)) setLevelDropdownOpen(false);
-            if (topicDropdownRef.current && !topicDropdownRef.current.contains(e.target as Node)) setTopicDropdownOpen(false);
         };
         document.addEventListener("mousedown", handleClick);
         return () => document.removeEventListener("mousedown", handleClick);
@@ -125,21 +122,13 @@ export default function CommunityPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery]);
 
-    // Level/Topic filter constants for mobile dropdowns
+    // Level filter constants for mobile dropdown
     const levelOptions = [
         { value: "", label: "All Levels" },
         { value: "beginner", label: "Beginner" },
         { value: "intermediate", label: "Intermediate" },
         { value: "advanced", label: "Advanced" },
         { value: "master", label: "Master" },
-    ];
-    const topicOptions = [
-        { value: "", label: "All Topics" },
-        { value: "dancing", label: "Dancing" },
-        { value: "expression", label: "Expression" },
-        { value: "musicality", label: "Musicality" },
-        { value: "partnerwork", label: "Partnerwork" },
-        { value: "shines", label: "Shines" },
     ];
 
     // Load posts - load for everyone including preview mode
@@ -252,8 +241,6 @@ export default function CommunityPage() {
                             onViewModeChange={setViewMode}
                             selectedLevels={selectedLevels}
                             onLevelsChange={setSelectedLevels}
-                            selectedTopics={selectedTopics}
-                            onTopicsChange={setSelectedTopics}
                             posts={posts}
                         />
                     </div>
@@ -319,7 +306,7 @@ export default function CommunityPage() {
                             {/* Level Dropdown */}
                             <div className="relative flex-1" ref={levelDropdownRef}>
                                 <button
-                                    onClick={() => { setLevelDropdownOpen(!levelDropdownOpen); setTopicDropdownOpen(false); }}
+                                    onClick={() => setLevelDropdownOpen(!levelDropdownOpen)}
                                     className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
                                         selectedLevels.length > 0
                                             ? "bg-amber-500/10 border-amber-500/40"
@@ -356,45 +343,6 @@ export default function CommunityPage() {
                                 )}
                             </div>
 
-                            {/* Topic Dropdown */}
-                            <div className="relative flex-1" ref={topicDropdownRef}>
-                                <button
-                                    onClick={() => { setTopicDropdownOpen(!topicDropdownOpen); setLevelDropdownOpen(false); }}
-                                    className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
-                                        selectedTopics.length > 0
-                                            ? "bg-cyan-500/10 border-cyan-500/40"
-                                            : "bg-white/[0.04] border-white/10"
-                                    } ${topicDropdownOpen ? "border-cyan-400/60 bg-white/[0.08]" : ""}`}
-                                >
-                                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Focus</span>
-                                    <span className={`text-[11px] font-bold ${selectedTopics.length > 0 ? "text-cyan-300" : "text-white"}`}>
-                                        {selectedTopics.length > 0
-                                            ? topicOptions.find((o) => o.value === selectedTopics[0])?.label || "All Topics"
-                                            : "All Topics"}
-                                    </span>
-                                    <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 text-gray-400 transition-transform ${topicDropdownOpen ? "rotate-180" : ""}`} />
-                                </button>
-                                {topicDropdownOpen && (
-                                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                                        {topicOptions.map((opt) => (
-                                            <button
-                                                key={opt.value}
-                                                onClick={() => {
-                                                    setSelectedTopics(opt.value ? [opt.value] : []);
-                                                    setTopicDropdownOpen(false);
-                                                }}
-                                                className={`w-full px-3 py-2.5 text-left text-[12px] font-semibold transition-all ${
-                                                    (opt.value === "" && selectedTopics.length === 0) || selectedTopics.includes(opt.value)
-                                                        ? "bg-cyan-500/20 text-cyan-300"
-                                                        : "text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]"
-                                                }`}
-                                            >
-                                                {opt.label}
-                                            </button>
-                                        ))}
-                                    </div>
-                                )}
-                            </div>
                         </div>
                     </div>
 
@@ -418,6 +366,23 @@ export default function CommunityPage() {
                                 )}
                             </div>
                         </div>
+
+                        {/* Active tag chip — set by trending-tag click */}
+                        {selectedTopics.length > 0 && (
+                            <div className="mb-4 flex flex-wrap items-center gap-2">
+                                <span className="text-[11px] uppercase tracking-widest text-white/40 font-semibold">Filtering by</span>
+                                {selectedTopics.map((tag) => (
+                                    <button
+                                        key={tag}
+                                        onClick={() => setSelectedTopics((prev) => prev.filter((t) => t !== tag))}
+                                        className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-cyan-500/15 border border-cyan-400/40 text-cyan-200 text-xs font-bold hover:bg-cyan-500/25 transition"
+                                    >
+                                        #{tag}
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                ))}
+                            </div>
+                        )}
 
                         {isLoading ? (
                             <div className="flex justify-center py-16">
@@ -564,12 +529,9 @@ export default function CommunityPage() {
                             posts={posts}
                             activeTopic={selectedTopics[0]}
                             onTagClick={(tag) => {
-                                const normalized = tag.replace(/^#/, "").toLowerCase();
-                                const known = topicOptions.some((o) => o.value === normalized);
-                                if (!known) {
-                                    handleSearch(tag);
-                                    return;
-                                }
+                                // Preserve original casing — backend Post.tags.any() is case-sensitive
+                                const normalized = tag.replace(/^#/, "");
+                                if (searchQuery) handleSearch("");
                                 setSelectedTopics((prev) =>
                                     prev.length === 1 && prev[0] === normalized ? [] : [normalized]
                                 );
