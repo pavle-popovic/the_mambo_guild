@@ -317,8 +317,10 @@ export default function HowItWorksSection() {
                 key={pillar.eyebrow}
                 className={[
                   "flex flex-col-reverse items-center gap-7 sm:gap-12 lg:gap-20",
-                  isEven ? "lg:flex-row" : "lg:flex-row-reverse",
-                  "landscape-phone:!flex-row landscape-phone:!gap-6 landscape-phone:!items-center",
+                  isEven
+                    ? "lg:flex-row landscape-phone:!flex-row"
+                    : "lg:flex-row-reverse landscape-phone:!flex-row-reverse",
+                  "landscape-phone:!gap-6 landscape-phone:!items-center",
                 ].join(" ")}
               >
                 {/* Text column */}

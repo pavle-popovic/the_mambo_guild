@@ -122,7 +122,7 @@ export default function FounderAuthorityStrip() {
                         flex flex-col items-center gap-7
                         rounded-3xl border border-white/10
                         bg-gradient-to-b from-white/[0.04] to-white/[0.01]
-                        p-5 shadow-[0_0_60px_rgba(212,175,55,0.08)] backdrop-blur-sm
+                        p-4 shadow-[0_0_60px_rgba(212,175,55,0.08)] backdrop-blur-sm
                         sm:p-10
                         lg:flex-row lg:items-center lg:gap-12 lg:p-12
                         landscape-phone:!flex-row landscape-phone:!items-center landscape-phone:!gap-5 landscape-phone:!p-5
@@ -176,17 +176,12 @@ export default function FounderAuthorityStrip() {
                             variants={fadeIn}
                             className="
                                 font-serif italic font-bold text-white leading-[1.1] whitespace-nowrap
-                                text-[clamp(1.1rem,5.1vw,3rem)]
-                                sm:text-[2.5rem] lg:text-[3rem]
+                                text-[clamp(1.3rem,5.8vw,3.25rem)]
+                                sm:text-[2.75rem] lg:text-[3.25rem]
                                 landscape-phone:!text-2xl landscape-phone:!leading-tight
-                                [text-shadow:0_0_22px_rgba(212,175,55,0.30),0_0_48px_rgba(252,226,5,0.18)]
                             "
                         >
-                            Built by a{" "}
-                            <span className="text-mambo-gold [text-shadow:0_0_18px_rgba(252,226,5,0.7),0_0_40px_rgba(212,175,55,0.55),0_0_70px_rgba(212,175,55,0.35)]">
-                                dancer
-                            </span>
-                            , not a studio.
+                            Built by a <span className="text-mambo-gold">dancer</span>, not a studio.
                         </motion.h2>
 
                         <motion.p
