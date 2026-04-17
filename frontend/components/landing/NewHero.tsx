@@ -42,22 +42,46 @@ export default function NewHero() {
         return () => mq.removeEventListener("change", apply);
     }, []);
 
-    // Nudge playback if the browser's native autoplay silently bails out
-    // (happens on hard-refresh when decode isn't ready at autoplay-attempt time).
+    // Recover from Chrome's "autoplay fires before decoder is ready" hang on hard-refresh.
+    // Watches currentTime; if playback isn't advancing we force a full load()+play() reset,
+    // which is exactly what a tab-visibility cycle does under the hood.
     useEffect(() => {
         const v = videoRef.current;
         if (!v) return;
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 
+        let lastTime = -1;
+        let stuckTicks = 0;
+        let resetCount = 0;
+
         const tryPlay = () => {
             if (v.paused && !v.ended) v.play().catch(() => {});
         };
+        const hardReset = () => {
+            if (resetCount >= 3) return; // give up after a few tries
+            resetCount += 1;
+            try { v.load(); } catch {}
+            v.play().catch(() => {});
+        };
+
         tryPlay();
-        const onVisible = () => { if (document.visibilityState === "visible") tryPlay(); };
+
         const id = window.setInterval(() => {
-            if (!v.paused) { window.clearInterval(id); return; }
-            tryPlay();
-        }, 800);
+            if (v.readyState < 2) { tryPlay(); return; }
+            if (v.paused) { tryPlay(); return; }
+            if (v.currentTime === lastTime) {
+                stuckTicks += 1;
+                if (stuckTicks >= 3) { // ~1.5s of no progress despite "playing"
+                    stuckTicks = 0;
+                    hardReset();
+                }
+            } else {
+                stuckTicks = 0;
+                lastTime = v.currentTime;
+            }
+        }, 500);
+
+        const onVisible = () => { if (document.visibilityState === "visible") tryPlay(); };
         document.addEventListener("visibilitychange", onVisible);
         v.addEventListener("loadeddata", tryPlay);
         v.addEventListener("canplay", tryPlay);
@@ -109,8 +133,8 @@ export default function NewHero() {
                             onEmptied={() => setVideoReady(false)}
                             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${videoReady ? "opacity-100" : "opacity-0"}`}
                         >
-                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v2.webm" type="video/webm" />
-                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v2.mp4" type="video/mp4" />
+                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v3.webm" type="video/webm" />
+                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v3.mp4" type="video/mp4" />
                         </video>
 
                         {/* Gradient Overlay */}
