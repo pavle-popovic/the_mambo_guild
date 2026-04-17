@@ -54,7 +54,7 @@ export default function NewHero() {
                     transition={{ duration: 0.6, ease: "easeOut" }}
                     className="flex-[1.2] w-full max-w-2xl lg:max-w-3xl order-2 lg:order-2"
                 >
-                    <div className="relative aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
+                    <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
                         <video
                             ref={videoRef}
                             poster="/assets/SilentHero-poster.jpg"
@@ -75,13 +75,6 @@ export default function NewHero() {
 
                         {/* Gradient Overlay */}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10 pointer-events-none" />
-
-                        {/* Label */}
-                        <div className="absolute bottom-3 sm:bottom-6 left-3 sm:left-6 right-3 sm:right-6 flex items-end justify-between pointer-events-none">
-                            <div className="text-[9px] sm:text-xs text-gray-300 tracking-[0.15em] uppercase font-bold bg-black/40 backdrop-blur-sm px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full">
-                                Cinematic Trailer
-                            </div>
-                        </div>
                     </div>
                 </motion.div>
 
