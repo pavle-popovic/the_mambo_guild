@@ -107,29 +107,7 @@ export default function LessonPage() {
   const [videoDuration, setVideoDuration] = useState(0);
   const [captionText, setCaptionText] = useState("");
   const [videoEnded, setVideoEnded] = useState(false);
-  // B20: When the user has watched ≥85% of a desktop video and the lesson
-  // is not yet completed, show a centered "Looks like you finished" prompt
-  // so the Mark Complete button isn't lost in the right rail.
-  const [showCompletePrompt, setShowCompletePrompt] = useState(false);
-  const completePromptDismissedRef = useRef(false);
-  const completePromptHideTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const abLoop = useABLoop(videoPlayerRef, videoDuration);
-
-  // Reset the B20 prompt whenever the user moves to a different lesson
-  useEffect(() => {
-    setShowCompletePrompt(false);
-    completePromptDismissedRef.current = false;
-    if (completePromptHideTimerRef.current) {
-      clearTimeout(completePromptHideTimerRef.current);
-      completePromptHideTimerRef.current = null;
-    }
-    return () => {
-      if (completePromptHideTimerRef.current) {
-        clearTimeout(completePromptHideTimerRef.current);
-        completePromptHideTimerRef.current = null;
-      }
-    };
-  }, [lessonId]);
 
   useEffect(() => {
     // Wait for auth to finish loading before making any decisions
@@ -883,46 +861,10 @@ export default function LessonPage() {
                       <MuxVideoPlayer
                         ref={videoPlayerRef}
                         playbackId={lesson.mux_playback_id}
-                        onEnded={() => {
-                          setVideoPlaying(false);
-                          setVideoEnded(true);
-                          // B20: also fire the "Mark Complete" prompt at true 100% (onEnded is the canonical end-of-video signal; onTimeUpdate may not hit exactly 1.0)
-                          if (!isCompleted && !completePromptDismissedRef.current) {
-                            setShowCompletePrompt((prev) => {
-                              if (prev) return prev;
-                              if (completePromptHideTimerRef.current) {
-                                clearTimeout(completePromptHideTimerRef.current);
-                              }
-                              completePromptHideTimerRef.current = setTimeout(() => {
-                                setShowCompletePrompt(false);
-                              }, 8000);
-                              return true;
-                            });
-                          }
-                        }}
+                        onEnded={() => { setVideoPlaying(false); setVideoEnded(true); }}
                         onPlay={() => setVideoEnded(false)}
                         onLoadedMetadata={(duration) => setVideoDuration(duration)}
                         onCaptionChange={setCaptionText}
-                        onTimeUpdate={(t) => {
-                          // B20: surface centre-screen "Mark Complete" prompt at 100%
-                          if (
-                            !isCompleted &&
-                            !completePromptDismissedRef.current &&
-                            videoDuration > 0 &&
-                            t / videoDuration >= 1
-                          ) {
-                            setShowCompletePrompt((prev) => {
-                              if (prev) return prev;
-                              if (completePromptHideTimerRef.current) {
-                                clearTimeout(completePromptHideTimerRef.current);
-                              }
-                              completePromptHideTimerRef.current = setTimeout(() => {
-                                setShowCompletePrompt(false);
-                              }, 8000);
-                              return true;
-                            });
-                          }
-                        }}
                         autoPlay={videoPlaying}
                         durationMinutes={lesson.duration_minutes}
                         metadata={{
@@ -1249,47 +1191,6 @@ export default function LessonPage() {
               abEnabled={abLoop.enabled}
               onToggleAB={abLoop.toggle}
             />
-          </div>
-        )}
-
-        {/* B20: Centred desktop prompt at ≥85% video progress */}
-        {showCompletePrompt && user && !isCompleted && !(isVideoLesson && hasQuiz && !quizPassed) && (
-          <div className="hidden lg:flex fixed inset-x-0 top-24 z-40 justify-center pointer-events-none">
-            <div className="pointer-events-auto bg-black/90 border-2 border-green-400/70 rounded-2xl px-5 py-4 shadow-[0_0_30px_rgba(34,197,94,0.45)] backdrop-blur-md flex items-center gap-4 max-w-md">
-              <div className="flex-1">
-                <p className="text-white text-sm font-bold">Looks like you finished — Mark Complete?</p>
-                <p className="text-white/60 text-xs mt-0.5">You're at the end of this lesson.</p>
-              </div>
-              <button
-                onClick={() => {
-                  completePromptDismissedRef.current = true;
-                  setShowCompletePrompt(false);
-                  if (completePromptHideTimerRef.current) {
-                    clearTimeout(completePromptHideTimerRef.current);
-                    completePromptHideTimerRef.current = null;
-                  }
-                  handleComplete();
-                }}
-                disabled={completing}
-                className="px-4 py-2 bg-green-500 hover:bg-green-400 text-white text-sm font-extrabold uppercase tracking-wide rounded-lg shadow-[0_0_20px_rgba(34,197,94,0.7)] transition-all active:scale-95 disabled:opacity-50 whitespace-nowrap"
-              >
-                Mark Complete
-              </button>
-              <button
-                onClick={() => {
-                  completePromptDismissedRef.current = true;
-                  setShowCompletePrompt(false);
-                  if (completePromptHideTimerRef.current) {
-                    clearTimeout(completePromptHideTimerRef.current);
-                    completePromptHideTimerRef.current = null;
-                  }
-                }}
-                aria-label="Dismiss"
-                className="text-white/40 hover:text-white text-lg leading-none px-1"
-              >
-                ×
-              </button>
-            </div>
           </div>
         )}
 
