@@ -146,17 +146,17 @@ export default function NewHero() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.8, duration: 0.6 }}
-                        className="hidden lg:flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start pt-2 sm:pt-4"
+                        className="hidden lg:flex flex-row gap-3 justify-center lg:justify-start pt-2"
                     >
                         <Link
                             href="/courses"
-                            className="bg-white hover:bg-gray-100 text-black font-extrabold py-3 sm:py-4 px-6 sm:px-8 rounded-full text-sm sm:text-lg shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.3)] transition-all transform hover:-translate-y-1 text-center"
+                            className="bg-white hover:bg-gray-100 text-black font-extrabold py-2.5 px-5 xl:py-3 xl:px-6 rounded-full text-xs xl:text-sm whitespace-nowrap shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.3)] transition-all transform hover:-translate-y-1 text-center"
                         >
                             Start Dancing Now
                         </Link>
                         <Link
                             href="/register"
-                            className="relative bg-amber-500 hover:bg-amber-400 text-black font-extrabold py-3 sm:py-4 px-6 sm:px-8 rounded-full text-sm sm:text-lg transition-all transform hover:-translate-y-1 text-center shadow-[0_0_25px_rgba(245,158,11,0.5),0_0_50px_rgba(245,158,11,0.2)] hover:shadow-[0_0_35px_rgba(245,158,11,0.7),0_0_70px_rgba(245,158,11,0.3)] ring-2 ring-amber-400/50"
+                            className="relative bg-amber-500 hover:bg-amber-400 text-black font-extrabold py-2.5 px-5 xl:py-3 xl:px-6 rounded-full text-xs xl:text-sm whitespace-nowrap transition-all transform hover:-translate-y-1 text-center shadow-[0_0_25px_rgba(245,158,11,0.5),0_0_50px_rgba(245,158,11,0.2)] hover:shadow-[0_0_35px_rgba(245,158,11,0.7),0_0_70px_rgba(245,158,11,0.3)] ring-2 ring-amber-400/50"
                         >
                             Get Your 7-Day Trial!
                         </Link>
