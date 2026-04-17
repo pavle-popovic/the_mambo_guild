@@ -7,9 +7,9 @@ import { FaCheck, FaCertificate } from "react-icons/fa";
 import Mambobot from "./Mambobot";
 
 const bulletPoints = [
-    "From total beginners to pro dancers",
-    "Anytime, anywhere",
     "No partner needed",
+    "13 languages",
+    "On-demand, anytime, anywhere",
 ];
 
 export default function NewHero() {
@@ -149,7 +149,7 @@ export default function NewHero() {
                     transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
                     className="flex-1 text-center lg:text-left space-y-4 md:space-y-6 max-w-2xl order-1 lg:order-1"
                 >
-                    {/* Certified Badge — aligned left on mobile */}
+                    {/* Credential Badge — aligned left on mobile */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
@@ -158,18 +158,21 @@ export default function NewHero() {
                     >
                         <FaCertificate className="text-mambo-gold text-xs sm:text-sm" />
                         <span className="text-xs sm:text-sm font-medium text-mambo-gold tracking-wide">
-                            Certified LXD Syllabus
+                            Built on Learning Experience Design
                         </span>
                     </motion.div>
 
-                    {/* Main Title — full brand name */}
-                    <div className="space-y-1">
-                        <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold font-serif leading-tight text-mambo-text whitespace-nowrap">
-                            The{" "}
+                    {/* Main Title — structured salsa curriculum positioning */}
+                    <div className="space-y-2">
+                        <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold font-serif leading-tight text-mambo-text">
+                            Every move, every technique.{" "}
                             <span className="text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.3)]">
-                                Mambo Guild
+                                Level 0 to 100.
                             </span>
                         </h1>
+                        <p className="text-base sm:text-lg md:text-xl text-gray-300 leading-snug max-w-xl mx-auto lg:mx-0">
+                            A structured salsa curriculum. Every skill in the right order.
+                        </p>
                     </div>
 
                     {/* Bullet Points — compact on mobile */}
@@ -195,47 +198,47 @@ export default function NewHero() {
                         ))}
                     </motion.ul>
 
-                    {/* CTA Buttons — desktop only (mobile version rendered below the video) */}
+                    {/* CTA Button — desktop only (mobile version rendered below the video) */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.8, duration: 0.6 }}
-                        className="hidden lg:flex flex-row gap-3 justify-center lg:justify-start pt-2"
+                        className="hidden lg:flex flex-col gap-3 items-center lg:items-start pt-2"
                     >
                         <Link
-                            href="/courses"
-                            className="bg-white hover:bg-gray-100 text-black font-extrabold py-2.5 px-5 xl:py-3 xl:px-6 rounded-full text-xs xl:text-sm whitespace-nowrap shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.3)] transition-all transform hover:-translate-y-1 text-center"
-                        >
-                            Start Dancing Now
-                        </Link>
-                        <Link
                             href="/register"
-                            className="relative bg-amber-500 hover:bg-amber-400 text-black font-extrabold py-2.5 px-5 xl:py-3 xl:px-6 rounded-full text-xs xl:text-sm whitespace-nowrap transition-all transform hover:-translate-y-1 text-center shadow-[0_0_25px_rgba(245,158,11,0.5),0_0_50px_rgba(245,158,11,0.2)] hover:shadow-[0_0_35px_rgba(245,158,11,0.7),0_0_70px_rgba(245,158,11,0.3)] ring-2 ring-amber-400/50"
+                            className="relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3 px-7 xl:py-3.5 xl:px-8 rounded-full text-sm xl:text-base whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50"
                         >
-                            Get Your 7-Day Trial!
+                            Get Your 7-Day Free Trial!
                         </Link>
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-300">
+                            <FaCheck className="text-mambo-gold text-[10px] sm:text-xs" />
+                            <span>
+                                <span className="font-bold text-mambo-gold">1,000+ dancers</span> on the early-access list
+                            </span>
+                        </div>
                     </motion.div>
                 </motion.div>
 
-                {/* CTA Buttons — mobile only, rendered BELOW the video */}
+                {/* CTA Button — mobile only, rendered BELOW the video */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.6 }}
-                    className="flex lg:hidden flex-col gap-3 w-full max-w-md order-3 pt-1"
+                    className="flex lg:hidden flex-col gap-3 items-center w-full max-w-md order-3 pt-1"
                 >
                     <Link
-                        href="/courses"
-                        className="bg-white hover:bg-gray-100 text-black font-extrabold py-3 px-6 rounded-full text-sm shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.3)] transition-all transform hover:-translate-y-1 text-center"
-                    >
-                        Start Dancing Now
-                    </Link>
-                    <Link
                         href="/register"
-                        className="relative bg-amber-500 hover:bg-amber-400 text-black font-extrabold py-3 px-6 rounded-full text-sm transition-all transform hover:-translate-y-1 text-center shadow-[0_0_25px_rgba(245,158,11,0.5),0_0_50px_rgba(245,158,11,0.2)] hover:shadow-[0_0_35px_rgba(245,158,11,0.7),0_0_70px_rgba(245,158,11,0.3)] ring-2 ring-amber-400/50"
+                        className="w-full relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-6 rounded-full text-sm transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50"
                     >
-                        Get Your 7-Day Trial!
+                        Get Your 7-Day Free Trial!
                     </Link>
+                    <div className="flex items-center gap-2 text-xs text-gray-300">
+                        <FaCheck className="text-mambo-gold text-[10px]" />
+                        <span>
+                            <span className="font-bold text-mambo-gold">1,000+ dancers</span> on the early-access list
+                        </span>
+                    </div>
                 </motion.div>
             </div>
 

@@ -21,8 +21,9 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
-  title: "The Mambo Guild | Gamify Your Dance",
-  description: "Structured courses. Real feedback. Stop memorizing steps—start mastering the game.",
+  title: "The Mambo Guild | Salsa On2 from Level 0 to 100",
+  description:
+    "A structured Salsa On2 curriculum. Every move, every technique, in the right order. 500+ classes, Skill Tree, and community feedback. 7-day free trial.",
 };
 
 export default function RootLayout({

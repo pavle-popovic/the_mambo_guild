@@ -9,6 +9,7 @@ import {
     SkillTreeTeaser,
     ReleaseScheduleSection,
     TestimonialsSection,
+    FAQSection,
 } from "@/components/landing";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -68,6 +69,11 @@ export default function HomePage() {
                 {/* Testimonials */}
                 <section className="relative z-10">
                     <TestimonialsSection />
+                </section>
+
+                {/* FAQ — schema.org FAQPage for GEO + SEO */}
+                <section className="relative z-10">
+                    <FAQSection />
                 </section>
 
                 {/* Footer — add bottom padding on mobile for sticky CTA */}

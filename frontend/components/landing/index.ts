@@ -13,4 +13,5 @@ export { default as SkillTreeTeaser } from "./SkillTreeTeaser";
 export { default as ReleaseScheduleSection, ReleaseScheduleButton } from "./ReleaseScheduleSection";
 export { default as Mambobot } from "./Mambobot";
 export { default as FounderAuthorityStrip } from "./FounderAuthorityStrip";
+export { default as FAQSection } from "./FAQSection";
 

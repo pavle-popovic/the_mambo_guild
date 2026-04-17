@@ -35,7 +35,7 @@ const pillars: Pillar[] = [
     body:
       "Courses, choreographies, history of salsa, science of training. No drip-feed. No upsell.",
     bullets: [
-      "300+ classes, beginner → pro",
+      "500+ classes, beginner to pro",
       "Full choreographies, broken down",
       "History of Salsa — 20 modules",
       "Science of Training — 18 modules",
