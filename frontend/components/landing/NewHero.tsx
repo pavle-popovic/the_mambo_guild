@@ -94,7 +94,7 @@ export default function NewHero() {
     }, []);
 
     return (
-        <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-start lg:items-center justify-center overflow-hidden bg-transparent pt-4 md:pt-20">
+        <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-start lg:items-center justify-center overflow-hidden bg-transparent pt-20 sm:pt-24 md:pt-24 landscape-phone:!pt-16">
             {/* Content Container */}
             <div className="hero-content-container relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-3 md:gap-12 lg:gap-12 landscape-phone:!flex-row landscape-phone:!items-center landscape-phone:!gap-4 landscape-phone:!px-4">
 
@@ -154,10 +154,10 @@ export default function NewHero() {
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
-                        className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-900/60 to-yellow-900/40 border border-mambo-gold/60 rounded-full backdrop-blur-sm shadow-[0_0_20px_rgba(212,175,55,0.15)] max-w-full landscape-phone:!py-0.5 landscape-phone:!px-2.5"
+                        className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2 bg-gradient-to-r from-amber-900/70 to-yellow-900/50 border border-mambo-gold/70 rounded-full backdrop-blur-sm shadow-[0_0_25px_rgba(212,175,55,0.2)] max-w-full landscape-phone:!py-0.5 landscape-phone:!px-2.5 landscape-phone:!gap-1.5"
                     >
-                        <FaCertificate className="text-mambo-gold text-[10px] sm:text-xs flex-shrink-0" />
-                        <span className="text-[10px] sm:text-xs md:text-sm font-medium text-mambo-gold tracking-wide leading-tight landscape-phone:!text-[10px]">
+                        <FaCertificate className="text-mambo-gold text-xs sm:text-xs flex-shrink-0 landscape-phone:!text-[10px]" />
+                        <span className="text-xs sm:text-xs md:text-sm font-semibold text-mambo-gold tracking-wide leading-tight landscape-phone:!text-[10px]">
                             Built on Learning Experience Design
                         </span>
                     </motion.div>
