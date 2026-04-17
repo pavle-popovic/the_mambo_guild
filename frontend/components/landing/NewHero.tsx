@@ -40,7 +40,7 @@ export default function NewHero() {
         apply();
         mq.addEventListener("change", apply);
         return () => mq.removeEventListener("change", apply);
-    }, [videoReady]);
+    }, []);
 
     return (
         <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-start lg:items-center justify-center overflow-hidden bg-transparent pt-4 md:pt-20">
@@ -76,8 +76,11 @@ export default function NewHero() {
                             disablePictureInPicture
                             controlsList="nodownload noplaybackrate nofullscreen"
                             aria-label="The Mambo Guild cinematic demo"
-                            onCanPlay={() => setVideoReady(true)}
-                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${videoReady ? "opacity-100" : "opacity-0"}`}
+                            onPlaying={() => setVideoReady(true)}
+                            onWaiting={() => setVideoReady(false)}
+                            onStalled={() => setVideoReady(false)}
+                            onEmptied={() => setVideoReady(false)}
+                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${videoReady ? "opacity-100" : "opacity-0"}`}
                         >
                             <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v2.webm" type="video/webm" />
                             <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v2.mp4" type="video/mp4" />
