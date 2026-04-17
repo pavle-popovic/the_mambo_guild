@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import Link from "next/link";
-import { FaPlay, FaCheck, FaCertificate } from "react-icons/fa";
+import { FaCheck, FaCertificate } from "react-icons/fa";
 import Mambobot from "./Mambobot";
 
 const bulletPoints = [
@@ -15,7 +14,8 @@ const bulletPoints = [
 
 export default function NewHero() {
     const [scrollOpacity, setScrollOpacity] = useState(1);
-    const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+    const [videoReady, setVideoReady] = useState(false);
+    const videoRef = useRef<HTMLVideoElement>(null);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -28,62 +28,69 @@ export default function NewHero() {
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
 
+    // Respect reduced-motion preference — pause the autoplay video
+    useEffect(() => {
+        const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+        const apply = () => {
+            const v = videoRef.current;
+            if (!v) return;
+            if (mq.matches) v.pause();
+            else v.play().catch(() => {});
+        };
+        apply();
+        mq.addEventListener("change", apply);
+        return () => mq.removeEventListener("change", apply);
+    }, [videoReady]);
+
     return (
         <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-center justify-center overflow-hidden bg-transparent pt-14 md:pt-20">
             {/* Content Container */}
             <div className="hero-content-container relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-5 md:gap-12 lg:gap-20">
 
-                {/* Video Side — FIRST on mobile, second on desktop */}
+                {/* Video Side — SECOND on mobile (below text), SECOND on desktop (right) */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="flex-[1.2] w-full max-w-2xl lg:max-w-3xl order-1 lg:order-2"
+                    className="flex-[1.2] w-full max-w-2xl lg:max-w-3xl order-2 lg:order-2"
                 >
-                    <div className="relative aspect-[4/5] sm:aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 group cursor-pointer transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
-                        {/* Thumbnail / Video */}
-                        <div className="absolute inset-0">
-                            <Image
-                                src="/assets/Personal_Pic.jpg"
-                                alt="The Mambo Guild - Learn Salsa Dancing"
-                                fill
-                                className="object-cover opacity-80 group-hover:opacity-60 transition-opacity duration-500 group-hover:scale-105 transition-transform"
-                                priority
-                            />
-                        </div>
+                    <div className="relative aspect-video bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
+                        <video
+                            ref={videoRef}
+                            poster="/assets/SilentHero-poster.jpg"
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="metadata"
+                            disablePictureInPicture
+                            controlsList="nodownload noplaybackrate nofullscreen"
+                            aria-label="The Mambo Guild cinematic demo"
+                            onCanPlay={() => setVideoReady(true)}
+                            className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${videoReady ? "opacity-100" : "opacity-0"}`}
+                        >
+                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.webm" type="video/webm" />
+                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.mp4" type="video/mp4" />
+                        </video>
 
                         {/* Gradient Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-
-                        {/* Play Button */}
-                        <div className="absolute inset-0 flex items-center justify-center">
-                            <motion.div
-                                whileHover={{ scale: 1.1 }}
-                                whileTap={{ scale: 0.95 }}
-                                className="w-16 h-16 sm:w-24 sm:h-24 bg-white/10 backdrop-blur-md rounded-full flex items-center justify-center border border-white/30 group-hover:bg-mambo-gold/20 group-hover:border-mambo-gold transition-all duration-300 shadow-2xl"
-                            >
-                                <FaPlay className="text-white ml-1 text-xl sm:text-3xl group-hover:text-mambo-gold transition-colors" />
-                            </motion.div>
-                        </div>
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/10 pointer-events-none" />
 
                         {/* Label */}
-                        <div className="absolute bottom-3 sm:bottom-6 left-3 sm:left-6 right-3 sm:right-6 flex items-end justify-between">
+                        <div className="absolute bottom-3 sm:bottom-6 left-3 sm:left-6 right-3 sm:right-6 flex items-end justify-between pointer-events-none">
                             <div className="text-[9px] sm:text-xs text-gray-300 tracking-[0.15em] uppercase font-bold bg-black/40 backdrop-blur-sm px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full">
                                 Cinematic Trailer
-                            </div>
-                            <div className="text-[9px] sm:text-xs text-mambo-gold tracking-wider font-semibold bg-black/40 backdrop-blur-sm px-2.5 py-1 sm:px-3 sm:py-1.5 rounded-full">
-                                Coming Soon
                             </div>
                         </div>
                     </div>
                 </motion.div>
 
-                {/* Text Side — SECOND on mobile, first on desktop */}
+                {/* Text Side — FIRST on mobile (above video), FIRST on desktop (left) */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                    className="flex-1 text-center lg:text-left space-y-4 md:space-y-8 max-w-2xl order-2 lg:order-1"
+                    className="flex-1 text-center lg:text-left space-y-4 md:space-y-8 max-w-2xl order-1 lg:order-1"
                 >
                     {/* Certified Badge — aligned left on mobile */}
                     <motion.div
