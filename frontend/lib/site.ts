@@ -1,5 +1,4 @@
-export const SITE_URL =
-    process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") || "https://themamboguild.com";
+export const SITE_URL = "https://themamboguild.com";
 
 export const SITE_NAME = "The Mambo Guild";
 export const SITE_TAGLINE = "Salsa On2 from Level 0 to 100";
