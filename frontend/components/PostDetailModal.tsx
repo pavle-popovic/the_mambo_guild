@@ -654,8 +654,7 @@ export default function PostDetailModal({
                 >
                   <GuildMasterAvatar
                     avatarUrl={post.user.avatar_url}
-                    firstName={post.user.first_name}
-                    lastName={post.user.last_name}
+                    username={post.user.username}
                     isPro={post.user.is_pro}
                     isGuildMaster={post.user.is_guild_master}
                     size="lg"
@@ -663,6 +662,7 @@ export default function PostDetailModal({
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
                       <GuildMasterUsername
+                        username={post.user.username}
                         firstName={post.user.first_name}
                         lastName={post.user.last_name}
                         isPro={post.user.is_pro}
@@ -972,12 +972,11 @@ export default function PostDetailModal({
                                 type="button"
                                 onClick={() => reply.user.username && setProfileModalUsername(reply.user.username)}
                                 className="rounded-full transition hover:ring-2 hover:ring-mambo-gold/50 focus:outline-none focus:ring-2 focus:ring-mambo-gold/50"
-                                aria-label={`View ${reply.user.first_name}'s profile`}
+                                aria-label={`View ${reply.user.username || "user"}'s profile`}
                               >
                                 <GuildMasterAvatar
                                   avatarUrl={reply.user.avatar_url}
-                                  firstName={reply.user.first_name}
-                                  lastName={reply.user.last_name}
+                                  username={reply.user.username}
                                   isPro={reply.user.is_pro}
                                   isGuildMaster={reply.user.is_guild_master}
                                   size="sm"
@@ -991,6 +990,7 @@ export default function PostDetailModal({
                                     className="rounded transition hover:opacity-80 focus:outline-none"
                                   >
                                     <GuildMasterUsername
+                                      username={reply.user.username}
                                       firstName={reply.user.first_name}
                                       lastName={reply.user.last_name}
                                       isPro={reply.user.is_pro}

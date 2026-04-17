@@ -122,16 +122,14 @@ export default function UserProfileModal({ isOpen, onClose, username }: UserProf
                   <div className="-mt-14 flex flex-col items-center text-center landscape:-mt-12">
                     <GuildMasterAvatar
                       avatarUrl={profile.avatar_url}
-                      firstName={profile.first_name}
-                      lastName={profile.last_name}
+                      username={profile.username}
                       isPro={isPro}
                       isGuildMaster={isGuildMaster}
                       size="xl"
                     />
                     <h2 className="mt-3 text-xl font-bold text-white">
-                      {profile.first_name} {profile.last_name}
+                      {profile.username || "Anonymous"}
                     </h2>
-                    <p className="text-xs text-white/50">@{profile.username}</p>
                     <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
                       {isGuildMaster ? (
                         <GuildMasterTag />

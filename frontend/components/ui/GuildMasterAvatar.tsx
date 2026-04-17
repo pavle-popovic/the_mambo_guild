@@ -6,7 +6,9 @@ import GuildMasterBadge from "./GuildMasterBadge";
 
 interface GuildMasterAvatarProps {
   avatarUrl: string | null;
-  firstName: string;
+  username?: string;
+  // Accepted for legacy callers; not used for the displayed initials.
+  firstName?: string;
   lastName?: string;
   isPro?: boolean;
   isGuildMaster?: boolean;
@@ -31,8 +33,7 @@ const sizeMap = {
  */
 export default function GuildMasterAvatar({
   avatarUrl,
-  firstName,
-  lastName,
+  username,
   isPro = false,
   isGuildMaster = false,
   size = "md",
@@ -41,7 +42,8 @@ export default function GuildMasterAvatar({
   onClick,
 }: GuildMasterAvatarProps) {
   const { container, text, badge, badgeOffset } = sizeMap[size];
-  const initials = `${firstName[0]}${lastName?.[0] || ""}`.toUpperCase();
+  const displayName = username || "Anonymous";
+  const initials = displayName.slice(0, 2).toUpperCase();
 
   // Guild Master gets animated gold ring, PRO gets amber ring
   const ringStyles = isGuildMaster
@@ -72,7 +74,7 @@ export default function GuildMasterAvatar({
         {avatarUrl ? (
           <Image
             src={avatarUrl}
-            alt={`${firstName}${lastName ? ` ${lastName}` : ""}`}
+            alt={displayName}
             width={64}
             height={64}
             className="w-full h-full object-cover"
@@ -100,18 +102,22 @@ export default function GuildMasterAvatar({
 }
 
 /**
- * Username display with Guild Master crown inline
+ * Username display with Guild Master crown inline.
+ * Always displays the user's chosen handle (username). The first/last name
+ * fields exist on the props for legacy compatibility but are intentionally
+ * not rendered — community surfaces show usernames only.
  */
 export function GuildMasterUsername({
-  firstName,
-  lastName,
+  username,
   isPro = false,
   isGuildMaster = false,
   className,
   showLevel,
   level,
 }: {
-  firstName: string;
+  username?: string;
+  // Accepted for legacy callers; not rendered.
+  firstName?: string;
   lastName?: string;
   isPro?: boolean;
   isGuildMaster?: boolean;
@@ -121,9 +127,7 @@ export function GuildMasterUsername({
 }) {
   return (
     <span className={cn("inline-flex items-center gap-1.5", className)}>
-      <span className="font-semibold text-white">
-        {firstName} {lastName}
-      </span>
+      <span className="font-semibold text-white">{username || "Anonymous"}</span>
       {isGuildMaster && <GuildMasterBadge size="sm" />}
       {showLevel && level && (
         <span className="text-xs text-white/50">Lvl {level}</span>
