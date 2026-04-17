@@ -47,10 +47,12 @@ type Credential = { key: string; text: ReactNode };
 
 const credentials: Credential[] = [
     {
-        key: "champion",
+        key: "cert",
         text: (
             <>
-                <span className="text-mambo-gold">2x European Champion</span>
+                Certified in <span className="text-mambo-gold">Learning Experience Design</span>
+                {" & "}
+                <span className="text-mambo-gold">Gamification</span>
             </>
         ),
     },
@@ -65,12 +67,10 @@ const credentials: Credential[] = [
         ),
     },
     {
-        key: "cert",
+        key: "champion",
         text: (
             <>
-                Certified in <span className="text-mambo-gold">Learning Experience Design</span>
-                {" & "}
-                <span className="text-mambo-gold">Gamification</span>
+                <span className="text-mambo-gold">2x European Champion</span>
             </>
         ),
     },
@@ -83,14 +83,6 @@ const credentials: Credential[] = [
                 <span className="text-mambo-gold">Brussels</span>
                 <span className="opacity-40"> · </span>
                 <span className="text-mambo-gold">Rome</span>
-            </>
-        ),
-    },
-    {
-        key: "list",
-        text: (
-            <>
-                <span className="text-mambo-gold">1,000+</span> dancers on the early-access list
             </>
         ),
     },

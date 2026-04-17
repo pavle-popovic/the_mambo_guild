@@ -214,10 +214,14 @@ export default function NewHero() {
                         >
                             Get Your 7-Day Free Trial!
                         </Link>
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-300 landscape-phone:!text-[10px] landscape-phone:!gap-1.5">
-                            <FaCheck className="text-mambo-gold text-[10px] sm:text-xs landscape-phone:!text-[8px]" />
-                            <span>
-                                <span className="font-bold text-mambo-gold">1,000+ dancers</span> on the early-access list
+                        <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-sm landscape-phone:!px-2.5 landscape-phone:!py-1 landscape-phone:!gap-1.5">
+                            <span className="relative flex h-2 w-2 landscape-phone:!h-1.5 landscape-phone:!w-1.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
+                                <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold landscape-phone:!h-1.5 landscape-phone:!w-1.5"></span>
+                            </span>
+                            <span className="text-sm sm:text-[15px] landscape-phone:!text-[11px]">
+                                <span className="font-bold text-mambo-gold">1,000+ dancers</span>
+                                <span className="text-gray-300"> already on the list</span>
                             </span>
                         </div>
                     </motion.div>
@@ -236,10 +240,14 @@ export default function NewHero() {
                     >
                         Get Your 7-Day Free Trial!
                     </Link>
-                    <div className="flex items-center gap-2 text-xs text-gray-300">
-                        <FaCheck className="text-mambo-gold text-[10px]" />
-                        <span>
-                            <span className="font-bold text-mambo-gold">1,000+ dancers</span> on the early-access list
+                    <div className="inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-white/[0.04] border border-white/10 backdrop-blur-sm">
+                        <span className="relative flex h-2 w-2">
+                            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
+                            <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold"></span>
+                        </span>
+                        <span className="text-sm">
+                            <span className="font-bold text-mambo-gold">1,000+ dancers</span>
+                            <span className="text-gray-300"> already on the list</span>
                         </span>
                     </div>
                 </motion.div>
