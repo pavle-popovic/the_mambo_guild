@@ -96,14 +96,14 @@ export default function NewHero() {
     return (
         <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-start lg:items-center justify-center overflow-hidden bg-transparent pt-4 md:pt-20">
             {/* Content Container */}
-            <div className="hero-content-container relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-3 md:gap-12 lg:gap-12">
+            <div className="hero-content-container relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-3 md:gap-12 lg:gap-12 landscape-phone:!flex-row landscape-phone:!items-center landscape-phone:!gap-4 landscape-phone:!px-4">
 
                 {/* Video Side — SECOND on mobile (below text), SECOND on desktop (right) */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="flex-[1.8] w-full max-w-2xl lg:max-w-5xl order-2 lg:order-2"
+                    className="flex-[1.8] w-full max-w-2xl lg:max-w-5xl order-2 lg:order-2 landscape-phone:!order-2 landscape-phone:!flex-[1.1] landscape-phone:!max-w-[50%]"
                 >
                     <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
                         {/* Poster image — always visible so users never see a black box while the video loads */}
@@ -147,25 +147,25 @@ export default function NewHero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                    className="flex-1 text-center lg:text-left space-y-4 md:space-y-6 max-w-2xl order-1 lg:order-1"
+                    className="flex-1 text-center lg:text-left space-y-4 md:space-y-6 max-w-2xl order-1 lg:order-1 landscape-phone:!order-1 landscape-phone:!text-left landscape-phone:!space-y-2 landscape-phone:!max-w-[50%]"
                 >
                     {/* Credential Badge — aligned left on mobile */}
                     <motion.div
                         initial={{ opacity: 0, y: -20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3, duration: 0.6 }}
-                        className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-amber-900/30 to-yellow-900/20 border border-mambo-gold/40 rounded-full backdrop-blur-sm"
+                        className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 bg-gradient-to-r from-amber-900/30 to-yellow-900/20 border border-mambo-gold/40 rounded-full backdrop-blur-sm whitespace-nowrap landscape-phone:!py-0.5 landscape-phone:!px-2.5"
                     >
-                        <FaCertificate className="text-mambo-gold text-xs sm:text-sm" />
-                        <span className="text-xs sm:text-sm font-medium text-mambo-gold tracking-wide">
+                        <FaCertificate className="text-mambo-gold text-[10px] sm:text-xs flex-shrink-0" />
+                        <span className="text-[11px] sm:text-xs md:text-sm font-medium text-mambo-gold tracking-wide landscape-phone:!text-[10px]">
                             Built on Learning Experience Design
                         </span>
                     </motion.div>
 
                     {/* Main Title — structured salsa curriculum positioning */}
-                    <div className="space-y-3 md:space-y-4">
+                    <div className="space-y-2.5 md:space-y-3 landscape-phone:!space-y-1.5">
                         <h1
-                            className="font-bold italic leading-[1.05] tracking-tight text-mambo-text text-balance text-[clamp(2rem,5.2vw,3.75rem)]"
+                            className="font-bold italic leading-[1.05] tracking-tight text-mambo-text text-balance text-[clamp(1.75rem,3.4vw,3rem)] landscape-phone:!text-2xl"
                             style={{ fontFamily: '"Playfair Display", serif' }}
                         >
                             Every move, every technique.{" "}
@@ -173,14 +173,14 @@ export default function NewHero() {
                                 Level 0 to 100.
                             </span>
                         </h1>
-                        <p className="text-base sm:text-lg text-gray-300 leading-snug max-w-md mx-auto lg:mx-0 text-balance">
+                        <p className="text-sm sm:text-base md:text-lg text-gray-300 leading-snug max-w-md mx-auto lg:mx-0 text-balance landscape-phone:!text-xs">
                             A structured salsa curriculum. Every skill in the right order.
                         </p>
                     </div>
 
                     {/* Bullet Points — compact on mobile */}
                     <motion.ul
-                        className="space-y-2 md:space-y-4"
+                        className="space-y-2 md:space-y-4 landscape-phone:!space-y-1"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4, duration: 0.6 }}
@@ -191,31 +191,31 @@ export default function NewHero() {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
-                                className="flex items-center gap-2 sm:gap-3 text-sm sm:text-lg md:text-xl text-gray-200 justify-center lg:justify-start"
+                                className="flex items-center gap-2 sm:gap-3 text-sm sm:text-lg md:text-xl text-gray-200 justify-center lg:justify-start landscape-phone:!text-[11px] landscape-phone:!gap-1.5 landscape-phone:!justify-start"
                             >
-                                <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center">
-                                    <FaCheck className="text-emerald-400 text-[10px] sm:text-xs" />
+                                <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center landscape-phone:!w-3.5 landscape-phone:!h-3.5">
+                                    <FaCheck className="text-emerald-400 text-[10px] sm:text-xs landscape-phone:!text-[8px]" />
                                 </div>
                                 <span>{point}</span>
                             </motion.li>
                         ))}
                     </motion.ul>
 
-                    {/* CTA Button — desktop only (mobile version rendered below the video) */}
+                    {/* CTA Button — desktop + landscape-phone (mobile-portrait version rendered below the video) */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.8, duration: 0.6 }}
-                        className="hidden lg:flex flex-col gap-3 items-center lg:items-start pt-2"
+                        className="hidden lg:flex flex-col gap-3 items-center lg:items-start pt-2 landscape-phone:!flex landscape-phone:!gap-1.5 landscape-phone:!pt-1 landscape-phone:!items-start"
                     >
                         <Link
                             href="/register"
-                            className="relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3 px-7 xl:py-3.5 xl:px-8 rounded-full text-sm xl:text-base whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50"
+                            className="relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3 px-7 xl:py-3.5 xl:px-8 rounded-full text-sm xl:text-base whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 landscape-phone:!py-2 landscape-phone:!px-4 landscape-phone:!text-[11px]"
                         >
                             Get Your 7-Day Free Trial!
                         </Link>
-                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-300">
-                            <FaCheck className="text-mambo-gold text-[10px] sm:text-xs" />
+                        <div className="flex items-center gap-2 text-xs sm:text-sm text-gray-300 landscape-phone:!text-[10px] landscape-phone:!gap-1.5">
+                            <FaCheck className="text-mambo-gold text-[10px] sm:text-xs landscape-phone:!text-[8px]" />
                             <span>
                                 <span className="font-bold text-mambo-gold">1,000+ dancers</span> on the early-access list
                             </span>
@@ -223,12 +223,12 @@ export default function NewHero() {
                     </motion.div>
                 </motion.div>
 
-                {/* CTA Button — mobile only, rendered BELOW the video */}
+                {/* CTA Button — mobile-portrait only, rendered BELOW the video */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8, duration: 0.6 }}
-                    className="flex lg:hidden flex-col gap-3 items-center w-full max-w-md order-3 pt-1"
+                    className="flex lg:hidden flex-col gap-3 items-center w-full max-w-md order-3 pt-1 landscape-phone:!hidden"
                 >
                     <Link
                         href="/register"
@@ -247,7 +247,7 @@ export default function NewHero() {
 
             {/* Scroll Indicator */}
             <motion.div
-                className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer z-20"
+                className="absolute bottom-4 sm:bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 cursor-pointer z-20 landscape-phone:!hidden"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: scrollOpacity }}
                 style={{ opacity: scrollOpacity, pointerEvents: scrollOpacity <= 0 ? 'none' : 'auto' }}
