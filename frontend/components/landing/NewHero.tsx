@@ -52,7 +52,7 @@ export default function NewHero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="flex-[1.2] w-full max-w-2xl lg:max-w-3xl order-2 lg:order-2"
+                    className="flex-[1.5] w-full max-w-2xl lg:max-w-4xl order-2 lg:order-2"
                 >
                     <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
                         {/* Poster image — always visible so users never see a black box while the video loads */}
@@ -110,9 +110,9 @@ export default function NewHero() {
 
                     {/* Main Title — full brand name */}
                     <div className="space-y-1">
-                        <h1 className="text-3xl sm:text-4xl md:text-6xl lg:text-7xl font-bold font-serif leading-tight text-mambo-text">
+                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-7xl font-bold font-serif leading-tight text-mambo-text">
                             The{" "}
-                            <span className="text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.3)]">
+                            <span className="text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.3)] whitespace-nowrap">
                                 Mambo Guild
                             </span>
                         </h1>
