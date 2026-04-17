@@ -5,50 +5,61 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 
+type PillarImageData = {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  caption?: string;
+};
+
 type Pillar = {
   eyebrow: string;
   title: ReactNode;
   body: string;
   bullets: string[];
-  image: string;
-  alt: string;
-  width: number;
-  height: number;
+  images: PillarImageData[]; // 1 image, or 2 stacked (diptych)
 };
 
 const gold = "text-mambo-gold";
 
 const pillars: Pillar[] = [
   {
-    eyebrow: "THE SKILL TREE",
+    // 1 — Courses & all the content
+    eyebrow: "COURSES & CONTENT",
     title: (
       <>
-        Your roadmap from <span className={gold}>basic step</span> to{" "}
-        <span className={gold}>pro choreo</span>
+        A full <span className={gold}>dance school</span>, unlocked on day one
       </>
     ),
     body:
-      "300+ classes laid out like a video-game tech tree. Every technique isolated. Every skill built step by step, in the right order. You always know exactly what to drill next.",
+      "Courses, choreographies, the complete history of salsa, the science of training — every piece built to move you forward. No drip-feed, no upsell: everything explained, from your first basic step to pro-level choreos.",
     bullets: [
       "300+ classes, beginner → pro",
-      "Built technique-by-technique",
-      "Unlocks as you level up",
-      "Never guess what to drill next",
+      "Full choreographies broken down step by step",
+      "History of Salsa — 20 modules of origins & culture",
+      "Science of Effective Training — 18 modules",
+      "Technique deep-dives, styling, musicality, partnering",
     ],
-    image: "/assets/skill-tree-new.png",
-    alt: "Constellation skill tree showing connected unlockable modules",
-    width: 869,
-    height: 777,
+    images: [
+      {
+        src: "/assets/howitworks/Image1Courses.png",
+        alt: "Course catalog showing lessons, choreographies and topic deep-dives",
+        width: 1572,
+        height: 767,
+      },
+    ],
   },
   {
-    eyebrow: "THE PRO PLAYER",
+    // 2 — Video player: mirrored + back view + all the features
+    eyebrow: "THE VIDEO PLAYER",
     title: (
       <>
         The <span className={gold}>practice room</span> pros have been waiting for
       </>
     ),
     body:
-      "Every frame, every speed, every angle. Built for obsessive repetition — the way motor learning actually works.",
+      "Every frame, every speed, every angle. Mirrored for zero guessing. Back view for that live-class vibe. 13 languages. Built for obsessive repetition — the way motor learning actually works.",
     bullets: [
       "Mirrored view — zero guessing which side is which",
       "Back view for that live-class “follow me” feel",
@@ -56,74 +67,101 @@ const pillars: Pillar[] = [
       "Speed controls (0.25× → 2×) + frame-by-frame",
       "A/B loop — drill one 2-second bar forever",
       "Summary notes + quizzes after every lesson",
-      "Full course navigation inside the player",
+      "Course navigation inside the player",
     ],
-    image: "/assets/instructor-page.png",
-    alt: "Lesson player with speed controls, A/B loop, captions and course navigation",
-    width: 1857,
-    height: 881,
+    images: [
+      {
+        src: "/assets/howitworks/Image2VideoPlayerMirrored.png",
+        alt: "Lesson player in mirrored view with speed, captions and A/B loop controls",
+        width: 1897,
+        height: 851,
+        caption: "MIRRORED VIEW",
+      },
+      {
+        src: "/assets/howitworks/Image3VideoPlayerBackview.png",
+        alt: "Lesson player in back view for live-class follow-along practice",
+        width: 1150,
+        height: 535,
+        caption: "BACK VIEW",
+      },
+    ],
   },
   {
-    eyebrow: "FULL COURSES — ORIGINS & SCIENCE",
+    // 3 — Skill tree, everything structured from basic to pro
+    eyebrow: "THE SKILL TREE",
     title: (
       <>
-        Understand the <span className={gold}>music</span>. Train like a{" "}
-        <span className={gold}>pro</span>.
+        Everything structured from <span className={gold}>basic</span> to{" "}
+        <span className={gold}>pro</span>
       </>
     ),
     body:
-      "Two full courses included, no upsell: the complete History of Salsa — from Cuba to New York to the world — and the Science of Effective Training, the exact principles elite dancers use to improve faster.",
+      "A video-game tech tree for your dancing. Every technique isolated. Every skill in the right order. You always know exactly what to drill next — and you see yourself leveling up.",
     bullets: [
-      "20-module History of Salsa",
-      "18-module Science of Effective Training",
-      "Motor learning, deliberate practice, cognitive load",
-      "Built-in quizzes + curated multimedia",
+      "Constellation-style roadmap from first step to pro choreo",
+      "Built technique-by-technique, prerequisites enforced",
+      "Unlocks as you complete lessons and earn XP",
+      "Never guess what to drill next",
     ],
-    image: "/assets/Course_page.png",
-    alt: "Course page showing structured lessons, modules and progress",
-    width: 1901,
-    height: 875,
+    images: [
+      {
+        src: "/assets/howitworks/Image4SkillTree.png",
+        alt: "Constellation skill tree showing connected unlockable modules",
+        width: 846,
+        height: 762,
+      },
+    ],
   },
   {
+    // 4 — Community, post videos, don't dance alone
     eyebrow: "THE COMMUNITY",
     title: (
       <>
-        You don&apos;t level up <span className={gold}>alone</span>
+        Post your videos. <span className={gold}>Don&apos;t dance alone.</span>
       </>
     ),
     body:
-      "The Stage for progress videos. The Lab for questions. Real feedback from dancers who actually train. Earn badges for every milestone and climb the leaderboards.",
+      "Share your progress, get real feedback, ask questions, help others. A community of dancers who actually train — not another comment section full of ghosts.",
     bullets: [
-      "The Stage — share progress videos",
+      "The Stage — post progress videos, get reactions & comments",
       "The Lab — ask & answer technique questions",
       "Hype or Coach feedback modes",
-      "38 badges across Bronze → Diamond",
+      "Earn 38 badges (Bronze → Silver → Gold → Diamond)",
       "Weekly, monthly and all-time leaderboards",
     ],
-    image: "/assets/Com_page.png",
-    alt: "Community feed with dancer posts, reactions and comments",
-    width: 1892,
-    height: 875,
+    images: [
+      {
+        src: "/assets/howitworks/Image5Community.png",
+        alt: "Community feed with dancer posts, reactions and comments",
+        width: 1653,
+        height: 851,
+      },
+    ],
   },
   {
-    eyebrow: "GUILD MASTER — VIP",
+    // 5 — VIP 1-to-1 coaching + private group
+    eyebrow: "VIP — 1-TO-1 COACHING & PRIVATE GROUP",
     title: (
       <>
-        Skip the plateau. Train with the <span className={gold}>Maestro</span> directly.
+        Train <span className={gold}>directly</span> with the Maestro
       </>
     ),
     body:
-      "When you&apos;re serious, Guild Master unlocks the inner circle — personal 1-on-1 coaching and live weekly Roundtable calls. The kind of access that used to cost $200/hour in person.",
+      "When you&apos;re serious, Guild Master unlocks the inner circle — personal 1-on-1 video coaching and weekly live Roundtable calls with the Maestro and fellow obsessives. The kind of access that used to cost $200/hour in person.",
     bullets: [
       "Monthly 1-on-1 video coaching with personal feedback",
-      "Weekly live Roundtable calls on Zoom",
+      "Weekly live Roundtable calls on Zoom — private group",
       "DJ Booth — isolated stems from classic tracks",
       "The Vault — every past Roundtable recording",
     ],
-    image: "/assets/founder-access.png",
-    alt: "Guild Master VIP access — coaching, Roundtable calls and DJ Booth",
-    width: 645,
-    height: 779,
+    images: [
+      {
+        src: "/assets/howitworks/Image6Vip1to1Coaching.png",
+        alt: "Guild Master VIP hub — 1-on-1 coaching, Roundtable calls and private group",
+        width: 1147,
+        height: 717,
+      },
+    ],
   },
 ];
 
@@ -170,12 +208,14 @@ function PillarImage({
   alt,
   width,
   height,
+  caption,
   priority = false,
 }: {
   src: string;
   alt: string;
   width: number;
   height: number;
+  caption?: string;
   priority?: boolean;
 }) {
   return (
@@ -192,7 +232,50 @@ function PillarImage({
           className="w-full h-auto transition-transform duration-700 group-hover:scale-[1.03]"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-mambo-dark/40 to-transparent pointer-events-none" />
+        {caption && (
+          <div className="absolute top-3 left-3 landscape-phone:top-1.5 landscape-phone:left-1.5 text-[10px] sm:text-xs landscape-phone:text-[8px] tracking-[0.22em] font-bold text-black bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] px-2.5 py-1 landscape-phone:px-1.5 landscape-phone:py-0.5 rounded-full shadow-lg shadow-black/40">
+            {caption}
+          </div>
+        )}
       </div>
+    </div>
+  );
+}
+
+function PillarMedia({
+  images,
+  priority,
+}: {
+  images: PillarImageData[];
+  priority: boolean;
+}) {
+  if (images.length === 1) {
+    const img = images[0];
+    return (
+      <PillarImage
+        src={img.src}
+        alt={img.alt}
+        width={img.width}
+        height={img.height}
+        caption={img.caption}
+        priority={priority}
+      />
+    );
+  }
+  // Diptych — stack the images vertically with a gap; each keeps its caption.
+  return (
+    <div className="flex flex-col gap-4 sm:gap-5 landscape-phone:gap-2">
+      {images.map((img, i) => (
+        <PillarImage
+          key={img.src}
+          src={img.src}
+          alt={img.alt}
+          width={img.width}
+          height={img.height}
+          caption={img.caption}
+          priority={priority && i === 0}
+        />
+      ))}
     </div>
   );
 }
@@ -236,9 +319,7 @@ export default function HowItWorksSection() {
                 key={pillar.eyebrow}
                 className={[
                   "flex flex-col items-center gap-10 sm:gap-12 lg:gap-20",
-                  // Desktop zig-zag (also fires on landscape phones via `lg:`)
                   isEven ? "lg:flex-row" : "lg:flex-row-reverse",
-                  // Landscape-phone override — always image-left, tighter gap
                   "landscape-phone:!flex-row landscape-phone:!gap-6 landscape-phone:!items-center",
                 ].join(" ")}
               >
@@ -290,13 +371,7 @@ export default function HowItWorksSection() {
                   viewport={{ once: true, margin: "-100px" }}
                   className="flex-1 w-full max-w-2xl landscape-phone:!max-w-[52%]"
                 >
-                  <PillarImage
-                    src={pillar.image}
-                    alt={pillar.alt}
-                    width={pillar.width}
-                    height={pillar.height}
-                    priority={index === 0}
-                  />
+                  <PillarMedia images={pillar.images} priority={index === 0} />
                 </motion.div>
               </div>
             );
