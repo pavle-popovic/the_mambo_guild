@@ -282,7 +282,7 @@ export default function HowItWorksSection() {
   return (
     <section
       id="how-it-works"
-      className="relative py-20 px-5 sm:py-28 sm:px-6 lg:py-32 bg-mambo-dark z-10 landscape-phone:py-10 landscape-phone:px-6"
+      className="relative py-14 px-5 sm:py-28 sm:px-6 lg:py-32 bg-mambo-dark z-10 landscape-phone:py-10 landscape-phone:px-6"
     >
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
@@ -291,7 +291,7 @@ export default function HowItWorksSection() {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          className="text-center mb-14 sm:mb-20 lg:mb-24 landscape-phone:mb-8"
+          className="text-center mb-10 sm:mb-20 lg:mb-24 landscape-phone:mb-8"
         >
           <div className="inline-block mb-4 px-3 py-1 text-[11px] tracking-[0.22em] font-bold text-mambo-gold border border-mambo-gold/30 rounded-full bg-mambo-gold/5">
             HOW IT WORKS
@@ -309,14 +309,14 @@ export default function HowItWorksSection() {
         </motion.div>
 
         {/* Pillars */}
-        <div className="space-y-20 sm:space-y-28 lg:space-y-32 landscape-phone:space-y-10">
+        <div className="space-y-14 sm:space-y-28 lg:space-y-32 landscape-phone:space-y-10">
           {pillars.map((pillar, index) => {
             const isEven = index % 2 === 0;
             return (
               <div
                 key={pillar.eyebrow}
                 className={[
-                  "flex flex-col items-center gap-10 sm:gap-12 lg:gap-20",
+                  "flex flex-col-reverse items-center gap-7 sm:gap-12 lg:gap-20",
                   isEven ? "lg:flex-row" : "lg:flex-row-reverse",
                   "landscape-phone:!flex-row landscape-phone:!gap-6 landscape-phone:!items-center",
                 ].join(" ")}
@@ -329,16 +329,16 @@ export default function HowItWorksSection() {
                   viewport={{ once: true, margin: "-100px" }}
                   className="flex-1 w-full max-w-xl text-center lg:text-left landscape-phone:!text-left landscape-phone:max-w-none"
                 >
-                  <div className="inline-block mb-3 text-[10px] sm:text-xs tracking-[0.22em] font-bold text-mambo-gold landscape-phone:text-[9px] landscape-phone:mb-2">
+                  <div className="inline-block mb-2 sm:mb-3 text-[10px] sm:text-xs tracking-[0.22em] font-bold text-mambo-gold landscape-phone:text-[9px] landscape-phone:mb-2">
                     {pillar.eyebrow}
                   </div>
                   <h3
-                    className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight tracking-tight italic landscape-phone:text-xl landscape-phone:mb-2"
+                    className="text-[1.7rem] sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-5 leading-[1.15] sm:leading-tight tracking-tight italic landscape-phone:text-xl landscape-phone:mb-2"
                     style={{ fontFamily: '"Playfair Display", serif' }}
                   >
                     {pillar.title}
                   </h3>
-                  <p className="text-base sm:text-lg text-mambo-text/80 leading-relaxed mb-6 landscape-phone:text-xs landscape-phone:mb-3 landscape-phone:leading-snug">
+                  <p className="text-[14px] sm:text-lg text-mambo-text/75 leading-snug sm:leading-relaxed mb-4 sm:mb-6 landscape-phone:text-xs landscape-phone:mb-3 landscape-phone:leading-snug">
                     {pillar.body}
                   </p>
                   <motion.ul
@@ -346,13 +346,13 @@ export default function HowItWorksSection() {
                     initial="hidden"
                     whileInView="visible"
                     viewport={{ once: true, margin: "-100px" }}
-                    className="space-y-2.5 text-left inline-block landscape-phone:space-y-1"
+                    className="space-y-1.5 sm:space-y-2.5 text-left inline-block landscape-phone:space-y-1"
                   >
                     {pillar.bullets.map((b) => (
                       <motion.li
                         key={b}
                         variants={bulletItem}
-                        className="flex gap-2.5 items-start text-sm sm:text-base text-mambo-text/90 landscape-phone:text-[11px] landscape-phone:gap-2"
+                        className="flex gap-2 sm:gap-2.5 items-start text-[13px] sm:text-base text-mambo-text/90 landscape-phone:text-[11px] landscape-phone:gap-2"
                       >
                         <CheckIcon />
                         <span>{b}</span>
