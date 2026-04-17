@@ -43,9 +43,9 @@ export default function NewHero() {
     }, [videoReady]);
 
     return (
-        <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-center justify-center overflow-hidden bg-transparent pt-14 md:pt-20">
+        <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-start lg:items-center justify-center overflow-hidden bg-transparent pt-4 md:pt-20">
             {/* Content Container */}
-            <div className="hero-content-container relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-5 md:gap-12 lg:gap-20">
+            <div className="hero-content-container relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-3 md:gap-12 lg:gap-20">
 
                 {/* Video Side — SECOND on mobile (below text), SECOND on desktop (right) */}
                 <motion.div
@@ -55,6 +55,16 @@ export default function NewHero() {
                     className="flex-[1.2] w-full max-w-2xl lg:max-w-3xl order-2 lg:order-2"
                 >
                     <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
+                        {/* Poster image — always visible so users never see a black box while the video loads */}
+                        <img
+                            src="/assets/SilentHero-poster.jpg"
+                            alt=""
+                            aria-hidden="true"
+                            loading="eager"
+                            decoding="async"
+                            fetchPriority="high"
+                            className="absolute inset-0 w-full h-full object-cover"
+                        />
                         <video
                             ref={videoRef}
                             poster="/assets/SilentHero-poster.jpg"
@@ -131,12 +141,12 @@ export default function NewHero() {
                         ))}
                     </motion.ul>
 
-                    {/* CTA Buttons — compact on mobile */}
+                    {/* CTA Buttons — desktop only (mobile version rendered below the video) */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.8, duration: 0.6 }}
-                        className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start pt-2 sm:pt-4"
+                        className="hidden lg:flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start pt-2 sm:pt-4"
                     >
                         <Link
                             href="/courses"
@@ -151,6 +161,27 @@ export default function NewHero() {
                             Get Your 7-Day Trial!
                         </Link>
                     </motion.div>
+                </motion.div>
+
+                {/* CTA Buttons — mobile only, rendered BELOW the video */}
+                <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.8, duration: 0.6 }}
+                    className="flex lg:hidden flex-col gap-3 w-full max-w-md order-3 pt-1"
+                >
+                    <Link
+                        href="/courses"
+                        className="bg-white hover:bg-gray-100 text-black font-extrabold py-3 px-6 rounded-full text-sm shadow-[0_0_25px_rgba(255,255,255,0.2)] hover:shadow-[0_0_35px_rgba(255,255,255,0.3)] transition-all transform hover:-translate-y-1 text-center"
+                    >
+                        Start Dancing Now
+                    </Link>
+                    <Link
+                        href="/register"
+                        className="relative bg-amber-500 hover:bg-amber-400 text-black font-extrabold py-3 px-6 rounded-full text-sm transition-all transform hover:-translate-y-1 text-center shadow-[0_0_25px_rgba(245,158,11,0.5),0_0_50px_rgba(245,158,11,0.2)] hover:shadow-[0_0_35px_rgba(245,158,11,0.7),0_0_70px_rgba(245,158,11,0.3)] ring-2 ring-amber-400/50"
+                    >
+                        Get Your 7-Day Trial!
+                    </Link>
                 </motion.div>
             </div>
 
