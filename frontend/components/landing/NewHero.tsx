@@ -72,15 +72,15 @@ export default function NewHero() {
                             muted
                             loop
                             playsInline
-                            preload="metadata"
+                            preload="auto"
                             disablePictureInPicture
                             controlsList="nodownload noplaybackrate nofullscreen"
                             aria-label="The Mambo Guild cinematic demo"
                             onCanPlay={() => setVideoReady(true)}
                             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-700 ${videoReady ? "opacity-100" : "opacity-0"}`}
                         >
-                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.webm" type="video/webm" />
-                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.mp4" type="video/mp4" />
+                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v2.webm" type="video/webm" />
+                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v2.mp4" type="video/mp4" />
                         </video>
 
                         {/* Gradient Overlay */}
