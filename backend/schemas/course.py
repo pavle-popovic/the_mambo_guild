@@ -121,6 +121,10 @@ class LevelResponse(BaseModel):
     duration_minutes: int = 0  # Total module duration
     total_xp: int = 0  # Total XP rewards
     status: str = "active"  # active, coming_soon, locked
+    # Populated only for topic-type worlds (history, training-science): the TL;DR
+    # section pulled from the first lesson's markdown notes, shown in place of the
+    # video preview inside the skill-tree node tooltip/modal.
+    tldr: Optional[str] = None
 
     class Config:
         from_attributes = True

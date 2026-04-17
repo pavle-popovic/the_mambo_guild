@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Clock, Zap, BookOpen, Lock, Trophy, ChevronRight } from "lucide-react";
+import { Clock, Zap, BookOpen, Lock, Trophy, ChevronRight, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 interface NodeTooltipProps {
@@ -22,6 +22,7 @@ interface NodeTooltipProps {
   durationMinutes?: number;
   totalXp?: number;
   status?: string;  // active, coming_soon, locked
+  tldr?: string | null;  // Topic worlds: replaces video preview with lesson TL;DR
   isAdminMode?: boolean;  // In admin mode, don't show locked state
 }
 
@@ -47,8 +48,10 @@ export default function NodeTooltip({
   durationMinutes = 0,
   totalXp = 0,
   status = "active",
+  tldr,
   isAdminMode = false,
 }: NodeTooltipProps) {
+  const hasTldr = !!tldr && tldr.trim().length > 0;
   // Auto-play preview when tooltip appears
   const [showPreview, setShowPreview] = useState(true);
   const isCompleted = completionPercentage >= 100;
@@ -165,6 +168,74 @@ export default function NodeTooltip({
             : "0 10px 40px rgba(212, 175, 55, 0.15), 0 0 20px rgba(255, 215, 0, 0.1)",
         }}
       >
+        {/* TL;DR variant for topic worlds — no video, no stats, just the lesson's TL;DR */}
+        {hasTldr ? (
+          <>
+            <div className="p-4 pb-3 border-b border-yellow-900/30 flex items-start justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <Sparkles
+                  className={`w-4 h-4 flex-shrink-0 ${
+                    displayLocked
+                      ? "text-gray-500"
+                      : isCompleted
+                      ? "text-green-400"
+                      : "text-yellow-400"
+                  }`}
+                />
+                <h3
+                  className={`font-bold text-base truncate ${
+                    displayLocked
+                      ? "text-gray-400"
+                      : isCompleted
+                      ? "text-green-300"
+                      : "text-yellow-200"
+                  }`}
+                >
+                  {title}
+                </h3>
+              </div>
+              {statusBadge && (
+                <div
+                  className={`flex-shrink-0 ${statusBadge.bg} ${statusBadge.border} border rounded-full px-2.5 py-1 text-[10px] ${statusBadge.color} font-medium`}
+                >
+                  {statusBadge.text}
+                </div>
+              )}
+            </div>
+            <div className="p-4 max-h-[280px] overflow-y-auto">
+              <p className="text-sm text-gray-200 leading-relaxed whitespace-pre-wrap">
+                {tldr}
+              </p>
+            </div>
+            <div className="px-4 pb-4">
+              {displayLocked ? (
+                <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
+                  <div className="flex items-center gap-2">
+                    <Lock className="w-4 h-4 text-gray-500" />
+                    <span className="text-sm font-medium text-gray-400">
+                      Content Locked
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500 mt-2">
+                    Complete the prerequisite modules to unlock this content.
+                  </p>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    onClose();
+                    window.location.href = `/courses/${courseId}?level=${levelId}`;
+                  }}
+                  className="w-full py-2.5 px-4 rounded-lg bg-gradient-to-r from-yellow-700/40 to-amber-700/30 border border-yellow-700/40 text-yellow-300 text-sm font-medium flex items-center justify-center gap-2 hover:border-yellow-600/60 transition min-h-[44px]"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                  {isAdminMode ? "Edit Lessons" : "View Module"}
+                </button>
+              )}
+            </div>
+          </>
+        ) : (
+          <>
         {/* Thumbnail / Preview - LARGE auto-playing animated GIF */}
         <div className="relative aspect-video overflow-hidden">
           {displayUrl ? (
@@ -300,6 +371,8 @@ export default function NodeTooltip({
             </button>
           )}
         </div>
+          </>
+        )}
       </div>
     </motion.div>
   );

@@ -19,6 +19,7 @@ interface Level {
     completion_percentage: number;
     lesson_count: number;
     thumbnail_url?: string;
+    tldr?: string | null;
 }
 
 interface Edge {
@@ -238,6 +239,7 @@ export default function CourseDetailPage() {
                         levelDescription={selectedLevel.description}
                         lessons={levelLessons}
                         completionPercentage={selectedLevel.completion_percentage}
+                        tldr={selectedLevel.tldr}
                     />
                 )}
             </div>

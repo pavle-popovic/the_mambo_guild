@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from typing import List, Dict
+import re
 from models import get_db
 from models.user import User, UserRole, Subscription, SubscriptionStatus
 from models.course import World, Lesson, Level
@@ -13,6 +14,29 @@ from typing import Optional
 from datetime import datetime
 
 router = APIRouter()
+
+
+# Grabs the body of a `## TL;DR` section from a lesson's markdown notes.
+# Matches from the TL;DR heading up to the next `## ` heading or end of string.
+_TLDR_PATTERN = re.compile(
+    r"^\s*##\s+TL;?DR\s*\n+(.*?)(?=^\s*##\s+|\Z)",
+    re.MULTILINE | re.DOTALL | re.IGNORECASE,
+)
+
+
+def _extract_tldr_for_level(level: Level) -> Optional[str]:
+    """Return the TL;DR text from the first lesson's markdown notes, or None."""
+    if not level.lessons:
+        return None
+    first_lesson = min(level.lessons, key=lambda l: (l.order_index or 0))
+    content = first_lesson.content_json or {}
+    notes = content.get("notes") if isinstance(content, dict) else None
+    if not isinstance(notes, str):
+        return None
+    match = _TLDR_PATTERN.search(notes)
+    if not match:
+        return None
+    return match.group(1).strip() or None
 
 
 @router.get("/worlds", response_model=List[WorldResponse])
@@ -426,13 +450,17 @@ def get_world_skill_tree(
     # Determine which levels are unlocked (shared logic with get_lesson access check)
     level_unlocked_map = compute_level_unlock_map(db, world, current_user)
 
+    # For topic-type worlds, the tooltip/modal shows the first lesson's TL;DR
+    # instead of a video preview. Regular courses and choreos skip this.
+    is_topic_world = (world.course_type or "course") == "topic"
+
     # Build level responses
     level_responses = []
     for level in world.levels:
         level_id = str(level.id)
         is_unlocked = level_unlocked_map.get(level_id, False)
         completion_pct = level_completion_map.get(level_id, 0.0)
-        
+
         # Calculate total XP from lessons if not set on level
         calculated_xp = sum(lesson.xp_value for lesson in level.lessons)
         total_xp = level.total_xp if level.total_xp else calculated_xp
@@ -440,6 +468,8 @@ def get_world_skill_tree(
         # Calculate duration from lessons if not set on level
         calculated_duration = sum((lesson.duration_minutes or 0) for lesson in level.lessons)
         duration = level.duration_minutes if level.duration_minutes else calculated_duration
+
+        tldr = _extract_tldr_for_level(level) if is_topic_world else None
 
         level_responses.append(LevelResponse(
             id=level_id,
@@ -457,7 +487,8 @@ def get_world_skill_tree(
             outcome=level.outcome,
             duration_minutes=duration,
             total_xp=total_xp,
-            status=level.status or "active"
+            status=level.status or "active",
+            tldr=tldr,
         ))
     
     # Build edge responses

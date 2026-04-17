@@ -39,6 +39,7 @@ interface Level {
   duration_minutes?: number;
   total_xp?: number;
   status?: string;  // active, coming_soon, locked
+  tldr?: string | null;  // Topic worlds: first lesson's TL;DR
 }
 
 interface EdgeData {
@@ -62,6 +63,7 @@ interface HoveredNode {
   durationMinutes?: number;
   totalXp?: number;
   status?: string;
+  tldr?: string | null;
 }
 
 interface ConstellationGraphProps {
@@ -276,6 +278,7 @@ function ConstellationGraphInner({
         durationMinutes: level.duration_minutes,
         totalXp: level.total_xp,
         status: level.status,
+        tldr: level.tldr,
       });
     },
     [levels, isTouchDevice]
@@ -684,6 +687,7 @@ function ConstellationGraphInner({
             durationMinutes={hoveredNode.durationMinutes}
             totalXp={hoveredNode.totalXp}
             status={hoveredNode.status}
+            tldr={hoveredNode.tldr}
             isAdminMode={isAdminMode}
           />
         )}

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Play, BookOpen, Award, Clock, Zap, ChevronRight, RotateCcw } from "lucide-react";
+import { X, Play, BookOpen, Award, Clock, Zap, ChevronRight, RotateCcw, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 import MuxPlayer from "@mux/mux-player-react";
 
@@ -32,6 +32,8 @@ interface ModuleModalProps {
     total_duration?: number; // in minutes
     courseId?: string;
     onNavigateToModule?: () => void;
+    // Topic worlds: replaces the video preview with the lesson's TL;DR text
+    tldr?: string | null;
 }
 
 export default function ModuleModal({
@@ -47,8 +49,10 @@ export default function ModuleModal({
     total_duration,
     courseId,
     onNavigateToModule,
+    tldr,
 }: ModuleModalProps) {
     const router = useRouter();
+    const hasTldr = !!tldr && tldr.trim().length > 0;
 
     const handleLessonClick = (lessonId: string, isLocked: boolean) => {
         if (isLocked) return;
@@ -139,46 +143,66 @@ export default function ModuleModal({
                             exit={{ scale: 0.95, y: 20, opacity: 0 }}
                             transition={{ type: "spring", damping: 20, stiffness: 300 }}
                         >
-                            {/* Video Preview / Thumbnail Section */}
-                            <div className="relative w-full aspect-video bg-black/50 overflow-hidden">
-                                {mux_preview_playback_id ? (
-                                    <MuxPlayer
-                                        playbackId={mux_preview_playback_id}
-                                        streamType="on-demand"
-                                        autoPlay={false}
-                                        muted
-                                        loop
-                                        className="w-full h-full object-cover"
-                                        style={{ aspectRatio: "16/9" }}
-                                    />
-                                ) : thumbnail_url ? (
-                                    <img
-                                        src={thumbnail_url}
-                                        alt={levelTitle}
-                                        className="w-full h-full object-cover"
-                                    />
-                                ) : (
-                                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
-                                        <div className="text-center">
-                                            <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-yellow-900/20 border border-yellow-700/30 flex items-center justify-center">
-                                                <Play className="w-8 h-8 text-yellow-500/70" />
-                                            </div>
-                                            <p className="text-gray-500 text-sm">No preview available</p>
-                                        </div>
+                            {/* Preview section — TL;DR for topic worlds, video otherwise */}
+                            {hasTldr ? (
+                                <div className="relative w-full px-6 pt-6 pb-5 bg-gradient-to-b from-yellow-900/20 via-gray-900/60 to-gray-900/90 border-b border-yellow-900/30">
+                                    <div className="flex items-center gap-2 mb-3">
+                                        <Sparkles className="w-4 h-4 text-yellow-400" />
+                                        <span className="text-xs uppercase tracking-widest text-yellow-400/90 font-semibold">
+                                            TL;DR
+                                        </span>
                                     </div>
-                                )}
+                                    <p className="text-base text-gray-100 leading-relaxed whitespace-pre-wrap">
+                                        {tldr}
+                                    </p>
+                                    <button
+                                        onClick={onClose}
+                                        className="absolute top-4 right-4 p-2 bg-black/60 hover:bg-black/80 rounded-full transition backdrop-blur-sm border border-white/10"
+                                    >
+                                        <X className="w-5 h-5 text-white" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="relative w-full aspect-video bg-black/50 overflow-hidden">
+                                    {mux_preview_playback_id ? (
+                                        <MuxPlayer
+                                            playbackId={mux_preview_playback_id}
+                                            streamType="on-demand"
+                                            autoPlay={false}
+                                            muted
+                                            loop
+                                            className="w-full h-full object-cover"
+                                            style={{ aspectRatio: "16/9" }}
+                                        />
+                                    ) : thumbnail_url ? (
+                                        <img
+                                            src={thumbnail_url}
+                                            alt={levelTitle}
+                                            className="w-full h-full object-cover"
+                                        />
+                                    ) : (
+                                        <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
+                                            <div className="text-center">
+                                                <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-yellow-900/20 border border-yellow-700/30 flex items-center justify-center">
+                                                    <Play className="w-8 h-8 text-yellow-500/70" />
+                                                </div>
+                                                <p className="text-gray-500 text-sm">No preview available</p>
+                                            </div>
+                                        </div>
+                                    )}
 
-                                {/* Gradient overlay at bottom */}
-                                <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-900/95 to-transparent" />
+                                    {/* Gradient overlay at bottom */}
+                                    <div className="absolute bottom-0 left-0 right-0 h-20 bg-gradient-to-t from-gray-900/95 to-transparent" />
 
-                                {/* Close button on video */}
-                                <button
-                                    onClick={onClose}
-                                    className="absolute top-4 right-4 p-2 bg-black/60 hover:bg-black/80 rounded-full transition backdrop-blur-sm border border-white/10"
-                                >
-                                    <X className="w-5 h-5 text-white" />
-                                </button>
-                            </div>
+                                    {/* Close button on video */}
+                                    <button
+                                        onClick={onClose}
+                                        className="absolute top-4 right-4 p-2 bg-black/60 hover:bg-black/80 rounded-full transition backdrop-blur-sm border border-white/10"
+                                    >
+                                        <X className="w-5 h-5 text-white" />
+                                    </button>
+                                </div>
+                            )}
 
                             {/* Header */}
                             <div className="p-6 border-b border-yellow-900/20">
