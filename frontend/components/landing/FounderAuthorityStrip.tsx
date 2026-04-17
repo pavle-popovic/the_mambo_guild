@@ -47,6 +47,14 @@ type Credential = { key: string; text: ReactNode };
 
 const credentials: Credential[] = [
     {
+        key: "champion",
+        text: (
+            <>
+                <span className="text-mambo-gold">2x European Champion</span>
+            </>
+        ),
+    },
+    {
         key: "years",
         text: (
             <>

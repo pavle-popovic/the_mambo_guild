@@ -163,14 +163,17 @@ export default function NewHero() {
                     </motion.div>
 
                     {/* Main Title — structured salsa curriculum positioning */}
-                    <div className="space-y-2">
-                        <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold font-serif leading-tight text-mambo-text">
+                    <div className="space-y-3 md:space-y-4">
+                        <h1
+                            className="font-bold italic leading-[1.05] tracking-tight text-mambo-text text-balance text-[clamp(2rem,5.2vw,3.75rem)]"
+                            style={{ fontFamily: '"Playfair Display", serif' }}
+                        >
                             Every move, every technique.{" "}
-                            <span className="text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.3)]">
+                            <span className="block text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.35)]">
                                 Level 0 to 100.
                             </span>
                         </h1>
-                        <p className="text-base sm:text-lg md:text-xl text-gray-300 leading-snug max-w-xl mx-auto lg:mx-0">
+                        <p className="text-base sm:text-lg text-gray-300 leading-snug max-w-md mx-auto lg:mx-0 text-balance">
                             A structured salsa curriculum. Every skill in the right order.
                         </p>
                     </div>
