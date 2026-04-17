@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import {
     NewHero,
     TrendingModulesSection,
+    HowItWorksSection,
     SkillTreeTeaser,
     ReleaseScheduleSection,
     TestimonialsSection,
@@ -41,6 +42,11 @@ export default function HomePage() {
                 {/* Trending Modules Carousel */}
                 <section className="relative z-10">
                     <TrendingModulesSection />
+                </section>
+
+                {/* How It Works — 5-pillar conversion showcase */}
+                <section className="relative z-10">
+                    <HowItWorksSection />
                 </section>
 
                 {/* Skill Tree / Gamification Teaser */}

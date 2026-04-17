@@ -1,152 +1,346 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, type Variants } from "framer-motion";
 import Image from "next/image";
+import Link from "next/link";
+import type { ReactNode } from "react";
 
-const steps = [
+type Pillar = {
+  eyebrow: string;
+  title: ReactNode;
+  body: string;
+  bullets: string[];
+  image: string;
+  alt: string;
+  width: number;
+  height: number;
+};
+
+const gold = "text-mambo-gold";
+
+const pillars: Pillar[] = [
   {
-    step: "01", // Kept for key/id but not displayed
-    title: "Learn at Your Pace",
-    description:
-      "Access structured courses anytime, anywhere. Each lesson builds on the last, so you never feel lost. Track your progress and earn XP as you go.",
+    eyebrow: "THE SKILL TREE",
+    title: (
+      <>
+        Your roadmap from <span className={gold}>basic step</span> to{" "}
+        <span className={gold}>pro choreo</span>
+      </>
+    ),
+    body:
+      "300+ classes laid out like a video-game tech tree. Every technique isolated. Every skill built step by step, in the right order. You always know exactly what to drill next.",
+    bullets: [
+      "300+ classes, beginner → pro",
+      "Built technique-by-technique",
+      "Unlocks as you level up",
+      "Never guess what to drill next",
+    ],
+    image: "/assets/skill-tree-new.png",
+    alt: "Constellation skill tree showing connected unlockable modules",
+    width: 869,
+    height: 777,
+  },
+  {
+    eyebrow: "THE PRO PLAYER",
+    title: (
+      <>
+        The <span className={gold}>practice room</span> pros have been waiting for
+      </>
+    ),
+    body:
+      "Every frame, every speed, every angle. Built for obsessive repetition — the way motor learning actually works.",
+    bullets: [
+      "Mirrored view — zero guessing which side is which",
+      "Back view for that live-class “follow me” feel",
+      "13 languages of captions + narration",
+      "Speed controls (0.25× → 2×) + frame-by-frame",
+      "A/B loop — drill one 2-second bar forever",
+      "Summary notes + quizzes after every lesson",
+      "Full course navigation inside the player",
+    ],
+    image: "/assets/instructor-page.png",
+    alt: "Lesson player with speed controls, A/B loop, captions and course navigation",
+    width: 1857,
+    height: 881,
+  },
+  {
+    eyebrow: "FULL COURSES — ORIGINS & SCIENCE",
+    title: (
+      <>
+        Understand the <span className={gold}>music</span>. Train like a{" "}
+        <span className={gold}>pro</span>.
+      </>
+    ),
+    body:
+      "Two full courses included, no upsell: the complete History of Salsa — from Cuba to New York to the world — and the Science of Effective Training, the exact principles elite dancers use to improve faster.",
+    bullets: [
+      "20-module History of Salsa",
+      "18-module Science of Effective Training",
+      "Motor learning, deliberate practice, cognitive load",
+      "Built-in quizzes + curated multimedia",
+    ],
     image: "/assets/Course_page.png",
-    alt: "Course page showing structured lessons",
+    alt: "Course page showing structured lessons, modules and progress",
+    width: 1901,
+    height: 875,
   },
   {
-    step: "02",
-    title: "Connect with the Community",
-    description:
-      "Share your progress, get inspired by others, and participate in challenges. Our community keeps you motivated and accountable.",
+    eyebrow: "THE COMMUNITY",
+    title: (
+      <>
+        You don&apos;t level up <span className={gold}>alone</span>
+      </>
+    ),
+    body:
+      "The Stage for progress videos. The Lab for questions. Real feedback from dancers who actually train. Earn badges for every milestone and climb the leaderboards.",
+    bullets: [
+      "The Stage — share progress videos",
+      "The Lab — ask & answer technique questions",
+      "Hype or Coach feedback modes",
+      "38 badges across Bronze → Diamond",
+      "Weekly, monthly and all-time leaderboards",
+    ],
     image: "/assets/Com_page.png",
-    alt: "Community page with dancer posts",
+    alt: "Community feed with dancer posts, reactions and comments",
+    width: 1892,
+    height: 875,
   },
   {
-    step: "03",
-    title: "Track Your Growth",
-    description:
-      "See your journey visualized. From XP and streaks to badges and achievements, every practice session counts toward your dancer profile.",
-    image: "/assets/Profile_page.png",
-    alt: "Profile page showing progress stats",
+    eyebrow: "GUILD MASTER — VIP",
+    title: (
+      <>
+        Skip the plateau. Train with the <span className={gold}>Maestro</span> directly.
+      </>
+    ),
+    body:
+      "When you&apos;re serious, Guild Master unlocks the inner circle — personal 1-on-1 coaching and live weekly Roundtable calls. The kind of access that used to cost $200/hour in person.",
+    bullets: [
+      "Monthly 1-on-1 video coaching with personal feedback",
+      "Weekly live Roundtable calls on Zoom",
+      "DJ Booth — isolated stems from classic tracks",
+      "The Vault — every past Roundtable recording",
+    ],
+    image: "/assets/founder-access.png",
+    alt: "Guild Master VIP access — coaching, Roundtable calls and DJ Booth",
+    width: 645,
+    height: 779,
   },
 ];
 
-const fadeInLeft = {
+const easeOut = [0.25, 0.1, 0.25, 1] as const;
+
+const fadeUp: Variants = {
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: easeOut } },
+};
+const fadeLeft: Variants = {
   hidden: { opacity: 0, x: -40 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.25, 0.1, 0.25, 1] as const,
-    },
-  },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: easeOut } },
+};
+const fadeRight: Variants = {
+  hidden: { opacity: 0, x: 40 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.6, ease: easeOut } },
+};
+const stagger: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.06, delayChildren: 0.15 } },
+};
+const bulletItem: Variants = {
+  hidden: { opacity: 0, x: -8 },
+  visible: { opacity: 1, x: 0, transition: { duration: 0.35, ease: easeOut } },
 };
 
-const fadeInRight = {
-  hidden: { opacity: 0, x: 40 },
-  visible: {
-    opacity: 1,
-    x: 0,
-    transition: {
-      duration: 0.6,
-      ease: [0.25, 0.1, 0.25, 1] as const,
-    },
-  },
-};
+function CheckIcon() {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      aria-hidden="true"
+      className="h-4 w-4 flex-shrink-0 text-mambo-gold mt-[3px] landscape-phone:h-3 landscape-phone:w-3 landscape-phone:mt-[2px]"
+    >
+      <path
+        fill="currentColor"
+        d="M6.173 11.414 2.759 8l1.06-1.06 2.354 2.353 5.768-5.768 1.06 1.061z"
+      />
+    </svg>
+  );
+}
+
+function PillarImage({
+  src,
+  alt,
+  width,
+  height,
+  priority = false,
+}: {
+  src: string;
+  alt: string;
+  width: number;
+  height: number;
+  priority?: boolean;
+}) {
+  return (
+    <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group">
+      <div className="absolute -inset-1 bg-gradient-to-r from-amber-400/25 via-yellow-500/15 to-amber-600/25 rounded-2xl blur-xl opacity-50 transition-opacity duration-500 group-hover:opacity-95 pointer-events-none" />
+      <div className="relative">
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          priority={priority}
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          className="w-full h-auto transition-transform duration-700 group-hover:scale-[1.03]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-mambo-dark/40 to-transparent pointer-events-none" />
+      </div>
+    </div>
+  );
+}
 
 export default function HowItWorksSection() {
   return (
-    <section className="relative py-32 px-6 bg-mambo-dark z-10">
+    <section
+      id="how-it-works"
+      className="relative py-20 px-5 sm:py-28 sm:px-6 lg:py-32 bg-mambo-dark z-10 landscape-phone:py-10 landscape-phone:px-6"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-14 sm:mb-20 lg:mb-24 landscape-phone:mb-8"
         >
+          <div className="inline-block mb-4 px-3 py-1 text-[11px] tracking-[0.22em] font-bold text-mambo-gold border border-mambo-gold/30 rounded-full bg-mambo-gold/5">
+            HOW IT WORKS
+          </div>
           <h2
-            className="text-4xl md:text-5xl font-bold mb-6 text-mambo-text tracking-tight font-serif italic"
+            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-mambo-text tracking-tight italic landscape-phone:text-3xl"
             style={{ fontFamily: '"Playfair Display", serif' }}
           >
-            How It{" "}
-            <span className="text-mambo-gold drop-shadow-md">
-              Works
-            </span>
+            Everything you need to{" "}
+            <span className="text-mambo-gold drop-shadow-md">actually get good.</span>
           </h2>
+          <p className="max-w-2xl mx-auto mt-5 text-base sm:text-lg text-mambo-text/70 leading-relaxed landscape-phone:text-sm landscape-phone:mt-3">
+            Not another video dump. A complete learning environment — structured, gamified, and built around how dancers actually improve.
+          </p>
         </motion.div>
 
-        {/* Zig-zag steps */}
-        <div className="space-y-24 lg:space-y-32">
-          {steps.map((step, index) => {
+        {/* Pillars */}
+        <div className="space-y-20 sm:space-y-28 lg:space-y-32 landscape-phone:space-y-10">
+          {pillars.map((pillar, index) => {
             const isEven = index % 2 === 0;
-
             return (
               <div
-                key={step.step}
-                className={`flex flex-col ${isEven ? "lg:flex-row" : "lg:flex-row-reverse"
-                  } gap-12 lg:gap-20 items-center`}
+                key={pillar.eyebrow}
+                className={[
+                  "flex flex-col items-center gap-10 sm:gap-12 lg:gap-20",
+                  // Desktop zig-zag (also fires on landscape phones via `lg:`)
+                  isEven ? "lg:flex-row" : "lg:flex-row-reverse",
+                  // Landscape-phone override — always image-left, tighter gap
+                  "landscape-phone:!flex-row landscape-phone:!gap-6 landscape-phone:!items-center",
+                ].join(" ")}
               >
-                {/* Text content */}
+                {/* Text column */}
                 <motion.div
-                  variants={isEven ? fadeInLeft : fadeInRight}
+                  variants={isEven ? fadeLeft : fadeRight}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-100px" }}
-                  className="flex-1 max-w-xl text-center lg:text-left"
+                  className="flex-1 w-full max-w-xl text-center lg:text-left landscape-phone:!text-left landscape-phone:max-w-none"
                 >
-                  {/* Step number REMOVED as requested */}
-
-                  {/* Title with Gold Highlights */}
-                  <h3 className="text-3xl md:text-4xl font-bold text-white mb-6 tracking-tight">
-                    {step.title === "Learn at Your Pace" ? (
-                      <>Learn at <span className="text-mambo-gold">Your Pace</span></>
-                    ) : step.title === "Connect with the Community" ? (
-                      <>Connect with the <span className="text-mambo-gold">Community</span></>
-                    ) : step.title === "Track Your Growth" ? (
-                      <><span className="text-mambo-gold">Track</span> Your Growth</>
-                    ) : (
-                      step.title
-                    )}
+                  <div className="inline-block mb-3 text-[10px] sm:text-xs tracking-[0.22em] font-bold text-mambo-gold landscape-phone:text-[9px] landscape-phone:mb-2">
+                    {pillar.eyebrow}
+                  </div>
+                  <h3
+                    className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-5 leading-tight tracking-tight italic landscape-phone:text-xl landscape-phone:mb-2"
+                    style={{ fontFamily: '"Playfair Display", serif' }}
+                  >
+                    {pillar.title}
                   </h3>
-
-                  {/* Description */}
-                  <p className="text-mambo-gold/90 text-lg leading-relaxed font-medium tracking-wide">
-                    {step.description}
+                  <p className="text-base sm:text-lg text-mambo-text/80 leading-relaxed mb-6 landscape-phone:text-xs landscape-phone:mb-3 landscape-phone:leading-snug">
+                    {pillar.body}
                   </p>
+                  <motion.ul
+                    variants={stagger}
+                    initial="hidden"
+                    whileInView="visible"
+                    viewport={{ once: true, margin: "-100px" }}
+                    className="space-y-2.5 text-left inline-block landscape-phone:space-y-1"
+                  >
+                    {pillar.bullets.map((b) => (
+                      <motion.li
+                        key={b}
+                        variants={bulletItem}
+                        className="flex gap-2.5 items-start text-sm sm:text-base text-mambo-text/90 landscape-phone:text-[11px] landscape-phone:gap-2"
+                      >
+                        <CheckIcon />
+                        <span>{b}</span>
+                      </motion.li>
+                    ))}
+                  </motion.ul>
                 </motion.div>
 
-                {/* Image */}
+                {/* Image column */}
                 <motion.div
-                  variants={isEven ? fadeInRight : fadeInLeft}
+                  variants={isEven ? fadeRight : fadeLeft}
                   initial="hidden"
                   whileInView="visible"
                   viewport={{ once: true, margin: "-100px" }}
-                  className="flex-1 w-full max-w-2xl"
+                  className="flex-1 w-full max-w-2xl landscape-phone:!max-w-[52%]"
                 >
-                  <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-black/50 border border-white/10 group">
-                    {/* Glow effect */}
-                    <div className="absolute -inset-1 bg-gradient-to-r from-mambo-blue/20 to-purple-500/20 rounded-2xl blur-xl opacity-50 transition-opacity duration-500 group-hover:opacity-75" />
-
-                    <div className="relative">
-                      <Image
-                        src={step.image}
-                        alt={step.alt}
-                        width={800}
-                        height={500}
-                        className="w-full h-auto transition-transform duration-700 group-hover:scale-105"
-                      />
-
-                      {/* Overlay gradient */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-mambo-dark/50 to-transparent pointer-events-none" />
-                    </div>
-                  </div>
+                  <PillarImage
+                    src={pillar.image}
+                    alt={pillar.alt}
+                    width={pillar.width}
+                    height={pillar.height}
+                    priority={index === 0}
+                  />
                 </motion.div>
               </div>
             );
           })}
         </div>
+
+        {/* Closing CTA strip */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, margin: "-100px" }}
+          className="mt-24 sm:mt-32 lg:mt-40 landscape-phone:mt-14"
+        >
+          <div className="relative overflow-hidden rounded-3xl border border-mambo-gold/25 bg-gradient-to-b from-black/60 to-mambo-dark px-6 py-14 sm:py-20 text-center landscape-phone:py-10 landscape-phone:rounded-2xl">
+            <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(252,226,5,0.18),transparent_60%)]" />
+            <div className="relative">
+              <h3
+                className="text-3xl sm:text-5xl font-bold text-mambo-text tracking-tight italic landscape-phone:text-2xl"
+                style={{ fontFamily: '"Playfair Display", serif' }}
+              >
+                If this isn&apos;t worth{" "}
+                <span className="text-mambo-gold drop-shadow-md">$1</span>, we&apos;ll buy you lunch.
+              </h3>
+              <p className="mt-4 max-w-xl mx-auto text-base sm:text-lg text-mambo-text/75 landscape-phone:text-sm landscape-phone:mt-2">
+                Try everything above for 7 days. $1. Cancel in two clicks.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 landscape-phone:mt-5">
+                <Link
+                  href="/register"
+                  className="w-full sm:w-auto bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-8 rounded-full text-base sm:text-lg tracking-wide shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm"
+                >
+                  Start 7-day $1 trial
+                </Link>
+                <Link
+                  href="/beta?key=a7f3e2b1c9d04e6f8a2b3c4d5e1ol86j"
+                  className="w-full sm:w-auto border border-mambo-gold/40 text-mambo-gold font-semibold py-3.5 px-8 rounded-full text-base sm:text-lg hover:bg-mambo-gold/10 transition-all landscape-phone:py-2.5 landscape-phone:text-sm"
+                >
+                  See inside first
+                </Link>
+              </div>
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );
