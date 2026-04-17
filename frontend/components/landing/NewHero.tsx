@@ -42,6 +42,33 @@ export default function NewHero() {
         return () => mq.removeEventListener("change", apply);
     }, []);
 
+    // Nudge playback if the browser's native autoplay silently bails out
+    // (happens on hard-refresh when decode isn't ready at autoplay-attempt time).
+    useEffect(() => {
+        const v = videoRef.current;
+        if (!v) return;
+        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+        const tryPlay = () => {
+            if (v.paused && !v.ended) v.play().catch(() => {});
+        };
+        tryPlay();
+        const onVisible = () => { if (document.visibilityState === "visible") tryPlay(); };
+        const id = window.setInterval(() => {
+            if (!v.paused) { window.clearInterval(id); return; }
+            tryPlay();
+        }, 800);
+        document.addEventListener("visibilitychange", onVisible);
+        v.addEventListener("loadeddata", tryPlay);
+        v.addEventListener("canplay", tryPlay);
+        return () => {
+            window.clearInterval(id);
+            document.removeEventListener("visibilitychange", onVisible);
+            v.removeEventListener("loadeddata", tryPlay);
+            v.removeEventListener("canplay", tryPlay);
+        };
+    }, []);
+
     return (
         <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-start lg:items-center justify-center overflow-hidden bg-transparent pt-4 md:pt-20">
             {/* Content Container */}
