@@ -111,7 +111,7 @@ export default function FounderAuthorityStrip() {
             />
 
             <motion.div
-                className="relative mx-auto max-w-5xl"
+                className="relative mx-auto max-w-6xl"
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: "-80px" }}
@@ -175,13 +175,18 @@ export default function FounderAuthorityStrip() {
                         <motion.h2
                             variants={fadeIn}
                             className="
-                                font-serif italic text-white leading-[1.1] whitespace-nowrap
-                                text-[clamp(1.05rem,5vw,2.75rem)]
-                                sm:text-4xl lg:text-[2.75rem]
-                                landscape-phone:!text-xl landscape-phone:!leading-tight
+                                font-serif italic font-bold text-white leading-[1.1] whitespace-nowrap
+                                text-[clamp(1.1rem,5.1vw,3rem)]
+                                sm:text-[2.5rem] lg:text-[3rem]
+                                landscape-phone:!text-2xl landscape-phone:!leading-tight
+                                [text-shadow:0_0_22px_rgba(212,175,55,0.30),0_0_48px_rgba(252,226,5,0.18)]
                             "
                         >
-                            Built by a <span className="text-mambo-gold">dancer</span>, not a studio.
+                            Built by a{" "}
+                            <span className="text-mambo-gold [text-shadow:0_0_18px_rgba(252,226,5,0.7),0_0_40px_rgba(212,175,55,0.55),0_0_70px_rgba(212,175,55,0.35)]">
+                                dancer
+                            </span>
+                            , not a studio.
                         </motion.h2>
 
                         <motion.p
