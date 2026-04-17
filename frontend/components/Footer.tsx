@@ -34,18 +34,8 @@ export default function Footer({ className = "" }: FooterProps) {
           <h4 className="font-bold mb-4 text-mambo-text">Learn</h4>
           <ul className="space-y-2 text-sm text-gray-500">
             <li>
-              <Link href="#" className="hover:text-mambo-blue transition">
-                Beginner Course
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="hover:text-mambo-blue transition">
-                Styling Workshop
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="hover:text-mambo-blue transition">
-                Musicality
+              <Link href="/courses" className="hover:text-mambo-blue transition">
+                Courses
               </Link>
             </li>
             <li>
@@ -53,29 +43,44 @@ export default function Footer({ className = "" }: FooterProps) {
                 Pricing
               </Link>
             </li>
+            <li>
+              <Link href="/instructors" className="hover:text-mambo-blue transition">
+                Instructor
+              </Link>
+            </li>
+            <li>
+              <Link href="/community" className="hover:text-mambo-blue transition">
+                Community
+              </Link>
+            </li>
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-4 text-mambo-text">Community</h4>
+          <h4 className="font-bold mb-4 text-mambo-text">Connect</h4>
           <ul className="space-y-2 text-sm text-gray-500">
             <li>
-              <Link href="#" className="hover:text-mambo-blue transition">
-                Discord Server
-              </Link>
-            </li>
-            <li>
-              <Link href="#" className="hover:text-mambo-blue transition">
+              <a
+                href="https://www.instagram.com/pavlepopovic204/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-mambo-blue transition"
+              >
                 Instagram
-              </Link>
+              </a>
             </li>
             <li>
-              <Link href="#" className="hover:text-mambo-blue transition">
+              <a
+                href="https://www.youtube.com/@TheMamboGuild"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-mambo-blue transition"
+              >
                 YouTube
-              </Link>
+              </a>
             </li>
             <li>
-              <Link href="#" className="hover:text-mambo-blue transition">
-                Support
+              <Link href="/waitlist" className="hover:text-mambo-blue transition">
+                Early Access
               </Link>
             </li>
           </ul>
@@ -83,10 +88,6 @@ export default function Footer({ className = "" }: FooterProps) {
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between text-xs text-gray-600">
         <p>&copy; 2024 The Mambo Guild. Keep dancing.</p>
-        <div className="flex gap-4 mt-2 md:mt-0">
-          <Link href="#">Privacy Policy</Link>
-          <Link href="#">Terms of Service</Link>
-        </div>
       </div>
     </footer>
   );

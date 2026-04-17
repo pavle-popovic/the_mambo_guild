@@ -398,18 +398,12 @@ export default function HowItWorksSection() {
               <p className="mt-4 max-w-xl mx-auto text-base sm:text-lg text-mambo-text/75 landscape-phone:text-sm landscape-phone:mt-2">
                 Full access. Cancel anytime.
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 landscape-phone:mt-5">
+              <div className="mt-8 flex items-center justify-center landscape-phone:mt-5">
                 <Link
                   href="/register"
                   className="w-full sm:w-auto bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-8 rounded-full text-base sm:text-lg tracking-wide shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm"
                 >
                   Start 7-day free trial
-                </Link>
-                <Link
-                  href="/beta?key=a7f3e2b1c9d04e6f8a2b3c4d5e1ol86j"
-                  className="w-full sm:w-auto border border-mambo-gold/40 text-mambo-gold font-semibold py-3.5 px-8 rounded-full text-base sm:text-lg hover:bg-mambo-gold/10 transition-all landscape-phone:py-2.5 landscape-phone:text-sm"
-                >
-                  See inside first
                 </Link>
               </div>
             </div>
