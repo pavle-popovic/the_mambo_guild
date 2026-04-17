@@ -45,14 +45,14 @@ export default function NewHero() {
     return (
         <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-start lg:items-center justify-center overflow-hidden bg-transparent pt-4 md:pt-20">
             {/* Content Container */}
-            <div className="hero-content-container relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center justify-between gap-3 md:gap-12 lg:gap-20">
+            <div className="hero-content-container relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-3 md:gap-12 lg:gap-12">
 
                 {/* Video Side — SECOND on mobile (below text), SECOND on desktop (right) */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="flex-[1.5] w-full max-w-2xl lg:max-w-4xl order-2 lg:order-2"
+                    className="flex-[1.8] w-full max-w-2xl lg:max-w-5xl order-2 lg:order-2"
                 >
                     <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
                         {/* Poster image — always visible so users never see a black box while the video loads */}
@@ -93,7 +93,7 @@ export default function NewHero() {
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: "easeOut" }}
-                    className="flex-1 text-center lg:text-left space-y-4 md:space-y-8 max-w-2xl order-1 lg:order-1"
+                    className="flex-1 text-center lg:text-left space-y-4 md:space-y-6 max-w-2xl order-1 lg:order-1"
                 >
                     {/* Certified Badge — aligned left on mobile */}
                     <motion.div
@@ -110,9 +110,9 @@ export default function NewHero() {
 
                     {/* Main Title — full brand name */}
                     <div className="space-y-1">
-                        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-5xl xl:text-7xl font-bold font-serif leading-tight text-mambo-text">
+                        <h1 className="text-3xl sm:text-4xl md:text-4xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold font-serif leading-tight text-mambo-text whitespace-nowrap">
                             The{" "}
-                            <span className="text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.3)] whitespace-nowrap">
+                            <span className="text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.3)]">
                                 Mambo Guild
                             </span>
                         </h1>
