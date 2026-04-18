@@ -73,6 +73,12 @@ def compute_level_unlock_map(
     def resolve(level_id: str) -> bool:
         if level_id in unlocked:
             return unlocked[level_id]
+        # Once the user has any progress on a level, keep it unlocked.
+        # Prereqs can be added or restructured after access was granted, and
+        # rolling back would hide content the user already entered.
+        if level_completion_map.get(level_id, 0.0) > 0.0:
+            unlocked[level_id] = True
+            return True
         prereqs = prerequisites_map.get(level_id, [])
         if not prereqs:
             unlocked[level_id] = True
