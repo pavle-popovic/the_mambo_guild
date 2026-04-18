@@ -266,7 +266,7 @@ const MuxPlayerWithCC = forwardRef<MuxPlayerWithCCHandle, MuxPlayerWithCCProps>(
           streamType="on-demand"
           autoPlay={autoPlay}
           poster={posterUrl}
-          primaryColor="#ff0000"
+          primaryColor="#D4AF37"
           secondaryColor="#8c8c8c"
           playbackRates={[] as any}
           /* Tell Mux which subtitle track to activate on initial load */

@@ -157,8 +157,8 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           --media-range-buffered-color: #6b7280 !important;
           --media-time-range-buffered-color: #6b7280 !important;
           --media-range-track-buffered-color: #6b7280 !important;
-          --media-range-bar-color: #ff0000 !important;
-          --media-primary-color: #ff0000 !important;
+          --media-range-bar-color: #D4AF37 !important;
+          --media-primary-color: #D4AF37 !important;
           --media-secondary-color: #6b7280 !important;
           --media-range-track-background: #8c8c8c !important;
           --media-preview-thumbnail-background: transparent !important;
@@ -457,7 +457,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           streamType="on-demand"
           autoPlay={autoPlay}
           poster={posterUrl}
-          primaryColor="#ff0000"
+          primaryColor="#D4AF37"
           secondaryColor="#8c8c8c"
           playbackRates={[0.5, 0.75, 1, 1.25, 1.5] as any}
           metadata={{
