@@ -65,7 +65,7 @@ const plans: Plan[] = [
     cardBg: "bg-gradient-to-b from-[#1a1a1a] to-black",
     grandfather: {
       nextPrice: "$49/mo",
-      reason: "Price increases to $49/mo on August 1, 2026",
+      reason: "Goes to $49/mo on Aug 1, 2026. Lock in $39/mo for life.",
     },
   },
   {
@@ -87,7 +87,7 @@ const plans: Plan[] = [
     priceId: PERFORMER_PRICE_ID,
     grandfather: {
       nextPrice: "$99/mo",
-      reason: "Price jumps to $99/mo once all 30 founding seats fill",
+      reason: "Goes to $99/mo when all 30 seats fill. Lock in $59/mo for life.",
     },
   },
 ];
@@ -280,7 +280,7 @@ export default function LandingPricingSection() {
                             )}
                           </div>
                           <div className="text-[11px] leading-tight text-white/75">
-                            {plan.grandfather.reason}. Lock it in today — yours for life.
+                            {plan.grandfather.reason}
                           </div>
                         </div>
                       )}

@@ -318,7 +318,7 @@ function PricingPageContent() {
                         )}
                       </div>
                       <div className="text-xs leading-snug text-white/75">
-                        Price increases to $49/mo on August 1, 2026. Lock in $39/mo today — yours for life, as long as you stay subscribed.
+                        Goes to $49/mo on Aug 1, 2026. Lock in $39/mo for life.
                       </div>
                     </div>
 
@@ -398,7 +398,7 @@ function PricingPageContent() {
                     <div className="mb-6 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-3 py-2 text-left">
                       <div className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold mb-0.5">Founding 30 Seats</div>
                       <div className="text-xs leading-snug text-white/75">
-                        Price jumps to $99/mo once all 30 founding seats fill. Lock in $59/mo today — yours for life, as long as you stay subscribed.
+                        Goes to $99/mo when all 30 seats fill. Lock in $59/mo for life.
                       </div>
                     </div>
                     {guildMasterSeats ? (

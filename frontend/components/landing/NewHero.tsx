@@ -96,14 +96,14 @@ export default function NewHero() {
     return (
         <section className="relative min-h-[calc(100vh-56px)] sm:min-h-screen w-full flex items-start lg:items-center justify-center overflow-hidden bg-transparent pt-20 sm:pt-24 md:pt-24 landscape-phone:!pt-16">
             {/* Content Container */}
-            <div className="hero-content-container relative z-10 container mx-auto px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center lg:items-start justify-between gap-3 md:gap-12 lg:gap-12 landscape-phone:!flex-row landscape-phone:!items-center landscape-phone:!gap-4 landscape-phone:!px-4">
+            <div className="hero-content-container relative z-10 container mx-auto max-w-6xl px-4 sm:px-6 md:px-12 flex flex-col lg:flex-row items-center lg:items-center justify-between gap-3 md:gap-10 lg:gap-14 landscape-phone:!flex-row landscape-phone:!items-center landscape-phone:!gap-4 landscape-phone:!px-4">
 
                 {/* Video Side — SECOND on mobile (below text), SECOND on desktop (right) */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="flex-[1.8] w-full max-w-2xl lg:max-w-5xl order-2 lg:order-2 landscape-phone:!order-2 landscape-phone:!flex-[1.1] landscape-phone:!max-w-[50%]"
+                    className="flex-1 w-full max-w-2xl lg:max-w-xl xl:max-w-2xl order-2 lg:order-2 landscape-phone:!order-2 landscape-phone:!flex-[1.1] landscape-phone:!max-w-[50%]"
                 >
                     <div className="relative aspect-[4/3] bg-gray-900 rounded-2xl overflow-hidden shadow-2xl border border-white/10 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-[0_0_50px_rgba(212,175,55,0.15)]">
                         {/* Poster image — always visible so users never see a black box while the video loads */}
