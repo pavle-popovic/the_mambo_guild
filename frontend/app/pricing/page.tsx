@@ -226,11 +226,7 @@ function PricingPageContent() {
       <NavBar user={user || undefined} />
 
       <FadeIn>
-        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-8 sm:py-20 pt-20 sm:pt-28 text-center">
-          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold mb-6 sm:mb-16 text-mambo-text tracking-tight font-serif italic" style={{ fontFamily: '"Playfair Display", serif' }}>
-            We Adapt to <span className="text-mambo-gold">Your Level</span>
-          </h1>
-
+        <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-10 pt-20 sm:pt-24 text-center">
           <StaggerContainer className="grid md:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
             {/* Rookie Tier */}
             <StaggerItem>
