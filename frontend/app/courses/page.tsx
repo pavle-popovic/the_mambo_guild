@@ -295,7 +295,7 @@ export default function CoursesPage() {
         </div>
 
         {/* Main Grid Content */}
-        <div className="max-w-[1600px] mx-auto px-3 sm:px-6 py-3 sm:py-8">
+        <div className="max-w-[1600px] mx-auto px-3 sm:px-6 pt-5 pb-3 sm:py-8">
           {loading ? (
             <div className="text-center py-20">
               <div className="animate-spin w-8 h-8 border-2 border-mambo-gold border-t-transparent rounded-full mx-auto mb-4" />
