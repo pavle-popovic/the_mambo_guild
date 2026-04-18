@@ -6,45 +6,19 @@ import { GlassCard } from "@/components/ui/GlassCard";
 import { FaQuoteLeft, FaStar, FaUserCircle } from "react-icons/fa";
 import Link from "next/link";
 import { Clickable } from "@/components/ui/motion";
-
-// Placeholder testimonials for beta launch
-const testimonials = [
-  {
-    id: 1,
-    quote:
-      "The structured approach finally helped me understand musicality. I went from struggling with basic steps to confidently freestyling in just 3 months.",
-    name: "Maria G.",
-    role: "Advanced Student",
-    avatar: null,
-    rating: 5,
-  },
-  {
-    id: 2,
-    quote:
-      "Having real instructors review my videos changed everything. The personalized feedback accelerated my progress like nothing else.",
-    name: "Carlos R.",
-    role: "Guild Master Tier",
-    avatar: null,
-    rating: 5,
-  },
-  {
-    id: 3,
-    quote:
-      "The gamification keeps me coming back. Earning XP and maintaining my streak has made practice feel like a game instead of a chore.",
-    name: "Sofia L.",
-    role: "6-Month Member",
-    avatar: null,
-    rating: 5,
-  },
-  {
-    id: "cta",
-    type: "cta",
-  },
-];
+import { useTranslations } from "@/i18n/useTranslations";
 
 export default function TestimonialsSection() {
+  const t = useTranslations("landing.testimonials");
   const [isPaused, setIsPaused] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const testimonials = [
+    { id: 1, type: "testimonial", quote: t("t1Quote"), name: t("t1Name"), role: t("t1Role"), avatar: null, rating: 5 },
+    { id: 2, type: "testimonial", quote: t("t2Quote"), name: t("t2Name"), role: t("t2Role"), avatar: null, rating: 5 },
+    { id: 3, type: "testimonial", quote: t("t3Quote"), name: t("t3Name"), role: t("t3Role"), avatar: null, rating: 5 },
+    { id: "cta", type: "cta" },
+  ] as const;
 
   // Auto-scroll carousel (same pattern as TrendingModulesSection)
   useEffect(() => {
@@ -85,7 +59,7 @@ export default function TestimonialsSection() {
           className="text-center mb-4 sm:mb-10 md:mb-14"
         >
           <h2 className="text-xl sm:text-3xl md:text-5xl font-extrabold mb-2 sm:mb-4 text-mambo-text tracking-tight">
-            What Dancers <span className="text-mambo-gold drop-shadow-md">Say</span>
+            {t("headingPre")} <span className="text-mambo-gold drop-shadow-md">{t("headingAccent")}</span>
           </h2>
         </motion.div>
 
@@ -120,17 +94,17 @@ export default function TestimonialsSection() {
                         <FaUserCircle className="w-5 h-5 sm:w-7 sm:h-7 text-white" />
                       </div>
                       <h3 className="text-sm sm:text-lg font-bold text-mambo-text mb-1.5 sm:mb-3">
-                        Be the First
+                        {t("ctaTitle")}
                       </h3>
                       <p className="text-gray-400 mb-3 sm:mb-5 text-xs sm:text-sm leading-relaxed">
-                        Join our beta program and share your transformation story.
+                        {t("ctaBody")}
                       </p>
                       <Clickable>
                         <Link
                           href="/register"
                           className="px-4 sm:px-6 py-2 bg-gradient-to-r from-mambo-blue to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-full text-xs sm:text-sm transition-all shadow-lg shadow-blue-500/25"
                         >
-                          Join Beta
+                          {t("ctaButton")}
                         </Link>
                       </Clickable>
                     </GlassCard>

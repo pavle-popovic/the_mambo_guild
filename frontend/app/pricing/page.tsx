@@ -12,12 +12,15 @@ import { FadeIn, StaggerContainer, StaggerItem, HoverCard, Clickable } from "@/c
 import AuthPromptModal from "@/components/AuthPromptModal";
 import { toast } from "sonner";
 import { CONTACT_EMAIL, daysUntilProGrandfatherEnd } from "@/lib/site";
+import { useTranslations } from "@/i18n/useTranslations";
 
 // Stripe Price IDs
 const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
 const PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml";
 
 function PricingPageContent() {
+  const t = useTranslations("pricingPage");
+  const tp = useTranslations("landing.pricing");
   const { user, refreshUser } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -74,7 +77,7 @@ function PricingPageContent() {
     let cancelled = false;
     let attempts = 0;
     const maxAttempts = 6;
-    const toastId = toast.loading("Updating your subscription…");
+    const toastId = toast.loading(t("toastUpdating"));
 
     const tick = async () => {
       if (cancelled) return;
@@ -89,7 +92,7 @@ function PricingPageContent() {
       if (matched || attempts >= maxAttempts) {
         toast.dismiss(toastId);
         if (matched) {
-          toast.success("Subscription updated");
+          toast.success(t("toastSubscriptionUpdated"));
         }
         // Strip the success/tier params so a refresh doesn't re-trigger the poll
         try {
@@ -122,7 +125,7 @@ function PricingPageContent() {
         await refreshUser();
       } catch (refreshError) {
         console.error("Failed to refresh user:", refreshError);
-        toast.error("Your session has expired. Please log in again.");
+        toast.error(t("toastSessionExpired"));
         router.push(`/login?redirect=/pricing`);
         setLoading(null);
         return;
@@ -140,10 +143,10 @@ function PricingPageContent() {
       if (error.message?.includes("Could not validate credentials") ||
         error.message?.includes("401") ||
         error.message?.includes("Unauthorized")) {
-        toast.error("Your session has expired. Please log in again.");
+        toast.error(t("toastSessionExpired"));
         router.push(`/login?redirect=/pricing`);
       } else {
-        toast.error(error.message || "Failed to start checkout. Please try again.");
+        toast.error(error.message || t("toastCheckoutFailed"));
       }
       setLoading(null);
     }
@@ -171,14 +174,14 @@ function PricingPageContent() {
       await apiClient.updateSubscription(PERFORMER_PRICE_ID);
       await Promise.all([refreshUser(), refreshSeats()]);
       setRefreshKey((k) => k + 1);
-      toast.success("Welcome to Guild Master", {
-        description: "You now have access to every premium feature.",
+      toast.success(t("toastWelcomeGm"), {
+        description: t("toastWelcomeGmDesc"),
         duration: 4500,
       });
     } catch (error: any) {
       console.error("Failed to upgrade:", error);
-      toast.error("Upgrade failed", {
-        description: error.message || "Please try again in a moment.",
+      toast.error(t("toastUpgradeFailed"), {
+        description: error.message || t("toastUpgradeFailedDesc"),
       });
     } finally {
       setLoading(null);
@@ -192,14 +195,14 @@ function PricingPageContent() {
       await apiClient.updateSubscription(ADVANCED_PRICE_ID);
       await Promise.all([refreshUser(), refreshSeats()]);
       setRefreshKey((k) => k + 1);
-      toast.success("Downgraded to Pro", {
-        description: "Your plan change is effective immediately.",
+      toast.success(t("toastDowngraded"), {
+        description: t("toastDowngradedDesc"),
         duration: 4500,
       });
     } catch (error: any) {
       console.error("Failed to downgrade:", error);
-      toast.error("Downgrade failed", {
-        description: error.message || "Please try again in a moment.",
+      toast.error(t("toastDowngradeFailed"), {
+        description: error.message || t("toastDowngradeFailedDesc"),
       });
     } finally {
       setLoading(null);
@@ -239,16 +242,16 @@ function PricingPageContent() {
 
                     <div className="mb-4">
                       <span className={`text-xs font-bold uppercase tracking-widest ${(isRookie && user) ? "text-mambo-gold" : "text-gray-500"}`}>
-                        Rookie
+                        {t("rookieName")}
                       </span>
                     </div>
-                    <div className="text-4xl font-bold mb-2 text-mambo-text">Free</div>
-                    <div className="text-sm text-gray-500 mb-8">Forever. No credit card.</div>
+                    <div className="text-4xl font-bold mb-2 text-mambo-text">{t("rookiePrice")}</div>
+                    <div className="text-sm text-gray-500 mb-8">{t("rookieDescription")}</div>
 
                     <ul className="text-left space-y-4 mb-8 flex-1">
                       <li className={`flex gap-3 text-sm leading-relaxed text-gray-300`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${(isRookie && user) ? "text-mambo-gold" : "text-gray-500"}`} />
-                        ChaChaCha Bruno Mars Choreography
+                        {t("rookieFeature")}
                       </li>
                     </ul>
                     <Clickable>
@@ -257,18 +260,18 @@ function PricingPageContent() {
                           href="/register"
                           className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text text-center shadow-md"
                         >
-                          Create Free Account
+                          {t("rookieCreateAccount")}
                         </Link>
                       ) : isRookie ? (
                         <Link
                           href="/courses"
                           className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 text-center"
                         >
-                          Current Plan
+                          {tp("currentPlan")}
                         </Link>
                       ) : (isAdvanced || isPerformer) ? (
                         <p className="block w-full py-3 text-center text-gray-500 text-sm">
-                          Cancel in Profile Page
+                          {t("rookieCancelHint")}
                         </p>
                       ) : null}
                     </Clickable>
@@ -287,49 +290,49 @@ function PricingPageContent() {
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                       <div className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-mambo-gold to-orange-500 rounded-full text-xs font-bold text-black shadow-lg">
                         <FaCrown className="w-3 h-3" />
-                        Full Access
+                        {t("proFullAccess")}
                       </div>
                     </div>
 
                     <div className="mb-4">
                       <span className="text-xs font-bold uppercase tracking-widest text-mambo-gold">
-                        Pro
+                        {tp("proName")}
                       </span>
                     </div>
                     <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
-                      $39<span className="text-lg text-gray-400 font-normal">/mo</span>
-                      <span className="ml-2 align-middle text-base text-gray-500 font-normal line-through decoration-gray-600">$49/mo</span>
+                      {tp("proPrice")}<span className="text-lg text-gray-400 font-normal">{tp("proPeriod")}</span>
+                      <span className="ml-2 align-middle text-base text-gray-500 font-normal line-through decoration-gray-600">{tp("proNextPrice")}</span>
                     </div>
                     <div className="mb-6 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-3 py-2 text-left">
                       <div className="flex items-center gap-2 mb-0.5">
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold">Founders' Price</span>
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold">{tp("foundersPrice")}</span>
                         {proDaysLeft !== null && proDaysLeft > 0 && (
                           <span className="inline-flex items-center gap-1 rounded-full bg-mambo-gold/15 px-2 py-0.5 text-[10px] font-bold text-mambo-gold">
                             <span className="relative flex h-1.5 w-1.5">
                               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60" />
                               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold" />
                             </span>
-                            {proDaysLeft} {proDaysLeft === 1 ? "day" : "days"} left
+                            {proDaysLeft} {proDaysLeft === 1 ? tp("daySingular") : tp("dayPlural")} {tp("daysLeftSuffix")}
                           </span>
                         )}
                       </div>
                       <div className="text-xs leading-snug text-white/75">
-                        Goes to $49/mo on Aug 1, 2026. Lock in $39/mo for life.
+                        {tp("proGrandfatherReason")}
                       </div>
                     </div>
 
                     <ul className="text-left space-y-4 mb-8 flex-1">
                       <li className={`flex gap-3 text-sm leading-relaxed ${isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isAdvanced ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Full access to Guild courses, choreos & topics
+                        {tp("proFeature1")}
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isAdvanced ? "text-mambo-gold" : "text-gray-500"}`} />
-                        New choreos bi-weekly
+                        {tp("proFeature2")}
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isAdvanced ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isAdvanced ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Access to the Guild community
+                        {tp("proFeature3")}
                       </li>
                     </ul>
                     <Clickable>
@@ -339,7 +342,7 @@ function PricingPageContent() {
                           disabled={loading === ADVANCED_PRICE_ID}
                           className="block w-full py-4 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black rounded-lg font-bold transition-all duration-300 shadow-lg shadow-yellow-500/25 hover:shadow-xl hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {loading === ADVANCED_PRICE_ID ? "Loading..." : "Start 7-Day Free Trial"}
+                          {loading === ADVANCED_PRICE_ID ? tp("loading") : t("proStartTrial")}
                         </button>
                       ) : isRookie ? (
                         <button
@@ -347,14 +350,14 @@ function PricingPageContent() {
                           disabled={loading === ADVANCED_PRICE_ID}
                           className="block w-full py-4 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black rounded-lg font-bold transition-all duration-300 shadow-lg shadow-yellow-500/25 hover:shadow-xl hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {loading === ADVANCED_PRICE_ID ? "Loading..." : "Start 7-Day Free Trial"}
+                          {loading === ADVANCED_PRICE_ID ? tp("loading") : t("proStartTrial")}
                         </button>
                       ) : isAdvanced ? (
                         <button
                           disabled
                           className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 cursor-default"
                         >
-                          Current Plan
+                          {tp("currentPlan")}
                         </button>
                       ) : isPerformer ? (
                         <div className="pt-1 text-center">
@@ -363,7 +366,7 @@ function PricingPageContent() {
                             disabled={loading === "downgrade"}
                             className="text-xs text-gray-500 hover:text-gray-300 underline underline-offset-4 decoration-gray-700 hover:decoration-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {loading === "downgrade" ? "Switching…" : "Switch to Pro"}
+                            {loading === "downgrade" ? t("proSwitching") : t("proSwitchTo")}
                           </button>
                         </div>
                       ) : null}
@@ -384,17 +387,17 @@ function PricingPageContent() {
 
                     <div className="mb-4">
                       <span className={`text-xs font-bold uppercase tracking-widest ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`}>
-                        Guild Master
+                        {t("guildMasterName")}
                       </span>
                     </div>
                     <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
-                      $59<span className="text-lg text-gray-400 font-normal">/mo</span>
-                      <span className="ml-2 align-middle text-base text-gray-500 font-normal line-through decoration-gray-600">$99/mo</span>
+                      {tp("guildMasterPrice")}<span className="text-lg text-gray-400 font-normal">{tp("guildMasterPeriod")}</span>
+                      <span className="ml-2 align-middle text-base text-gray-500 font-normal line-through decoration-gray-600">{tp("guildMasterNextPrice")}</span>
                     </div>
                     <div className="mb-6 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-3 py-2 text-left">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold mb-0.5">Founding 30 Seats</div>
+                      <div className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold mb-0.5">{tp("foundingSeats")}</div>
                       <div className="text-xs leading-snug text-white/75">
-                        Goes to $99/mo when all 30 seats fill. Lock in $59/mo for life.
+                        {tp("guildMasterGrandfatherReason")}
                       </div>
                     </div>
                     {guildMasterSeats ? (
@@ -402,8 +405,8 @@ function PricingPageContent() {
                         <div className="flex items-baseline gap-2 mb-2">
                           <span className={`text-sm font-bold ${guildMasterSeats.is_full ? "text-red-400" : "text-mambo-gold"}`}>
                             {guildMasterSeats.is_full
-                              ? "Fully booked"
-                              : `${guildMasterSeats.remaining} of ${guildMasterSeats.total} seats left`}
+                              ? tp("fullyBooked")
+                              : tp("seatsLeft", { remaining: guildMasterSeats.remaining, total: guildMasterSeats.total })}
                           </span>
                         </div>
                         <div className="h-1.5 w-full rounded-full bg-gray-800 overflow-hidden">
@@ -416,29 +419,29 @@ function PricingPageContent() {
                         </div>
                       </div>
                     ) : (
-                      <div className="text-sm text-gray-400 mb-8">Capped at 30 members.</div>
+                      <div className="text-sm text-gray-400 mb-8">{t("guildMasterCapped")}</div>
                     )}
 
                     <ul className="text-left space-y-4 mb-8 flex-1">
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Everything in Pro
+                        {tp("guildMasterFeature1")}
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Monthly 1-on-1 video feedback from Instructors
+                        {tp("guildMasterFeature2")}
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Roundtable exclusive Zoom calls
+                        {tp("guildMasterFeature3")}
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Exclusive Badge
+                        {tp("guildMasterFeature4")}
                       </li>
                       <li className={`flex gap-3 text-sm leading-relaxed ${isPerformer ? "text-mambo-text font-medium" : "text-gray-300"}`}>
                         <FaCheck className={`shrink-0 mt-0.5 ${isPerformer ? "text-mambo-gold" : "text-gray-500"}`} />
-                        Additional claves for the community
+                        {tp("guildMasterFeature5")}
                       </li>
                     </ul>
                     <Clickable>
@@ -451,7 +454,7 @@ function PricingPageContent() {
                               disabled
                               className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 cursor-default"
                             >
-                              Current Plan
+                              {tp("currentPlan")}
                             </button>
                           );
                         }
@@ -462,7 +465,7 @@ function PricingPageContent() {
                               disabled
                               className="block w-full py-4 bg-gray-800/60 border border-gray-700 text-gray-500 rounded-lg font-bold cursor-not-allowed"
                             >
-                              Fully Booked — Join Waitlist
+                              {tp("fullyBookedWaitlist")}
                             </button>
                           );
                         }
@@ -474,7 +477,7 @@ function PricingPageContent() {
                               disabled={loading === "upgrade"}
                               className="block w-full py-4 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black rounded-lg font-bold transition-all duration-300 shadow-lg shadow-yellow-500/25 hover:shadow-xl hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                              {loading === "upgrade" ? "Loading..." : "Upgrade"}
+                              {loading === "upgrade" ? tp("loading") : t("guildMasterUpgrade")}
                             </button>
                           );
                         }
@@ -485,7 +488,7 @@ function PricingPageContent() {
                             disabled={loading === PERFORMER_PRICE_ID}
                             className="block w-full py-3 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
                           >
-                            {loading === PERFORMER_PRICE_ID ? "Loading..." : "Get Guild Master Access"}
+                            {loading === PERFORMER_PRICE_ID ? tp("loading") : tp("guildMasterCta")}
                           </button>
                         );
                       })()}
@@ -502,25 +505,25 @@ function PricingPageContent() {
                 <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span><span className="font-semibold text-white">Cancel anytime</span> — two clicks, no commitment</span>
+                <span><span className="font-semibold text-white">{tp("trustCancelAnytime")}</span> — {tp("trustCancelAnytimeDesc")}</span>
               </div>
               <div className="hidden sm:block h-5 w-px bg-white/10" />
               <div className="flex items-center gap-2.5 text-sm text-white/80">
                 <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
                   <path d="M5 9V7a5 5 0 0110 0v2h1a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2h1zm8 0V7a3 3 0 10-6 0v2h6z" />
                 </svg>
-                <span><span className="font-semibold text-white">Your price, locked for life</span></span>
+                <span><span className="font-semibold text-white">{tp("trustLocked")}</span></span>
               </div>
               <div className="hidden sm:block h-5 w-px bg-white/10" />
               <div className="flex items-center gap-2.5 text-sm text-white/80">
                 <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
                   <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                 </svg>
-                <span>Secure <span className="font-semibold text-white">Stripe</span> checkout</span>
+                <span>{tp("trustSecurePre")} <span className="font-semibold text-white">{tp("trustSecureBrand")}</span> {tp("trustSecurePost")}</span>
               </div>
             </div>
             <p className="mt-6 text-center text-gray-500 text-sm">
-              Questions? Email <a href={`mailto:${CONTACT_EMAIL}`} className="text-mambo-gold/90 hover:text-mambo-gold">{CONTACT_EMAIL}</a>
+              {t("contactPrompt")} <a href={`mailto:${CONTACT_EMAIL}`} className="text-mambo-gold/90 hover:text-mambo-gold">{CONTACT_EMAIL}</a>
             </p>
           </div>
         </div>
@@ -551,33 +554,32 @@ function PricingPageContent() {
               ×
             </button>
             <h2 className="text-2xl font-extrabold text-mambo-text mb-2 tracking-tight">
-              Downgrade to <span className="text-amber-300">Pro</span>?
+              {t("downgradeTitlePre")} <span className="text-amber-300">{t("downgradeTitleAccent")}</span>{t("downgradeTitleSuffix")}
             </h2>
             <p className="text-gray-400 mb-5">
-              You&apos;ll lose Guild Master perks immediately:
+              {t("downgradeBody")}
             </p>
             <ul className="space-y-3 mb-6">
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <span className="text-red-400 mt-0.5">✕</span>
-                <span>Monthly 1-on-1 video feedback from instructors</span>
+                <span>{t("downgradePerk1")}</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <span className="text-red-400 mt-0.5">✕</span>
-                <span>Roundtable exclusive Zoom calls</span>
+                <span>{t("downgradePerk2")}</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <span className="text-red-400 mt-0.5">✕</span>
-                <span>Exclusive Guild Master badge</span>
+                <span>{t("downgradePerk3")}</span>
               </li>
               <li className="flex items-start gap-3 text-sm text-gray-300">
                 <span className="text-red-400 mt-0.5">✕</span>
-                <span>Additional claves for the community</span>
+                <span>{t("downgradePerk4")}</span>
               </li>
             </ul>
             <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 mb-6">
               <p className="text-sm text-amber-100/80 leading-relaxed">
-                Your plan will change to Pro right now. Stripe will credit the unused portion of
-                your Guild Master month against your next Pro bill — no refund to your card.
+                {t("downgradeWarning")}
               </p>
             </div>
             <div className="flex flex-col gap-3">
@@ -585,14 +587,14 @@ function PricingPageContent() {
                 onClick={() => setShowDowngradeModal(false)}
                 className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold shadow-lg shadow-amber-500/20 hover:scale-[1.02] transition"
               >
-                Keep Guild Master
+                {t("downgradeKeep")}
               </button>
               <button
                 onClick={performDowngrade}
                 disabled={loading === "downgrade"}
                 className="w-full py-2 text-xs text-gray-600 hover:text-gray-400 underline underline-offset-4 transition disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                {loading === "downgrade" ? "Downgrading..." : "I understand, downgrade to Pro"}
+                {loading === "downgrade" ? t("downgradeProcessing") : t("downgradeConfirm")}
               </button>
             </div>
           </div>

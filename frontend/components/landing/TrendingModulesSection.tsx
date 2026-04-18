@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { FaPlay, FaFire, FaBookOpen, FaMusic, FaHistory, FaBrain, FaTheaterMasks } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi";
 import Link from "next/link";
+import { useTranslations } from "@/i18n/useTranslations";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -25,17 +26,6 @@ interface WorldWithLevels {
     levels: Level[];
 }
 
-// Content stats
-const CONTENT_STATS = [
-    { icon: FaBookOpen, label: "500+ Lessons", color: "text-emerald-400" },
-    { icon: FaTheaterMasks, label: "Beginner to Pro Salsa Course", color: "text-mambo-gold" },
-    { icon: FaMusic, label: "Pachanga Course", color: "text-purple-400" },
-    { icon: HiSparkles, label: "Body Movement Course", color: "text-pink-400" },
-    { icon: FaHistory, label: "Full Salsa History", color: "text-cyan-400" },
-    { icon: FaBrain, label: "How to Train Science", color: "text-orange-400" },
-    { icon: FaPlay, label: "9 Full Choreographies", color: "text-red-400" },
-];
-
 interface ModuleCardProps {
     module: Level;
     isHovered: boolean;
@@ -43,6 +33,7 @@ interface ModuleCardProps {
 }
 
 function ModuleCard({ module, isHovered, onHover }: ModuleCardProps) {
+    const t = useTranslations("landing.trending");
     const [showPreview, setShowPreview] = useState(false);
 
     useEffect(() => {
@@ -65,9 +56,10 @@ function ModuleCard({ module, isHovered, onHover }: ModuleCardProps) {
     const displayUrl = showPreview && gifUrl ? gifUrl : thumbnailUrl;
 
     const xp = module.total_xp || module.lesson_count * 25;
+    const minLabel = t("minLabel");
     const duration = module.duration_minutes
-        ? `${module.duration_minutes} min`
-        : `${Math.max(5, module.lesson_count * 5)} min`;
+        ? `${module.duration_minutes} ${minLabel}`
+        : `${Math.max(5, module.lesson_count * 5)} ${minLabel}`;
 
     return (
         <Link href={`/courses/${module.world_id}`}>
@@ -98,7 +90,7 @@ function ModuleCard({ module, isHovered, onHover }: ModuleCardProps) {
                 {/* Trending Badge */}
                 <div className="absolute top-3 left-3 flex items-center gap-1.5 px-2.5 py-1 bg-gradient-to-r from-orange-500/90 to-red-500/90 rounded-full text-[10px] font-bold text-white shadow-lg backdrop-blur-sm">
                     <FaFire className="text-yellow-300" />
-                    Trending
+                    {t("trendingBadge")}
                 </div>
 
                 {/* XP Badge */}
@@ -130,7 +122,7 @@ function ModuleCard({ module, isHovered, onHover }: ModuleCardProps) {
                     <div className="flex items-center gap-3 text-[11px] text-gray-300">
                         <span className="flex items-center gap-1">
                             <FaBookOpen className="text-gray-400" />
-                            {module.lesson_count} lessons
+                            {module.lesson_count} {t("lessonsLabel")}
                         </span>
                         <span className="text-gray-500">•</span>
                         <span>{duration}</span>
@@ -154,10 +146,21 @@ function shuffleArray<T>(array: T[], seed: number): T[] {
 }
 
 export default function TrendingModulesSection() {
+    const t = useTranslations("landing.trending");
     const [hoveredModule, setHoveredModule] = useState<string | null>(null);
     const [isPaused, setIsPaused] = useState(false);
     const [modules, setModules] = useState<Level[]>([]);
     const scrollRef = useRef<HTMLDivElement>(null);
+
+    const CONTENT_STATS = [
+        { icon: FaBookOpen, label: t("stat500"), color: "text-emerald-400" },
+        { icon: FaTheaterMasks, label: t("statBeginnerToPro"), color: "text-mambo-gold" },
+        { icon: FaMusic, label: t("statPachanga"), color: "text-purple-400" },
+        { icon: HiSparkles, label: t("statBodyMovement"), color: "text-pink-400" },
+        { icon: FaHistory, label: t("statHistory"), color: "text-cyan-400" },
+        { icon: FaBrain, label: t("statScience"), color: "text-orange-400" },
+        { icon: FaPlay, label: t("statChoreos"), color: "text-red-400" },
+    ];
 
     // Fetch real modules from API
     useEffect(() => {
@@ -237,10 +240,10 @@ export default function TrendingModulesSection() {
                     className="text-center mb-6 md:mb-14"
                 >
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-mambo-text tracking-tight">
-                        Trending <span className="text-mambo-gold">Modules</span>
+                        {t("headingPre")} <span className="text-mambo-gold">{t("headingAccent")}</span>
                     </h2>
                     <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto">
-                        Join thousands of dancers mastering these popular modules
+                        {t("subheading")}
                     </p>
                 </motion.div>
 
@@ -310,7 +313,7 @@ export default function TrendingModulesSection() {
                         className="inline-flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 bg-gradient-to-r from-mambo-gold to-amber-500 hover:from-amber-500 hover:to-mambo-gold text-black font-bold rounded-full text-sm md:text-base transition-all shadow-[0_0_20px_rgba(212,175,55,0.3)] hover:shadow-[0_0_30px_rgba(212,175,55,0.5)]"
                     >
                         <FaBookOpen />
-                        Explore All Courses
+                        {t("exploreAll")}
                     </Link>
                 </motion.div>
             </div>

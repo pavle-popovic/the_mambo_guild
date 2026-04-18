@@ -1,11 +1,15 @@
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface FooterProps {
   className?: string;
 }
 
 export default function Footer({ className = "" }: FooterProps) {
+  const t = useTranslations("footer");
   return (
     <footer className={`border-t border-gray-800 bg-black pt-16 pb-8 mt-20 ${className}`}>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 grid md:grid-cols-4 gap-6 md:gap-12 mb-12">
@@ -26,37 +30,36 @@ export default function Footer({ className = "" }: FooterProps) {
             </span>
           </Link>
           <p className="text-gray-500 max-w-sm">
-            The world&apos;s first structured salsa academy. We use proven methods to make you a
-            better dancer, faster.
+            {t("tagline")}
           </p>
         </div>
         <div>
-          <h4 className="font-bold mb-4 text-mambo-text">Learn</h4>
+          <h4 className="font-bold mb-4 text-mambo-text">{t("learnTitle")}</h4>
           <ul className="space-y-2 text-sm text-gray-500">
             <li>
               <Link href="/courses" className="hover:text-mambo-blue transition">
-                Courses
+                {t("learnCourses")}
               </Link>
             </li>
             <li>
               <Link href="/pricing" className="hover:text-mambo-blue transition">
-                Pricing
+                {t("learnPricing")}
               </Link>
             </li>
             <li>
               <Link href="/instructors" className="hover:text-mambo-blue transition">
-                Instructor
+                {t("learnInstructor")}
               </Link>
             </li>
             <li>
               <Link href="/community" className="hover:text-mambo-blue transition">
-                Community
+                {t("learnCommunity")}
               </Link>
             </li>
           </ul>
         </div>
         <div>
-          <h4 className="font-bold mb-4 text-mambo-text">Connect</h4>
+          <h4 className="font-bold mb-4 text-mambo-text">{t("connectTitle")}</h4>
           <ul className="space-y-2 text-sm text-gray-500">
             <li>
               <a
@@ -65,7 +68,7 @@ export default function Footer({ className = "" }: FooterProps) {
                 rel="noopener noreferrer"
                 className="hover:text-mambo-blue transition"
               >
-                Instagram
+                {t("connectInstagram")}
               </a>
             </li>
             <li>
@@ -75,19 +78,19 @@ export default function Footer({ className = "" }: FooterProps) {
                 rel="noopener noreferrer"
                 className="hover:text-mambo-blue transition"
               >
-                YouTube
+                {t("connectYoutube")}
               </a>
             </li>
             <li>
               <Link href="/waitlist" className="hover:text-mambo-blue transition">
-                Early Access
+                {t("connectEarlyAccess")}
               </Link>
             </li>
           </ul>
         </div>
       </div>
       <div className="max-w-7xl mx-auto px-4 sm:px-6 border-t border-gray-900 pt-8 flex flex-col md:flex-row justify-between text-xs text-gray-600">
-        <p>&copy; 2024 The Mambo Guild. Keep dancing.</p>
+        <p>{t("copyright")}</p>
       </div>
     </footer>
   );

@@ -2,55 +2,16 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence, type Variants } from "framer-motion";
+import { useTranslations } from "@/i18n/useTranslations";
 
 const easeOut = [0.25, 0.1, 0.25, 1] as const;
 
 type FAQ = { q: string; a: string };
 
-const faqs: FAQ[] = [
-    {
-        q: "What is The Mambo Guild?",
-        a: "The Mambo Guild is the number 1 gamified, world-class learning management system (LMS) dedicated to Salsa On2 (New York Style Mambo). Unlike static video libraries, the Guild uses Learning Experience Design (LXD) to provide a structured, interactive roadmap. Students navigate a visual Skill Tree, get feedback from instructors and peers, and learn from over 500 classes as they master everything from foundational footwork to advanced social dancing mechanics.",
-    },
-    {
-        q: "How is The Mambo Guild different from other online classes?",
-        a: "Most online dance platforms are \"content graveyards\": hundreds of videos with no clear path. The Guild is built on Autonomy. We replace \"watch and copy\" with objective biomechanics and a structured curriculum. Features like A/B Looping, Frame-by-Frame slow motion, and a community-driven Lab for technical Q&A ensure you aren't just watching dance, you're intrinsically motivated to become a dancer.",
-    },
-    {
-        q: "Who teaches The Mambo Guild courses?",
-        a: "Courses are led by Pavle Popovic, a professional Mambo instructor and competitor. The curriculum isn't just based on personal style; it integrates the history of Mambo (based on Juliet McMains' research) and modern motor-learning science. In our teaching philosophy we value logic and clear communication methods.",
-    },
-    {
-        q: "Can I learn salsa without a partner?",
-        a: "Absolutely. In fact, the Guild's philosophy is that autonomy in solo practice is the fastest way to partner-dancing mastery. Our curriculum focuses heavily on shines (solo footwork), body mechanics, timing, and weight transfer. By building a \"solo\" foundation of balance and coordination, you become a more reliable, fluid, and confident partner when you hit the social dance floor.",
-    },
-    {
-        q: "Does The Mambo Guild work for beginners?",
-        a: "Yes. The Skill Tree was designed specifically for the \"I don't know where to start\" phase. Beginners aren't left to guess; they follow a visual constellation of lessons that unlock in a logical order. With our 7-Day Free Trial, beginners can test the waters, earn their first XP, and see the roadmap to mastery before committing.",
-    },
-];
-
 const fadeUp: Variants = {
     hidden: { opacity: 0, y: 16 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: easeOut } },
 };
-
-const faqSchema = {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    mainEntity: faqs.map((f) => ({
-        "@type": "Question",
-        name: f.q,
-        acceptedAnswer: {
-            "@type": "Answer",
-            text: f.a,
-        },
-    })),
-};
-
-// Escape `<` to prevent `</script>` in content from breaking out of the tag.
-// We control the source here, but the pattern is defensive and standard.
-const faqSchemaJson = JSON.stringify(faqSchema).replace(/</g, "\\u003c");
 
 function Chevron({ open }: { open: boolean }) {
     return (
@@ -68,7 +29,27 @@ function Chevron({ open }: { open: boolean }) {
 }
 
 export default function FAQSection() {
+    const t = useTranslations("landing.faq");
     const [openIdx, setOpenIdx] = useState<number | null>(0);
+
+    const faqs: FAQ[] = [
+        { q: t("q1"), a: t("a1") },
+        { q: t("q2"), a: t("a2") },
+        { q: t("q3"), a: t("a3") },
+        { q: t("q4"), a: t("a4") },
+        { q: t("q5"), a: t("a5") },
+    ];
+
+    const faqSchema = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqs.map((f) => ({
+            "@type": "Question",
+            name: f.q,
+            acceptedAnswer: { "@type": "Answer", text: f.a },
+        })),
+    };
+    const faqSchemaJson = JSON.stringify(faqSchema).replace(/</g, "\\u003c");
 
     return (
         <section
@@ -98,10 +79,10 @@ export default function FAQSection() {
                     className="mb-10 text-center sm:mb-14"
                 >
                     <div className="mb-4 inline-block rounded-full border border-mambo-gold/30 bg-mambo-gold/5 px-3 py-1 text-[11px] font-bold tracking-[0.22em] text-mambo-gold">
-                        FAQ
+                        {t("eyebrow")}
                     </div>
                     <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
-                        Questions dancers ask us.
+                        {t("heading")}
                     </h2>
                 </motion.div>
 

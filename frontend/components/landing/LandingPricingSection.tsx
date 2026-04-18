@@ -10,6 +10,7 @@ import { apiClient } from "@/lib/api";
 import { HoverCard, Clickable, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
 import { daysUntilProGrandfatherEnd } from "@/lib/site";
+import { useTranslations } from "@/i18n/useTranslations";
 
 const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
 const PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml";
@@ -32,67 +33,67 @@ type Plan = {
   };
 };
 
-const plans: Plan[] = [
-  {
-    id: "guest-list",
-    name: "Guest List",
-    price: "Free",
-    period: "Forever",
-    description: "Get started with the basics",
-    features: [
-      { text: "ChaChaCha Bruno Mars Choreography", included: true },
-    ],
-    cta: "Create Free Account",
-    highlighted: false,
-    priceId: null,
-  },
-  {
-    id: "full-access",
-    name: "Pro",
-    price: "$39",
-    period: "/mo",
-    description: "Full access to the Guild",
-    features: [
-      { text: "Full access to Guild courses, choreos & topics", included: true },
-      { text: "New choreos bi-weekly", included: true },
-      { text: "Access to the Guild community", included: true },
-      { text: "Your $39/mo locked in for life", included: true },
-    ],
-    cta: "Start Pro Access",
-    highlighted: true,
-    priceId: ADVANCED_PRICE_ID,
-    customStyle: "border border-mambo-gold/50 shadow-[0_0_30px_rgba(251,191,36,0.15)]",
-    cardBg: "bg-gradient-to-b from-[#1a1a1a] to-black",
-    grandfather: {
-      nextPrice: "$49/mo",
-      reason: "Goes to $49/mo on Aug 1, 2026. Lock in $39/mo for life.",
-    },
-  },
-  {
-    id: "performer",
-    name: "Guild Master",
-    price: "$59",
-    period: "/mo",
-    description: "Capped at 30 members",
-    features: [
-      { text: "Everything in Pro", included: true },
-      { text: "Monthly 1-on-1 video feedback from Instructors", included: true },
-      { text: "Roundtable exclusive Zoom calls", included: true },
-      { text: "Exclusive Badge", included: true },
-      { text: "Additional claves for the community", included: true },
-      { text: "Your $59/mo locked in for life", included: true },
-    ],
-    cta: "Get Guild Master Access",
-    highlighted: false,
-    priceId: PERFORMER_PRICE_ID,
-    grandfather: {
-      nextPrice: "$99/mo",
-      reason: "Goes to $99/mo when all 30 seats fill. Lock in $59/mo for life.",
-    },
-  },
-];
-
 export default function LandingPricingSection() {
+  const t = useTranslations("landing.pricing");
+  const plans: Plan[] = [
+    {
+      id: "guest-list",
+      name: t("guestListName"),
+      price: t("guestListPrice"),
+      period: t("guestListPeriod"),
+      description: t("guestListDescription"),
+      features: [
+        { text: t("guestListFeature1"), included: true },
+      ],
+      cta: t("guestListCta"),
+      highlighted: false,
+      priceId: null,
+    },
+    {
+      id: "full-access",
+      name: t("proName"),
+      price: t("proPrice"),
+      period: t("proPeriod"),
+      description: t("proDescription"),
+      features: [
+        { text: t("proFeature1"), included: true },
+        { text: t("proFeature2"), included: true },
+        { text: t("proFeature3"), included: true },
+        { text: t("proFeature4"), included: true },
+      ],
+      cta: t("proCta"),
+      highlighted: true,
+      priceId: ADVANCED_PRICE_ID,
+      customStyle: "border border-mambo-gold/50 shadow-[0_0_30px_rgba(251,191,36,0.15)]",
+      cardBg: "bg-gradient-to-b from-[#1a1a1a] to-black",
+      grandfather: {
+        nextPrice: t("proNextPrice"),
+        reason: t("proGrandfatherReason"),
+      },
+    },
+    {
+      id: "performer",
+      name: t("guildMasterName"),
+      price: t("guildMasterPrice"),
+      period: t("guildMasterPeriod"),
+      description: t("guildMasterDescription"),
+      features: [
+        { text: t("guildMasterFeature1"), included: true },
+        { text: t("guildMasterFeature2"), included: true },
+        { text: t("guildMasterFeature3"), included: true },
+        { text: t("guildMasterFeature4"), included: true },
+        { text: t("guildMasterFeature5"), included: true },
+        { text: t("guildMasterFeature6"), included: true },
+      ],
+      cta: t("guildMasterCta"),
+      highlighted: false,
+      priceId: PERFORMER_PRICE_ID,
+      grandfather: {
+        nextPrice: t("guildMasterNextPrice"),
+        reason: t("guildMasterGrandfatherReason"),
+      },
+    },
+  ];
   const { user, refreshUser } = useAuth();
   const router = useRouter();
   const [loading, setLoading] = useState<string>(""); // Initialize as empty string to avoid null === null match
@@ -191,7 +192,7 @@ export default function LandingPricingSection() {
           className="text-center mb-8 sm:mb-16"
         >
           <h2 className="text-4xl md:text-5xl font-extrabold mb-8 text-mambo-text tracking-tight">
-            Join The <span className="text-mambo-gold drop-shadow-md">Mambo Guild Now</span>
+            {t("headingPre")} <span className="text-mambo-gold drop-shadow-md">{t("headingAccent")}</span>
           </h2>
         </motion.div>
 
@@ -221,7 +222,7 @@ export default function LandingPricingSection() {
                         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                           <div className="flex items-center gap-1.5 px-4 py-1.5 bg-gradient-to-r from-mambo-gold to-orange-500 rounded-full text-xs font-bold text-black shadow-lg">
                             <FaCrown className="w-3 h-3" />
-                            Most Popular
+                            {t("mostPopular")}
                           </div>
                         </div>
                       )}
@@ -230,7 +231,7 @@ export default function LandingPricingSection() {
                       {isCurrentPlan && (
                         <div className="absolute -top-4 left-1/2 -translate-x-1/2">
                           <div className="px-4 py-1.5 bg-mambo-blue rounded-full text-xs font-bold text-white shadow-lg">
-                            Active Plan
+                            {t("activePlan")}
                           </div>
                         </div>
                       )}
@@ -249,7 +250,7 @@ export default function LandingPricingSection() {
                       {/* Price */}
                       <div className="text-4xl font-bold mb-2 text-mambo-text tracking-tight">
                         {plan.price}
-                        {plan.period !== "Forever" && (
+                        {plan.period !== t("guestListPeriod") && (
                           <span className="text-lg text-gray-400 font-normal">
                             {plan.period}
                           </span>
@@ -264,7 +265,7 @@ export default function LandingPricingSection() {
                         <div className="mb-3 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-2.5 py-1.5">
                           <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
                             <span className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold whitespace-nowrap">
-                              {plan.id === "performer" ? "Founding 30 Seats" : "Founders' Price"}
+                              {plan.id === "performer" ? t("foundingSeats") : t("foundersPrice")}
                             </span>
                             {plan.id === "full-access" && proDaysLeft !== null && proDaysLeft > 0 && (
                               <span className="inline-flex items-center gap-1 rounded-full bg-mambo-gold/15 px-1.5 py-0.5 text-[9px] font-bold text-mambo-gold">
@@ -272,7 +273,7 @@ export default function LandingPricingSection() {
                                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60" />
                                   <span className="relative inline-flex h-1 w-1 rounded-full bg-mambo-gold" />
                                 </span>
-                                {proDaysLeft} {proDaysLeft === 1 ? "day" : "days"} left
+                                {proDaysLeft} {proDaysLeft === 1 ? t("daySingular") : t("dayPlural")} {t("daysLeftSuffix")}
                               </span>
                             )}
                           </div>
@@ -286,8 +287,8 @@ export default function LandingPricingSection() {
                           <div className="flex items-baseline gap-2 mb-2">
                             <span className={`text-sm font-bold ${guildMasterSeats.is_full ? "text-red-400" : "text-mambo-gold"}`}>
                               {guildMasterSeats.is_full
-                                ? "Fully booked"
-                                : `${guildMasterSeats.remaining} of ${guildMasterSeats.total} seats left`}
+                                ? t("fullyBooked")
+                                : t("seatsLeft", { remaining: guildMasterSeats.remaining, total: guildMasterSeats.total })}
                             </span>
                           </div>
                           <div className="h-1.5 w-full rounded-full bg-gray-800 overflow-hidden">
@@ -349,14 +350,14 @@ export default function LandingPricingSection() {
                             href="/courses"
                             className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 text-center"
                           >
-                            Current Plan
+                            {t("currentPlan")}
                           </Link>
                         ) : plan.id === "performer" && guildMasterSeats?.is_full ? (
                           <button
                             disabled
                             className="block w-full py-4 bg-gray-800/60 border border-gray-700 text-gray-500 rounded-lg font-bold cursor-not-allowed"
                           >
-                            Fully Booked — Join Waitlist
+                            {t("fullyBookedWaitlist")}
                           </button>
                         ) : (
                           <button
@@ -367,7 +368,7 @@ export default function LandingPricingSection() {
                               : "border border-gray-600 hover:border-gray-500 hover:bg-gray-800/50 text-mambo-text shadow-md"
                               }`}
                           >
-                            {loading === plan.priceId ? "Loading..." : plan.cta}
+                            {loading === plan.priceId ? t("loading") : plan.cta}
                           </button>
                         )}
                       </Clickable>
@@ -392,26 +393,26 @@ export default function LandingPricingSection() {
               <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span><span className="font-semibold text-white">Cancel anytime</span> — two clicks, no commitment</span>
+              <span><span className="font-semibold text-white">{t("trustCancelAnytime")}</span> — {t("trustCancelAnytimeDesc")}</span>
             </div>
             <div className="hidden sm:block h-5 w-px bg-white/10" />
             <div className="flex items-center gap-2.5 text-sm text-white/80">
               <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
                 <path d="M5 9V7a5 5 0 0110 0v2h1a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2h1zm8 0V7a3 3 0 10-6 0v2h6z" />
               </svg>
-              <span><span className="font-semibold text-white">Your price, locked for life</span> — even when rates go up</span>
+              <span><span className="font-semibold text-white">{t("trustLocked")}</span> — {t("trustLockedDesc")}</span>
             </div>
             <div className="hidden sm:block h-5 w-px bg-white/10" />
             <div className="flex items-center gap-2.5 text-sm text-white/80">
               <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
                 <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
-              <span>Secure <span className="font-semibold text-white">Stripe</span> checkout</span>
+              <span>{t("trustSecurePre")} <span className="font-semibold text-white">{t("trustSecureBrand")}</span> {t("trustSecurePost")}</span>
             </div>
           </div>
           <p className="mt-5 text-center text-gray-500 text-xs">
             <Link href="/pricing" className="text-mambo-gold/90 hover:text-mambo-gold underline-offset-4 hover:underline">
-              See full pricing details and FAQ →
+              {t("seeFullPricing")}
             </Link>
           </p>
         </motion.div>

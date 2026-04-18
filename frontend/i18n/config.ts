@@ -5,7 +5,7 @@
 
 export const LOCALES = [
   'en', 'es', 'pt', 'fr', 'de', 'it',
-  'ja', 'ko', 'zh', 'ru', 'pl', 'nl', 'ar'
+  'ja', 'ko', 'zh', 'ru', 'pl', 'nl', 'ar', 'el'
 ] as const;
 
 export type Locale = (typeof LOCALES)[number];
@@ -34,6 +34,7 @@ export const LOCALE_META: Record<Locale, {
   pl: { nativeName: 'Polski',            englishName: 'Polish',     flag: '🇵🇱', dir: 'ltr' },
   nl: { nativeName: 'Nederlands',        englishName: 'Dutch',      flag: '🇳🇱', dir: 'ltr' },
   ar: { nativeName: 'العربية',           englishName: 'Arabic',     flag: '🇸🇦', dir: 'rtl' },
+  el: { nativeName: 'Ελληνικά',          englishName: 'Greek',      flag: '🇬🇷', dir: 'ltr' },
 };
 
 /**
@@ -55,4 +56,5 @@ export const LOCALE_TO_MUX_LANG: Record<Locale, string> = {
   pl: 'pl',
   nl: 'nl',
   ar: 'ar',
+  el: 'el',
 };

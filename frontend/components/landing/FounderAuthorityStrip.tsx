@@ -3,6 +3,7 @@
 import { motion, type Variants } from "framer-motion";
 import Image from "next/image";
 import type { ReactNode } from "react";
+import { useTranslations } from "@/i18n/useTranslations";
 
 const easeOut = [0.25, 0.1, 0.25, 1] as const;
 
@@ -45,50 +46,51 @@ function CheckIcon() {
 
 type Credential = { key: string; text: ReactNode };
 
-const credentials: Credential[] = [
-    {
-        key: "cert",
-        text: (
-            <>
-                Certified in <span className="text-mambo-gold">Learning Experience Design</span>
-                {" & "}
-                <span className="text-mambo-gold">Gamification</span>
-            </>
-        ),
-    },
-    {
-        key: "years",
-        text: (
-            <>
-                <span className="text-mambo-gold">10 years</span> dancing
-                <span className="opacity-40"> · </span>
-                <span className="text-mambo-gold">7 years</span> teaching
-            </>
-        ),
-    },
-    {
-        key: "champion",
-        text: (
-            <>
-                <span className="text-mambo-gold">2x European Champion</span>
-            </>
-        ),
-    },
-    {
-        key: "cities",
-        text: (
-            <>
-                Teaching in <span className="text-mambo-gold">London</span>
-                <span className="opacity-40"> · </span>
-                <span className="text-mambo-gold">Brussels</span>
-                <span className="opacity-40"> · </span>
-                <span className="text-mambo-gold">Rome</span>
-            </>
-        ),
-    },
-];
-
 export default function FounderAuthorityStrip() {
+    const t = useTranslations("landing.founder");
+    const credentials: Credential[] = [
+        {
+            key: "cert",
+            text: (
+                <>
+                    {t("credCertPre")} <span className="text-mambo-gold">{t("credCertLxd")}</span>
+                    {" "}{t("credCertAnd")}{" "}
+                    <span className="text-mambo-gold">{t("credCertGamification")}</span>
+                </>
+            ),
+        },
+        {
+            key: "years",
+            text: (
+                <>
+                    <span className="text-mambo-gold">{t("credYearsDancing")}</span> {t("credYearsDancingLabel")}
+                    <span className="opacity-40"> · </span>
+                    <span className="text-mambo-gold">{t("credYearsTeaching")}</span> {t("credYearsTeachingLabel")}
+                </>
+            ),
+        },
+        {
+            key: "champion",
+            text: (
+                <>
+                    <span className="text-mambo-gold">{t("credChampion")}</span>
+                </>
+            ),
+        },
+        {
+            key: "cities",
+            text: (
+                <>
+                    {t("credCitiesPre")} <span className="text-mambo-gold">{t("credCityLondon")}</span>
+                    <span className="opacity-40"> · </span>
+                    <span className="text-mambo-gold">{t("credCityBrussels")}</span>
+                    <span className="opacity-40"> · </span>
+                    <span className="text-mambo-gold">{t("credCityRome")}</span>
+                </>
+            ),
+        },
+    ];
+
     return (
         <section className="relative bg-mambo-dark py-14 px-5 sm:py-20 sm:px-8 lg:py-24 landscape-phone:!py-10 landscape-phone:!px-5 overflow-hidden">
             {/* Brass radial glow background */}
@@ -169,7 +171,7 @@ export default function FounderAuthorityStrip() {
                                 landscape-phone:!text-[9px] landscape-phone:!mb-1 landscape-phone:!tracking-[0.22em]
                             "
                         >
-                            The Founder
+                            {t("eyebrow")}
                         </motion.p>
 
                         <motion.h2
@@ -181,7 +183,7 @@ export default function FounderAuthorityStrip() {
                                 landscape-phone:!text-2xl landscape-phone:!leading-tight
                             "
                         >
-                            Built by a <span className="text-mambo-gold">dancer</span>, not a studio.
+                            {t("titlePre")} <span className="text-mambo-gold">{t("titleAccent")}</span>{t("titlePost")}
                         </motion.h2>
 
                         <motion.p
@@ -191,7 +193,7 @@ export default function FounderAuthorityStrip() {
                                 landscape-phone:!text-xs landscape-phone:!mt-1
                             "
                         >
-                            — Pavle Popovic, Founder
+                            {t("attribution")}
                         </motion.p>
 
                         {/* Credentials */}

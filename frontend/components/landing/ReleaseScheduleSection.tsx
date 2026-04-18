@@ -7,6 +7,7 @@ import Link from "next/link";
 import { FaCalendarAlt, FaStar, FaTimes } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi";
 import { apiClient, type ReleaseScheduleItemDTO } from "@/lib/api";
+import { useTranslations } from "@/i18n/useTranslations";
 
 // ============ DATA ============
 type ReleaseType = "choreo" | "course";
@@ -174,8 +175,21 @@ const parseDate = (s: string) => new Date(s + "T00:00:00");
 const fmtShort = (d: Date) => d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
 const fmtFull = (d: Date) => d.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" });
 
+// ============ LEVEL LABELS ============
+function useLevelLabels() {
+    const t = useTranslations("landing.releases");
+    return {
+        beginner: t("levelBeginner"),
+        intermediate: t("levelIntermediate"),
+        advanced: t("levelAdvanced"),
+        mastery: t("levelMastery"),
+    } as Record<ReleaseLevel, string>;
+}
+
 // ============ CARD ============
 function ReleaseCard({ item, compact = false }: { item: ReleaseItem; compact?: boolean }) {
+    const t = useTranslations("landing.releases");
+    const labels = useLevelLabels();
     const style = LEVEL_STYLES[item.level];
     const date = parseDate(item.date);
     return (
@@ -188,14 +202,14 @@ function ReleaseCard({ item, compact = false }: { item: ReleaseItem; compact?: b
             <div className="relative">
                 <div className="flex flex-wrap items-center gap-1.5">
                     <span className={`rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${style.text}`}>
-                        {style.label}
+                        {labels[item.level]}
                     </span>
                     <span className="rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-gray-300">
-                        {item.type === "course" ? "Course" : "Choreo"}
+                        {item.type === "course" ? t("typeCourse") : t("typeChoreo")}
                     </span>
                     {item.featured && (
                         <span className="flex items-center gap-1 rounded-full bg-amber-300/20 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest text-amber-200">
-                            <FaStar className="text-[8px]" /> Full
+                            <FaStar className="text-[8px]" /> {t("featuredFull")}
                         </span>
                     )}
                 </div>
@@ -291,6 +305,7 @@ function HorizontalTimeline({ items, nextId }: { items: ReleaseItem[]; nextId: s
 
 // ============ LAYOUT: VERTICAL (PORTRAIT MOBILE) ============
 function VerticalTimeline({ items, nextId }: { items: ReleaseItem[]; nextId: string | null }) {
+    const t = useTranslations("landing.releases");
     return (
         <div className="relative mx-auto max-w-md px-2">
             <div className="absolute bottom-2 left-5 top-2 w-[2px] bg-gradient-to-b from-amber-300/10 via-amber-300/70 to-amber-300/10">
@@ -318,7 +333,7 @@ function VerticalTimeline({ items, nextId }: { items: ReleaseItem[]; nextId: str
                                 </span>
                                 {isNext && (
                                     <span className="flex items-center gap-1 rounded-full bg-amber-300/20 px-2 py-0.5 text-[8px] font-black uppercase tracking-widest text-amber-200">
-                                        <HiSparkles /> Next
+                                        <HiSparkles /> {t("nextLabel")}
                                     </span>
                                 )}
                             </div>
@@ -370,6 +385,8 @@ function ResponsiveTimeline({ items }: { items: ReleaseItem[] }) {
 
 // ============ COUNTDOWN HERO ============
 function CountdownHero({ release }: { release: ReleaseItem }) {
+    const t = useTranslations("landing.releases");
+    const labels = useLevelLabels();
     const target = useMemo(() => parseDate(release.date), [release.date]);
     const { days, hours, minutes, seconds, ready } = useCountdown(target);
     const style = LEVEL_STYLES[release.level];
@@ -384,12 +401,12 @@ function CountdownHero({ release }: { release: ReleaseItem }) {
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(252,226,5,0.12),transparent_60%)]" />
             <div className="relative text-center">
                 <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.25em] text-amber-200">
-                    <HiSparkles className="animate-pulse" /> Next Drop • {fmtFull(target)}
+                    <HiSparkles className="animate-pulse" /> {t("nextDrop")} • {fmtFull(target)}
                 </div>
                 <div className="mt-3 flex flex-wrap items-center justify-center gap-1.5">
-                    <span className={`rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${style.text}`}>{style.label}</span>
+                    <span className={`rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-black uppercase tracking-widest ${style.text}`}>{labels[release.level]}</span>
                     <span className="rounded-full bg-black/50 px-2 py-0.5 text-[9px] font-bold uppercase tracking-widest text-gray-300">
-                        {release.type === "course" ? "Course" : "Choreography"}
+                        {release.type === "course" ? t("typeCourse") : t("typeChoreography")}
                     </span>
                 </div>
                 <h3 className="mt-3 text-2xl font-extrabold text-white sm:text-4xl tracking-tight">
@@ -398,16 +415,16 @@ function CountdownHero({ release }: { release: ReleaseItem }) {
                 {release.artist && <p className="mt-1 text-sm text-gray-400 sm:text-base">{release.artist}</p>}
                 <div className="mx-auto mt-5 grid max-w-lg grid-cols-4 gap-2 sm:gap-3">
                     {[
-                        { v: days, l: "Days" },
-                        { v: hours, l: "Hours" },
-                        { v: minutes, l: "Min" },
-                        { v: seconds, l: "Sec" },
-                    ].map((t, i) => (
+                        { v: days, l: t("countdownDays") },
+                        { v: hours, l: t("countdownHours") },
+                        { v: minutes, l: t("countdownMin") },
+                        { v: seconds, l: t("countdownSec") },
+                    ].map((tx, i) => (
                         <div key={i} className="rounded-xl border border-amber-300/20 bg-black/60 py-3 backdrop-blur-sm">
                             <div className="font-mono text-2xl font-black tabular-nums text-amber-200 sm:text-4xl">
-                                {ready ? String(t.v).padStart(2, "0") : "--"}
+                                {ready ? String(tx.v).padStart(2, "0") : "--"}
                             </div>
-                            <div className="text-[9px] uppercase tracking-widest text-gray-500 sm:text-[10px]">{t.l}</div>
+                            <div className="text-[9px] uppercase tracking-widest text-gray-500 sm:text-[10px]">{tx.l}</div>
                         </div>
                     ))}
                 </div>
@@ -418,6 +435,7 @@ function CountdownHero({ release }: { release: ReleaseItem }) {
 
 // ============ LANDING SECTION ============
 export default function ReleaseScheduleSection() {
+    const t = useTranslations("landing.releases");
     const items = useReleaseSchedule();
     const next = useNextRelease(items);
     return (
@@ -432,13 +450,13 @@ export default function ReleaseScheduleSection() {
                     className="mb-8 text-center md:mb-12"
                 >
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-amber-300 backdrop-blur-sm">
-                        <HiSparkles /> Release Calendar
+                        <HiSparkles /> {t("eyebrow")}
                     </div>
                     <h2 className="mt-4 text-3xl font-extrabold text-mambo-text sm:text-4xl md:text-5xl tracking-tight">
-                        The Road <span className="text-mambo-gold">Ahead</span>
+                        {t("headingPre")} <span className="text-mambo-gold">{t("headingAccent")}</span>
                     </h2>
                     <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-400 md:text-base">
-                        Every two weeks a new choreography drops. Full courses land between them. Here's what's coming next to The Guild.
+                        {t("subheading")}
                     </p>
                 </motion.div>
 
@@ -457,9 +475,9 @@ export default function ReleaseScheduleSection() {
                         href="/register"
                         className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-mambo-gold to-amber-500 px-6 py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all hover:from-amber-500 hover:to-mambo-gold hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] md:px-8 md:py-4 md:text-base"
                     >
-                        <FaCalendarAlt /> Lock In Your Spot
+                        <FaCalendarAlt /> {t("cta")}
                     </Link>
-                    <p className="mt-3 text-xs text-gray-500">Members unlock every release the moment it drops.</p>
+                    <p className="mt-3 text-xs text-gray-500">{t("ctaHint")}</p>
                 </motion.div>
             </div>
         </section>
@@ -468,6 +486,7 @@ export default function ReleaseScheduleSection() {
 
 // ============ COURSES PAGE BUTTON + POPOVER/MODAL ============
 export function ReleaseScheduleButton() {
+    const t = useTranslations("landing.releases");
     const mode = useLayoutMode();
     const [open, setOpen] = useState(false);
     const [hovered, setHovered] = useState(false);
@@ -552,13 +571,13 @@ export function ReleaseScheduleButton() {
                           <div className="overflow-hidden rounded-2xl border border-amber-300/30 bg-black/90 p-5 shadow-[0_20px_60px_rgba(0,0,0,0.7),0_0_50px_rgba(252,226,5,0.15)] backdrop-blur-xl">
                               <div className="mb-4 text-center">
                                   <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-amber-200">
-                                      <HiSparkles /> Upcoming Drops
+                                      <HiSparkles /> {t("upcomingDrops")}
                                   </div>
                                   <h4 className="mt-2 text-lg font-bold text-white">
-                                      Next: {next.title}
+                                      {t("nextPrefix")} {next.title}
                                   </h4>
                                   <p className="text-xs text-gray-400">
-                                      in {days} days • {fmtFull(target)}
+                                      {t("inDays", { days })} • {fmtFull(target)}
                                   </p>
                               </div>
                               <div className="-mr-1 max-h-[60vh] space-y-2 overflow-y-auto pr-1">
@@ -591,9 +610,9 @@ export function ReleaseScheduleButton() {
                 className="group relative inline-flex items-center gap-2 overflow-hidden rounded-full border border-amber-300/40 bg-gradient-to-r from-amber-500/20 via-amber-400/10 to-amber-500/20 px-3.5 py-2 text-[11px] font-black uppercase tracking-wider text-amber-200 shadow-[0_0_20px_rgba(252,226,5,0.2)] transition-all hover:border-amber-300/80 hover:text-amber-100 hover:shadow-[0_0_30px_rgba(252,226,5,0.4)] sm:px-4 sm:text-xs"
             >
                 <HiSparkles className="animate-pulse" />
-                <span className="whitespace-nowrap">Release Calendar</span>
+                <span className="whitespace-nowrap">{t("eyebrow")}</span>
                 <span className="hidden rounded-full bg-amber-300/30 px-2 py-0.5 text-[9px] tabular-nums text-amber-100 md:inline">
-                    Next in {days}d
+                    {t("nextInDaysShort", { days })}
                 </span>
             </button>
 
@@ -605,6 +624,8 @@ export function ReleaseScheduleButton() {
 }
 
 function PopoverRow({ item, isNext }: { item: ReleaseItem; isNext: boolean }) {
+    const t = useTranslations("landing.releases");
+    const labels = useLevelLabels();
     const style = LEVEL_STYLES[item.level];
     const date = parseDate(item.date);
     return (
@@ -620,10 +641,10 @@ function PopoverRow({ item, isNext }: { item: ReleaseItem; isNext: boolean }) {
             <div className="min-w-0 flex-1">
                 <div className="flex flex-wrap items-center gap-1">
                     <span className={`rounded-full bg-black/50 px-1.5 py-0.5 text-[8px] font-black uppercase tracking-wider ${style.text}`}>
-                        {style.label}
+                        {labels[item.level]}
                     </span>
                     <span className="rounded-full bg-black/50 px-1.5 py-0.5 text-[8px] font-bold uppercase tracking-wider text-gray-300">
-                        {item.type === "course" ? "Course" : "Choreo"}
+                        {item.type === "course" ? t("typeCourse") : t("typeChoreo")}
                     </span>
                     {item.featured && <FaStar className="text-[9px] text-amber-300" />}
                 </div>
@@ -635,6 +656,7 @@ function PopoverRow({ item, isNext }: { item: ReleaseItem; isNext: boolean }) {
 }
 
 function MobileModal({ open, onClose, next, items }: { open: boolean; onClose: () => void; next: ReleaseItem; items: ReleaseItem[] }) {
+    const t = useTranslations("landing.releases");
     const [mounted, setMounted] = useState(false);
     useEffect(() => setMounted(true), []);
     const mode = useLayoutMode();
@@ -663,12 +685,12 @@ function MobileModal({ open, onClose, next, items }: { open: boolean; onClose: (
                     >
                         <div className="sticky top-0 z-10 flex items-center justify-between border-b border-white/10 bg-black/80 px-4 py-3 backdrop-blur-xl">
                             <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.25em] text-amber-300">
-                                <HiSparkles className="animate-pulse" /> Release Calendar
+                                <HiSparkles className="animate-pulse" /> {t("eyebrow")}
                             </div>
                             <button
                                 onClick={onClose}
                                 className="rounded-full border border-white/10 bg-white/5 p-2 text-white transition-colors hover:bg-white/10"
-                                aria-label="Close"
+                                aria-label={t("close")}
                             >
                                 <FaTimes className="text-xs" />
                             </button>
@@ -677,7 +699,7 @@ function MobileModal({ open, onClose, next, items }: { open: boolean; onClose: (
                         <div className="h-[calc(92vh-52px)] overflow-y-auto px-4 py-4">
                             <div className="mb-4 rounded-2xl border border-amber-300/30 bg-gradient-to-br from-amber-500/10 via-black/40 to-black/60 p-4 text-center">
                                 <div className="text-[9px] font-black uppercase tracking-widest text-amber-300">
-                                    Next Drop — {fmtFull(target)}
+                                    {t("nextDrop")} — {fmtFull(target)}
                                 </div>
                                 <h3 className="mt-1 text-lg font-bold text-white">
                                     {next.title}
@@ -685,16 +707,16 @@ function MobileModal({ open, onClose, next, items }: { open: boolean; onClose: (
                                 {next.artist && <p className="text-xs text-gray-400">{next.artist}</p>}
                                 <div className="mx-auto mt-3 grid max-w-sm grid-cols-4 gap-1.5">
                                     {[
-                                        { v: days, l: "D" },
-                                        { v: hours, l: "H" },
-                                        { v: minutes, l: "M" },
-                                        { v: seconds, l: "S" },
-                                    ].map((t, i) => (
+                                        { v: days, l: t("countdownDShort") },
+                                        { v: hours, l: t("countdownHShort") },
+                                        { v: minutes, l: t("countdownMShort") },
+                                        { v: seconds, l: t("countdownSShort") },
+                                    ].map((tx, i) => (
                                         <div key={i} className="rounded-lg border border-amber-300/20 bg-black/60 py-2">
                                             <div className="font-mono text-lg font-black tabular-nums text-amber-200">
-                                                {ready ? String(t.v).padStart(2, "0") : "--"}
+                                                {ready ? String(tx.v).padStart(2, "0") : "--"}
                                             </div>
-                                            <div className="text-[8px] uppercase tracking-widest text-gray-500">{t.l}</div>
+                                            <div className="text-[8px] uppercase tracking-widest text-gray-500">{tx.l}</div>
                                         </div>
                                     ))}
                                 </div>

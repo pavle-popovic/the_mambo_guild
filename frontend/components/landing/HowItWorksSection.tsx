@@ -4,6 +4,7 @@ import { motion, type Variants } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { useTranslations } from "@/i18n/useTranslations";
 
 type PillarImageData = {
   src: string;
@@ -22,146 +23,6 @@ type Pillar = {
 };
 
 const gold = "text-mambo-gold";
-
-const pillars: Pillar[] = [
-  {
-    // 1 — Courses & all the content
-    eyebrow: "COURSES & CONTENT",
-    title: (
-      <>
-        A full <span className={gold}>dance school</span>. Day one.
-      </>
-    ),
-    body:
-      "Courses, choreographies, history of salsa, science of training. No drip-feed. No upsell.",
-    bullets: [
-      "500+ classes, beginner to pro",
-      "Full choreographies, broken down",
-      "History of Salsa — 20 modules",
-      "Science of Training — 18 modules",
-      "Technique, styling, musicality, partnering",
-    ],
-    images: [
-      {
-        src: "/assets/howitworks/Image1Courses.png",
-        alt: "Course catalog showing lessons, choreographies and topic deep-dives",
-        width: 1572,
-        height: 767,
-      },
-    ],
-  },
-  {
-    // 2 — Video player: mirrored + back view
-    eyebrow: "THE VIDEO PLAYER",
-    title: (
-      <>
-        The <span className={gold}>practice room</span> pros have been waiting for
-      </>
-    ),
-    body: "Every angle. Every speed. 13 languages.",
-    bullets: [
-      "Mirrored view — zero guessing",
-      "Back view — live-class vibe",
-      "13 languages, captions + narration",
-      "0.25× → 2× + frame-by-frame",
-      "A/B loop",
-      "Summary notes + quizzes",
-      "Course nav inside the player",
-    ],
-    images: [
-      {
-        src: "/assets/howitworks/Image2VideoPlayerMirrored.png",
-        alt: "Lesson player in mirrored view with speed, captions and A/B loop controls",
-        width: 1897,
-        height: 851,
-        caption: "MIRRORED VIEW",
-      },
-      {
-        src: "/assets/howitworks/Image3VideoPlayerBackview.png",
-        alt: "Lesson player in back view for live-class follow-along practice",
-        width: 1150,
-        height: 535,
-        caption: "BACK VIEW",
-      },
-    ],
-  },
-  {
-    // 3 — Skill tree, everything structured from basic to pro
-    eyebrow: "THE SKILL TREE",
-    title: (
-      <>
-        Structured from <span className={gold}>basic</span> to{" "}
-        <span className={gold}>pro</span>
-      </>
-    ),
-    body:
-      "A tech tree for your dancing. Every skill in the right order. You always know what to drill next.",
-    bullets: [
-      "First step to pro choreo",
-      "Technique-by-technique, prerequisites enforced",
-      "Unlocks as you level up",
-      "Never guess what's next",
-    ],
-    images: [
-      {
-        src: "/assets/howitworks/Image4SkillTree.png",
-        alt: "Constellation skill tree showing connected unlockable modules",
-        width: 846,
-        height: 762,
-      },
-    ],
-  },
-  {
-    // 4 — Community, post videos, don't dance alone
-    eyebrow: "THE COMMUNITY",
-    title: (
-      <>
-        Post your videos. <span className={gold}>Don&apos;t dance alone.</span>
-      </>
-    ),
-    body: "Progress videos. Real feedback. Questions answered. Dancers who actually train.",
-    bullets: [
-      "The Stage — post progress videos",
-      "The Lab — ask & answer questions",
-      "Hype or Coach feedback",
-      "38 badges, Bronze → Diamond",
-      "Weekly & all-time leaderboards",
-    ],
-    images: [
-      {
-        src: "/assets/howitworks/Image5Community.png",
-        alt: "Community feed with dancer posts, reactions and comments",
-        width: 1653,
-        height: 851,
-      },
-    ],
-  },
-  {
-    // 5 — VIP 1-to-1 coaching + private group
-    eyebrow: "VIP — 1-TO-1 COACHING & PRIVATE GROUP",
-    title: (
-      <>
-        Train <span className={gold}>directly</span> with the Maestro
-      </>
-    ),
-    body:
-      "1-on-1 coaching and weekly Roundtable calls. Private group. No crowd.",
-    bullets: [
-      "Monthly 1-on-1 video coaching",
-      "Weekly Roundtable calls on Zoom",
-      "DJ Booth — isolated stems",
-      "The Vault — every past recording",
-    ],
-    images: [
-      {
-        src: "/assets/howitworks/Image6Vip1to1Coaching.png",
-        alt: "Guild Master VIP hub — 1-on-1 coaching, Roundtable calls and private group",
-        width: 1147,
-        height: 717,
-      },
-    ],
-  },
-];
 
 const easeOut = [0.25, 0.1, 0.25, 1] as const;
 
@@ -279,6 +140,140 @@ function PillarMedia({
 }
 
 export default function HowItWorksSection() {
+  const t = useTranslations("landing.howItWorks");
+
+  const pillars: Pillar[] = [
+    {
+      eyebrow: t("pillarCoursesEyebrow"),
+      title: (
+        <>
+          {t("pillarCoursesTitlePre")} <span className={gold}>{t("pillarCoursesTitleAccent")}</span>{t("pillarCoursesTitlePost")}
+        </>
+      ),
+      body: t("pillarCoursesBody"),
+      bullets: [
+        t("pillarCoursesBullet1"),
+        t("pillarCoursesBullet2"),
+        t("pillarCoursesBullet3"),
+        t("pillarCoursesBullet4"),
+        t("pillarCoursesBullet5"),
+      ],
+      images: [
+        {
+          src: "/assets/howitworks/Image1Courses.png",
+          alt: t("pillarImageAltCourses"),
+          width: 1572,
+          height: 767,
+        },
+      ],
+    },
+    {
+      eyebrow: t("pillarPlayerEyebrow"),
+      title: (
+        <>
+          {t("pillarPlayerTitlePre")} <span className={gold}>{t("pillarPlayerTitleAccent")}</span> {t("pillarPlayerTitlePost")}
+        </>
+      ),
+      body: t("pillarPlayerBody"),
+      bullets: [
+        t("pillarPlayerBullet1"),
+        t("pillarPlayerBullet2"),
+        t("pillarPlayerBullet3"),
+        t("pillarPlayerBullet4"),
+        t("pillarPlayerBullet5"),
+        t("pillarPlayerBullet6"),
+        t("pillarPlayerBullet7"),
+      ],
+      images: [
+        {
+          src: "/assets/howitworks/Image2VideoPlayerMirrored.png",
+          alt: t("pillarImageAltPlayerMirrored"),
+          width: 1897,
+          height: 851,
+          caption: t("pillarPlayerMirroredCaption"),
+        },
+        {
+          src: "/assets/howitworks/Image3VideoPlayerBackview.png",
+          alt: t("pillarImageAltPlayerBack"),
+          width: 1150,
+          height: 535,
+          caption: t("pillarPlayerBackCaption"),
+        },
+      ],
+    },
+    {
+      eyebrow: t("pillarSkillTreeEyebrow"),
+      title: (
+        <>
+          {t("pillarSkillTreeTitlePre")} <span className={gold}>{t("pillarSkillTreeTitleAccent1")}</span> {t("pillarSkillTreeTitleMid")}{" "}
+          <span className={gold}>{t("pillarSkillTreeTitleAccent2")}</span>
+        </>
+      ),
+      body: t("pillarSkillTreeBody"),
+      bullets: [
+        t("pillarSkillTreeBullet1"),
+        t("pillarSkillTreeBullet2"),
+        t("pillarSkillTreeBullet3"),
+        t("pillarSkillTreeBullet4"),
+      ],
+      images: [
+        {
+          src: "/assets/howitworks/Image4SkillTree.png",
+          alt: t("pillarImageAltSkillTree"),
+          width: 846,
+          height: 762,
+        },
+      ],
+    },
+    {
+      eyebrow: t("pillarCommunityEyebrow"),
+      title: (
+        <>
+          {t("pillarCommunityTitlePre")} <span className={gold}>{t("pillarCommunityTitleAccent")}</span>
+        </>
+      ),
+      body: t("pillarCommunityBody"),
+      bullets: [
+        t("pillarCommunityBullet1"),
+        t("pillarCommunityBullet2"),
+        t("pillarCommunityBullet3"),
+        t("pillarCommunityBullet4"),
+        t("pillarCommunityBullet5"),
+      ],
+      images: [
+        {
+          src: "/assets/howitworks/Image5Community.png",
+          alt: t("pillarImageAltCommunity"),
+          width: 1653,
+          height: 851,
+        },
+      ],
+    },
+    {
+      eyebrow: t("pillarVipEyebrow"),
+      title: (
+        <>
+          {t("pillarVipTitlePre")} <span className={gold}>{t("pillarVipTitleAccent")}</span> {t("pillarVipTitlePost")}
+        </>
+      ),
+      body: t("pillarVipBody"),
+      bullets: [
+        t("pillarVipBullet1"),
+        t("pillarVipBullet2"),
+        t("pillarVipBullet3"),
+        t("pillarVipBullet4"),
+      ],
+      images: [
+        {
+          src: "/assets/howitworks/Image6Vip1to1Coaching.png",
+          alt: t("pillarImageAltVip"),
+          width: 1147,
+          height: 717,
+        },
+      ],
+    },
+  ];
+
   return (
     <section
       id="how-it-works"
@@ -294,14 +289,14 @@ export default function HowItWorksSection() {
           className="text-center mb-10 sm:mb-20 lg:mb-24 landscape-phone:mb-8"
         >
           <div className="inline-block mb-4 px-3 py-1 text-[11px] tracking-[0.22em] font-bold text-mambo-gold border border-mambo-gold/30 rounded-full bg-mambo-gold/5">
-            HOW IT WORKS
+            {t("eyebrow")}
           </div>
           <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-mambo-text tracking-tight landscape-phone:text-3xl">
-            Everything you need to{" "}
-            <span className="text-mambo-gold drop-shadow-md">actually get good.</span>
+            {t("headingPre")}{" "}
+            <span className="text-mambo-gold drop-shadow-md">{t("headingAccent")}</span>
           </h2>
           <p className="max-w-2xl mx-auto mt-5 text-base sm:text-lg text-mambo-text/70 leading-relaxed landscape-phone:text-sm landscape-phone:mt-3">
-            Not another video dump. Everything below is included, day one.
+            {t("subheading")}
           </p>
         </motion.div>
 
@@ -384,17 +379,17 @@ export default function HowItWorksSection() {
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(252,226,5,0.18),transparent_60%)]" />
             <div className="relative">
               <h3 className="text-3xl sm:text-5xl font-extrabold text-mambo-text tracking-tight landscape-phone:text-2xl">
-                7 days. <span className="text-mambo-gold drop-shadow-md">On the house.</span>
+                {t("closingTitlePre")} <span className="text-mambo-gold drop-shadow-md">{t("closingTitleAccent")}</span>
               </h3>
               <p className="mt-4 max-w-xl mx-auto text-base sm:text-lg text-mambo-text/75 landscape-phone:text-sm landscape-phone:mt-2">
-                Full access. Cancel anytime.
+                {t("closingBody")}
               </p>
               <div className="mt-8 flex items-center justify-center landscape-phone:mt-5">
                 <Link
                   href="/register"
                   className="w-full sm:w-auto bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-8 rounded-full text-base sm:text-lg tracking-wide shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm"
                 >
-                  Start 7-day free trial
+                  {t("closingCta")}
                 </Link>
               </div>
             </div>

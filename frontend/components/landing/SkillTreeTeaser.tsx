@@ -23,6 +23,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import AuthPromptModal from "@/components/AuthPromptModal";
+import { useTranslations } from "@/i18n/useTranslations";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -291,7 +292,8 @@ interface HoveredNodeData {
 }
 
 function NodeHoverTooltip({ level, position, isLoggedOut }: { level: Level; position: { x: number; y: number }; isLoggedOut: boolean }) {
-  const previewGif = level.mux_preview_playback_id 
+  const t = useTranslations("landing.skillTree");
+  const previewGif = level.mux_preview_playback_id
     ? `https://image.mux.com/${level.mux_preview_playback_id}/animated.gif?start=0&end=3&width=400&fps=15`
     : null;
   const staticThumb = level.thumbnail_url || (level.mux_preview_playback_id 
@@ -328,17 +330,17 @@ function NodeHoverTooltip({ level, position, isLoggedOut }: { level: Level; posi
           <div className="absolute inset-0 bg-gradient-to-t from-gray-900 via-transparent to-transparent" />
           
           {/* Status Badge */}
-          {isCompleted && <div className="absolute top-2 left-2 bg-green-500/20 border border-green-500/50 rounded-full px-2 py-0.5 text-[10px] text-green-400 font-medium">Completed</div>}
-          {inProgress && !isLoggedOut && <div className="absolute top-2 left-2 bg-yellow-500/20 border border-yellow-500/50 rounded-full px-2 py-0.5 text-[10px] text-yellow-400 font-medium">In Progress</div>}
-          {(isLocked || isLoggedOut) && <div className="absolute top-2 left-2 bg-gray-500/20 border border-gray-500/50 rounded-full px-2 py-0.5 text-[10px] text-gray-400 font-medium">Locked</div>}
+          {isCompleted && <div className="absolute top-2 left-2 bg-green-500/20 border border-green-500/50 rounded-full px-2 py-0.5 text-[10px] text-green-400 font-medium">{t("statusCompleted")}</div>}
+          {inProgress && !isLoggedOut && <div className="absolute top-2 left-2 bg-yellow-500/20 border border-yellow-500/50 rounded-full px-2 py-0.5 text-[10px] text-yellow-400 font-medium">{t("statusInProgress")}</div>}
+          {(isLocked || isLoggedOut) && <div className="absolute top-2 left-2 bg-gray-500/20 border border-gray-500/50 rounded-full px-2 py-0.5 text-[10px] text-gray-400 font-medium">{t("statusLocked")}</div>}
           
           {/* Preview indicator */}
           {previewGif && !isLocked && !isLoggedOut && (
             <div className="absolute top-2 right-2 bg-black/70 rounded-full px-2 py-0.5 text-[10px] text-white/90 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />Preview
+              <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />{t("tooltipPreview")}
             </div>
           )}
-          
+
           {/* Title */}
           <div className="absolute bottom-0 left-0 right-0 p-2.5">
             <h3 className={`font-bold text-base ${isLocked || isLoggedOut ? "text-gray-400" : isCompleted ? "text-green-400" : "text-yellow-200"}`}>
@@ -359,8 +361,8 @@ function NodeHoverTooltip({ level, position, isLoggedOut }: { level: Level; posi
           
           {/* Stats */}
           <div className="flex items-center justify-center gap-3 py-1.5 border-y border-gray-700/50 text-[10px] text-gray-400">
-            <div className="flex items-center gap-1"><Star className="w-3 h-3" />{level.lesson_count} lessons</div>
-            {level.total_xp && <div className="flex items-center gap-1 border-l border-gray-700/50 pl-3"><HiLightningBolt className="w-3 h-3 text-yellow-500" />{level.total_xp} XP</div>}
+            <div className="flex items-center gap-1"><Star className="w-3 h-3" />{level.lesson_count} {t("tooltipLessons")}</div>
+            {level.total_xp && <div className="flex items-center gap-1 border-l border-gray-700/50 pl-3"><HiLightningBolt className="w-3 h-3 text-yellow-500" />{level.total_xp} {t("tooltipXp")}</div>}
           </div>
           
           {/* Progress */}
@@ -378,7 +380,7 @@ function NodeHoverTooltip({ level, position, isLoggedOut }: { level: Level; posi
             <div className="bg-gray-800/50 rounded-lg p-2 mt-2 border border-gray-700/50">
               <div className="flex items-center gap-1.5">
                 <Lock className="w-3 h-3 text-gray-500" />
-                <span className="text-xs font-medium text-gray-400">{isLoggedOut ? "Login to access" : "Complete prerequisites"}</span>
+                <span className="text-xs font-medium text-gray-400">{isLoggedOut ? t("tooltipLoginToAccess") : t("tooltipCompletePrereq")}</span>
               </div>
             </div>
           )}
@@ -386,7 +388,7 @@ function NodeHoverTooltip({ level, position, isLoggedOut }: { level: Level; posi
           {/* Click hint */}
           {!isLocked && !isLoggedOut && (
             <div className="text-center mt-2">
-              <span className="text-[9px] text-gray-500 uppercase tracking-wider">Click to start lessons</span>
+              <span className="text-[9px] text-gray-500 uppercase tracking-wider">{t("tooltipClickToStart")}</span>
             </div>
           )}
         </div>
@@ -510,18 +512,15 @@ function SkillTreeGraphInner({ levels, edges: edgeData, onNodeSelect, selectedNo
 }
 
 // ============================================
-// FEATURES DATA
-// ============================================
-const FEATURES = [
-  { icon: FaChartLine, title: "Track Progress", description: "Visual skill tree shows your journey", color: "from-blue-500 to-cyan-500" },
-  { icon: HiLightningBolt, title: "Earn XP", description: "Level up as you learn", color: "from-yellow-500 to-orange-500" },
-  { icon: FaTrophy, title: "Unlock Badges", description: "Collect achievements", color: "from-purple-500 to-indigo-500" },
-];
-
-// ============================================
 // MAIN COMPONENT
 // ============================================
 export default function SkillTreeTeaser() {
+  const t = useTranslations("landing.skillTree");
+  const FEATURES = [
+    { icon: FaChartLine, title: t("featureTrackProgressTitle"), description: t("featureTrackProgressDesc"), color: "from-blue-500 to-cyan-500" },
+    { icon: HiLightningBolt, title: t("featureEarnXpTitle"), description: t("featureEarnXpDesc"), color: "from-yellow-500 to-orange-500" },
+    { icon: FaTrophy, title: t("featureUnlockBadgesTitle"), description: t("featureUnlockBadgesDesc"), color: "from-purple-500 to-indigo-500" },
+  ];
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [courses, setCourses] = useState<Course[]>([]);
@@ -616,12 +615,12 @@ export default function SkillTreeTeaser() {
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="text-center mb-4 md:mb-10">
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-purple-500/10 border border-purple-500/30 rounded-full mb-3 sm:mb-4">
             <FaStar className="text-purple-400 text-xs" />
-            <span className="text-xs font-medium text-purple-400">Gamified Learning</span>
+            <span className="text-xs font-medium text-purple-400">{t("badge")}</span>
           </div>
           <h2 className="text-xl sm:text-3xl md:text-4xl font-extrabold mb-1 sm:mb-2 text-mambo-text tracking-tight">
-            Your <span className="text-mambo-gold">Learning</span> Path
+            {t("headingPre")} <span className="text-mambo-gold">{t("headingAccent")}</span> {t("headingPost")}
           </h2>
-          <p className="text-gray-400 text-xs sm:text-sm max-w-xl mx-auto">Explore our interactive skill trees</p>
+          <p className="text-gray-400 text-xs sm:text-sm max-w-xl mx-auto">{t("subheading")}</p>
         </motion.div>
 
         <div className="grid lg:grid-cols-6 gap-3 lg:gap-6 items-start">
@@ -629,7 +628,7 @@ export default function SkillTreeTeaser() {
           <motion.div initial={{ opacity: 0, x: -20 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="lg:col-span-5 order-2 lg:order-1">
             {/* Course Selector — Dropdown on mobile, tabs on desktop */}
             {loading ? (
-              <div className="flex items-center gap-2 px-4 py-2 text-gray-500 mb-3"><FaSpinner className="animate-spin" /><span className="text-sm">Loading courses...</span></div>
+              <div className="flex items-center gap-2 px-4 py-2 text-gray-500 mb-3"><FaSpinner className="animate-spin" /><span className="text-sm">{t("loadingCourses")}</span></div>
             ) : (
               <>
                 {/* Mobile dropdown — glassmorphism */}
@@ -642,9 +641,9 @@ export default function SkillTreeTeaser() {
                         : 'bg-white/[0.04] border-white/10'
                     }`}
                   >
-                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Course</span>
+                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">{t("courseLabel")}</span>
                     <span className="text-[11px] font-bold text-white truncate block max-w-[200px]">
-                      {courses.find(c => c.id === selectedCourseId)?.title || 'Select course'}
+                      {courses.find(c => c.id === selectedCourseId)?.title || t("selectCourse")}
                     </span>
                     <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 text-mambo-gold transition-transform ${courseDropdownOpen ? 'rotate-180' : ''}`} />
                   </button>
@@ -713,11 +712,11 @@ export default function SkillTreeTeaser() {
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-1 px-2 py-0.5 bg-emerald-500/20 border border-emerald-500/40 rounded-full">
                       <div className="w-1.5 h-1.5 bg-emerald-400 rounded-full animate-pulse" />
-                      <span className="text-[9px] font-bold text-emerald-400 uppercase">Live</span>
+                      <span className="text-[9px] font-bold text-emerald-400 uppercase">{t("liveBadge")}</span>
                     </div>
                     <span className="text-[10px] text-gray-400">{selectedCourse?.title}</span>
                   </div>
-                  {skillTree && <span className="text-[9px] text-gray-500">{skillTree.levels.length} modules</span>}
+                  {skillTree && <span className="text-[9px] text-gray-500">{skillTree.levels.length} {t("modulesLabel")}</span>}
                 </div>
               </div>
 
@@ -726,7 +725,7 @@ export default function SkillTreeTeaser() {
                 <div className="absolute top-12 left-0 right-0 z-30 flex justify-center">
                   <div className="px-3 py-1.5 bg-black/80 border border-zinc-700/50 rounded-full text-[10px] text-gray-400 flex items-center gap-2">
                     <FaLock className="text-gray-500" />
-                    <span>Login to see your progress</span>
+                    <span>{t("loginHint")}</span>
                   </div>
                 </div>
               )}
@@ -739,7 +738,7 @@ export default function SkillTreeTeaser() {
                   <SkillTreeGraphInner levels={skillTree.levels} edges={skillTree.edges} onNodeSelect={handleNodeSelect} selectedNodeId={selectedNode?.id || null} isLoggedOut={isLoggedOut} />
                 </ReactFlowProvider>
               ) : (
-                <div className="absolute inset-0 flex items-center justify-center"><span className="text-gray-500 text-sm">No skill tree available</span></div>
+                <div className="absolute inset-0 flex items-center justify-center"><span className="text-gray-500 text-sm">{t("noTree")}</span></div>
               )}
             </div>
 
@@ -778,7 +777,7 @@ export default function SkillTreeTeaser() {
                         {/* Preview indicator */}
                         {previewGif && selectedNode.is_unlocked && user && (
                           <div className="absolute top-1.5 left-1.5 bg-black/70 rounded-full px-1.5 py-0.5 text-[8px] text-white/80 flex items-center gap-1">
-                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />Preview
+                            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />{t("tooltipPreview")}
                           </div>
                         )}
                         {/* Lock overlay */}
@@ -794,13 +793,13 @@ export default function SkillTreeTeaser() {
                           <div className="flex items-center gap-2 mb-1 flex-wrap">
                             <h4 className="font-bold text-white text-sm truncate">{selectedNode.title}</h4>
                             <span className={`text-[8px] font-bold px-1.5 py-0.5 rounded-full uppercase flex-shrink-0 ${selectedNode.completion_percentage >= 100 ? "bg-green-500/20 text-green-400" : selectedNode.is_unlocked ? "bg-mambo-gold/20 text-mambo-gold" : "bg-zinc-700/50 text-zinc-400"}`}>
-                              {selectedNode.completion_percentage >= 100 ? "✓ Done" : selectedNode.is_unlocked ? "Available" : "Locked"}
+                              {selectedNode.completion_percentage >= 100 ? t("nodeDone") : selectedNode.is_unlocked ? t("nodeAvailable") : t("nodeLocked")}
                             </span>
                           </div>
                           <p className="text-[10px] text-gray-400">
-                            {selectedNode.lesson_count} lessons
+                            {selectedNode.lesson_count} {t("nodeLessons")}
                             {selectedNode.duration_minutes ? ` • ${selectedNode.duration_minutes}m` : ""}
-                            {selectedNode.total_xp ? <span className="text-mambo-gold ml-1">+{selectedNode.total_xp} XP</span> : ""}
+                            {selectedNode.total_xp ? <span className="text-mambo-gold ml-1">+{selectedNode.total_xp} {t("tooltipXp")}</span> : ""}
                           </p>
                           {/* Progress bar */}
                           {hasProgress && (
@@ -813,7 +812,7 @@ export default function SkillTreeTeaser() {
                           )}
                         </div>
                         <button onClick={handleStartModule} className="self-start mt-2 px-4 py-1.5 rounded-lg text-[11px] font-bold bg-gradient-to-r from-mambo-gold to-amber-500 hover:from-amber-500 hover:to-mambo-gold text-black flex items-center gap-1.5 transition-all">
-                          {!user ? <><FaLock size={9} />Login to Access</> : selectedNode.completion_percentage >= 100 ? <><FaCheck size={9} />Review</> : <><FaPlay size={9} />Start Module</>}
+                          {!user ? <><FaLock size={9} />{t("nodeLoginToAccess")}</> : selectedNode.completion_percentage >= 100 ? <><FaCheck size={9} />{t("nodeReview")}</> : <><FaPlay size={9} />{t("nodeStartModule")}</>}
                         </button>
                       </div>
                     </div>

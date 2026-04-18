@@ -5,14 +5,15 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { FaCheck, FaCertificate } from "react-icons/fa";
 import Mambobot from "./Mambobot";
-
-const bulletPoints = [
-    "No partner needed",
-    "13 languages",
-    "On-demand, anytime, anywhere",
-];
+import { useTranslations } from "@/i18n/useTranslations";
 
 export default function NewHero() {
+    const t = useTranslations("landing.hero");
+    const bulletPoints = [
+        t("bulletNoPartner"),
+        t("bulletLanguages"),
+        t("bulletOnDemand"),
+    ];
     const [scrollOpacity, setScrollOpacity] = useState(1);
     const [videoReady, setVideoReady] = useState(false);
     const videoRef = useRef<HTMLVideoElement>(null);
@@ -158,7 +159,7 @@ export default function NewHero() {
                     >
                         <FaCertificate className="text-mambo-gold text-xs sm:text-sm flex-shrink-0 landscape-phone:!text-[10px]" />
                         <span className="text-xs sm:text-sm font-semibold text-mambo-gold tracking-wide leading-tight landscape-phone:!text-[10px]">
-                            Built on Learning Experience Design
+                            {t("credentialBadge")}
                         </span>
                     </motion.div>
 
@@ -166,14 +167,14 @@ export default function NewHero() {
                     <div className="space-y-2 md:space-y-2.5 landscape-phone:!space-y-1">
                         <h1 className="leading-[1.05] tracking-tight text-mambo-text">
                             <span className="block font-extrabold text-[clamp(1.5rem,2.2vw,2.25rem)] landscape-phone:!text-xl">
-                                Every move, every technique.
+                                {t("titleLine1")}
                             </span>
                             <span className="block font-extrabold text-mambo-gold text-[clamp(2rem,3.2vw,3.5rem)] drop-shadow-[0_0_30px_rgba(212,175,55,0.35)] landscape-phone:!text-2xl">
-                                Level 0 to 100.
+                                {t("titleLine2")}
                             </span>
                         </h1>
                         <p className="text-base sm:text-lg text-gray-300 leading-snug max-w-md mx-auto lg:mx-0 text-balance landscape-phone:!text-xs">
-                            A structured salsa curriculum. Every skill in the right order.
+                            {t("subtitle")}
                         </p>
                     </div>
 
@@ -213,14 +214,14 @@ export default function NewHero() {
                                 <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold landscape-phone:!h-1.5 landscape-phone:!w-1.5"></span>
                             </span>
                             <span>
-                                Join <span className="font-bold text-mambo-gold">1,000+ dancers</span> already on the list
+                                {t("socialProofPrefix")} <span className="font-bold text-mambo-gold">{t("socialProofCount")}</span> {t("socialProofSuffix")}
                             </span>
                         </div>
                         <Link
                             href="/register"
                             className="relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3 px-7 xl:py-3.5 xl:px-8 rounded-full text-base xl:text-lg whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 landscape-phone:!py-2 landscape-phone:!px-4 landscape-phone:!text-[11px]"
                         >
-                            Get Your 7-Day Free Trial!
+                            {t("cta")}
                         </Link>
                     </motion.div>
                 </motion.div>
@@ -238,14 +239,14 @@ export default function NewHero() {
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold"></span>
                         </span>
                         <span>
-                            Join <span className="font-bold text-mambo-gold">1,000+ dancers</span> already on the list
+                            {t("socialProofPrefix")} <span className="font-bold text-mambo-gold">{t("socialProofCount")}</span> {t("socialProofSuffix")}
                         </span>
                     </div>
                     <Link
                         href="/register"
                         className="w-full relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-6 rounded-full text-sm transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50"
                     >
-                        Get Your 7-Day Free Trial!
+                        {t("cta")}
                     </Link>
                 </motion.div>
             </div>
