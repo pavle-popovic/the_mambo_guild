@@ -25,11 +25,13 @@ import { cn } from "@/lib/utils";
 interface LocaleSwitcherProps {
   /** Show flag + native name (default) vs flag only */
   compact?: boolean;
+  /** Hide the globe icon to save space */
+  hideIcon?: boolean;
   /** Extra classes on the trigger button */
   className?: string;
 }
 
-export default function LocaleSwitcher({ compact = false, className }: LocaleSwitcherProps) {
+export default function LocaleSwitcher({ compact = false, hideIcon = false, className }: LocaleSwitcherProps) {
   const locale = useLocale();
   const { setLocale, isPending } = useSetLocale();
   const [open, setOpen] = useState(false);
@@ -75,7 +77,7 @@ export default function LocaleSwitcher({ compact = false, className }: LocaleSwi
           className
         )}
       >
-        {isPending ? (
+        {!hideIcon && (isPending ? (
           <motion.span
             animate={{ rotate: 360 }}
             transition={{ repeat: Infinity, duration: 1, ease: "linear" }}
@@ -85,7 +87,7 @@ export default function LocaleSwitcher({ compact = false, className }: LocaleSwi
           </motion.span>
         ) : (
           <Globe size={14} />
-        )}
+        ))}
         <span>{current.flag}</span>
         {!compact && (
           <span className="hidden sm:inline max-w-[80px] truncate">

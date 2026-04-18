@@ -164,7 +164,7 @@ export default function NavBar({ user }: NavBarProps) {
 
           {/* Mobile: Hamburger + minimal icons */}
           <div className="flex md:hidden items-center gap-2 ml-auto">
-            <LocaleSwitcher compact />
+            <LocaleSwitcher compact hideIcon />
             {isAuthenticated && <NotificationBell />}
             {isAuthenticated && (
               <Link
@@ -486,19 +486,14 @@ export default function NavBar({ user }: NavBarProps) {
                       </Link>
                     )}
 
-                    <div className="h-px bg-white/10 my-2" />
-                    <div className="px-4 py-2">
-                      <LocaleSwitcher compact />
-                    </div>
+
                   </>
                 ) : (
                   <>
                     <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="mx-4 mt-2 py-3 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black rounded-full text-center font-bold shadow-lg shadow-[0_0_20px_rgba(252,226,5,0.4)] ring-2 ring-amber-400/50">
                       {t('login')}
                     </Link>
-                    <div className="px-4 py-2 mt-2">
-                      <LocaleSwitcher compact />
-                    </div>
+
                   </>
                 )}
               </div>
