@@ -15,6 +15,7 @@ import LabQuestionRow from "@/components/community/LabQuestionRow";
 import PreviewCTABar from "@/components/community/PreviewCTABar";
 import CreatePostModal from "@/components/CreatePostModal";
 import PostDetailModal from "@/components/PostDetailModal";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Post {
     id: string;
@@ -48,6 +49,7 @@ interface Post {
 type ViewMode = "stage" | "lab" | "saved" | "my_posts";
 
 export default function CommunityPage() {
+    const t = useTranslations("community");
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const [viewMode, setViewMode] = useState<ViewMode>("stage");
@@ -124,11 +126,11 @@ export default function CommunityPage() {
 
     // Level filter constants for mobile dropdown
     const levelOptions = [
-        { value: "", label: "All Levels" },
-        { value: "beginner", label: "Beginner" },
-        { value: "intermediate", label: "Intermediate" },
-        { value: "advanced", label: "Advanced" },
-        { value: "master", label: "Master" },
+        { value: "", label: t("allLevels") },
+        { value: "beginner", label: t("beginner") },
+        { value: "intermediate", label: t("intermediate") },
+        { value: "advanced", label: t("advanced") },
+        { value: "master", label: t("master") },
     ];
 
     // Load posts - load for everyone including preview mode
@@ -254,7 +256,7 @@ export default function CommunityPage() {
                                 type="text"
                                 value={searchQuery}
                                 onChange={(e) => handleSearch(e.target.value)}
-                                placeholder="Search videos & questions..."
+                                placeholder={t("searchPlaceholder")}
                                 className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-8 py-2.5 text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-white/20 transition-all"
                             />
                             {searchQuery && (
@@ -277,7 +279,7 @@ export default function CommunityPage() {
                                     }`}
                                 >
                                     <Tv size={12} />
-                                    Stage
+                                    {t("stageTab")}
                                 </button>
                                 <button
                                     onClick={() => { setViewMode("lab"); setSearchQuery(""); }}
@@ -288,7 +290,7 @@ export default function CommunityPage() {
                                     }`}
                                 >
                                     <FlaskConical size={12} />
-                                    Lab
+                                    {t("labTab")}
                                 </button>
                                 <button
                                     onClick={() => { setViewMode("my_posts"); setSearchQuery(""); }}
@@ -299,7 +301,7 @@ export default function CommunityPage() {
                                     }`}
                                 >
                                     <Bookmark size={12} />
-                                    Mine
+                                    {t("myPostsTab")}
                                 </button>
                             </div>
 
@@ -313,11 +315,11 @@ export default function CommunityPage() {
                                             : "bg-white/[0.04] border-white/10"
                                     } ${levelDropdownOpen ? "border-amber-400/60 bg-white/[0.08]" : ""}`}
                                 >
-                                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Level</span>
+                                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">{t("levelLabel")}</span>
                                     <span className={`text-[11px] font-bold ${selectedLevels.length > 0 ? "text-amber-300" : "text-white"}`}>
                                         {selectedLevels.length > 0
-                                            ? levelOptions.find((o) => o.value === selectedLevels[0])?.label || "All Levels"
-                                            : "All Levels"}
+                                            ? levelOptions.find((o) => o.value === selectedLevels[0])?.label || t("allLevels")
+                                            : t("allLevels")}
                                     </span>
                                     <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 text-gray-400 transition-transform ${levelDropdownOpen ? "rotate-180" : ""}`} />
                                 </button>
@@ -356,7 +358,7 @@ export default function CommunityPage() {
                                     type="text"
                                     value={searchQuery}
                                     onChange={(e) => handleSearch(e.target.value)}
-                                    placeholder="Search videos & questions..."
+                                    placeholder={t("searchPlaceholder")}
                                     className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-10 pr-10 py-3 text-sm text-white placeholder-gray-500 focus:outline-none focus:border-amber-400/40 focus:bg-white/[0.06] transition-all"
                                 />
                                 {searchQuery && (
@@ -370,7 +372,7 @@ export default function CommunityPage() {
                         {/* Active tag chip — set by trending-tag click */}
                         {selectedTopics.length > 0 && (
                             <div className="mb-4 flex flex-wrap items-center gap-2">
-                                <span className="text-[11px] uppercase tracking-widest text-white/40 font-semibold">Filtering by</span>
+                                <span className="text-[11px] uppercase tracking-widest text-white/40 font-semibold">{t("filteringBy")}</span>
                                 {selectedTopics.map((tag) => (
                                     <button
                                         key={tag}
@@ -395,21 +397,21 @@ export default function CommunityPage() {
                                     onClick={loadPosts}
                                     className="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 rounded-lg transition"
                                 >
-                                    Retry
+                                    {t("retry")}
                                 </button>
                             </div>
                         ) : filteredPosts.length === 0 && !isPreviewMode ? (
                             <div className="text-center py-16">
                                 <p className="text-white/50 mb-4">
                                     {viewMode === "stage"
-                                        ? "No videos yet. Be the first to share your progress!"
-                                        : "No questions yet. Ask the community for help!"}
+                                        ? t("noStageVideos")
+                                        : t("noLabQuestions")}
                                 </p>
                                 <button
                                     onClick={() => setIsCreateModalOpen(true)}
                                     className="px-6 py-3 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold rounded-lg transition shadow-lg shadow-amber-500/20"
                                 >
-                                    Create Post
+                                    {t("createPost")}
                                 </button>
                             </div>
                         ) : (
@@ -503,10 +505,10 @@ export default function CommunityPage() {
                                             <div className="absolute bottom-0 right-0 w-8 h-8 border-r-2 border-b-2 border-amber-400/60 rounded-br-xl" />
 
                                             <h2 className="text-2xl font-serif font-bold text-white mb-3">
-                                                Join The <span className="text-amber-400">Mambo Guild</span>
+                                                {t("joinPre")} <span className="text-amber-400">{t("joinAccent")}</span>
                                             </h2>
                                             <p className="text-white/70 mb-6">
-                                                Connect with dancers worldwide. Share videos, ask questions, and level up together.
+                                                {t("joinBody")}
                                             </p>
                                             <motion.a
                                                 href="/pricing"
@@ -514,7 +516,7 @@ export default function CommunityPage() {
                                                 whileHover={{ scale: 1.05 }}
                                                 whileTap={{ scale: 0.98 }}
                                             >
-                                                <span className="font-serif tracking-wide">Become a Member</span>
+                                                <span className="font-serif tracking-wide">{t("becomeMember")}</span>
                                             </motion.a>
                                         </div>
                                     </div>

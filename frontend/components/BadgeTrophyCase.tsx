@@ -4,6 +4,7 @@ import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api";
 import { GlassCard } from "./ui/GlassCard";
 import { FaLock, FaStar } from "react-icons/fa";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Badge {
   id: string;
@@ -37,6 +38,7 @@ interface BadgeTrophyCaseProps {
 }
 
 export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userStats }: BadgeTrophyCaseProps) {
+  const t = useTranslations("profile");
   console.log("🏆 BadgeTrophyCase Rendered", { badgeCount: initialBadges?.length, streakCount, userStats });
   const [badges, setBadges] = useState<Badge[]>([]);
   const [featuredBadges, setFeaturedBadges] = useState<Badge[]>([]);
@@ -229,9 +231,9 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
     <GlassCard className="p-6">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-2xl font-bold text-white mb-1">🏆 Trophy Case</h2>
+          <h2 className="text-2xl font-bold text-white mb-1">{t("trophyCaseTitle")}</h2>
           <p className="text-sm text-white/50">
-            Showcase your achievements
+            {t("trophyCaseSubtitle")}
           </p>
         </div>
         {/* Mobile edit toggle */}
@@ -245,7 +247,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                 : "bg-white/5 border-white/10 text-white/50"
             )}
           >
-            {mobileEditMode ? `Done (${featuredBadges.length}/5)` : "Edit Showcase"}
+            {mobileEditMode ? t("showcaseDone", { count: featuredBadges.length }) : t("editShowcase")}
           </button>
         )}
       </div>
@@ -254,7 +256,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
       {featuredBadges.length > 0 && !mobileEditMode && (
         <div className="lg:hidden mb-6">
           <h3 className="text-xs font-semibold text-amber-400 uppercase tracking-wide flex items-center gap-1.5 mb-3">
-            <FaStar className="text-[10px]" /> Showcase ({featuredBadges.length}/5)
+            <FaStar className="text-[10px]" /> {t("showcaseLabel", { count: featuredBadges.length })}
           </h3>
           <div className="flex gap-2 overflow-x-auto pb-1">
             {featuredBadges.map((badge) => (
@@ -285,14 +287,14 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
       <div className="mb-8 hidden lg:block">
         <div className="flex justify-between items-center mb-4">
           <h3 className="text-sm font-semibold text-amber-400 uppercase tracking-wide flex items-center gap-2">
-            <FaStar /> Featured ({featuredBadges.length}/5)
+            <FaStar /> {t("featuredLabel", { count: featuredBadges.length })}
           </h3>
-          {canEdit && <span className="text-xs text-white/40">Drag to reorder • Click to unfeature</span>}
+          {canEdit && <span className="text-xs text-white/40">{t("dragToReorder")}</span>}
         </div>
 
         {featuredBadges.length === 0 ? (
           <div className="border-2 border-dashed border-white/10 rounded-xl p-8 text-center text-white/30 text-sm">
-            Click a badge below to feature it here
+            {t("clickToFeatureHint")}
           </div>
         ) : (
           <Reorder.Group
@@ -345,11 +347,11 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
       {/* Collection Grid */}
       <div className="mb-8">
         <h3 className="text-sm font-semibold text-white/70 mb-4 uppercase tracking-wide">
-          <span className="hidden lg:inline">Collection</span>
-          <span className="lg:hidden">Achievements</span>
+          <span className="hidden lg:inline">{t("collection")}</span>
+          <span className="lg:hidden">{t("achievements")}</span>
         </h3>
         {allEarnedBadges.length === 0 && unearnedBadges.length === 0 ? (
-          <p className="text-white/40 text-sm">No badges earned yet.</p>
+          <p className="text-white/40 text-sm">{t("noBadgesYet")}</p>
         ) : (
           <div className="grid grid-cols-3 gap-2 lg:grid-cols-5 lg:gap-4">
             {/* On mobile: show ALL earned (featured section is hidden). On desktop: only non-featured collection. */}
@@ -397,7 +399,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                             ? "text-white/30"
                             : "bg-white/10 text-white/70 border border-white/20"
                       )}>
-                        {featured ? "★ Featured" : featuredBadges.length >= 5 ? "Full" : "+ Feature"}
+                        {featured ? t("featuredTag") : featuredBadges.length >= 5 ? t("fullTag") : t("featureTag")}
                       </span>
                     </div>
                   )}
@@ -427,7 +429,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                   {/* Add Trigger Hint — desktop only */}
                   {canEdit && !featured && featuredBadges.length < 5 && (
                     <div className="absolute inset-0 hidden lg:flex items-center justify-center bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                      <span className="text-amber-400 text-xs font-bold">Feature +</span>
+                      <span className="text-amber-400 text-xs font-bold">{t("featurePlus")}</span>
                     </div>
                   )}
                 </motion.div>
@@ -486,7 +488,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                     </div>
                   ) : (
                     <div className="mt-auto relative z-10 px-2 py-1 rounded bg-black/40 text-[10px] text-white/30 border border-white/5 flex items-center gap-1 opacity-50">
-                      <FaLock className="w-2 h-2" /> Locked
+                      <FaLock className="w-2 h-2" /> {t("lockedTag")}
                     </div>
                   )}
 

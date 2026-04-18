@@ -8,6 +8,7 @@ import { useCallback, useState } from "react";
 import { UISound } from "@/hooks/useUISound";
 import GuildMasterAvatar from "@/components/ui/GuildMasterAvatar";
 import UserProfileModal from "@/components/UserProfileModal";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Post {
     id: string;
@@ -46,6 +47,7 @@ export default function StageVideoCard({
     onLockedClick,
     variant = "default",
 }: StageVideoCardProps) {
+    const t = useTranslations("community");
     const isCompact = variant === "grid-compact";
     const [isHovered, setIsHovered] = useState(false);
     const [showProfileModal, setShowProfileModal] = useState(false);
@@ -119,7 +121,7 @@ export default function StageVideoCard({
                     <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 to-black">
                         <div className="text-center text-white/40">
                             <span className="text-4xl block mb-2">📺</span>
-                            <span className="text-xs">Processing...</span>
+                            <span className="text-xs">{t("processing")}</span>
                         </div>
                     </div>
                 )}
@@ -142,7 +144,7 @@ export default function StageVideoCard({
                 {post.is_wip && (
                     <div className="absolute top-3 left-0 right-0 z-10 flex justify-center">
                         <div className="bg-orange-500/90 py-1 px-3 rounded-full shadow-lg border border-black/20 backdrop-blur-sm">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-black">Work in Progress</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-black">{t("workInProgress")}</span>
                         </div>
                     </div>
                 )}
@@ -152,7 +154,7 @@ export default function StageVideoCard({
                     <div className="absolute top-3 right-3 z-10">
                         <div className="bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black text-[10px] font-bold px-2 py-1 rounded-full flex items-center gap-1 shadow-[0_0_15px_rgba(252,226,5,0.4)] border border-white/20">
                             <Award size={12} />
-                            <span>Maestro</span>
+                            <span>{t("maestroBadge")}</span>
                         </div>
                     </div>
                 )}
@@ -184,7 +186,7 @@ export default function StageVideoCard({
                                     if (post.user.username) setShowProfileModal(true);
                                 }}
                                 className="rounded-full transition hover:ring-2 hover:ring-mambo-gold/60 focus:outline-none focus:ring-2 focus:ring-mambo-gold/60"
-                                aria-label={`View ${post.user.username || "user"}'s profile`}
+                                aria-label={t("viewProfileAria", { username: post.user.username || "user" })}
                             >
                                 <GuildMasterAvatar
                                     avatarUrl={post.user.avatar_url}

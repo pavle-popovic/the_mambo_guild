@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { Trophy, TrendingUp, Users, Crown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Post {
     id: string;
@@ -52,20 +53,22 @@ const rankLabels = {
 type Period = "weekly" | "monthly" | "all_time";
 type Category = "overall" | "helpful" | "creative" | "active";
 
-const PERIOD_LABELS: Record<Period, string> = {
-    weekly: "This Week",
-    monthly: "This Month",
-    all_time: "All Time",
-};
-
-const CATEGORY_LABELS: Record<Category, string> = {
-    overall: "Overall",
-    helpful: "Helpful",
-    creative: "Creative",
-    active: "Active",
-};
-
 export default function CommunityWidgets({ posts = [], onTagClick, activeTopic }: CommunityWidgetsProps) {
+    const t = useTranslations("community");
+
+    const PERIOD_LABELS: Record<Period, string> = {
+        weekly: t("periodWeekly"),
+        monthly: t("periodMonthly"),
+        all_time: t("periodAllTime"),
+    };
+
+    const CATEGORY_LABELS: Record<Category, string> = {
+        overall: t("categoryOverall"),
+        helpful: t("categoryHelpful"),
+        creative: t("categoryCreative"),
+        active: t("categoryActive"),
+    };
+
     const [memberCount, setMemberCount] = useState(0);
     const [activeNow, setActiveNow] = useState(0);
     const [apiLeaderboard, setApiLeaderboard] = useState<LeaderboardUser[]>([]);
@@ -176,7 +179,7 @@ export default function CommunityWidgets({ posts = [], onTagClick, activeTopic }
                 <div className="pb-3 border-b border-white/10 mb-2">
                     <div className="flex items-center gap-2 mb-3">
                         <Crown size={20} className="text-[#FCE205]" />
-                        <h3 className="font-serif font-bold text-white tracking-wide">High Rollers</h3>
+                        <h3 className="font-serif font-bold text-white tracking-wide">{t("highRollers")}</h3>
                     </div>
 
                     {/* Period Toggle */}
@@ -266,7 +269,7 @@ export default function CommunityWidgets({ posts = [], onTagClick, activeTopic }
                                             user.rank === 1 ? "text-[#FCE205]" :
                                                 user.rank === 2 ? "text-gray-200" :
                                                     "text-amber-600"
-                                        )}>{user.username || "Anonymous"}</span>
+                                        )}>{user.username || t("anonymous")}</span>
                                         <span className="text-xs text-white/50">{PERIOD_LABELS[period]} • {CATEGORY_LABELS[category]}</span>
                                     </div>
                                     <span className="text-white font-bold font-mono text-lg">{user.score}</span>
@@ -286,26 +289,26 @@ export default function CommunityWidgets({ posts = [], onTagClick, activeTopic }
                                             <Image src={user.avatar_url} alt={user.username || "User"} width={32} height={32} className="w-full h-full object-cover" />
                                         ) : (user.username || "?")[0].toUpperCase()}
                                     </div>
-                                    <span className="flex-1 text-white/80 font-medium truncate text-sm">{user.username || "Anonymous"}</span>
+                                    <span className="flex-1 text-white/80 font-medium truncate text-sm">{user.username || t("anonymous")}</span>
                                     <span className="text-[#D4AF37] font-bold text-sm">{user.score}</span>
                                 </motion.div>
                             ))}
                         </>
                     ) : (
-                        <p className="text-white/50 text-sm text-center py-4">Be the first on the leaderboard!</p>
+                        <p className="text-white/50 text-sm text-center py-4">{t("firstOnLeaderboard")}</p>
                     )}
                 </div>
 
                 {/* Personal Rank Bar */}
                 <div className="mt-4 pt-4 border-t border-white/10">
                     <div className="flex items-center gap-3 p-3 rounded-xl bg-gradient-to-r from-purple-900/40 to-blue-900/40 border border-white/10 backdrop-blur-md">
-                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold text-white">You</div>
+                        <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center text-xs font-bold text-white">{t("youLabel")}</div>
                         <div className="flex-1">
                             <p className="text-white text-sm font-bold">
-                                {myRank.rank ? `You are #${myRank.rank}` : "Your Rank"}
+                                {myRank.rank ? t("youAreRank", { rank: myRank.rank }) : t("yourRank")}
                             </p>
                             <p className="text-white/50 text-xs">
-                                {myRank.rank ? `Score: ${myRank.score}` : "Keep dancing to rise up!"}
+                                {myRank.rank ? t("scoreLabel", { score: myRank.score }) : t("keepDancing")}
                             </p>
                         </div>
                         <span className="text-[#D4AF37] font-mono font-bold">
@@ -317,7 +320,7 @@ export default function CommunityWidgets({ posts = [], onTagClick, activeTopic }
 
             {/* Trending Tags (Compact at bottom) */}
             <div className="border-t border-white/10 pt-4">
-                <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-[0.2em] mb-3 font-serif">Trending</h3>
+                <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-[0.2em] mb-3 font-serif">{t("trending")}</h3>
                 <div className="flex flex-wrap gap-2">
                     {displayTags.slice(0, 5).map(({ tag, count }) => {
                         const normalized = tag.replace(/^#/, "").toLowerCase();
@@ -334,7 +337,7 @@ export default function CommunityWidgets({ posts = [], onTagClick, activeTopic }
                                 )}
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.97 }}
-                                title={`${count} posts`}
+                                title={t("postsCount", { count })}
                                 type="button"
                             >
                                 {tag}

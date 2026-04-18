@@ -7,6 +7,7 @@ import { apiClient } from "@/lib/api";
 import { UISound } from "@/hooks/useUISound";
 import { GlassCard } from "./ui/GlassCard";
 import { MagicButton } from "./ui/MagicButton";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Tag {
   slug: string;
@@ -23,6 +24,7 @@ interface CreatePostModalProps {
 }
 
 export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: CreatePostModalProps) {
+  const t = useTranslations("community");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -124,7 +126,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
     if (!file) return;
 
     if (!file.type.startsWith("video/")) {
-      alert("Please select a video file");
+      alert(t("selectVideoFile"));
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -142,7 +144,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
         return;
       }
     } catch (err: any) {
-      alert(err.message || "Failed to check video slot limit");
+      alert(err.message || t("failedCheckSlot"));
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -152,7 +154,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
     // For community posts, we need the title to create post first
     // But we'll handle upload after post creation in handleSubmit
     if (!title.trim()) {
-      setError("Please enter a title first, then upload video");
+      setError(t("enterTitleFirst"));
       if (fileInputRef.current) {
         fileInputRef.current.value = "";
       }
@@ -173,27 +175,27 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
 
   const handleSubmit = async () => {
     if (!title.trim()) {
-      setError("Title is required");
+      setError(t("titleRequired"));
       return;
     }
 
     if (mode === "lab" && !body.trim()) {
-      setError("Question body is required for Lab posts");
+      setError(t("bodyRequired"));
       return;
     }
 
     if (selectedTags.length === 0) {
-      setError("Please select at least one tag");
+      setError(t("selectOneTag"));
       return;
     }
 
     if (mode === "stage" && !videoFile) {
-      setError("Please select a video file");
+      setError(t("selectVideoRequired"));
       return;
     }
 
     if (mode === "stage" && uploadStatus === "uploading") {
-      setError("Please wait for video upload to complete");
+      setError(t("waitForUpload"));
       return;
     }
 
@@ -216,7 +218,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
       });
 
       const timeoutPromise = new Promise((_, reject) =>
-        setTimeout(() => reject(new Error("Request timed out. Please try again.")), 15000)
+        setTimeout(() => reject(new Error(t("requestTimedOut"))), 15000)
       );
 
       const result = await Promise.race([createPostPromise, timeoutPromise]) as any;
@@ -237,7 +239,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
           const { upload_url, upload_id } = await apiClient.createMuxUploadUrl(undefined, videoFile.name, undefined, postId);
 
           if (!upload_url || !upload_id) {
-            throw new Error("Failed to get upload URL from server");
+            throw new Error(t("uploadUrlFailed"));
           }
 
           // Upload video and wait for it to complete before closing modal
@@ -285,7 +287,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
 
                 resolve(); // Video uploaded successfully
               } else {
-                const errorMsg = `Video upload failed with status ${xhr.status}`;
+                const errorMsg = t("videoUploadFailed", { status: xhr.status });
                 console.error("[CreatePostModal] Video upload failed:", errorMsg);
                 setUploadStatus("error");
                 setError(errorMsg);
@@ -293,14 +295,14 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               }
             });
             xhr.addEventListener("error", (e) => {
-              const errorMsg = "Video upload failed. Please check your connection and try again.";
+              const errorMsg = t("videoUploadError");
               console.error("[CreatePostModal] Video upload error:", e);
               setUploadStatus("error");
               setError(errorMsg);
               reject(new Error(errorMsg));
             });
             xhr.addEventListener("abort", () => {
-              const errorMsg = "Video upload was cancelled.";
+              const errorMsg = t("videoUploadCancelled");
               setUploadStatus("error");
               setError(errorMsg);
               reject(new Error(errorMsg));
@@ -315,7 +317,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
         } catch (err: any) {
           console.error("[CreatePostModal] Video upload error:", err);
           setUploadStatus("error");
-          setError(err.message || "Failed to upload video. The post was created but video upload failed.");
+          setError(err.message || t("videoUploadPostFailed"));
           setIsLoading(false);
           return; // Don't close modal if video upload fails - let user see the error
         }
@@ -354,7 +356,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
     } catch (err: any) {
       console.error("Error creating post:", err);
       // Show user-friendly error message
-      let errorMessage = err.message || "Failed to create post";
+      let errorMessage = err.message || t("createPostFailed");
 
       // Extract message from error detail if available
       if (err.message && err.message.includes("detail")) {
@@ -411,12 +413,12 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             {/* Header */}
             <div className="mb-6 pr-8">
               <h2 className="text-2xl font-bold text-white mb-1">
-                {mode === "stage" ? "🎬 Share Your Progress" : "🧠 Ask a Question"}
+                {mode === "stage" ? t("shareProgressTitle") : t("askQuestionTitle")}
               </h2>
               <p className="text-sm text-white/50">
                 {mode === "stage"
-                  ? "Upload a video and inspire the community"
-                  : "Get help from experienced dancers"}
+                  ? t("shareProgressSubtitle")
+                  : t("askQuestionSubtitle")}
               </p>
             </div>
 
@@ -436,7 +438,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                       onClick={() => window.open("/pricing", "_blank")}
                       className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-md shadow-lg transition-colors flex items-center gap-1.5"
                     >
-                      <span className="text-base">🥢</span> Get More Claves
+                      <span className="text-base">🥢</span> {t("getMoreClaves")}
                     </button>
                   </div>
                 )}
@@ -446,13 +448,13 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             {/* Title Input */}
             <div className="mb-4">
               <label className="block text-sm font-semibold text-white/70 mb-2">
-                Title *
+                {t("titleLabel")}
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                placeholder={mode === "stage" ? "e.g., My first On2 combo!" : "e.g., How do I improve my spins?"}
+                placeholder={mode === "stage" ? t("titlePlaceholderStage") : t("titlePlaceholderLab")}
                 className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-amber-500/50"
                 maxLength={200}
               />
@@ -462,7 +464,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             {mode === "stage" && (
               <div className="mb-4">
                 <label className="block text-sm font-semibold text-white/70 mb-2">
-                  Video *
+                  {t("videoLabel")}
                 </label>
                 <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
                   {uploadStatus === "idle" && !videoFile && (
@@ -478,13 +480,13 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                         onClick={() => fileInputRef.current?.click()}
                         className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
                       >
-                        Choose Video File
+                        {t("chooseVideoFile")}
                       </button>
                       <p className="text-xs text-white/40 mt-2">
-                        MP4, MOV, or WebM (max 500MB)
+                        {t("videoFormatsHint")}
                       </p>
                       <p className="text-xs text-amber-400/60 mt-1">
-                        Video will upload automatically when you submit the post
+                        {t("videoAutoUploadHint")}
                       </p>
                     </>
                   )}
@@ -510,11 +512,11 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                           }}
                           className="text-red-400 hover:text-red-300 text-xs"
                         >
-                          Remove
+                          {t("removeBtn")}
                         </button>
                       </div>
                       <p className="text-xs text-blue-300/60 mt-1">
-                        Video will upload when you submit the post
+                        {t("videoWillUpload")}
                       </p>
                     </div>
                   )}
@@ -538,14 +540,14 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                     <div className="p-3 bg-yellow-900/20 border border-yellow-700/50 rounded-lg">
                       <div className="flex items-center gap-2 text-yellow-400 text-sm">
                         <div className="w-4 h-4 border-2 border-yellow-500/30 border-t-yellow-500 rounded-full animate-spin" />
-                        <span>Processing video... This may take a few minutes.</span>
+                        <span>{t("processingVideoHint")}</span>
                       </div>
                     </div>
                   )}
 
                   {uploadStatus === "error" && videoFile && (
                     <div className="p-3 bg-red-900/20 border border-red-700/50 rounded-lg">
-                      <p className="text-sm text-red-400 mb-2">Upload failed</p>
+                      <p className="text-sm text-red-400 mb-2">{t("uploadFailedLabel")}</p>
                       <button
                         onClick={() => {
                           setVideoFile(null);
@@ -557,7 +559,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                         }}
                         className="text-sm text-amber-400 hover:text-amber-300"
                       >
-                        Try again
+                        {t("tryAgainBtn")}
                       </button>
                     </div>
                   )}
@@ -569,12 +571,12 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             {mode === "lab" && (
               <div className="mb-4">
                 <label className="block text-sm font-semibold text-white/70 mb-2">
-                  Question *
+                  {t("questionLabel")}
                 </label>
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
-                  placeholder="Describe your question in detail..."
+                  placeholder={t("questionPlaceholder")}
                   rows={6}
                   className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-amber-500/50 resize-none"
                 />
@@ -584,7 +586,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             {/* Tags */}
             <div className="mb-4">
               <label className="block text-sm font-semibold text-white/70 mb-2">
-                Tags ({selectedTags.length}/5)
+                {t("tagsLabel", { count: selectedTags.length })}
               </label>
               <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
                 {tags.map((tag) => (
@@ -610,7 +612,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             {mode === "stage" && (
               <div className="mb-4">
                 <label className="block text-sm font-semibold text-white/70 mb-2">
-                  Feedback Type
+                  {t("feedbackTypeLabel")}
                 </label>
                 <div className="flex gap-2">
                   <motion.button
@@ -624,7 +626,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                         : "bg-white/10 text-white/60 border border-white/10 hover:border-white/20"
                     )}
                   >
-                    🔥 Hype Only
+                    {t("hypeOnly")}
                   </motion.button>
                   <motion.button
                     whileHover={{ scale: 1.02 }}
@@ -637,7 +639,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                         : "bg-white/10 text-white/60 border border-white/10 hover:border-white/20"
                     )}
                   >
-                    💬 Coaching Allowed
+                    {t("coachingAllowed")}
                   </motion.button>
                 </div>
               </div>
@@ -653,7 +655,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 className="w-5 h-5 rounded bg-white/10 border-white/20 text-amber-500 focus:ring-amber-500"
               />
               <label htmlFor="wip" className="text-sm text-white/70 cursor-pointer">
-                Mark as Work in Progress
+                {t("markWip")}
               </label>
             </div>
 
@@ -670,16 +672,16 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 }
               >
                 {mode === "stage"
-                  ? (uploadStatus === "processing" ? "🎬 Post (Video Processing...)" : "🎬 Share Video")
-                  : "🧠 Post Question"}
+                  ? (uploadStatus === "processing" ? t("shareVideoProcessing") : t("shareVideoBtn"))
+                  : t("postQuestionBtn")}
               </MagicButton>
             </div>
 
             {/* Cost Info */}
             <p className="text-xs text-white/40 mt-4 text-center">
               {mode === "stage"
-                ? "Costs 15 claves • Video slot required"
-                : `Costs 5 claves${questionSlots ? ` • ${questionSlots.max_slots - questionSlots.current_slots} question slots remaining` : ""}`}
+                ? t("stageCost")
+                : `${t("labCost")}${questionSlots ? t("questionSlotsRemaining", { remaining: questionSlots.max_slots - questionSlots.current_slots }) : ""}`}
             </p>
           </GlassCard>
 

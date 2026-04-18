@@ -4,11 +4,13 @@ import { motion } from "framer-motion";
 import { CheckCircle, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import GuildMasterBadge from "@/components/ui/GuildMasterBadge";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Post {
     id: string;
     user: {
         id: string;
+        username?: string;
         first_name: string;
         last_name: string;
         avatar_url: string | null;
@@ -39,7 +41,8 @@ export default function LabQuestionRow({
     isLocked = false,
     onLockedClick,
 }: LabQuestionRowProps) {
-    const timeAgo = getTimeAgo(post.created_at);
+    const t = useTranslations("community");
+    const timeAgo = getTimeAgo(post.created_at, t);
 
     const handleClick = () => {
         if (isLocked && onLockedClick) {
@@ -82,7 +85,7 @@ export default function LabQuestionRow({
                 <span className="text-2xl font-serif font-bold text-amber-400">
                     {post.reaction_count}
                 </span>
-                <span className="text-[10px] text-white/50 uppercase tracking-wider">votes</span>
+                <span className="text-[10px] text-white/50 uppercase tracking-wider">{t("votes")}</span>
             </div>
 
             {/* Content */}
@@ -117,7 +120,7 @@ export default function LabQuestionRow({
                 {/* Meta */}
                 <div className="flex items-center gap-3 mt-2 text-xs text-white/40">
                     <span className="flex items-center gap-1">
-                        {post.user.first_name} {post.user.last_name[0]}.
+                        {post.user.username || t("anonymous")}
                         {post.user.is_guild_master && <GuildMasterBadge size="sm" animate={false} />}
                     </span>
                     <span>•</span>
@@ -140,7 +143,7 @@ export default function LabQuestionRow({
                     {post.is_solved ? (
                         <>
                             <CheckCircle size={20} className="text-green-400 mb-1" />
-                            <span className="text-[10px] text-green-400 font-bold uppercase">Solved</span>
+                            <span className="text-[10px] text-green-400 font-bold uppercase">{t("solved")}</span>
                         </>
                     ) : (
                         <>
@@ -153,7 +156,7 @@ export default function LabQuestionRow({
                                 {post.reply_count}
                             </span>
                             <span className="text-[10px] text-white/50 uppercase tracking-wider">
-                                {post.reply_count === 1 ? "Answer" : "Answers"}
+                                {post.reply_count === 1 ? t("answer") : t("answers")}
                             </span>
                         </>
                     )}
@@ -163,7 +166,7 @@ export default function LabQuestionRow({
     );
 }
 
-function getTimeAgo(dateString: string): string {
+function getTimeAgo(dateString: string, t: (key: string, params?: Record<string, string | number>) => string): string {
     const date = new Date(dateString);
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -171,9 +174,9 @@ function getTimeAgo(dateString: string): string {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return "just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
-    if (diffHours < 24) return `${diffHours}h ago`;
-    if (diffDays < 7) return `${diffDays}d ago`;
+    if (diffMins < 1) return t("justNow");
+    if (diffMins < 60) return t("minutesAgo", { count: diffMins });
+    if (diffHours < 24) return t("hoursAgo", { count: diffHours });
+    if (diffDays < 7) return t("daysAgo", { count: diffDays });
     return date.toLocaleDateString();
 }

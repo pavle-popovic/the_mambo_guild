@@ -4,8 +4,10 @@ import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { Crown } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "@/i18n/useTranslations";
 
 export default function PreviewCTABar() {
+    const t = useTranslations("community");
     const [memberCount, setMemberCount] = useState(1200);
 
     // Fetch real member count from API
@@ -52,9 +54,9 @@ export default function PreviewCTABar() {
                         {/* Text */}
                         <div className="text-center md:text-left">
                             <p className="text-white/90 text-lg font-serif">
-                                The floor is full. Join{" "}
+                                {t("floorFullPre")}{" "}
                                 <span className="text-amber-400 font-bold">{memberCount.toLocaleString()}+</span>{" "}
-                                dancers inside the Inn.
+                                {t("floorFullPost")}
                             </p>
                         </div>
 
@@ -66,7 +68,7 @@ export default function PreviewCTABar() {
                                 whileTap={{ scale: 0.98 }}
                             >
                                 <Crown size={20} />
-                                <span className="font-serif tracking-wide">Become a Member</span>
+                                <span className="font-serif tracking-wide">{t("becomeMember")}</span>
                             </motion.button>
                         </Link>
                     </div>

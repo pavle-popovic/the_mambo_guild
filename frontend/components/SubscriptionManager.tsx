@@ -4,10 +4,12 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslations } from "@/i18n/useTranslations";
 
 type Step = "closed" | "loss" | "price" | "confirm";
 
 export default function SubscriptionManager() {
+  const t = useTranslations("profile");
   const { user, refreshUser } = useAuth();
   const [step, setStep] = useState<Step>("closed");
   const [confirmInput, setConfirmInput] = useState("");
@@ -40,14 +42,14 @@ export default function SubscriptionManager() {
     try {
       const res = await apiClient.cancelSubscription();
       if (res.success) {
-        toast.success(res.message || "Subscription canceled.");
+        toast.success(res.message || t("cancelSuccess"));
         await refreshUser();
         close();
       } else {
-        toast.error("Something went wrong. Please try again.");
+        toast.error(t("cancelError"));
       }
     } catch {
-      toast.error("Something went wrong. Please try again.");
+      toast.error(t("cancelError"));
     } finally {
       setSubmitting(false);
     }
@@ -58,13 +60,13 @@ export default function SubscriptionManager() {
     try {
       const res = await apiClient.resumeSubscription();
       if (res.success) {
-        toast.success(res.message || "Subscription resumed.");
+        toast.success(res.message || t("resumeSuccess"));
         await refreshUser();
       } else {
-        toast.error("Could not resume subscription.");
+        toast.error(t("resumeError"));
       }
     } catch {
-      toast.error("Could not resume subscription.");
+      toast.error(t("resumeError"));
     } finally {
       setSubmitting(false);
     }
@@ -75,22 +77,20 @@ export default function SubscriptionManager() {
       {/* Billing footer — intentionally low-key at the very bottom of the profile */}
       <div className="mt-16 pt-8 border-t border-gray-900">
         <div className="text-[10px] uppercase tracking-widest text-gray-600 mb-2">
-          Billing
+          {t("billing")}
         </div>
         {isScheduledToCancel ? (
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
             <p className="text-sm text-gray-400">
-              Your <span className="text-amber-300 font-semibold">{planLabel}</span> plan is
-              scheduled to end
-              {periodEndLabel ? ` on ${periodEndLabel}` : ""}. You still have full access until
-              then.
+              {t("subscriptionEndingPre")} <span className="text-amber-300 font-semibold">{planLabel}</span> {t("subscriptionEndingMid")}
+              {periodEndLabel ? t("subscriptionEndingOn", { date: periodEndLabel }) : ""}{t("subscriptionEndingPost")}
             </p>
             <button
               onClick={handleResume}
               disabled={submitting}
               className="px-4 py-2 rounded-lg bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold text-sm hover:scale-[1.02] transition disabled:opacity-50"
             >
-              {submitting ? "..." : "Resume subscription"}
+              {submitting ? t("resumingShort") : t("resumeSubscription")}
             </button>
           </div>
         ) : (
@@ -98,38 +98,37 @@ export default function SubscriptionManager() {
             onClick={() => setStep("loss")}
             className="text-xs text-gray-600 hover:text-gray-400 underline underline-offset-4 transition"
           >
-            Manage subscription
+            {t("manageSubscriptionLink")}
           </button>
         )}
       </div>
 
       {/* Step 1 — Loss framing */}
       {step === "loss" && (
-        <ModalShell onClose={close}>
+        <ModalShell onClose={close} closeAria={t("modalCloseAria")}>
           <h2 className="text-2xl font-serif font-bold text-mambo-text mb-2">
-            Before you go…
+            {t("lossTitle")}
           </h2>
           <p className="text-gray-400 mb-5">
-            Canceling <span className="text-amber-300 font-semibold">{planLabel}</span> means
-            losing:
+            {t("lossIntroPre")} <span className="text-amber-300 font-semibold">{planLabel}</span> {t("lossIntroPost")}
           </p>
           <ul className="space-y-3 mb-6">
-            <LossItem>All Guild courses, choreos &amp; topics</LossItem>
-            <LossItem>New bi-weekly choreographies as they drop</LossItem>
-            <LossItem>Access to the Guild community</LossItem>
-            <LossItem>Your weekly clave earnings boost</LossItem>
-            <LossItem>Exclusive member badges you&apos;ve earned</LossItem>
+            <LossItem>{t("lossItem1")}</LossItem>
+            <LossItem>{t("lossItem2")}</LossItem>
+            <LossItem>{t("lossItem3")}</LossItem>
+            <LossItem>{t("lossItem4")}</LossItem>
+            <LossItem>{t("lossItem5")}</LossItem>
             {tier === "performer" && (
-              <LossItem>Monthly 1-on-1 video feedback from instructors</LossItem>
+              <LossItem>{t("lossItem6")}</LossItem>
             )}
           </ul>
           <ModalButtons
             primary={{
-              label: "Keep my subscription",
+              label: t("keepSubscription"),
               onClick: close,
             }}
             secondary={{
-              label: "I still want to cancel",
+              label: t("stillCancel"),
               onClick: () => setStep("price"),
             }}
           />
@@ -138,27 +137,25 @@ export default function SubscriptionManager() {
 
       {/* Step 2 — Price-lock warning */}
       {step === "price" && (
-        <ModalShell onClose={close}>
+        <ModalShell onClose={close} closeAria={t("modalCloseAria")}>
           <h2 className="text-2xl font-serif font-bold text-mambo-text mb-2">
-            You&apos;re locked in at <span className="text-amber-300">{planPrice}/mo</span>
+            {t("priceTitlePre")} <span className="text-amber-300">{planPrice}{t("priceTitlePost")}</span>
           </h2>
           <p className="text-gray-400 mb-5">
-            This is the lowest price The Mambo Guild will ever offer.
+            {t("priceSubtitle")}
           </p>
           <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 mb-6">
             <p className="text-sm text-amber-100/80 leading-relaxed">
-              As we add more instructors, new choreographies, and expanded community features,
-              pricing will go up. If you cancel today and rejoin next month — or next year — you
-              will pay the new rate, not your founder rate. <span className="font-semibold text-amber-200">Your current price is guaranteed for as long as you stay subscribed.</span>
+              {t("priceBodyPre")} <span className="font-semibold text-amber-200">{t("priceBodyGuarantee")}</span>
             </p>
           </div>
           <ModalButtons
             primary={{
-              label: `Keep my ${planPrice}/mo rate`,
+              label: t("keepRate", { price: planPrice }),
               onClick: close,
             }}
             secondary={{
-              label: "I understand, continue",
+              label: t("understandContinue"),
               onClick: () => setStep("confirm"),
             }}
           />
@@ -167,30 +164,29 @@ export default function SubscriptionManager() {
 
       {/* Step 3 — Type CANCEL */}
       {step === "confirm" && (
-        <ModalShell onClose={close}>
+        <ModalShell onClose={close} closeAria={t("modalCloseAria")}>
           <h2 className="text-2xl font-serif font-bold text-mambo-text mb-2">
-            Last step
+            {t("confirmTitle")}
           </h2>
           <p className="text-gray-400 mb-5">
-            Type <span className="font-mono text-amber-300">CANCEL</span> below to confirm. Your
-            access will continue until the end of your current billing period
-            {periodEndLabel ? ` (${periodEndLabel})` : ""}.
+            {t("confirmBodyPre")} <span className="font-mono text-amber-300">CANCEL</span> {t("confirmBodyMid")}
+            {periodEndLabel ? t("confirmPeriodSuffix", { date: periodEndLabel }) : ""}.
           </p>
           <input
             type="text"
             value={confirmInput}
             onChange={(e) => setConfirmInput(e.target.value)}
-            placeholder="Type CANCEL"
+            placeholder={t("confirmInputPlaceholder")}
             className="w-full px-4 py-3 rounded-lg bg-mambo-panel border border-gray-800 text-mambo-text font-mono focus:outline-none focus:border-amber-500/50 mb-6"
             autoFocus
           />
           <ModalButtons
             primary={{
-              label: "Never mind, keep it",
+              label: t("neverMind"),
               onClick: close,
             }}
             secondary={{
-              label: submitting ? "Canceling..." : "Cancel my subscription",
+              label: submitting ? t("cancelingInProgress") : t("cancelFinal"),
               onClick: handleFinalCancel,
               disabled: confirmInput.trim().toUpperCase() !== "CANCEL" || submitting,
             }}
@@ -213,9 +209,11 @@ function LossItem({ children }: { children: React.ReactNode }) {
 function ModalShell({
   children,
   onClose,
+  closeAria,
 }: {
   children: React.ReactNode;
   onClose: () => void;
+  closeAria: string;
 }) {
   return (
     <div
@@ -229,7 +227,7 @@ function ModalShell({
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-600 hover:text-gray-300 text-xl leading-none"
-          aria-label="Close"
+          aria-label={closeAria}
         >
           ×
         </button>

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 import GuildMasterAvatar, { GuildMasterUsername } from "@/components/ui/GuildMasterAvatar";
 import { GuildMasterTag } from "@/components/ui/GuildMasterBadge";
 import UserProfileModal from "@/components/UserProfileModal";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Tag {
   slug: string;
@@ -87,6 +88,7 @@ export default function PostDetailModal({
   onRefresh,
   initialEditMode,
 }: PostDetailModalProps) {
+  const t = useTranslations("community");
   const [post, setPost] = useState<Post | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -189,7 +191,7 @@ export default function PostDetailModal({
       }
     } catch (err: any) {
       if (err.name !== 'AbortError' && !controller.signal.aborted) {
-        setError(err.message || "Failed to load post");
+        setError(err.message || t("failedLoadPost"));
       }
     } finally {
       if (!controller.signal.aborted) {
@@ -215,7 +217,7 @@ export default function PostDetailModal({
       onPostDeleted?.(postId);
       onClose();
     } catch (err: any) {
-      alert(err.message || "Failed to delete post");
+      alert(err.message || t("failedDeletePost"));
     } finally {
       setIsDeleting(false);
       setShowDeleteConfirm(false);
@@ -285,15 +287,15 @@ export default function PostDetailModal({
 
     // Validate
     if (!editTitle.trim()) {
-      setError("Title is required");
+      setError(t("titleRequired2"));
       return;
     }
     if (post.post_type === "lab" && !editBody.trim()) {
-      setError("Question body is required for Lab posts");
+      setError(t("questionBodyRequired"));
       return;
     }
     if (editTags.length === 0) {
-      setError("At least one tag is required");
+      setError(t("atLeastOneTag"));
       return;
     }
 
@@ -312,7 +314,7 @@ export default function PostDetailModal({
       await loadPost({ forceRefresh: true }); // Reload to show updated post
       onRefresh?.();
     } catch (err: any) {
-      setError(err.message || "Failed to update post");
+      setError(err.message || t("failedUpdatePost"));
     } finally {
       setIsSaving(false);
     }
@@ -399,7 +401,7 @@ export default function PostDetailModal({
         }
       }, 1500);
     } catch (err: any) {
-      setError(err.message || "Failed to post reply");
+      setError(err.message || t("failedPostReply"));
       // Revert optimistic update on error
       setPost(prev => prev ? {
         ...prev,
@@ -419,7 +421,7 @@ export default function PostDetailModal({
       await loadPost({ forceRefresh: true });
       onRefresh?.();
     } catch (err: any) {
-      setError(err.message || "Failed to mark solution");
+      setError(err.message || t("failedMarkSolution"));
     }
   };
 
@@ -431,7 +433,7 @@ export default function PostDetailModal({
       setEditingReplyContent("");
       await loadPost({ forceRefresh: true });
     } catch (err: any) {
-      setError(err.message || "Failed to update reply");
+      setError(err.message || t("failedUpdateReply"));
     }
   };
 
@@ -442,7 +444,7 @@ export default function PostDetailModal({
       await loadPost({ forceRefresh: true });
       onRefresh?.();
     } catch (err: any) {
-      setError(err.message || "Failed to delete reply");
+      setError(err.message || t("failedDeleteReply"));
     }
   };
 
@@ -472,7 +474,7 @@ export default function PostDetailModal({
           className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-4 pb-3 sm:pb-4 bg-black/60 backdrop-blur-md border-b border-white/10"
           style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
         >
-          <h2 className="text-base sm:text-xl font-semibold text-white">Post Details</h2>
+          <h2 className="text-base sm:text-xl font-semibold text-white">{t("postDetails")}</h2>
           <div className="flex items-center gap-2">
             {(() => {
               // Proper null checks and normalized comparison
@@ -505,7 +507,7 @@ export default function PostDetailModal({
                   <button
                     onClick={handleEdit}
                     className="p-2 text-blue-400 hover:text-blue-300 hover:bg-blue-500/20 rounded-lg transition"
-                    title="Edit post"
+                    title={t("editPost")}
                   >
                     <FaEdit />
                   </button>
@@ -513,7 +515,7 @@ export default function PostDetailModal({
                     onClick={handleDeleteClick}
                     disabled={isDeleting}
                     className="p-2 text-red-400 hover:text-red-300 hover:bg-red-500/20 rounded-lg transition"
-                    title="Delete post"
+                    title={t("deletePost")}
                   >
                     <FaTrash />
                   </button>
@@ -526,7 +528,7 @@ export default function PostDetailModal({
                   onClick={handleSave}
                   disabled={isSaving}
                   className="p-2 text-green-400 hover:text-green-300 hover:bg-green-500/20 rounded-lg transition disabled:opacity-50"
-                  title="Save changes"
+                  title={t("saveChanges")}
                 >
                   <FaSave />
                 </button>
@@ -534,7 +536,7 @@ export default function PostDetailModal({
                   onClick={handleCancelEdit}
                   disabled={isSaving}
                   className="p-2 text-white/60 hover:text-white hover:bg-white/10 rounded-lg transition disabled:opacity-50"
-                  title="Cancel editing"
+                  title={t("cancelEditing")}
                 >
                   <FaTimes />
                 </button>
@@ -550,7 +552,7 @@ export default function PostDetailModal({
                     ? "text-amber-400 hover:text-amber-300 hover:bg-amber-500/20"
                     : "text-white/40 hover:text-white hover:bg-white/10"
                 )}
-                title={post.is_saved ? "Remove bookmark" : "Bookmark post"}
+                title={post.is_saved ? t("removeBookmark") : t("bookmarkPost")}
               >
                 {post.is_saved ? <FaBookmark /> : <FaRegBookmark />}
               </button>
@@ -582,7 +584,7 @@ export default function PostDetailModal({
                   onClick={() => loadPost({ forceRefresh: true })}
                   className="px-4 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 rounded-lg transition"
                 >
-                  Retry
+                  {t("retryBtn")}
                 </button>
               </GlassPanel>
             ) : post ? (
@@ -615,7 +617,7 @@ export default function PostDetailModal({
                             </div>
                           </div>
                           <div className="absolute bottom-3 left-3 px-2 py-1 bg-black/60 rounded text-xs text-white/80">
-                            Tap to play
+                            {t("tapToPlay")}
                           </div>
                         </div>
                       ) : (
@@ -639,7 +641,7 @@ export default function PostDetailModal({
                       <div className="w-full aspect-video bg-black/30 rounded-lg flex items-center justify-center">
                         <div className="text-center text-white/40">
                           <span className="text-6xl mb-2 block">📺</span>
-                          <p className="text-sm">Video processing...</p>
+                          <p className="text-sm">{t("videoProcessing")}</p>
                         </div>
                       </div>
                     )}
@@ -672,11 +674,11 @@ export default function PostDetailModal({
                         <GuildMasterTag />
                       ) : post.user.is_pro && (
                         <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200">
-                          PRO
+                          {t("proBadge")}
                         </span>
                       )}
                     </div>
-                    <span className="text-xs text-white/50">Level {post.user.level}</span>
+                    <span className="text-xs text-white/50">{t("levelNumber", { level: post.user.level })}</span>
                   </div>
                 </button>
 
@@ -684,14 +686,14 @@ export default function PostDetailModal({
                 {isEditing ? (
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-white/70 mb-2">
-                      Title *
+                      {t("postTitleLabel")}
                     </label>
                     <input
                       type="text"
                       value={editTitle}
                       onChange={(e) => setEditTitle(e.target.value)}
                       className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                      placeholder="Enter post title"
+                      placeholder={t("postTitlePlaceholder")}
                     />
                   </div>
                 ) : (
@@ -702,7 +704,7 @@ export default function PostDetailModal({
                 {isEditing ? (
                   <div className="mb-4">
                     <label className="block text-sm font-medium text-white/70 mb-2">
-                      Tags ({editTags.length}/5) *
+                      {t("editTagsLabel", { count: editTags.length })}
                     </label>
                     <div className="flex flex-wrap gap-2">
                       {tags.map((tag) => (
@@ -733,7 +735,7 @@ export default function PostDetailModal({
                     ))}
                     {post.is_wip && (
                       <span className="text-xs px-2 py-1 rounded bg-orange-500/30 text-orange-200">
-                        🚧 Work in Progress
+                        {t("wipTag")}
                       </span>
                     )}
                     {post.post_type === "lab" && (
@@ -745,7 +747,7 @@ export default function PostDetailModal({
                             : "bg-gray-500/30 text-gray-200"
                         )}
                       >
-                        {post.is_solved ? "✅ Solved" : "❓ Unsolved"}
+                        {post.is_solved ? t("solvedTag") : t("unsolvedTag")}
                       </span>
                     )}
                   </div>
@@ -756,14 +758,14 @@ export default function PostDetailModal({
                   isEditing ? (
                     <div className="mb-4">
                       <label className="block text-sm font-medium text-white/70 mb-2">
-                        Question Body *
+                        {t("questionBodyLabel")}
                       </label>
                       <textarea
                         value={editBody}
                         onChange={(e) => setEditBody(e.target.value)}
                         rows={6}
                         className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-none"
-                        placeholder="Enter your question..."
+                        placeholder={t("questionBodyPlaceholder")}
                       />
                     </div>
                   ) : post.body ? (
@@ -783,12 +785,12 @@ export default function PostDetailModal({
                         onChange={(e) => setEditIsWip(e.target.checked)}
                         className="w-4 h-4 rounded bg-white/10 border-white/20 text-amber-500 focus:ring-amber-500/50"
                       />
-                      <span className="text-sm text-white/80">Mark as Work in Progress</span>
+                      <span className="text-sm text-white/80">{t("markWip")}</span>
                     </label>
                     {post.post_type === "stage" && (
                       <div>
                         <label className="block text-sm font-medium text-white/70 mb-2">
-                          Feedback Type
+                          {t("feedbackTypeLabel")}
                         </label>
                         <div className="flex gap-2">
                           <button
@@ -800,7 +802,7 @@ export default function PostDetailModal({
                                 : "bg-white/10 text-white/60 hover:bg-white/20 border border-white/20"
                             )}
                           >
-                            💬 Coaching Allowed
+                            {t("coachingAllowed")}
                           </button>
                           <button
                             onClick={() => setEditFeedbackType("hype")}
@@ -811,7 +813,7 @@ export default function PostDetailModal({
                                 : "bg-white/10 text-white/60 hover:bg-white/20 border border-white/20"
                             )}
                           >
-                            🔥 Hype Only
+                            {t("hypeOnly")}
                           </button>
                         </div>
                       </div>
@@ -885,10 +887,10 @@ export default function PostDetailModal({
                   })()}
 
                   {post.feedback_type === "hype" ? (
-                    <span className="text-sm text-white/40 ml-auto">Hype Only</span>
+                    <span className="text-sm text-white/40 ml-auto">{t("hypeOnlyLabel")}</span>
                   ) : (
                     <span className="text-sm text-white/60 ml-auto">
-                      💬 {post.reply_count} comments
+                      {t("commentsCount", { count: post.reply_count })}
                     </span>
                   )}
                 </div>
@@ -897,19 +899,19 @@ export default function PostDetailModal({
                 {post.feedback_type !== "hype" && !isEditing && (
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <h3 className="text-lg font-semibold text-white mb-4">
-                      💬 Write a Reply
+                      {t("writeReply")}
                     </h3>
                     <div className="space-y-3">
                       <textarea
                         value={replyContent}
                         onChange={(e) => setReplyContent(e.target.value)}
-                        placeholder="Write your reply or question..."
+                        placeholder={t("replyPlaceholder")}
                         rows={4}
                         className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-none"
                       />
                       <div className="flex items-center justify-between">
                         <span className="text-xs text-white/50">
-                          Cost: 2 🥢 claves
+                          {t("replyCost")}
                         </span>
                         <motion.button
                           onClick={handleSubmitReply}
@@ -927,10 +929,10 @@ export default function PostDetailModal({
                           {isSubmittingReply ? (
                             <>
                               <div className="w-4 h-4 border-2 border-amber-200/30 border-t-amber-200 rounded-full animate-spin" />
-                              <span>Posting...</span>
+                              <span>{t("posting")}</span>
                             </>
                           ) : (
-                            "Post Reply"
+                            t("postReply")
                           )}
                         </motion.button>
                       </div>
@@ -942,7 +944,7 @@ export default function PostDetailModal({
                 {post.feedback_type !== "hype" && post.replies && post.replies.length > 0 && (
                   <div className="mt-6 pt-6 border-t border-white/10">
                     <h3 className="text-lg font-semibold text-white mb-4">
-                      Replies ({post.reply_count})
+                      {t("repliesCount", { count: post.reply_count })}
                     </h3>
                     <div className="space-y-4">
                       <AnimatePresence mode="popLayout">
@@ -972,7 +974,7 @@ export default function PostDetailModal({
                                 type="button"
                                 onClick={() => reply.user.username && setProfileModalUsername(reply.user.username)}
                                 className="rounded-full transition hover:ring-2 hover:ring-mambo-gold/50 focus:outline-none focus:ring-2 focus:ring-mambo-gold/50"
-                                aria-label={`View ${reply.user.username || "user"}'s profile`}
+                                aria-label={t("viewProfileAria", { username: reply.user.username || "user" })}
                               >
                                 <GuildMasterAvatar
                                   avatarUrl={reply.user.avatar_url}
@@ -1000,21 +1002,21 @@ export default function PostDetailModal({
                                   </button>
                                   {isOptimistic && (
                                     <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200">
-                                      Posting...
+                                      {t("postingTag")}
                                     </span>
                                   )}
                                   {reply.is_accepted_answer && (
                                     <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/30 text-green-200">
-                                      ✅ Solution
+                                      {t("solutionTag")}
                                     </span>
                                   )}
                                   {!isOptimistic && currentUserId && String(currentUserId) === String(post.user.id) && post.post_type === "lab" && !reply.is_accepted_answer && (
                                     <button
                                       onClick={() => handleMarkSolution(reply.id)}
                                       className="text-xs px-2 py-1 rounded bg-green-500/20 hover:bg-green-500/30 text-green-200 transition"
-                                      title="Mark as solution"
+                                      title={t("markSolutionTitle")}
                                     >
-                                      ✓ Accept
+                                      {t("acceptBtn")}
                                     </button>
                                   )}
 
@@ -1027,14 +1029,14 @@ export default function PostDetailModal({
                                           setEditingReplyContent(reply.content);
                                         }}
                                         className="p-1 rounded hover:bg-white/10 text-white/40 hover:text-white/70 transition"
-                                        title="Edit reply"
+                                        title={t("editReplyTitle")}
                                       >
                                         <FaEdit size={12} />
                                       </button>
                                       <button
                                         onClick={() => setDeletingReplyId(reply.id)}
                                         className="p-1 rounded hover:bg-red-500/20 text-white/40 hover:text-red-400 transition"
-                                        title="Delete reply"
+                                        title={t("deleteReplyTitle")}
                                       >
                                         <FaTrash size={12} />
                                       </button>
@@ -1056,13 +1058,13 @@ export default function PostDetailModal({
                                         onClick={() => handleUpdateReply(reply.id)}
                                         className="px-3 py-1 rounded bg-[#D4AF37]/20 text-[#FCE205] text-xs font-bold hover:bg-[#D4AF37]/30 transition"
                                       >
-                                        Save
+                                        {t("saveBtn")}
                                       </button>
                                       <button
                                         onClick={() => { setEditingReplyId(null); setEditingReplyContent(""); }}
                                         className="px-3 py-1 rounded text-white/50 text-xs hover:text-white/70 transition"
                                       >
-                                        Cancel
+                                        {t("cancelBtn")}
                                       </button>
                                     </div>
                                   </div>
@@ -1077,7 +1079,7 @@ export default function PostDetailModal({
                                     <MuxVideoPlayer
                                       playbackId={reply.mux_playback_id}
                                       metadata={{
-                                        video_title: `Reply to ${post.title}`,
+                                        video_title: t("replyVideoTitle", { title: post.title }),
                                         video_id: reply.id,
                                       }}
                                     />
@@ -1098,22 +1100,22 @@ export default function PostDetailModal({
                 {deletingReplyId && (
                   <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
                     <GlassCard className="max-w-md w-full p-6 space-y-4">
-                      <h3 className="text-xl font-bold text-white">Delete Reply?</h3>
+                      <h3 className="text-xl font-bold text-white">{t("deleteReplyConfirmTitle")}</h3>
                       <p className="text-white/70">
-                        Are you sure you want to delete this reply? This action cannot be undone.
+                        {t("deleteReplyConfirmBody")}
                       </p>
                       <div className="flex justify-end gap-3 mt-6">
                         <button
                           onClick={() => setDeletingReplyId(null)}
                           className="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
                         >
-                          Cancel
+                          {t("cancelBtn")}
                         </button>
                         <button
                           onClick={() => handleDeleteReply(deletingReplyId)}
                           className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
                         >
-                          Delete
+                          {t("deleteBtn")}
                         </button>
                       </div>
                     </GlassCard>
@@ -1126,23 +1128,23 @@ export default function PostDetailModal({
           {showDeleteConfirm && (
             <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
               <GlassCard className="max-w-md w-full p-6 space-y-4">
-                <h3 className="text-xl font-bold text-white">Delete Post?</h3>
+                <h3 className="text-xl font-bold text-white">{t("deletePostConfirmTitle")}</h3>
                 <p className="text-white/70">
-                  Are you sure you want to delete <span className="text-white font-semibold">"{post?.title}"</span>? This action cannot be undone and will remove all reactions and comments.
+                  {t("deletePostConfirmBodyPre")} <span className="text-white font-semibold">"{post?.title}"</span>{t("deletePostConfirmBodyPost")}
                 </p>
                 <div className="flex justify-end gap-3 mt-6">
                   <button
                     onClick={() => setShowDeleteConfirm(false)}
                     className="px-4 py-2 rounded-lg text-white/70 hover:text-white hover:bg-white/10 transition-colors"
                   >
-                    Cancel
+                    {t("cancelBtn")}
                   </button>
                   <button
                     onClick={executeDelete}
                     disabled={isDeleting}
                     className="px-4 py-2 rounded-lg bg-red-500 hover:bg-red-600 text-white font-medium transition-colors"
                   >
-                    {isDeleting ? "Deleting..." : "Delete"}
+                    {isDeleting ? t("deletingBtn") : t("deleteBtn")}
                   </button>
                 </div>
               </GlassCard>

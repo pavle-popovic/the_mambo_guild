@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  Radio, Calendar, Clock, Play, Users, Crown, Lock,
+  Radio, Calendar, Play, Users, Crown, Lock,
   ArrowLeft, ExternalLink, Tag, X
 } from "lucide-react";
 import NavBar from "@/components/NavBar";
@@ -13,6 +13,7 @@ import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface MeetingConfig {
   meeting_url: string | null;
@@ -47,6 +48,7 @@ function nextWednesdayGMT(): Date {
 
 // Locked Page Component for non-Guild Masters
 function LockedPage({ user }: { user: any }) {
+  const t = useTranslations("roundtable");
   return (
     <div className="min-h-screen bg-mambo-dark">
       <NavBar user={user} />
@@ -62,25 +64,25 @@ function LockedPage({ user }: { user: any }) {
             </div>
 
             <h1 className="text-4xl font-bold text-white mb-4">
-              The Roundtable is for Guild Masters
+              {t("lockedTitle")}
             </h1>
 
             <p className="text-lg text-gray-400 mb-8 max-w-md mx-auto">
-              Join our exclusive weekly live sessions, access the full archive of past discussions, and connect directly with instructors.
+              {t("lockedSubtitle")}
             </p>
 
             <div className="space-y-4 text-left max-w-md mx-auto mb-8">
               <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-800/50 border border-gray-700">
                 <Radio size={20} className="text-red-400" />
-                <span className="text-gray-300">Weekly live Q&amp;A sessions</span>
+                <span className="text-gray-300">{t("perk1")}</span>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-800/50 border border-gray-700">
                 <Play size={20} className="text-cyan-400" />
-                <span className="text-gray-300">Full archive of past recordings</span>
+                <span className="text-gray-300">{t("perk2")}</span>
               </div>
               <div className="flex items-center gap-3 p-4 rounded-xl bg-gray-800/50 border border-gray-700">
                 <Users size={20} className="text-purple-400" />
-                <span className="text-gray-300">Direct instructor interaction</span>
+                <span className="text-gray-300">{t("perk3")}</span>
               </div>
             </div>
 
@@ -89,14 +91,14 @@ function LockedPage({ user }: { user: any }) {
               className="inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold text-lg hover:from-amber-400 hover:to-yellow-400 transition-all shadow-lg shadow-amber-500/25"
             >
               <Crown size={20} />
-              Upgrade to Guild Master
+              {t("upgradeCta")}
             </Link>
 
             <Link
               href="/studio"
               className="block mt-6 text-gray-400 hover:text-white transition-colors"
             >
-              ← Back to Studio
+              ← {t("backToStudio")}
             </Link>
           </motion.div>
         </div>
@@ -109,6 +111,7 @@ function LockedPage({ user }: { user: any }) {
 export default function RoundtablePage() {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const t = useTranslations("roundtable");
   const isGuildMaster = user?.tier?.toLowerCase() === "performer";
 
   const [meetingConfig, setMeetingConfig] = useState<MeetingConfig | null>(null);
@@ -121,7 +124,7 @@ export default function RoundtablePage() {
   const [countdown, setCountdown] = useState<number | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [, setIsPlaying] = useState(false);
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -207,9 +210,9 @@ export default function RoundtablePage() {
     const mins = Math.floor((seconds % 3600) / 60);
     const secs = seconds % 60;
 
-    if (days > 0) return `${days}d ${hours}h ${mins}m`;
-    if (hours > 0) return `${hours}h ${mins}m ${secs}s`;
-    return `${mins}m ${secs}s`;
+    if (days > 0) return `${days}${t("unitDay")} ${hours}${t("unitHour")} ${mins}${t("unitMinute")}`;
+    if (hours > 0) return `${hours}${t("unitHour")} ${mins}${t("unitMinute")} ${secs}${t("unitSecond")}`;
+    return `${mins}${t("unitMinute")} ${secs}${t("unitSecond")}`;
   };
 
   if (loading) {
@@ -236,7 +239,7 @@ export default function RoundtablePage() {
             className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors mb-8"
           >
             <ArrowLeft size={16} />
-            <span>Back to Studio</span>
+            <span>{t("backToStudio")}</span>
           </Link>
 
           {/* Header */}
@@ -251,8 +254,8 @@ export default function RoundtablePage() {
                 <Radio size={28} className="text-white" />
               </div>
               <div>
-                <h1 className="text-4xl font-bold text-white">The Roundtable</h1>
-                <p className="text-gray-400">Live calls & archives</p>
+                <h1 className="text-4xl font-bold text-white">{t("pageTitle")}</h1>
+                <p className="text-gray-400">{t("pageSubtitle")}</p>
               </div>
             </div>
           </motion.div>
@@ -268,14 +271,14 @@ export default function RoundtablePage() {
               <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
                 <div>
                   <span className="text-sm font-bold text-amber-400 uppercase tracking-wide">
-                    Weekly VIP Session
+                    {t("weeklyVipSession")}
                   </span>
                   <h2 className="text-2xl font-bold text-white mt-1 mb-2">
-                    Next Meeting
+                    {t("nextMeeting")}
                   </h2>
                   <div className="flex items-center gap-1.5 text-sm text-gray-400">
                     <Calendar size={14} />
-                    <span>Every Wednesday at 7:00 PM GMT</span>
+                    <span>{t("scheduleLine")}</span>
                   </div>
                   {meetingConfig?.meeting_notes && (
                     <p className="text-gray-300 text-sm mt-3">
@@ -291,7 +294,7 @@ export default function RoundtablePage() {
                         {formatCountdown(countdown)}
                       </div>
                       <span className="text-xs text-gray-500 uppercase tracking-wide">
-                        until next session
+                        {t("untilNextSession")}
                       </span>
                     </div>
                   )}
@@ -310,7 +313,7 @@ export default function RoundtablePage() {
                     )}
                   >
                     <ExternalLink size={18} />
-                    {meetingConfig?.meeting_url ? "Join Meeting" : "Link Coming Soon"}
+                    {meetingConfig?.meeting_url ? t("joinMeeting") : t("linkComingSoon")}
                   </a>
                 </div>
               </div>
@@ -351,11 +354,11 @@ export default function RoundtablePage() {
                         onPause={() => setIsPlaying(false)}
                       >
                         <source src={signedVideoUrl} type="video/mp4" />
-                        Your browser does not support the video tag.
+                        {t("videoFallback")}
                       </video>
                     ) : (
                       <div className="absolute inset-0 flex items-center justify-center text-gray-500">
-                        Failed to load video
+                        {t("videoLoadFailed")}
                       </div>
                     )}
                   </div>
@@ -374,7 +377,7 @@ export default function RoundtablePage() {
                         )}
                         <div className="flex items-center gap-4 text-sm text-gray-500">
                           <span>
-                            {new Date(selectedArchive.recorded_at).toLocaleDateString("en-US", {
+                            {new Date(selectedArchive.recorded_at).toLocaleDateString(undefined, {
                               month: "long",
                               day: "numeric",
                               year: "numeric",
@@ -383,7 +386,7 @@ export default function RoundtablePage() {
                           {selectedArchive.duration_minutes && (
                             <>
                               <span>•</span>
-                              <span>{selectedArchive.duration_minutes} mins</span>
+                              <span>{selectedArchive.duration_minutes} {t("mins")}</span>
                             </>
                           )}
                         </div>
@@ -424,7 +427,7 @@ export default function RoundtablePage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            <h2 className="text-2xl font-bold text-white mb-6">Past Recordings</h2>
+            <h2 className="text-2xl font-bold text-white mb-6">{t("pastRecordings")}</h2>
 
             {isLoadingArchives ? (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -444,8 +447,8 @@ export default function RoundtablePage() {
             ) : archives.length === 0 ? (
               <div className="text-center py-12 text-gray-500">
                 <Radio size={48} className="mx-auto mb-4 opacity-50" />
-                <p>No recordings available yet.</p>
-                <p className="text-sm">Check back after the next live session!</p>
+                <p>{t("noRecordingsTitle")}</p>
+                <p className="text-sm">{t("noRecordingsBody")}</p>
               </div>
             ) : (
               <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -487,7 +490,7 @@ export default function RoundtablePage() {
                         {/* Duration Badge */}
                         {archive.duration_minutes && (
                           <div className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 text-xs font-mono text-white">
-                            {archive.duration_minutes} min
+                            {archive.duration_minutes} {t("min")}
                           </div>
                         )}
 
@@ -512,7 +515,7 @@ export default function RoundtablePage() {
                           {archive.title}
                         </h3>
                         <p className="text-sm text-gray-500">
-                          {new Date(archive.recorded_at).toLocaleDateString("en-US", {
+                          {new Date(archive.recorded_at).toLocaleDateString(undefined, {
                             month: "short",
                             day: "numeric",
                             year: "numeric",

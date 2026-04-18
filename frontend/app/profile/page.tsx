@@ -12,6 +12,7 @@ import { apiClient } from "@/lib/api";
 import { BadgeTrophyCase } from "@/components/BadgeTrophyCase";
 import { ReferralSection } from "@/components/ReferralSection";
 import SubscriptionManager from "@/components/SubscriptionManager";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Course {
   id: string;
@@ -35,6 +36,7 @@ interface Lesson {
 }
 
 export default function ProfilePage() {
+  const t = useTranslations("profile");
   const { user, loading, logout, refreshUser } = useAuth();
   const router = useRouter();
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
@@ -61,7 +63,7 @@ export default function ProfilePage() {
       await refreshUser();
       setIsEditingInstagram(false);
     } catch (error: any) {
-      setInstagramError(error?.message || "Failed to update Instagram link");
+      setInstagramError(error?.message || t("instagramUpdateFailed"));
     } finally {
       setUpdatingInstagram(false);
     }
@@ -69,7 +71,7 @@ export default function ProfilePage() {
 
   const handleUpdateUsername = async () => {
     if (!newUsername || newUsername.length < 3) {
-      setUsernameError("Username must be at least 3 characters");
+      setUsernameError(t("usernameTooShort"));
       return;
     }
 
@@ -85,7 +87,7 @@ export default function ProfilePage() {
       if (error.message && error.message.includes("Detail:")) {
         setUsernameError(error.message);
       } else {
-        setUsernameError(error.message || "Failed to update username. Try another one.");
+        setUsernameError(error.message || t("usernameUpdateFailed"));
       }
     } finally {
       setUpdatingUsername(false);
@@ -144,7 +146,7 @@ export default function ProfilePage() {
   if (loading) {
     return (
       <div className="min-h-screen bg-mambo-dark flex items-center justify-center">
-        <div className="text-gray-400">Loading...</div>
+        <div className="text-gray-400">{t("loading")}</div>
       </div>
     );
   }
@@ -228,14 +230,14 @@ export default function ProfilePage() {
                 onChange={async (e) => {
                   const file = e.target.files?.[0];
                   if (!file) return;
-                  if (file.size > 5 * 1024 * 1024) { alert("File size must be less than 5MB"); return; }
+                  if (file.size > 5 * 1024 * 1024) { alert(t("fileTooLarge")); return; }
                   setUploadingAvatar(true);
                   try {
                     const { upload_url, public_url } = await apiClient.getPresignedUploadUrl(file.type, "avatars");
                     await fetch(upload_url, { method: "PUT", body: file, headers: { "Content-Type": file.type } });
                     await apiClient.updateProfile({ avatar_url: public_url });
                     await refreshUser();
-                  } catch (error) { console.error("Failed to upload avatar:", error); alert("Failed to upload image. Please try again."); }
+                  } catch (error) { console.error("Failed to upload avatar:", error); alert(t("uploadFailed")); }
                   finally { setUploadingAvatar(false); e.target.value = ""; }
                 }}
                 disabled={uploadingAvatar}
@@ -251,11 +253,11 @@ export default function ProfilePage() {
                     value={newUsername}
                     onChange={(e) => setNewUsername(e.target.value)}
                     className="bg-black/40 border border-gray-600 rounded px-2 py-1 text-white text-sm font-bold flex-1 min-w-0 focus:ring-1 focus:ring-mambo-gold focus:border-transparent outline-none"
-                    placeholder="Username"
+                    placeholder={t("usernamePlaceholder")}
                     autoFocus
                   />
                   <button onClick={handleUpdateUsername} disabled={updatingUsername} className="px-2 py-1 bg-green-600 text-white text-xs rounded font-bold disabled:opacity-50">
-                    {updatingUsername ? "..." : "Save"}
+                    {updatingUsername ? t("savingShort") : t("saveBtn")}
                   </button>
                   <button onClick={() => { setIsEditingUsername(false); setNewUsername(user.username || ""); setUsernameError(""); }} className="px-2 py-1 bg-gray-700 text-white text-xs rounded">
                     X
@@ -285,7 +287,7 @@ export default function ProfilePage() {
             <button
               onClick={() => { logout(); router.push("/"); }}
               className="w-8 h-8 flex items-center justify-center text-gray-500 hover:text-red-400 transition shrink-0"
-              title="Log Out"
+              title={t("logoutAria")}
             >
               <FaSignOutAlt className="text-sm" />
             </button>
@@ -294,8 +296,8 @@ export default function ProfilePage() {
           {/* 2. Level Progress Bar */}
           <div className="bg-mambo-panel border border-gray-800 rounded-lg p-3">
             <div className="flex justify-between items-center mb-1.5">
-              <span className="text-sm font-bold text-mambo-gold">LVL {user.level}</span>
-              <span className="text-xs text-gray-400">{user.xp.toLocaleString()} / {nextLevelXP.toLocaleString()} XP</span>
+              <span className="text-sm font-bold text-mambo-gold">{t("xpProgressLabel", { level: user.level })}</span>
+              <span className="text-xs text-gray-400">{t("xpProgressCounter", { current: user.xp.toLocaleString(), total: nextLevelXP.toLocaleString() })}</span>
             </div>
             <div className="w-full bg-gray-800 h-2.5 rounded-full overflow-hidden">
               <div
@@ -304,7 +306,7 @@ export default function ProfilePage() {
               />
             </div>
             <p className="text-[10px] text-gray-500 mt-1">
-              {Math.max(0, nextLevelXP - user.xp).toLocaleString()} XP to Level {user.level + 1}
+              {t("xpToNextLevel", { xp: Math.max(0, nextLevelXP - user.xp).toLocaleString(), nextLevel: user.level + 1 })}
             </p>
           </div>
 
@@ -312,32 +314,32 @@ export default function ProfilePage() {
           <div className="grid grid-cols-3 gap-1.5">
             <div className="bg-mambo-panel border border-gray-800/60 rounded-lg p-2 flex flex-col items-center text-center">
               <FaFire className="text-sm text-orange-500 mb-0.5" />
-              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">Streak</span>
-              <span className="text-sm font-bold text-mambo-text">{user.streak_count}d</span>
+              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">{t("statStreakLabel")}</span>
+              <span className="text-sm font-bold text-mambo-text">{t("statStreakShort", { count: user.streak_count })}</span>
             </div>
             <div className="bg-mambo-panel border border-gray-800/60 rounded-lg p-2 flex flex-col items-center text-center">
               <FaBolt className="text-sm text-mambo-gold mb-0.5" />
-              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">XP</span>
+              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">{t("statXpLabel")}</span>
               <span className="text-sm font-bold text-mambo-text">{user.xp.toLocaleString()}</span>
             </div>
             <div className="bg-mambo-panel border border-gray-800/60 rounded-lg p-2 flex flex-col items-center text-center">
               <FaMedal className="text-sm text-blue-500 mb-0.5" />
-              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">Tier</span>
+              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">{t("statTierLabel")}</span>
               <span className="text-sm font-bold text-mambo-text capitalize">{user.tier}</span>
             </div>
             <div className="bg-mambo-panel border border-gray-800/60 rounded-lg p-2 flex flex-col items-center text-center">
               <FaStar className="text-sm text-yellow-400 mb-0.5" />
-              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">Rep</span>
+              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">{t("statReputationShort")}</span>
               <span className="text-sm font-bold text-mambo-text">{user.reputation}</span>
             </div>
             <div className="bg-mambo-panel border border-gray-800/60 rounded-lg p-2 flex flex-col items-center text-center">
               <span className="text-sm mb-0.5">🥢</span>
-              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">Claves</span>
+              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">{t("statClavesLabel")}</span>
               <span className="text-sm font-bold text-mambo-text">{user.current_claves}</span>
             </div>
             <div className="bg-mambo-panel border border-gray-800/60 rounded-lg p-2 flex flex-col items-center text-center">
               <FaCheck className="text-sm text-green-500 mb-0.5" />
-              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">Solved</span>
+              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">{t("statSolvedLabel")}</span>
               <span className="text-sm font-bold text-mambo-text">{user.stats?.solutions_accepted ?? 0}</span>
             </div>
           </div>
@@ -346,11 +348,11 @@ export default function ProfilePage() {
           {user.stats && (
             <div className="flex gap-2">
               <div className="flex-1 bg-mambo-panel/50 border border-gray-800/40 rounded-lg px-3 py-2 flex items-center justify-between">
-                <span className="text-[10px] text-gray-500">Reactions Given</span>
+                <span className="text-[10px] text-gray-500">{t("reactionsGiven")}</span>
                 <span className="text-sm font-bold text-white">{user.stats.reactions_given}</span>
               </div>
               <div className="flex-1 bg-mambo-panel/50 border border-gray-800/40 rounded-lg px-3 py-2 flex items-center justify-between">
-                <span className="text-[10px] text-gray-500">Reactions Received</span>
+                <span className="text-[10px] text-gray-500">{t("reactionsReceived")}</span>
                 <span className="text-sm font-bold text-white">{user.stats.reactions_received}</span>
               </div>
             </div>
@@ -380,12 +382,12 @@ export default function ProfilePage() {
                 )}
                 {/* Level badge - green and visible */}
                 <div className="absolute bottom-1 right-1 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full border-2 border-white shadow-lg z-10">
-                  Lvl {user.level}
+                  {t("levelBadge", { level: user.level })}
                 </div>
                 {/* Hover overlay with upload functionality */}
                 <div className="absolute inset-0 rounded-full bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center z-20">
-                  <div className="text-white text-sm font-semibold mb-1">Replace profile picture</div>
-                  <div className="text-white/80 text-xs">JPG, PNG, WebP (5MB max)</div>
+                  <div className="text-white text-sm font-semibold mb-1">{t("replaceProfilePicture")}</div>
+                  <div className="text-white/80 text-xs">{t("fileFormatsHint")}</div>
                 </div>
                 {/* Hidden file input */}
                 <input
@@ -398,7 +400,7 @@ export default function ProfilePage() {
 
                     // Check file size (5MB max)
                     if (file.size > 5 * 1024 * 1024) {
-                      alert("File size must be less than 5MB");
+                      alert(t("fileTooLarge"));
                       return;
                     }
 
@@ -425,7 +427,7 @@ export default function ProfilePage() {
                       await refreshUser();
                     } catch (error) {
                       console.error("Failed to upload avatar:", error);
-                      alert("Failed to upload image. Please try again.");
+                      alert(t("uploadFailed"));
                     } finally {
                       setUploadingAvatar(false);
                       // Reset input
@@ -442,7 +444,7 @@ export default function ProfilePage() {
                   disabled={uploadingAvatar}
                   className="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white text-sm font-semibold rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Remove Image
+                  {t("removeImage")}
                 </button>
               )}
             </div>
@@ -457,10 +459,10 @@ export default function ProfilePage() {
                         value={newUsername}
                         onChange={(e) => setNewUsername(e.target.value)}
                         className="bg-black/40 border border-gray-600 rounded-lg px-3 py-1 text-white text-xl font-bold w-full max-w-xs focus:ring-2 focus:ring-mambo-gold focus:border-transparent outline-none"
-                        placeholder="Enter new username"
+                        placeholder={t("usernamePlaceholderLong")}
                         autoFocus
                       />
-                      <span className="text-xs text-gray-500">3-30 chars, letters/numbers only</span>
+                      <span className="text-xs text-gray-500">{t("usernameHint")}</span>
                     </div>
                     <button
                       onClick={handleUpdateUsername}
@@ -470,7 +472,7 @@ export default function ProfilePage() {
                       {updatingUsername ? (
                         <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                       ) : (
-                        "Save"
+                        t("saveBtn")
                       )}
                     </button>
                     <button
@@ -482,7 +484,7 @@ export default function ProfilePage() {
                       disabled={updatingUsername}
                       className="p-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg transition"
                     >
-                      Cancel
+                      {t("cancelBtn")}
                     </button>
                   </div>
                 ) : (
@@ -496,7 +498,7 @@ export default function ProfilePage() {
                         setIsEditingUsername(true);
                       }}
                       className="opacity-0 group-hover/username:opacity-100 p-1.5 text-gray-400 hover:text-white transition-all transform hover:scale-110"
-                      title="Edit Username"
+                      title={t("editUsername")}
                     >
                       <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
@@ -514,11 +516,11 @@ export default function ProfilePage() {
                     }}
                     className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-bold text-gray-300 transition shrink-0"
                   >
-                    Log Out
+                    {t("logout")}
                   </button>
                 </div>
               </div>
-              <p className="text-gray-400 mb-4">Mambo Engineer • Member since 2024</p>
+              <p className="text-gray-400 mb-4">{t("memberSinceYear")}</p>
 
               {/* Instagram Link */}
               <div className="mb-6">
@@ -529,7 +531,7 @@ export default function ProfilePage() {
                         type="text"
                         value={newInstagram}
                         onChange={(e) => setNewInstagram(e.target.value)}
-                        placeholder="@handle or https://instagram.com/handle"
+                        placeholder={t("instagramPlaceholder")}
                         className="flex-1 bg-black/40 border border-gray-600 rounded-lg px-3 py-2 text-white text-sm focus:ring-2 focus:ring-pink-500 focus:border-transparent outline-none"
                         autoFocus
                       />
@@ -538,7 +540,7 @@ export default function ProfilePage() {
                         disabled={updatingInstagram}
                         className="px-3 py-2 bg-green-600 hover:bg-green-500 text-white text-sm rounded-lg font-bold transition disabled:opacity-50"
                       >
-                        {updatingInstagram ? "…" : "Save"}
+                        {updatingInstagram ? t("instagramSaving") : t("saveBtn")}
                       </button>
                       <button
                         onClick={() => {
@@ -548,11 +550,11 @@ export default function ProfilePage() {
                         }}
                         className="px-3 py-2 bg-gray-700 hover:bg-gray-600 text-white text-sm rounded-lg transition"
                       >
-                        Cancel
+                        {t("cancelBtn")}
                       </button>
                     </div>
                     {instagramError && <div className="text-red-500 text-xs">{instagramError}</div>}
-                    <span className="text-xs text-gray-500">Leave empty to remove the link.</span>
+                    <span className="text-xs text-gray-500">{t("instagramLeaveEmpty")}</span>
                   </div>
                 ) : user.instagram_url ? (
                   <div className="flex items-center gap-3">
@@ -565,7 +567,7 @@ export default function ProfilePage() {
                       <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
                         <path d="M12 2.2c3.2 0 3.58 0 4.85.07 1.17.05 1.8.25 2.22.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.05.41 2.22.07 1.27.07 1.65.07 4.85s0 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.22-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.05.36-2.22.41-1.27.07-1.65.07-4.85.07s-3.58 0-4.85-.07c-1.17-.05-1.8-.25-2.22-.41-.56-.22-.96-.48-1.38-.9-.42-.42-.68-.82-.9-1.38-.16-.42-.36-1.05-.41-2.22C2.2 15.58 2.2 15.2 2.2 12s0-3.58.07-4.85c.05-1.17.25-1.8.41-2.22.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.05-.36 2.22-.41C8.42 2.2 8.8 2.2 12 2.2zm0 2c-3.14 0-3.5 0-4.74.07-.98.04-1.51.21-1.86.35-.47.18-.8.4-1.15.75-.35.35-.57.68-.75 1.15-.14.35-.31.88-.35 1.86C3.2 9.5 3.2 9.86 3.2 13s0 3.5.07 4.74c.04.98.21 1.51.35 1.86.18.47.4.8.75 1.15.35.35.68.57 1.15.75.35.14.88.31 1.86.35 1.24.07 1.6.07 4.74.07s3.5 0 4.74-.07c.98-.04 1.51-.21 1.86-.35.47-.18.8-.4 1.15-.75.35-.35.57-.68.75-1.15.14-.35.31-.88.35-1.86.07-1.24.07-1.6.07-4.74s0-3.5-.07-4.74c-.04-.98-.21-1.51-.35-1.86a3.1 3.1 0 0 0-.75-1.15 3.1 3.1 0 0 0-1.15-.75c-.35-.14-.88-.31-1.86-.35C15.5 4.2 15.14 4.2 12 4.2zm0 3.4a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8zm0 2a2.4 2.4 0 1 0 0 4.8 2.4 2.4 0 0 0 0-4.8zm5-2.7a1.05 1.05 0 1 1 0 2.1 1.05 1.05 0 0 1 0-2.1z"/>
                       </svg>
-                      Connect on Instagram
+                      {t("instagramConnect")}
                     </a>
                     <button
                       onClick={() => {
@@ -574,7 +576,7 @@ export default function ProfilePage() {
                       }}
                       className="text-xs text-gray-400 hover:text-white underline"
                     >
-                      Edit
+                      {t("instagramEdit")}
                     </button>
                   </div>
                 ) : (
@@ -585,7 +587,7 @@ export default function ProfilePage() {
                     }}
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-gray-300 text-xs font-semibold hover:bg-white/10 transition"
                   >
-                    + Add Instagram
+                    {t("instagramAdd")}
                   </button>
                 )}
               </div>
@@ -594,21 +596,21 @@ export default function ProfilePage() {
                 <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
                   <FaFire className="text-orange-500" />
                   <div>
-                    <div className="text-xs text-gray-500 uppercase font-bold">Streak</div>
-                    <div className="font-bold text-mambo-text">{user.streak_count} Days</div>
+                    <div className="text-xs text-gray-500 uppercase font-bold">{t("statStreakLabel")}</div>
+                    <div className="font-bold text-mambo-text">{t("statStreakDays", { count: user.streak_count })}</div>
                   </div>
                 </div>
                 <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
                   <FaBolt className="text-mambo-gold" />
                   <div>
-                    <div className="text-xs text-gray-500 uppercase font-bold">XP</div>
+                    <div className="text-xs text-gray-500 uppercase font-bold">{t("statXpLabel")}</div>
                     <div className="font-bold text-mambo-text">{user.xp.toLocaleString()}</div>
                   </div>
                 </div>
                 <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
                   <FaMedal className="text-blue-500" />
                   <div>
-                    <div className="text-xs text-gray-500 uppercase font-bold">Tier</div>
+                    <div className="text-xs text-gray-500 uppercase font-bold">{t("statTierLabel")}</div>
                     <div className="font-bold text-mambo-text capitalize">{user.tier}</div>
                   </div>
                 </div>
@@ -616,14 +618,14 @@ export default function ProfilePage() {
                 <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
                   <FaStar className="text-yellow-400" />
                   <div>
-                    <div className="text-xs text-gray-500 uppercase font-bold">Reputation</div>
+                    <div className="text-xs text-gray-500 uppercase font-bold">{t("statReputationLabel")}</div>
                     <div className="font-bold text-mambo-text">{user.reputation}</div>
                   </div>
                 </div>
                 <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
                   <span className="text-lg">🥢</span>
                   <div>
-                    <div className="text-xs text-gray-500 uppercase font-bold">Claves</div>
+                    <div className="text-xs text-gray-500 uppercase font-bold">{t("statClavesLabel")}</div>
                     <div className="font-bold text-mambo-text">{user.current_claves}</div>
                   </div>
                 </div>
@@ -635,15 +637,15 @@ export default function ProfilePage() {
           {user.stats && (
             <div className="grid grid-cols-3 gap-2 sm:gap-4 mb-6 sm:mb-8">
               <div className="bg-mambo-panel border border-gray-800 p-2.5 sm:p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-0.5">
-                <span className="text-gray-400 text-[11px] sm:text-sm font-medium">Reactions Given</span>
+                <span className="text-gray-400 text-[11px] sm:text-sm font-medium">{t("reactionsGiven")}</span>
                 <span className="text-white font-bold text-lg">{user.stats.reactions_given}</span>
               </div>
               <div className="bg-mambo-panel border border-gray-800 p-2.5 sm:p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-0.5">
-                <span className="text-gray-400 text-[11px] sm:text-sm font-medium">Reactions Received</span>
+                <span className="text-gray-400 text-[11px] sm:text-sm font-medium">{t("reactionsReceived")}</span>
                 <span className="text-white font-bold text-lg">{user.stats.reactions_received}</span>
               </div>
               <div className="bg-mambo-panel border border-gray-800 p-2.5 sm:p-4 rounded-xl flex flex-col sm:flex-row items-start sm:items-center sm:justify-between gap-0.5">
-                <span className="text-gray-400 text-[11px] sm:text-sm font-medium">Solutions Accepted</span>
+                <span className="text-gray-400 text-[11px] sm:text-sm font-medium">{t("solutionsAccepted")}</span>
                 <span className="text-white font-bold text-lg">{user.stats.solutions_accepted}</span>
               </div>
             </div>
@@ -652,9 +654,9 @@ export default function ProfilePage() {
           {/* Level Progress */}
           <div className="bg-mambo-panel border border-gray-800 rounded-xl p-4 sm:p-6 mb-6 sm:mb-8">
             <div className="flex justify-between items-center mb-2">
-              <h2 className="text-xl font-bold text-mambo-text">Level Progress</h2>
+              <h2 className="text-xl font-bold text-mambo-text">{t("levelProgress")}</h2>
               <span className="text-gray-400 text-sm">
-                {user.xp.toLocaleString()} / {nextLevelXP.toLocaleString()} XP
+                {t("xpProgressCounter", { current: user.xp.toLocaleString(), total: nextLevelXP.toLocaleString() })}
               </span>
             </div>
             <div className="w-full bg-gray-800 h-3 rounded-full overflow-hidden">
@@ -664,7 +666,7 @@ export default function ProfilePage() {
               />
             </div>
             <p className="text-gray-400 text-sm mt-2">
-              {Math.max(0, nextLevelXP - user.xp).toLocaleString()} XP until Level {user.level + 1}
+              {t("xpUntilNextLevel", { xp: Math.max(0, nextLevelXP - user.xp).toLocaleString(), nextLevel: user.level + 1 })}
             </p>
           </div>
         </div>
@@ -688,10 +690,10 @@ export default function ProfilePage() {
 
           {/* Continue Learning Section — last on mobile, first on desktop */}
           <div className="order-3 lg:order-1">
-            <h2 className="text-xl font-bold mb-6 text-mambo-text">Continue Learning</h2>
+            <h2 className="text-xl font-bold mb-6 text-mambo-text">{t("continueLearning")}</h2>
 
             {loadingCourses ? (
-              <div className="text-center text-gray-400 py-8">Loading your courses...</div>
+              <div className="text-center text-gray-400 py-8">{t("loadingCourses")}</div>
             ) : activeCourses.length === 0 ? (
               <Link
                 href="/courses"
@@ -709,10 +711,10 @@ export default function ProfilePage() {
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-lg text-mambo-text mb-1">
-                      Start Your Journey
+                      {t("startJourney")}
                     </h3>
                     <p className="text-sm text-gray-500 mb-3">
-                      Explore all available worlds and lessons
+                      {t("exploreWorldsHint")}
                     </p>
                   </div>
                   <div className="w-10 h-10 rounded-full bg-mambo-blue flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">

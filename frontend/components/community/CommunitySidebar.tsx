@@ -4,6 +4,7 @@ import { useMemo } from "react";
 import { motion } from "framer-motion";
 import { Tv, FlaskConical, Bookmark } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/i18n/useTranslations";
 
 type ViewMode = "stage" | "lab" | "saved" | "my_posts";
 
@@ -21,13 +22,6 @@ interface CommunitySidebarProps {
     posts?: Post[]; // Pass posts to calculate counts
 }
 
-const levels = [
-    { id: "level-1", label: "Beginner", value: "beginner", keywords: ["beginner", "level 1", "level-1", "I"] },
-    { id: "level-2", label: "Intermediate", value: "intermediate", keywords: ["intermediate", "level 2", "level-2", "II"] },
-    { id: "level-3", label: "Advanced", value: "advanced", keywords: ["advanced", "level 3", "level-3", "III"] },
-    { id: "level-4", label: "Master", value: "master", keywords: ["master", "level 4", "level-4", "IV", "expert"] },
-];
-
 export default function CommunitySidebar({
     viewMode,
     onViewModeChange,
@@ -35,6 +29,13 @@ export default function CommunitySidebar({
     onLevelsChange,
     posts = [],
 }: CommunitySidebarProps) {
+    const t = useTranslations("community");
+    const levels = [
+        { id: "level-1", label: t("beginner"), value: "beginner", keywords: ["beginner", "level 1", "level-1", "I"] },
+        { id: "level-2", label: t("intermediate"), value: "intermediate", keywords: ["intermediate", "level 2", "level-2", "II"] },
+        { id: "level-3", label: t("advanced"), value: "advanced", keywords: ["advanced", "level 3", "level-3", "III"] },
+        { id: "level-4", label: t("master"), value: "master", keywords: ["master", "level 4", "level-4", "IV", "expert"] },
+    ];
     // Calculate counts for each filter
     const filterCounts = useMemo(() => {
         const levelCounts: Record<string, number> = {};
@@ -69,9 +70,9 @@ export default function CommunitySidebar({
             <div>
                 <nav className="space-y-2">
                     {[
-                        { mode: "stage" as ViewMode, label: "The Stage", icon: Tv },
-                        { mode: "lab" as ViewMode, label: "The Lab", icon: FlaskConical },
-                        { mode: "my_posts" as ViewMode, label: "My Posts", icon: Bookmark },
+                        { mode: "stage" as ViewMode, label: t("theStage"), icon: Tv },
+                        { mode: "lab" as ViewMode, label: t("theLab"), icon: FlaskConical },
+                        { mode: "my_posts" as ViewMode, label: t("myPosts"), icon: Bookmark },
                     ].map(({ mode, label, icon: Icon }) => (
                         <motion.button
                             key={mode}
@@ -98,7 +99,7 @@ export default function CommunitySidebar({
             {/* Level Filter */}
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
                 <h3 className="text-xs font-bold text-[#D4AF37] uppercase tracking-[0.2em] mb-4 font-serif pl-2">
-                    Experience Level
+                    {t("experienceLevel")}
                 </h3>
                 <div className="space-y-2">
                     {levels.map((level) => {

@@ -6,8 +6,10 @@ import { apiClient } from "@/lib/api";
 import { GlassCard } from "./ui/GlassCard";
 import { MagicButton } from "./ui/MagicButton";
 import { UISound } from "@/hooks/useUISound";
+import { useTranslations } from "@/i18n/useTranslations";
 
 export function ReferralSection() {
+  const t = useTranslations("profile");
   const [referralCount, setReferralCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [copied, setCopied] = useState(false);
@@ -49,15 +51,15 @@ export function ReferralSection() {
     <GlassCard className="p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-xl font-bold text-white mb-1">🎁 Referral Program</h2>
+          <h2 className="text-xl font-bold text-white mb-1">{t("referralTitle")}</h2>
           <p className="text-sm text-white/50">
-            Share your link and earn 50 claves per referral!
+            {t("referralSubtitle")}
           </p>
         </div>
         {referralCount !== null && (
           <div className="text-right">
             <div className="text-2xl font-bold text-amber-400">{referralCount}</div>
-            <div className="text-xs text-white/40">Referrals</div>
+            <div className="text-xs text-white/40">{t("referralCountLabel")}</div>
           </div>
         )}
       </div>
@@ -65,7 +67,7 @@ export function ReferralSection() {
       {/* Referral Link */}
       <div className="mb-4 p-4 rounded-lg bg-white/5 border border-white/10">
         <label className="block text-sm font-semibold text-white/70 mb-2">
-          Your Referral Link
+          {t("yourReferralLink")}
         </label>
         <div className="flex gap-2">
           <input
@@ -79,17 +81,17 @@ export function ReferralSection() {
             variant="secondary"
             size="sm"
           >
-            {copied ? "✓ Copied" : "Copy"}
+            {copied ? t("copiedBtn") : t("copyBtn")}
           </MagicButton>
         </div>
       </div>
 
       {/* Info */}
       <div className="text-xs text-white/50 space-y-1">
-        <p>• You earn 50 claves when someone signs up using your link</p>
-        <p>• Your friend gets a welcome bonus too!</p>
+        <p>{t("referralInfo1")}</p>
+        <p>{t("referralInfo2")}</p>
         <p className="text-amber-400/70 mt-2">
-          Note: Full referral system coming soon. This is a preview.
+          {t("referralComingSoon")}
         </p>
       </div>
     </GlassCard>

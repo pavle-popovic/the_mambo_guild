@@ -6,9 +6,11 @@ import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
 import { FaInstagram, FaYoutube, FaTrophy, FaMusic } from "react-icons/fa";
+import { useTranslations } from "@/i18n/useTranslations";
 
 export default function InstructorsPage() {
   const { user } = useAuth();
+  const t = useTranslations("instructors");
 
   return (
     <div className="min-h-screen bg-mambo-dark">
@@ -17,10 +19,10 @@ export default function InstructorsPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-8 py-16 sm:py-20 pt-24 sm:pt-28">
         <div className="text-center mb-16">
           <h1 className="text-5xl font-extrabold mb-6 text-mambo-text">
-            Meet Your Instructors
+            {t("pageTitle")}
           </h1>
           <p className="text-xl text-gray-400 max-w-2xl mx-auto">
-            Learn from world-class dancers who have dedicated their lives to mastering salsa on2
+            {t("pageSubtitle")}
           </p>
         </div>
 
@@ -37,12 +39,12 @@ export default function InstructorsPage() {
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
             </div>
-            
+
             <div className="p-8">
               <div className="flex items-center justify-between mb-4">
                 <div>
                   <h2 className="text-2xl font-bold text-mambo-text mb-1">Pavle Popovic</h2>
-                  <p className="text-mambo-blue font-semibold">Lead Instructor & Founder</p>
+                  <p className="text-mambo-blue font-semibold">{t("role")}</p>
                 </div>
                 <div className="flex gap-3">
                   <a
@@ -67,10 +69,7 @@ export default function InstructorsPage() {
               </div>
 
               <p className="text-gray-400 mb-6 leading-relaxed">
-                With 10 years of experience in salsa on2, Pavle combines his passion for dance
-                with expertise in learning design. As a certified Learning Experience Designer (LXD),
-                he has collaborated with leading experts to study motor pattern learning and dance
-                training methodologies, bringing evidence-based teaching approaches to his students.
+                {t("bio")}
               </p>
 
               <div className="space-y-4">
@@ -79,11 +78,9 @@ export default function InstructorsPage() {
                     <FaTrophy className="text-lg" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-mambo-text mb-1">Certified LXD</h3>
+                    <h3 className="font-bold text-mambo-text mb-1">{t("credCertTitle")}</h3>
                     <p className="text-sm text-gray-500">
-                      Certified Learning Experience Designer with a focus on motor pattern learning
-                      and dance training. Collaborates with experts to develop effective teaching
-                      methodologies.
+                      {t("credCertBody")}
                     </p>
                   </div>
                 </div>
@@ -93,11 +90,9 @@ export default function InstructorsPage() {
                     <FaMusic className="text-lg" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-mambo-text mb-1">Research-Based Teaching</h3>
+                    <h3 className="font-bold text-mambo-text mb-1">{t("credResearchTitle")}</h3>
                     <p className="text-sm text-gray-500">
-                      Combines 10 years of dance experience with scientific research on motor pattern
-                      learning to create structured, effective training programs that help students
-                      progress faster and more efficiently.
+                      {t("credResearchBody")}
                     </p>
                   </div>
                 </div>
@@ -105,9 +100,7 @@ export default function InstructorsPage() {
 
               <div className="mt-6 pt-6 border-t border-gray-800">
                 <p className="text-sm text-gray-500 italic">
-                  &quot;Dancing is not just about steps—it&apos;s about connection, musicality, and
-                  expressing yourself through movement. My goal is to help you find your own voice
-                  on the dance floor.&quot;
+                  &ldquo;{t("quote")}&rdquo;
                 </p>
               </div>
             </div>
@@ -116,38 +109,35 @@ export default function InstructorsPage() {
           {/* Additional Instructors Section */}
           <div className="space-y-6">
             <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-mambo-text mb-4">Join Our Team</h3>
+              <h3 className="text-xl font-bold text-mambo-text mb-4">{t("joinTeamTitle")}</h3>
               <p className="text-gray-400 mb-4 text-sm leading-relaxed">
-                We&apos;re always looking for passionate instructors who share our vision of
-                making quality salsa education accessible to everyone.
+                {t("joinTeamBody")}
               </p>
               <Link
                 href="#"
                 className="inline-block px-6 py-3 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-lg transition text-sm"
               >
-                Apply to Teach
+                {t("joinTeamCta")}
               </Link>
             </div>
 
             <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-mambo-text mb-4">Guest Instructors</h3>
+              <h3 className="text-xl font-bold text-mambo-text mb-4">{t("guestTitle")}</h3>
               <p className="text-gray-400 text-sm leading-relaxed">
-                Throughout the year, we host workshops with internationally renowned salsa
-                instructors, bringing you diverse perspectives and advanced techniques from around
-                the world.
+                {t("guestBody")}
               </p>
             </div>
 
             <div className="bg-gradient-to-br from-mambo-blue/10 to-purple-600/10 border border-mambo-blue/30 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-mambo-text mb-2">Want to Learn More?</h3>
+              <h3 className="text-lg font-bold text-mambo-text mb-2">{t("learnMoreTitle")}</h3>
               <p className="text-gray-400 text-sm mb-4">
-                Check out our courses and start your journey with us today.
+                {t("learnMoreBody")}
               </p>
               <Link
                 href="/courses"
                 className="inline-block px-6 py-2 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-lg transition text-sm"
               >
-                Explore Courses
+                {t("learnMoreCta")}
               </Link>
             </div>
           </div>
@@ -158,4 +148,3 @@ export default function InstructorsPage() {
     </div>
   );
 }
-
