@@ -84,10 +84,7 @@ export default function TestimonialsSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-4 sm:mb-10 md:mb-14"
         >
-          <h2
-            className="text-xl sm:text-3xl md:text-5xl font-bold mb-2 sm:mb-4 text-mambo-text tracking-tight font-serif italic"
-            style={{ fontFamily: '"Playfair Display", serif' }}
-          >
+          <h2 className="text-xl sm:text-3xl md:text-5xl font-extrabold mb-2 sm:mb-4 text-mambo-text tracking-tight">
             What Dancers <span className="text-mambo-gold drop-shadow-md">Say</span>
           </h2>
         </motion.div>

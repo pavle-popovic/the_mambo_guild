@@ -168,7 +168,7 @@ export default function NewHero() {
                             <span className="block font-extrabold text-[clamp(1.5rem,2.2vw,2.25rem)] landscape-phone:!text-xl">
                                 Every move, every technique.
                             </span>
-                            <span className="block font-serif font-bold italic text-mambo-gold text-[clamp(2rem,3.2vw,3.5rem)] drop-shadow-[0_0_30px_rgba(212,175,55,0.35)] landscape-phone:!text-2xl">
+                            <span className="block font-extrabold text-mambo-gold text-[clamp(2rem,3.2vw,3.5rem)] drop-shadow-[0_0_30px_rgba(212,175,55,0.35)] landscape-phone:!text-2xl">
                                 Level 0 to 100.
                             </span>
                         </h1>

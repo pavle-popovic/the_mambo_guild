@@ -100,7 +100,7 @@ export default function FAQSection() {
                     <div className="mb-4 inline-block rounded-full border border-mambo-gold/30 bg-mambo-gold/5 px-3 py-1 text-[11px] font-bold tracking-[0.22em] text-mambo-gold">
                         FAQ
                     </div>
-                    <h2 className="font-serif text-3xl font-bold italic leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
+                    <h2 className="text-3xl font-extrabold leading-tight tracking-tight text-white sm:text-4xl lg:text-5xl">
                         Questions dancers ask us.
                     </h2>
                 </motion.div>
@@ -128,7 +128,7 @@ export default function FAQSection() {
                                     aria-controls={`faq-answer-${idx}`}
                                     className="flex w-full items-center justify-between gap-4 p-5 text-left sm:p-6"
                                 >
-                                    <span className="font-serif text-lg italic leading-snug text-white sm:text-xl">
+                                    <span className="text-lg font-semibold leading-snug text-white sm:text-xl">
                                         {f.q}
                                     </span>
                                     <Chevron open={isOpen} />

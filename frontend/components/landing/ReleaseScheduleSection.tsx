@@ -199,10 +199,7 @@ function ReleaseCard({ item, compact = false }: { item: ReleaseItem; compact?: b
                         </span>
                     )}
                 </div>
-                <h4
-                    className={`mt-2 font-bold leading-tight text-white ${compact ? "text-sm" : "text-base"}`}
-                    style={{ fontFamily: '"Playfair Display", serif' }}
-                >
+                <h4 className={`mt-2 font-bold leading-tight text-white ${compact ? "text-sm" : "text-base"}`}>
                     {item.title}
                 </h4>
                 {item.artist && (
@@ -395,10 +392,7 @@ function CountdownHero({ release }: { release: ReleaseItem }) {
                         {release.type === "course" ? "Course" : "Choreography"}
                     </span>
                 </div>
-                <h3
-                    className="mt-3 text-2xl italic text-white sm:text-4xl"
-                    style={{ fontFamily: '"Playfair Display", serif' }}
-                >
+                <h3 className="mt-3 text-2xl font-extrabold text-white sm:text-4xl tracking-tight">
                     {release.title}
                 </h3>
                 {release.artist && <p className="mt-1 text-sm text-gray-400 sm:text-base">{release.artist}</p>}
@@ -440,11 +434,8 @@ export default function ReleaseScheduleSection() {
                     <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-bold uppercase tracking-[0.25em] text-amber-300 backdrop-blur-sm">
                         <HiSparkles /> Release Calendar
                     </div>
-                    <h2
-                        className="mt-4 text-3xl font-bold text-mambo-text sm:text-4xl md:text-5xl"
-                        style={{ fontFamily: '"Playfair Display", serif' }}
-                    >
-                        The Road <span className="italic text-mambo-gold">Ahead</span>
+                    <h2 className="mt-4 text-3xl font-extrabold text-mambo-text sm:text-4xl md:text-5xl tracking-tight">
+                        The Road <span className="text-mambo-gold">Ahead</span>
                     </h2>
                     <p className="mx-auto mt-3 max-w-2xl text-sm text-gray-400 md:text-base">
                         Every two weeks a new choreography drops. Full courses land between them. Here's what's coming next to The Guild.
@@ -563,10 +554,7 @@ export function ReleaseScheduleButton() {
                                   <div className="inline-flex items-center gap-2 rounded-full border border-amber-300/40 bg-amber-300/10 px-3 py-1 text-[9px] font-black uppercase tracking-widest text-amber-200">
                                       <HiSparkles /> Upcoming Drops
                                   </div>
-                                  <h4
-                                      className="mt-2 text-lg italic text-white"
-                                      style={{ fontFamily: '"Playfair Display", serif' }}
-                                  >
+                                  <h4 className="mt-2 text-lg font-bold text-white">
                                       Next: {next.title}
                                   </h4>
                                   <p className="text-xs text-gray-400">
@@ -691,10 +679,7 @@ function MobileModal({ open, onClose, next, items }: { open: boolean; onClose: (
                                 <div className="text-[9px] font-black uppercase tracking-widest text-amber-300">
                                     Next Drop — {fmtFull(target)}
                                 </div>
-                                <h3
-                                    className="mt-1 text-lg italic text-white"
-                                    style={{ fontFamily: '"Playfair Display", serif' }}
-                                >
+                                <h3 className="mt-1 text-lg font-bold text-white">
                                     {next.title}
                                 </h3>
                                 {next.artist && <p className="text-xs text-gray-400">{next.artist}</p>}

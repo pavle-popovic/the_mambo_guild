@@ -190,10 +190,7 @@ export default function LandingPricingSection() {
           transition={{ duration: 0.6 }}
           className="text-center mb-8 sm:mb-16"
         >
-          <h2
-            className="text-4xl md:text-5xl font-bold mb-8 text-mambo-text tracking-tight font-serif italic"
-            style={{ fontFamily: '"Playfair Display", serif' }}
-          >
+          <h2 className="text-4xl md:text-5xl font-extrabold mb-8 text-mambo-text tracking-tight">
             Join The <span className="text-mambo-gold drop-shadow-md">Mambo Guild Now</span>
           </h2>
         </motion.div>

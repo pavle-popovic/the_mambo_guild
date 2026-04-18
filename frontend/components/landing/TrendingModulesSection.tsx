@@ -236,11 +236,8 @@ export default function TrendingModulesSection() {
                     transition={{ duration: 0.6 }}
                     className="text-center mb-6 md:mb-14"
                 >
-                    <h2
-                        className="text-3xl sm:text-4xl md:text-5xl font-bold mb-4 text-mambo-text font-serif"
-                        style={{ fontFamily: '"Playfair Display", serif' }}
-                    >
-                        Trending <span className="text-mambo-gold italic">Modules</span>
+                    <h2 className="text-3xl sm:text-4xl md:text-5xl font-extrabold mb-4 text-mambo-text tracking-tight">
+                        Trending <span className="text-mambo-gold">Modules</span>
                     </h2>
                     <p className="text-gray-400 text-base md:text-lg max-w-2xl mx-auto">
                         Join thousands of dancers mastering these popular modules

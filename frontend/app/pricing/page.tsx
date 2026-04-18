@@ -550,7 +550,7 @@ function PricingPageContent() {
             >
               ×
             </button>
-            <h2 className="text-2xl font-serif font-bold text-mambo-text mb-2">
+            <h2 className="text-2xl font-extrabold text-mambo-text mb-2 tracking-tight">
               Downgrade to <span className="text-amber-300">Pro</span>?
             </h2>
             <p className="text-gray-400 mb-5">

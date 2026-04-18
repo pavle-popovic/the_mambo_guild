@@ -296,10 +296,7 @@ export default function HowItWorksSection() {
           <div className="inline-block mb-4 px-3 py-1 text-[11px] tracking-[0.22em] font-bold text-mambo-gold border border-mambo-gold/30 rounded-full bg-mambo-gold/5">
             HOW IT WORKS
           </div>
-          <h2
-            className="text-4xl sm:text-5xl lg:text-6xl font-bold text-mambo-text tracking-tight italic landscape-phone:text-3xl"
-            style={{ fontFamily: '"Playfair Display", serif' }}
-          >
+          <h2 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-mambo-text tracking-tight landscape-phone:text-3xl">
             Everything you need to{" "}
             <span className="text-mambo-gold drop-shadow-md">actually get good.</span>
           </h2>
@@ -334,10 +331,7 @@ export default function HowItWorksSection() {
                   <div className="inline-block mb-2 sm:mb-3 text-[10px] sm:text-xs tracking-[0.22em] font-bold text-mambo-gold landscape-phone:text-[9px] landscape-phone:mb-2">
                     {pillar.eyebrow}
                   </div>
-                  <h3
-                    className="text-[1.7rem] sm:text-4xl lg:text-5xl font-bold text-white mb-3 sm:mb-5 leading-[1.15] sm:leading-tight tracking-tight italic landscape-phone:text-xl landscape-phone:mb-2"
-                    style={{ fontFamily: '"Playfair Display", serif' }}
-                  >
+                  <h3 className="text-[1.7rem] sm:text-4xl lg:text-5xl font-extrabold text-white mb-3 sm:mb-5 leading-[1.15] sm:leading-tight tracking-tight landscape-phone:text-xl landscape-phone:mb-2">
                     {pillar.title}
                   </h3>
                   <p className="text-[14px] sm:text-lg text-mambo-text/75 leading-snug sm:leading-relaxed mb-4 sm:mb-6 landscape-phone:text-xs landscape-phone:mb-3 landscape-phone:leading-snug">
@@ -389,10 +383,7 @@ export default function HowItWorksSection() {
           <div className="relative overflow-hidden rounded-3xl border border-mambo-gold/25 bg-gradient-to-b from-black/60 to-mambo-dark px-6 py-14 sm:py-20 text-center landscape-phone:py-10 landscape-phone:rounded-2xl">
             <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(252,226,5,0.18),transparent_60%)]" />
             <div className="relative">
-              <h3
-                className="text-3xl sm:text-5xl font-bold text-mambo-text tracking-tight italic landscape-phone:text-2xl"
-                style={{ fontFamily: '"Playfair Display", serif' }}
-              >
+              <h3 className="text-3xl sm:text-5xl font-extrabold text-mambo-text tracking-tight landscape-phone:text-2xl">
                 7 days. <span className="text-mambo-gold drop-shadow-md">On the house.</span>
               </h3>
               <p className="mt-4 max-w-xl mx-auto text-base sm:text-lg text-mambo-text/75 landscape-phone:text-sm landscape-phone:mt-2">
