@@ -198,10 +198,7 @@ def get_lesson(
                 status_code=403,
                 detail="Subscription required. Please upgrade to access this course."
             )
-        raise HTTPException(
-            status_code=403,
-            detail="Lesson locked. Complete prerequisites to unlock."
-        )
+        raise HTTPException(status_code=403, detail="Access denied.")
 
     # Get all lessons in the world, sorted by week_number, day_number, and order_index
     all_lessons = []

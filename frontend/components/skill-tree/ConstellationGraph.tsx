@@ -165,6 +165,10 @@ function ConstellationGraphInner({
   const { user } = useAuth();
   const [showAuthModal, setShowAuthModal] = useState(false);
   const [showSubscribeModal, setShowSubscribeModal] = useState(false);
+  const [skipConfirmLevel, setSkipConfirmLevel] = useState<{
+    id: string;
+    title: string;
+  } | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [hoveredNode, setHoveredNode] = useState<HoveredNode | null>(null);
   const hoverTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -292,6 +296,44 @@ function ConstellationGraphInner({
     }, 150);
   }, [isTouchDevice]);
 
+  // Fetch lessons for a level and navigate to the next one. Shared between
+  // the "recommended path" click and the "skip prerequisites" confirm flow.
+  const navigateToModule = useCallback(
+    async (levelId: string) => {
+      try {
+        const response = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/courses/levels/${levelId}/lessons`,
+          { credentials: "include" as RequestCredentials }
+        );
+
+        if (response.status === 401) {
+          setShowAuthModal(true);
+          return;
+        }
+        if (response.status === 403) {
+          setShowSubscribeModal(true);
+          return;
+        }
+
+        if (response.ok) {
+          const lessons = await response.json();
+          if (lessons && lessons.length > 0) {
+            const sortedLessons = lessons.sort(
+              (a: any, b: any) => a.order_index - b.order_index
+            );
+            const nextLesson =
+              sortedLessons.find((l: any) => !l.is_completed) || sortedLessons[0];
+            router.push(`/lesson/${nextLesson.id}`);
+            onNodeClick?.(levelId);
+          }
+        }
+      } catch (err) {
+        console.error("Failed to fetch lessons:", err);
+      }
+    },
+    [router, onNodeClick]
+  );
+
   // Handle node click - navigate directly to first lesson of the module
   const handleNodeClick: NodeMouseHandler = useCallback(
     async (event, node) => {
@@ -305,14 +347,18 @@ function ConstellationGraphInner({
         return;
       }
 
-      // B9: On touch devices, tapping a LOCKED node should open the tooltip
-      // (which shows the preview + lock message + CTA) instead of doing
-      // nothing. Hover handlers are skipped on touch, so locked previews
-      // would otherwise be invisible on mobile.
-      if (isTouchDevice && !level.is_unlocked) {
+      // On touch devices, tapping a locked node opens the tooltip (preview +
+      // soft warning). The tooltip's locked block is itself a button that
+      // triggers the skip-confirm flow — so users still get the prompt, just
+      // with a preview step in between. Hover doesn't fire on touch, so
+      // without this branch, mobile users would never see the preview.
+      if (
+        isTouchDevice &&
+        !level.is_unlocked &&
+        level.completion_percentage < 100
+      ) {
         const nodeElement = event.currentTarget as HTMLElement;
         const rect = nodeElement.getBoundingClientRect();
-        // Anchor near the top so the clamp logic centers it nicely on phones
         const tooltipX = Math.max(12, rect.left);
         const tooltipY = Math.max(80, rect.bottom + 12);
         setHoveredNode({
@@ -349,47 +395,25 @@ function ConstellationGraphInner({
         return;
       }
 
-      // If unlocked, fetch lessons and navigate to first lesson
-      if (level.is_unlocked) {
-        try {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/courses/levels/${node.id}/lessons`,
-            {
-              credentials: "include" as RequestCredentials,
-            }
-          );
-
-          if (response.status === 401) {
-            // Token expired — prompt login instead of silently failing
-            setShowAuthModal(true);
-            return;
-          }
-
-          if (response.status === 403) {
-            // Subscription required
-            setShowSubscribeModal(true);
-            return;
-          }
-
-          if (response.ok) {
-            const lessons = await response.json();
-
-            if (lessons && lessons.length > 0) {
-              // Sort by order_index and find first incomplete lesson, or first lesson
-              const sortedLessons = lessons.sort((a: any, b: any) => a.order_index - b.order_index);
-              const nextLesson = sortedLessons.find((l: any) => !l.is_completed) || sortedLessons[0];
-              router.push(`/lesson/${nextLesson.id}`);
-              onNodeClick?.(node.id);
-              return;
-            }
-          }
-        } catch (err) {
-          console.error('Failed to fetch lessons:', err);
-        }
+      // Prerequisites not met — warn before letting the user skip ahead.
+      // Mastered modules (completion >= 100) always skip the prompt even if
+      // the backend still reports them as not-on-path after a tree reshuffle.
+      if (!level.is_unlocked && level.completion_percentage < 100) {
+        setSkipConfirmLevel({ id: level.id, title: level.title });
+        return;
       }
-      // If locked, tooltip already shows the message
+
+      await navigateToModule(node.id);
     },
-    [levels, courseId, router, onNodeClick, isAdminMode, isCourseLocked, user]
+    [
+      levels,
+      onNodeClick,
+      isAdminMode,
+      isCourseLocked,
+      user,
+      isTouchDevice,
+      navigateToModule,
+    ]
   );
 
   // Create nodes and edges — use stored positions when available, dagre as fallback
@@ -719,6 +743,12 @@ function ConstellationGraphInner({
             status={hoveredNode.status}
             tldr={hoveredNode.tldr}
             isAdminMode={isAdminMode}
+            onSkipRequest={() =>
+              setSkipConfirmLevel({
+                id: hoveredNode.levelId,
+                title: hoveredNode.title,
+              })
+            }
           />
         )}
       </AnimatePresence>
@@ -761,6 +791,67 @@ function ConstellationGraphInner({
         type="subscribe"
         courseTitle={courseTitle}
       />
+
+      {/* Skip-prerequisites confirmation */}
+      <AnimatePresence>
+        {skipConfirmLevel && (
+          <motion.div
+            className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setSkipConfirmLevel(null)}
+          >
+            <motion.div
+              className="relative w-full max-w-md bg-gradient-to-b from-gray-900/95 to-black/95 border border-yellow-900/30 rounded-2xl shadow-[0_0_60px_rgba(212,175,55,0.15)] p-6"
+              initial={{ scale: 0.92, y: 20, opacity: 0 }}
+              animate={{ scale: 1, y: 0, opacity: 1 }}
+              exit={{ scale: 0.95, y: 10, opacity: 0 }}
+              transition={{ type: "spring", damping: 22, stiffness: 320 }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <div className="flex items-start gap-3 mb-4">
+                <div className="w-10 h-10 rounded-full bg-yellow-900/30 border border-yellow-700/40 flex items-center justify-center flex-shrink-0">
+                  <span className="text-xl">⚠</span>
+                </div>
+                <div>
+                  <h3 className="text-lg font-bold text-yellow-200 leading-tight">
+                    Skip the recommended path?
+                  </h3>
+                  <p className="text-sm text-gray-400 mt-1">
+                    {skipConfirmLevel.title}
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-sm text-gray-300 leading-relaxed mb-6">
+                Modules are built on top of one another — some terms and
+                techniques will be assumed as understood. We recommend
+                following the path, but it&apos;s your call.
+              </p>
+
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button
+                  onClick={() => setSkipConfirmLevel(null)}
+                  className="flex-1 py-2.5 px-4 rounded-lg bg-gray-800/60 border border-gray-700/60 text-gray-200 text-sm font-medium hover:bg-gray-800 transition min-h-[44px]"
+                >
+                  Stay on path
+                </button>
+                <button
+                  onClick={() => {
+                    const id = skipConfirmLevel.id;
+                    setSkipConfirmLevel(null);
+                    void navigateToModule(id);
+                  }}
+                  className="flex-1 py-2.5 px-4 rounded-lg bg-gradient-to-r from-yellow-600 to-amber-600 border border-yellow-500/60 text-black text-sm font-semibold hover:from-yellow-500 hover:to-amber-500 transition min-h-[44px]"
+                >
+                  Skip anyway
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

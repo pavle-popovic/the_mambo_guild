@@ -24,6 +24,7 @@ interface NodeTooltipProps {
   status?: string;  // active, coming_soon, locked
   tldr?: string | null;  // Topic worlds: replaces video preview with lesson TL;DR
   isAdminMode?: boolean;  // In admin mode, don't show locked state
+  onSkipRequest?: () => void;  // Parent handler for "skip prerequisites" CTA
 }
 
 // Tooltip dimensions — clamped to viewport on small screens
@@ -50,6 +51,7 @@ export default function NodeTooltip({
   status = "active",
   tldr,
   isAdminMode = false,
+  onSkipRequest,
 }: NodeTooltipProps) {
   const hasTldr = !!tldr && tldr.trim().length > 0;
   // Auto-play preview when tooltip appears
@@ -218,17 +220,23 @@ export default function NodeTooltip({
             </div>
             <div className="px-4 pb-4">
               {displayLocked ? (
-                <div className="bg-gray-800/50 rounded-lg p-3 border border-gray-700/50">
+                <button
+                  onClick={() => {
+                    onClose();
+                    onSkipRequest?.();
+                  }}
+                  className="w-full bg-gray-800/50 rounded-lg p-3 border border-yellow-900/30 hover:border-yellow-700/50 transition text-left min-h-[44px]"
+                >
                   <div className="flex items-center gap-2">
-                    <Lock className="w-4 h-4 text-gray-500" />
-                    <span className="text-sm font-medium text-gray-400">
-                      Content Locked
+                    <Lock className="w-4 h-4 text-yellow-500/70" />
+                    <span className="text-sm font-medium text-yellow-300/90">
+                      Off the recommended path
                     </span>
                   </div>
-                  <p className="text-xs text-gray-500 mt-2">
-                    Complete the prerequisite modules to unlock this content.
+                  <p className="text-xs text-gray-400 mt-2">
+                    Tap to skip ahead — we&apos;ll confirm first.
                   </p>
-                </div>
+                </button>
               ) : (
                 <button
                   onClick={() => {
@@ -353,19 +361,25 @@ export default function NodeTooltip({
             </div>
           )}
 
-          {/* Locked Message - Only show in learner mode, not admin mode */}
+          {/* Off-path notice - Only show in learner mode, not admin mode */}
           {displayLocked ? (
-            <div className="bg-gray-800/50 rounded-lg p-3 mt-3 border border-gray-700/50">
+            <button
+              onClick={() => {
+                onClose();
+                onSkipRequest?.();
+              }}
+              className="w-full bg-gray-800/50 rounded-lg p-3 mt-3 border border-yellow-900/30 hover:border-yellow-700/50 transition text-left min-h-[44px]"
+            >
               <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-gray-500" />
-                <span className="text-sm font-medium text-gray-400">
-                  Content Locked
+                <Lock className="w-4 h-4 text-yellow-500/70" />
+                <span className="text-sm font-medium text-yellow-300/90">
+                  Off the recommended path
                 </span>
               </div>
-              <p className="text-xs text-gray-500 mt-2">
-                Complete the prerequisite modules to unlock this content.
+              <p className="text-xs text-gray-400 mt-2">
+                Tap to skip ahead — we&apos;ll confirm first.
               </p>
-            </div>
+            </button>
           ) : (
             /* Tappable "View Module" button — works as click hint on desktop too */
             <button

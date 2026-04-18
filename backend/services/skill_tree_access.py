@@ -1,20 +1,20 @@
 """
 Skill-tree access helpers.
 
-Centralizes the read-side prerequisite logic so every endpoint that serves a
-lesson applies the same unlock rules. The rules:
+Access rules:
 
 - Admins always have full access.
-- A level is unlocked only when all its prerequisite levels are 100% complete.
-- Levels with no prerequisites are always unlocked.
-- A lesson is accessible when its level is unlocked (and subscription allows).
+- Subscribed members have full access to every lesson in every world they
+  paid for — prerequisites are a UI recommendation, not a hard gate.
+- `compute_level_unlock_map` returns a per-level "on-path" signal used by the
+  skill-tree UI to render lock icons and warn before skipping ahead.
 """
 
 from typing import Dict, List, Optional, Tuple
 
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session
 
-from models.course import Lesson, Level, LevelEdge, World
+from models.course import Lesson, LevelEdge, World
 from models.progress import UserProgress
 from models.user import Subscription, SubscriptionStatus, User, UserRole
 
@@ -104,7 +104,11 @@ def is_lesson_accessible(
     Return (accessible, reason). Reason is one of:
       None          — accessible
       "subscription"— paid world, user not subscribed
-      "prerequisites" — level prerequisites not met
+
+    Prerequisites are a recommendation, not a hard gate. The skill-tree UI
+    surfaces a "skip prerequisites?" warning for levels whose prereqs aren't
+    met, but subscribed members can still access any lesson. See
+    `compute_level_unlock_map` for the UI-facing unlock signal.
     """
     if user.role == UserRole.ADMIN:
         return (True, None)
@@ -113,7 +117,7 @@ def is_lesson_accessible(
     world = level.world if level else None
     if not world:
         # No world means we can't reason about access; fail closed.
-        return (False, "prerequisites")
+        return (False, "subscription")
 
     if not world.is_free:
         subscription = (
@@ -126,19 +130,5 @@ def is_lesson_accessible(
             SubscriptionStatus.TRIALING,
         ):
             return (False, "subscription")
-
-    # Ensure the world's levels + lessons are loaded for the unlock map.
-    # If the caller eager-loaded them this is a no-op.
-    if not world.levels or any(not hasattr(lvl, "lessons") for lvl in world.levels):
-        world = (
-            db.query(World)
-            .filter(World.id == world.id)
-            .options(joinedload(World.levels).joinedload(Level.lessons))
-            .first()
-        )
-
-    unlock_map = compute_level_unlock_map(db, world, user)
-    if not unlock_map.get(str(lesson.level_id), False):
-        return (False, "prerequisites")
 
     return (True, None)
