@@ -114,7 +114,9 @@
     "module": "Module",
     "lesson": "Les",
     "noResults": "Geen cursussen gevonden. Probeer een ander filter.",
-    "comingSoon": "Binnenkort"
+    "comingSoon": "Binnenkort",
+    "typeLabel": "Type",
+    "levelLabel": "Niveau"
   },
   "lesson": {
     "title": "Les",

@@ -140,8 +140,8 @@ export default function CoursesPage() {
         <div className="sticky top-0 z-40 w-full bg-black/60 backdrop-blur-xl border-b border-white/10 pt-20 sm:pt-24 pb-3 sm:pb-4 transition-all duration-300">
           <div className="max-w-[1600px] mx-auto px-3 sm:px-6">
 
-            {/* Mobile + landscape phones: Search + filter dropdowns */}
-            <div className="flex xl:hidden flex-col landscape:flex-row landscape:items-center gap-2 w-full">
+            {/* Mobile + landscape phones + mid-desktop: Search + filter dropdowns */}
+            <div className="flex 2xl:hidden flex-col landscape:flex-row landscape:items-center gap-2 w-full">
               {/* Release Calendar pill */}
               <div className="flex justify-center landscape:order-last landscape:flex-shrink-0">
                 <ReleaseScheduleButton />
@@ -175,15 +175,15 @@ export default function CoursesPage() {
                         : 'bg-white/[0.04] border-white/10'
                     } ${typeDropdownOpen ? 'border-purple-400/60 bg-white/[0.08]' : ''}`}
                   >
-                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Type</span>
+                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">{tCourses('typeLabel')}</span>
                     <span className={`text-[11px] font-bold ${typeFilter !== 'all' ? 'text-purple-300' : 'text-white'}`}>
-                      {({ all: 'All Classes', course: 'Courses', choreo: 'Choreos', topic: 'Topics' } as Record<string, string>)[typeFilter]}
+                      {({ all: tCourses('filterAll'), course: tCourses('filterCourses'), choreo: tCourses('filterChoreo'), topic: tCourses('filterTopics') } as Record<string, string>)[typeFilter]}
                     </span>
                     <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 transition-transform ${typeDropdownOpen ? 'rotate-180' : ''} ${typeFilter !== 'all' ? 'text-purple-400' : 'text-gray-500'}`} />
                   </button>
                   {typeDropdownOpen && (
                     <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                      {([['all', 'All Classes'], ['course', 'Courses'], ['choreo', 'Choreos'], ['topic', 'Topics']] as const).map(([val, label]) => (
+                      {([['all', tCourses('filterAll')], ['course', tCourses('filterCourses')], ['choreo', tCourses('filterChoreo')], ['topic', tCourses('filterTopics')]] as const).map(([val, label]) => (
                         <button
                           key={val}
                           onClick={() => { setTypeFilter(val as TypeFilter); setTypeDropdownOpen(false); }}
@@ -210,15 +210,15 @@ export default function CoursesPage() {
                         : 'bg-white/[0.04] border-white/10'
                     } ${levelDropdownOpen ? 'border-amber-400/60 bg-white/[0.08]' : ''}`}
                   >
-                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">Level</span>
+                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">{tCourses('levelLabel')}</span>
                     <span className={`text-[11px] font-bold ${difficultyFilter !== 'all' ? 'text-amber-300' : 'text-white'}`}>
-                      {({ all: 'All Levels', beginner: 'Beginner', intermediate: 'Intermediate', advanced: 'Advanced' } as Record<string, string>)[difficultyFilter]}
+                      {({ all: tCourses('difficultyAll'), beginner: tCourses('difficultyBeginner'), intermediate: tCourses('difficultyIntermediate'), advanced: tCourses('difficultyAdvanced') } as Record<string, string>)[difficultyFilter]}
                     </span>
                     <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 transition-transform ${levelDropdownOpen ? 'rotate-180' : ''} ${difficultyFilter !== 'all' ? 'text-amber-400' : 'text-gray-500'}`} />
                   </button>
                   {levelDropdownOpen && (
                     <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                      {([['all', 'All Levels'], ['beginner', 'Beginner'], ['intermediate', 'Intermediate'], ['advanced', 'Advanced']] as const).map(([val, label]) => (
+                      {([['all', tCourses('difficultyAll')], ['beginner', tCourses('difficultyBeginner')], ['intermediate', tCourses('difficultyIntermediate')], ['advanced', tCourses('difficultyAdvanced')]] as const).map(([val, label]) => (
                         <button
                           key={val}
                           onClick={() => { setDifficultyFilter(val as DifficultyFilter); setLevelDropdownOpen(false); }}
@@ -237,8 +237,8 @@ export default function CoursesPage() {
               </div>
             </div>
 
-            {/* Desktop: Original pill layout + release calendar pinned right */}
-            <div className="hidden xl:flex items-center gap-3 w-full">
+            {/* Desktop (≥1536px): Original pill layout + release calendar pinned right */}
+            <div className="hidden 2xl:flex items-center gap-3 w-full">
               <div className="flex items-center gap-3 flex-1 min-w-0 overflow-x-auto no-scrollbar pb-0">
                 {/* Search Pill */}
                 <div className="relative group min-w-[200px]">

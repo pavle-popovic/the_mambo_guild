@@ -114,7 +114,9 @@
     "module": "Modulo",
     "lesson": "Lezione",
     "noResults": "Nessun corso trovato. Prova un altro filtro.",
-    "comingSoon": "Prossimamente"
+    "comingSoon": "Prossimamente",
+    "typeLabel": "Tipo",
+    "levelLabel": "Livello"
   },
   "lesson": {
     "title": "Lezione",

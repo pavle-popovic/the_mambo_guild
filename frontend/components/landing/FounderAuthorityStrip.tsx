@@ -177,9 +177,9 @@ export default function FounderAuthorityStrip() {
                         <motion.h2
                             variants={fadeIn}
                             className="
-                                font-extrabold text-white leading-[1.1] whitespace-nowrap
+                                font-extrabold text-white leading-[1.1] text-balance
                                 text-[clamp(1.3rem,5.8vw,3.25rem)]
-                                sm:text-[2.75rem] lg:text-[3.25rem]
+                                sm:text-[2.5rem] lg:text-[3rem] xl:text-[3.25rem]
                                 landscape-phone:!text-2xl landscape-phone:!leading-tight
                             "
                         >

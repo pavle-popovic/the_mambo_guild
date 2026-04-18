@@ -114,7 +114,9 @@
     "module": "Module",
     "lesson": "Lesson",
     "noResults": "No courses found. Try a different filter.",
-    "comingSoon": "Coming Soon"
+    "comingSoon": "Coming Soon",
+    "typeLabel": "Type",
+    "levelLabel": "Level"
   },
   "lesson": {
     "title": "Lesson",

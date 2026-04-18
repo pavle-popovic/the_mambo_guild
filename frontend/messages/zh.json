@@ -114,7 +114,9 @@
     "module": "模块",
     "lesson": "课时",
     "noResults": "未找到课程。请尝试其他筛选条件。",
-    "comingSoon": "即将推出"
+    "comingSoon": "即将推出",
+    "typeLabel": "类型",
+    "levelLabel": "等级"
   },
   "lesson": {
     "title": "课时",

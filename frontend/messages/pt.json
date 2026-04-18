@@ -114,7 +114,9 @@
     "module": "Módulo",
     "lesson": "Aula",
     "noResults": "Nenhum curso encontrado. Tente outro filtro.",
-    "comingSoon": "Em Breve"
+    "comingSoon": "Em Breve",
+    "typeLabel": "Tipo",
+    "levelLabel": "Nível"
   },
   "lesson": {
     "title": "Aula",

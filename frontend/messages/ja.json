@@ -114,7 +114,9 @@
     "module": "モジュール",
     "lesson": "レッスン",
     "noResults": "コースが見つかりません。別のフィルターをお試しください。",
-    "comingSoon": "近日公開"
+    "comingSoon": "近日公開",
+    "typeLabel": "タイプ",
+    "levelLabel": "レベル"
   },
   "lesson": {
     "title": "レッスン",

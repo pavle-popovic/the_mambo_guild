@@ -114,7 +114,9 @@
     "module": "وحدة",
     "lesson": "درس",
     "noResults": "لم يتم العثور على دورات. جرب فلتراً آخر.",
-    "comingSoon": "قريباً"
+    "comingSoon": "قريباً",
+    "typeLabel": "النوع",
+    "levelLabel": "المستوى"
   },
   "lesson": {
     "title": "الدرس",

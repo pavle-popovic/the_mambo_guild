@@ -114,7 +114,9 @@
     "module": "모듈",
     "lesson": "레슨",
     "noResults": "강좌를 찾을 수 없습니다. 다른 필터를 시도해보세요.",
-    "comingSoon": "곧 출시"
+    "comingSoon": "곧 출시",
+    "typeLabel": "유형",
+    "levelLabel": "레벨"
   },
   "lesson": {
     "title": "레슨",

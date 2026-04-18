@@ -114,7 +114,9 @@
     "module": "Модуль",
     "lesson": "Урок",
     "noResults": "Курсы не найдены. Попробуйте другой фильтр.",
-    "comingSoon": "Скоро"
+    "comingSoon": "Скоро",
+    "typeLabel": "Тип",
+    "levelLabel": "Уровень"
   },
   "lesson": {
     "title": "Урок",
