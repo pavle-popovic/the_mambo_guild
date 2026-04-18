@@ -14,4 +14,16 @@ export const FOUNDER = {
         "Professional Salsa On2 (Mambo) instructor, 2x European Champion, certified in Learning Experience Design and Gamification. 10 years dancing, 7 years teaching across London, Brussels, and Rome.",
 };
 
-export const CONTACT_EMAIL = "support@themamboinn.com";
+export const CONTACT_EMAIL = "support@themamboguild.com";
+
+export const PRO_GRANDFATHER_END = "2026-08-01T00:00:00Z";
+export const PRO_PRICE_NEXT = "$49/mo";
+export const PRO_PRICE_CURRENT = "$39/mo";
+export const GUILD_MASTER_PRICE_CURRENT = "$59/mo";
+export const GUILD_MASTER_PRICE_NEXT = "$99/mo";
+
+export function daysUntilProGrandfatherEnd(now: number = Date.now()): number {
+    const end = new Date(PRO_GRANDFATHER_END).getTime();
+    const diff = end - now;
+    return Math.max(0, Math.ceil(diff / 86_400_000));
+}

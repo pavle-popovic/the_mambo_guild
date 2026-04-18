@@ -11,6 +11,7 @@ import { FaCheck, FaTimes, FaCrown } from "react-icons/fa";
 import { FadeIn, StaggerContainer, StaggerItem, HoverCard, Clickable } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
 import { toast } from "sonner";
+import { CONTACT_EMAIL, daysUntilProGrandfatherEnd } from "@/lib/site";
 
 // Stripe Price IDs
 const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
@@ -32,6 +33,12 @@ function PricingPageContent() {
   // Bumped after every refreshUser() so derived isRookie/isAdvanced/isPerformer
   // values in the JSX recompute even if React 18 batched the AuthContext update.
   const [, setRefreshKey] = useState(0);
+  // Days until the Pro grandfather price expires. Computed client-side only
+  // to avoid SSR hydration mismatches between build time and first paint.
+  const [proDaysLeft, setProDaysLeft] = useState<number | null>(null);
+  useEffect(() => {
+    setProDaysLeft(daysUntilProGrandfatherEnd());
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -298,7 +305,18 @@ function PricingPageContent() {
                       <span className="ml-2 align-middle text-base text-gray-500 font-normal line-through decoration-gray-600">$49/mo</span>
                     </div>
                     <div className="mb-6 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-3 py-2 text-left">
-                      <div className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold mb-0.5">Founders' Price</div>
+                      <div className="flex items-center gap-2 mb-0.5">
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold">Founders' Price</span>
+                        {proDaysLeft !== null && proDaysLeft > 0 && (
+                          <span className="inline-flex items-center gap-1 rounded-full bg-mambo-gold/15 px-2 py-0.5 text-[10px] font-bold text-mambo-gold">
+                            <span className="relative flex h-1.5 w-1.5">
+                              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60" />
+                              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold" />
+                            </span>
+                            {proDaysLeft} {proDaysLeft === 1 ? "day" : "days"} left
+                          </span>
+                        )}
+                      </div>
                       <div className="text-xs leading-snug text-white/75">
                         Price increases to $49/mo on August 1, 2026. Lock in $39/mo today — yours for life, as long as you stay subscribed.
                       </div>
@@ -343,13 +361,15 @@ function PricingPageContent() {
                           Current Plan
                         </button>
                       ) : isPerformer ? (
-                        <button
-                          onClick={handleDowngrade}
-                          disabled={loading === "downgrade"}
-                          className="block w-full py-4 border border-gray-600 hover:border-gray-500 rounded-lg font-bold hover:bg-gray-800/50 transition-all duration-300 text-mambo-text shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                          {loading === "downgrade" ? "Loading..." : "Downgrade to Advanced Pass Plan"}
-                        </button>
+                        <div className="pt-1 text-center">
+                          <button
+                            onClick={handleDowngrade}
+                            disabled={loading === "downgrade"}
+                            className="text-xs text-gray-500 hover:text-gray-300 underline underline-offset-4 decoration-gray-700 hover:decoration-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                          >
+                            {loading === "downgrade" ? "Switching…" : "Switch to Pro"}
+                          </button>
+                        </div>
                       ) : null}
                     </Clickable>
                   </div>
@@ -504,7 +524,7 @@ function PricingPageContent() {
               </div>
             </div>
             <p className="mt-6 text-center text-gray-500 text-sm">
-              Questions? Email <a href="mailto:support@themamboinn.com" className="text-mambo-gold/90 hover:text-mambo-gold">support@themamboinn.com</a>
+              Questions? Email <a href={`mailto:${CONTACT_EMAIL}`} className="text-mambo-gold/90 hover:text-mambo-gold">{CONTACT_EMAIL}</a>
             </p>
           </div>
         </div>

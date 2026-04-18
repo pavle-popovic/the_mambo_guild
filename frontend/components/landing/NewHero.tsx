@@ -156,8 +156,8 @@ export default function NewHero() {
                         transition={{ delay: 0.3, duration: 0.6 }}
                         className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-2 sm:py-2 bg-gradient-to-r from-amber-900/70 to-yellow-900/50 border border-mambo-gold/70 rounded-full backdrop-blur-sm shadow-[0_0_25px_rgba(212,175,55,0.2)] max-w-full landscape-phone:!py-0.5 landscape-phone:!px-2.5 landscape-phone:!gap-1.5"
                     >
-                        <FaCertificate className="text-mambo-gold text-xs sm:text-xs flex-shrink-0 landscape-phone:!text-[10px]" />
-                        <span className="text-xs sm:text-xs md:text-sm font-semibold text-mambo-gold tracking-wide leading-tight landscape-phone:!text-[10px]">
+                        <FaCertificate className="text-mambo-gold text-[10px] sm:text-xs flex-shrink-0 landscape-phone:!text-[10px]" />
+                        <span className="text-[11px] sm:text-xs font-semibold text-mambo-gold tracking-wide leading-tight landscape-phone:!text-[10px]">
                             Built on Learning Experience Design
                         </span>
                     </motion.div>
@@ -165,17 +165,17 @@ export default function NewHero() {
                     {/* Main Title — structured salsa curriculum positioning */}
                     <div className="space-y-2 md:space-y-2.5 landscape-phone:!space-y-1">
                         <h1 className="leading-[1.05] tracking-tight text-mambo-text">
-                            <span className="block font-extrabold text-[clamp(1.4rem,2.3vw,2.25rem)] landscape-phone:!text-xl">
+                            <span className="block font-extrabold text-[clamp(1.25rem,1.7vw,1.75rem)] landscape-phone:!text-xl">
                                 Every move, every technique.
                             </span>
                             <span
-                                className="block font-bold italic text-mambo-gold text-[clamp(1.75rem,3.2vw,3.25rem)] drop-shadow-[0_0_30px_rgba(212,175,55,0.35)] landscape-phone:!text-2xl"
+                                className="block font-bold italic text-mambo-gold text-[clamp(1.5rem,2.25vw,2.5rem)] drop-shadow-[0_0_30px_rgba(212,175,55,0.35)] landscape-phone:!text-2xl"
                                 style={{ fontFamily: '"Playfair Display", serif' }}
                             >
                                 Level 0 to 100.
                             </span>
                         </h1>
-                        <p className="text-sm sm:text-base md:text-lg text-gray-300 leading-snug max-w-md mx-auto lg:mx-0 text-balance landscape-phone:!text-xs">
+                        <p className="text-sm sm:text-base text-gray-300 leading-snug max-w-md mx-auto lg:mx-0 text-balance landscape-phone:!text-xs">
                             A structured salsa curriculum. Every skill in the right order.
                         </p>
                     </div>
@@ -193,10 +193,10 @@ export default function NewHero() {
                                 initial={{ opacity: 0, x: -20 }}
                                 animate={{ opacity: 1, x: 0 }}
                                 transition={{ delay: 0.5 + index * 0.1, duration: 0.5 }}
-                                className="flex items-center gap-2 sm:gap-3 text-sm sm:text-lg md:text-xl text-gray-200 justify-center lg:justify-start landscape-phone:!text-[11px] landscape-phone:!gap-1.5 landscape-phone:!justify-start"
+                                className="flex items-center gap-2 sm:gap-3 text-sm sm:text-base text-gray-200 justify-center lg:justify-start landscape-phone:!text-[11px] landscape-phone:!gap-1.5 landscape-phone:!justify-start"
                             >
-                                <div className="flex-shrink-0 w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center landscape-phone:!w-3.5 landscape-phone:!h-3.5">
-                                    <FaCheck className="text-emerald-400 text-[10px] sm:text-xs landscape-phone:!text-[8px]" />
+                                <div className="flex-shrink-0 w-4 h-4 sm:w-5 sm:h-5 rounded-full bg-emerald-500/20 border border-emerald-500/50 flex items-center justify-center landscape-phone:!w-3.5 landscape-phone:!h-3.5">
+                                    <FaCheck className="text-emerald-400 text-[9px] sm:text-[10px] landscape-phone:!text-[8px]" />
                                 </div>
                                 <span>{point}</span>
                             </motion.li>
@@ -221,7 +221,7 @@ export default function NewHero() {
                         </div>
                         <Link
                             href="/register"
-                            className="relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3 px-7 xl:py-3.5 xl:px-8 rounded-full text-sm xl:text-base whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 landscape-phone:!py-2 landscape-phone:!px-4 landscape-phone:!text-[11px]"
+                            className="relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-2.5 px-6 xl:py-3 xl:px-7 rounded-full text-sm whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 landscape-phone:!py-2 landscape-phone:!px-4 landscape-phone:!text-[11px]"
                         >
                             Get Your 7-Day Free Trial!
                         </Link>

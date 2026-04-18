@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { HoverCard, Clickable, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
+import { daysUntilProGrandfatherEnd } from "@/lib/site";
 
 const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
 const PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml";
@@ -102,6 +103,10 @@ export default function LandingPricingSection() {
     remaining: number;
     is_full: boolean;
   } | null>(null);
+  const [proDaysLeft, setProDaysLeft] = useState<number | null>(null);
+  useEffect(() => {
+    setProDaysLeft(daysUntilProGrandfatherEnd());
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -259,13 +264,24 @@ export default function LandingPricingSection() {
                         )}
                       </div>
                       {plan.grandfather && (
-                        <div className="mb-3 flex items-center gap-2 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-2.5 py-1.5">
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold whitespace-nowrap">
-                            Founders' Price
-                          </span>
-                          <span className="text-[11px] leading-tight text-white/75">
+                        <div className="mb-3 rounded-lg border border-mambo-gold/30 bg-mambo-gold/[0.06] px-2.5 py-1.5">
+                          <div className="flex flex-wrap items-center gap-1.5 mb-0.5">
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold whitespace-nowrap">
+                              {plan.id === "performer" ? "Founding 30 Seats" : "Founders' Price"}
+                            </span>
+                            {plan.id === "full-access" && proDaysLeft !== null && proDaysLeft > 0 && (
+                              <span className="inline-flex items-center gap-1 rounded-full bg-mambo-gold/15 px-1.5 py-0.5 text-[9px] font-bold text-mambo-gold">
+                                <span className="relative flex h-1 w-1">
+                                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60" />
+                                  <span className="relative inline-flex h-1 w-1 rounded-full bg-mambo-gold" />
+                                </span>
+                                {proDaysLeft} {proDaysLeft === 1 ? "day" : "days"} left
+                              </span>
+                            )}
+                          </div>
+                          <div className="text-[11px] leading-tight text-white/75">
                             {plan.grandfather.reason}. Lock it in today — yours for life.
-                          </span>
+                          </div>
                         </div>
                       )}
                       {plan.id === "performer" && guildMasterSeats ? (

@@ -7,7 +7,7 @@ import LocaleProviderWrapper from "@/components/LocaleProviderWrapper";
 import StarryBackground from "@/components/ui/StarryBackground";
 import BugReportButton from "@/components/BugReportButton";
 import { Toaster } from "sonner";
-import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION, FOUNDER } from "@/lib/site";
+import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION, FOUNDER, CONTACT_EMAIL } from "@/lib/site";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -121,7 +121,7 @@ const organizationSchema = {
   sameAs: [] as string[],
   contactPoint: {
     "@type": "ContactPoint",
-    email: "support@themamboinn.com",
+    email: CONTACT_EMAIL,
     contactType: "customer support",
     availableLanguage: ["English", "French", "Italian", "Spanish"],
   },
