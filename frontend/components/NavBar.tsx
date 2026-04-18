@@ -164,6 +164,7 @@ export default function NavBar({ user }: NavBarProps) {
 
           {/* Mobile: Hamburger + minimal icons */}
           <div className="flex md:hidden items-center gap-2 ml-auto">
+            <LocaleSwitcher compact />
             {isAuthenticated && <NotificationBell />}
             {isAuthenticated && (
               <Link
