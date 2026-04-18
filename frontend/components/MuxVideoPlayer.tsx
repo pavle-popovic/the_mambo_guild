@@ -161,6 +161,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           --media-primary-color: #ff0000 !important;
           --media-secondary-color: #6b7280 !important;
           --media-range-track-background: #8c8c8c !important;
+          --media-preview-thumbnail-background: transparent !important;
         }
       `;
       const STYLE_MARKER = "data-mux-color-fix";
