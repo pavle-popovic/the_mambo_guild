@@ -619,7 +619,7 @@ export default function SkillTreeTeaser() {
             <span className="text-xs font-medium text-purple-400">Gamified Learning</span>
           </div>
           <h2 className="text-xl sm:text-3xl md:text-4xl font-bold mb-1 sm:mb-2 text-mambo-text font-serif" style={{ fontFamily: '"Playfair Display", serif' }}>
-            Your <span className="text-mambo-gold italic">Constellation</span> Path
+            Your <span className="text-mambo-gold italic">Learning</span> Path
           </h2>
           <p className="text-gray-400 text-xs sm:text-sm max-w-xl mx-auto">Explore our interactive skill trees</p>
         </motion.div>
