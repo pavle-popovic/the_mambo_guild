@@ -3,6 +3,12 @@ import os
 import time
 import sys
 
+try:
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
+    sys.stderr.reconfigure(encoding='utf-8', errors='replace')
+except Exception:
+    pass
+
 # Load environment variables from .env file
 try:
     from dotenv import load_dotenv
@@ -119,8 +125,6 @@ def get_beautiful_html(username, referral_link):
 
             <p>This Challenge is for dancers that have been dancing salsa for <strong>less than 2 years</strong>! Obviously, this is not rocket science, but if you are a more experienced dancer please share this with someone that is getting started!</p>
 
-            <p>On April 29th, I am opening the doors to a fully gamified, structured, premium learning platform for Salsa On2. But before we go live, <strong>I am giving away one Lifetime Access pass.</strong></p>
-
             <h2>THE PRIZE:</h2>
             <p>The first place, winner of the challenge gets a lifetime free access to the entire Mambo Guild platform. That means 30+ hours of mechanics, practice drills, and full access to our interactive Skill Tree and "Clave" point system.</p>
 
@@ -133,8 +137,6 @@ def get_beautiful_html(username, referral_link):
             <h2>SUBMISSION RULES:</h2>
             <p>You can post your video as a <strong>Reel</strong> or an <strong>IG Story</strong>.<br>
             ⚠️ <strong>Crucial:</strong> If you post it as a Story, you <strong>MUST</strong> send the raw video to my DMs after posting. Stories disappear in 24 hours. (Posting a Reel is highly preferred).</p>
-
-            <p>The Guild opens April 29th.</p>
 
             <p>💪 Feel like you're more advanced? The <strong>Open Challenge</strong> below is for you — check it out.</p>
 
@@ -182,8 +184,16 @@ def send_broadcast():
         else:
             print("   (Proceeding anyway because DRY_RUN is True)")
 
-    with open(JSON_FILE, 'r') as f:
+    with open(JSON_FILE, 'r', encoding='utf-8') as f:
         users = json.load(f)
+
+    # Resume support: skip any emails already successfully sent in a prior run
+    already_sent_file = os.path.join(script_dir, 'already_sent.txt')
+    already_sent = set()
+    if os.path.exists(already_sent_file):
+        with open(already_sent_file, 'r', encoding='utf-8') as f:
+            already_sent = {line.strip().lower() for line in f if line.strip()}
+        print(f"Resume mode: {len(already_sent)} emails already sent in prior run — will skip.")
 
     print(f"Found {len(users)} users in the list.")
     print(f"Mode: {'DRY RUN (No emails will be sent)' if DRY_RUN else 'LIVE BROADCAST'}")
@@ -267,6 +277,11 @@ def send_broadcast():
             print(f"   [SKIPPED] {email} (test/fake)")
             skipped += 1
             continue
+
+        # Skip already-sent in a prior run (resume support)
+        if email and email.lower() in already_sent:
+            skipped += 1
+            continue
         
         # Construct referral link
         # Ensure helper works with/without trailing slash
@@ -274,7 +289,7 @@ def send_broadcast():
         referral_link = f"{base_url}/waitlist?ref={code}"
 
         # 2. Prepare the Email Content
-        subject = "🏆 The Mambo Guild Open Challenge — Win Lifetime VIP Access"
+        subject = "🌱 Beginner Challenge — Win Lifetime Access"
         html_content = get_beautiful_html(username, referral_link)
 
         # 3. Send (or Print)
@@ -294,6 +309,11 @@ def send_broadcast():
                 })
                 print(f"Sent to: {email}")
                 count += 1
+                try:
+                    with open(already_sent_file, 'a', encoding='utf-8') as asf:
+                        asf.write(email + '\n')
+                except Exception:
+                    pass
                 time.sleep(1.0) # Small pause to be gentle on the API
             except Exception as e:
                 print(f"FAILED to send to {email}: {e}")

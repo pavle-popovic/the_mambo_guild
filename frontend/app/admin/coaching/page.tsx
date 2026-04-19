@@ -19,6 +19,7 @@ import {
 import AdminSidebar from "@/components/AdminSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import MuxPlayer from "@mux/mux-player-react";
 
 interface CoachingSubmission {
   id: string;
@@ -53,7 +54,7 @@ function ReviewStudio({
   onClose: () => void;
   onComplete: () => void;
 }) {
-  const studentVideoRef = useRef<HTMLVideoElement>(null);
+  const studentVideoRef = useRef<any>(null);
   const webcamVideoRef = useRef<HTMLVideoElement>(null);
   const previewVideoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -70,9 +71,6 @@ function ReviewStudio({
   const [uploadProgress, setUploadProgress] = useState(0);
   const [toast, setToast] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  // Student video src (Mux HLS → direct mp4 for canvas CORS compatibility)
-  const studentVideoSrc = `https://stream.mux.com/${submission.video_mux_playback_id}/medium.mp4`;
 
   // Start webcam on mount
   useEffect(() => {
@@ -107,9 +105,23 @@ function ReviewStudio({
   // Canvas draw loop — student video left 65%, webcam right 35%
   const drawFrame = useCallback(() => {
     const canvas = canvasRef.current;
-    const studentVid = studentVideoRef.current;
+    
+    // Extract the actual HTMLVideoElement from inside MuxPlayer
+    let studentVid: HTMLVideoElement | null = null;
+    if (studentVideoRef.current) {
+      studentVid = 
+        studentVideoRef.current.media?.nativeEl || 
+        studentVideoRef.current.shadowRoot?.querySelector("video") ||
+        studentVideoRef.current.querySelector("video");
+    }
+
     const webcamVid = webcamVideoRef.current;
-    if (!canvas || !studentVid || !webcamVid) return;
+    if (!canvas || !studentVid || !webcamVid) {
+      if (recordingState === "recording") {
+         animFrameRef.current = requestAnimationFrame(drawFrame);
+      }
+      return;
+    }
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -299,11 +311,10 @@ function ReviewStudio({
               <Video className="w-3 h-3" /> Student Submission
             </p>
             <div className="aspect-video rounded-xl overflow-hidden bg-black">
-              <video
+              <MuxPlayer
                 ref={studentVideoRef}
-                src={studentVideoSrc}
+                playbackId={submission.video_mux_playback_id}
                 crossOrigin="anonymous"
-                controls
                 className="w-full h-full"
               />
             </div>

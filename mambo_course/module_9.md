@@ -12,7 +12,7 @@ New York City in the 1970s was famously, practically bankrupt. Basic city servic
 
 Salsa became their voice. 
 
-Unlike the glamorous Mambo bands of the 1950s—where artists dressed in impeccable tuxedos and played in massive, polite midtown ballrooms—the musicians of the 70s were deeply rooted in the barrio. 
+Unlike the glamorous Mambo bands of the 1950s,where artists dressed in impeccable tuxedos and played in massive, polite midtown ballrooms,the musicians of the 70s were deeply rooted in the barrio. 
 
 Artists like **Willie Colón**, known as "El Malo," intentionally cultivated an outlaw, gangster persona. He dressed his band like street thugs and wrote lyrics exclusively about the harsh realities of the neighborhood: poverty, crime, hustling, and the overwhelming desire to retain their cultural identity in a hostile environment. 
 
@@ -52,7 +52,7 @@ C) Willie Colón
 D) Celia Cruz
 *Correct Answer: C) Willie Colón. His album covers famously featured him holding a trombone like a machine gun.*
 
-**3. What specific physical mechanic—born during this street-level era—requires the dancer to roll their shoulders forward, drop their chin, and cross their feet aggressively to simulate the bravado of a street fight?**
+**3. What specific physical mechanic,born during this street-level era,requires the dancer to roll their shoulders forward, drop their chin, and cross their feet aggressively to simulate the bravado of a street fight?**
 A) The Suzie Q
 B) The Pachuco Cross
 C) The fundamental basic step
@@ -63,7 +63,7 @@ D) The cross-body lead
 
 ## 📺 Watch & Listen
 
-**Willie Colón live — hear the street attitude in the music:**
+**Willie Colón live, hear the street attitude in the music:**
 🎬 [Willie Colón & Héctor Lavoe – "El Malo" Live](https://www.youtube.com/watch?v=KP_TJdAiGLE)
 
 **The NYC Salsa Community tells their own story:**

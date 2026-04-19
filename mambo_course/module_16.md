@@ -16,7 +16,7 @@ He didn't just book dancers for a single event. He actively built a colossal, in
 
 This centralized monopoly completely uprooted the entire physical location of the dance. 
 
-The social nightclub—the historically sweaty, gritty, culturally rich center of the music—was suddenly completely irrelevant to a professional dancer's career. The physical floor had moved entirely to massive, generic hotel ballrooms in industrial convention centers. 
+The social nightclub,the historically sweaty, gritty, culturally rich center of the music,was suddenly completely irrelevant to a professional dancer's career. The physical floor had moved entirely to massive, generic hotel ballrooms in industrial convention centers. 
 
 Torres also created the **World Latin Dance Cup**, bringing terrifyingly strict, highly stressful ballroom-style judging criteria to a dance that was originally born as a spontaneous tool of urban survival in El Barrio. By establishing a formalized World Championship, he officially cemented the total transformation of Salsa from a social, cultural folk tradition into a regulated, hyper-athletic global sport.
 

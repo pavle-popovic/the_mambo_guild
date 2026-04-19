@@ -81,6 +81,9 @@ export default function GuildMasterPage() {
   const [meetingConfig, setMeetingConfig] = useState<{
     meeting_url: string | null;
     meeting_notes: string | null;
+    meeting_day_of_week: number;
+    meeting_hour_utc: number;
+    meeting_minute_utc: number;
   } | null>(null);
   const [vaultRecordings, setVaultRecordings] = useState<VaultRecording[]>([]);
   const [vaultSearch, setVaultSearch] = useState("");
@@ -130,11 +133,6 @@ export default function GuildMasterPage() {
       loadCoachingStatus();
       loadMySubmissions();
       loadDjTracks();
-
-      // Init countdown to next Wednesday 7pm GMT
-      const target = nextWednesdayGMT();
-      const secs = Math.floor((target.getTime() - Date.now()) / 1000);
-      setCountdown(secs > 0 ? secs : 0);
     }
   }, [user, authLoading, isGuildMaster, router]);
 
@@ -149,12 +147,12 @@ export default function GuildMasterPage() {
     return () => clearInterval(timer);
   }, [countdown]);
 
-  function nextWednesdayGMT(): Date {
+  function nextMeetingGMT(dayOfWeek: number, hour: number, minute: number): Date {
     const now = new Date();
-    const daysUntil = ((3 - now.getUTCDay() + 7) % 7) || 7;
+    const daysUntil = ((dayOfWeek - now.getUTCDay() + 7) % 7) || 7;
     const d = new Date(now);
     d.setUTCDate(d.getUTCDate() + daysUntil);
-    d.setUTCHours(19, 0, 0, 0);
+    d.setUTCHours(hour, minute, 0, 0);
     return d;
   }
 
@@ -173,6 +171,13 @@ export default function GuildMasterPage() {
       if (response.ok) {
         const data = await response.json();
         setMeetingConfig(data);
+        // Start countdown based on the configured schedule
+        const dow = data.meeting_day_of_week ?? 3;
+        const h   = data.meeting_hour_utc   ?? 19;
+        const m   = data.meeting_minute_utc  ?? 0;
+        const target = nextMeetingGMT(dow, h, m);
+        const secs = Math.floor((target.getTime() - Date.now()) / 1000);
+        setCountdown(secs > 0 ? secs : 0);
       }
     } catch (error) {
       console.error("Failed to load meeting config:", error);
@@ -487,7 +492,17 @@ export default function GuildMasterPage() {
                     </h3>
                     <div className="flex items-center gap-1.5 text-sm text-white/60">
                       <Calendar className="w-4 h-4" />
-                      Every Wednesday at 7:00 PM GMT
+                      {(() => {
+                        const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                        const dow = meetingConfig?.meeting_day_of_week ?? 3;
+                        const h   = meetingConfig?.meeting_hour_utc   ?? 19;
+                        const m   = meetingConfig?.meeting_minute_utc  ?? 0;
+                        const day = DAY_NAMES[dow];
+                        const ampm = h >= 12 ? "PM" : "AM";
+                        const h12 = h % 12 === 0 ? 12 : h % 12;
+                        const mStr = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
+                        return `Every ${day} at ${h12}${mStr} ${ampm} GMT`;
+                      })()}
                     </div>
                     {meetingConfig?.meeting_notes && (
                       <p className="mt-3 text-white/70 text-sm">

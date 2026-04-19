@@ -3,14 +3,14 @@
 ## Introduction: The Core Thesis
 Mambo began as an intensely local, marginalized Afro-Cuban language of survival. Today, it is a massive, highly regulated, multi-national economic engine driven entirely by the endless consumption of the "Salsa Tourist."
 
-The undeniable, deeply controversial truth of the final era of Spinning Mambo into Salsa is that the original architects of the dance—the old guard of the Palladium and the gritty streets of El Barrio—have entirely lost financial and cultural control of their own creation to a massive global machine that values aesthetic perfection over cultural authenticity.
+The undeniable, deeply controversial truth of the final era of Spinning Mambo into Salsa is that the original architects of the dance,the old guard of the Palladium and the gritty streets of El Barrio,have entirely lost financial and cultural control of their own creation to a massive global machine that values aesthetic perfection over cultural authenticity.
 
 ## The Story: The Business of Authenticity
 If you walk into a major European Salsa Congress today, you are confronted immediately by the sheer scale of the economy. The event is sponsored by massive shoe companies like Burju and Ray Rose. The headlining instructors command thousands of dollars per weekend to teach patterns they invented three weeks ago on Instagram. The attendees spend literal fortunes on flights, hotels, VIP passes, rhinestoned costumes, and private coaching sessions.
 
 Salsa is no longer just a dance; it is an industrial complex.
 
-But as the dance became a multi-million-dollar industry, a brutal cultural tension emerged. The dancers who historically invented the core mechanics of New York Style—the Palladium Mamboniks, the Puerto Rican and Cuban immigrants of the 1950s and 70s—rarely saw any of that money. 
+But as the dance became a multi-million-dollar industry, a brutal cultural tension emerged. The dancers who historically invented the core mechanics of New York Style,the Palladium Mamboniks, the Puerto Rican and Cuban immigrants of the 1950s and 70s,rarely saw any of that money. 
 
 Instead, the global market rewarded young, highly athletic, predominantly European, Russian, and Asian dancers who utilized the massive digital infrastructure of YouTube to perfectly mimic the external aesthetics of Latin movement without historically participating in the chaotic culture that produced it. 
 
@@ -20,7 +20,7 @@ This created a bitter, fascinating debate over **Ownership**.
 
 If a brilliant Italian dancer executes a mathematically flawless, blisteringly fast Eddie Torres On2 shine sequence, but has absolutely zero connection to the historical struggle of Spanish Harlem, does he "own" the dance? If a French ballroom champion integrates a hyper-athletic Los Angeles Style drop into a deeply emotional Cuban Timba song, is it still authentic Salsa? 
 
-The old masters argue that the soul of the dance—the complex, conversational relationship with the live band and the physical grit of the street—has been entirely eradicated by a sterile, commercial greed. 
+The old masters argue that the soul of the dance,the complex, conversational relationship with the live band and the physical grit of the street,has been entirely eradicated by a sterile, commercial greed. 
 
 The new generation argues that by formalizing the dance, increasing the athleticism, and exporting it through massive Congresses, they fundamentally saved a dying art form from disappearing completely into history, explicitly honoring its creators by elevating it to a recognized global sport.
 

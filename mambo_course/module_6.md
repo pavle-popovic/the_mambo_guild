@@ -12,7 +12,7 @@ Both are incorrect for New York Mambo.
 
 The Palladium dancers achieved genius because they forcefully combined the two aesthetics into a brutal, highly disciplined physical framework. 
 
-When you look at the African roots of this dance—the Guaguancó, the Yambú—the orientation is fundamentally toward the ground. The knees are permanently bent. The dancer's center of gravity is significantly lowered. The connection to the floor is active; the feet dig into the wood, gripping it. This is biologically necessary because the deep, rolling Afro-Cuban rhythms of the conga and the clave require you to physically delay your weight transfer. You simply cannot execute a delayed weight transfer on a stiff leg.
+When you look at the African roots of this dance,the Guaguancó, the Yambú,the orientation is fundamentally toward the ground. The knees are permanently bent. The dancer's center of gravity is significantly lowered. The connection to the floor is active; the feet dig into the wood, gripping it. This is biologically necessary because the deep, rolling Afro-Cuban rhythms of the conga and the clave require you to physically delay your weight transfer. You simply cannot execute a delayed weight transfer on a stiff leg.
 
 However, the Palladium dancers were performing on stage. They were competing against sophisticated ballroom dancers. They were heavily influenced by the glamour of mid-century American cabaret jazz and ballet. 
 
@@ -32,11 +32,11 @@ If your legs are bent and your hips are executing a delayed figure-eight (Cuban 
 
 This is known as **Core Opposition**. 
 
-Your upper body—from the rib cage up—is "locked." This is why a world-class follow looks like she is floating effortlessly across the slot while her feet are moving at 200 beats per minute. If her core was relaxed, the violent speed of her legs would cause her shoulders to violently shake, destroying the aesthetic. 
+Your upper body,from the rib cage up,is "locked." This is why a world-class follow looks like she is floating effortlessly across the slot while her feet are moving at 200 beats per minute. If her core was relaxed, the violent speed of her legs would cause her shoulders to violently shake, destroying the aesthetic. 
 
 When a lead initiates a Cross-Body Lead, he must maintain this exact frame lock. The power of the lead does not come from his arms. His arms are entirely static. The power comes from his lats being pulled down into the floor, transmitting the rotational energy of his grounded hips directly through his locked torso into the follow's frame. 
 
-If you lose this tension—if you stand straight up or if you hunch over—the entire mechanical illusion of Mambo collapses. You cease dancing and begin merely stepping.
+If you lose this tension,if you stand straight up or if you hunch over,the entire mechanical illusion of Mambo collapses. You cease dancing and begin merely stepping.
 
 ## Knowledge Check
 

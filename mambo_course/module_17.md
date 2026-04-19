@@ -12,7 +12,7 @@ In the 1920s and 30s, as the very first waves of Cuban Son and traditional Rumba
 
 So, they "fixed" it.
 
-A British instructor named Monsieur Pierre traveled to Cuba, observed the movement, brought it back to London, and systematically eliminated the African elements. The ISTD rigidly standardized what they called "Rumba," "Mamba," and "Cha-Cha-Cha." They forced the dancers to stand entirely upright. They locked the knees completely straight. They mandated that couples dance continuously in a massive, traveling circle around the room—an architectural hangover from the European Waltz—which fundamentally destroyed the intimate, conversational nature of the localized slot or the open casino circle.
+A British instructor named Monsieur Pierre traveled to Cuba, observed the movement, brought it back to London, and systematically eliminated the African elements. The ISTD rigidly standardized what they called "Rumba," "Mamba," and "Cha-Cha-Cha." They forced the dancers to stand entirely upright. They locked the knees completely straight. They mandated that couples dance continuously in a massive, traveling circle around the room,an architectural hangover from the European Waltz,which fundamentally destroyed the intimate, conversational nature of the localized slot or the open casino circle.
 
 This British standardization birthed the entire multi-million-dollar industry known today as **Dancesport**.
 

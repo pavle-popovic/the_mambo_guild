@@ -1,7 +1,7 @@
 # Module 4: The Palladium Legends - Inventing New York Style
 
 ## Introduction: The Core Thesis
-The aggressive, deeply competitive subculture of the Palladium Ballroom deliberately stripped Mambo of its strictly Cuban identity. By fusing the grounded Cuban movement with Harlem tap dancing, Lindy Hop acrobatics, and unbridled theatricality, a diverse group of working-class kids—the Palladium Legends—literally invented **"New York Style" Mambo**. 
+The aggressive, deeply competitive subculture of the Palladium Ballroom deliberately stripped Mambo of its strictly Cuban identity. By fusing the grounded Cuban movement with Harlem tap dancing, Lindy Hop acrobatics, and unbridled theatricality, a diverse group of working-class kids,the Palladium Legends,literally invented **"New York Style" Mambo**. 
 
 The undeniable truth here is that modern Salsa is not a pure Latin import; it is a massive, cross-cultural, urban American invention forged by the feet of dancers like Cuban Pete, Millie Donay, and Killer Joe Piro.
 
@@ -38,7 +38,7 @@ Instead of letting the arms swing casually by their sides, follows began rigidly
 
 To do this today, you have to create massive core tension. You separate your upper block (from the ribs up) from your lower block (from the hips down). When you throw a sharp arm styling variation during a shine, your core must physically lock to prevent that momentum from knocking you off your center of balance. 
 
-This requirement—the strict isolation of a quiet, "cool" upper body placed on top of heavily syncopated, burning-fast footwork—is the physical signature of New York Style that you still train to perfect today.
+This requirement,the strict isolation of a quiet, "cool" upper body placed on top of heavily syncopated, burning-fast footwork,is the physical signature of New York Style that you still train to perfect today.
 
 ## Knowledge Check
 

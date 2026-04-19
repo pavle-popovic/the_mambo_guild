@@ -8,7 +8,7 @@ The central, undeniable shift of this era is that Mambo ceased being a relaxed, 
 ## The Story: The Concrete Jungle
 Following the end of World War II, America experienced a massive industrial boom. Up north, the factories were humming. But the island of Puerto Rico faced severe economic hardship. Because the Jones-Shafroth Act of 1917 had granted US citizenship to Puerto Ricans, a staggering migration began in the 1940s and 50s. 
 
-Hundreds of thousands of families uprooted their lives and relocated to New York City seeking factory work. They settled primarily in East Harlem—an area that quickly and famously became known as **El Barrio**. 
+Hundreds of thousands of families uprooted their lives and relocated to New York City seeking factory work. They settled primarily in East Harlem,an area that quickly and famously became known as **El Barrio**. 
 
 Simultaneously, Cuban musicians were traveling back and forth on the ferry from Havana to Miami and up to New York, desperately looking for lucrative gigs where American dollars flowed freely. The music they brought with them was a piece of home. But it could not stay the same. You cannot play a relaxed country rhythm in a city that never sleeps.
 

@@ -38,7 +38,7 @@ If you are dancing On1 today, your frame mathematically cannot be as relaxed as 
 
 **1. What primary musical element did the creators of Los Angeles Style strongly emphasize, breaking away from the New York tradition entirely?**
 A) The heavy downbeats (the 1, 2, 3, 4), fundamentally rejecting the Afro-Cuban emphasis on syncopation.
-B) The exact opposite—they solely danced to the empty spaces between the beats.
+B) The exact opposite,they solely danced to the empty spaces between the beats.
 C) Dancing exclusively to the vocal track, completely ignoring the drums.
 D) Using the Cha-Cha-Cha timing of 2-3-4-and-1 to slow the dance entirely down.
 *Correct Answer: A) They violently stepped on the driving, heavy European downbeats, shifting the timing from On2 to On1.*

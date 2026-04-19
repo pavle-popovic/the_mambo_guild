@@ -18,7 +18,7 @@ The Congress format exploded. Within five years, organizers were hosting massive
 
 This fundamentally transformed how the dance was transmitted. Salsa was no longer learned organically over years in a sweaty local nightclub. It was learned in massive, fluorescent-lit hotel ballrooms on a Sunday morning. You paid $150 for a full pass, stood in rows of 500 people, and learned a highly complex, 8-count "festival pattern" from a famous instructor in exactly 45 minutes.
 
-This created the modern "Salsa Tourist"—a dancer whose primary social outlet was no longer their local club, but flying internationally once a month to collect wristbands, take workshops, and dance until 6:00 AM with absolute strangers from different continents who magically spoke the exact same physical language.
+This created the modern "Salsa Tourist",a dancer whose primary social outlet was no longer their local club, but flying internationally once a month to collect wristbands, take workshops, and dance until 6:00 AM with absolute strangers from different continents who magically spoke the exact same physical language.
 
 ## The 'Aha' Moment: The Standardization of "Lead-and-Follow" Mechanics
 When you lock 2,000 dancers from 40 different countries in a single hotel ballroom, a massive biological problem emerges: How do you dance with a total stranger when their local style is entirely different from yours?

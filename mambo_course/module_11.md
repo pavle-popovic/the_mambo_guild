@@ -26,13 +26,13 @@ Why did Torres specifically choose to break on the 2, and why does it feel so pr
 **The Mechanical Shift:**
 In Western music, the heavy downbeat is always the 1. When you dance "On1" (which later became LA Style), you violently step forward and throw your weight into the floor on that first heavy beat. 
 
-But Mambo music is built on the African clave, which heavily emphasizes syncopation—the spaces between the beats. 
+But Mambo music is built on the African clave, which heavily emphasizes syncopation,the spaces between the beats. 
 
 By forcing the dancer to step relatively quietly *in place* on the 1, and instead executing the massive, massive weight shift (the break) on the **second beat** of the measure, Torres permanently altered the dancer's relationship to balance.
 
 When you break on 2, you are physically hitting the strongest percussion accents (often the slap of the conga drum). Because you are stepping forward on the 2 and holding that tension through the 3, your body spends significantly more time suspended in transition. 
 
-This specific mechanic—the delayed break step—creates a continuous, flowing momentum that never truly stops. It fundamentally forces you to maintain an engaged, perfectly balanced core. It makes the dance feel incredibly smooth, grounded, and inherently sophisticated, completely eliminating the bouncy, marching aesthetic of downbeat dancing. Every time you sink your weight into the 2 on the floor today, you are utilizing Eddie Torres' exact, codified mathematical framework.
+This specific mechanic,the delayed break step,creates a continuous, flowing momentum that never truly stops. It fundamentally forces you to maintain an engaged, perfectly balanced core. It makes the dance feel incredibly smooth, grounded, and inherently sophisticated, completely eliminating the bouncy, marching aesthetic of downbeat dancing. Every time you sink your weight into the 2 on the floor today, you are utilizing Eddie Torres' exact, codified mathematical framework.
 
 ## Knowledge Check
 

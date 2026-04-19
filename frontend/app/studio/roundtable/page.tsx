@@ -18,6 +18,9 @@ import { useTranslations } from "@/i18n/useTranslations";
 interface MeetingConfig {
   meeting_url: string | null;
   meeting_notes: string | null;
+  meeting_day_of_week: number;
+  meeting_hour_utc: number;
+  meeting_minute_utc: number;
   updated_at: string | null;
 }
 
@@ -37,12 +40,12 @@ function getYouTubeId(url: string): string | null {
   return m ? m[1] : null;
 }
 
-function nextWednesdayGMT(): Date {
+function nextMeetingGMT(dayOfWeek: number, hour: number, minute: number): Date {
   const now = new Date();
-  const daysUntil = ((3 - now.getUTCDay() + 7) % 7) || 7;
+  const daysUntil = ((dayOfWeek - now.getUTCDay() + 7) % 7) || 7;
   const d = new Date(now);
   d.setUTCDate(d.getUTCDate() + daysUntil);
-  d.setUTCHours(19, 0, 0, 0);
+  d.setUTCHours(hour, minute, 0, 0);
   return d;
 }
 
@@ -145,6 +148,13 @@ export default function RoundtablePage() {
         ]);
         setMeetingConfig(configData);
         setArchives(archivesData);
+        // Start countdown from the configured schedule
+        const dow = (configData as any).meeting_day_of_week ?? 3;
+        const h   = (configData as any).meeting_hour_utc   ?? 19;
+        const m   = (configData as any).meeting_minute_utc  ?? 0;
+        const target = nextMeetingGMT(dow, h, m);
+        const secs = Math.floor((target.getTime() - Date.now()) / 1000);
+        setCountdown(secs > 0 ? secs : 0);
       } catch (error) {
         console.error("Failed to fetch roundtable data:", error);
       } finally {
@@ -153,11 +163,6 @@ export default function RoundtablePage() {
     };
 
     fetchData();
-
-    // Init countdown to next Wednesday 7pm GMT
-    const target = nextWednesdayGMT();
-    const secs = Math.floor((target.getTime() - Date.now()) / 1000);
-    setCountdown(secs > 0 ? secs : 0);
   }, [user, isGuildMaster]);
 
   // Countdown timer
@@ -278,7 +283,19 @@ export default function RoundtablePage() {
                   </h2>
                   <div className="flex items-center gap-1.5 text-sm text-gray-400">
                     <Calendar size={14} />
-                    <span>{t("scheduleLine")}</span>
+                    <span>
+                      {(() => {
+                        const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+                        const dow = meetingConfig?.meeting_day_of_week ?? 3;
+                        const h   = meetingConfig?.meeting_hour_utc   ?? 19;
+                        const m   = meetingConfig?.meeting_minute_utc  ?? 0;
+                        const day = DAY_NAMES[dow];
+                        const ampm = h >= 12 ? "PM" : "AM";
+                        const h12 = h % 12 === 0 ? 12 : h % 12;
+                        const mStr = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
+                        return `Every ${day} at ${h12}${mStr} ${ampm} GMT`;
+                      })()}
+                    </span>
                   </div>
                   {meetingConfig?.meeting_notes && (
                     <p className="text-gray-300 text-sm mt-3">

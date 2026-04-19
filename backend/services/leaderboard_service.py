@@ -121,6 +121,7 @@ def get_leaderboard(
     # Main query
     query = db.query(
         User.id,
+        UserProfile.username,
         UserProfile.first_name,
         UserProfile.avatar_url,
         score_expr.label("score")
@@ -147,6 +148,7 @@ def get_leaderboard(
     return [
         {
             "id": str(r.id),
+            "username": r.username,
             "first_name": r.first_name or "User",
             "avatar_url": r.avatar_url,
             "score": r.score or 0,

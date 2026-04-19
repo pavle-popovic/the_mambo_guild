@@ -22,6 +22,9 @@ import { cn } from "@/lib/utils";
 interface MeetingConfig {
   meeting_url: string | null;
   meeting_notes: string | null;
+  meeting_day_of_week: number;
+  meeting_hour_utc: number;
+  meeting_minute_utc: number;
   updated_at: string | null;
 }
 
@@ -73,11 +76,17 @@ export default function AdminLivePage() {
   const [config, setConfig] = useState<MeetingConfig>({
     meeting_url: null,
     meeting_notes: null,
+    meeting_day_of_week: 3,
+    meeting_hour_utc: 19,
+    meeting_minute_utc: 0,
     updated_at: null,
   });
   const [configForm, setConfigForm] = useState({
     meeting_url: "",
     meeting_notes: "",
+    meeting_day_of_week: 3,
+    meeting_hour_utc: 19,
+    meeting_minute_utc: 0,
   });
   const [savingConfig, setSavingConfig] = useState(false);
   const [configSaved, setConfigSaved] = useState(false);
@@ -122,6 +131,9 @@ export default function AdminLivePage() {
         setConfigForm({
           meeting_url: data.meeting_url || "",
           meeting_notes: data.meeting_notes || "",
+          meeting_day_of_week: data.meeting_day_of_week ?? 3,
+          meeting_hour_utc: data.meeting_hour_utc ?? 19,
+          meeting_minute_utc: data.meeting_minute_utc ?? 0,
         });
       }
     } catch (e) {
@@ -141,6 +153,9 @@ export default function AdminLivePage() {
           body: JSON.stringify({
             meeting_url: configForm.meeting_url || null,
             meeting_notes: configForm.meeting_notes || null,
+            meeting_day_of_week: configForm.meeting_day_of_week,
+            meeting_hour_utc: configForm.meeting_hour_utc,
+            meeting_minute_utc: configForm.meeting_minute_utc,
           }),
         }
       );
@@ -315,10 +330,21 @@ export default function AdminLivePage() {
             <Link className="w-5 h-5 text-amber-400" />
             Weekly Meeting Link
           </h2>
-          <p className="text-sm text-white/50 mb-5">
-            Every Wednesday at 7 PM GMT. This link is shown to all Guild Master
-            members.
-          </p>
+          {/* Dynamic schedule description */}
+          {(() => {
+            const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+            const day = DAY_NAMES[config.meeting_day_of_week] ?? "Wednesday";
+            const h = config.meeting_hour_utc;
+            const m = config.meeting_minute_utc;
+            const ampm = h >= 12 ? "PM" : "AM";
+            const h12 = h % 12 === 0 ? 12 : h % 12;
+            const mStr = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
+            return (
+              <p className="text-sm text-white/50 mb-5">
+                Every {day} at {h12}{mStr} {ampm} GMT. This link is shown to all Guild Master members.
+              </p>
+            );
+          })()}
 
           <div className="space-y-4">
             <div>
@@ -334,6 +360,63 @@ export default function AdminLivePage() {
                 placeholder="https://zoom.us/j/..."
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
               />
+            </div>
+
+            {/* Schedule row */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  Day of Week
+                </label>
+                <select
+                  value={configForm.meeting_day_of_week}
+                  onChange={(e) =>
+                    setConfigForm((f) => ({ ...f, meeting_day_of_week: Number(e.target.value) }))
+                  }
+                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                >
+                  {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map(
+                    (d, i) => (
+                      <option key={i} value={i} className="bg-zinc-900 text-white">
+                        {d}
+                      </option>
+                    )
+                  )}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-white/70 mb-2">
+                  Time (UTC)
+                </label>
+                <div className="flex gap-2">
+                  <select
+                    value={configForm.meeting_hour_utc}
+                    onChange={(e) =>
+                      setConfigForm((f) => ({ ...f, meeting_hour_utc: Number(e.target.value) }))
+                    }
+                    className="flex-1 px-3 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                  >
+                    {Array.from({ length: 24 }, (_, i) => (
+                      <option key={i} value={i} className="bg-zinc-900 text-white">
+                        {String(i).padStart(2, "0")}:00
+                      </option>
+                    ))}
+                  </select>
+                  <select
+                    value={configForm.meeting_minute_utc}
+                    onChange={(e) =>
+                      setConfigForm((f) => ({ ...f, meeting_minute_utc: Number(e.target.value) }))
+                    }
+                    className="flex-1 px-3 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+                  >
+                    {[0, 15, 30, 45].map((m) => (
+                      <option key={m} value={m} className="bg-zinc-900 text-white">
+                        :{String(m).padStart(2, "0")}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
             <div>
               <label className="block text-sm font-medium text-white/70 mb-2">

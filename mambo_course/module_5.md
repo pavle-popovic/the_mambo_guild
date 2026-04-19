@@ -1,7 +1,7 @@
 # Module 5: The Big Three - Machito, Puente, and Rodríguez
 
 ## Introduction: The Core Thesis
-You cannot understand how to dance New York Mambo without intimately understanding the three men who physically engineered its music. The legendary "Big Three"—**Machito, Tito Puente, and Tito Rodríguez**—did not just play music for dancers; they engaged in a brutal, decade-long musical arms race at the Palladium Ballroom. 
+You cannot understand how to dance New York Mambo without intimately understanding the three men who physically engineered its music. The legendary "Big Three",**Machito, Tito Puente, and Tito Rodríguez**,did not just play music for dancers; they engaged in a brutal, decade-long musical arms race at the Palladium Ballroom. 
 
 The central shift of this era is that this intense competition drove the music to become faster, far more structurally complex, and heavily reliant on massive, aggressive brass arrangements. They literally forced dancers to become better athletes to survive the songs.
 
@@ -14,7 +14,7 @@ Then came the challengers.
 
 **Tito Puente**, often called "El Rey del Timbal," was a musical prodigy from Spanish Harlem. Puente was a showman. He didn't just play the timbales; he attacked them. He stood up in front of the band, sweating, grinning, and hammering the skins. Puente's arrangements were incredibly aggressive. He wrote music that featured massive percussion breakdowns and terrifyingly sharp brass hits. Going to war with a Puente song required massive physical stamina. If Machito was the sophisticated jazz mastermind, Puente was the relentless, driving street fighter.
 
-And finally, you had **Tito Rodríguez**. Rodríguez was the romantic, the singer, and the absolute perfectionist. He was impeccably dressed and heavily focused on the lyrics and the melody. While Puente was hammering the timbales to drive the dancers crazy, Rodríguez was charming them, focusing on the swing and the romantic tension of the music. But do not mistake his elegance for weakness—Rodríguez ran one of the tightest, most highly disciplined orchestras in the entire city. 
+And finally, you had **Tito Rodríguez**. Rodríguez was the romantic, the singer, and the absolute perfectionist. He was impeccably dressed and heavily focused on the lyrics and the melody. While Puente was hammering the timbales to drive the dancers crazy, Rodríguez was charming them, focusing on the swing and the romantic tension of the music. But do not mistake his elegance for weakness,Rodríguez ran one of the tightest, most highly disciplined orchestras in the entire city. 
 
 The rivalry between Puente and Rodríguez was legendary, bitter, and highly publicized. 
 
@@ -36,7 +36,7 @@ But then, the song shifts into the **Montuno** section. The piano starts an aggr
 
 When you hear that massive energy shift into the montuno today, your physical mechanics must change. You must drop your weight lower. Your cross-body leads must snap with more aggression. The tension in your frame increases. 
 
-Finally, the band drops into the **Mambo Section**—the instrumental climax. The brass is literally screaming, and the percussion is going insane. This is where you physically must break apart from your partner. 
+Finally, the band drops into the **Mambo Section**,the instrumental climax. The brass is literally screaming, and the percussion is going insane. This is where you physically must break apart from your partner. 
 
 You execute **shines** specifically because the Big Three engineered this section of the music to be too aggressive, too syncopated, and too complex to comfortably navigate in a closed partner frame. You have to let go to let your feet match the timbales. When you do that, you are actively respecting a 70-year-old musical architecture built in the Bronx.
 
@@ -67,7 +67,7 @@ D) Ignoring the music completely and maintaining the exact same energy from star
 
 ## 📺 Watch & Listen
 
-**Tito Puente — live at the Palladium:**
+**Tito Puente, live at the Palladium:**
 🎬 [Tito Puente – "Oye Como Va" & Live Timbales (Archival)](https://www.youtube.com/watch?v=Rvfq7Q7_zfA)
 
 **Eddie Torres & Tito Puente collaboration:**

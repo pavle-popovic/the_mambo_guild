@@ -97,6 +97,7 @@ class PostUpdateRequest(BaseModel):
 class PostUserInfo(BaseModel):
     """Embedded user info in post response."""
     id: str
+    username: Optional[str] = None
     first_name: str
     last_name: str
     avatar_url: Optional[str] = None

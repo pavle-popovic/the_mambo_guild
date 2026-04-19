@@ -1,15 +1,15 @@
-# Module 12: Stop Asking If You Got It — Start Asking How
+# Module 12: Stop Asking If You Got It, Start Asking How
 
 ## The Big Idea
-There are two completely different types of feedback, and most dancers are stuck using the wrong one for their skill level. Beginners need to know *whether* they succeeded. Advanced dancers need to know *how* they succeeded — and the difference between those two questions is the difference between plateauing at intermediate level forever and continuing to improve for years. The shift takes five minutes to understand and a lifetime to fully exploit.
+There are two completely different types of feedback, and most dancers are stuck using the wrong one for their skill level. Beginners need to know *whether* they succeeded. Advanced dancers need to know *how* they succeeded, and the difference between those two questions is the difference between plateauing at intermediate level forever and continuing to improve for years. The shift takes five minutes to understand and a lifetime to fully exploit.
 
 ## Why Your Brain Works This Way
 
 Motor learning researcher Richard Schmidt proposed a framework called **schema theory** in 1975 that explains exactly what happens when your brain processes feedback.
 
-Every time you attempt a movement, your brain stores two things: a **recall schema** (the motor commands you sent) and a **recognition schema** (the sensory consequences you expected from those commands). Feedback about *whether the outcome was correct* — called **Knowledge of Results (KR)** — primarily updates the recall schema. It tells your motor system: "the command you sent produced the right result" or "the command was off — adjust the magnitude next time."
+Every time you attempt a movement, your brain stores two things: a **recall schema** (the motor commands you sent) and a **recognition schema** (the sensory consequences you expected from those commands). Feedback about *whether the outcome was correct*, called **Knowledge of Results (KR)**, primarily updates the recall schema. It tells your motor system: "the command you sent produced the right result" or "the command was off, adjust the magnitude next time."
 
-For beginners, this is enormously useful. When you're first learning to land on count one, KR — "yes, that was the beat" / "no, that was half a beat late" — is exactly the foundational data you need. You can't build a spatial and temporal reference map without outcome data.
+For beginners, this is enormously useful. When you're first learning to land on count one, KR, "yes, that was the beat" / "no, that was half a beat late", is exactly the foundational data you need. You can't build a spatial and temporal reference map without outcome data.
 
 ### The Wall Every Intermediate Hits
 
@@ -17,18 +17,18 @@ But here's where it breaks down. Once you can reliably hit the correct counts, t
 
 You're not improving. You're confirming.
 
-The limitation of KR is structural: it cannot address the **kinematic quality** of how you arrive at those outcomes. The weight transfer path, the push angle from the floor, the hip rotation velocity, the heel-to-ball contact sequence — these are process variables that outcome-based feedback simply cannot see. Every "success" contains continuous dimensional improvements that KR is blind to.
+The limitation of KR is structural: it cannot address the **kinematic quality** of how you arrive at those outcomes. The weight transfer path, the push angle from the floor, the hip rotation velocity, the heel-to-ball contact sequence, these are process variables that outcome-based feedback simply cannot see. Every "success" contains continuous dimensional improvements that KR is blind to.
 
-Newell and Walter (1981) demonstrated this experimentally: **Knowledge of Performance (KP)** — feedback specifying movement pattern variables rather than outcomes — produces superior kinematic consistency compared to KR alone in trained performers. Salmoni, Schmidt, and Walter's comprehensive 1984 review confirmed the hierarchy: for advanced performers on complex sequential tasks, KP is the active ingredient. KR has diminishing marginal returns once basic outcome achievement is consistent.
+Newell and Walter (1981) demonstrated this experimentally: **Knowledge of Performance (KP)**, feedback specifying movement pattern variables rather than outcomes, produces superior kinematic consistency compared to KR alone in trained performers. Salmoni, Schmidt, and Walter's comprehensive 1984 review confirmed the hierarchy: for advanced performers on complex sequential tasks, KP is the active ingredient. KR has diminishing marginal returns once basic outcome achievement is consistent.
 
 ### The Kinematic Questions That Unlock Growth
 
 KP targets the variables that determine *how* a movement is executed: joint angles at critical moments, force application timing, velocity curves, weight transfer sequencing, segmental coordination patterns.
 
 In dance terms, this means asking:
-- "Did my weight *arrive* on my front foot before or after the beat?" — not just "Did I hit the beat?"
-- "Was my foot contact heel-to-ball or flat?" — not just "Did I land on time?"
-- "Was my hip over the stance foot at peak weight transfer?" — not just "Did the combination look right?"
+- "Did my weight *arrive* on my front foot before or after the beat?", not just "Did I hit the beat?"
+- "Was my foot contact heel-to-ball or flat?", not just "Did I land on time?"
+- "Was my hip over the stance foot at peak weight transfer?", not just "Did the combination look right?"
 
 The KR-focused mental model asks: pass or fail?
 The KP-focused mental model asks: *how precisely, how efficiently, how consistently?*
@@ -47,7 +47,7 @@ Identify the **three most relevant kinematic variables** for your current weakes
 
 **KR tells you whether you passed. KP tells you by how much, and why.**
 
-Most intermediate dancers become trapped in a "good enough" plateau because their KR feedback loop is constantly giving them green lights. The feedback confirms they're achieving acceptable outcomes. But within each "successful" repetition, there are continuous dimensional improvements available — in precision, efficiency, and consistency — that are completely invisible to outcome-based assessment.
+Most intermediate dancers become trapped in a "good enough" plateau because their KR feedback loop is constantly giving them green lights. The feedback confirms they're achieving acceptable outcomes. But within each "successful" repetition, there are continuous dimensional improvements available, in precision, efficiency, and consistency, that are completely invisible to outcome-based assessment.
 
 The advanced dancer is not looking for different passes and fails. They are refining the *quality* of every pass, on a continuous scale that has no ceiling. That's how the best dancers in the world keep getting better for decades, long after "getting it right" is no longer the challenge.
 
@@ -65,14 +65,14 @@ A) Advanced dancers process KR too quickly to benefit from it
 B) KR cannot address the kinematic process variables that determine movement quality beyond binary outcome achievement
 C) Advanced dancers have already memorized all possible outcome combinations
 D) KR is unavailable in social dance environments
-*Correct Answer: B) Once basic outcome achievement is consistent, continued improvement requires optimizing the kinematic dimensions of how movements are executed — variables that KR's binary pass/fail structure cannot address.*
+*Correct Answer: B) Once basic outcome achievement is consistent, continued improvement requires optimizing the kinematic dimensions of how movements are executed, variables that KR's binary pass/fail structure cannot address.*
 
 **3. Which of the following is an example of a Knowledge of Performance (KP) self-feedback question?**
 A) "Did I hit beat one?"
 B) "Did my partner follow the lead?"
 C) "Did my weight fully arrive over my stance foot before the beat or slightly after?"
 D) "Was the combination I just did correct?"
-*Correct Answer: C) KP feedback targets specific kinematic process variables — in this case, the temporal relationship between weight transfer completion and beat arrival — rather than binary outcome correctness. That's the question that unlocks continuous improvement.*
+*Correct Answer: C) KP feedback targets specific kinematic process variables, in this case, the temporal relationship between weight transfer completion and beat arrival, rather than binary outcome correctness. That's the question that unlocks continuous improvement.*
 
 ---
 

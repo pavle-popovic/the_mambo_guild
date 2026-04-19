@@ -731,6 +731,9 @@ def get_weekly_meeting(
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,
         meeting_notes=config.meeting_notes,
+        meeting_day_of_week=config.meeting_day_of_week,
+        meeting_hour_utc=config.meeting_hour_utc,
+        meeting_minute_utc=config.meeting_minute_utc,
         updated_at=config.updated_at
     )
 
@@ -750,6 +753,9 @@ def get_weekly_meeting_admin(
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,
         meeting_notes=config.meeting_notes,
+        meeting_day_of_week=config.meeting_day_of_week,
+        meeting_hour_utc=config.meeting_hour_utc,
+        meeting_minute_utc=config.meeting_minute_utc,
         updated_at=config.updated_at
     )
 
@@ -779,6 +785,9 @@ def update_weekly_meeting(
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,
         meeting_notes=config.meeting_notes,
+        meeting_day_of_week=config.meeting_day_of_week,
+        meeting_hour_utc=config.meeting_hour_utc,
+        meeting_minute_utc=config.meeting_minute_utc,
         updated_at=config.updated_at
     )
 

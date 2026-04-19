@@ -1,7 +1,7 @@
 # Module 7: The Pachanga Fad - The Death of Mambo and the Flute Revolution
 
 ## Introduction: The Core Thesis
-Mambo did not quietly age out of style—it was violently killed overnight by a completely new, fundamentally different dance craze: **The Pachanga**. 
+Mambo did not quietly age out of style,it was violently killed overnight by a completely new, fundamentally different dance craze: **The Pachanga**. 
 
 The central shift of this era is that the heavy, aggressive, strictly partnered Mambo structure was momentarily abandoned for a bouncy, light, entirely solo-driven phenomenon that completely revolutionized Latin dance footwork and set the stage for modern shines.
 

@@ -1,38 +1,38 @@
-# Module 5: The Focus Trick — Why Thinking About Your Body Is Wrecking Your Dancing
+# Module 5: The Focus Trick, Why Thinking About Your Body Is Wrecking Your Dancing
 
 ## The Big Idea
-Where you direct your attention during practice doesn't just affect your mindset — it physically changes which parts of your brain control the movement. And here's what's shocking: thinking about your own body actually makes your dancing worse. Not a little worse. Measurably, immediately, worse. The fix is a single mental shift that costs you nothing and starts working the same session you try it.
+Where you direct your attention during practice doesn't just affect your mindset, it physically changes which parts of your brain control the movement. And here's what's shocking: thinking about your own body actually makes your dancing worse. Not a little worse. Measurably, immediately, worse. The fix is a single mental shift that costs you nothing and starts working the same session you try it.
 
 ## Why Your Brain Works This Way
 
 Gabriele Wulf has spent decades running experiments on this one question: where should a dancer's attention be directed during practice? Her answer is unambiguous, thoroughly replicated, and counterintuitive to almost everyone.
 
-When you think about your own body during movement — "lift your chest," "bend your knees," "point your toe" — you're engaging what's called an **internal focus of attention**. And according to Wulf's **Constrained Action Hypothesis (CAH)**, this is neurologically problematic.
+When you think about your own body during movement, "lift your chest," "bend your knees," "point your toe", you're engaging what's called an **internal focus of attention**. And according to Wulf's **Constrained Action Hypothesis (CAH)**, this is neurologically problematic.
 
 Here's why. Your cerebellum and basal ganglia are exquisitely designed to run learned movement programs with extraordinary precision and speed. These subcortical systems are optimized for exactly this kind of execution. They're fast, efficient, and reliable. Think of them as a professional autopilot flying a smooth, steady cruise.
 
-But the moment you direct conscious attention to your body parts, your **prefrontal cortex** — the slow, deliberate, analytical part of your brain — decides it needs to get involved. It starts interfering with movements that the autopilot was handling just fine. The result is what engineers would call "control noise": unnecessary tension, micro-hesitations, and coordinative interference between muscle groups that never needed conscious management in the first place.
+But the moment you direct conscious attention to your body parts, your **prefrontal cortex**, the slow, deliberate, analytical part of your brain, decides it needs to get involved. It starts interfering with movements that the autopilot was handling just fine. The result is what engineers would call "control noise": unnecessary tension, micro-hesitations, and coordinative interference between muscle groups that never needed conscious management in the first place.
 
 It's like a nervous student pilot grabbing the controls from a seasoned captain. The plane flies worse, not better.
 
 ### The Experiment That Proved It
 
-In 1998, Wulf, Höß, and Prinz ran a ski-simulator study. One group was told to focus on their feet (internal cue). Another was told to focus on the movement of the ski platform (external cue). Same physical task. Dramatically different results — the external focus group performed significantly better, and the improvement appeared immediately, within the first practice session, and held through retention testing days later.
+In 1998, Wulf, Höß, and Prinz ran a ski-simulator study. One group was told to focus on their feet (internal cue). Another was told to focus on the movement of the ski platform (external cue). Same physical task. Dramatically different results, the external focus group performed significantly better, and the improvement appeared immediately, within the first practice session, and held through retention testing days later.
 
-Wulf's expanded theory — the **OPTIMAL theory of motor learning** (2016) — goes even further, arguing that attentional focus, autonomy, and enhanced expectancies all work through a single common pathway: they either constrain or liberate the automatic motor system. External focus is what sets it free.
+Wulf's expanded theory, the **OPTIMAL theory of motor learning** (2016), goes even further, arguing that attentional focus, autonomy, and enhanced expectancies all work through a single common pathway: they either constrain or liberate the automatic motor system. External focus is what sets it free.
 
 ### The Problem with "Lift Your Chest"
 
 In dance instruction, internal cues are everywhere: "lift your chest," "point your toe," "bend your knees," "pull your shoulder back." These cues are anatomically precise. But for a dancer who has already acquired the basic movement pattern, they're neurologically counterproductive.
 
-The same instruction can be reframed as an **external cue** — one that directs attention to the *effect* of the movement in the environment rather than the mechanism:
+The same instruction can be reframed as an **external cue**, one that directs attention to the *effect* of the movement in the environment rather than the mechanism:
 
 - "Lift your chest" → "Let the ceiling pull you up"
 - "Push the floor away" (instead of "straighten your knee")
 - "Reach the wall behind me" (instead of "pull your shoulder back")
 - "Trace a line on the floor" (instead of "point your toe")
 
-The body part is still being addressed. But attention is directed to the consequence, not the mechanism — and that's the difference between your autopilot running the show and your overthinking conscious brain grabbing the controls.
+The body part is still being addressed. But attention is directed to the consequence, not the mechanism, and that's the difference between your autopilot running the show and your overthinking conscious brain grabbing the controls.
 
 ## What You're Going to Do About It
 
@@ -45,9 +45,9 @@ Use only the external versions during drill repetitions. Every. Single. Time.
 
 ## The Mind-Blowing Part
 
-Here's the striking data point: **36% of professional dancers still habitually use internal attentional cues** — even at elite levels. More than a third of experienced performers are chronically constraining their own automatic motor system during execution.
+Here's the striking data point: **36% of professional dancers still habitually use internal attentional cues**, even at elite levels. More than a third of experienced performers are chronically constraining their own automatic motor system during execution.
 
-And the research is unambiguous: switching from internal to external focus produces immediate, measurable improvements in balance, timing precision, and movement fluidity — in the very first session you apply the change. This is one of the highest return-on-investment adjustments available to any dancer at any skill level. It requires zero additional physical training time. Just a different question to ask yourself during the next rep.
+And the research is unambiguous: switching from internal to external focus produces immediate, measurable improvements in balance, timing precision, and movement fluidity, in the very first session you apply the change. This is one of the highest return-on-investment adjustments available to any dancer at any skill level. It requires zero additional physical training time. Just a different question to ask yourself during the next rep.
 
 ## Knowledge Check
 
@@ -70,7 +70,7 @@ A) "Think about your left knee" → "Think about your right knee"
 B) "Straighten your knee" → "Push the floor away from you"
 C) "Relax your shoulders" → "Tighten your core"
 D) "Watch your feet" → "Watch your hands"
-*Correct Answer: B) Redirecting attention from the body segment (knee) to the environmental effect (the floor) is the correct application of external focus. The movement outcome is unchanged; only the attentional target shifts — and that shift is everything.*
+*Correct Answer: B) Redirecting attention from the body segment (knee) to the environmental effect (the floor) is the correct application of external focus. The movement outcome is unchanged; only the attentional target shifts, and that shift is everything.*
 
 ---
 

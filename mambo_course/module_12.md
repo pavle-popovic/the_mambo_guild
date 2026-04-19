@@ -26,7 +26,7 @@ This environment created a completely new aesthetic: **The "Show" Style**.
 
 The dancers realized they had to project energy to the absolute back row of a massive theater. Lines became sharper. Footwork became so blisteringly fast it was almost violently detached from the physical floor. Costumes became heavily rhinestoned. 
 
-The tragedy, however, was that this specialized, hyper-aggressive stage technique bled directly back onto the social dance floors. Suddenly, if you went to a Tuesday night social at the Copacabana, the leads weren't trying to connect with their follows—they were violently attempting to execute incredibly dangerous, five-spin "show" patterns they had memorized from a Santo Rico performance, fundamentally altering the organic safety of the social scene forever.
+The tragedy, however, was that this specialized, hyper-aggressive stage technique bled directly back onto the social dance floors. Suddenly, if you went to a Tuesday night social at the Copacabana, the leads weren't trying to connect with their follows,they were violently attempting to execute incredibly dangerous, five-spin "show" patterns they had memorized from a Santo Rico performance, fundamentally altering the organic safety of the social scene forever.
 
 ## The 'Aha' Moment: Spotting and the Physics of Acceleration
 Before this era of performance companies, a social dancer rarely executed more than a leisurely single or double turn. It wasn't necessary. 

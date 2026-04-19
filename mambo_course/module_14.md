@@ -34,7 +34,7 @@ This means the core entirely locks. The foot strikes the floor heavily. The body
 
 By executing a perfect, hard linear check, the dancer turns the partnership into a massive rubber band. You create intense physical tension pulling away from your partner. When that tension naturally rebounds on the 2 or the 5, the "snap" physically launches the follow down the slot. 
 
-This specific, aggressive elastic snap—created by eliminating all curves and strictly hitting the linear check—is the absolute foundation of Vazquez-style speed. Without the snap, their complex double-spin combinations are physically impossible to execute within the available musical timing.
+This specific, aggressive elastic snap,created by eliminating all curves and strictly hitting the linear check,is the absolute foundation of Vazquez-style speed. Without the snap, their complex double-spin combinations are physically impossible to execute within the available musical timing.
 
 ## Knowledge Check
 

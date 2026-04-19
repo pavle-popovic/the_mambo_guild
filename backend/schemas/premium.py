@@ -276,6 +276,10 @@ class WeeklyMeetingConfigResponse(BaseModel):
     """Meeting config returned to both guild masters and admins."""
     meeting_url: Optional[str] = None
     meeting_notes: Optional[str] = None
+    # Schedule fields (0=Sun … 6=Sat; hour/minute in UTC)
+    meeting_day_of_week: int = 3
+    meeting_hour_utc: int = 19
+    meeting_minute_utc: int = 0
     updated_at: Optional[datetime] = None
 
     class Config:
@@ -283,9 +287,13 @@ class WeeklyMeetingConfigResponse(BaseModel):
 
 
 class WeeklyMeetingConfigUpdate(BaseModel):
-    """Admin request to update the meeting link/notes."""
+    """Admin request to update the meeting link/notes and schedule."""
     meeting_url: Optional[str] = Field(None, max_length=500)
     meeting_notes: Optional[str] = None
+    # Schedule fields
+    meeting_day_of_week: Optional[int] = Field(None, ge=0, le=6)
+    meeting_hour_utc: Optional[int] = Field(None, ge=0, le=23)
+    meeting_minute_utc: Optional[int] = Field(None, ge=0, le=59)
 
 
 # ============================================

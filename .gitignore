@@ -80,3 +80,7 @@ SkillTreeUI.png
 skill_tree_builder.html
 # Local-only docs
 PENDING_CC_FIXES.md
+
+# Local-only working notes / outputs (not for commit)
+bugs/
+backend/scripts/already_sent.txt

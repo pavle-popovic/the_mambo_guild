@@ -79,6 +79,10 @@ class WeeklyMeetingConfig(Base):
     id = Column(Integer, primary_key=True)
     meeting_url = Column(String(500), nullable=True)
     meeting_notes = Column(Text, nullable=True)
+    # Schedule: day 0=Sun…6=Sat; hour/minute in UTC
+    meeting_day_of_week = Column(Integer, default=3, nullable=False)  # 3 = Wednesday
+    meeting_hour_utc = Column(Integer, default=19, nullable=False)
+    meeting_minute_utc = Column(Integer, default=0, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
 
     def __repr__(self):
