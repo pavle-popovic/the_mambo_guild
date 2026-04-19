@@ -9,7 +9,7 @@
 - **Founded:** 2025
 - **Founder:** Pavle Popovic — 2x European Salsa Champion, certified in Learning Experience Design and Gamification, 10 years dancing, 7 years teaching across London, Brussels, and Rome.
 - **Pedagogy:** Built on Juliet McMains' historical research (Spinning Mambo into Salsa) and modern motor-learning science (deliberate practice, cognitive load theory).
-- **Languages:** English, with captions in 13 languages.
+- **Languages:** English, with captions in 14 languages.
 
 ## Who it's for
 
@@ -29,7 +29,7 @@ All plans: cancel anytime in two clicks. No contracts. Secure payment via Stripe
 ## Key features
 
 - **Skill Tree** — A visual roadmap of 300+ classes laid out like a video-game tech tree. Unlocks as you level up.
-- **Pro Player** — Mirrored view, back view, 13 languages of captions, speed controls (0.25× to 2×), frame-by-frame, A/B loop, summary notes and quizzes.
+- **Pro Player** — Mirrored view, back view, 14 languages of captions, speed controls (0.25× to 2×), frame-by-frame, A/B loop, summary notes and quizzes.
 - **Courses** — Structured Salsa On2 curriculum (foundations to advanced), plus a 20-module History of Salsa course and an 18-module Science of Effective Training course.
 - **Community** — The Stage (share progress videos), The Lab (technique Q&A), badges, leaderboards.
 - **Guild Master VIP** — Monthly 1-on-1 coaching, weekly live Zoom calls, DJ Booth with isolated stems, The Vault archive.

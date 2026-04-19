@@ -671,11 +671,9 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Shared sections — on mobile: badges first, referrals, then continue learning (at bottom) */}
-        {/* On desktop: continue learning, badges, referrals (original order) */}
+        {/* Badges first on every viewport, then referrals, then continue learning */}
         <div className="flex flex-col">
-          {/* Badge Trophy Case — order 1 on mobile, order 1 on desktop (same) */}
-          <div className="mt-5 sm:mt-8 order-1 lg:order-2">
+          <div className="mt-5 sm:mt-8 order-1">
             <BadgeTrophyCase
               initialBadges={user.badges}
               streakCount={user.streak_count}
@@ -683,13 +681,11 @@ export default function ProfilePage() {
             />
           </div>
 
-          {/* Referral Section */}
-          <div className="mt-5 sm:mt-8 order-2 lg:order-3">
+          <div className="mt-5 sm:mt-8 order-2">
             <ReferralSection />
           </div>
 
-          {/* Continue Learning Section — last on mobile, first on desktop */}
-          <div className="order-3 lg:order-1">
+          <div className="mt-5 sm:mt-8 order-3">
             <h2 className="text-xl font-bold mb-6 text-mambo-text">{t("continueLearning")}</h2>
 
             {loadingCourses ? (
