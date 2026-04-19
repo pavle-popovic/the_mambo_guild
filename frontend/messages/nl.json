@@ -666,7 +666,7 @@
       "trustSecurePre": "Veilige",
       "trustSecureBrand": "Stripe",
       "trustSecurePost": "checkout",
-      "seeFullPricing": "Bekijk alle prijsdetails en FAQ →"
+      "seeFullPricing": "Bekijk alle prijsdetails →"
     },
     "faq": {
       "eyebrow": "FAQ",

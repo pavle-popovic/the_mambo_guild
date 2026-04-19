@@ -666,7 +666,7 @@
       "trustSecurePre": "Checkout seguro",
       "trustSecureBrand": "Stripe",
       "trustSecurePost": "",
-      "seeFullPricing": "Veja detalhes completos de preços e FAQ →"
+      "seeFullPricing": "Veja detalhes completos de preços →"
     },
     "faq": {
       "eyebrow": "FAQ",

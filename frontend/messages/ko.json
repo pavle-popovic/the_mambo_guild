@@ -805,7 +805,7 @@
       "trustSecurePre": "안전한",
       "trustSecureBrand": "Stripe",
       "trustSecurePost": "결제",
-      "seeFullPricing": "전체 요금제와 FAQ 보기 →"
+      "seeFullPricing": "전체 요금제 보기 →"
     },
     "faq": {
       "eyebrow": "FAQ",

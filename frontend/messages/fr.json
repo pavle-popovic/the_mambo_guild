@@ -666,7 +666,7 @@
       "trustSecurePre": "Paiement sécurisé via",
       "trustSecureBrand": "Stripe",
       "trustSecurePost": "",
-      "seeFullPricing": "Voir tous les détails tarifaires et la FAQ →"
+      "seeFullPricing": "Voir tous les détails tarifaires →"
     },
     "faq": {
       "eyebrow": "FAQ",

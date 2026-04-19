@@ -805,7 +805,7 @@
       "trustSecurePre": "Ασφαλές",
       "trustSecureBrand": "Stripe",
       "trustSecurePost": "checkout",
-      "seeFullPricing": "Δες όλες τις λεπτομέρειες τιμολόγησης και το FAQ →"
+      "seeFullPricing": "Δες όλες τις λεπτομέρειες τιμολόγησης →"
     },
     "faq": {
       "eyebrow": "FAQ",

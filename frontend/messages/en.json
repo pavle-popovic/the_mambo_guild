@@ -960,7 +960,7 @@
       "trustSecurePre": "Secure",
       "trustSecureBrand": "Stripe",
       "trustSecurePost": "checkout",
-      "seeFullPricing": "See full pricing details and FAQ →"
+      "seeFullPricing": "See full pricing details →"
     },
     "faq": {
       "eyebrow": "FAQ",
