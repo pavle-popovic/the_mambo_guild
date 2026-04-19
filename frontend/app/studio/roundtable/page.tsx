@@ -149,9 +149,9 @@ export default function RoundtablePage() {
         setMeetingConfig(configData);
         setArchives(archivesData);
         // Start countdown from the configured schedule
-        const dow = (configData as any).meeting_day_of_week ?? 3;
-        const h   = (configData as any).meeting_hour_utc   ?? 19;
-        const m   = (configData as any).meeting_minute_utc  ?? 0;
+        const dow = configData.meeting_day_of_week ?? 3;
+        const h   = configData.meeting_hour_utc   ?? 19;
+        const m   = configData.meeting_minute_utc  ?? 0;
         const target = nextMeetingGMT(dow, h, m);
         const secs = Math.floor((target.getTime() - Date.now()) / 1000);
         setCountdown(secs > 0 ? secs : 0);

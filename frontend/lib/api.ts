@@ -1476,6 +1476,9 @@ class ApiClient {
     return this.request<{
       meeting_url: string | null;
       meeting_notes: string | null;
+      meeting_day_of_week: number;
+      meeting_hour_utc: number;
+      meeting_minute_utc: number;
       updated_at: string | null;
     }>("/api/premium/weekly-meeting");
   }

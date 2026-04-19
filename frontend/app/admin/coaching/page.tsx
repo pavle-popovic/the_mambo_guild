@@ -19,7 +19,7 @@ import {
 import AdminSidebar from "@/components/AdminSidebar";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
-import MuxPlayer from "@mux/mux-player-react";
+import MuxVideoPlayer, { type MuxVideoPlayerHandle } from "@/components/MuxVideoPlayer";
 
 interface CoachingSubmission {
   id: string;
@@ -54,7 +54,7 @@ function ReviewStudio({
   onClose: () => void;
   onComplete: () => void;
 }) {
-  const studentVideoRef = useRef<any>(null);
+  const studentVideoRef = useRef<MuxVideoPlayerHandle>(null);
   const webcamVideoRef = useRef<HTMLVideoElement>(null);
   const previewVideoRef = useRef<HTMLVideoElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -82,6 +82,28 @@ function ReviewStudio({
     };
   }, []);
 
+  // Set crossOrigin="anonymous" on the underlying Mux <video> as early as
+  // possible so canvas recording isn't tainted. Mux HLS is CORS-enabled, so
+  // subsequent segment fetches will carry the header.
+  useEffect(() => {
+    let cancelled = false;
+    const attempt = (tries = 0) => {
+      if (cancelled) return;
+      const video = studentVideoRef.current?.getVideoElement();
+      if (!video) {
+        if (tries < 30) setTimeout(() => attempt(tries + 1), 200);
+        return;
+      }
+      if (video.crossOrigin !== "anonymous") {
+        video.crossOrigin = "anonymous";
+      }
+    };
+    attempt();
+    return () => {
+      cancelled = true;
+    };
+  }, [submission.video_mux_playback_id]);
+
   const startWebcam = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
@@ -106,15 +128,7 @@ function ReviewStudio({
   const drawFrame = useCallback(() => {
     const canvas = canvasRef.current;
     
-    // Extract the actual HTMLVideoElement from inside MuxPlayer
-    let studentVid: HTMLVideoElement | null = null;
-    if (studentVideoRef.current) {
-      studentVid = 
-        studentVideoRef.current.media?.nativeEl || 
-        studentVideoRef.current.shadowRoot?.querySelector("video") ||
-        studentVideoRef.current.querySelector("video");
-    }
-
+    const studentVid = studentVideoRef.current?.getVideoElement() ?? null;
     const webcamVid = webcamVideoRef.current;
     if (!canvas || !studentVid || !webcamVid) {
       if (recordingState === "recording") {
@@ -311,11 +325,10 @@ function ReviewStudio({
               <Video className="w-3 h-3" /> Student Submission
             </p>
             <div className="aspect-video rounded-xl overflow-hidden bg-black">
-              <MuxPlayer
+              <MuxVideoPlayer
                 ref={studentVideoRef}
                 playbackId={submission.video_mux_playback_id}
-                crossOrigin="anonymous"
-                className="w-full h-full"
+                metadata={{ video_title: "Coaching submission" }}
               />
             </div>
           </div>
