@@ -28,6 +28,9 @@ interface Post {
     is_wip: boolean;
     feedback_type: "coach" | "hype";
     reaction_count: number;
+    fire_count?: number;
+    ruler_count?: number;
+    clap_count?: number;
     reply_count: number;
     has_instructor_comment?: boolean;
 }

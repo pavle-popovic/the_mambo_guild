@@ -24,6 +24,9 @@ interface Post {
     tags: string[];
     is_solved: boolean;
     reaction_count: number;
+    fire_count?: number;
+    ruler_count?: number;
+    clap_count?: number;
     reply_count: number;
     created_at: string;
 }

@@ -33,6 +33,9 @@ interface Post {
   feedback_type: "coach" | "hype";
   is_solved: boolean;
   reaction_count: number;
+  fire_count?: number;
+  ruler_count?: number;
+  clap_count?: number;
   reply_count: number;
   user_reaction: "fire" | "ruler" | "clap" | null;
   is_saved?: boolean;
@@ -107,7 +110,13 @@ export default function PostDetailModal({
   const [deletingReplyId, setDeletingReplyId] = useState<string | null>(null);
 
   // Optimistic state management
-  const [optimisticReaction, setOptimisticReaction] = useState<{ type: string | null, count: number } | null>(null);
+  const [optimisticReaction, setOptimisticReaction] = useState<{
+    type: string | null;
+    count: number;
+    fire_count: number;
+    ruler_count: number;
+    clap_count: number;
+  } | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
   // Edit form state
@@ -184,6 +193,9 @@ export default function PostDetailModal({
             ...(postData as Post),
             user_reaction: optimisticReaction.type as Post['user_reaction'],
             reaction_count: optimisticReaction.count,
+            fire_count: optimisticReaction.fire_count,
+            ruler_count: optimisticReaction.ruler_count,
+            clap_count: optimisticReaction.clap_count,
           });
         } else {
           setPost(postData as Post);
@@ -231,6 +243,9 @@ export default function PostDetailModal({
     // Store current state for potential revert
     const prevReaction = post.user_reaction;
     const prevCount = post.reaction_count;
+    const prevFire = post.fire_count ?? 0;
+    const prevRuler = post.ruler_count ?? 0;
+    const prevClap = post.clap_count ?? 0;
 
     // Calculate new state
     const isTogglingOff = prevReaction === type;
@@ -239,16 +254,36 @@ export default function PostDetailModal({
       ? prevCount - 1  // Removing reaction
       : prevReaction === null
         ? prevCount + 1  // New reaction
-        : prevCount;  // Changing type doesn't change count
+        : prevCount;  // Changing type doesn't change total count
+
+    // Adjust per-type counts: remove from previous type (if any), add to new type (if any)
+    const adjust = (current: number, kind: "fire" | "ruler" | "clap") => {
+      let next = current;
+      if (prevReaction === kind) next = Math.max(0, next - 1);
+      if (newReaction === kind) next = next + 1;
+      return next;
+    };
+    const newFire = adjust(prevFire, "fire");
+    const newRuler = adjust(prevRuler, "ruler");
+    const newClap = adjust(prevClap, "clap");
 
     // Set optimistic state (separate from post state)
-    setOptimisticReaction({ type: newReaction, count: newCount });
+    setOptimisticReaction({
+      type: newReaction,
+      count: newCount,
+      fire_count: newFire,
+      ruler_count: newRuler,
+      clap_count: newClap,
+    });
 
     // Update post state optimistically using functional update
     setPost(prev => prev ? {
       ...prev,
       user_reaction: newReaction,
       reaction_count: newCount,
+      fire_count: newFire,
+      ruler_count: newRuler,
+      clap_count: newClap,
     } : null);
 
     // Call API
@@ -267,6 +302,9 @@ export default function PostDetailModal({
         ...prev,
         user_reaction: prevReaction,
         reaction_count: prevCount,
+        fire_count: prevFire,
+        ruler_count: prevRuler,
+        clap_count: prevClap,
       } : null);
       setOptimisticReaction(null);
     }
@@ -833,7 +871,9 @@ export default function PostDetailModal({
                   {(() => {
                     // Use optimistic state if available, otherwise use post state
                     const displayReaction = optimisticReaction?.type ?? post.user_reaction;
-                    const displayCount = optimisticReaction?.count ?? post.reaction_count;
+                    const displayFire = optimisticReaction?.fire_count ?? post.fire_count ?? 0;
+                    const displayRuler = optimisticReaction?.ruler_count ?? post.ruler_count ?? 0;
+                    const displayClap = optimisticReaction?.clap_count ?? post.clap_count ?? 0;
 
                     return (
                       <>
@@ -850,7 +890,7 @@ export default function PostDetailModal({
                           )}
                         >
                           <FaFire />
-                          <span className="font-semibold">{!displayReaction || displayReaction === "fire" ? displayCount : 0}</span>
+                          <span className="font-semibold">{displayFire}</span>
                         </motion.button>
                         <motion.button
                           onClick={() => handleReaction("ruler")}
@@ -865,7 +905,7 @@ export default function PostDetailModal({
                           )}
                         >
                           <FaRuler />
-                          <span className="font-semibold">{displayReaction === "ruler" ? displayCount : 0}</span>
+                          <span className="font-semibold">{displayRuler}</span>
                         </motion.button>
                         <motion.button
                           onClick={() => handleReaction("clap")}
@@ -880,7 +920,7 @@ export default function PostDetailModal({
                           )}
                         >
                           <span>👏</span>
-                          <span className="font-semibold">{displayReaction === "clap" ? displayCount : 0}</span>
+                          <span className="font-semibold">{displayClap}</span>
                         </motion.button>
                       </>
                     );

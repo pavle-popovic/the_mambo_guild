@@ -38,6 +38,9 @@ interface Post {
     feedback_type: "coach" | "hype";
     is_solved: boolean;
     reaction_count: number;
+    fire_count?: number;
+    ruler_count?: number;
+    clap_count?: number;
     reply_count: number;
     user_reaction: string | null;
     is_saved?: boolean;

@@ -1058,6 +1058,9 @@ class ApiClient {
       feedback_type: string;
       is_solved: boolean;
       reaction_count: number;
+      fire_count?: number;
+      ruler_count?: number;
+      clap_count?: number;
       reply_count: number;
       user_reaction: string | null;
       created_at: string;
@@ -1088,6 +1091,9 @@ class ApiClient {
       feedback_type: string;
       is_solved: boolean;
       reaction_count: number;
+      fire_count?: number;
+      ruler_count?: number;
+      clap_count?: number;
       reply_count: number;
       user_reaction: string | null;
       created_at: string;
@@ -1138,6 +1144,11 @@ class ApiClient {
     return this.request<{
       success: boolean;
       message: string;
+      user_reaction?: 'fire' | 'ruler' | 'clap' | null;
+      reaction_count?: number;
+      fire_count?: number;
+      ruler_count?: number;
+      clap_count?: number;
     }>(`/api/community/posts/${postId}/react`, {
       method: "POST",
       body: JSON.stringify({ reaction_type: reactionType }),
@@ -1148,6 +1159,11 @@ class ApiClient {
     return this.request<{
       success: boolean;
       message: string;
+      user_reaction?: null;
+      reaction_count?: number;
+      fire_count?: number;
+      ruler_count?: number;
+      clap_count?: number;
     }>(`/api/community/posts/${postId}/react`, {
       method: "DELETE",
     });

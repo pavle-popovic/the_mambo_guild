@@ -54,8 +54,10 @@ def _build_post_dict(
     user_reaction: str | None,
     db: Session,
     is_saved: bool = False,
+    type_counts: dict | None = None,
 ) -> dict:
     """Build the post response dict from pre-loaded objects."""
+    tc = type_counts or {}
     return {
         "id": str(post.id),
         "user": _get_user_info(user, db) if user else None,
@@ -69,12 +71,25 @@ def _build_post_dict(
         "feedback_type": post.feedback_type,
         "is_solved": post.is_solved,
         "reaction_count": post.reaction_count,
+        "fire_count": int(tc.get("fire", 0)),
+        "ruler_count": int(tc.get("ruler", 0)),
+        "clap_count": int(tc.get("clap", 0)),
         "reply_count": post.reply_count,
         "user_reaction": user_reaction,
         "is_saved": is_saved,
         "created_at": post.created_at,
         "updated_at": post.updated_at,
     }
+
+
+def _get_type_counts_for_post(post_id, db: Session) -> dict:
+    """Single-post per-type count query."""
+    rows = db.query(
+        PostReaction.reaction_type, func.count(PostReaction.id)
+    ).filter(
+        PostReaction.post_id == post_id
+    ).group_by(PostReaction.reaction_type).all()
+    return {r[0]: r[1] for r in rows}
 
 
 def _format_post_response(post: Post, current_user_id: str, db: Session) -> dict:
@@ -95,13 +110,14 @@ def _format_post_response(post: Post, current_user_id: str, db: Session) -> dict
             SavedPost.post_id == post.id,
             SavedPost.user_id == current_user_id
         ).first() is not None
-    return _build_post_dict(post, user, user_reaction, db, is_saved=is_saved)
+    type_counts = _get_type_counts_for_post(post.id, db)
+    return _build_post_dict(post, user, user_reaction, db, is_saved=is_saved, type_counts=type_counts)
 
 
 def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
     """
     Format a list of posts for API response using batch queries.
-    Avoids N+1: 2 extra queries regardless of how many posts.
+    Avoids N+1: 3 extra queries regardless of how many posts.
     """
     if not posts:
         return []
@@ -113,11 +129,24 @@ def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
     ).all()
     user_map = {str(u.id): u for u in users}
 
+    post_ids = [p.id for p in posts]
+
+    # Batch-load per-type reaction counts for all posts in one query
+    type_count_rows = db.query(
+        PostReaction.post_id,
+        PostReaction.reaction_type,
+        func.count(PostReaction.id)
+    ).filter(
+        PostReaction.post_id.in_(post_ids)
+    ).group_by(PostReaction.post_id, PostReaction.reaction_type).all()
+    type_counts_map: dict = {}
+    for post_id_row, rtype, cnt in type_count_rows:
+        type_counts_map.setdefault(str(post_id_row), {})[rtype] = cnt
+
     # Batch-load current user's reactions and saved status in two queries
     reaction_map: dict = {}
     saved_set: set = set()
     if current_user_id:
-        post_ids = [p.id for p in posts]
         reactions = db.query(PostReaction).filter(
             PostReaction.post_id.in_(post_ids),
             PostReaction.user_id == current_user_id
@@ -137,6 +166,7 @@ def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
             reaction_map.get(str(p.id)),
             db,
             is_saved=str(p.id) in saved_set,
+            type_counts=type_counts_map.get(str(p.id), {}),
         )
         for p in posts
     ]
@@ -362,10 +392,28 @@ def add_reaction(
         if existing.reaction_type != reaction_type:
             existing.reaction_type = reaction_type
             db.flush()
-            return {"success": True, "message": "Reaction updated"}
+            counts = _get_type_counts_for_post(post_id, db)
+            return {
+                "success": True,
+                "message": "Reaction updated",
+                "user_reaction": reaction_type,
+                "reaction_count": post.reaction_count,
+                "fire_count": int(counts.get("fire", 0)),
+                "ruler_count": int(counts.get("ruler", 0)),
+                "clap_count": int(counts.get("clap", 0)),
+            }
         else:
-            return {"success": True, "message": "Already reacted"}
-    
+            counts = _get_type_counts_for_post(post_id, db)
+            return {
+                "success": True,
+                "message": "Already reacted",
+                "user_reaction": reaction_type,
+                "reaction_count": post.reaction_count,
+                "fire_count": int(counts.get("fire", 0)),
+                "ruler_count": int(counts.get("ruler", 0)),
+                "clap_count": int(counts.get("clap", 0)),
+            }
+
     # New reaction - charge claves
     success, balance = spend_claves(user_id, COST_REACTION, "reaction", db, reference_id=str(post_id))
     if not success:
@@ -375,7 +423,7 @@ def add_reaction(
             "required": COST_REACTION,
             "balance": balance
         }
-    
+
     # Create reaction
     reaction = PostReaction(
         id=uuid.uuid4(),
@@ -384,18 +432,27 @@ def add_reaction(
         reaction_type=reaction_type
     )
     db.add(reaction)
-    
+
     # Update post reaction count
     post.reaction_count += 1
-    
+
     # Process refund for post owner (ANY reaction type triggers it)
     if str(post.user_id) != user_id:
         process_reaction_refund(str(post_id), str(post.user_id), db)
-    
+
     db.flush()
-    
+
+    counts = _get_type_counts_for_post(post_id, db)
     logger.info(f"User {user_id} reacted {reaction_type} on post {post_id}")
-    return {"success": True, "message": f"Reacted with {reaction_type}! (-{COST_REACTION} 🥢)"}
+    return {
+        "success": True,
+        "message": f"Reacted with {reaction_type}! (-{COST_REACTION} 🥢)",
+        "user_reaction": reaction_type,
+        "reaction_count": post.reaction_count,
+        "fire_count": int(counts.get("fire", 0)),
+        "ruler_count": int(counts.get("ruler", 0)),
+        "clap_count": int(counts.get("clap", 0)),
+    }
 
 
 def remove_reaction(
@@ -410,10 +467,10 @@ def remove_reaction(
         PostReaction.post_id == post_id,
         PostReaction.user_id == user_id
     ).first()
-    
+
     if not reaction:
         return {"success": False, "message": "No reaction to remove"}
-    
+
     # Get post to update count
     post = db.query(Post).filter(Post.id == post_id).first()
     if post:
@@ -426,7 +483,17 @@ def remove_reaction(
     db.delete(reaction)
     db.flush()
 
-    return {"success": True, "message": "Reaction removed"}
+    counts = _get_type_counts_for_post(post_id, db)
+    total = post.reaction_count if post else 0
+    return {
+        "success": True,
+        "message": "Reaction removed",
+        "user_reaction": None,
+        "reaction_count": total,
+        "fire_count": int(counts.get("fire", 0)),
+        "ruler_count": int(counts.get("ruler", 0)),
+        "clap_count": int(counts.get("clap", 0)),
+    }
 
 
 def add_reply(
