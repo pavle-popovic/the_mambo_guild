@@ -10,13 +10,13 @@ import { Toaster } from "sonner";
 import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION, FOUNDER, CONTACT_EMAIL } from "@/lib/site";
 
 const inter = Inter({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext", "greek", "cyrillic"],
   weight: ["300", "400", "600", "800"],
   variable: "--font-inter",
 });
 
 const playfair = Playfair_Display({
-  subsets: ["latin"],
+  subsets: ["latin", "latin-ext", "cyrillic"],
   weight: ["700"],
   style: ["normal", "italic"],
   variable: "--font-playfair",
