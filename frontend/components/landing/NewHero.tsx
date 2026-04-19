@@ -163,12 +163,12 @@ export default function NewHero() {
                         </span>
                     </motion.div>
 
-                    {/* Main Title — single line across desktop, portrait phone, and landscape phone.
-                        Font-size is vw-based with tight min/max clamps so the longest translations
-                        (German/Italian/Polish) still fit on one row; whitespace-nowrap prevents wrap. */}
+                    {/* Main Title. Mobile: big, allowed to wrap to 2 lines for long translations.
+                        Desktop (lg+): single line via whitespace-nowrap with a tight vw clamp so
+                        even the longest locales (Greek/Polish/German) fit on one row. */}
                     <div className="space-y-2 md:space-y-2.5 landscape-phone:!space-y-1 min-w-0">
                         <h1 className="leading-[1.05] tracking-tight text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.35)]">
-                            <span className="block font-extrabold whitespace-nowrap text-[clamp(0.6rem,2.8vw,1.4rem)] lg:text-[clamp(0.8rem,1.3vw,1.08rem)] xl:text-[clamp(0.9rem,1.35vw,1.25rem)] landscape-phone:!text-[clamp(0.58rem,2vw,0.9rem)]">
+                            <span className="block font-extrabold text-[clamp(1.5rem,5.5vw,2.5rem)] lg:whitespace-nowrap lg:text-[clamp(1.25rem,1.7vw,1.5rem)] xl:text-[clamp(1.4rem,1.9vw,1.85rem)] landscape-phone:!text-[clamp(1.1rem,3.2vw,1.6rem)]">
                                 {t("title")}
                             </span>
                         </h1>
