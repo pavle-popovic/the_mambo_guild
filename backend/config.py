@@ -68,6 +68,12 @@ class Settings:
     SECURE_COOKIES: bool = os.getenv("SECURE_COOKIES", "true" if _is_production else "false").lower() == "true"
     COOKIE_DOMAIN: Optional[str] = os.getenv("COOKIE_DOMAIN")  # e.g., ".yourdomain.com" for cross-subdomain
 
+    # Number of trusted reverse proxies sitting between the client and this app.
+    # Used by utils.request.client_ip to pick the real client IP from X-Forwarded-For
+    # without letting clients spoof the header. Railway-only deploy = 1. Cloudflare
+    # + Railway = 2. Local dev with no proxy = 0 (falls back to request.client.host).
+    TRUSTED_PROXY_HOPS: int = int(os.getenv("TRUSTED_PROXY_HOPS", "1" if _is_production else "0"))
+
     # Mux Configuration
     MUX_TOKEN_ID: Optional[str] = os.getenv("MUX_TOKEN_ID")
     MUX_TOKEN_SECRET: Optional[str] = os.getenv("MUX_TOKEN_SECRET")

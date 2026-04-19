@@ -22,6 +22,11 @@ import hashlib
 import base64
 import json
 import logging
+import time
+
+from sqlalchemy.exc import IntegrityError
+
+from models.payment import MuxWebhookEvent
 
 logger = logging.getLogger(__name__)
 
@@ -364,7 +369,18 @@ def create_mux_upload_url(
     upload_id = result.get("upload_id", "unknown")
     upload_url = result.get("upload_url", "unknown")
     logger.info(f"Upload URL created: {upload_id}")
-    
+
+    # Record upload ownership so only the uploader (or an admin) can later
+    # poll /mux/upload-status/{upload_id} and read the resulting playback_id.
+    # Without this, any authenticated user could scrape private coaching
+    # submissions by iterating upload ids.
+    if current_user_opt and upload_id and upload_id != "unknown":
+        try:
+            from services.redis_service import set_mux_upload_owner
+            set_mux_upload_owner(upload_id, str(current_user_opt.id))
+        except Exception as e:
+            logger.error(f"Failed to persist upload owner: {type(e).__name__}")
+
     # If called via query params (MuxUploader), return format it expects
     # MuxUploader expects { url, uploadId }
     # Check if this was called with query params (MuxUploader pattern)
@@ -395,7 +411,21 @@ def get_upload_status(
     """
     Check the status of a direct upload by its upload_id.
     Returns asset_id and playback_id when the upload is complete.
+
+    Ownership: only the user who minted the upload (or an admin) can poll it.
+    This prevents an authenticated user from iterating upload ids to lift
+    private coaching submissions' playback ids before they're attached to a
+    coaching_submissions row.
     """
+    if current_user.role != UserRole.ADMIN:
+        from services.redis_service import get_mux_upload_owner
+        owner_id = get_mux_upload_owner(upload_id)
+        # If we have an owner recorded and it doesn't match → deny.
+        # If the record has expired or Redis is down (owner_id is None), we
+        # fall through: the endpoint becomes no worse than before for cache
+        # misses, and the TTL is long enough to cover legitimate upload flows.
+        if owner_id is not None and owner_id != str(current_user.id):
+            raise HTTPException(status_code=403, detail="Not your upload")
     try:
         from mux_python import DirectUploadsApi, AssetsApi
         from services.mux_service import _get_mux_configuration
@@ -927,7 +957,22 @@ async def mux_webhook_handler(
                         if not hmac.compare_digest(signature, computed_signature_hex):
                             logger.error("Invalid Mux webhook signature")
                             raise HTTPException(status_code=401, detail="Invalid webhook signature")
-                        
+
+                        # Reject replays outside a 5-minute tolerance window.
+                        # Signature-only checks let an attacker replay a captured
+                        # legitimate event forever; binding the signature to a
+                        # bounded timestamp closes that window.
+                        try:
+                            ts_int = int(timestamp)
+                            if abs(int(time.time()) - ts_int) > 300:
+                                logger.warning("Mux webhook timestamp outside tolerance window")
+                                if not settings._is_development:
+                                    raise HTTPException(status_code=401, detail="Webhook timestamp outside tolerance window")
+                        except ValueError:
+                            logger.warning("Mux webhook timestamp not an integer")
+                            if not settings._is_development:
+                                raise HTTPException(status_code=401, detail="Invalid webhook timestamp")
+
                         logger.info("Mux webhook signature verified")
                 except HTTPException:
                     raise
@@ -943,8 +988,21 @@ async def mux_webhook_handler(
         # Parse request body from bytes
         body = json.loads(body_bytes.decode('utf-8'))
         event_type = body.get("type")
+        event_id = body.get("id")
         logger.info(f"Mux webhook event: {event_type}")
-        
+
+        # Idempotency guard: Mux retries the same webhook on failure using the
+        # same event id. Inserting into a UNIQUE(event_id) table and catching
+        # IntegrityError gives us at-most-once processing without a race.
+        if event_id:
+            try:
+                db.add(MuxWebhookEvent(event_id=event_id, event_type=event_type or "unknown"))
+                db.commit()
+            except IntegrityError:
+                db.rollback()
+                logger.info(f"Mux webhook {event_id} ({event_type}) already processed — skipping")
+                return {"status": "already_processed"}
+
         if event_type == "video.asset.ready":
             # Asset is ready - extract playback_id and asset_id
             asset_data = body.get("data", {})

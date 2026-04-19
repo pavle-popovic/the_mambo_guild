@@ -38,13 +38,15 @@ Respond with ONLY a JSON object, no other text:
 def evaluate_reply(content: str) -> str:
     """
     Evaluate a reply's content using Claude.
-    Returns 'active' if the comment passes, 'flagged_by_ai' if it fails.
-    Falls back to 'active' on any error (fail-open to avoid blocking users).
+    Returns 'active' if the comment passes, 'flagged_by_ai' if it fails
+    or if the call errors out (fail-closed: unclassified replies go to the
+    moderation queue where an admin approves or ghosts them; the author
+    still sees their own reply via the shadowban filter in post_service).
     """
     api_key = settings.ANTHROPIC_API_KEY
     if not api_key:
-        logger.warning("ANTHROPIC_API_KEY not set - moderation disabled, defaulting to active")
-        return "active"
+        logger.error("ANTHROPIC_API_KEY not set — flagging reply for manual review")
+        return "flagged_by_ai"
 
     try:
         import anthropic
@@ -62,21 +64,23 @@ def evaluate_reply(content: str) -> str:
         )
 
         result_text = response.content[0].text.strip()
-
-        # Parse the JSON verdict
         result = json.loads(result_text)
-        verdict = result.get("verdict", "pass")
+        verdict = result.get("verdict")
+
+        if verdict == "pass":
+            return "active"
 
         if verdict == "fail":
             reason = result.get("reason", "no reason given")
             logger.info(f"[MODERATION] Reply flagged: {reason} | Content preview: {content[:80]}")
             return "flagged_by_ai"
 
-        return "active"
+        logger.warning(f"[MODERATION] Unknown verdict from AI ({verdict!r}) — flagging for manual review")
+        return "flagged_by_ai"
 
     except json.JSONDecodeError:
-        logger.warning(f"[MODERATION] Failed to parse AI response, defaulting to active")
-        return "active"
+        logger.warning("[MODERATION] Failed to parse AI response — flagging for manual review")
+        return "flagged_by_ai"
     except Exception as e:
-        logger.error(f"[MODERATION] Error during evaluation: {e}", exc_info=True)
-        return "active"
+        logger.error(f"[MODERATION] Error during evaluation: {e} — flagging for manual review", exc_info=True)
+        return "flagged_by_ai"

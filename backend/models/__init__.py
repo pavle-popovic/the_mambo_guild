@@ -62,7 +62,7 @@ from models.premium import (
     WeeklyMeetingConfig,
     ReleaseScheduleItem,
 )
-from models.payment import StripeWebhookEvent, XPAuditLog
+from models.payment import StripeWebhookEvent, MuxWebhookEvent, XPAuditLog
 
 # Dependency to get database session
 def get_db():

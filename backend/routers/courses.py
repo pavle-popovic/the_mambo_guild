@@ -268,6 +268,25 @@ def get_level_lessons(
     if not world:
         raise HTTPException(status_code=404, detail="World not found")
 
+    # Playback-ID gate: strip Mux IDs from paid-world responses unless the
+    # caller is an admin or has an active/trialing subscription. Keeps the
+    # sidebar listing public without leaking streamable IDs.
+    can_access_paid = False
+    if current_user:
+        if current_user.role == UserRole.ADMIN:
+            can_access_paid = True
+        else:
+            subscription = (
+                db.query(Subscription)
+                .filter(Subscription.user_id == current_user.id)
+                .first()
+            )
+            can_access_paid = bool(
+                subscription
+                and subscription.status in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING)
+            )
+    strip_playback_ids = not world.is_free and not can_access_paid
+
     # Get all lessons in this level, sorted by order_index
     lessons = sorted(level.lessons, key=lambda l: (
         l.week_number if l.week_number is not None else 0,
@@ -310,8 +329,8 @@ def get_level_lessons(
             week_number=lesson.week_number,
             day_number=lesson.day_number,
             content_json=lesson.content_json,
-            mux_playback_id=lesson.mux_playback_id,
-            mux_asset_id=lesson.mux_asset_id,
+            mux_playback_id=None if strip_playback_ids else lesson.mux_playback_id,
+            mux_asset_id=None if strip_playback_ids else lesson.mux_asset_id,
             duration_minutes=lesson.duration_minutes,
             thumbnail_url=lesson.thumbnail_url,
             lesson_type=lesson_type_str
@@ -332,12 +351,32 @@ def get_world_lessons(
     ).first()
     if not world:
         raise HTTPException(status_code=404, detail="World not found")
-    
+
+    # Playback-ID gate: the list endpoint is public so previews work, but Mux
+    # playback IDs for paid worlds must only be returned to admins or users
+    # with an active/trialing subscription. Otherwise anyone could scrape the
+    # IDs and stream the video directly from Mux without a subscription.
+    can_access_paid = False
+    if current_user:
+        if current_user.role == UserRole.ADMIN:
+            can_access_paid = True
+        else:
+            subscription = (
+                db.query(Subscription)
+                .filter(Subscription.user_id == current_user.id)
+                .first()
+            )
+            can_access_paid = bool(
+                subscription
+                and subscription.status in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING)
+            )
+    strip_playback_ids = not world.is_free and not can_access_paid
+
     # Collect all lessons from all levels
     all_lessons = []
     for level in world.levels:
         all_lessons.extend(level.lessons)
-    
+
     # Sort lessons by week_number, day_number, and order_index
     # Handle None values by treating them as 0 for sorting
     all_lessons.sort(key=lambda l: (
@@ -345,7 +384,7 @@ def get_world_lessons(
         l.day_number if l.day_number is not None else 0,
         l.order_index
     ))
-    
+
     # PERFORMANCE FIX: Pre-fetch all user progress for this world's lessons in a single query
     completed_lesson_ids: set = set()
     if current_user and all_lessons:
@@ -356,15 +395,15 @@ def get_world_lessons(
             UserProgress.lesson_id.in_(lesson_ids)
         ).all()
         completed_lesson_ids = {str(lesson_id) for (lesson_id,) in completed_progress} if completed_progress else set()
-    
+
     lessons = []
     for lesson in all_lessons:
         # Check completion from pre-fetched data
         is_completed = str(lesson.id) in completed_lesson_ids if current_user else False
-        
+
         # lesson_type is now a string, use it directly
         lesson_type_str = lesson.lesson_type or "video"
-        
+
         # All lessons are unlocked (no prerequisites)
         lessons.append(LessonResponse(
             id=str(lesson.id),
@@ -379,13 +418,13 @@ def get_world_lessons(
             week_number=lesson.week_number,
             day_number=lesson.day_number,
             content_json=lesson.content_json,
-            mux_playback_id=lesson.mux_playback_id,
-            mux_asset_id=lesson.mux_asset_id,
+            mux_playback_id=None if strip_playback_ids else lesson.mux_playback_id,
+            mux_asset_id=None if strip_playback_ids else lesson.mux_asset_id,
             duration_minutes=lesson.duration_minutes,
             thumbnail_url=lesson.thumbnail_url,
             lesson_type=lesson_type_str
         ))
-    
+
     return lessons
 
 

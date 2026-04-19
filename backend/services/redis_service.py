@@ -274,6 +274,43 @@ def is_token_blacklisted(token: str) -> bool:
         return False  # Fail open
 
 
+# ============================================
+# Mux direct-upload ownership (IDOR guard)
+# ============================================
+
+# TTL covers Mux's 1-hour direct-upload window plus asset processing time.
+# After this, the record drops and an anonymous poll returns "not found"
+# rather than leaking a stranger's playback ID.
+_MUX_UPLOAD_OWNER_PREFIX = "mux_upload_owner:"
+MUX_UPLOAD_OWNER_TTL_SECONDS = 24 * 60 * 60  # 24 hours
+
+
+def set_mux_upload_owner(upload_id: str, user_id: str) -> bool:
+    """Record which user minted a Mux direct-upload id, so we can enforce
+    that only the owner (or an admin) can poll its status and see the
+    resulting playback_id."""
+    try:
+        client = get_redis_client()
+        key = f"{_MUX_UPLOAD_OWNER_PREFIX}{upload_id}"
+        client.setex(key, MUX_UPLOAD_OWNER_TTL_SECONDS, user_id)
+        return True
+    except Exception as e:
+        logger.error(f"Failed to record mux upload owner: {e}")
+        return False
+
+
+def get_mux_upload_owner(upload_id: str) -> Optional[str]:
+    """Return the user_id that minted this upload_id, or None if unknown
+    (cache miss, expired, or Redis unavailable)."""
+    try:
+        client = get_redis_client()
+        key = f"{_MUX_UPLOAD_OWNER_PREFIX}{upload_id}"
+        return client.get(key)
+    except Exception as e:
+        logger.error(f"Failed to look up mux upload owner: {e}")
+        return None
+
+
 def invalidate_feed_cache(feed_type: str = None) -> bool:
     """
     Invalidate feed cache. Called when posts are created/deleted.

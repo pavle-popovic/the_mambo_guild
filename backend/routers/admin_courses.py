@@ -11,7 +11,7 @@ from models.user import User
 from models.course import World, Level, Lesson, Difficulty
 from models.progress import UserProgress, BossSubmission, Comment
 from schemas.course import WorldResponse, LessonResponse
-from dependencies import get_admin_user
+from dependencies import get_admin_user, get_current_user_optional
 import uuid
 
 router = APIRouter()
@@ -556,35 +556,23 @@ def get_course_full_details(
 @router.get("/levels/{level_id}/lessons", response_model=List[LessonResponse])
 def get_level_lessons(
     level_id: str,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: Optional[User] = Depends(get_current_user_optional),
 ):
     """Get all lessons for a specific level. Open endpoint for skill tree modal."""
     from models.progress import UserProgress
-    from dependencies import get_current_user_optional
-    from fastapi import Request
-    
+
     level = db.query(Level).filter(Level.id == level_id).first()
     if not level:
         raise HTTPException(status_code=404, detail="Level not found")
-    
-    # Get lessons sorted by order_index
+
     lessons = sorted(level.lessons, key=lambda l: l.order_index)
-    
-    # Pre-fetch user progress if authenticated (via admin_user context or passed user)
-    # Note: admin_courses is usually for admins, but if used for preview it might be useful.
-    # Actually, for admin view, we might not care about user progress, but let's assume we might likely want to see it or at least not have it hardcoded false if an admin is testing.
-    # Since this is the admin endpoint, 'admin_user' is the current user.
-    
-    from models.progress import UserProgress
+
     completed_lesson_ids: set = set()
-    
-    # We use admin_user.id as the user to check progress for, effectively letting the admin see their own progress
-    # or potentially we could allow passing a user_id to check progress FOR someone else, but let's keep it simple.
-    
     lesson_ids = [str(l.id) for l in lessons]
-    if lesson_ids:
+    if current_user and lesson_ids:
         completed = db.query(UserProgress.lesson_id).filter(
-            UserProgress.user_id == admin_user.id,
+            UserProgress.user_id == current_user.id,
             UserProgress.is_completed == True,
             UserProgress.lesson_id.in_(lesson_ids)
         ).all()

@@ -13,6 +13,7 @@ logger = logging.getLogger(__name__)
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
+from sqlalchemy.exc import IntegrityError
 
 from dependencies import get_db, get_current_user
 from models.user import User, Subscription, SubscriptionTier, SubscriptionStatus, UserProfile
@@ -400,12 +401,23 @@ def submit_coaching_video(
         submission_month=current_month,
         submission_year=current_year
     )
-    
+
     db.add(submission)
 
-    db.commit()
+    try:
+        db.commit()
+    except IntegrityError:
+        # Race: two concurrent submits slipped past the existence check above.
+        # The unique index on (user_id, submission_month, submission_year)
+        # rejects the second insert — surface the same user-facing error as
+        # the pre-check so the client flow is identical.
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You have already submitted a coaching video this month."
+        )
     db.refresh(submission)
-    
+
     return _format_submission_response(submission)
 
 

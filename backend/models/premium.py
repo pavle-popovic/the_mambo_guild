@@ -5,7 +5,7 @@ Premium Feature Models for Guild Master (PERFORMER) tier
 - Coaching Submissions (1-on-1 Video Analysis)
 - DJ Booth Tracks (Mambo Mixer)
 """
-from sqlalchemy import Column, String, Integer, DateTime, Date, Boolean, Text, ForeignKey, Enum as SQLEnum
+from sqlalchemy import Column, String, Integer, DateTime, Date, Boolean, Text, ForeignKey, Enum as SQLEnum, UniqueConstraint
 from sqlalchemy.dialects.postgresql import UUID, ARRAY
 from sqlalchemy.orm import relationship
 import uuid
@@ -153,6 +153,18 @@ class CoachingSubmission(Base):
     One submission per user per billing cycle/month.
     """
     __tablename__ = "coaching_submissions"
+    __table_args__ = (
+        # DB-level backstop for the "1 submission per user per month" rule.
+        # The application check in POST /premium/coaching/submit is racy under
+        # concurrent double-clicks — this constraint collapses the race so the
+        # second insert fails with IntegrityError instead of creating a duplicate.
+        UniqueConstraint(
+            "user_id",
+            "submission_month",
+            "submission_year",
+            name="uq_coaching_submissions_user_month_year",
+        ),
+    )
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
