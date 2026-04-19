@@ -95,16 +95,18 @@ export default function NotificationBell() {
       } catch {}
     }
     // Navigate to referenced content if applicable
-    if (notification.reference_type === "post" && notification.reference_id) {
+    const ref = notification.reference_type;
+    const refId = notification.reference_id;
+    if (ref === "post" && refId) {
       setIsOpen(false);
-      // Dispatch custom event for post detail modal
-      window.dispatchEvent(new CustomEvent("open-post-detail", {
-        detail: { postId: notification.reference_id }
-      }));
-    } else if (notification.reference_type === "coaching_submission") {
+      window.location.href = `/community?post=${encodeURIComponent(refId)}`;
+    } else if (ref === "badge") {
+      setIsOpen(false);
+      window.location.href = "/profile";
+    } else if (ref === "coaching_submission") {
       setIsOpen(false);
       window.location.href = "/studio/coaching";
-    } else if (notification.reference_type === "weekly_meeting") {
+    } else if (ref === "weekly_meeting") {
       setIsOpen(false);
       window.location.href = "/studio/roundtable";
     }

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, X, Tv, FlaskConical, ChevronDown, Bookmark } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,6 +51,7 @@ type ViewMode = "stage" | "lab" | "saved" | "my_posts";
 export default function CommunityPage() {
     const t = useTranslations("community");
     const router = useRouter();
+    const searchParams = useSearchParams();
     const { user, loading: authLoading } = useAuth();
     const [viewMode, setViewMode] = useState<ViewMode>("stage");
     const [posts, setPosts] = useState<Post[]>([]);
@@ -85,6 +86,16 @@ export default function CommunityPage() {
         window.addEventListener("resize", check);
         return () => window.removeEventListener("resize", check);
     }, []);
+
+    // Deep-link: /community?post=<id> opens the post detail modal.
+    // Used by notification bell click-throughs for reply/reaction notifications.
+    useEffect(() => {
+        const postId = searchParams?.get("post");
+        if (postId && !isPreviewMode) {
+            setSelectedPostId(postId);
+            setIsPostDetailOpen(true);
+        }
+    }, [searchParams, isPreviewMode]);
 
     // Click-outside for mobile dropdowns
     useEffect(() => {
@@ -243,7 +254,11 @@ export default function CommunityPage() {
                             onViewModeChange={setViewMode}
                             selectedLevels={selectedLevels}
                             onLevelsChange={setSelectedLevels}
-                            posts={posts}
+                            posts={
+                                viewMode === "my_posts"
+                                    ? posts.filter((p) => p.user.id === user?.id)
+                                    : posts
+                            }
                         />
                     </div>
 
