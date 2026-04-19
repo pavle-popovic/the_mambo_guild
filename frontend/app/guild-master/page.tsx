@@ -859,13 +859,14 @@ export default function GuildMasterPage() {
                         
                         {/* Feedback */}
                         {coachingStatus.current_submission.status === "completed" && coachingStatus.current_submission.feedback_video_url && (
-                          <div className="mt-3">
-                            <video
-                              src={coachingStatus.current_submission.feedback_video_url}
-                              controls
-                              className="w-full rounded-lg bg-black"
-                              style={{ maxHeight: "200px" }}
-                            />
+                          <div className="mt-3 max-w-xl">
+                            <div className="aspect-video rounded-lg overflow-hidden bg-black">
+                              <video
+                                src={coachingStatus.current_submission.feedback_video_url}
+                                controls
+                                className="w-full h-full"
+                              />
+                            </div>
                             <a
                               href={coachingStatus.current_submission.feedback_video_url}
                               target="_blank"
