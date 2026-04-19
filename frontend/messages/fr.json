@@ -116,7 +116,8 @@
     "noResults": "Aucun cours trouvé. Essayez un autre filtre.",
     "comingSoon": "Bientôt Disponible",
     "typeLabel": "Type",
-    "levelLabel": "Niveau"
+    "levelLabel": "Niveau",
+    "whatYoullLearn": "Ce que tu vas apprendre"
   },
   "lesson": {
     "title": "Leçon",
@@ -1114,5 +1115,194 @@
     "cancelingInProgress": "Annulation...",
     "cancelFinal": "Annuler mon abonnement",
     "modalCloseAria": "Fermer"
+  },
+  "courseObjectives": {
+    "bodymovement-mastery": [
+      "Comprends l'isolation corporelle",
+      "Apprends à enchaîner les isolations du corps",
+      "Intègre le mouvement corporel à ta danse"
+    ],
+    "mambo-101": [
+      "Maîtrise le timing et les pas fondamentaux",
+      "Deviens à l'aise pour danser sur la musique",
+      "Apprends des variations clés pour donner du style à ta danse"
+    ],
+    "mambo-201": [
+      "Enrichis ton vocabulaire de danse avec des blocs de base",
+      "Deviens à l'aise avec des chorégraphies complexes",
+      "Maîtrise de nouveaux outils de style et de fluidité"
+    ],
+    "mambo-301": [
+      "Pousse ton vocabulaire de mambo à ses limites",
+      "Maîtrise les rythmes syncopés et les tempos rapides",
+      "Affine ta technique avec un style avancé"
+    ],
+    "pachanga": [
+      "Maîtrise le vocabulaire de la Pachanga",
+      "Débloque la vitesse et le jeu de pieds élaboré",
+      "Découvre l'histoire et la culture de la Pachanga"
+    ]
+  },
+  "badges": {
+    "beta_tester": {
+      "name": "Bêta-testeur",
+      "description": "A testé la plateforme pendant l'accès anticipé."
+    },
+    "center_stage_bronze": {
+      "name": "Sous les Projecteurs",
+      "description": "Tu partages ton parcours sur The Stage. Premiers pas."
+    },
+    "center_stage_diamond": {
+      "name": "Sous les Projecteurs",
+      "description": "Tu partages ton parcours sur The Stage. Légende de la scène."
+    },
+    "center_stage_gold": {
+      "name": "Sous les Projecteurs",
+      "description": "Tu partages ton parcours sur The Stage. Aura de star."
+    },
+    "center_stage_silver": {
+      "name": "Sous les Projecteurs",
+      "description": "Tu partages ton parcours sur The Stage. Artiste régulier."
+    },
+    "crowd_favorite_bronze": {
+      "name": "Chouchou du Public",
+      "description": "Reconnu pour ton effort et ton esprit. Tu attires les regards."
+    },
+    "crowd_favorite_diamond": {
+      "name": "Chouchou du Public",
+      "description": "Reconnu pour ton effort et ton esprit. Champion du peuple."
+    },
+    "crowd_favorite_gold": {
+      "name": "Chouchou du Public",
+      "description": "Reconnu pour ton effort et ton esprit. Standing ovation."
+    },
+    "crowd_favorite_silver": {
+      "name": "Chouchou du Public",
+      "description": "Reconnu pour ton effort et ton esprit. Les applaudissements montent."
+    },
+    "curious_mind_bronze": {
+      "name": "Esprit Curieux",
+      "description": "Tu demandes de l'aide et tu apprends des autres. Première question."
+    },
+    "curious_mind_diamond": {
+      "name": "Esprit Curieux",
+      "description": "Tu demandes de l'aide et tu apprends des autres. Maître questionneur."
+    },
+    "curious_mind_gold": {
+      "name": "Esprit Curieux",
+      "description": "Tu demandes de l'aide et tu apprends des autres. Tu creuses en profondeur."
+    },
+    "curious_mind_silver": {
+      "name": "Esprit Curieux",
+      "description": "Tu demandes de l'aide et tu apprends des autres. Apprenant régulier."
+    },
+    "firestarter_bronze": {
+      "name": "Met le Feu",
+      "description": "Ta danse enflamme la scène. Braises chaudes."
+    },
+    "firestarter_diamond": {
+      "name": "Met le Feu",
+      "description": "Ta danse enflamme la scène. Une supernova sur la piste."
+    },
+    "firestarter_gold": {
+      "name": "Met le Feu",
+      "description": "Ta danse enflamme la scène. Statut infernal."
+    },
+    "firestarter_silver": {
+      "name": "Met le Feu",
+      "description": "Ta danse enflamme la scène. Brasier complet."
+    },
+    "founder_diamond": {
+      "name": "Fondateur",
+      "description": "Membre originel de The Mambo Guild. Réservé aux 1000 premiers utilisateurs."
+    },
+    "guild_master": {
+      "name": "Maître de Guilde",
+      "description": "Abonnement Elite Performer. Le plus haut niveau de The Mambo Guild."
+    },
+    "human_metronome_bronze": {
+      "name": "Métronome Humain",
+      "description": "Timing impeccable reconnu par tes pairs. Tu trouves le groove."
+    },
+    "human_metronome_diamond": {
+      "name": "Métronome Humain",
+      "description": "Timing impeccable reconnu par tes pairs. TU ES le rythme."
+    },
+    "human_metronome_gold": {
+      "name": "Métronome Humain",
+      "description": "Timing impeccable reconnu par tes pairs. Précision absolue."
+    },
+    "human_metronome_silver": {
+      "name": "Métronome Humain",
+      "description": "Timing impeccable reconnu par tes pairs. Parfaitement calé."
+    },
+    "pro_member": {
+      "name": "Membre Pro",
+      "description": "Passé à l'abonnement Advanced. Accès à toutes les fonctionnalités Pro."
+    },
+    "talent_scout_bronze": {
+      "name": "Dénicheur de Talents",
+      "description": "Tu soutiens la communauté par tes retours. Œil pour le talent."
+    },
+    "talent_scout_diamond": {
+      "name": "Dénicheur de Talents",
+      "description": "Tu soutiens la communauté par tes retours. Le moteur ultime."
+    },
+    "talent_scout_gold": {
+      "name": "Dénicheur de Talents",
+      "description": "Tu soutiens la communauté par tes retours. Pilier de la communauté."
+    },
+    "talent_scout_silver": {
+      "name": "Dénicheur de Talents",
+      "description": "Tu soutiens la communauté par tes retours. Soutien fidèle."
+    },
+    "the_professor_bronze": {
+      "name": "Le Professeur",
+      "description": "Tu apportes des solutions vérifiées à la communauté. Coup de main."
+    },
+    "the_professor_diamond": {
+      "name": "Le Professeur",
+      "description": "Tu apportes des solutions vérifiées à la communauté. L'Oracle de la Salsa."
+    },
+    "the_professor_gold": {
+      "name": "Le Professeur",
+      "description": "Tu apportes des solutions vérifiées à la communauté. Maître-instructeur."
+    },
+    "the_professor_silver": {
+      "name": "Le Professeur",
+      "description": "Tu apportes des solutions vérifiées à la communauté. Conseiller de confiance."
+    },
+    "the_socialite_bronze": {
+      "name": "Mondain",
+      "description": "Tu participes activement aux discussions. Tu brises la glace."
+    },
+    "the_socialite_diamond": {
+      "name": "Mondain",
+      "description": "Tu participes activement aux discussions. La voix d'une génération."
+    },
+    "the_socialite_gold": {
+      "name": "Mondain",
+      "description": "Tu participes activement aux discussions. Partout à la fois."
+    },
+    "the_socialite_silver": {
+      "name": "Mondain",
+      "description": "Tu participes activement aux discussions. L'âme de la fête."
+    },
+    "unstoppable_bronze": {
+      "name": "Inarrêtable",
+      "description": "Dévouement constant à être présent. Tu prends de l'élan."
+    },
+    "unstoppable_diamond": {
+      "name": "Inarrêtable",
+      "description": "Dévouement constant à être présent. Force véritablement inarrêtable."
+    },
+    "unstoppable_gold": {
+      "name": "Inarrêtable",
+      "description": "Dévouement constant à être présent. Maître du mois."
+    },
+    "unstoppable_silver": {
+      "name": "Inarrêtable",
+      "description": "Dévouement constant à être présent. Deux semaines solides."
+    }
   }
 }

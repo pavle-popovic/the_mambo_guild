@@ -5,6 +5,7 @@ from datetime import datetime
 
 class WorldResponse(BaseModel):
     id: str
+    slug: Optional[str] = None
     title: str
     description: Optional[str]
     image_url: Optional[str]

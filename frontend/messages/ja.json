@@ -116,7 +116,8 @@
     "noResults": "コースが見つかりません。別のフィルターをお試しください。",
     "comingSoon": "近日公開",
     "typeLabel": "タイプ",
-    "levelLabel": "レベル"
+    "levelLabel": "レベル",
+    "whatYoullLearn": "学べること"
   },
   "lesson": {
     "title": "レッスン",
@@ -370,7 +371,118 @@
     "copyReferralLink": "紹介リンクをコピー",
     "referralLinkCopied": "リンクをコピーしました！",
     "dangerZone": "危険ゾーン",
-    "deleteAccount": "アカウントを削除"
+    "deleteAccount": "アカウントを削除",
+    "loading": "読み込み中...",
+    "logout": "ログアウト",
+    "logoutAria": "ログアウト",
+    "memberSinceYear": "Mambo Engineer • 2024年加入",
+    "replaceProfilePicture": "プロフィール画像を変更",
+    "fileFormatsHint": "JPG、PNG、WebP（最大5MB）",
+    "fileTooLarge": "ファイルサイズは5MB未満にしてください",
+    "uploadFailed": "画像のアップロードに失敗しました。再試行してください。",
+    "removeImage": "画像を削除",
+    "usernamePlaceholder": "ユーザー名",
+    "usernamePlaceholderLong": "新しいユーザー名を入力",
+    "usernameHint": "3〜30文字、英数字のみ",
+    "usernameTooShort": "ユーザー名は3文字以上にしてください",
+    "usernameUpdateFailed": "ユーザー名の更新に失敗しました。別のものを試してください。",
+    "saveBtn": "保存",
+    "savingShort": "...",
+    "cancelBtn": "キャンセル",
+    "editUsername": "ユーザー名を編集",
+    "instagramPlaceholder": "@handle または https://instagram.com/handle",
+    "instagramSaving": "…",
+    "instagramUpdateFailed": "Instagramリンクの更新に失敗しました",
+    "instagramLeaveEmpty": "空欄にするとリンクが削除されます。",
+    "instagramConnect": "Instagramで接続",
+    "instagramEdit": "編集",
+    "instagramAdd": "+ Instagramを追加",
+    "statStreakLabel": "ストリーク",
+    "statStreakDays": "{count}日",
+    "statStreakShort": "{count}日",
+    "statXpLabel": "XP",
+    "statTierLabel": "ティア",
+    "statReputationLabel": "評価",
+    "statReputationShort": "評価",
+    "statClavesLabel": "Claves",
+    "statSolvedLabel": "解決済み",
+    "xpProgressLabel": "LVL {level}",
+    "levelBadge": "Lvl {level}",
+    "xpProgressCounter": "{current} / {total} XP",
+    "xpToNextLevel": "レベル{nextLevel}まで {xp} XP",
+    "xpUntilNextLevel": "レベル{nextLevel}まで {xp} XP",
+    "levelProgress": "レベルの進捗",
+    "reactionsGiven": "送ったリアクション",
+    "reactionsReceived": "受け取ったリアクション",
+    "solutionsAccepted": "採用された解決策",
+    "continueLearning": "学習を続ける",
+    "loadingCourses": "コースを読み込み中...",
+    "startJourney": "旅を始めよう",
+    "exploreWorldsHint": "すべてのワールドとレッスンを探索",
+    "trophyCaseTitle": "🏆 トロフィーケース",
+    "trophyCaseSubtitle": "あなたの実績を披露",
+    "editShowcase": "ショーケースを編集",
+    "showcaseDone": "完了 ({count}/5)",
+    "showcaseLabel": "ショーケース ({count}/5)",
+    "featuredLabel": "注目 ({count}/5)",
+    "dragToReorder": "ドラッグで並び替え • クリックで外す",
+    "clickToFeatureHint": "下のバッジをクリックしてここに表示",
+    "collection": "コレクション",
+    "achievements": "実績",
+    "noBadgesYet": "まだ獲得したバッジはありません。",
+    "featuredTag": "★ 注目",
+    "fullTag": "満杯",
+    "featureTag": "+ 注目",
+    "featurePlus": "注目 +",
+    "lockedTag": "ロック",
+    "referralTitle": "🎁 紹介プログラム",
+    "referralSubtitle": "リンクを共有して紹介1件につき50 clavesを獲得！",
+    "referralCountLabel": "紹介",
+    "yourReferralLink": "あなたの紹介リンク",
+    "copyBtn": "コピー",
+    "copiedBtn": "✓ コピー済み",
+    "referralInfo1": "• あなたのリンク経由で登録があると50 clavesを獲得",
+    "referralInfo2": "• 友達もウェルカムボーナスを受け取れます！",
+    "referralComingSoon": "注：正式な紹介システムは近日公開。これはプレビューです。",
+    "billing": "請求",
+    "subscriptionEndingPre": "あなたの",
+    "subscriptionEndingMid": "プランは終了予定",
+    "subscriptionEndingOn": "日付: {date}",
+    "subscriptionEndingPost": "。それまでフルアクセスが維持されます。",
+    "resumeSubscription": "サブスクリプションを再開",
+    "resumingShort": "...",
+    "manageSubscriptionLink": "サブスクリプションを管理",
+    "cancelSuccess": "サブスクリプションをキャンセルしました。",
+    "cancelError": "エラーが発生しました。再試行してください。",
+    "resumeSuccess": "サブスクリプションを再開しました。",
+    "resumeError": "サブスクリプションを再開できませんでした。",
+    "lossTitle": "行く前に…",
+    "lossIntroPre": "キャンセルすると",
+    "lossIntroPost": "次のものを失います：",
+    "lossItem1": "すべてのGuildコース、コレオ、トピック",
+    "lossItem2": "2週間ごとに公開される新しいコレオ",
+    "lossItem3": "Guildコミュニティへのアクセス",
+    "lossItem4": "週次clave獲得ブースト",
+    "lossItem5": "獲得した限定メンバーバッジ",
+    "lossItem6": "インストラクターからの月1回1対1ビデオフィードバック",
+    "keepSubscription": "サブスクリプションを維持",
+    "stillCancel": "それでもキャンセルする",
+    "priceTitlePre": "あなたは",
+    "priceTitlePost": "/月でロック中",
+    "priceSubtitle": "これはThe Mambo Guildが提供する史上最安値です。",
+    "priceBodyPre": "インストラクター、新しいコレオ、拡張されたコミュニティ機能が追加されるにつれ、価格は上がります。今日キャンセルして来月または来年再加入すると、founder料金ではなく新しい料金が適用されます。",
+    "priceBodyGuarantee": "サブスクリプションを継続している限り、現在の価格は保証されます。",
+    "keepRate": "{price}/月の料金を維持",
+    "understandContinue": "了解しました、続ける",
+    "confirmTitle": "最後のステップ",
+    "confirmBodyPre": "次を入力：",
+    "confirmBodyMid": "下に入力して確認してください。現在の請求期間の終了まではアクセス可能です",
+    "confirmPeriodSuffix": " ({date})",
+    "confirmInputPlaceholder": "CANCELと入力",
+    "neverMind": "やめる、維持する",
+    "cancelingInProgress": "キャンセル中...",
+    "cancelFinal": "サブスクリプションをキャンセル",
+    "modalCloseAria": "閉じる"
   },
   "onboarding": {
     "welcome": "The Mambo Guildへようこそ",
@@ -1004,143 +1116,193 @@
     "deletingBtn": "削除中...",
     "replyVideoTitle": "{title} に返信"
   },
-  "profile": {
-    "title": "プロフィール",
-    "editProfile": "プロフィールを編集",
-    "displayName": "表示名",
-    "username": "ゲーマータグ",
-    "email": "メールアドレス",
-    "bio": "自己紹介",
-    "location": "場所",
-    "danceLevel": "ダンスレベル",
-    "memberSince": "加入日",
-    "subscription": "サブスクリプション",
-    "manageSubscription": "サブスクリプション管理",
-    "notificationSettings": "通知",
-    "language": "言語",
-    "saveChanges": "変更を保存",
-    "publicProfile": "公開プロフィール",
-    "badges": "バッジ",
-    "stats": "統計",
-    "totalXP": "合計XP",
-    "lessonsCompleted": "完了レッスン",
-    "currentStreak": "現在のストリーク",
-    "longestStreak": "最長ストリーク",
-    "referrals": "紹介",
-    "copyReferralLink": "紹介リンクをコピー",
-    "referralLinkCopied": "リンクをコピーしました！",
-    "dangerZone": "危険ゾーン",
-    "deleteAccount": "アカウントを削除",
-    "loading": "読み込み中...",
-    "logout": "ログアウト",
-    "logoutAria": "ログアウト",
-    "memberSinceYear": "Mambo Engineer • 2024年加入",
-    "replaceProfilePicture": "プロフィール画像を変更",
-    "fileFormatsHint": "JPG、PNG、WebP（最大5MB）",
-    "fileTooLarge": "ファイルサイズは5MB未満にしてください",
-    "uploadFailed": "画像のアップロードに失敗しました。再試行してください。",
-    "removeImage": "画像を削除",
-    "usernamePlaceholder": "ユーザー名",
-    "usernamePlaceholderLong": "新しいユーザー名を入力",
-    "usernameHint": "3〜30文字、英数字のみ",
-    "usernameTooShort": "ユーザー名は3文字以上にしてください",
-    "usernameUpdateFailed": "ユーザー名の更新に失敗しました。別のものを試してください。",
-    "saveBtn": "保存",
-    "savingShort": "...",
-    "cancelBtn": "キャンセル",
-    "editUsername": "ユーザー名を編集",
-    "instagramPlaceholder": "@handle または https://instagram.com/handle",
-    "instagramSaving": "…",
-    "instagramUpdateFailed": "Instagramリンクの更新に失敗しました",
-    "instagramLeaveEmpty": "空欄にするとリンクが削除されます。",
-    "instagramConnect": "Instagramで接続",
-    "instagramEdit": "編集",
-    "instagramAdd": "+ Instagramを追加",
-    "statStreakLabel": "ストリーク",
-    "statStreakDays": "{count}日",
-    "statStreakShort": "{count}日",
-    "statXpLabel": "XP",
-    "statTierLabel": "ティア",
-    "statReputationLabel": "評価",
-    "statReputationShort": "評価",
-    "statClavesLabel": "Claves",
-    "statSolvedLabel": "解決済み",
-    "xpProgressLabel": "LVL {level}",
-    "levelBadge": "Lvl {level}",
-    "xpProgressCounter": "{current} / {total} XP",
-    "xpToNextLevel": "レベル{nextLevel}まで {xp} XP",
-    "xpUntilNextLevel": "レベル{nextLevel}まで {xp} XP",
-    "levelProgress": "レベルの進捗",
-    "reactionsGiven": "送ったリアクション",
-    "reactionsReceived": "受け取ったリアクション",
-    "solutionsAccepted": "採用された解決策",
-    "continueLearning": "学習を続ける",
-    "loadingCourses": "コースを読み込み中...",
-    "startJourney": "旅を始めよう",
-    "exploreWorldsHint": "すべてのワールドとレッスンを探索",
-    "trophyCaseTitle": "🏆 トロフィーケース",
-    "trophyCaseSubtitle": "あなたの実績を披露",
-    "editShowcase": "ショーケースを編集",
-    "showcaseDone": "完了 ({count}/5)",
-    "showcaseLabel": "ショーケース ({count}/5)",
-    "featuredLabel": "注目 ({count}/5)",
-    "dragToReorder": "ドラッグで並び替え • クリックで外す",
-    "clickToFeatureHint": "下のバッジをクリックしてここに表示",
-    "collection": "コレクション",
-    "achievements": "実績",
-    "noBadgesYet": "まだ獲得したバッジはありません。",
-    "featuredTag": "★ 注目",
-    "fullTag": "満杯",
-    "featureTag": "+ 注目",
-    "featurePlus": "注目 +",
-    "lockedTag": "ロック",
-    "referralTitle": "🎁 紹介プログラム",
-    "referralSubtitle": "リンクを共有して紹介1件につき50 clavesを獲得！",
-    "referralCountLabel": "紹介",
-    "yourReferralLink": "あなたの紹介リンク",
-    "copyBtn": "コピー",
-    "copiedBtn": "✓ コピー済み",
-    "referralInfo1": "• あなたのリンク経由で登録があると50 clavesを獲得",
-    "referralInfo2": "• 友達もウェルカムボーナスを受け取れます！",
-    "referralComingSoon": "注：正式な紹介システムは近日公開。これはプレビューです。",
-    "billing": "請求",
-    "subscriptionEndingPre": "あなたの",
-    "subscriptionEndingMid": "プランは終了予定",
-    "subscriptionEndingOn": "日付: {date}",
-    "subscriptionEndingPost": "。それまでフルアクセスが維持されます。",
-    "resumeSubscription": "サブスクリプションを再開",
-    "resumingShort": "...",
-    "manageSubscriptionLink": "サブスクリプションを管理",
-    "cancelSuccess": "サブスクリプションをキャンセルしました。",
-    "cancelError": "エラーが発生しました。再試行してください。",
-    "resumeSuccess": "サブスクリプションを再開しました。",
-    "resumeError": "サブスクリプションを再開できませんでした。",
-    "lossTitle": "行く前に…",
-    "lossIntroPre": "キャンセルすると",
-    "lossIntroPost": "次のものを失います：",
-    "lossItem1": "すべてのGuildコース、コレオ、トピック",
-    "lossItem2": "2週間ごとに公開される新しいコレオ",
-    "lossItem3": "Guildコミュニティへのアクセス",
-    "lossItem4": "週次clave獲得ブースト",
-    "lossItem5": "獲得した限定メンバーバッジ",
-    "lossItem6": "インストラクターからの月1回1対1ビデオフィードバック",
-    "keepSubscription": "サブスクリプションを維持",
-    "stillCancel": "それでもキャンセルする",
-    "priceTitlePre": "あなたは",
-    "priceTitlePost": "/月でロック中",
-    "priceSubtitle": "これはThe Mambo Guildが提供する史上最安値です。",
-    "priceBodyPre": "インストラクター、新しいコレオ、拡張されたコミュニティ機能が追加されるにつれ、価格は上がります。今日キャンセルして来月または来年再加入すると、founder料金ではなく新しい料金が適用されます。",
-    "priceBodyGuarantee": "サブスクリプションを継続している限り、現在の価格は保証されます。",
-    "keepRate": "{price}/月の料金を維持",
-    "understandContinue": "了解しました、続ける",
-    "confirmTitle": "最後のステップ",
-    "confirmBodyPre": "次を入力：",
-    "confirmBodyMid": "下に入力して確認してください。現在の請求期間の終了まではアクセス可能です",
-    "confirmPeriodSuffix": " ({date})",
-    "confirmInputPlaceholder": "CANCELと入力",
-    "neverMind": "やめる、維持する",
-    "cancelingInProgress": "キャンセル中...",
-    "cancelFinal": "サブスクリプションをキャンセル",
-    "modalCloseAria": "閉じる"
+  "courseObjectives": {
+    "bodymovement-mastery": [
+      "ボディアイソレーションの理解を身につける",
+      "アイソレーションをつなげる方法を学ぶ",
+      "ダンスにボディムーブメントを取り入れる"
+    ],
+    "mambo-101": [
+      "タイミングと基本ステップをマスターする",
+      "音楽に合わせて踊ることに慣れる",
+      "ダンスに華を添える重要なバリエーションを学ぶ"
+    ],
+    "mambo-201": [
+      "ビルディングブロックでダンスの語彙を広げる",
+      "複雑な振り付けを難なくこなせるようになる",
+      "スタイリングとフロウの新しいツールをマスターする"
+    ],
+    "mambo-301": [
+      "マンボの語彙を限界まで拡張する",
+      "シンコペーションと速いテンポをマスターする",
+      "高度なスタイリングで技術を磨く"
+    ],
+    "pachanga": [
+      "パチャンガのボキャブラリーをマスターする",
+      "スピードと華麗なフットワークを解き放つ",
+      "パチャンガの歴史と文化を学ぶ"
+    ]
+  },
+  "badges": {
+    "beta_tester": {
+      "name": "ベータテスター",
+      "description": "アーリーアクセス期間中にプラットフォームのテストに協力しました。"
+    },
+    "center_stage_bronze": {
+      "name": "センターステージ",
+      "description": "The Stage で旅を共有しています。最初の一歩。"
+    },
+    "center_stage_diamond": {
+      "name": "センターステージ",
+      "description": "The Stage で旅を共有。ステージのレジェンド。"
+    },
+    "center_stage_gold": {
+      "name": "センターステージ",
+      "description": "The Stage で旅を共有。スターのオーラ。"
+    },
+    "center_stage_silver": {
+      "name": "センターステージ",
+      "description": "The Stage で旅を共有。常連パフォーマー。"
+    },
+    "crowd_favorite_bronze": {
+      "name": "観客の人気者",
+      "description": "努力と情熱が評価されました。注目を集めています。"
+    },
+    "crowd_favorite_diamond": {
+      "name": "観客の人気者",
+      "description": "努力と情熱が評価されました。民衆のチャンピオン。"
+    },
+    "crowd_favorite_gold": {
+      "name": "観客の人気者",
+      "description": "努力と情熱が評価されました。総立ちの拍手。"
+    },
+    "crowd_favorite_silver": {
+      "name": "観客の人気者",
+      "description": "努力と情熱が評価されました。拍手が湧き上がります。"
+    },
+    "curious_mind_bronze": {
+      "name": "好奇心の持ち主",
+      "description": "助けを求め、他の人から学んでいます。最初の質問。"
+    },
+    "curious_mind_diamond": {
+      "name": "好奇心の持ち主",
+      "description": "助けを求め学んでいます。質問の達人。"
+    },
+    "curious_mind_gold": {
+      "name": "好奇心の持ち主",
+      "description": "助けを求め学んでいます。深く掘り下げる人。"
+    },
+    "curious_mind_silver": {
+      "name": "好奇心の持ち主",
+      "description": "助けを求め学んでいます。継続的な学習者。"
+    },
+    "firestarter_bronze": {
+      "name": "ファイアスターター",
+      "description": "あなたのダンスがステージを熱くしています。燻る炎。"
+    },
+    "firestarter_diamond": {
+      "name": "ファイアスターター",
+      "description": "あなたのダンスがステージを熱くしています。ダンスフロアの超新星。"
+    },
+    "firestarter_gold": {
+      "name": "ファイアスターター",
+      "description": "あなたのダンスがステージを熱くしています。インフェルノ級。"
+    },
+    "firestarter_silver": {
+      "name": "ファイアスターター",
+      "description": "あなたのダンスがステージを熱くしています。全開の炎。"
+    },
+    "founder_diamond": {
+      "name": "創設メンバー",
+      "description": "The Mambo Guild のオリジナルメンバー。最初の 1000 人限定。"
+    },
+    "guild_master": {
+      "name": "ギルドマスター",
+      "description": "Elite Performer メンバーシップ。The Mambo Guild の最上位ランク。"
+    },
+    "human_metronome_bronze": {
+      "name": "ヒューマンメトロノーム",
+      "description": "仲間が認めた完璧なタイミング。グルーヴを掴んでいます。"
+    },
+    "human_metronome_diamond": {
+      "name": "ヒューマンメトロノーム",
+      "description": "仲間が認めた完璧なタイミング。あなた自身がリズムです。"
+    },
+    "human_metronome_gold": {
+      "name": "ヒューマンメトロノーム",
+      "description": "仲間が認めた完璧なタイミング。絶対的な精度。"
+    },
+    "human_metronome_silver": {
+      "name": "ヒューマンメトロノーム",
+      "description": "仲間が認めた完璧なタイミング。ぴったりはまっています。"
+    },
+    "pro_member": {
+      "name": "プロメンバー",
+      "description": "Advanced メンバーシップにアップグレードしました。すべての Pro 機能にアクセス可能。"
+    },
+    "talent_scout_bronze": {
+      "name": "タレントスカウト",
+      "description": "フィードバックでコミュニティを支えています。才能を見抜く目。"
+    },
+    "talent_scout_diamond": {
+      "name": "タレントスカウト",
+      "description": "フィードバックでコミュニティを支えています。究極のハイプマン。"
+    },
+    "talent_scout_gold": {
+      "name": "タレントスカウト",
+      "description": "フィードバックでコミュニティを支えています。コミュニティの柱。"
+    },
+    "talent_scout_silver": {
+      "name": "タレントスカウト",
+      "description": "フィードバックでコミュニティを支えています。熱心なサポーター。"
+    },
+    "the_professor_bronze": {
+      "name": "教授",
+      "description": "コミュニティの質問に検証済みの解答を提供しています。頼れる手。"
+    },
+    "the_professor_diamond": {
+      "name": "教授",
+      "description": "コミュニティの質問に検証済みの解答を提供しています。サルサの神託。"
+    },
+    "the_professor_gold": {
+      "name": "教授",
+      "description": "コミュニティの質問に検証済みの解答を提供しています。マスター講師。"
+    },
+    "the_professor_silver": {
+      "name": "教授",
+      "description": "コミュニティの質問に検証済みの解答を提供しています。信頼されるアドバイザー。"
+    },
+    "the_socialite_bronze": {
+      "name": "ソーシャライト",
+      "description": "ディスカッションに積極的に参加しています。場を和ませる一歩。"
+    },
+    "the_socialite_diamond": {
+      "name": "ソーシャライト",
+      "description": "ディスカッションに積極的に参加しています。世代の声。"
+    },
+    "the_socialite_gold": {
+      "name": "ソーシャライト",
+      "description": "ディスカッションに積極的に参加しています。どこにでも登場。"
+    },
+    "the_socialite_silver": {
+      "name": "ソーシャライト",
+      "description": "ディスカッションに積極的に参加しています。パーティーの主役。"
+    },
+    "unstoppable_bronze": {
+      "name": "止まらない",
+      "description": "継続して顔を出す姿勢。勢いを築いています。"
+    },
+    "unstoppable_diamond": {
+      "name": "止まらない",
+      "description": "継続して顔を出す姿勢。真に止まらない力。"
+    },
+    "unstoppable_gold": {
+      "name": "止まらない",
+      "description": "継続して顔を出す姿勢。月間マスター。"
+    },
+    "unstoppable_silver": {
+      "name": "止まらない",
+      "description": "継続して顔を出す姿勢。2 週間連続達成。"
+    }
   }
 }

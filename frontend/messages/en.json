@@ -116,7 +116,8 @@
     "noResults": "No courses found. Try a different filter.",
     "comingSoon": "Coming Soon",
     "typeLabel": "Type",
-    "levelLabel": "Level"
+    "levelLabel": "Level",
+    "whatYoullLearn": "What You'll Learn"
   },
   "lesson": {
     "title": "Lesson",
@@ -1114,5 +1115,194 @@
     "noRecordingsBody": "Check back after the next live session!",
     "videoFallback": "Your browser does not support the video tag.",
     "videoLoadFailed": "Failed to load video"
+  },
+  "courseObjectives": {
+    "bodymovement-mastery": [
+      "Acquire an understanding of body isolation",
+      "Learn to connect body isolations together",
+      "Bring body movement into your dance"
+    ],
+    "mambo-101": [
+      "Master timing and foundational steps",
+      "Become comfortable with dancing to music",
+      "Learn key variations to add flair to your dance"
+    ],
+    "mambo-201": [
+      "Build your dance vocabulary with building blocks",
+      "Become comfortable with complex choreographies",
+      "Master new tools for styling and flow"
+    ],
+    "mambo-301": [
+      "Push your mambo vocabulary to its limits",
+      "Master syncopated rhythms and fast tempos",
+      "Refine your technique with advanced styling"
+    ],
+    "pachanga": [
+      "Master the Pachanga vocabulary",
+      "Unlock speed and fancy footwork",
+      "Learn the history and culture of Pachanga"
+    ]
+  },
+  "badges": {
+    "beta_tester": {
+      "name": "Beta Tester",
+      "description": "Helped test the platform during early access."
+    },
+    "center_stage_bronze": {
+      "name": "Center Stage",
+      "description": "Sharing your journey on The Stage. First steps."
+    },
+    "center_stage_diamond": {
+      "name": "Center Stage",
+      "description": "Sharing your journey on The Stage. Legend of the stage."
+    },
+    "center_stage_gold": {
+      "name": "Center Stage",
+      "description": "Sharing your journey on The Stage. Star power."
+    },
+    "center_stage_silver": {
+      "name": "Center Stage",
+      "description": "Sharing your journey on The Stage. Regular performer."
+    },
+    "crowd_favorite_bronze": {
+      "name": "Crowd Favorite",
+      "description": "Recognized for great effort and spirit. Turning heads."
+    },
+    "crowd_favorite_diamond": {
+      "name": "Crowd Favorite",
+      "description": "Recognized for great effort and spirit. The peoples champion."
+    },
+    "crowd_favorite_gold": {
+      "name": "Crowd Favorite",
+      "description": "Recognized for great effort and spirit. Standing ovation."
+    },
+    "crowd_favorite_silver": {
+      "name": "Crowd Favorite",
+      "description": "Recognized for great effort and spirit. Applause rising."
+    },
+    "curious_mind_bronze": {
+      "name": "Curious Mind",
+      "description": "Asking for help and learning from others. First question."
+    },
+    "curious_mind_diamond": {
+      "name": "Curious Mind",
+      "description": "Asking for help and learning from others. Master inquirer."
+    },
+    "curious_mind_gold": {
+      "name": "Curious Mind",
+      "description": "Asking for help and learning from others. Deep diver."
+    },
+    "curious_mind_silver": {
+      "name": "Curious Mind",
+      "description": "Asking for help and learning from others. Regular learner."
+    },
+    "firestarter_bronze": {
+      "name": "Firestarter",
+      "description": "Your dancing is heating up the stage. Warm embers."
+    },
+    "firestarter_diamond": {
+      "name": "Firestarter",
+      "description": "Your dancing is heating up the stage. A supernova on the dance floor."
+    },
+    "firestarter_gold": {
+      "name": "Firestarter",
+      "description": "Your dancing is heating up the stage. Inferno status."
+    },
+    "firestarter_silver": {
+      "name": "Firestarter",
+      "description": "Your dancing is heating up the stage. Full blaze."
+    },
+    "founder_diamond": {
+      "name": "Founder",
+      "description": "Original member of The Mambo Guild. Reserved for the first 1000 users."
+    },
+    "guild_master": {
+      "name": "Guild Master",
+      "description": "Elite Performer membership. The highest tier in The Mambo Guild."
+    },
+    "human_metronome_bronze": {
+      "name": "Human Metronome",
+      "description": "Impeccable timing acknowledged by peers. Finding the groove."
+    },
+    "human_metronome_diamond": {
+      "name": "Human Metronome",
+      "description": "Impeccable timing acknowledged by peers. You ARE the rhythm."
+    },
+    "human_metronome_gold": {
+      "name": "Human Metronome",
+      "description": "Impeccable timing acknowledged by peers. Absolute precision."
+    },
+    "human_metronome_silver": {
+      "name": "Human Metronome",
+      "description": "Impeccable timing acknowledged by peers. Locked in."
+    },
+    "pro_member": {
+      "name": "Pro Member",
+      "description": "Upgraded to Advanced membership. Access to all Pro features."
+    },
+    "talent_scout_bronze": {
+      "name": "Talent Scout",
+      "description": "Supporting the community with feedback. Eye for talent."
+    },
+    "talent_scout_diamond": {
+      "name": "Talent Scout",
+      "description": "Supporting the community with feedback. The ultimate hype person."
+    },
+    "talent_scout_gold": {
+      "name": "Talent Scout",
+      "description": "Supporting the community with feedback. Community pillar."
+    },
+    "talent_scout_silver": {
+      "name": "Talent Scout",
+      "description": "Supporting the community with feedback. Dedicated supporter."
+    },
+    "the_professor_bronze": {
+      "name": "The Professor",
+      "description": "Providing verified solutions to community questions. Helpful hand."
+    },
+    "the_professor_diamond": {
+      "name": "The Professor",
+      "description": "Providing verified solutions to community questions. The Oracle of Salsa."
+    },
+    "the_professor_gold": {
+      "name": "The Professor",
+      "description": "Providing verified solutions to community questions. Master instructor."
+    },
+    "the_professor_silver": {
+      "name": "The Professor",
+      "description": "Providing verified solutions to community questions. Trusted advisor."
+    },
+    "the_socialite_bronze": {
+      "name": "The Socialite",
+      "description": "Active participant in discussions. Breaking the ice."
+    },
+    "the_socialite_diamond": {
+      "name": "The Socialite",
+      "description": "Active participant in discussions. Voice of the generation."
+    },
+    "the_socialite_gold": {
+      "name": "The Socialite",
+      "description": "Active participant in discussions. Everywhere at once."
+    },
+    "the_socialite_silver": {
+      "name": "The Socialite",
+      "description": "Active participant in discussions. Life of the party."
+    },
+    "unstoppable_bronze": {
+      "name": "Unstoppable",
+      "description": "Consistent dedication to showing up. Building momentum."
+    },
+    "unstoppable_diamond": {
+      "name": "Unstoppable",
+      "description": "Consistent dedication to showing up. Truly unstoppable force."
+    },
+    "unstoppable_gold": {
+      "name": "Unstoppable",
+      "description": "Consistent dedication to showing up. Monthly master."
+    },
+    "unstoppable_silver": {
+      "name": "Unstoppable",
+      "description": "Consistent dedication to showing up. Two weeks strong."
+    }
   }
 }

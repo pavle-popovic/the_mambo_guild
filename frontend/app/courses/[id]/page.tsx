@@ -8,6 +8,7 @@ import NavBar from "@/components/NavBar";
 import { useAuth } from "@/contexts/AuthContext";
 import ConstellationGraph from "@/components/skill-tree/ConstellationGraph";
 import { useTranslations } from "@/i18n/useTranslations";
+import { useLocale } from "@/i18n/client";
 
 interface Level {
   id: string;
@@ -49,15 +50,16 @@ export default function CourseDetailPage() {
   const [error, setError] = useState("");
   const tCommon = useTranslations('common');
   const tCourses = useTranslations('courses');
+  const locale = useLocale();
 
-  // Load skill tree on mount. Only depends on courseId — NOT on user.
+  // Load skill tree on mount. Only depends on courseId + locale — NOT on user.
   // When user auth resolves, a second fetch updates progress silently.
   const hasFetchedForUser = useRef(false);
   useEffect(() => {
     async function load() {
       try {
         const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/courses/worlds/${courseId}/skill-tree`,
+          `${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/courses/worlds/${courseId}/skill-tree?locale=${locale}`,
           { credentials: "include" as RequestCredentials }
         );
         if (!response.ok) throw new Error("Failed to load skill tree");
@@ -71,7 +73,7 @@ export default function CourseDetailPage() {
       }
     }
     load();
-  }, [courseId]);
+  }, [courseId, locale]);
 
   // Silent re-fetch when user changes (to get progress data)
   useEffect(() => {
@@ -79,13 +81,13 @@ export default function CourseDetailPage() {
     if (hasFetchedForUser.current) return;
     hasFetchedForUser.current = true;
     fetch(
-      `${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/courses/worlds/${courseId}/skill-tree`,
+      `${process.env.NEXT_PUBLIC_API_URL ?? ""}/api/courses/worlds/${courseId}/skill-tree?locale=${locale}`,
       { credentials: "include" as RequestCredentials }
     )
       .then(r => r.ok ? r.json() : null)
       .then(data => { if (data) setSkillTree(data); })
       .catch(() => {});
-  }, [user?.id, skillTree, courseId]);
+  }, [user?.id, skillTree, courseId, locale]);
 
   // Calculate overall course progress and stats
   const stats = useMemo(() => {

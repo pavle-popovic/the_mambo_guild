@@ -39,6 +39,19 @@ interface BadgeTrophyCaseProps {
 
 export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userStats }: BadgeTrophyCaseProps) {
   const t = useTranslations("profile");
+  const tBadges = useTranslations("badges");
+  // Prefer the i18n lookup badges.<id>.{name,description}; fall back to the
+  // English string coming from the DB if the key is missing.
+  const badgeName = (b: Badge): string => {
+    const key = `${b.id}.name`;
+    const v = tBadges(key);
+    return v && v !== key ? v : b.name;
+  };
+  const badgeDesc = (b: Badge): string => {
+    const key = `${b.id}.description`;
+    const v = tBadges(key);
+    return v && v !== key ? v : b.description;
+  };
   console.log("🏆 BadgeTrophyCase Rendered", { badgeCount: initialBadges?.length, streakCount, userStats });
   const [badges, setBadges] = useState<Badge[]>([]);
   const [featuredBadges, setFeaturedBadges] = useState<Badge[]>([]);
@@ -272,7 +285,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                           badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
                             'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
                   }}>
-                    <img src={badge.icon_url} alt={badge.name} className="w-full h-full object-cover" />
+                    <img src={badge.icon_url} alt={badgeName(badge)} className="w-full h-full object-cover" />
                   </div>
                 ) : (
                   <span className="text-xl">🏆</span>
@@ -323,12 +336,12 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                               badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
                                 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
                       }}>
-                        <img src={badge.icon_url} alt={badge.name} className="w-full h-full object-cover" />
+                        <img src={badge.icon_url} alt={badgeName(badge)} className="w-full h-full object-cover" />
                       </div>
                     ) : "🏆"}
                   </div>
                   <h4 className="font-bold text-white text-sm leading-tight">
-                    {badge.name}
+                    {badgeName(badge)}
                     {badge.id.includes('bronze') && " I"}
                     {badge.id.includes('silver') && " III"}
                     {badge.id.includes('gold') && " V"}
@@ -413,18 +426,18 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                               badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
                                 'linear-gradient(135deg, #FFD700 0%, #FFA500 100%)'
                       }}>
-                        <img src={badge.icon_url} className="w-full h-full object-cover" alt={badge.name} />
+                        <img src={badge.icon_url} className="w-full h-full object-cover" alt={badgeName(badge)} />
                       </div>
                     ) : "🏅"}
                   </div>
                   <h4 className="font-medium text-white text-xs">
-                    {badge.name}
+                    {badgeName(badge)}
                     {badge.id.includes('bronze') && " I"}
                     {badge.id.includes('silver') && " III"}
                     {badge.id.includes('gold') && " V"}
                     {badge.id.includes('diamond') && " X"}
                   </h4>
-                  <p className="text-[10px] text-white/50 mt-1 line-clamp-1 hidden lg:block">{badge.description}</p>
+                  <p className="text-[10px] text-white/50 mt-1 line-clamp-1 hidden lg:block">{badgeDesc(badge)}</p>
 
                   {/* Add Trigger Hint — desktop only */}
                   {canEdit && !featured && featuredBadges.length < 5 && (
@@ -454,7 +467,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                               badge.id.includes('diamond') ? 'linear-gradient(135deg, #E8E8E8 0%, #FFFFFF 100%)' :
                                 'linear-gradient(135deg, #777777 0%, #999999 100%)'
                       }}>
-                        <img src={badge.icon_url} alt={badge.name} className="w-full h-full object-cover" />
+                        <img src={badge.icon_url} alt={badgeName(badge)} className="w-full h-full object-cover" />
                       </div>
                     ) : "🔒"}
                   </div>
@@ -465,7 +478,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                   </div>
 
                   <h4 className="font-medium text-white/40 text-xs mb-2 opacity-50 relative z-10">
-                    {badge.name}
+                    {badgeName(badge)}
                     {badge.id.includes('bronze') && " I"}
                     {badge.id.includes('silver') && " III"}
                     {badge.id.includes('gold') && " V"}
@@ -499,7 +512,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                       {badge.requirement_type?.replace(/_/g, " ")}
                     </p>
                     <p className="text-[9px] text-white/60">
-                      {badge.description}
+                      {badgeDesc(badge)}
                     </p>
                   </div>
                 </div>

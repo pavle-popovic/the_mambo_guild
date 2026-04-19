@@ -116,7 +116,8 @@
     "noResults": "لم يتم العثور على دورات. جرب فلتراً آخر.",
     "comingSoon": "قريباً",
     "typeLabel": "النوع",
-    "levelLabel": "المستوى"
+    "levelLabel": "المستوى",
+    "whatYoullLearn": "ما الذي ستتعلمه"
   },
   "lesson": {
     "title": "الدرس",
@@ -1114,5 +1115,194 @@
     "deletePostConfirmBodyPost": "؟ لا يمكن التراجع عن هذا الإجراء وسيتم حذف كل التفاعلات والتعليقات.",
     "deletingBtn": "جاري الحذف...",
     "replyVideoTitle": "الرد على {title}"
+  },
+  "courseObjectives": {
+    "bodymovement-mastery": [
+      "فهم مبدأ عزل الجسم",
+      "تعلّم ربط عزلات الجسم ببعضها",
+      "أدخل حركة الجسم في رقصك"
+    ],
+    "mambo-101": [
+      "أتقن التوقيت والخطوات الأساسية",
+      "اشعر بالراحة وأنت ترقص على الموسيقى",
+      "تعلّم تنويعات مهمة تُضفي لمسة على رقصك"
+    ],
+    "mambo-201": [
+      "وسّع مفرداتك الراقصة بوحدات أساسية",
+      "اشعر بالراحة مع الكوريوغرافيا المعقدة",
+      "أتقن أدوات جديدة للأسلوب والانسيابية"
+    ],
+    "mambo-301": [
+      "ادفع مفرداتك في المامبو إلى أقصى حد",
+      "أتقن الإيقاعات المتقطعة والإيقاعات السريعة",
+      "هذّب تقنيتك بأسلوب متقدّم"
+    ],
+    "pachanga": [
+      "أتقن مفردات الباتشانغا",
+      "افتح آفاق السرعة والأداء القدمي الرشيق",
+      "تعرّف على تاريخ وثقافة الباتشانغا"
+    ]
+  },
+  "badges": {
+    "beta_tester": {
+      "name": "مختبر تجريبي",
+      "description": "ساهم في اختبار المنصة خلال فترة الوصول المبكر."
+    },
+    "center_stage_bronze": {
+      "name": "نجم العرض",
+      "description": "تشارك رحلتك على The Stage. الخطوات الأولى."
+    },
+    "center_stage_diamond": {
+      "name": "نجم العرض",
+      "description": "تشارك رحلتك على The Stage. أسطورة المسرح."
+    },
+    "center_stage_gold": {
+      "name": "نجم العرض",
+      "description": "تشارك رحلتك على The Stage. وهج النجومية."
+    },
+    "center_stage_silver": {
+      "name": "نجم العرض",
+      "description": "تشارك رحلتك على The Stage. فنان منتظم."
+    },
+    "crowd_favorite_bronze": {
+      "name": "مفضل الجمهور",
+      "description": "تُقدَّر جهودك وروحك. تلفت الأنظار."
+    },
+    "crowd_favorite_diamond": {
+      "name": "مفضل الجمهور",
+      "description": "تُقدَّر جهودك وروحك. بطل الجمهور."
+    },
+    "crowd_favorite_gold": {
+      "name": "مفضل الجمهور",
+      "description": "تُقدَّر جهودك وروحك. تحية وقوفاً."
+    },
+    "crowd_favorite_silver": {
+      "name": "مفضل الجمهور",
+      "description": "تُقدَّر جهودك وروحك. التصفيق يتعالى."
+    },
+    "curious_mind_bronze": {
+      "name": "عقل فضولي",
+      "description": "تسأل وتتعلم من الآخرين. أول سؤال."
+    },
+    "curious_mind_diamond": {
+      "name": "عقل فضولي",
+      "description": "تسأل وتتعلم. سيّد الأسئلة."
+    },
+    "curious_mind_gold": {
+      "name": "عقل فضولي",
+      "description": "تسأل وتتعلم. تغوص عميقاً."
+    },
+    "curious_mind_silver": {
+      "name": "عقل فضولي",
+      "description": "تسأل وتتعلم. متعلم منتظم."
+    },
+    "firestarter_bronze": {
+      "name": "مشعل الحماس",
+      "description": "رقصك يُلهب المسرح. جمرات متّقدة."
+    },
+    "firestarter_diamond": {
+      "name": "مشعل الحماس",
+      "description": "رقصك يُلهب المسرح. سوبرنوفا على حلبة الرقص."
+    },
+    "firestarter_gold": {
+      "name": "مشعل الحماس",
+      "description": "رقصك يُلهب المسرح. درجة الجحيم."
+    },
+    "firestarter_silver": {
+      "name": "مشعل الحماس",
+      "description": "رقصك يُلهب المسرح. لهيب كامل."
+    },
+    "founder_diamond": {
+      "name": "مؤسس",
+      "description": "عضو مؤسس في The Mambo Guild. حصري لأول 1000 مستخدم."
+    },
+    "guild_master": {
+      "name": "سيّد النقابة",
+      "description": "عضوية Elite Performer. أعلى فئة في The Mambo Guild."
+    },
+    "human_metronome_bronze": {
+      "name": "مترونوم بشري",
+      "description": "توقيت دقيق يُشيد به الزملاء. تجد الإيقاع."
+    },
+    "human_metronome_diamond": {
+      "name": "مترونوم بشري",
+      "description": "توقيت دقيق يُشيد به الزملاء. أنت نفسك الإيقاع."
+    },
+    "human_metronome_gold": {
+      "name": "مترونوم بشري",
+      "description": "توقيت دقيق يُشيد به الزملاء. دقة مطلقة."
+    },
+    "human_metronome_silver": {
+      "name": "مترونوم بشري",
+      "description": "توقيت دقيق يُشيد به الزملاء. متماسك تماماً."
+    },
+    "pro_member": {
+      "name": "عضو Pro",
+      "description": "تمت الترقية إلى عضوية Advanced. الوصول إلى جميع ميزات Pro."
+    },
+    "talent_scout_bronze": {
+      "name": "مكتشف المواهب",
+      "description": "تدعم المجتمع بالتغذية الراجعة. عين تكتشف الموهبة."
+    },
+    "talent_scout_diamond": {
+      "name": "مكتشف المواهب",
+      "description": "تدعم المجتمع بالتغذية الراجعة. محفّز الحماس الأول."
+    },
+    "talent_scout_gold": {
+      "name": "مكتشف المواهب",
+      "description": "تدعم المجتمع بالتغذية الراجعة. ركيزة المجتمع."
+    },
+    "talent_scout_silver": {
+      "name": "مكتشف المواهب",
+      "description": "تدعم المجتمع بالتغذية الراجعة. داعم مخلص."
+    },
+    "the_professor_bronze": {
+      "name": "البروفيسور",
+      "description": "تقدّم حلولاً موثّقة لأسئلة المجتمع. يد عون."
+    },
+    "the_professor_diamond": {
+      "name": "البروفيسور",
+      "description": "تقدّم حلولاً موثّقة لأسئلة المجتمع. عرّاف السالسا."
+    },
+    "the_professor_gold": {
+      "name": "البروفيسور",
+      "description": "تقدّم حلولاً موثّقة لأسئلة المجتمع. مدرّب بارع."
+    },
+    "the_professor_silver": {
+      "name": "البروفيسور",
+      "description": "تقدّم حلولاً موثّقة لأسئلة المجتمع. مستشار موثوق."
+    },
+    "the_socialite_bronze": {
+      "name": "نجم التواصل",
+      "description": "مشارك فعّال في النقاشات. تكسر الجليد."
+    },
+    "the_socialite_diamond": {
+      "name": "نجم التواصل",
+      "description": "مشارك فعّال في النقاشات. صوت الجيل."
+    },
+    "the_socialite_gold": {
+      "name": "نجم التواصل",
+      "description": "مشارك فعّال في النقاشات. في كل مكان."
+    },
+    "the_socialite_silver": {
+      "name": "نجم التواصل",
+      "description": "مشارك فعّال في النقاشات. روح الجلسة."
+    },
+    "unstoppable_bronze": {
+      "name": "لا يُوقَف",
+      "description": "التزام مستمر بالحضور. تبني الزخم."
+    },
+    "unstoppable_diamond": {
+      "name": "لا يُوقَف",
+      "description": "التزام مستمر بالحضور. قوة لا تُوقَف حقاً."
+    },
+    "unstoppable_gold": {
+      "name": "لا يُوقَف",
+      "description": "التزام مستمر بالحضور. بطل الشهر."
+    },
+    "unstoppable_silver": {
+      "name": "لا يُوقَف",
+      "description": "التزام مستمر بالحضور. أسبوعان متتاليان."
+    }
   }
 }

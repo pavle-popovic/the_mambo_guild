@@ -116,7 +116,8 @@
     "noResults": "Geen cursussen gevonden. Probeer een ander filter.",
     "comingSoon": "Binnenkort",
     "typeLabel": "Type",
-    "levelLabel": "Niveau"
+    "levelLabel": "Niveau",
+    "whatYoullLearn": "Wat je gaat leren"
   },
   "lesson": {
     "title": "Les",
@@ -1114,5 +1115,194 @@
     "cancelingInProgress": "Opzeggen...",
     "cancelFinal": "Mijn abonnement opzeggen",
     "modalCloseAria": "Sluiten"
+  },
+  "courseObjectives": {
+    "bodymovement-mastery": [
+      "Krijg inzicht in lichaamsisolatie",
+      "Leer lichaamsisolaties met elkaar te verbinden",
+      "Breng lichaamsbeweging in je dans"
+    ],
+    "mambo-101": [
+      "Beheers timing en de basispassen",
+      "Voel je op je gemak bij het dansen op muziek",
+      "Leer belangrijke variaties om je dans meer flair te geven"
+    ],
+    "mambo-201": [
+      "Bouw je dansvocabulaire op met bouwstenen",
+      "Voel je op je gemak bij complexe choreografieën",
+      "Beheers nieuwe tools voor styling en flow"
+    ],
+    "mambo-301": [
+      "Duw je mambo-vocabulaire tot het uiterste",
+      "Beheers gesyncopeerde ritmes en snelle tempo's",
+      "Verfijn je techniek met geavanceerde styling"
+    ],
+    "pachanga": [
+      "Beheers het Pachanga-vocabulaire",
+      "Ontgrendel snelheid en verfijnd voetenwerk",
+      "Leer de geschiedenis en cultuur van de Pachanga"
+    ]
+  },
+  "badges": {
+    "beta_tester": {
+      "name": "Bètatester",
+      "description": "Hielp het platform testen tijdens early access."
+    },
+    "center_stage_bronze": {
+      "name": "In de Schijnwerpers",
+      "description": "Je deelt je reis op The Stage. Eerste stappen."
+    },
+    "center_stage_diamond": {
+      "name": "In de Schijnwerpers",
+      "description": "Je deelt je reis op The Stage. Legende van het podium."
+    },
+    "center_stage_gold": {
+      "name": "In de Schijnwerpers",
+      "description": "Je deelt je reis op The Stage. Sterrenstatus."
+    },
+    "center_stage_silver": {
+      "name": "In de Schijnwerpers",
+      "description": "Je deelt je reis op The Stage. Vaste performer."
+    },
+    "crowd_favorite_bronze": {
+      "name": "Publiekslieveling",
+      "description": "Erkend voor inzet en spirit. Je trekt de aandacht."
+    },
+    "crowd_favorite_diamond": {
+      "name": "Publiekslieveling",
+      "description": "Erkend voor inzet en spirit. Kampioen van het volk."
+    },
+    "crowd_favorite_gold": {
+      "name": "Publiekslieveling",
+      "description": "Erkend voor inzet en spirit. Staande ovatie."
+    },
+    "crowd_favorite_silver": {
+      "name": "Publiekslieveling",
+      "description": "Erkend voor inzet en spirit. Het applaus groeit."
+    },
+    "curious_mind_bronze": {
+      "name": "Nieuwsgierige Geest",
+      "description": "Je vraagt om hulp en leert van anderen. Eerste vraag."
+    },
+    "curious_mind_diamond": {
+      "name": "Nieuwsgierige Geest",
+      "description": "Je vraagt hulp en leert. Meester-ondervrager."
+    },
+    "curious_mind_gold": {
+      "name": "Nieuwsgierige Geest",
+      "description": "Je vraagt hulp en leert. Je graaft diep."
+    },
+    "curious_mind_silver": {
+      "name": "Nieuwsgierige Geest",
+      "description": "Je vraagt hulp en leert. Vaste leerling."
+    },
+    "firestarter_bronze": {
+      "name": "Vuurmaker",
+      "description": "Je dans verwarmt het podium. Gloeiende sintels."
+    },
+    "firestarter_diamond": {
+      "name": "Vuurmaker",
+      "description": "Je dans verwarmt het podium. Een supernova op de dansvloer."
+    },
+    "firestarter_gold": {
+      "name": "Vuurmaker",
+      "description": "Je dans verwarmt het podium. Infernostand."
+    },
+    "firestarter_silver": {
+      "name": "Vuurmaker",
+      "description": "Je dans verwarmt het podium. Volop vuur."
+    },
+    "founder_diamond": {
+      "name": "Oprichter",
+      "description": "Oorspronkelijk lid van The Mambo Guild. Alleen voor de eerste 1000 gebruikers."
+    },
+    "guild_master": {
+      "name": "Gildenmeester",
+      "description": "Elite Performer-lidmaatschap. De hoogste rang in The Mambo Guild."
+    },
+    "human_metronome_bronze": {
+      "name": "Menselijke Metronoom",
+      "description": "Door collega's erkende onberispelijke timing. Je vindt de groove."
+    },
+    "human_metronome_diamond": {
+      "name": "Menselijke Metronoom",
+      "description": "Door collega's erkende onberispelijke timing. JIJ BENT het ritme."
+    },
+    "human_metronome_gold": {
+      "name": "Menselijke Metronoom",
+      "description": "Door collega's erkende onberispelijke timing. Absolute precisie."
+    },
+    "human_metronome_silver": {
+      "name": "Menselijke Metronoom",
+      "description": "Door collega's erkende onberispelijke timing. Volledig in de pas."
+    },
+    "pro_member": {
+      "name": "Pro-lid",
+      "description": "Opgewaardeerd naar Advanced-lidmaatschap. Toegang tot alle Pro-functies."
+    },
+    "talent_scout_bronze": {
+      "name": "Talentenspotter",
+      "description": "Je steunt de community met feedback. Oog voor talent."
+    },
+    "talent_scout_diamond": {
+      "name": "Talentenspotter",
+      "description": "Je steunt de community met feedback. De ultieme aanjager."
+    },
+    "talent_scout_gold": {
+      "name": "Talentenspotter",
+      "description": "Je steunt de community met feedback. Pijler van de community."
+    },
+    "talent_scout_silver": {
+      "name": "Talentenspotter",
+      "description": "Je steunt de community met feedback. Toegewijde supporter."
+    },
+    "the_professor_bronze": {
+      "name": "De Professor",
+      "description": "Je geeft geverifieerde oplossingen aan de community. Helpende hand."
+    },
+    "the_professor_diamond": {
+      "name": "De Professor",
+      "description": "Je geeft geverifieerde oplossingen aan de community. Het Orakel van Salsa."
+    },
+    "the_professor_gold": {
+      "name": "De Professor",
+      "description": "Je geeft geverifieerde oplossingen aan de community. Meester-instructeur."
+    },
+    "the_professor_silver": {
+      "name": "De Professor",
+      "description": "Je geeft geverifieerde oplossingen aan de community. Vertrouwde adviseur."
+    },
+    "the_socialite_bronze": {
+      "name": "Sociale Ster",
+      "description": "Actieve deelnemer aan discussies. Breekt het ijs."
+    },
+    "the_socialite_diamond": {
+      "name": "Sociale Ster",
+      "description": "Actieve deelnemer aan discussies. Stem van een generatie."
+    },
+    "the_socialite_gold": {
+      "name": "Sociale Ster",
+      "description": "Actieve deelnemer aan discussies. Overal tegelijk."
+    },
+    "the_socialite_silver": {
+      "name": "Sociale Ster",
+      "description": "Actieve deelnemer aan discussies. Ziel van het feest."
+    },
+    "unstoppable_bronze": {
+      "name": "Niet Te Stoppen",
+      "description": "Consistente toewijding om te verschijnen. Je bouwt momentum op."
+    },
+    "unstoppable_diamond": {
+      "name": "Niet Te Stoppen",
+      "description": "Consistente toewijding om te verschijnen. Echt onstuitbare kracht."
+    },
+    "unstoppable_gold": {
+      "name": "Niet Te Stoppen",
+      "description": "Consistente toewijding om te verschijnen. Maandmeester."
+    },
+    "unstoppable_silver": {
+      "name": "Niet Te Stoppen",
+      "description": "Consistente toewijding om te verschijnen. Twee weken sterk."
+    }
   }
 }

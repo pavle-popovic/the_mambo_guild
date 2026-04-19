@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session, joinedload
 from sqlalchemy import func
 from typing import List, Dict
@@ -24,13 +24,30 @@ _TLDR_PATTERN = re.compile(
 )
 
 
-def _extract_tldr_for_level(level: Level) -> Optional[str]:
-    """Return the TL;DR text from the first lesson's markdown notes, or None."""
+def _extract_tldr_for_level(level: Level, locale: str = "en") -> Optional[str]:
+    """Return the TL;DR text from the first lesson's markdown notes, or None.
+
+    When locale != "en" and translated notes exist at
+    content_json.translations[locale].notes, the TL;DR is pulled from there.
+    Falls back to the English notes if the locale is missing or malformed.
+    The `## TL;DR` heading itself is preserved verbatim across all 14 locales,
+    so the same regex works for every language.
+    """
     if not level.lessons:
         return None
     first_lesson = min(level.lessons, key=lambda l: (l.order_index or 0))
     content = first_lesson.content_json or {}
-    notes = content.get("notes") if isinstance(content, dict) else None
+    if not isinstance(content, dict):
+        return None
+    notes: Optional[str] = None
+    if locale and locale != "en":
+        trans = content.get("translations")
+        if isinstance(trans, dict):
+            block = trans.get(locale)
+            if isinstance(block, dict) and isinstance(block.get("notes"), str):
+                notes = block["notes"]
+    if not isinstance(notes, str):
+        notes = content.get("notes") if isinstance(content.get("notes"), str) else None
     if not isinstance(notes, str):
         return None
     match = _TLDR_PATTERN.search(notes)
@@ -143,6 +160,7 @@ def get_worlds(
 
         result.append(WorldResponse(
             id=str(world.id),
+            slug=world.slug,
             title=world.title,
             description=world.description,
             image_url=world.image_url,
@@ -431,6 +449,7 @@ def get_world_lessons(
 @router.get("/worlds/{world_id}/skill-tree", response_model=WorldDetailResponse)
 def get_world_skill_tree(
     world_id: str,
+    locale: str = Query("en", regex=r"^[a-z]{2}$"),
     current_user: Optional[User] = Depends(get_current_user_optional),
     db: Session = Depends(get_db)
 ):
@@ -505,7 +524,7 @@ def get_world_skill_tree(
         calculated_duration = sum((lesson.duration_minutes or 0) for lesson in level.lessons)
         duration = level.duration_minutes if level.duration_minutes else calculated_duration
 
-        tldr = _extract_tldr_for_level(level) if is_topic_world else None
+        tldr = _extract_tldr_for_level(level, locale) if is_topic_world else None
 
         # B5: Sidebar shows boss-battle lessons separately, so the count
         # the user sees in the module label must exclude boss-battle.

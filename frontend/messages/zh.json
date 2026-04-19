@@ -116,7 +116,8 @@
     "noResults": "未找到课程。请尝试其他筛选条件。",
     "comingSoon": "即将推出",
     "typeLabel": "类型",
-    "levelLabel": "等级"
+    "levelLabel": "等级",
+    "whatYoullLearn": "你将学到什么"
   },
   "lesson": {
     "title": "课时",
@@ -1114,5 +1115,194 @@
     "cancelingInProgress": "取消中...",
     "cancelFinal": "取消我的订阅",
     "modalCloseAria": "关闭"
+  },
+  "courseObjectives": {
+    "bodymovement-mastery": [
+      "掌握身体分离动作的理解",
+      "学习将身体的各个分离动作连接起来",
+      "将身体律动融入你的舞蹈"
+    ],
+    "mambo-101": [
+      "掌握节奏和基础步伐",
+      "学会自如地随着音乐起舞",
+      "学习关键的变化,让你的舞蹈更有风格"
+    ],
+    "mambo-201": [
+      "用基础模块扩展你的舞蹈词汇",
+      "自如驾驭复杂的编舞",
+      "掌握风格与流动性的全新工具"
+    ],
+    "mambo-301": [
+      "将你的曼波词汇推向极限",
+      "掌握切分节奏与快速节拍",
+      "通过高阶风格化精雕你的技巧"
+    ],
+    "pachanga": [
+      "掌握帕查恩加的动作词汇",
+      "解锁速度与华丽的脚下功夫",
+      "了解帕查恩加的历史与文化"
+    ]
+  },
+  "badges": {
+    "beta_tester": {
+      "name": "测试先锋",
+      "description": "在抢先体验期间帮助测试平台。"
+    },
+    "center_stage_bronze": {
+      "name": "舞台中央",
+      "description": "在 The Stage 上分享你的旅程。迈出第一步。"
+    },
+    "center_stage_diamond": {
+      "name": "舞台中央",
+      "description": "在 The Stage 上分享你的旅程。舞台传奇。"
+    },
+    "center_stage_gold": {
+      "name": "舞台中央",
+      "description": "在 The Stage 上分享你的旅程。明星气场。"
+    },
+    "center_stage_silver": {
+      "name": "舞台中央",
+      "description": "在 The Stage 上分享你的旅程。常驻表演者。"
+    },
+    "crowd_favorite_bronze": {
+      "name": "观众宠儿",
+      "description": "因投入与热情获得认可。开始引人注目。"
+    },
+    "crowd_favorite_diamond": {
+      "name": "观众宠儿",
+      "description": "因投入与热情获得认可。人民的冠军。"
+    },
+    "crowd_favorite_gold": {
+      "name": "观众宠儿",
+      "description": "因投入与热情获得认可。全场起立鼓掌。"
+    },
+    "crowd_favorite_silver": {
+      "name": "观众宠儿",
+      "description": "因投入与热情获得认可。掌声渐起。"
+    },
+    "curious_mind_bronze": {
+      "name": "好奇之心",
+      "description": "向他人求助并从中学习。第一个问题。"
+    },
+    "curious_mind_diamond": {
+      "name": "好奇之心",
+      "description": "向他人求助并学习。提问大师。"
+    },
+    "curious_mind_gold": {
+      "name": "好奇之心",
+      "description": "向他人求助并学习。深入钻研。"
+    },
+    "curious_mind_silver": {
+      "name": "好奇之心",
+      "description": "向他人求助并学习。稳定的学习者。"
+    },
+    "firestarter_bronze": {
+      "name": "点火者",
+      "description": "你的舞步正在加热舞台。余烬温热。"
+    },
+    "firestarter_diamond": {
+      "name": "点火者",
+      "description": "你的舞步正在加热舞台。舞池中的超新星。"
+    },
+    "firestarter_gold": {
+      "name": "点火者",
+      "description": "你的舞步正在加热舞台。炼狱等级。"
+    },
+    "firestarter_silver": {
+      "name": "点火者",
+      "description": "你的舞步正在加热舞台。熊熊燃烧。"
+    },
+    "founder_diamond": {
+      "name": "创始成员",
+      "description": "The Mambo Guild 的原始成员。仅保留给最初的 1000 名用户。"
+    },
+    "guild_master": {
+      "name": "公会大师",
+      "description": "Elite Performer 会员。The Mambo Guild 的最高等级。"
+    },
+    "human_metronome_bronze": {
+      "name": "人肉节拍器",
+      "description": "同伴认可的精准节奏。正在找到律动。"
+    },
+    "human_metronome_diamond": {
+      "name": "人肉节拍器",
+      "description": "同伴认可的精准节奏。你,就是节奏。"
+    },
+    "human_metronome_gold": {
+      "name": "人肉节拍器",
+      "description": "同伴认可的精准节奏。绝对的精确。"
+    },
+    "human_metronome_silver": {
+      "name": "人肉节拍器",
+      "description": "同伴认可的精准节奏。完全合拍。"
+    },
+    "pro_member": {
+      "name": "专业会员",
+      "description": "已升级到 Advanced 会员。可使用全部 Pro 功能。"
+    },
+    "talent_scout_bronze": {
+      "name": "星探",
+      "description": "用反馈支持社区。慧眼识才。"
+    },
+    "talent_scout_diamond": {
+      "name": "星探",
+      "description": "用反馈支持社区。终极助威者。"
+    },
+    "talent_scout_gold": {
+      "name": "星探",
+      "description": "用反馈支持社区。社区的中坚。"
+    },
+    "talent_scout_silver": {
+      "name": "星探",
+      "description": "用反馈支持社区。忠实的支持者。"
+    },
+    "the_professor_bronze": {
+      "name": "教授",
+      "description": "为社区问题提供经过验证的解答。援手。"
+    },
+    "the_professor_diamond": {
+      "name": "教授",
+      "description": "为社区问题提供经过验证的解答。萨尔萨的神谕。"
+    },
+    "the_professor_gold": {
+      "name": "教授",
+      "description": "为社区问题提供经过验证的解答。资深导师。"
+    },
+    "the_professor_silver": {
+      "name": "教授",
+      "description": "为社区问题提供经过验证的解答。值得信赖的顾问。"
+    },
+    "the_socialite_bronze": {
+      "name": "社交达人",
+      "description": "积极参与讨论。破冰而出。"
+    },
+    "the_socialite_diamond": {
+      "name": "社交达人",
+      "description": "积极参与讨论。一代人的声音。"
+    },
+    "the_socialite_gold": {
+      "name": "社交达人",
+      "description": "积极参与讨论。无处不在。"
+    },
+    "the_socialite_silver": {
+      "name": "社交达人",
+      "description": "积极参与讨论。派对焦点。"
+    },
+    "unstoppable_bronze": {
+      "name": "势不可挡",
+      "description": "持续到场的坚持。势头正在累积。"
+    },
+    "unstoppable_diamond": {
+      "name": "势不可挡",
+      "description": "持续到场的坚持。真正势不可挡的力量。"
+    },
+    "unstoppable_gold": {
+      "name": "势不可挡",
+      "description": "持续到场的坚持。月度之王。"
+    },
+    "unstoppable_silver": {
+      "name": "势不可挡",
+      "description": "持续到场的坚持。连续两周。"
+    }
   }
 }

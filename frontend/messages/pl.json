@@ -116,7 +116,8 @@
     "noResults": "Nie znaleziono kursów. Spróbuj innego filtru.",
     "comingSoon": "Wkrótce",
     "typeLabel": "Typ",
-    "levelLabel": "Poziom"
+    "levelLabel": "Poziom",
+    "whatYoullLearn": "Czego się nauczysz"
   },
   "lesson": {
     "title": "Lekcja",
@@ -1114,5 +1115,194 @@
     "cancelingInProgress": "Anulowanie...",
     "cancelFinal": "Anuluj moją subskrypcję",
     "modalCloseAria": "Zamknij"
+  },
+  "courseObjectives": {
+    "bodymovement-mastery": [
+      "Zrozum zasady izolacji ciała",
+      "Naucz się łączyć izolacje ciała",
+      "Wprowadź ruch ciała do swojego tańca"
+    ],
+    "mambo-101": [
+      "Opanuj timing i kroki podstawowe",
+      "Poczuj się swobodnie, tańcząc w rytm muzyki",
+      "Poznaj kluczowe wariacje, by dodać stylu swojemu tańcowi"
+    ],
+    "mambo-201": [
+      "Poszerz swój taneczny słownik o podstawowe elementy",
+      "Poczuj się swobodnie w złożonych choreografiach",
+      "Opanuj nowe narzędzia stylu i płynności"
+    ],
+    "mambo-301": [
+      "Dociśnij swój słownik mambo do granic możliwości",
+      "Opanuj rytmy synkopowane i szybkie tempa",
+      "Doszlifuj technikę dzięki zaawansowanemu stylowi"
+    ],
+    "pachanga": [
+      "Opanuj słownik Pachangi",
+      "Odblokuj szybkość i efektowną pracę stóp",
+      "Poznaj historię i kulturę Pachangi"
+    ]
+  },
+  "badges": {
+    "beta_tester": {
+      "name": "Beta Tester",
+      "description": "Pomógł testować platformę we wczesnym dostępie."
+    },
+    "center_stage_bronze": {
+      "name": "Na Środku Sceny",
+      "description": "Dzielisz się swoją drogą na The Stage. Pierwsze kroki."
+    },
+    "center_stage_diamond": {
+      "name": "Na Środku Sceny",
+      "description": "Dzielisz się drogą na The Stage. Legenda sceny."
+    },
+    "center_stage_gold": {
+      "name": "Na Środku Sceny",
+      "description": "Dzielisz się drogą na The Stage. Moc gwiazdy."
+    },
+    "center_stage_silver": {
+      "name": "Na Środku Sceny",
+      "description": "Dzielisz się drogą na The Stage. Stały wykonawca."
+    },
+    "crowd_favorite_bronze": {
+      "name": "Ulubieniec Publiczności",
+      "description": "Doceniony za wysiłek i ducha. Przyciągasz spojrzenia."
+    },
+    "crowd_favorite_diamond": {
+      "name": "Ulubieniec Publiczności",
+      "description": "Doceniony za wysiłek i ducha. Mistrz publiczności."
+    },
+    "crowd_favorite_gold": {
+      "name": "Ulubieniec Publiczności",
+      "description": "Doceniony za wysiłek i ducha. Owacja na stojąco."
+    },
+    "crowd_favorite_silver": {
+      "name": "Ulubieniec Publiczności",
+      "description": "Doceniony za wysiłek i ducha. Oklaski rosną."
+    },
+    "curious_mind_bronze": {
+      "name": "Ciekawy Umysł",
+      "description": "Prosisz o pomoc i uczysz się od innych. Pierwsze pytanie."
+    },
+    "curious_mind_diamond": {
+      "name": "Ciekawy Umysł",
+      "description": "Prosisz i uczysz się. Mistrz pytań."
+    },
+    "curious_mind_gold": {
+      "name": "Ciekawy Umysł",
+      "description": "Prosisz i uczysz się. Dociekliwy."
+    },
+    "curious_mind_silver": {
+      "name": "Ciekawy Umysł",
+      "description": "Prosisz i uczysz się. Stały uczeń."
+    },
+    "firestarter_bronze": {
+      "name": "Podpalacz",
+      "description": "Twój taniec rozgrzewa scenę. Żarzące się węgle."
+    },
+    "firestarter_diamond": {
+      "name": "Podpalacz",
+      "description": "Twój taniec rozgrzewa scenę. Supernowa na parkiecie."
+    },
+    "firestarter_gold": {
+      "name": "Podpalacz",
+      "description": "Twój taniec rozgrzewa scenę. Status inferno."
+    },
+    "firestarter_silver": {
+      "name": "Podpalacz",
+      "description": "Twój taniec rozgrzewa scenę. Pełny płomień."
+    },
+    "founder_diamond": {
+      "name": "Założyciel",
+      "description": "Oryginalny członek The Mambo Guild. Dla pierwszych 1000 użytkowników."
+    },
+    "guild_master": {
+      "name": "Mistrz Gildii",
+      "description": "Subskrypcja Elite Performer. Najwyższy poziom w The Mambo Guild."
+    },
+    "human_metronome_bronze": {
+      "name": "Ludzki Metronom",
+      "description": "Bezbłędne timing uznane przez innych. Łapiesz groove."
+    },
+    "human_metronome_diamond": {
+      "name": "Ludzki Metronom",
+      "description": "Bezbłędne timing uznane przez innych. TY jesteś rytmem."
+    },
+    "human_metronome_gold": {
+      "name": "Ludzki Metronom",
+      "description": "Bezbłędne timing uznane przez innych. Absolutna precyzja."
+    },
+    "human_metronome_silver": {
+      "name": "Ludzki Metronom",
+      "description": "Bezbłędne timing uznane przez innych. Pełna synchronizacja."
+    },
+    "pro_member": {
+      "name": "Członek Pro",
+      "description": "Aktualizacja do subskrypcji Advanced. Dostęp do wszystkich funkcji Pro."
+    },
+    "talent_scout_bronze": {
+      "name": "Łowca Talentów",
+      "description": "Wspierasz społeczność feedbackiem. Oko do talentu."
+    },
+    "talent_scout_diamond": {
+      "name": "Łowca Talentów",
+      "description": "Wspierasz społeczność feedbackiem. Największy hype-maker."
+    },
+    "talent_scout_gold": {
+      "name": "Łowca Talentów",
+      "description": "Wspierasz społeczność feedbackiem. Filar społeczności."
+    },
+    "talent_scout_silver": {
+      "name": "Łowca Talentów",
+      "description": "Wspierasz społeczność feedbackiem. Oddany kibic."
+    },
+    "the_professor_bronze": {
+      "name": "Profesor",
+      "description": "Dostarczasz zweryfikowane rozwiązania społeczności. Pomocna dłoń."
+    },
+    "the_professor_diamond": {
+      "name": "Profesor",
+      "description": "Dostarczasz zweryfikowane rozwiązania społeczności. Wyrocznia Salsy."
+    },
+    "the_professor_gold": {
+      "name": "Profesor",
+      "description": "Dostarczasz zweryfikowane rozwiązania społeczności. Mistrz-instruktor."
+    },
+    "the_professor_silver": {
+      "name": "Profesor",
+      "description": "Dostarczasz zweryfikowane rozwiązania społeczności. Zaufany doradca."
+    },
+    "the_socialite_bronze": {
+      "name": "Dusza Towarzystwa",
+      "description": "Aktywnie bierzesz udział w dyskusjach. Przełamujesz lody."
+    },
+    "the_socialite_diamond": {
+      "name": "Dusza Towarzystwa",
+      "description": "Aktywnie bierzesz udział w dyskusjach. Głos pokolenia."
+    },
+    "the_socialite_gold": {
+      "name": "Dusza Towarzystwa",
+      "description": "Aktywnie bierzesz udział w dyskusjach. Wszędzie jednocześnie."
+    },
+    "the_socialite_silver": {
+      "name": "Dusza Towarzystwa",
+      "description": "Aktywnie bierzesz udział w dyskusjach. Dusza towarzystwa."
+    },
+    "unstoppable_bronze": {
+      "name": "Nie Do Zatrzymania",
+      "description": "Konsekwentne zaangażowanie. Budujesz rozpęd."
+    },
+    "unstoppable_diamond": {
+      "name": "Nie Do Zatrzymania",
+      "description": "Konsekwentne zaangażowanie. Prawdziwie niepowstrzymana siła."
+    },
+    "unstoppable_gold": {
+      "name": "Nie Do Zatrzymania",
+      "description": "Konsekwentne zaangażowanie. Mistrz miesiąca."
+    },
+    "unstoppable_silver": {
+      "name": "Nie Do Zatrzymania",
+      "description": "Konsekwentne zaangażowanie. Dwa tygodnie z rzędu."
+    }
   }
 }

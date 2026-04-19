@@ -116,7 +116,8 @@
     "noResults": "강좌를 찾을 수 없습니다. 다른 필터를 시도해보세요.",
     "comingSoon": "곧 출시",
     "typeLabel": "유형",
-    "levelLabel": "레벨"
+    "levelLabel": "레벨",
+    "whatYoullLearn": "배우게 될 내용"
   },
   "lesson": {
     "title": "레슨",
@@ -370,7 +371,118 @@
     "copyReferralLink": "추천 링크 복사",
     "referralLinkCopied": "링크 복사됨!",
     "dangerZone": "위험 구역",
-    "deleteAccount": "계정 삭제"
+    "deleteAccount": "계정 삭제",
+    "loading": "로딩 중...",
+    "logout": "로그아웃",
+    "logoutAria": "로그아웃",
+    "memberSinceYear": "Mambo Engineer • 2024년 가입",
+    "replaceProfilePicture": "프로필 사진 교체",
+    "fileFormatsHint": "JPG, PNG, WebP (최대 5MB)",
+    "fileTooLarge": "파일 크기는 5MB 미만이어야 해요",
+    "uploadFailed": "이미지 업로드에 실패했어요. 다시 시도해 주세요.",
+    "removeImage": "이미지 제거",
+    "usernamePlaceholder": "사용자명",
+    "usernamePlaceholderLong": "새 사용자명 입력",
+    "usernameHint": "3~30자, 영문자/숫자만",
+    "usernameTooShort": "사용자명은 3자 이상이어야 해요",
+    "usernameUpdateFailed": "사용자명 업데이트에 실패했어요. 다른 이름으로 시도해 주세요.",
+    "saveBtn": "저장",
+    "savingShort": "...",
+    "cancelBtn": "취소",
+    "editUsername": "사용자명 편집",
+    "instagramPlaceholder": "@핸들 또는 https://instagram.com/handle",
+    "instagramSaving": "…",
+    "instagramUpdateFailed": "Instagram 링크 업데이트에 실패했어요",
+    "instagramLeaveEmpty": "비워두면 링크가 제거돼요.",
+    "instagramConnect": "Instagram 연결",
+    "instagramEdit": "편집",
+    "instagramAdd": "+ Instagram 추가",
+    "statStreakLabel": "스트릭",
+    "statStreakDays": "{count}일",
+    "statStreakShort": "{count}일",
+    "statXpLabel": "XP",
+    "statTierLabel": "티어",
+    "statReputationLabel": "평판",
+    "statReputationShort": "평판",
+    "statClavesLabel": "Claves",
+    "statSolvedLabel": "해결",
+    "xpProgressLabel": "LVL {level}",
+    "levelBadge": "Lvl {level}",
+    "xpProgressCounter": "{current} / {total} XP",
+    "xpToNextLevel": "레벨 {nextLevel}까지 {xp} XP",
+    "xpUntilNextLevel": "레벨 {nextLevel}까지 {xp} XP",
+    "levelProgress": "레벨 진행",
+    "reactionsGiven": "보낸 반응",
+    "reactionsReceived": "받은 반응",
+    "solutionsAccepted": "채택된 해결책",
+    "continueLearning": "학습 계속하기",
+    "loadingCourses": "코스를 불러오는 중...",
+    "startJourney": "여정 시작하기",
+    "exploreWorldsHint": "모든 월드와 레슨을 살펴보세요",
+    "trophyCaseTitle": "🏆 트로피 케이스",
+    "trophyCaseSubtitle": "당신의 업적을 보여주세요",
+    "editShowcase": "쇼케이스 편집",
+    "showcaseDone": "완료 ({count}/5)",
+    "showcaseLabel": "쇼케이스 ({count}/5)",
+    "featuredLabel": "주요 ({count}/5)",
+    "dragToReorder": "끌어서 순서 변경 • 클릭하여 해제",
+    "clickToFeatureHint": "아래 배지를 클릭해 여기에 전시하세요",
+    "collection": "컬렉션",
+    "achievements": "업적",
+    "noBadgesYet": "아직 획득한 배지가 없어요.",
+    "featuredTag": "★ 주요",
+    "fullTag": "가득참",
+    "featureTag": "+ 전시",
+    "featurePlus": "전시 +",
+    "lockedTag": "잠김",
+    "referralTitle": "🎁 추천 프로그램",
+    "referralSubtitle": "링크를 공유하고 추천 1건당 50 claves를 받으세요!",
+    "referralCountLabel": "추천 수",
+    "yourReferralLink": "내 추천 링크",
+    "copyBtn": "복사",
+    "copiedBtn": "✓ 복사됨",
+    "referralInfo1": "• 링크로 누군가 가입하면 50 claves를 받아요",
+    "referralInfo2": "• 친구도 환영 보너스를 받아요!",
+    "referralComingSoon": "참고: 정식 추천 시스템은 곧 출시됩니다. 이것은 미리보기예요.",
+    "billing": "결제",
+    "subscriptionEndingPre": "당신의",
+    "subscriptionEndingMid": "플랜이 종료 예정이에요",
+    "subscriptionEndingOn": " 날짜: {date}",
+    "subscriptionEndingPost": ". 그때까지 전체 이용이 유지돼요.",
+    "resumeSubscription": "구독 재개",
+    "resumingShort": "...",
+    "manageSubscriptionLink": "구독 관리",
+    "cancelSuccess": "구독이 취소되었어요.",
+    "cancelError": "문제가 발생했어요. 다시 시도해 주세요.",
+    "resumeSuccess": "구독이 재개되었어요.",
+    "resumeError": "구독을 재개할 수 없었어요.",
+    "lossTitle": "떠나기 전에…",
+    "lossIntroPre": "취소하면",
+    "lossIntroPost": "다음을 잃게 돼요:",
+    "lossItem1": "모든 Guild 코스, 안무, 주제",
+    "lossItem2": "격주로 공개되는 새 안무",
+    "lossItem3": "Guild 커뮤니티 이용",
+    "lossItem4": "주간 clave 획득 부스트",
+    "lossItem5": "획득한 독점 멤버 배지",
+    "lossItem6": "강사의 월간 1:1 영상 피드백",
+    "keepSubscription": "구독 유지",
+    "stillCancel": "그래도 취소할래요",
+    "priceTitlePre": "당신의 가격은",
+    "priceTitlePost": "/월로 고정되어 있어요",
+    "priceSubtitle": "이 가격은 The Mambo Guild이 제시할 가장 낮은 가격이에요.",
+    "priceBodyPre": "강사가 늘고 새 안무, 확장된 커뮤니티 기능이 추가되면 가격은 오를 거예요. 오늘 취소하고 다음 달 또는 내년에 다시 가입하면, founder 요금이 아닌 새 요금이 적용돼요.",
+    "priceBodyGuarantee": "구독을 유지하는 동안에는 현재 가격이 보장돼요.",
+    "keepRate": "{price}/월 가격 유지",
+    "understandContinue": "이해했어요, 계속",
+    "confirmTitle": "마지막 단계",
+    "confirmBodyPre": "다음을 입력:",
+    "confirmBodyMid": "아래에 입력해 확정하세요. 현재 결제 주기가 끝날 때까지는 이용할 수 있어요",
+    "confirmPeriodSuffix": " ({date})",
+    "confirmInputPlaceholder": "CANCEL 입력",
+    "neverMind": "그만둘게요, 유지",
+    "cancelingInProgress": "취소 중...",
+    "cancelFinal": "내 구독 취소",
+    "modalCloseAria": "닫기"
   },
   "onboarding": {
     "welcome": "The Mambo Guild에 오신 것을 환영합니다",
@@ -1004,143 +1116,193 @@
     "deletingBtn": "삭제 중...",
     "replyVideoTitle": "{title}에 답글"
   },
-  "profile": {
-    "title": "프로필",
-    "editProfile": "프로필 편집",
-    "displayName": "표시 이름",
-    "username": "게이머태그",
-    "email": "이메일",
-    "bio": "자기소개",
-    "location": "위치",
-    "danceLevel": "댄스 레벨",
-    "memberSince": "가입일",
-    "subscription": "구독",
-    "manageSubscription": "구독 관리",
-    "notificationSettings": "알림",
-    "language": "언어",
-    "saveChanges": "변경 사항 저장",
-    "publicProfile": "공개 프로필",
-    "badges": "배지",
-    "stats": "통계",
-    "totalXP": "총 XP",
-    "lessonsCompleted": "완료된 레슨",
-    "currentStreak": "현재 스트릭",
-    "longestStreak": "최장 스트릭",
-    "referrals": "추천",
-    "copyReferralLink": "추천 링크 복사",
-    "referralLinkCopied": "링크 복사됨!",
-    "dangerZone": "위험 구역",
-    "deleteAccount": "계정 삭제",
-    "loading": "로딩 중...",
-    "logout": "로그아웃",
-    "logoutAria": "로그아웃",
-    "memberSinceYear": "Mambo Engineer • 2024년 가입",
-    "replaceProfilePicture": "프로필 사진 교체",
-    "fileFormatsHint": "JPG, PNG, WebP (최대 5MB)",
-    "fileTooLarge": "파일 크기는 5MB 미만이어야 해요",
-    "uploadFailed": "이미지 업로드에 실패했어요. 다시 시도해 주세요.",
-    "removeImage": "이미지 제거",
-    "usernamePlaceholder": "사용자명",
-    "usernamePlaceholderLong": "새 사용자명 입력",
-    "usernameHint": "3~30자, 영문자/숫자만",
-    "usernameTooShort": "사용자명은 3자 이상이어야 해요",
-    "usernameUpdateFailed": "사용자명 업데이트에 실패했어요. 다른 이름으로 시도해 주세요.",
-    "saveBtn": "저장",
-    "savingShort": "...",
-    "cancelBtn": "취소",
-    "editUsername": "사용자명 편집",
-    "instagramPlaceholder": "@핸들 또는 https://instagram.com/handle",
-    "instagramSaving": "…",
-    "instagramUpdateFailed": "Instagram 링크 업데이트에 실패했어요",
-    "instagramLeaveEmpty": "비워두면 링크가 제거돼요.",
-    "instagramConnect": "Instagram 연결",
-    "instagramEdit": "편집",
-    "instagramAdd": "+ Instagram 추가",
-    "statStreakLabel": "스트릭",
-    "statStreakDays": "{count}일",
-    "statStreakShort": "{count}일",
-    "statXpLabel": "XP",
-    "statTierLabel": "티어",
-    "statReputationLabel": "평판",
-    "statReputationShort": "평판",
-    "statClavesLabel": "Claves",
-    "statSolvedLabel": "해결",
-    "xpProgressLabel": "LVL {level}",
-    "levelBadge": "Lvl {level}",
-    "xpProgressCounter": "{current} / {total} XP",
-    "xpToNextLevel": "레벨 {nextLevel}까지 {xp} XP",
-    "xpUntilNextLevel": "레벨 {nextLevel}까지 {xp} XP",
-    "levelProgress": "레벨 진행",
-    "reactionsGiven": "보낸 반응",
-    "reactionsReceived": "받은 반응",
-    "solutionsAccepted": "채택된 해결책",
-    "continueLearning": "학습 계속하기",
-    "loadingCourses": "코스를 불러오는 중...",
-    "startJourney": "여정 시작하기",
-    "exploreWorldsHint": "모든 월드와 레슨을 살펴보세요",
-    "trophyCaseTitle": "🏆 트로피 케이스",
-    "trophyCaseSubtitle": "당신의 업적을 보여주세요",
-    "editShowcase": "쇼케이스 편집",
-    "showcaseDone": "완료 ({count}/5)",
-    "showcaseLabel": "쇼케이스 ({count}/5)",
-    "featuredLabel": "주요 ({count}/5)",
-    "dragToReorder": "끌어서 순서 변경 • 클릭하여 해제",
-    "clickToFeatureHint": "아래 배지를 클릭해 여기에 전시하세요",
-    "collection": "컬렉션",
-    "achievements": "업적",
-    "noBadgesYet": "아직 획득한 배지가 없어요.",
-    "featuredTag": "★ 주요",
-    "fullTag": "가득참",
-    "featureTag": "+ 전시",
-    "featurePlus": "전시 +",
-    "lockedTag": "잠김",
-    "referralTitle": "🎁 추천 프로그램",
-    "referralSubtitle": "링크를 공유하고 추천 1건당 50 claves를 받으세요!",
-    "referralCountLabel": "추천 수",
-    "yourReferralLink": "내 추천 링크",
-    "copyBtn": "복사",
-    "copiedBtn": "✓ 복사됨",
-    "referralInfo1": "• 링크로 누군가 가입하면 50 claves를 받아요",
-    "referralInfo2": "• 친구도 환영 보너스를 받아요!",
-    "referralComingSoon": "참고: 정식 추천 시스템은 곧 출시됩니다. 이것은 미리보기예요.",
-    "billing": "결제",
-    "subscriptionEndingPre": "당신의",
-    "subscriptionEndingMid": "플랜이 종료 예정이에요",
-    "subscriptionEndingOn": " 날짜: {date}",
-    "subscriptionEndingPost": ". 그때까지 전체 이용이 유지돼요.",
-    "resumeSubscription": "구독 재개",
-    "resumingShort": "...",
-    "manageSubscriptionLink": "구독 관리",
-    "cancelSuccess": "구독이 취소되었어요.",
-    "cancelError": "문제가 발생했어요. 다시 시도해 주세요.",
-    "resumeSuccess": "구독이 재개되었어요.",
-    "resumeError": "구독을 재개할 수 없었어요.",
-    "lossTitle": "떠나기 전에…",
-    "lossIntroPre": "취소하면",
-    "lossIntroPost": "다음을 잃게 돼요:",
-    "lossItem1": "모든 Guild 코스, 안무, 주제",
-    "lossItem2": "격주로 공개되는 새 안무",
-    "lossItem3": "Guild 커뮤니티 이용",
-    "lossItem4": "주간 clave 획득 부스트",
-    "lossItem5": "획득한 독점 멤버 배지",
-    "lossItem6": "강사의 월간 1:1 영상 피드백",
-    "keepSubscription": "구독 유지",
-    "stillCancel": "그래도 취소할래요",
-    "priceTitlePre": "당신의 가격은",
-    "priceTitlePost": "/월로 고정되어 있어요",
-    "priceSubtitle": "이 가격은 The Mambo Guild이 제시할 가장 낮은 가격이에요.",
-    "priceBodyPre": "강사가 늘고 새 안무, 확장된 커뮤니티 기능이 추가되면 가격은 오를 거예요. 오늘 취소하고 다음 달 또는 내년에 다시 가입하면, founder 요금이 아닌 새 요금이 적용돼요.",
-    "priceBodyGuarantee": "구독을 유지하는 동안에는 현재 가격이 보장돼요.",
-    "keepRate": "{price}/월 가격 유지",
-    "understandContinue": "이해했어요, 계속",
-    "confirmTitle": "마지막 단계",
-    "confirmBodyPre": "다음을 입력:",
-    "confirmBodyMid": "아래에 입력해 확정하세요. 현재 결제 주기가 끝날 때까지는 이용할 수 있어요",
-    "confirmPeriodSuffix": " ({date})",
-    "confirmInputPlaceholder": "CANCEL 입력",
-    "neverMind": "그만둘게요, 유지",
-    "cancelingInProgress": "취소 중...",
-    "cancelFinal": "내 구독 취소",
-    "modalCloseAria": "닫기"
+  "courseObjectives": {
+    "bodymovement-mastery": [
+      "바디 아이솔레이션의 이해를 습득하세요",
+      "아이솔레이션을 서로 연결하는 법을 배우세요",
+      "바디 무브먼트를 당신의 춤에 접목하세요"
+    ],
+    "mambo-101": [
+      "타이밍과 기초 스텝을 완벽하게 익히세요",
+      "음악에 맞춰 춤추는 데 익숙해지세요",
+      "춤에 멋을 더할 핵심 바리에이션을 배우세요"
+    ],
+    "mambo-201": [
+      "빌딩 블록으로 춤의 어휘를 확장하세요",
+      "복잡한 안무에도 익숙해지세요",
+      "스타일링과 플로우를 위한 새로운 도구를 익히세요"
+    ],
+    "mambo-301": [
+      "당신의 맘보 어휘를 한계까지 밀어붙이세요",
+      "싱코페이션 리듬과 빠른 템포를 완벽히 익히세요",
+      "고급 스타일링으로 테크닉을 다듬으세요"
+    ],
+    "pachanga": [
+      "파창가의 어휘를 완벽하게 익히세요",
+      "스피드와 화려한 풋워크를 해제하세요",
+      "파창가의 역사와 문화를 배우세요"
+    ]
+  },
+  "badges": {
+    "beta_tester": {
+      "name": "베타 테스터",
+      "description": "얼리 액세스 기간 동안 플랫폼 테스트를 도왔습니다."
+    },
+    "center_stage_bronze": {
+      "name": "센터 스테이지",
+      "description": "The Stage에서 여정을 공유 중. 첫걸음."
+    },
+    "center_stage_diamond": {
+      "name": "센터 스테이지",
+      "description": "The Stage에서 여정을 공유. 무대의 전설."
+    },
+    "center_stage_gold": {
+      "name": "센터 스테이지",
+      "description": "The Stage에서 여정을 공유. 스타의 포스."
+    },
+    "center_stage_silver": {
+      "name": "센터 스테이지",
+      "description": "The Stage에서 여정을 공유. 단골 퍼포머."
+    },
+    "crowd_favorite_bronze": {
+      "name": "관객의 스타",
+      "description": "노력과 열정으로 주목받기 시작. 시선을 끄는 중."
+    },
+    "crowd_favorite_diamond": {
+      "name": "관객의 스타",
+      "description": "노력과 열정으로 주목. 대중의 챔피언."
+    },
+    "crowd_favorite_gold": {
+      "name": "관객의 스타",
+      "description": "노력과 열정으로 주목. 기립 박수."
+    },
+    "crowd_favorite_silver": {
+      "name": "관객의 스타",
+      "description": "노력과 열정으로 주목. 박수가 커지고 있어요."
+    },
+    "curious_mind_bronze": {
+      "name": "호기심 많은 학도",
+      "description": "도움을 구하고 타인에게 배우는 중. 첫 질문."
+    },
+    "curious_mind_diamond": {
+      "name": "호기심 많은 학도",
+      "description": "도움을 구하고 배우는 중. 질문의 달인."
+    },
+    "curious_mind_gold": {
+      "name": "호기심 많은 학도",
+      "description": "도움을 구하고 배우는 중. 깊이 파고드는 사람."
+    },
+    "curious_mind_silver": {
+      "name": "호기심 많은 학도",
+      "description": "도움을 구하고 배우는 중. 꾸준한 학습자."
+    },
+    "firestarter_bronze": {
+      "name": "불꽃 점화자",
+      "description": "당신의 춤이 무대를 달구고 있어요. 타오르는 불씨."
+    },
+    "firestarter_diamond": {
+      "name": "불꽃 점화자",
+      "description": "당신의 춤이 무대를 달구고 있어요. 플로어의 초신성."
+    },
+    "firestarter_gold": {
+      "name": "불꽃 점화자",
+      "description": "당신의 춤이 무대를 달구고 있어요. 인페르노 등급."
+    },
+    "firestarter_silver": {
+      "name": "불꽃 점화자",
+      "description": "당신의 춤이 무대를 달구고 있어요. 화염 절정."
+    },
+    "founder_diamond": {
+      "name": "창립 멤버",
+      "description": "The Mambo Guild의 원년 멤버. 최초 1000명에게만 제공됩니다."
+    },
+    "guild_master": {
+      "name": "길드 마스터",
+      "description": "엘리트 퍼포머 멤버십. The Mambo Guild의 최상위 등급."
+    },
+    "human_metronome_bronze": {
+      "name": "인간 메트로놈",
+      "description": "동료들이 인정한 완벽한 타이밍. 그루브를 찾는 중."
+    },
+    "human_metronome_diamond": {
+      "name": "인간 메트로놈",
+      "description": "동료들이 인정한 완벽한 타이밍. 당신이 곧 리듬."
+    },
+    "human_metronome_gold": {
+      "name": "인간 메트로놈",
+      "description": "동료들이 인정한 완벽한 타이밍. 절대적 정확성."
+    },
+    "human_metronome_silver": {
+      "name": "인간 메트로놈",
+      "description": "동료들이 인정한 완벽한 타이밍. 완전히 맞춰짐."
+    },
+    "pro_member": {
+      "name": "프로 멤버",
+      "description": "Advanced 멤버십으로 업그레이드. 모든 Pro 기능 이용 가능."
+    },
+    "talent_scout_bronze": {
+      "name": "탤런트 스카우트",
+      "description": "피드백으로 커뮤니티를 지원. 재능을 보는 눈."
+    },
+    "talent_scout_diamond": {
+      "name": "탤런트 스카우트",
+      "description": "피드백으로 커뮤니티를 지원. 최고의 하이프 메이커."
+    },
+    "talent_scout_gold": {
+      "name": "탤런트 스카우트",
+      "description": "피드백으로 커뮤니티를 지원. 커뮤니티의 기둥."
+    },
+    "talent_scout_silver": {
+      "name": "탤런트 스카우트",
+      "description": "피드백으로 커뮤니티를 지원. 헌신적인 서포터."
+    },
+    "the_professor_bronze": {
+      "name": "프로페서",
+      "description": "커뮤니티 질문에 검증된 해답 제공. 도움의 손길."
+    },
+    "the_professor_diamond": {
+      "name": "프로페서",
+      "description": "커뮤니티 질문에 검증된 해답 제공. 살사의 신탁."
+    },
+    "the_professor_gold": {
+      "name": "프로페서",
+      "description": "커뮤니티 질문에 검증된 해답 제공. 마스터 강사."
+    },
+    "the_professor_silver": {
+      "name": "프로페서",
+      "description": "커뮤니티 질문에 검증된 해답 제공. 신뢰받는 조언자."
+    },
+    "the_socialite_bronze": {
+      "name": "소셜라이트",
+      "description": "토론에 적극적으로 참여 중. 분위기를 깨는 중."
+    },
+    "the_socialite_diamond": {
+      "name": "소셜라이트",
+      "description": "토론에 적극적으로 참여 중. 세대의 목소리."
+    },
+    "the_socialite_gold": {
+      "name": "소셜라이트",
+      "description": "토론에 적극적으로 참여 중. 어디에나 있는 존재."
+    },
+    "the_socialite_silver": {
+      "name": "소셜라이트",
+      "description": "토론에 적극적으로 참여 중. 분위기 메이커."
+    },
+    "unstoppable_bronze": {
+      "name": "멈추지 않는",
+      "description": "꾸준히 참여하는 헌신. 탄력을 쌓는 중."
+    },
+    "unstoppable_diamond": {
+      "name": "멈추지 않는",
+      "description": "꾸준히 참여하는 헌신. 진정 멈출 수 없는 힘."
+    },
+    "unstoppable_gold": {
+      "name": "멈추지 않는",
+      "description": "꾸준히 참여하는 헌신. 월간 마스터."
+    },
+    "unstoppable_silver": {
+      "name": "멈추지 않는",
+      "description": "꾸준히 참여하는 헌신. 2주 연속."
+    }
   }
 }

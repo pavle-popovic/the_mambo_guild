@@ -58,6 +58,7 @@ const COURSE_TYPE_STYLES: Record<
 interface CourseCardProps {
   course: {
     id: string;
+    slug?: string | null;
     title: string;
     description: string | null;
     image_url: string | null;
@@ -81,6 +82,7 @@ interface CourseCardProps {
 export default function CourseCard({ course, index, user, onCourseClick }: CourseCardProps) {
   const router = useRouter();
   const tCourses = useTranslations('courses');
+  const tObjectives = useTranslations('courseObjectives');
   const [isHovering, setIsHovering] = useState(false);
   const [isResolvingChoreo, setIsResolvingChoreo] = useState(false);
 
@@ -297,17 +299,25 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
               <div className="p-4 pt-0 bg-black border-t border-gray-800">
                 <div className="flex items-center gap-2 mb-3">
                   <Sparkles className="w-4 h-4 text-mambo-gold" />
-                  <span className="text-xs uppercase text-mambo-gold font-bold tracking-wider">What You'll Learn</span>
+                  <span className="text-xs uppercase text-mambo-gold font-bold tracking-wider">{tCourses('whatYoullLearn')}</span>
                 </div>
                 <ul className="space-y-2">
-                  {course.objectives?.slice(0, 3).map((objective, idx) => (
-                    <li key={idx} className="flex items-start gap-2.5">
-                      <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mt-0.5">
-                        <CheckCircle className="w-3 h-3 text-white" />
-                      </div>
-                      <span className="text-sm text-gray-200 leading-tight">{objective}</span>
-                    </li>
-                  ))}
+                  {course.objectives?.slice(0, 3).map((objective, idx) => {
+                    // Prefer the i18n lookup courseObjectives.<slug>.<idx>; fall
+                    // back to the DB-provided English string if the slug isn't
+                    // known or the key is missing.
+                    const key = course.slug ? `${course.slug}.${idx}` : "";
+                    const translated = key ? tObjectives(key) : "";
+                    const text = translated && translated !== key ? translated : objective;
+                    return (
+                      <li key={idx} className="flex items-start gap-2.5">
+                        <div className="flex-shrink-0 w-5 h-5 rounded-full bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center mt-0.5">
+                          <CheckCircle className="w-3 h-3 text-white" />
+                        </div>
+                        <span className="text-sm text-gray-200 leading-tight">{text}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>

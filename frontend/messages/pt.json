@@ -116,7 +116,8 @@
     "noResults": "Nenhum curso encontrado. Tente outro filtro.",
     "comingSoon": "Em Breve",
     "typeLabel": "Tipo",
-    "levelLabel": "Nível"
+    "levelLabel": "Nível",
+    "whatYoullLearn": "O que você vai aprender"
   },
   "lesson": {
     "title": "Aula",
@@ -1114,5 +1115,194 @@
     "cancelingInProgress": "Cancelando...",
     "cancelFinal": "Cancelar minha assinatura",
     "modalCloseAria": "Fechar"
+  },
+  "courseObjectives": {
+    "bodymovement-mastery": [
+      "Compreenda o isolamento corporal",
+      "Aprenda a conectar os isolamentos do corpo",
+      "Leve o movimento corporal para sua dança"
+    ],
+    "mambo-101": [
+      "Domine o timing e os passos fundamentais",
+      "Fique à vontade dançando com a música",
+      "Aprenda variações essenciais para dar estilo à sua dança"
+    ],
+    "mambo-201": [
+      "Expanda seu vocabulário de dança com blocos fundamentais",
+      "Fique confortável com coreografias complexas",
+      "Domine novas ferramentas de estilo e fluidez"
+    ],
+    "mambo-301": [
+      "Leve seu vocabulário de mambo ao limite",
+      "Domine ritmos sincopados e andamentos rápidos",
+      "Refine sua técnica com styling avançado"
+    ],
+    "pachanga": [
+      "Domine o vocabulário da Pachanga",
+      "Desbloqueie velocidade e jogo de pés elaborado",
+      "Conheça a história e a cultura da Pachanga"
+    ]
+  },
+  "badges": {
+    "beta_tester": {
+      "name": "Beta Tester",
+      "description": "Ajudou a testar a plataforma durante o acesso antecipado."
+    },
+    "center_stage_bronze": {
+      "name": "Centro do Palco",
+      "description": "Compartilhando sua jornada no The Stage. Primeiros passos."
+    },
+    "center_stage_diamond": {
+      "name": "Centro do Palco",
+      "description": "Compartilhando sua jornada no The Stage. Lenda do palco."
+    },
+    "center_stage_gold": {
+      "name": "Centro do Palco",
+      "description": "Compartilhando sua jornada no The Stage. Poder de estrela."
+    },
+    "center_stage_silver": {
+      "name": "Centro do Palco",
+      "description": "Compartilhando sua jornada no The Stage. Artista regular."
+    },
+    "crowd_favorite_bronze": {
+      "name": "Favorito do Público",
+      "description": "Reconhecido pelo esforço e espírito. Chamando a atenção."
+    },
+    "crowd_favorite_diamond": {
+      "name": "Favorito do Público",
+      "description": "Reconhecido pelo esforço e espírito. Campeão do povo."
+    },
+    "crowd_favorite_gold": {
+      "name": "Favorito do Público",
+      "description": "Reconhecido pelo esforço e espírito. Ovação de pé."
+    },
+    "crowd_favorite_silver": {
+      "name": "Favorito do Público",
+      "description": "Reconhecido pelo esforço e espírito. Os aplausos aumentam."
+    },
+    "curious_mind_bronze": {
+      "name": "Mente Curiosa",
+      "description": "Pedindo ajuda e aprendendo com os outros. Primeira pergunta."
+    },
+    "curious_mind_diamond": {
+      "name": "Mente Curiosa",
+      "description": "Pedindo ajuda e aprendendo com os outros. Mestre do questionamento."
+    },
+    "curious_mind_gold": {
+      "name": "Mente Curiosa",
+      "description": "Pedindo ajuda e aprendendo com os outros. Mergulhador profundo."
+    },
+    "curious_mind_silver": {
+      "name": "Mente Curiosa",
+      "description": "Pedindo ajuda e aprendendo com os outros. Aprendiz regular."
+    },
+    "firestarter_bronze": {
+      "name": "Fogo no Palco",
+      "description": "Sua dança está esquentando o palco. Brasas vivas."
+    },
+    "firestarter_diamond": {
+      "name": "Fogo no Palco",
+      "description": "Sua dança está esquentando o palco. Uma supernova na pista."
+    },
+    "firestarter_gold": {
+      "name": "Fogo no Palco",
+      "description": "Sua dança está esquentando o palco. Inferno absoluto."
+    },
+    "firestarter_silver": {
+      "name": "Fogo no Palco",
+      "description": "Sua dança está esquentando o palco. Em chamas."
+    },
+    "founder_diamond": {
+      "name": "Fundador",
+      "description": "Membro original do The Mambo Guild. Reservado aos primeiros 1000 usuários."
+    },
+    "guild_master": {
+      "name": "Mestre da Guilda",
+      "description": "Assinatura Elite Performer. O nível mais alto de The Mambo Guild."
+    },
+    "human_metronome_bronze": {
+      "name": "Metrônomo Humano",
+      "description": "Timing impecável reconhecido pelos colegas. Achando o groove."
+    },
+    "human_metronome_diamond": {
+      "name": "Metrônomo Humano",
+      "description": "Timing impecável reconhecido pelos colegas. VOCÊ é o ritmo."
+    },
+    "human_metronome_gold": {
+      "name": "Metrônomo Humano",
+      "description": "Timing impecável reconhecido pelos colegas. Precisão absoluta."
+    },
+    "human_metronome_silver": {
+      "name": "Metrônomo Humano",
+      "description": "Timing impecável reconhecido pelos colegas. Travado no ritmo."
+    },
+    "pro_member": {
+      "name": "Membro Pro",
+      "description": "Atualizado para assinatura Advanced. Acesso a todos os recursos Pro."
+    },
+    "talent_scout_bronze": {
+      "name": "Caçador de Talentos",
+      "description": "Apoiando a comunidade com feedback. Olhar para o talento."
+    },
+    "talent_scout_diamond": {
+      "name": "Caçador de Talentos",
+      "description": "Apoiando a comunidade com feedback. O maior incentivador."
+    },
+    "talent_scout_gold": {
+      "name": "Caçador de Talentos",
+      "description": "Apoiando a comunidade com feedback. Pilar da comunidade."
+    },
+    "talent_scout_silver": {
+      "name": "Caçador de Talentos",
+      "description": "Apoiando a comunidade com feedback. Apoiador dedicado."
+    },
+    "the_professor_bronze": {
+      "name": "O Professor",
+      "description": "Oferecendo soluções verificadas à comunidade. Mão amiga."
+    },
+    "the_professor_diamond": {
+      "name": "O Professor",
+      "description": "Oferecendo soluções verificadas à comunidade. O Oráculo da Salsa."
+    },
+    "the_professor_gold": {
+      "name": "O Professor",
+      "description": "Oferecendo soluções verificadas à comunidade. Instrutor mestre."
+    },
+    "the_professor_silver": {
+      "name": "O Professor",
+      "description": "Oferecendo soluções verificadas à comunidade. Conselheiro confiável."
+    },
+    "the_socialite_bronze": {
+      "name": "Estrela Social",
+      "description": "Participa ativamente nas discussões. Quebrando o gelo."
+    },
+    "the_socialite_diamond": {
+      "name": "Estrela Social",
+      "description": "Participa ativamente nas discussões. A voz de uma geração."
+    },
+    "the_socialite_gold": {
+      "name": "Estrela Social",
+      "description": "Participa ativamente nas discussões. Em todo lugar ao mesmo tempo."
+    },
+    "the_socialite_silver": {
+      "name": "Estrela Social",
+      "description": "Participa ativamente nas discussões. Alma da festa."
+    },
+    "unstoppable_bronze": {
+      "name": "Imparável",
+      "description": "Dedicação constante em comparecer. Ganhando ritmo."
+    },
+    "unstoppable_diamond": {
+      "name": "Imparável",
+      "description": "Dedicação constante em comparecer. Força verdadeiramente imparável."
+    },
+    "unstoppable_gold": {
+      "name": "Imparável",
+      "description": "Dedicação constante em comparecer. Mestre do mês."
+    },
+    "unstoppable_silver": {
+      "name": "Imparável",
+      "description": "Dedicação constante em comparecer. Duas semanas firme."
+    }
   }
 }
