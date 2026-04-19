@@ -416,8 +416,7 @@
   "landing": {
     "hero": {
       "credentialBadge": "Построено на основе Learning Experience Design",
-      "titleLine1": "№1 в мире",
-      "titleLine2": "Онлайн-платформа сальсы",
+      "title": "Онлайн-школа сальсы №1 в мире с геймификацией",
       "subtitle": "Структурированная программа по сальсе. Каждый навык в правильном порядке.",
       "bulletNoPartner": "Партнёр не нужен",
       "bulletLanguages": "13 языков",

@@ -444,8 +444,7 @@
   "landing": {
     "hero": {
       "credentialBadge": "ラーニング・エクスペリエンス・デザインに基づいて設計",
-      "titleLine1": "世界No.1",
-      "titleLine2": "オンライン・サルサ・プラットフォーム",
+      "title": "世界No.1のゲーミフィケーション型オンラインサルサ教室",
       "subtitle": "体系化されたサルサ・カリキュラム。すべてのスキルを正しい順番で。",
       "bulletNoPartner": "パートナー不要",
       "bulletLanguages": "13言語対応",

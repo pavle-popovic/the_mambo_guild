@@ -163,14 +163,13 @@ export default function NewHero() {
                         </span>
                     </motion.div>
 
-                    {/* Main Title — structured salsa curriculum positioning */}
-                    <div className="space-y-2 md:space-y-2.5 landscape-phone:!space-y-1">
-                        <h1 className="leading-[1.05] tracking-tight text-mambo-text">
-                            <span className="block font-extrabold text-[clamp(1.5rem,2.2vw,2.25rem)] landscape-phone:!text-xl">
-                                {t("titleLine1")}
-                            </span>
-                            <span className="block font-extrabold text-mambo-gold text-[clamp(2rem,3.2vw,3.5rem)] drop-shadow-[0_0_30px_rgba(212,175,55,0.35)] landscape-phone:!text-2xl">
-                                {t("titleLine2")}
+                    {/* Main Title — single line across desktop, portrait phone, and landscape phone.
+                        Font-size is vw-based with tight min/max clamps so the longest translations
+                        (German/Italian/Polish) still fit on one row; whitespace-nowrap prevents wrap. */}
+                    <div className="space-y-2 md:space-y-2.5 landscape-phone:!space-y-1 min-w-0">
+                        <h1 className="leading-[1.05] tracking-tight text-mambo-gold drop-shadow-[0_0_30px_rgba(212,175,55,0.35)]">
+                            <span className="block font-extrabold whitespace-nowrap text-[clamp(0.6rem,2.8vw,1.4rem)] lg:text-[clamp(0.8rem,1.3vw,1.08rem)] xl:text-[clamp(0.9rem,1.35vw,1.25rem)] landscape-phone:!text-[clamp(0.58rem,2vw,0.9rem)]">
+                                {t("title")}
                             </span>
                         </h1>
                         <p className="text-base sm:text-lg text-gray-300 leading-snug max-w-md mx-auto lg:mx-0 text-balance landscape-phone:!text-xs">

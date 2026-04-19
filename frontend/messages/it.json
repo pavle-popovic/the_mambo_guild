@@ -444,8 +444,7 @@
   "landing": {
     "hero": {
       "credentialBadge": "Costruito sul Learning Experience Design",
-      "titleLine1": "La #1 al mondo",
-      "titleLine2": "Piattaforma di Salsa Online",
+      "title": "La #1 scuola di salsa online gamificata al mondo",
       "subtitle": "Un percorso di salsa strutturato. Ogni abilità nel giusto ordine.",
       "bulletNoPartner": "Nessun partner richiesto",
       "bulletLanguages": "13 lingue",
