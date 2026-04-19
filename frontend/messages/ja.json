@@ -783,7 +783,14 @@
     "guestBody": "1年を通して、国際的に著名なサルサインストラクターによるワークショップを開催し、世界中から多様な視点と高度なテクニックをお届けします。",
     "learnMoreTitle": "もっと知りたい方へ",
     "learnMoreBody": "コースをチェックして、今日から一緒に旅を始めましょう。",
-    "learnMoreCta": "コースを見る"
+    "learnMoreCta": "コースを見る",
+    "timotheRole": "ダンサー兼ダンス歴史家",
+    "timotheBio": "Mr. Whiteとしても知られるTimothéは、Parisを拠点とするサルサダンサーで、マンボとラテンダンス文化に深いバックグラウンドを持ちます。はじめにParisでMouaze Konatéから教えを受け、その後も世界中の著名な指導者のもとでトレーニングを重ね、Mexicoで過ごした時間が彼のスタイルを大きく形づくりました。デュオBlack and White Mamboの一員として多くの国で公演を行い、のちに自身のチームMambo All Starsを立ち上げ率いてきました。現在はParisで教え、公演しながら、サルサの技術的な側面と文化的な側面の両方を伝えています。",
+    "timotheHistoryTitle": "サルサの歴史家",
+    "timotheHistoryBody": "長年にわたりサルサの歴史を研究し、Roly Madenのようなシーンの歴史的なレジェンドたちにインタビューを重ねてきました。マンボとラテンダンスの歴史に関する書籍も執筆しています。",
+    "timotheMamboTitle": "マンボに根ざしたスタイル",
+    "timotheMamboBody": "マンボに深く根ざしつつ、フュージョンと個人的な解釈を織り交ぜたスタイル。ParisとMexicoでトレーニングを積み、Black and White Mamboとして世界各地で公演し、自身のチームMambo All Starsを率いてきました。",
+    "timotheQuote": "サルサはステップ以上のものです。それは記憶であり、文化であり、それをかたちづくってきた人々の物語です。"
   },
   "coaching": {
     "lockedTitle": "コーチングコーナーはGuild Master専用です",

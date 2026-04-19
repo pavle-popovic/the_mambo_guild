@@ -783,7 +783,14 @@
     "guestBody": "일 년 내내 국제적으로 명성 있는 살사 강사들의 워크샵을 열어, 전 세계의 다양한 관점과 고급 테크닉을 소개해 드려요.",
     "learnMoreTitle": "더 알아보고 싶으신가요?",
     "learnMoreBody": "저희 코스를 확인하고 오늘 함께 여정을 시작해 보세요.",
-    "learnMoreCta": "코스 살펴보기"
+    "learnMoreCta": "코스 살펴보기",
+    "timotheRole": "댄서 겸 댄스 역사가",
+    "timotheBio": "Mr. White로도 알려진 Timothé는 Paris를 기반으로 활동하는 살사 댄서로, 맘보와 라틴 댄스 문화에 깊은 뿌리를 두고 있어요. 처음에는 Paris에서 Mouaze Konaté에게 가르침을 받았고, 이후 세계적으로 유명한 강사들에게 훈련을 이어갔으며, Mexico에서 보낸 시간이 그의 스타일을 깊이 있게 다져 주었어요. 듀오 Black and White Mambo의 멤버로 여러 나라에서 공연했고, 이후 자신의 팀 Mambo All Stars를 만들어 이끌었어요. 현재는 Paris에서 가르치고 공연하며, 살사의 기술적 측면과 문화적 측면을 함께 나누고 있어요.",
+    "timotheHistoryTitle": "살사 역사가",
+    "timotheHistoryBody": "오랜 세월 살사의 역사를 연구했고, Roly Maden처럼 살사 씬의 역사적 전설들을 직접 인터뷰해 왔어요. 맘보와 라틴 댄스의 역사에 관한 책도 집필했어요.",
+    "timotheMamboTitle": "맘보에 뿌리를 둔 스타일",
+    "timotheMamboBody": "맘보에 깊이 뿌리를 두면서도 퓨전과 개인적인 해석이 더해진 스타일을 지녔어요. Paris와 Mexico에서 훈련을 쌓았고, Black and White Mambo로 세계 무대에서 공연했으며, 자신의 팀 Mambo All Stars를 이끌었어요.",
+    "timotheQuote": "살사는 스텝 그 이상이에요. 그것은 기억이고, 문화이며, 그것을 만들어 온 사람들의 이야기예요."
   },
   "coaching": {
     "lockedTitle": "코칭 코너는 Guild Master 전용이에요",

@@ -755,7 +755,14 @@
     "guestBody": "Das ganze Jahr über veranstalten wir Workshops mit international renommierten Salsa-Instruktoren und bringen dir vielfältige Perspektiven und fortgeschrittene Techniken aus aller Welt.",
     "learnMoreTitle": "Mehr erfahren?",
     "learnMoreBody": "Schau dir unsere Kurse an und starte heute deine Reise mit uns.",
-    "learnMoreCta": "Kurse entdecken"
+    "learnMoreCta": "Kurse entdecken",
+    "timotheRole": "Tänzer & Tanzhistoriker",
+    "timotheBio": "Timothé, auch bekannt als Mr. White, ist ein in Paris ansässiger Salsa-Tänzer mit einem starken Hintergrund im Mambo und in der Kultur lateinamerikanischer Tänze. Zunächst in Paris von Mouaze Konaté ausgebildet, setzte er sein Training international bei renommierten Instruktoren fort und verbrachte Zeit in Mexico, was seinen Stil tief geprägt hat. Er trat als Teil des Duos Black and White Mambo in vielen Ländern auf und gründete und leitete später sein eigenes Team, Mambo All Stars. Heute unterrichtet und tritt er in Paris auf und teilt sowohl die technische als auch die kulturelle Seite der Salsa.",
+    "timotheHistoryTitle": "Salsa-Historiker",
+    "timotheHistoryBody": "Erforschte viele Jahre lang die Geschichte der Salsa und interviewte historische Legenden der Szene wie Roly Maden. Schrieb ein Buch über die Geschichte des Mambo und der lateinamerikanischen Tänze.",
+    "timotheMamboTitle": "Im Mambo verwurzelter Stil",
+    "timotheMamboBody": "Tief im Mambo verwurzelt, mit einem Hauch Fusion und persönlicher Interpretation. Ausgebildet in Paris und Mexico, trat mit Black and White Mambo weltweit auf und leitete sein eigenes Team Mambo All Stars.",
+    "timotheQuote": "Salsa ist mehr als nur Schritte. Sie ist Erinnerung, Kultur und die Geschichte derer, die sie geprägt haben."
   },
   "coaching": {
     "lockedTitle": "Die Coaching-Ecke ist für Guild Masters",

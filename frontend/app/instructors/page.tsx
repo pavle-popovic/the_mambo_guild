@@ -5,7 +5,7 @@ import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { FaInstagram, FaYoutube, FaTrophy, FaMusic } from "react-icons/fa";
+import { FaInstagram, FaYoutube, FaTrophy, FaMusic, FaBook, FaHistory } from "react-icons/fa";
 import { useTranslations } from "@/i18n/useTranslations";
 
 export default function InstructorsPage() {
@@ -27,7 +27,7 @@ export default function InstructorsPage() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
-          {/* Main Instructor Card */}
+          {/* Pavle Popovic */}
           <div className="bg-mambo-panel border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition">
             <div className="relative h-64 sm:h-80 bg-gradient-to-br from-mambo-blue/20 to-purple-600/20 overflow-hidden">
               <Image
@@ -106,40 +106,119 @@ export default function InstructorsPage() {
             </div>
           </div>
 
-          {/* Additional Instructors Section */}
-          <div className="space-y-6">
-            <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-mambo-text mb-4">{t("joinTeamTitle")}</h3>
-              <p className="text-gray-400 mb-4 text-sm leading-relaxed">
-                {t("joinTeamBody")}
-              </p>
-              <Link
-                href="#"
-                className="inline-block px-6 py-3 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-lg transition text-sm"
-              >
-                {t("joinTeamCta")}
-              </Link>
+          {/* Timothé Fournier */}
+          <div className="bg-mambo-panel border border-gray-800 rounded-2xl overflow-hidden hover:border-gray-700 transition">
+            <div className="relative h-64 sm:h-80 bg-gradient-to-br from-mambo-gold/20 to-mambo-blue/20 overflow-hidden">
+              <Image
+                src="/assets/TimothePic.png"
+                alt="Timothé Fournier"
+                fill
+                className="object-cover object-center"
+                style={{ objectPosition: 'center 20%' }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
             </div>
 
-            <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
-              <h3 className="text-xl font-bold text-mambo-text mb-4">{t("guestTitle")}</h3>
-              <p className="text-gray-400 text-sm leading-relaxed">
-                {t("guestBody")}
-              </p>
-            </div>
+            <div className="p-8">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h2 className="text-2xl font-bold text-mambo-text mb-1">Timothé Fournier</h2>
+                  <p className="text-mambo-blue font-semibold">{t("timotheRole")}</p>
+                </div>
+                <div className="flex gap-3">
+                  <a
+                    href="https://www.instagram.com/timothe.fdance/"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-mambo-blue transition"
+                    aria-label="Instagram"
+                  >
+                    <FaInstagram />
+                  </a>
+                  <a
+                    href="https://www.amazon.fr/Bible-Salsero-afro-cubaines-moderne-pratiques/dp/2959604008"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="w-10 h-10 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 hover:text-mambo-gold transition"
+                    aria-label="Book"
+                  >
+                    <FaBook />
+                  </a>
+                </div>
+              </div>
 
-            <div className="bg-gradient-to-br from-mambo-blue/10 to-purple-600/10 border border-mambo-blue/30 rounded-xl p-6">
-              <h3 className="text-lg font-bold text-mambo-text mb-2">{t("learnMoreTitle")}</h3>
-              <p className="text-gray-400 text-sm mb-4">
-                {t("learnMoreBody")}
+              <p className="text-gray-400 mb-6 leading-relaxed">
+                {t("timotheBio")}
               </p>
-              <Link
-                href="/courses"
-                className="inline-block px-6 py-2 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-lg transition text-sm"
-              >
-                {t("learnMoreCta")}
-              </Link>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-mambo-gold shrink-0">
+                    <FaHistory className="text-lg" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-mambo-text mb-1">{t("timotheHistoryTitle")}</h3>
+                    <p className="text-sm text-gray-500">
+                      {t("timotheHistoryBody")}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center text-mambo-blue shrink-0">
+                    <FaMusic className="text-lg" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-mambo-text mb-1">{t("timotheMamboTitle")}</h3>
+                    <p className="text-sm text-gray-500">
+                      {t("timotheMamboBody")}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-6 border-t border-gray-800">
+                <p className="text-sm text-gray-500 italic">
+                  &ldquo;{t("timotheQuote")}&rdquo;
+                </p>
+              </div>
             </div>
+          </div>
+        </div>
+
+        {/* Additional Info Section */}
+        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-12">
+          <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-mambo-text mb-4">{t("joinTeamTitle")}</h3>
+            <p className="text-gray-400 mb-4 text-sm leading-relaxed">
+              {t("joinTeamBody")}
+            </p>
+            <Link
+              href="#"
+              className="inline-block px-6 py-3 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-lg transition text-sm"
+            >
+              {t("joinTeamCta")}
+            </Link>
+          </div>
+
+          <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-mambo-text mb-4">{t("guestTitle")}</h3>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              {t("guestBody")}
+            </p>
+          </div>
+
+          <div className="bg-gradient-to-br from-mambo-blue/10 to-purple-600/10 border border-mambo-blue/30 rounded-xl p-6">
+            <h3 className="text-lg font-bold text-mambo-text mb-2">{t("learnMoreTitle")}</h3>
+            <p className="text-gray-400 text-sm mb-4">
+              {t("learnMoreBody")}
+            </p>
+            <Link
+              href="/courses"
+              className="inline-block px-6 py-2 bg-mambo-blue hover:bg-blue-600 text-white font-bold rounded-lg transition text-sm"
+            >
+              {t("learnMoreCta")}
+            </Link>
           </div>
         </div>
       </div>

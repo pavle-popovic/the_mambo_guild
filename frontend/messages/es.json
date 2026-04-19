@@ -755,7 +755,14 @@
     "guestBody": "A lo largo del año, organizamos talleres con instructores de salsa reconocidos internacionalmente, trayéndote perspectivas diversas y técnicas avanzadas de todo el mundo.",
     "learnMoreTitle": "¿Quieres Aprender Más?",
     "learnMoreBody": "Explora nuestros cursos y empieza tu camino con nosotros hoy.",
-    "learnMoreCta": "Explorar Cursos"
+    "learnMoreCta": "Explorar Cursos",
+    "timotheRole": "Bailarín e Historiador de la Danza",
+    "timotheBio": "Timothé, también conocido como Mr. White, es un bailarín de salsa con base en Paris y una sólida formación en mambo y cultura de danzas latinas. Formado inicialmente en Paris por Mouaze Konaté, continuó su entrenamiento a nivel internacional con instructores reconocidos y pasó un tiempo en Mexico que marcó profundamente su estilo. Se presentó como parte del dúo Black and White Mambo en muchos países y, más tarde, creó y lideró su propio equipo, Mambo All Stars. Hoy enseña y actúa en Paris, compartiendo tanto el lado técnico como el cultural de la salsa.",
+    "timotheHistoryTitle": "Historiador de la Salsa",
+    "timotheHistoryBody": "Investigó la historia de la salsa durante muchos años y entrevistó a leyendas históricas de la escena como Roly Maden. Escribió un libro sobre la historia del mambo y las danzas latinas.",
+    "timotheMamboTitle": "Estilo con Raíces en el Mambo",
+    "timotheMamboBody": "Profundamente enraizado en el mambo con un toque de fusión e interpretación personal. Formado en Paris y Mexico, se presentó por todo el mundo con Black and White Mambo y lideró su propio equipo Mambo All Stars.",
+    "timotheQuote": "La salsa es más que pasos. Es memoria, cultura y la historia de quienes la moldearon."
   },
   "coaching": {
     "lockedTitle": "El Rincón del Coaching es para Guild Masters",
