@@ -43,6 +43,7 @@ from schemas.premium import (
 )
 from services.r2_service import generate_r2_signed_url
 from services.email_service import send_coaching_feedback_email
+from services.notification_service import create_notification
 
 router = APIRouter(prefix="/premium", tags=["premium"])
 
@@ -526,7 +527,7 @@ def update_coaching_submission(
     db.commit()
     db.refresh(submission)
 
-    # Send notification email to student when feedback is ready
+    # Send notification email + in-app notification to student when feedback is ready
     if submission.status == CoachingSubmissionStatus.COMPLETED and submission.feedback_video_url:
         student_user = db.query(User).filter(User.id == submission.user_id).first()
         student_profile = db.query(UserProfile).filter(UserProfile.user_id == submission.user_id).first()
@@ -537,6 +538,20 @@ def update_coaching_submission(
                 student_name=student_name,
                 feedback_url=submission.feedback_video_url
             )
+            try:
+                create_notification(
+                    user_id=str(student_user.id),
+                    type="coaching_feedback_ready",
+                    title="Your Feedback is Ready",
+                    message="Your 1-on-1 video feedback has been uploaded. Watch it now!",
+                    reference_type="coaching_submission",
+                    reference_id=str(submission.id),
+                    db=db,
+                )
+                db.commit()
+            except Exception:
+                logger.exception("Failed to create coaching feedback notification")
+                db.rollback()
 
     return _format_submission_response(submission)
 
@@ -770,9 +785,19 @@ def update_weekly_meeting(
     require_admin(current_user)
 
     config = db.query(WeeklyMeetingConfig).filter(WeeklyMeetingConfig.id == 1).first()
-    if not config:
+    is_new = config is None
+    if is_new:
         config = WeeklyMeetingConfig(id=1)
         db.add(config)
+
+    # Snapshot schedule-relevant fields before mutation so we can tell whether
+    # to fan out a notification (ignore notes-only edits).
+    prev = {
+        "meeting_url": getattr(config, "meeting_url", None),
+        "meeting_day_of_week": getattr(config, "meeting_day_of_week", None),
+        "meeting_hour_utc": getattr(config, "meeting_hour_utc", None),
+        "meeting_minute_utc": getattr(config, "meeting_minute_utc", None),
+    }
 
     update_dict = data.model_dump(exclude_unset=True)
     for key, value in update_dict.items():
@@ -781,6 +806,33 @@ def update_weekly_meeting(
     config.updated_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db.commit()
     db.refresh(config)
+
+    schedule_fields = ("meeting_url", "meeting_day_of_week", "meeting_hour_utc", "meeting_minute_utc")
+    schedule_changed = is_new or any(
+        getattr(config, f) != prev[f] for f in schedule_fields
+    )
+
+    if schedule_changed:
+        try:
+            performers = db.query(User).join(Subscription, Subscription.user_id == User.id).filter(
+                Subscription.status == SubscriptionStatus.ACTIVE,
+                Subscription.tier == SubscriptionTier.PERFORMER,
+            ).all()
+            for performer in performers:
+                create_notification(
+                    user_id=str(performer.id),
+                    type="weekly_meeting_scheduled",
+                    title="New Roundtable Scheduled",
+                    message="The next Roundtable is set. Tap to see the new time and link.",
+                    reference_type="weekly_meeting",
+                    reference_id=None,
+                    db=db,
+                )
+            db.commit()
+            logger.info("Weekly-meeting notification fanned out to %d performers", len(performers))
+        except Exception:
+            logger.exception("Failed to fan out weekly-meeting notifications")
+            db.rollback()
 
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,

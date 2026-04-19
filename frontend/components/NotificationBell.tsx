@@ -101,6 +101,12 @@ export default function NotificationBell() {
       window.dispatchEvent(new CustomEvent("open-post-detail", {
         detail: { postId: notification.reference_id }
       }));
+    } else if (notification.reference_type === "coaching_submission") {
+      setIsOpen(false);
+      window.location.href = "/studio/coaching";
+    } else if (notification.reference_type === "weekly_meeting") {
+      setIsOpen(false);
+      window.location.href = "/studio/roundtable";
     }
   };
 
