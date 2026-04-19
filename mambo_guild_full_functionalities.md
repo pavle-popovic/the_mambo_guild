@@ -1,7 +1,7 @@
 # The Mambo Guild — Complete Codebase Functionality Reference
 
-> **Last Updated**: April 9, 2026  
-> **Status**: Lessons not yet uploaded on MUX (planned for next week). i18n architecture (13 languages) and Diego AI concierge system prompt generated — awaiting `next-intl` install and `feature/i18n-diego` branch integration. Global in-app **Bug Report Widget** added (Section 36).
+> **Last Updated**: April 19, 2026  
+> **Status**: Platform is live in beta. Mux upload pipeline is wired end-to-end (lesson editor + VIP 1-on-1 coaching both use real Mux direct upload with status polling). Diego AI concierge is shipped and running on Gemini 2.0 Flash. **i18n is fully deployed across 14 locales** (en, es, pt, fr, de, it, ja, ko, zh, ru, pl, nl, ar, el) on landing, pricing, instructors, coaching, roundtable, community, profile, skill tree, and auth surfaces via a homegrown `useTranslations` hook (no `next-intl` runtime). Stripe is hardened for beta (7-day free trial on Advanced, live Guild Master seat cap, grandfather pricing lock-in, cancel-at-period-end, retention flow). Two-instructor landing (Pavle + Timothé Fournier) and release schedule roadmap are live. Global in-app **Bug Report Widget** (Section 36).
 
 ---
 
@@ -151,6 +151,24 @@ The Mambo Guild is **a gamified online salsa dance learning management system** 
 - Users can edit their gamertag/username
 - Validation: 3-30 characters, unique (case-insensitive)
 
+### User Profile Modal
+- Clickable user avatars across the app open a `UserProfileModal` with avatar, name, level, quick stats, and an **Instagram connect link** (`instagram_url` field on UserProfile)
+- The owner-edit flow refreshes `instagram_url` in context immediately after save so the UI updates without a reload
+
+### Mobile Profile (RPG Character Sheet)
+- Redesigned portrait profile fits all key info on first screen: compact avatar header, level progress bar, 3x2 stats grid, community stats row, and featured badges
+- **Tap-to-toggle badge showcase editing** directly on mobile (no separate edit page)
+- Gear icon replaced with a sign-out icon at the top of mobile profile
+- Featured badges section hidden on mobile, collection items use smaller tiles, "Continue learning" card pushed to the bottom
+- Desktop profile layout is unchanged
+
+### Subscription Management (Profile)
+- Paid users see a hidden "Manage subscription" link at the bottom of the profile page
+- Opens a 3-step retention modal: loss framing, price-lock warning, type-CANCEL confirmation
+- Primary button at every step is "Keep my subscription"; cancel is always a dim secondary link
+- Confirmed cancel hits `/api/payments/cancel-subscription` which **schedules cancellation at period end** (not immediate)
+- While a cancel is scheduled, the billing section shows the end date and a Resume button calling `/api/payments/resume-subscription`
+
 ---
 
 ## 4. Course & Content Management System
@@ -219,6 +237,11 @@ World (Course) → Level (Module/Week) → Lesson
 - **Search bar** with aesthetic warm amber glow
 - **Type filters**: Courses / Choreographies / Topics with count badges
 - **Difficulty filters**: Beginner / Intermediate / Advanced
+- Dropdown filter UI used up through the `xl` breakpoint (desktop-width) so narrow laptops get the mobile-friendly picker instead of wrapping chips
+- Portal-rendered popovers so the filter bar isn't clipped by card grid overflow
+- **Type color coding** on course cards so Courses / Choreographies / Topics are visually distinct
+- **Choreography click goes directly to the lesson**, skipping the skill-tree view (choreos are single-lesson)
+- `course_type` filter normalizes both `choreo` and `choreography` so legacy content still matches
 
 ---
 
@@ -259,6 +282,11 @@ World (Course) → Level (Module/Week) → Lesson
 - Generate upload URLs
 - Get download URLs (for secure downloads)
 - Playback token generation
+- Upload-status endpoint returns the **asset status** alongside the playback ID so the frontend poller can reliably detect completion instead of hanging
+- Webhook signature verification uses the correct **hex** (not base64) decoding for the Mux signing secret
+
+### Coaching Upload Integration
+- Guild Master 1-on-1 coaching submissions use the real Mux direct-upload flow (file picker, size/duration validation, status polling) and the `MuxVideoPlayer` wrapper for playback, rather than a placeholder drop zone
 
 ---
 
@@ -385,7 +413,7 @@ World (Course) → Level (Module/Week) → Lesson
 
 ### Reactions
 - Three types: 🔥 Fire, 📏 Ruler (precision), 👏 Clap
-- One reaction per user per post (unique constraint)
+- One reaction per user **per type** per post, so each emoji has its own independent unique constraint and 🔥, 📏, and 👏 counts increment separately on the same post
 - Costs 1 🥢 to react
 - Post owner gets reaction refund (up to 5 per video)
 
@@ -406,6 +434,26 @@ World (Course) → Level (Module/Week) → Lesson
 - Create, update, delete (with Mux asset cleanup)
 - Admin: global delete/edit permissions
 - Cascade deletion: replies deleted with posts
+
+### Saved Posts
+- Users can save posts for later via a dedicated `saved_posts` table
+- CRUD endpoints under `/api/community`
+- Saved tab in the community UI
+
+### Community Moderation
+- AI gatekeeper adds `moderation_status` to replies
+- Admin moderation queue at `/admin/moderation` to flag / approve / ghost replies
+- Backed by `moderation_service` on the backend
+
+### Mobile Community (Instagram-style)
+- Sticky mobile header with search bar, Stage/Lab pill toggle, and **glassmorphism Level filter dropdown**
+- Stage videos render as a tight **3-column square thumbnail grid** (Instagram Explore style)
+- Sidebar and widgets hidden on mobile
+- Desktop layout unchanged, with a dedicated desktop search bar added alongside the existing filters
+- Portrait mobile also gets a "Mine" toggle in the header to scope the feed to the user's own posts
+- **Focus Area filter removed**; trending-tag clicks correctly populate the tag filter
+- **My Posts level counts scoped** so the badge only reflects the user's own posts, not the global level count
+- `?post=<id>` deep links are read from `window.location` (not `useSearchParams`) so modal open works reliably on first paint
 
 ---
 
@@ -518,7 +566,47 @@ World (Course) → Level (Module/Week) → Lesson
 | `stripe_subscription_id` | Stripe Subscription ID |
 | `status` | active / past_due / canceled / incomplete / trialing |
 | `tier` | rookie / advanced / performer |
-| `current_period_end` | Billing period end date |
+| `current_period_end` | Billing period end date, read from the subscription **item** (Stripe 2025 API shape) |
+| `cancel_at_period_end` | Scheduled-cancel flag, set by retention flow |
+| `has_used_trial` | One-trial-per-user guard on `user_profiles` |
+
+### 7-Day Free Trial
+- Trial is offered on the **Advanced** tier only; Guild Master has no trial
+- Auto-converts to paid after 7 days
+- One trial per user (enforced via `user_profiles.has_used_trial`)
+- Stripe pre-check refuses the trial if the email is already known to Stripe (defeats same-email re-signup loophole)
+- All paid content gates on `ACTIVE` **or** `TRIALING` status; Guild Master perks stay `ACTIVE`-only (trialers excluded)
+- Upgrading auto-clears `cancel_at_period_end`; a trialing user upgrading to Performer ends the trial immediately
+
+### Live Guild Master Seat Counter
+- `/pricing` page shows a live count of Guild Master seats taken against a 30-seat cap
+- Checkout is blocked when the cap is reached
+- Seat-cap check is serialized with a **Postgres advisory lock** so concurrent checkouts can't overfill the cap
+
+### Grandfather Pricing
+- "Founders' Price" lock-in badges on paid tiers, with line-through on the future price
+  - Pro: $39 now, $49 after Aug 1 2026
+  - Guild Master: $59 now, $99 after 30 seats
+- Live countdown to the Pro price change, rendered below the pricing cards
+- "Your $price locked in for life" feature row on each paid tier
+- Trust bar: cancel anytime, price-locked-for-life, Stripe checkout
+
+### Pricing UX
+- `sonner` toasts replace browser `alert` / `confirm` for upgrade/downgrade/error messaging
+- Downgrade uses a `ModalShell` confirmation pattern instead of a confirm toast
+- Upgrade/downgrade **updates the card in place** with no navigation away from `/pricing`
+
+### Stripe Hardening (Security Audit Pass)
+- **Open-redirect prevention**: `success_url` / `cancel_url` must match the frontend host or checkout is rejected
+- `customer.subscription.deleted` events filtered on both `sub_id` **and** `customer_id` so stale events can't flip the wrong user to ROOKIE
+- `customer.subscription.updated` mirrors past_due / canceled / incomplete so failed renewals don't leave stale ACTIVE rows
+- `metadata.user_id` validated against the DB before minting a subscription row; existing rows are updated rather than duplicated
+- Existing Stripe customers reused by email (no duplicate customers)
+- `invoice.payment_succeeded` no longer raises 5xx (prevents retries into an already-consumed idempotency slot)
+- Tier resolution goes through `price.id` first, `lookup_key` as fallback, so a dashboard rename can't silently drop users to ROOKIE
+- Stripe subscription `customer` verified against stored id before `Subscription.modify` (defense-in-depth)
+- Clave welcome bonus guarded to once per user+tier (kills the upgrade/downgrade XP-farming cycle)
+- Invoice `.data` attribute collision fixed; `current_period_end` read from the subscription **item**, not the subscription root
 
 ---
 
@@ -543,16 +631,19 @@ All premium features require **Performer (Guild Master)** subscription.
 ### 14c. Weekly Meeting Config
 - Persistent Zoom meeting link (single row, id=1)
 - Admin editable URL + meeting notes
+- **Dynamic weekly meeting schedule**: admin edits the day/time, and the Roundtable page reflects it on the user side in real time
 - Displayed to Guild Master users
 
 ### 14d. 1-on-1 Video Coaching
 - **1 submission per month** per Guild Master user
-- Upload dance video via Mux (max 100 seconds)
+- Upload dance video via **real Mux direct upload** (file picker, client-side size/duration validation, status polling); replaced the earlier placeholder drop zone
 - Optional "specific question" (140 chars) — "What should I look at?"
-- Marketing consent: `allow_social_share` (+50 XP)
+- Marketing consent: `allow_social_share` (the +50 XP bonus was removed; the field is now pure marketing-consent signal)
 - Status flow: `pending` → `in_review` → `completed` / `expired`
 - Admin feedback: feedback video URL (Loom/external) + text notes
+- Feedback playback uses the `MuxVideoPlayer` wrapper (so the student's video actually plays) and is **locked to a 16:9 container** so the composite reaction video doesn't get pillarboxed
 - **Email notification** sent to student when feedback is ready
+- **In-app notification** also fired (see Section 17)
 
 ### 14e. DJ Booth / Mambo Mixer
 - Salsa tracks with **separated stems** (percussion, piano/bass, vocals/brass, full mix)
@@ -667,10 +758,10 @@ All premium features require **Performer (Guild Master)** subscription.
 ### Notification Model
 | Field | Description |
 |---|---|
-| `type` | `badge_earned`, `reaction_received`, `reply_received`, `answer_accepted` |
+| `type` | `badge_earned`, `reaction_received`, `reply_received`, `answer_accepted`, `coaching_feedback_ready`, `roundtable_scheduled` |
 | `title` | Notification title |
 | `message` | Notification body |
-| `reference_type` | `post`, `reply`, `badge` |
+| `reference_type` | `post`, `reply`, `badge`, `coaching`, `roundtable` |
 | `reference_id` | ID of related entity |
 | `is_read` | Read status flag |
 
@@ -678,6 +769,17 @@ All premium features require **Performer (Guild Master)** subscription.
 - Bell icon in navbar with unread count badge
 - Dropdown list of recent notifications
 - Mark as read functionality
+- **Click-through wiring**: clicking a notification navigates to the related entity (post, coaching submission, roundtable, badge)
+- On mobile, the notification panel uses fixed full-width positioning so it doesn't overflow the viewport
+
+### Notification Triggers
+- Community: reaction received, reply received, accepted answer, badge earned (existing)
+- **Coaching feedback ready**: fired when an admin marks a coaching submission complete (in addition to the existing Resend email)
+- **Roundtable scheduled**: fired to all Guild Master users when the admin schedules or updates a live call
+
+### Infra Fixes
+- List route registered without a trailing slash to avoid Railway proxy 307 redirects (cookies were being dropped on the redirect)
+- List response handling hardened to surface fetch errors instead of silently failing
 
 ---
 
@@ -691,6 +793,8 @@ All premium features require **Performer (Guild Master)** subscription.
 | **Waitlist Welcome** | New waitlist signup |
 | **Announcement Email** | Admin sends custom announcement |
 | **Waitlist Broadcast** | Mass email to waitlist users |
+| **Beginner Challenge (Mambo Inn)** | Broadcast aimed at total beginners, sent above the open challenge in the broadcast cadence |
+| **Open Challenge** | Broadcast inviting existing dancers to try the platform |
 | **Bug Report** | User submits via in-app widget → `support@themamboguild.com` with screenshots + device metadata (Section 36) |
 
 ### Design
@@ -748,11 +852,16 @@ All premium features require **Performer (Guild Master)** subscription.
 |---|---|
 | `/admin` | Main dashboard with overview stats |
 | `/admin/builder` | Course builder with drag-and-drop curriculum |
-| `/admin/settings` | Platform settings |
-| `/admin/students` | View enrolled students |
+| `/admin/settings` | Platform settings (Platform / Email Broadcast / Weekly Meeting / **Release Schedule**) |
+| `/admin/students` | View enrolled students, inline grant-claves + grant-XP controls |
 | `/admin/grading` | Boss battle submission review |
 | `/admin/coaching` | Coaching submission queue |
 | `/admin/live` | Live call scheduling and management |
+| `/admin/moderation` | Community moderation queue (flag / approve / ghost replies) |
+
+### Mobile Admin
+- `AdminSidebar` converts from a fixed `w-64` panel to a **slide-in drawer with hamburger** on mobile
+- All admin pages use responsive `ml-0 lg:ml-64` margins so content doesn't overlap the drawer
 
 ### Course Builder (`admin_courses.py`)
 - **World (Course) CRUD**: Create, update, delete, reorder courses
@@ -785,6 +894,15 @@ All premium features require **Performer (Guild Master)** subscription.
 - DJ Booth track management
 - Weekly meeting config
 - Weekly archive management
+- **Grant claves** to students directly from the admin students page (in addition to grant-XP)
+- **Auto-create new tables** on backend startup via `Base.metadata.create_all` so fresh beta tables (saved posts, release schedule, moderation_status) land on deploy without a manual migration step
+- **Cascade-delete lesson dependents** when deleting a lesson so foreign-key NOT NULL constraints don't block removal
+- Release Schedule editor (see below)
+
+### Release Schedule Admin
+- New Settings tab lets staff add, edit, delete, and reorder items on the launch roadmap
+- Backed by a `release_schedule_items` table with CRUD endpoints under `/api/premium/admin/release-schedule`
+- The landing roadmap and the `/courses` popover both read from this table (the frontend falls back to a hardcoded list when the API is empty, so the landing page never looks broken on first deploy)
 
 ---
 
@@ -813,6 +931,24 @@ All premium features require **Performer (Guild Master)** subscription.
 - Grey-out effect for logged-out users
 - Mobile-first "Phone Frame" scanning animation
 - Progress tracking overlaid on skill tree
+- On topic worlds, the hover preview surfaces a **lesson TL;DR** snippet
+- On touch, hover tooltip is bypassed and a tap fires the click directly (with `whileTap` scale feedback)
+- Resize event dispatched after mount to force ReactFlow node rendering after soft navigation
+- Skill tree no longer unmounts on auth re-fetch; centering is computed from the dagre bounds (no DOM timing) with `useNodesInitialized` + double-rAF for reliability
+
+### Prerequisite Rules
+- Prerequisites are now a **recommendation**, not a hard gate
+- Subscribed users (or admins) can click any off-path node; a confirmation modal explains that modules build on each other and lets them **stay on path** or **skip anyway**
+- Mastered nodes never prompt
+- **Levels with any progress stay unlocked** across prereq graph changes (so editing edges in admin never strands a student mid-course)
+- Subscription and admin remain the only hard access checks at the lesson level
+
+### Zoom / Viewport Hardening
+- `defaultViewport` computed dynamically from the dagre layout bounds instead of hardcoded
+- `onInit` used (not `setTimeout`) for reliable initial centering
+- `setCenter` pattern matched to the `SkillTreeTeaser` implementation (dropped `fitView`)
+- **Lower default zoom on mobile** so more of the tree is visible on first paint
+- Key-based remount for reliable fitView on soft nav
 
 ### Landing Page Integration (`SkillTreeTeaser.tsx` — 47KB)
 - Live skill tree data from API with course toggle
@@ -823,29 +959,92 @@ All premium features require **Performer (Guild Master)** subscription.
 
 ## 23. Landing Page & Marketing
 
-### Sections (in order)
-| Component | Description |
-|---|---|
-| `NewHero.tsx` | "Join The Guild" with bullet points, certified LXD badge, mobile video |
-| `HeroScrollAnimation.tsx` | Progressive loading hero animation with "Enter" experience |
-| `HeroOverlayEffects.tsx` | Visual effects and overlays |
-| `TrendingModulesSection.tsx` | Auto-spinning carousel of popular modules with hover previews |
-| `ValuePropsSection.tsx` | "Stop Stepping on Toes", "Unlock Fluidity", "Steal the Spotlight" |
-| `MaestroSection.tsx` | "Meet the Maestro" cinematic video introduction |
-| `CourseExplorerSection.tsx` | Netflix-style horizontal scrolling carousels |
-| `SkillTreeTeaser.tsx` | Interactive skill tree with live data |
-| `ConstellationSection.tsx` | Constellation graph section wrapper |
-| `HowItWorksSection.tsx` | Step-by-step process explanation |
-| `TestimonialsSection.tsx` | Social proof / testimonials |
-| `LandingPricingSection.tsx` | Pricing cards with tier comparison |
-| `Mambobot.tsx` | AI concierge chatbot interface |
-| `LevelSelectionModal.tsx` | Dance level selection during signup |
+### Current Section Order
+1. `NewHero.tsx`: hero block (see below)
+2. `FounderAuthorityStrip.tsx`: founder authority strip directly under the hero
+3. `TrendingModulesSection.tsx`: auto-spinning carousel of popular modules with hover previews
+4. `HowItWorksSection.tsx`: 5-pillar "How It Works" conversion section with Guild UI captures
+5. `SkillTreeTeaser.tsx`: interactive skill tree, renamed "Your Learning Path"
+6. `ReleaseScheduleSection.tsx`: release roadmap with live countdown (see below)
+7. `TestimonialsSection.tsx`: social proof (auto-scrolling on mobile)
+8. `FAQSection.tsx`: 5 dancer-voiced Q&As with `FAQPage` JSON-LD (see GEO below)
+9. `LandingPricingSection.tsx`: pricing cards with tier comparison, grandfather badges, live seat counter
+10. Universal sticky trial bar (gold bar CTA, shown to all visitors) + `BugReportButton` (bottom-left)
 
-### Design Elements
-- **PalladiumMesh background**: Dark monochrome mesh gradient with drifting circles
-- **Cinematic entrance**: Progressive loading animation
-- **Gold dust particles**: Mobile hero effect
-- **Glass/neon effects**: Premium dark theme aesthetics
+### Hero (`NewHero.tsx`)
+- H1 iterated through several rewrites; current positioning is around the **"World's #1 Online Salsa Platform"** concept with a **Level 0 to 100** structured-curriculum promise
+- Badge "Built on Learning Experience Design"
+- **2x European Champion** credential
+- **Autoplaying silent cinematic trailer** served from R2 (not Mux) for fastest first paint; `preload=auto`, fades in only once actually playing, hard-reset recovery when playback stalls, forces playback on mount and on visibility change
+- 4:3 video container, top-aligned with title one-line at `lg`
+- Desktop: compact horizontal pill CTAs above the fold, bright amber primary CTA with glow ring
+- Mobile portrait: **video-first**, CTAs below video, centered skill tree, gold sticky trial CTA
+- **Landscape phone**: custom layout with zig-zag founder strip and larger video
+- Social proof moved into the hero (1,000+ dancers proof signal)
+- Trial CTA shown to **all visitors** (no longer gated on auth state)
+
+### Meet Your Instructors (Landing + `/instructors`)
+- Two-instructor roster with i18n across all 14 locales:
+  - **Pavle Popović**: founder, 2x European Champion, Learning Experience Design certified
+  - **Timothé Fournier**: profile added April 19, with `TimothePic.png` asset
+- Copy and bios fully translated via the `instructors` namespace
+
+### Founder Authority Strip
+- New section under the hero with one-line founder headline and tightened bio
+- Responsive: zig-zag layout on landscape phone, lighter treatment on portrait mobile
+- Translation overflow protection so long locales don't break the layout
+
+### How It Works (5-Pillar)
+- Replaced earlier "Value Props" / "Maestro" blocks
+- 5 pillars with Guild UI captures
+- Copy tightened to "7-day free trial" (aligned with the Stripe flow)
+- "500+ classes" bullet (bumped from 300+) to match FAQ copy
+
+### Release Schedule Roadmap
+- New `ReleaseScheduleSection.tsx` on landing
+- **Horizontal rail** on desktop, **vertical spine** on mobile portrait, **snap carousel** on mobile landscape
+- Live countdown to the next drop
+- Data sourced from the admin-editable `release_schedule_items` table (see Section 21)
+- Also surfaced on `/courses` as a hover popover on desktop and a bottom-sheet modal on mobile landscape (glass dropdown layout)
+
+### FAQ Section
+- `FAQSection.tsx`: 5 dancer-voiced Q&As
+- **`FAQPage` JSON-LD** (XSS-escaped) for GEO + rich-result eligibility
+- Accessible accordion with `aria-expanded` / `aria-controls`
+
+### Pricing on Landing
+- `LandingPricingSection.tsx` wired below testimonials (replacing a previously removed on-landing pricing block)
+- Grandfather badges, live Guild Master seat counter, trust bar
+- See Section 13 for the full Stripe/pricing mechanics
+
+### Navigation & CTAs
+- **Full brand name** in the navbar (simplified CTAs)
+- **Universal sticky trial bar**: solid gold, eye-catching, visible on every page
+- Bug report button moved to bottom-left so it doesn't collide with the sticky trial CTA
+- Skill tree section has a **dropdown selector** for switching between courses
+- Testimonials auto-scroll on mobile
+- Navbar compacted on landscape phones to prevent link overlap; spaced on portrait so the logo doesn't crowd nav links
+
+### Design / Typography
+- **PalladiumMesh background**: dark monochrome mesh gradient with drifting circles (static circles on mobile instead of 5 infinite blur animations, for perf)
+- **Typography unified to Inter** across all landing sections, with **Playfair** reserved for the hero H1 only
+- Cinematic entrance, gold dust particles, glass/neon effects retained
+
+### GEO / SEO Stack (`aa0ab72`)
+- `metadataBase` + canonical, OpenGraph + Twitter Card metadata
+- Dynamic `/opengraph-image` route rendering a branded 1200x630 card
+- `/robots.txt` via `app/robots.ts` (public allowed, admin/api/private blocked)
+- `/sitemap.xml` via `app/sitemap.ts` with priorities
+- `/public/llms.txt` with cite-ready facts for AI crawlers
+- `EducationalOrganization` + `Person` JSON-LD in the root layout (inherited by every page)
+- `Course` + `VideoObject` + `BreadcrumbList` JSON-LD on landing (`LandingSchemas` component)
+- Central site config at `lib/site.ts`; canonical `SITE_URL` is now **hardcoded** (no `NEXT_PUBLIC_SITE_URL` env dependency)
+
+### Beta Access
+- `/beta?key=...` route sets an httpOnly `BETA_ACCESS_KEY` cookie (60-day TTL) that bypasses the waitlist velvet rope
+- Dual-track bypass: magic-link cookie **or** authenticated admin role
+- Auth routes (`/login`, `/forgot-password`, `/reset-password`, `/register`, `/beta`) are exempt from the waitlist redirect so the account-claim flow works
+- Rotate `BETA_ACCESS_KEY` on Vercel to revoke all beta access at once
 
 ---
 
@@ -859,6 +1058,29 @@ All premium features require **Performer (Guild Master)** subscription.
 | `SpeedControl.tsx` | Variable playback speed (0.25x to 2x) |
 | `UpgradePrompt.tsx` | Prompt for free users to upgrade for pro controls |
 
+### Player Styling & UX
+- **Brass gold accent (#D4AF37)** replaces the Mux default red (prevents "red square" thumbnail on first play)
+- **Green progress bar** (YouTube-like color styling)
+- **Grey buffered bar**, forced via recursive shadow-DOM CSS injection to override Mux defaults inside every nested shadow root
+- **A/B loop toggle in the sidebar** (not only in the overlay) so users can enable the loop without opening fullscreen
+- **Fullscreen A/B overlay**: A/B toggle also available as a fullscreen overlay; on-state flips to dark background + bright gold text to contrast against the video
+- **Glowing Prev / Next / Mark Complete buttons** with clearer visual affordance
+- In-player lesson navigation (Prev/Next) with improved UX
+- Duplicate top "Mark Complete" prompt was reverted
+
+### Desktop 3-Panel Lesson Layout
+- Redesigned desktop lesson viewer with a **3-panel flex layout** (video center, quest log + controls in side panels)
+- Sidebars overlay the video's black bars instead of squeezing the video
+- Controls moved to the correct panel
+
+### Mobile / Landscape Lesson Page
+- **Quest bar embedded as an overlay inside the video player** on mobile
+- **Captions pushed above the mobile controls bar** (and moved below video on mobile portrait)
+- Horizontal quest bar on lesson page, with quest bar video gap fixed
+- **Rotate-for-fullscreen hint** above the mobile lesson controls
+- **Landscape-phone shows the 3-panel desktop layout**; quest log + controls placed in video negative space; dots and outer controls hidden to maximize video area
+- Glassmorphism custom dropdowns replace native selects (constellation path, filters)
+
 ### Practice Mode (`PracticeModeOverlay.tsx` — 14KB)
 - Full-screen practice overlay mode
 - Drill view count tracking (`useDrillViewCount.ts`)
@@ -868,6 +1090,12 @@ All premium features require **Performer (Guild Master)** subscription.
 - Integrated download with daily limit tracking
 - Progress indicator
 - Tier-based access control
+
+### Choreography Back Nav
+- Back navigation from a choreography lesson returns to `/courses` rather than the skill tree (choreos are single-lesson so the skill tree isn't meaningful)
+
+### Post Modal (Community Post Full-Screen)
+- Respects `safe-area-inset-top` so header buttons clear the mobile URL bar
 
 ---
 
@@ -969,11 +1197,25 @@ All premium features require **Performer (Guild Master)** subscription.
 ### Navigation (`NavBar.tsx` — 16KB)
 - Responsive navigation bar with mobile hamburger menu
 - Sticky mobile bottom bar
+- Full brand name in the navbar, simplified CTAs
 - Logo, course links, community, profile
 - Clave wallet display
 - Notification bell
+- **Language selector** exposed in the mobile header bar (globe icon hidden on mobile, shown on desktop)
 - Auth state-aware (login/register vs profile/logout)
 - Navigation progress bar (`NavigationProgress.tsx`)
+- Compacted on landscape phones to prevent link overlap; spaced on portrait so the logo doesn't crowd nav links
+
+### Responsive Architecture
+- **Landscape-phone = desktop layout across the app**: the `md:` breakpoint is landscape-aware (navbar, footer, pricing, lesson viewer all get the desktop treatment when a phone is rotated)
+- **Native-app portrait mobile redesign**: video-first hero, sticky trial CTA, centered skill tree, glassmorphism dropdowns replacing native selects, mobile-friendly filter dropdowns on the courses page
+- Courses page filters are dropdowns on mobile, with portal-rendered popovers so they aren't clipped
+- Comprehensive mobile UI refactor touched every top-level page (admin, community, courses, instructors, profile, lesson, skill tree)
+
+### Layout Stability
+- `StarryBackground` scoped to the landing page only (it was previously stacking above mobile content on other routes)
+- Framer Motion page-transition wrapper removed; it was stranding mobile pages at `opacity: 0` after soft-nav
+- API URL reads use `??` (not `||`) so an explicit empty-string `NEXT_PUBLIC_API_URL` doesn't get replaced
 
 ### Context & Hooks
 | File | Purpose |
@@ -1128,6 +1370,16 @@ community_tags
 - Download daily limit (5/day)
 - Community video downloads restricted to owner only
 - SELECT FOR UPDATE for race condition prevention on financial operations
+- Postgres advisory lock serializes Guild Master seat-cap checks
+
+### Stripe-Specific Security (April beta hardening)
+- Checkout `success_url` / `cancel_url` host-matched against the frontend to prevent open-redirect phishing
+- `customer.subscription.deleted` filtered on both `sub_id` and `customer_id`
+- Trial abuse blocked by Stripe email pre-check
+- See Section 13 for the full Stripe hardening list
+
+### IP Handling
+- All IP-based rate limiters (auth, bug report) respect `X-Forwarded-For` so one abuser behind Cloudflare / Railway doesn't share a rate-limit bucket with every user
 
 ---
 
@@ -1213,15 +1465,9 @@ community_tags
 ## 35. Global Translation Architecture (i18n)
 
 ### Overview
-The platform supports **13 languages** via `next-intl` in cookie-based mode. No URL restructuring required — existing routes (`/courses`, `/lesson/[id]`, etc.) are unchanged. Locale is stored in a `NEXT_LOCALE` cookie, read server-side, and forwarded as a request header so both Server and Client Components get the correct locale with no hydration mismatch.
+The platform is **fully translated across 14 locales** and shipped to production. i18n uses a **homegrown client provider** (no `next-intl` runtime dependency) so there is no server plugin required and no middleware changes. Locale is stored in a `NEXT_LOCALE` cookie, hydrated into a React context, and resolved via dot-path lookups by a single `useTranslations` hook.
 
-### Why next-intl (not React Context + localStorage)
-| Approach | SSR safe | No hydration flash | SEO crawlable | Server Components |
-|---|---|---|---|---|
-| React Context + localStorage | ❌ | ❌ | ❌ | ❌ |
-| **next-intl (cookie-based)** | ✅ | ✅ | ✅ | ✅ |
-
-### Supported Languages
+### Supported Languages (14)
 | Code | Language | Dir |
 |---|---|---|
 | `en` | English | LTR |
@@ -1236,69 +1482,58 @@ The platform supports **13 languages** via `next-intl` in cookie-based mode. No 
 | `ru` | Русский | LTR |
 | `pl` | Polski | LTR |
 | `nl` | Nederlands | LTR |
+| `el` | Ελληνικά | LTR |
 | `ar` | العربية | **RTL** |
 
 ### File Structure
 ```
 frontend/
 ├── messages/
-│   ├── en.json          ← base (13 namespaces, ~120 keys each)
-│   ├── es.json
-│   ├── pt.json
-│   ├── fr.json
-│   ├── de.json
-│   ├── it.json
-│   ├── ja.json
-│   ├── ko.json
-│   ├── zh.json
-│   ├── ru.json
-│   ├── pl.json
-│   ├── nl.json
-│   └── ar.json
+│   ├── en.json          ← base
+│   ├── es.json, pt.json, fr.json, de.json, it.json
+│   ├── ja.json, ko.json, zh.json
+│   ├── ru.json, pl.json, nl.json
+│   ├── el.json          ← Greek, added alongside the 14-locale rollout
+│   └── ar.json          ← RTL
 └── i18n/
-    ├── config.ts        ← locale list, metadata, Mux BCP-47 map
-    ├── request.ts       ← server-side locale resolution (cookie → Accept-Language → en)
-    ├── client.tsx       ← LocaleProvider, useLocale(), useSetLocale()
-    └── SETUP.md         ← step-by-step wiring instructions
+    ├── config.ts          ← locale list, metadata, Mux BCP-47 map
+    ├── useTranslations.ts ← single hook, dot-path resolution
+    ├── client.tsx         ← LocaleProvider, useLocale(), useSetLocale()
+    └── LocaleContext tree (loads the matching messages/*.json at provider mount)
 ```
 
-### Translation Namespaces (per locale file)
-`nav` · `auth` · `dashboard` · `courses` · `lesson` · `skillTree` · `lab` · `stage` · `claves` · `pricing` · `player` · `common` · `profile` · `onboarding` · `chatbot` · `guildMaster` · `errors`
+### Translation Namespaces
+Current namespaces include: `nav`, `auth`, `landing`, `hero`, `authorityStrip`, `trending`, `howItWorks`, `skillTree`, `releases`, `testimonials`, `pricing`, `faq`, `footer`, `instructors`, `coaching`, `roundtable`, `community`, `profile`, `player`, `common`, `errors`, plus the earlier namespaces (`dashboard`, `courses`, `lesson`, `lab`, `stage`, `claves`, `onboarding`, `chatbot`, `guildMaster`).
 
-### Key Components
-| Component | Purpose |
-|---|---|
-| `components/LocaleSwitcher.tsx` | Framer Motion dropdown — flag + native name, RTL-aware, updates cookie + triggers RSC refresh |
-| `components/MuxPlayerWithCC.tsx` | Mux player that auto-switches closed-caption VTT track when global locale changes |
+The `profile` namespace was extended from ~27 keys to a 137-key superset during the April rollout. Across `instructors`, `coaching`, `roundtable`, `community`, and the extended `profile`, ~361 new keys were translated into all 13 non-English locales.
 
-### MuxPlayerWithCC — Caption Sync Flow
-1. Each Mux video asset has VTT subtitle tracks uploaded per language (via Mux Tracks API), tagged with BCP-47 language codes
-2. `useLocale()` hook provides the current locale to the component
-3. `LOCALE_TO_MUX_LANG` map converts locale code → BCP-47 (e.g. `zh` → `zh-Hans`, `pt` → `pt-BR`)
-4. On locale change: iterates `video.textTracks`, sets matching track to `"showing"`, all others to `"hidden"`
-5. Graceful fallback: if no track exists for the requested language, falls back to English and shows a subtle notice
+### Translated Surfaces (live in prod)
+- **Landing page**: hero, founder authority strip, trending modules, how it works, skill tree teaser, release schedule, testimonials, FAQ, pricing section, footer, sticky CTA (325 EN keys)
+- **Pricing page** (`/pricing`): cards, sonner toasts, downgrade modal
+- **Instructors** (`/instructors`): Pavle + Timothé profiles and bios
+- **Guild Master**: coaching (`/studio/coaching`), roundtable (`/studio/roundtable`)
+- **Community** (`/community`): feed, filters, `CreatePostModal`
+- **Profile** (`/profile`): stats, edit flow, `BadgeTrophyCase`
+- **Auth flows**: login, register, password reset
+- **Navbar**, locale switcher, global error copy
 
-### Locale Switching Flow
-```
-User clicks flag in LocaleSwitcher
-  → writes NEXT_LOCALE=es cookie (1 year, path=/, SameSite=Lax)
-  → sets document.lang + document.dir immediately (instant visual feedback)
-  → router.refresh() triggers RSC re-render
-  → i18n/request.ts reads cookie → loads messages/es.json
-  → NextIntlClientProvider re-hydrates with Spanish messages
-  → MuxPlayerWithCC receives new locale → switches VTT track
-```
+### `useTranslations` Hook
+- Single hook at `frontend/i18n/useTranslations.ts`
+- Dot-path resolution (e.g. `t("pricing.downgrade.confirm")`)
+- Returned `t()` is renamed to `tx` in components that compose countdown maps or array data, to avoid variable shadowing
+- Module-level arrays (plans, testimonials, `FEATURES`, level labels) were moved **inside** components so the hook-returned `t()` is in scope when they're built
 
-### Integration Status
-- **Status**: Files generated, awaiting `npm install next-intl` and branch integration
-- **Branch**: `feature/i18n-diego` (to be created — do NOT merge to `main` until locally verified)
-- **Activation**: Follow `frontend/i18n/SETUP.md` (3 file changes: `next.config.ts`, `app/layout.tsx`, `middleware.ts`)
-- **Risk to live site**: Zero — all new files are inert until imported. `middleware.ts` restored to original waitlist-only version.
+### Locale Switcher
+- Mobile header bar exposes a language picker (the globe icon is hidden on mobile / removed from the mobile dropdown for a cleaner look)
+- Desktop keeps the globe-icon dropdown
+- Switching writes `NEXT_LOCALE=<code>` cookie, sets `document.lang` + `document.dir` instantly, and remounts the provider so all components re-render in the new locale
 
-### Dependency to install
-```bash
-cd frontend && npm install next-intl
-```
+### Translation Overflow Hardening
+- Long locale strings no longer break layout on the **founder authority strip** or the **courses filter bar** (wrapping / truncation rules applied where string length varies most)
+
+### What's not yet wired
+- `MuxPlayerWithCC` (closed-caption VTT track switching on locale change) is designed but awaits content-side VTT uploads per language
+- Diego AI is shipped but responds primarily in English; per-locale AI responses are a future extension
 
 ---
 
@@ -1402,4 +1637,4 @@ Browsers block `new Worker(crossOriginUrl)` **even when CORS headers are set** (
 
 ---
 
-> **Note**: The lessons/videos are not yet uploaded to MUX. The full MUX pipeline (upload → webhook → playback) is fully built and tested — it awaits content upload next week.
+> **Note**: The Mux pipeline (direct upload → webhook → playback) is live end-to-end and is used in production for both lesson videos and VIP 1-on-1 coaching submissions. Per-language VTT captions are the next content-side workstream (see Section 35).
