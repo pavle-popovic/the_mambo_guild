@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, X, Tv, FlaskConical, ChevronDown, Bookmark } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
@@ -51,7 +51,6 @@ type ViewMode = "stage" | "lab" | "saved" | "my_posts";
 export default function CommunityPage() {
     const t = useTranslations("community");
     const router = useRouter();
-    const searchParams = useSearchParams();
     const { user, loading: authLoading } = useAuth();
     const [viewMode, setViewMode] = useState<ViewMode>("stage");
     const [posts, setPosts] = useState<Post[]>([]);
@@ -89,13 +88,17 @@ export default function CommunityPage() {
 
     // Deep-link: /community?post=<id> opens the post detail modal.
     // Used by notification bell click-throughs for reply/reaction notifications.
+    // Read from window.location to avoid useSearchParams' Suspense requirement
+    // in Next 14 (which otherwise breaks static generation at build time).
     useEffect(() => {
-        const postId = searchParams?.get("post");
+        if (typeof window === "undefined") return;
+        const params = new URLSearchParams(window.location.search);
+        const postId = params.get("post");
         if (postId && !isPreviewMode) {
             setSelectedPostId(postId);
             setIsPostDetailOpen(true);
         }
-    }, [searchParams, isPreviewMode]);
+    }, [isPreviewMode]);
 
     // Click-outside for mobile dropdowns
     useEffect(() => {
