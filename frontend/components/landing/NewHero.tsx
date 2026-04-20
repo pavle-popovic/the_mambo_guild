@@ -134,8 +134,10 @@ export default function NewHero() {
                             onEmptied={() => setVideoReady(false)}
                             className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ${videoReady ? "opacity-100" : "opacity-0"}`}
                         >
-                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v4.webm" type="video/webm" />
-                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v4.mp4" type="video/mp4" />
+                            <source media="(max-width: 768px)" src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v5.mobile.webm" type="video/webm" />
+                            <source media="(max-width: 768px)" src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v5.mobile.mp4" type="video/mp4" />
+                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v5.desktop.webm" type="video/webm" />
+                            <source src="https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v5.desktop.mp4" type="video/mp4" />
                         </video>
 
                         {/* Gradient Overlay */}
