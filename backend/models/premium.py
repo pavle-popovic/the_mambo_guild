@@ -79,7 +79,13 @@ class WeeklyMeetingConfig(Base):
     id = Column(Integer, primary_key=True)
     meeting_url = Column(String(500), nullable=True)
     meeting_notes = Column(Text, nullable=True)
-    # Schedule: day 0=Sun…6=Sat; hour/minute in UTC
+    # Static next-meeting datetime (UTC). When set, this is the primary source
+    # of truth for when the next Roundtable starts. Admin bumps it after each
+    # call. Kept alongside the legacy day-of-week schedule so older data still
+    # renders (fallback path in the client) while we move to one-off scheduling.
+    meeting_starts_at = Column(DateTime, nullable=True)
+    # Legacy recurring schedule (kept for backward compat). Superseded by
+    # meeting_starts_at above. day 0=Sun…6=Sat; hour/minute in UTC.
     meeting_day_of_week = Column(Integer, default=3, nullable=False)  # 3 = Wednesday
     meeting_hour_utc = Column(Integer, default=19, nullable=False)
     meeting_minute_utc = Column(Integer, default=0, nullable=False)

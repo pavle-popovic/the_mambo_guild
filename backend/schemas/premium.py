@@ -276,7 +276,10 @@ class WeeklyMeetingConfigResponse(BaseModel):
     """Meeting config returned to both guild masters and admins."""
     meeting_url: Optional[str] = None
     meeting_notes: Optional[str] = None
-    # Schedule fields (0=Sun … 6=Sat; hour/minute in UTC)
+    # Static one-off schedule (UTC). Primary source of truth when set.
+    meeting_starts_at: Optional[datetime] = None
+    # Legacy recurring schedule (0=Sun … 6=Sat; hour/minute in UTC). Fallback
+    # for older rows where meeting_starts_at is null.
     meeting_day_of_week: int = 3
     meeting_hour_utc: int = 19
     meeting_minute_utc: int = 0
@@ -290,7 +293,10 @@ class WeeklyMeetingConfigUpdate(BaseModel):
     """Admin request to update the meeting link/notes and schedule."""
     meeting_url: Optional[str] = Field(None, max_length=500)
     meeting_notes: Optional[str] = None
-    # Schedule fields
+    # Static one-off schedule (UTC). Send ISO 8601 datetime.
+    meeting_starts_at: Optional[datetime] = None
+    # Legacy recurring schedule fields (kept so admins can still adjust them
+    # if they want to revert — not the primary UI input anymore).
     meeting_day_of_week: Optional[int] = Field(None, ge=0, le=6)
     meeting_hour_utc: Optional[int] = Field(None, ge=0, le=23)
     meeting_minute_utc: Optional[int] = Field(None, ge=0, le=59)

@@ -1519,6 +1519,7 @@ class ApiClient {
     return this.request<{
       meeting_url: string | null;
       meeting_notes: string | null;
+      meeting_starts_at: string | null;
       meeting_day_of_week: number;
       meeting_hour_utc: number;
       meeting_minute_utc: number;
@@ -1740,18 +1741,28 @@ class ApiClient {
     return this.request<{
       meeting_url: string | null;
       meeting_notes: string | null;
+      meeting_starts_at: string | null;
       updated_at: string | null;
     }>("/api/premium/admin/weekly-meeting");
   }
 
-  async updateWeeklyMeeting(meetingUrl: string, meetingNotes: string) {
+  async updateWeeklyMeeting(
+    meetingUrl: string,
+    meetingNotes: string,
+    meetingStartsAt: string | null,
+  ) {
     return this.request<{
       meeting_url: string | null;
       meeting_notes: string | null;
+      meeting_starts_at: string | null;
       updated_at: string | null;
     }>("/api/premium/admin/weekly-meeting", {
       method: "PUT",
-      body: JSON.stringify({ meeting_url: meetingUrl, meeting_notes: meetingNotes }),
+      body: JSON.stringify({
+        meeting_url: meetingUrl,
+        meeting_notes: meetingNotes,
+        meeting_starts_at: meetingStartsAt,
+      }),
     });
   }
 

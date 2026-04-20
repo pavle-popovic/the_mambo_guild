@@ -758,6 +758,7 @@ def get_weekly_meeting(
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,
         meeting_notes=config.meeting_notes,
+        meeting_starts_at=config.meeting_starts_at,
         meeting_day_of_week=config.meeting_day_of_week,
         meeting_hour_utc=config.meeting_hour_utc,
         meeting_minute_utc=config.meeting_minute_utc,
@@ -780,6 +781,7 @@ def get_weekly_meeting_admin(
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,
         meeting_notes=config.meeting_notes,
+        meeting_starts_at=config.meeting_starts_at,
         meeting_day_of_week=config.meeting_day_of_week,
         meeting_hour_utc=config.meeting_hour_utc,
         meeting_minute_utc=config.meeting_minute_utc,
@@ -806,12 +808,20 @@ def update_weekly_meeting(
     # to fan out a notification (ignore notes-only edits).
     prev = {
         "meeting_url": getattr(config, "meeting_url", None),
+        "meeting_starts_at": getattr(config, "meeting_starts_at", None),
         "meeting_day_of_week": getattr(config, "meeting_day_of_week", None),
         "meeting_hour_utc": getattr(config, "meeting_hour_utc", None),
         "meeting_minute_utc": getattr(config, "meeting_minute_utc", None),
     }
 
     update_dict = data.model_dump(exclude_unset=True)
+    # Strip timezone before storing — column is naive DateTime (UTC assumed).
+    if "meeting_starts_at" in update_dict and update_dict["meeting_starts_at"] is not None:
+        dt = update_dict["meeting_starts_at"]
+        if dt.tzinfo is not None:
+            dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+        update_dict["meeting_starts_at"] = dt
+
     for key, value in update_dict.items():
         setattr(config, key, value)
 
@@ -819,7 +829,7 @@ def update_weekly_meeting(
     db.commit()
     db.refresh(config)
 
-    schedule_fields = ("meeting_url", "meeting_day_of_week", "meeting_hour_utc", "meeting_minute_utc")
+    schedule_fields = ("meeting_url", "meeting_starts_at", "meeting_day_of_week", "meeting_hour_utc", "meeting_minute_utc")
     schedule_changed = is_new or any(
         getattr(config, f) != prev[f] for f in schedule_fields
     )
@@ -849,6 +859,7 @@ def update_weekly_meeting(
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,
         meeting_notes=config.meeting_notes,
+        meeting_starts_at=config.meeting_starts_at,
         meeting_day_of_week=config.meeting_day_of_week,
         meeting_hour_utc=config.meeting_hour_utc,
         meeting_minute_utc=config.meeting_minute_utc,

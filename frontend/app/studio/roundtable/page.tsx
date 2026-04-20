@@ -18,6 +18,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 interface MeetingConfig {
   meeting_url: string | null;
   meeting_notes: string | null;
+  meeting_starts_at: string | null;
   meeting_day_of_week: number;
   meeting_hour_utc: number;
   meeting_minute_utc: number;
@@ -40,9 +41,21 @@ function getYouTubeId(url: string): string | null {
   return m ? m[1] : null;
 }
 
+// Fallback for legacy rows without an explicit meeting_starts_at. Returns the
+// next occurrence of (dayOfWeek, hour:minute) in UTC. Correctly handles the
+// "meeting is today, later" case — previous version forced it to next week
+// via `|| 7`, which made a 2-hours-away meeting show "7d 1h 48m".
 function nextMeetingGMT(dayOfWeek: number, hour: number, minute: number): Date {
   const now = new Date();
-  const daysUntil = ((dayOfWeek - now.getUTCDay() + 7) % 7) || 7;
+  const todayCandidate = new Date(now);
+  todayCandidate.setUTCHours(hour, minute, 0, 0);
+
+  let daysUntil = (dayOfWeek - now.getUTCDay() + 7) % 7;
+  // If the meeting is today but already passed, push to next week.
+  if (daysUntil === 0 && todayCandidate.getTime() <= now.getTime()) {
+    daysUntil = 7;
+  }
+
   const d = new Date(now);
   d.setUTCDate(d.getUTCDate() + daysUntil);
   d.setUTCHours(hour, minute, 0, 0);
@@ -148,11 +161,17 @@ export default function RoundtablePage() {
         ]);
         setMeetingConfig(configData);
         setArchives(archivesData);
-        // Start countdown from the configured schedule
-        const dow = configData.meeting_day_of_week ?? 3;
-        const h   = configData.meeting_hour_utc   ?? 19;
-        const m   = configData.meeting_minute_utc  ?? 0;
-        const target = nextMeetingGMT(dow, h, m);
+        // Prefer the static one-off datetime. Fall back to recurring schedule
+        // for legacy rows that don't have meeting_starts_at set yet.
+        let target: Date;
+        if (configData.meeting_starts_at) {
+          target = new Date(configData.meeting_starts_at);
+        } else {
+          const dow = configData.meeting_day_of_week ?? 3;
+          const h   = configData.meeting_hour_utc   ?? 19;
+          const m   = configData.meeting_minute_utc  ?? 0;
+          target = nextMeetingGMT(dow, h, m);
+        }
         const secs = Math.floor((target.getTime() - Date.now()) / 1000);
         setCountdown(secs > 0 ? secs : 0);
       } catch (error) {
@@ -285,6 +304,18 @@ export default function RoundtablePage() {
                     <Calendar size={14} />
                     <span>
                       {(() => {
+                        if (meetingConfig?.meeting_starts_at) {
+                          const d = new Date(meetingConfig.meeting_starts_at);
+                          return d.toLocaleString(undefined, {
+                            weekday: "long",
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                            timeZoneName: "short",
+                          });
+                        }
                         const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
                         const dow = meetingConfig?.meeting_day_of_week ?? 3;
                         const h   = meetingConfig?.meeting_hour_utc   ?? 19;
