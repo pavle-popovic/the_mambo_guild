@@ -300,9 +300,6 @@ class ApiClient {
     username: string;
     password: string;
     confirm_password: string;
-    first_name: string;
-    last_name: string;
-    current_level_tag: string;
     fbclid?: string | null;
     utm?: Record<string, string> | null;
     landing_url?: string | null;

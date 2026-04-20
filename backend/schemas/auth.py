@@ -9,11 +9,6 @@ class UserRegisterRequest(BaseModel):
     username: str
     password: str
     confirm_password: str
-    # Cap name fields — prevents 10MB name DoS / DB bloat. Matches the
-    # VARCHAR(100) column constraint applied in the accompanying Supabase migration.
-    first_name: str = Field(..., min_length=1, max_length=100)
-    last_name: str = Field(..., min_length=1, max_length=100)
-    current_level_tag: str  # "Beginner", "Novice", "Intermediate", "Advanced"
 
     # Optional Meta Ads attribution captured on the landing page.
     fbclid: Optional[str] = Field(default=None, max_length=255)

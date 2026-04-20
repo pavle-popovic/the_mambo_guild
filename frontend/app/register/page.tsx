@@ -7,22 +7,12 @@ import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import { useAuth } from "@/contexts/AuthContext";
 
-const LEVEL_OPTIONS = [
-  { value: "Beginner", label: "Total Beginner (Two Left Feet)" },
-  { value: "Novice", label: "Novice (I know the basic step)" },
-  { value: "Intermediate", label: "Intermediate (Social Dancer)" },
-  { value: "Advanced", label: "Advanced (Performer)" },
-];
-
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
     username: "",
-    firstName: "",
-    lastName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    currentLevelTag: "Beginner",
   });
   const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
@@ -56,9 +46,6 @@ export default function RegisterPage() {
         username: formData.username,
         password: formData.password,
         confirm_password: formData.confirmPassword,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        current_level_tag: formData.currentLevelTag,
       });
       router.push("/courses");
     } catch (err: any) {
@@ -107,37 +94,6 @@ export default function RegisterPage() {
               <p className="text-[10px] text-gray-500 mt-1">This is how you will appear in the community.</p>
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                  First Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.firstName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, firstName: e.target.value })
-                  }
-                  required
-                  className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue focus:outline-none transition"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                  Last Name
-                </label>
-                <input
-                  type="text"
-                  value={formData.lastName}
-                  onChange={(e) =>
-                    setFormData({ ...formData, lastName: e.target.value })
-                  }
-                  required
-                  className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue focus:outline-none transition"
-                />
-              </div>
-            </div>
-
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
                 Email
@@ -151,25 +107,6 @@ export default function RegisterPage() {
                 required
                 className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue focus:outline-none transition"
               />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                Current Level
-              </label>
-              <select
-                value={formData.currentLevelTag}
-                onChange={(e) =>
-                  setFormData({ ...formData, currentLevelTag: e.target.value })
-                }
-                className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue focus:outline-none transition appearance-none"
-              >
-                {LEVEL_OPTIONS.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
             </div>
 
             <div>

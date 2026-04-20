@@ -150,24 +150,28 @@ def register(
         db.add(user)
         db.flush()
 
-        # Create user profile
-        try:
-            level_tag = CurrentLevelTag[user_data.current_level_tag.upper()]
-        except KeyError:
-            level_tag = CurrentLevelTag.BEGINNER
-        
+        # Create user profile. `current_level_tag` is no longer collected at
+        # signup (removed from the form to reduce friction); users set it later
+        # via profile settings. Column stays NOT NULL — default to BEGINNER.
+        level_tag = CurrentLevelTag.BEGINNER
+
         # Generate Referral Code for new user
         new_referral_code = secrets.token_hex(4).upper()
         # Verify uniqueness collision
         while db.query(UserProfile).filter(UserProfile.referral_code == new_referral_code).first():
             new_referral_code = secrets.token_hex(4).upper()
 
+        # first/last name are no longer collected at signup — username is
+        # the canonical public identity. Default first_name to the username
+        # (NOT NULL column) so admin/email personalisation still reads
+        # naturally; users can set a real name later via profile settings.
+        username_clean = user_data.username.strip()
         profile = UserProfile(
             id=uuid.uuid4(),
             user_id=user_id,
-            first_name=user_data.first_name.strip(),
-            last_name=user_data.last_name.strip(),
-            username=user_data.username.strip(),
+            first_name=username_clean,
+            last_name="",
+            username=username_clean,
             current_level_tag=level_tag,
             xp=0,
             level=1,

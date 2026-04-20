@@ -48,9 +48,6 @@ interface AuthContextType {
     username: string;
     password: string;
     confirm_password: string;
-    first_name: string;
-    last_name: string;
-    current_level_tag: string;
   }) => Promise<{ analytics_event_id?: string | null }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
@@ -167,9 +164,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     username: string;
     password: string;
     confirm_password: string;
-    first_name: string;
-    last_name: string;
-    current_level_tag: string;
   }) => {
     // Attach Meta Ads attribution so the server can persist first-touch.
     const { readFbc, readUtm } = await import("@/lib/fbclid");
