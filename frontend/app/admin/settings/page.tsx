@@ -33,26 +33,7 @@ type Tab = "platform" | "email" | "meeting" | "releases";
 interface WeeklyMeeting {
   meeting_url: string | null;
   meeting_notes: string | null;
-  meeting_starts_at: string | null;
   updated_at: string | null;
-}
-
-// Convert a UTC ISO datetime → value for <input type="datetime-local">
-// (which expects YYYY-MM-DDTHH:mm in the *local* timezone).
-function utcIsoToLocalInput(iso: string | null): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-}
-
-// Convert a <input type="datetime-local"> value (local time) → UTC ISO string.
-function localInputToUtcIso(local: string): string | null {
-  if (!local) return null;
-  const d = new Date(local);
-  if (Number.isNaN(d.getTime())) return null;
-  return d.toISOString();
 }
 
 // ---------------------------------------------------------------------------
@@ -479,7 +460,6 @@ function MeetingTab() {
   const [meeting, setMeeting] = useState<WeeklyMeeting | null>(null);
   const [url, setUrl] = useState("");
   const [notes, setNotes] = useState("");
-  const [startsAtLocal, setStartsAtLocal] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ msg: string; type: "success" | "error" } | null>(null);
@@ -491,7 +471,6 @@ function MeetingTab() {
         setMeeting(data);
         setUrl(data.meeting_url ?? "");
         setNotes(data.meeting_notes ?? "");
-        setStartsAtLocal(utcIsoToLocalInput(data.meeting_starts_at));
       } catch {
         // ignore
       } finally {
@@ -503,13 +482,11 @@ function MeetingTab() {
   const save = async () => {
     setSaving(true);
     try {
-      const data = await apiClient.updateWeeklyMeeting(
-        url,
-        notes,
-        localInputToUtcIso(startsAtLocal),
-      );
+      // Date/time lives on the Live Meetings admin page; this tab only edits
+      // the URL + notes. Omit meeting_starts_at so the field is left out of
+      // the PUT body and the backend preserves the existing value.
+      const data = await apiClient.updateWeeklyMeeting(url, notes);
       setMeeting(data);
-      setStartsAtLocal(utcIsoToLocalInput(data.meeting_starts_at));
       setToast({ msg: "Meeting config saved!", type: "success" });
     } catch (err: any) {
       setToast({ msg: err?.message ?? "Failed to save.", type: "error" });

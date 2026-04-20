@@ -22,10 +22,25 @@ import { cn } from "@/lib/utils";
 interface MeetingConfig {
   meeting_url: string | null;
   meeting_notes: string | null;
-  meeting_day_of_week: number;
-  meeting_hour_utc: number;
-  meeting_minute_utc: number;
+  meeting_starts_at: string | null;
   updated_at: string | null;
+}
+
+// <input type="datetime-local"> round-trip helpers. The input shows/returns
+// values in the user's local timezone (YYYY-MM-DDTHH:mm); backend stores UTC.
+function utcIsoToLocalInput(iso: string | null): string {
+  if (!iso) return "";
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return "";
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
+function localInputToUtcIso(local: string): string | null {
+  if (!local) return null;
+  const d = new Date(local);
+  if (Number.isNaN(d.getTime())) return null;
+  return d.toISOString();
 }
 
 interface ArchiveEntry {
@@ -76,17 +91,13 @@ export default function AdminLivePage() {
   const [config, setConfig] = useState<MeetingConfig>({
     meeting_url: null,
     meeting_notes: null,
-    meeting_day_of_week: 3,
-    meeting_hour_utc: 19,
-    meeting_minute_utc: 0,
+    meeting_starts_at: null,
     updated_at: null,
   });
   const [configForm, setConfigForm] = useState({
     meeting_url: "",
     meeting_notes: "",
-    meeting_day_of_week: 3,
-    meeting_hour_utc: 19,
-    meeting_minute_utc: 0,
+    meeting_starts_at_local: "",
   });
   const [savingConfig, setSavingConfig] = useState(false);
   const [configSaved, setConfigSaved] = useState(false);
@@ -131,9 +142,7 @@ export default function AdminLivePage() {
         setConfigForm({
           meeting_url: data.meeting_url || "",
           meeting_notes: data.meeting_notes || "",
-          meeting_day_of_week: data.meeting_day_of_week ?? 3,
-          meeting_hour_utc: data.meeting_hour_utc ?? 19,
-          meeting_minute_utc: data.meeting_minute_utc ?? 0,
+          meeting_starts_at_local: utcIsoToLocalInput(data.meeting_starts_at),
         });
       }
     } catch (e) {
@@ -153,15 +162,17 @@ export default function AdminLivePage() {
           body: JSON.stringify({
             meeting_url: configForm.meeting_url || null,
             meeting_notes: configForm.meeting_notes || null,
-            meeting_day_of_week: configForm.meeting_day_of_week,
-            meeting_hour_utc: configForm.meeting_hour_utc,
-            meeting_minute_utc: configForm.meeting_minute_utc,
+            meeting_starts_at: localInputToUtcIso(configForm.meeting_starts_at_local),
           }),
         }
       );
       if (res.ok) {
         const data = await res.json();
         setConfig(data);
+        setConfigForm((f) => ({
+          ...f,
+          meeting_starts_at_local: utcIsoToLocalInput(data.meeting_starts_at),
+        }));
         setConfigSaved(true);
         setTimeout(() => setConfigSaved(false), 2500);
         showToast("success", "Meeting link saved!");
@@ -330,21 +341,19 @@ export default function AdminLivePage() {
             <Link className="w-5 h-5 text-amber-400" />
             Weekly Meeting Link
           </h2>
-          {/* Dynamic schedule description */}
-          {(() => {
-            const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-            const day = DAY_NAMES[config.meeting_day_of_week] ?? "Wednesday";
-            const h = config.meeting_hour_utc;
-            const m = config.meeting_minute_utc;
-            const ampm = h >= 12 ? "PM" : "AM";
-            const h12 = h % 12 === 0 ? 12 : h % 12;
-            const mStr = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
-            return (
-              <p className="text-sm text-white/50 mb-5">
-                Every {day} at {h12}{mStr} {ampm} GMT. This link is shown to all Guild Master members.
-              </p>
-            );
-          })()}
+          <p className="text-sm text-white/50 mb-5">
+            {config.meeting_starts_at
+              ? `Next session: ${new Date(config.meeting_starts_at).toLocaleString(undefined, {
+                  weekday: "long",
+                  month: "long",
+                  day: "numeric",
+                  year: "numeric",
+                  hour: "numeric",
+                  minute: "2-digit",
+                  timeZoneName: "short",
+                })}. This link is shown to all Guild Master members.`
+              : "Pick the exact date and time for the next session. Update it before each call."}
+          </p>
 
           <div className="space-y-4">
             <div>
@@ -362,61 +371,21 @@ export default function AdminLivePage() {
               />
             </div>
 
-            {/* Schedule row */}
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">
-                  Day of Week
-                </label>
-                <select
-                  value={configForm.meeting_day_of_week}
-                  onChange={(e) =>
-                    setConfigForm((f) => ({ ...f, meeting_day_of_week: Number(e.target.value) }))
-                  }
-                  className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                >
-                  {["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"].map(
-                    (d, i) => (
-                      <option key={i} value={i} className="bg-zinc-900 text-white">
-                        {d}
-                      </option>
-                    )
-                  )}
-                </select>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-white/70 mb-2">
-                  Time (UTC)
-                </label>
-                <div className="flex gap-2">
-                  <select
-                    value={configForm.meeting_hour_utc}
-                    onChange={(e) =>
-                      setConfigForm((f) => ({ ...f, meeting_hour_utc: Number(e.target.value) }))
-                    }
-                    className="flex-1 px-3 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                  >
-                    {Array.from({ length: 24 }, (_, i) => (
-                      <option key={i} value={i} className="bg-zinc-900 text-white">
-                        {String(i).padStart(2, "0")}:00
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    value={configForm.meeting_minute_utc}
-                    onChange={(e) =>
-                      setConfigForm((f) => ({ ...f, meeting_minute_utc: Number(e.target.value) }))
-                    }
-                    className="flex-1 px-3 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
-                  >
-                    {[0, 15, 30, 45].map((m) => (
-                      <option key={m} value={m} className="bg-zinc-900 text-white">
-                        :{String(m).padStart(2, "0")}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-white/70 mb-2">
+                Next Meeting Date & Time
+              </label>
+              <input
+                type="datetime-local"
+                value={configForm.meeting_starts_at_local}
+                onChange={(e) =>
+                  setConfigForm((f) => ({ ...f, meeting_starts_at_local: e.target.value }))
+                }
+                className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
+              />
+              <p className="text-xs text-white/40 mt-1.5">
+                Uses your browser timezone; stored as UTC. Clear the field to hide the next-session info from members.
+              </p>
             </div>
             <div>
               <label className="block text-sm font-medium text-white/70 mb-2">

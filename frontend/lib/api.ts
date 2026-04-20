@@ -1749,8 +1749,19 @@ class ApiClient {
   async updateWeeklyMeeting(
     meetingUrl: string,
     meetingNotes: string,
-    meetingStartsAt: string | null,
+    meetingStartsAt?: string | null,
   ) {
+    // Only include meeting_starts_at when caller passes it explicitly; the
+    // backend uses Pydantic exclude_unset so omitting the key leaves the
+    // existing value alone (important: the /admin/settings tab edits only
+    // URL+notes and must not accidentally clear the scheduled date).
+    const body: Record<string, unknown> = {
+      meeting_url: meetingUrl,
+      meeting_notes: meetingNotes,
+    };
+    if (meetingStartsAt !== undefined) {
+      body.meeting_starts_at = meetingStartsAt;
+    }
     return this.request<{
       meeting_url: string | null;
       meeting_notes: string | null;
@@ -1758,11 +1769,7 @@ class ApiClient {
       updated_at: string | null;
     }>("/api/premium/admin/weekly-meeting", {
       method: "PUT",
-      body: JSON.stringify({
-        meeting_url: meetingUrl,
-        meeting_notes: meetingNotes,
-        meeting_starts_at: meetingStartsAt,
-      }),
+      body: JSON.stringify(body),
     });
   }
 
