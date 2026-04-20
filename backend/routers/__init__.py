@@ -34,6 +34,9 @@ from .downloads import router as downloads_router
 # Support / Bug Reports
 from .support import router as support_router
 
+# Analytics (Meta CAPI + ML event log)
+from .analytics import router as analytics_router
+
 # Register routers
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(courses_router, prefix="/courses", tags=["courses"])
@@ -65,3 +68,6 @@ api_router.include_router(downloads_router, tags=["downloads"])
 
 # Support / Bug Reports
 api_router.include_router(support_router, prefix="/support", tags=["support"])
+
+# Analytics (Meta CAPI + ML event log)
+api_router.include_router(analytics_router, prefix="/analytics", tags=["analytics"])

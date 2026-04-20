@@ -112,6 +112,24 @@ def earn_claves(
     db.flush()
     
     logger.info(f"User {user_id} earned {amount} claves ({reason}). New balance: {profile.current_claves}")
+
+    try:
+        import uuid as _uuid
+        from services.analytics_service import track_event
+        track_event(
+            db=db,
+            event_name="ClaveEarned",
+            user_id=_uuid.UUID(str(user_id)),
+            properties={
+                "amount": amount,
+                "reason": reason,
+                "reference_id": str(reference_id) if reference_id else None,
+                "new_balance": profile.current_claves,
+            },
+        )
+    except Exception:
+        logger.exception("earn_claves: analytics track failed (non-fatal)")
+
     return profile.current_claves
 
 
@@ -158,6 +176,24 @@ def spend_claves(
     db.flush()
 
     logger.info(f"User {user_id} spent {amount} claves ({reason}). New balance: {profile.current_claves}")
+
+    try:
+        import uuid as _uuid
+        from services.analytics_service import track_event
+        track_event(
+            db=db,
+            event_name="ClaveSpent",
+            user_id=_uuid.UUID(str(user_id)),
+            properties={
+                "amount": amount,
+                "reason": reason,
+                "reference_id": str(reference_id) if reference_id else None,
+                "new_balance": profile.current_claves,
+            },
+        )
+    except Exception:
+        logger.exception("spend_claves: analytics track failed (non-fatal)")
+
     return (True, profile.current_claves)
 
 

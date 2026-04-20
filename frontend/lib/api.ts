@@ -300,14 +300,18 @@ class ApiClient {
     first_name: string;
     last_name: string;
     current_level_tag: string;
+    fbclid?: string | null;
+    utm?: Record<string, string> | null;
+    landing_url?: string | null;
   }) {
-    const response = await this.request<{ access_token: string; token_type: string }>(
-      "/api/auth/register",
-      {
-        method: "POST",
-        body: JSON.stringify(data),
-      }
-    );
+    const response = await this.request<{
+      access_token: string;
+      token_type: string;
+      analytics_event_id?: string | null;
+    }>("/api/auth/register", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
     this.setToken(response.access_token);
     return response;
   }
@@ -349,10 +353,32 @@ class ApiClient {
     }
   }
 
-  async waitlistRegister(email: string, username: string, referrer_code?: string, hp?: string) {
-    return this.request<{ referral_code: string; position: number }>("/api/auth/waitlist", {
+  async waitlistRegister(
+    email: string,
+    username: string,
+    referrer_code?: string,
+    hp?: string,
+    attribution?: {
+      fbclid?: string | null;
+      utm?: Record<string, string> | null;
+      landing_url?: string | null;
+    }
+  ) {
+    return this.request<{
+      referral_code: string;
+      position: number;
+      analytics_event_id?: string | null;
+    }>("/api/auth/waitlist", {
       method: "POST",
-      body: JSON.stringify({ email, username, referrer_code, hp: hp || "" }),
+      body: JSON.stringify({
+        email,
+        username,
+        referrer_code,
+        hp: hp || "",
+        fbclid: attribution?.fbclid ?? null,
+        utm: attribution?.utm ?? null,
+        landing_url: attribution?.landing_url ?? null,
+      }),
     });
   }
 
@@ -883,6 +909,7 @@ class ApiClient {
     return this.request<{
       session_id: string;
       url: string;
+      analytics_event_id?: string | null;
     }>("/api/payments/create-checkout-session", {
       method: "POST",
       body: JSON.stringify({

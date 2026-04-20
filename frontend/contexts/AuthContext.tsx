@@ -51,10 +51,19 @@ interface AuthContextType {
     first_name: string;
     last_name: string;
     current_level_tag: string;
-  }) => Promise<void>;
+  }) => Promise<{ analytics_event_id?: string | null }>;
   logout: () => Promise<void>;
   refreshUser: () => Promise<void>;
-  waitlistRegister: (email: string, username: string, referrer_code?: string, hp?: string) => Promise<{ referral_code: string; position: number }>;
+  waitlistRegister: (
+    email: string,
+    username: string,
+    referrer_code?: string,
+    hp?: string
+  ) => Promise<{
+    referral_code: string;
+    position: number;
+    analytics_event_id?: string | null;
+  }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -162,12 +171,50 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     last_name: string;
     current_level_tag: string;
   }) => {
-    await apiClient.register(data);
+    // Attach Meta Ads attribution so the server can persist first-touch.
+    const { readFbc, readUtm } = await import("@/lib/fbclid");
+    const attribution = {
+      fbclid: (() => {
+        const fbc = readFbc();
+        return fbc ? fbc.split(".").pop() ?? null : null;
+      })(),
+      utm: readUtm(),
+      landing_url: typeof window !== "undefined" ? window.location.href : null,
+    };
+    const response = await apiClient.register({ ...data, ...attribution });
     await refreshUser();
+    // Echo the server-generated event id through the browser Pixel so Meta
+    // dedupes the pair. fbq is safe to call even if the Pixel hasn't loaded.
+    try {
+      const { echoServerEvent } = await import("@/lib/analytics");
+      echoServerEvent("CompleteRegistration", response.analytics_event_id ?? null, {
+        value: 5,
+        currency: "USD",
+      });
+    } catch {
+      // tracking must never block registration
+    }
+    return { analytics_event_id: response.analytics_event_id ?? null };
   };
 
   const waitlistRegister = async (email: string, username: string, referrer_code?: string, hp?: string) => {
-    return await apiClient.waitlistRegister(email, username, referrer_code, hp);
+    const { readFbc, readUtm } = await import("@/lib/fbclid");
+    const fbc = readFbc();
+    const response = await apiClient.waitlistRegister(email, username, referrer_code, hp, {
+      fbclid: fbc ? fbc.split(".").pop() ?? null : null,
+      utm: readUtm(),
+      landing_url: typeof window !== "undefined" ? window.location.href : null,
+    });
+    try {
+      const { echoServerEvent } = await import("@/lib/analytics");
+      echoServerEvent("Lead", response.analytics_event_id ?? null, {
+        value: 2,
+        currency: "USD",
+      });
+    } catch {
+      // ignored
+    }
+    return response;
   };
 
   const logout = async () => {

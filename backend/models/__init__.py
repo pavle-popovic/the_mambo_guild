@@ -63,6 +63,7 @@ from models.premium import (
     ReleaseScheduleItem,
 )
 from models.payment import StripeWebhookEvent, MuxWebhookEvent, XPAuditLog
+from models.analytics import UserEvent
 
 # Dependency to get database session
 def get_db():

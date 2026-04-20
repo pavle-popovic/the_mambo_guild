@@ -1061,8 +1061,49 @@ async def mux_webhook_handler(
                                 post.mux_playback_id = playback_id
                                 db.commit()
                                 logger.info(f"Updated post {post_id} with video")
+
+                                # ML feature: community video creation signals high-intent engagement.
+                                try:
+                                    from services.analytics_service import track_event
+                                    track_event(
+                                        db=db,
+                                        event_name="CommunityVideoReady",
+                                        user_id=post.user_id,
+                                        properties={
+                                            "post_id": post_id,
+                                            "post_type": post.post_type,
+                                            "asset_id": asset_id,
+                                        },
+                                    )
+                                except Exception:
+                                    logger.exception("mux_webhook: CommunityVideoReady track failed (non-fatal)")
                             else:
                                 logger.warning(f"Post {post_id} not found")
+                        elif passthrough_data.get("type") == "coaching-submission":
+                            coaching_user_id = passthrough_data.get("user_id")
+                            if coaching_user_id:
+                                import uuid as _uuid
+                                try:
+                                    user_uuid = _uuid.UUID(coaching_user_id)
+                                except (ValueError, TypeError):
+                                    user_uuid = None
+
+                                # ML feature: coaching upload = premium-tier engagement (Guild Master).
+                                try:
+                                    from services.analytics_service import track_event
+                                    track_event(
+                                        db=db,
+                                        event_name="CoachingSubmissionUploaded",
+                                        user_id=user_uuid,
+                                        properties={
+                                            "asset_id": asset_id,
+                                            "playback_id": playback_id,
+                                        },
+                                    )
+                                except Exception:
+                                    logger.exception("mux_webhook: CoachingSubmissionUploaded track failed (non-fatal)")
+                            else:
+                                logger.warning("Coaching submission webhook missing user_id in passthrough")
                         else:
                             logger.warning("No entity ID in passthrough data")
                     except Exception as e:

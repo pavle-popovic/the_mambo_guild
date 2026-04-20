@@ -91,6 +91,8 @@ class CheckoutSessionRequest(BaseModel):
 class CheckoutSessionResponse(BaseModel):
     session_id: str
     url: str
+    # Shared id between Meta Pixel (InitiateCheckout) and server-side CAPI row.
+    analytics_event_id: Optional[str] = None
 
 
 class UpdateSubscriptionRequest(BaseModel):

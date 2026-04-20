@@ -14,6 +14,11 @@ class UserRegisterRequest(BaseModel):
     first_name: str = Field(..., min_length=1, max_length=100)
     last_name: str = Field(..., min_length=1, max_length=100)
     current_level_tag: str  # "Beginner", "Novice", "Intermediate", "Advanced"
+
+    # Optional Meta Ads attribution captured on the landing page.
+    fbclid: Optional[str] = Field(default=None, max_length=255)
+    utm: Optional[dict] = None
+    landing_url: Optional[str] = Field(default=None, max_length=500)
     
     @field_validator('username')
     @classmethod
@@ -56,6 +61,10 @@ class UserLoginRequest(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
+    # Server-generated event id for the CAPI conversion that fired on the
+    # authoritative action (register / login). Client echoes it back via
+    # fbq('track', ..., { eventID }) so Meta dedupes browser + server events.
+    analytics_event_id: Optional[str] = None
 
 
 class BadgeResponse(BaseModel):

@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Integer, DateTime, Enum as SQLEnum, ForeignKey, Boolean, Date
-from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.dialects.postgresql import UUID, JSONB
 from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime, date
@@ -88,6 +88,16 @@ class UserProfile(Base):
     # the user's local time instead of server UTC — fixes users in negative
     # offsets losing streaks mid-afternoon. Default UTC for existing rows.
     timezone = Column(String, nullable=False, default="UTC", server_default="UTC")
+
+    # Meta Ads attribution (persisted at first touch so days-later conversions
+    # still get credited to the original ad click). fbp/fbc mirror Meta's
+    # _fbp/_fbc cookies; first_touch_* capture the very first landing context.
+    fbp = Column(String(255), nullable=True)
+    fbc = Column(String(255), nullable=True)
+    first_touch_utm = Column(JSONB, nullable=True)
+    first_touch_landing_url = Column(String(500), nullable=True)
+    first_touch_referrer = Column(String(500), nullable=True)
+    first_touch_at = Column(DateTime(timezone=True), nullable=True)
 
     # Relationships
     user = relationship("User", back_populates="profile")

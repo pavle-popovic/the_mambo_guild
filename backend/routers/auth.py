@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request, Response, Query
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status, Request, Response, Query
 from fastapi.responses import RedirectResponse, HTMLResponse
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -14,6 +14,7 @@ from services.gamification_service import update_streak
 from services.email_service import send_password_reset_email, send_waitlist_welcome_email
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
 from services.clave_service import process_daily_login, award_new_user_bonus, award_referral_bonus
+from services.analytics_service import track_event, capture_first_touch
 from utils.request import client_ip as get_client_ip
 from dependencies import get_current_user
 from config import settings
@@ -81,6 +82,7 @@ def get_google_oauth():
 def register(
     response: Response,
     request: Request,
+    background_tasks: BackgroundTasks,
     user_data: UserRegisterRequest,
     db: Session = Depends(get_db)
 ):
@@ -189,15 +191,50 @@ def register(
 
         db.commit()
         db.refresh(user)
+        db.refresh(profile)
+
+        # Persist Meta Ads first-touch attribution onto the profile so CAPI
+        # conversions days later still credit the right ad click.
+        try:
+            capture_first_touch(
+                db=db,
+                profile=profile,
+                request=request,
+                fbclid=user_data.fbclid,
+                utm=user_data.utm,
+                landing_url=user_data.landing_url,
+            )
+        except Exception:
+            logger.exception("register: first-touch capture failed (non-fatal)")
+
+        # Fire CompleteRegistration to Meta CAPI + write to user_events.
+        analytics_event_id = None
+        try:
+            analytics_event_id = track_event(
+                db=db,
+                event_name="CompleteRegistration",
+                user_id=user_id,
+                value=5.0,
+                currency="USD",
+                properties={"method": "email"},
+                request=request,
+                background_tasks=background_tasks,
+            )
+        except Exception:
+            logger.exception("register: CompleteRegistration tracking failed (non-fatal)")
 
         # Create tokens
         access_token = create_access_token(data={"sub": str(user_id)})
         refresh_token = create_refresh_token(data={"sub": str(user_id)})
-        
+
         # Set httpOnly cookies
         _set_auth_cookies(response, access_token, refresh_token)
-        
-        return TokenResponse(access_token=access_token, token_type="bearer")
+
+        return TokenResponse(
+            access_token=access_token,
+            token_type="bearer",
+            analytics_event_id=analytics_event_id,
+        )
     
     except HTTPException:
         raise
@@ -892,11 +929,16 @@ class WaitlistRegisterRequest(BaseModel):
     username: str
     referrer_code: Optional[str] = None
     hp: Optional[str] = None  # Honeypot — must be empty for real humans
+    # Optional Meta Ads attribution captured on the landing page.
+    fbclid: Optional[str] = None
+    utm: Optional[dict] = None
+    landing_url: Optional[str] = None
 
 @router.post("/waitlist", status_code=status.HTTP_201_CREATED)
 def join_waitlist(
     request: WaitlistRegisterRequest,
     http_request: Request,
+    background_tasks: BackgroundTasks,
     db: Session = Depends(get_db)
 ):
     """
@@ -1017,11 +1059,37 @@ def join_waitlist(
         except Exception as e:
             logger.error(f"Failed to send welcome email: {e}")
 
+        # Persist first-touch attribution + fire Lead event to Meta CAPI.
+        analytics_event_id = None
+        try:
+            db.refresh(profile)
+            capture_first_touch(
+                db=db,
+                profile=profile,
+                request=http_request,
+                fbclid=request.fbclid,
+                utm=request.utm,
+                landing_url=request.landing_url,
+            )
+            analytics_event_id = track_event(
+                db=db,
+                event_name="Lead",
+                user_id=user_id,
+                value=2.0,
+                currency="USD",
+                properties={"source": "waitlist"},
+                request=http_request,
+                background_tasks=background_tasks,
+            )
+        except Exception:
+            logger.exception("waitlist: Lead tracking failed (non-fatal)")
+
         return {
             "message": "Welcome to the Inner Circle.",
             "user_id": str(user_id),
             "referral_code": new_referral_code,
-            "position": 1234 # Mock position or calc from COUNT(id)
+            "position": 1234, # Mock position or calc from COUNT(id)
+            "analytics_event_id": analytics_event_id,
         }
 
     except HTTPException:

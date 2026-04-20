@@ -94,6 +94,20 @@ def update_streak(user_id: str, db: Session) -> Dict:
     from services.badge_service import check_streak_badges
     check_streak_badges(user_id, profile.streak_count, db)
 
+    # ML feature: streak milestone crossings are a strong retention signal.
+    if profile.streak_count in {7, 30, 100, 365}:
+        try:
+            from services.analytics_service import track_event
+            track_event(
+                db=db,
+                event_name="StreakMilestone",
+                user_id=profile.user_id,
+                properties={"days": profile.streak_count},
+            )
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("update_streak: milestone track failed")
+
     return {
         "streak_count": profile.streak_count,
         "streak_saved": streak_saved,
@@ -166,6 +180,24 @@ def award_xp(
     db.flush()
 
     leveled_up = new_level > old_level
+
+    if leveled_up:
+        try:
+            from services.analytics_service import track_event
+            track_event(
+                db=db,
+                event_name="LevelUp",
+                user_id=profile.user_id,
+                properties={
+                    "old_level": old_level,
+                    "new_level": new_level,
+                    "xp_total": profile.xp,
+                    "reason": reason,
+                },
+            )
+        except Exception:
+            import logging
+            logging.getLogger(__name__).exception("award_xp: LevelUp track failed")
 
     return {
         "xp_gained": xp_amount,

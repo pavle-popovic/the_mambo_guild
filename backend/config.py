@@ -139,4 +139,13 @@ class Settings:
     AI_RATE_LIMIT_REQUESTS: int = int(os.getenv("AI_RATE_LIMIT_REQUESTS", "20"))  # requests per window
     AI_RATE_LIMIT_WINDOW_SECONDS: int = int(os.getenv("AI_RATE_LIMIT_WINDOW_SECONDS", "60"))  # window in seconds
 
+    # Meta Conversions API (server-side ad event tracking)
+    # Pixel ID is also safe to expose client-side via NEXT_PUBLIC_META_PIXEL_ID.
+    # CAPI access token is a server-only secret. TEST_EVENT_CODE is set only in
+    # staging/dev to route events to Events Manager's Test Events tab.
+    META_PIXEL_ID: Optional[str] = os.getenv("META_PIXEL_ID")
+    META_CAPI_ACCESS_TOKEN: Optional[str] = os.getenv("META_CAPI_ACCESS_TOKEN")
+    META_TEST_EVENT_CODE: Optional[str] = os.getenv("META_TEST_EVENT_CODE")
+    META_API_VERSION: str = os.getenv("META_API_VERSION", "v20.0")
+
 settings = Settings()

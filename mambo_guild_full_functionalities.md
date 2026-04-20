@@ -545,8 +545,8 @@ World (Course) → Level (Module/Week) → Lesson
 | Tier | Price | Stripe Price ID | Access |
 |---|---|---|---|
 | **Guest List (Rookie)** | Free | — | 1 free course, limited community |
-| **Full Access (Advanced)** | €29/mo | `price_1SmeXA1a6FlufVwfOLg5SMcc` | Unlimited courses, full community |
-| **Performer (Guild Master)** | €49/mo | `price_1SmeZa1a6FlufVwfrJCJrv94` | All Advanced + premium features |
+| **Full Access (Advanced)** | $39/mo USD | `price_1TKKp51a6FlufVwfYgvr192X` | Unlimited courses, full community |
+| **Performer (Guild Master)** | $59/mo USD | `price_1TKKwC1a6FlufVwfVmE6uHml` | All Advanced + premium features |
 
 ### Checkout Flow
 1. `POST /api/payments/create-checkout-session` — creates Stripe Checkout Session

@@ -154,11 +154,23 @@ export default function LandingPricingSection() {
       const successUrl = `${window.location.origin}/pricing?success=true&tier=${planId}`;
       const cancelUrl = `${window.location.origin}/pricing?canceled=true`;
 
-      const { url } = await apiClient.createCheckoutSession(
+      const { url, analytics_event_id } = await apiClient.createCheckoutSession(
         priceId,
         successUrl,
         cancelUrl
       );
+
+      try {
+        const { echoServerEvent } = await import("@/lib/analytics");
+        const tierValue = planId === "performer" ? 59 : 39;
+        echoServerEvent("InitiateCheckout", analytics_event_id ?? null, {
+          value: tierValue,
+          currency: "USD",
+          content_name: planId,
+        });
+      } catch {
+        // tracking must never block checkout
+      }
 
       window.location.href = url;
     } catch (error: any) {

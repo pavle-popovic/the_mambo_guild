@@ -162,6 +162,24 @@ def award_badge(user_id: str, badge: Union[BadgeDefinition, str], db: Session):
         db=db
     )
 
+    # ML feature: badges earned in first 7 days is the #1 retention predictor.
+    try:
+        import uuid as _uuid
+        from services.analytics_service import track_event
+        track_event(
+            db=db,
+            event_name="BadgeEarned",
+            user_id=_uuid.UUID(str(user_id)),
+            properties={
+                "badge_id": badge_def.id,
+                "badge_name": badge_def.name,
+                "badge_tier": getattr(badge_def, "tier", None),
+                "badge_category": getattr(badge_def, "category", None),
+            },
+        )
+    except Exception:
+        logger.exception("award_badge: analytics track failed (non-fatal)")
+
 
 def get_user_stats(user_id: str, db: Session) -> dict:
     """

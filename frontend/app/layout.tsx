@@ -6,6 +6,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import LocaleProviderWrapper from "@/components/LocaleProviderWrapper";
 import StarryBackground from "@/components/ui/StarryBackground";
 import BugReportButton from "@/components/BugReportButton";
+import MetaPixel from "@/components/MetaPixel";
 import { Toaster } from "sonner";
 import { SITE_URL, SITE_NAME, SITE_TAGLINE, SITE_DESCRIPTION, FOUNDER, CONTACT_EMAIL } from "@/lib/site";
 
@@ -147,6 +148,7 @@ export default function RootLayout({
         <StarryBackground />
         <LocaleProviderWrapper>
           <AuthProvider>
+            <MetaPixel />
             {children}
             <GlobalAudioPlayer />
             <BugReportButton />

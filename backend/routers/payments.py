@@ -5,7 +5,7 @@ import logging
 import stripe
 from datetime import datetime, timezone
 
-from fastapi import APIRouter, Depends, HTTPException, Response, status, Request
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, status, Request
 from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
@@ -19,6 +19,7 @@ from models.payment import StripeWebhookEvent
 from services import stripe_service
 from services.clave_service import award_subscription_bonus
 from services.badge_service import award_subscription_badge
+from services.analytics_service import track_event
 from config import settings
 
 from schemas.course import (
@@ -36,6 +37,45 @@ router = APIRouter(prefix="/payments", tags=["payments"])
 # SubscriptionTier.PERFORMER to avoid a DB migration.
 ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X"
 PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml"
+
+def _fire_subscribe_and_purchase(
+    *,
+    db: Session,
+    background_tasks: BackgroundTasks,
+    request: Request,
+    user_id,
+    tier: "SubscriptionTier",
+    invoice: dict,
+    stripe_subscription_id: str,
+) -> None:
+    """Fire both Subscribe and Purchase for one paid invoice.
+
+    Meta treats these as distinct optimisation goals — firing both lets
+    advertisers choose either without re-instrumenting.
+    """
+    amount_paid_cents = invoice.get("amount_paid", 0) or 0
+    amount = amount_paid_cents / 100.0
+    currency = (invoice.get("currency") or "usd").upper()
+    props = {
+        "tier": tier.value,
+        "stripe_subscription_id": stripe_subscription_id,
+        "stripe_invoice_id": invoice.get("id"),
+    }
+    for event_name in ("Subscribe", "Purchase"):
+        try:
+            track_event(
+                db=db,
+                event_name=event_name,
+                user_id=user_id,
+                value=amount,
+                currency=currency,
+                properties=props,
+                request=request,
+                background_tasks=background_tasks,
+            )
+        except Exception:
+            logger.exception("webhook: %s tracking failed (non-fatal)", event_name)
+
 
 # Guild Master (PERFORMER) is an intentionally scarce tier capped at 30 seats.
 # We surface live remaining-seats to the pricing page so prospects see urgency,
@@ -169,6 +209,8 @@ def guild_master_seats(response: Response, db: Session = Depends(get_db)):
 @router.post("/create-checkout-session", response_model=CheckoutSessionResponse)
 def create_checkout_session(
     request_data: CheckoutSessionRequest,
+    http_request: Request,
+    background_tasks: BackgroundTasks,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
@@ -278,10 +320,35 @@ def create_checkout_session(
             metadata={"user_id": str(current_user.id)},
             trial_period_days=trial_period_days,
         )
-        
+
+        # Fire InitiateCheckout to Meta CAPI. Value reflects the tier's list
+        # price so Meta's bidder can prioritise high-value checkouts.
+        tier_value = 59.0 if request_data.price_id == PERFORMER_PRICE_ID else 39.0
+        tier_name = "performer" if request_data.price_id == PERFORMER_PRICE_ID else "advanced"
+        analytics_event_id = None
+        try:
+            analytics_event_id = track_event(
+                db=db,
+                event_name="InitiateCheckout",
+                user_id=current_user.id,
+                value=tier_value,
+                currency="USD",
+                properties={
+                    "tier": tier_name,
+                    "content_name": tier_name,
+                    "stripe_session_id": checkout_session.id,
+                    "has_trial": bool(trial_period_days),
+                },
+                request=http_request,
+                background_tasks=background_tasks,
+            )
+        except Exception:
+            logger.exception("checkout: InitiateCheckout tracking failed (non-fatal)")
+
         return CheckoutSessionResponse(
             session_id=checkout_session.id,
-            url=checkout_session.url
+            url=checkout_session.url,
+            analytics_event_id=analytics_event_id,
         )
     except stripe.error.StripeError as e:
         logger.error(f"Stripe error creating checkout session for user {current_user.id}: {e}")
@@ -295,7 +362,11 @@ def create_checkout_session(
 
 
 @router.post("/webhook")
-async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db)]):
+async def stripe_webhook(
+    request: Request,
+    background_tasks: BackgroundTasks,
+    db: Annotated[Session, Depends(get_db)],
+):
     """
     Stripe webhook endpoint to handle subscription events.
     
@@ -426,6 +497,26 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                     user_profile.has_used_trial = True
                     db.commit()
 
+                # Fire StartTrial to Meta CAPI. $0 value but predicted_ltv
+                # tells the bidder to treat this as potential $39/mo revenue.
+                try:
+                    track_event(
+                        db=db,
+                        event_name="StartTrial",
+                        user_id=db_subscription.user_id,
+                        value=0.0,
+                        currency="USD",
+                        properties={
+                            "tier": tier.value,
+                            "predicted_ltv": 59.0 if tier == SubscriptionTier.PERFORMER else 39.0,
+                            "stripe_subscription_id": stripe_sub_id,
+                        },
+                        request=request,
+                        background_tasks=background_tasks,
+                    )
+                except Exception:
+                    logger.exception("webhook: StartTrial tracking failed (non-fatal)")
+
     if event["type"] == "invoice.payment_succeeded":
         invoice = event["data"]["object"]
         # Stripe API 2025-08+ moved `subscription` from the top level of the
@@ -481,6 +572,15 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                     if is_paid_invoice:
                         award_subscription_bonus(str(db_subscription.user_id), tier, db)
                         award_subscription_badge(str(db_subscription.user_id), tier.value, db)
+                        _fire_subscribe_and_purchase(
+                            db=db,
+                            background_tasks=background_tasks,
+                            request=request,
+                            user_id=db_subscription.user_id,
+                            tier=tier,
+                            invoice=invoice,
+                            stripe_subscription_id=stripe_subscription.id,
+                        )
                 else:
                     # This case might happen if the subscription was created directly in Stripe
                     # or if the initial 'incomplete' record wasn't found.
@@ -535,6 +635,15 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
                             if is_paid_invoice:
                                 award_subscription_bonus(str(target_sub.user_id), tier, db)
                                 award_subscription_badge(str(target_sub.user_id), tier.value, db)
+                                _fire_subscribe_and_purchase(
+                                    db=db,
+                                    background_tasks=background_tasks,
+                                    request=request,
+                                    user_id=target_sub.user_id,
+                                    tier=tier,
+                                    invoice=invoice,
+                                    stripe_subscription_id=stripe_subscription.id,
+                                )
 
             except stripe.error.StripeError as e:
                 # Never raise 5xx from a webhook handler — Stripe will retry
@@ -558,11 +667,28 @@ async def stripe_webhook(request: Request, db: Annotated[Session, Depends(get_db
             Subscription.stripe_customer_id == stripe_customer_id,
         ).first()
         if db_subscription:
+            cancelled_user_id = db_subscription.user_id
+            cancelled_tier = db_subscription.tier.value if db_subscription.tier else None
             db_subscription.status = SubscriptionStatus.CANCELED
             db_subscription.tier = SubscriptionTier.ROOKIE
             db_subscription.cancel_at_period_end = False
             db.commit()
             db.refresh(db_subscription)
+
+            # Churn label for ML — not forwarded to Meta.
+            try:
+                track_event(
+                    db=db,
+                    event_name="SubscriptionCanceled",
+                    user_id=cancelled_user_id,
+                    properties={
+                        "tier": cancelled_tier,
+                        "stripe_subscription_id": stripe_subscription_id,
+                    },
+                    request=request,
+                )
+            except Exception:
+                logger.exception("webhook: SubscriptionCanceled tracking failed (non-fatal)")
         else:
             logger.warning(
                 f"Subscription {stripe_subscription_id} (customer {stripe_customer_id}) "

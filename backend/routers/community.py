@@ -11,6 +11,7 @@ from models import get_db
 from models.user import User
 from dependencies import get_current_user, get_current_user_optional
 from services import post_service, badge_service, notification_service
+from services.analytics_service import track_event
 
 logger = logging.getLogger(__name__)
 from schemas.community import (
@@ -188,7 +189,25 @@ def create_post(
         ).scalar() or 0
         badge_service.check_and_award_badges(str(current_user.id), "questions_posted", question_count, db)
         db.commit()
-    
+
+    # ML feature: social engagement is the #1 retention predictor.
+    try:
+        track_event(
+            db=db,
+            event_name="PostCreated",
+            user_id=current_user.id,
+            properties={
+                "post_id": result.get("post_id"),
+                "post_type": request.post_type,
+                "has_video": bool(request.mux_asset_id),
+                "tags": request.tags or [],
+                "is_wip": bool(request.is_wip),
+                "feedback_type": request.feedback_type,
+            },
+        )
+    except Exception:
+        logger.exception("create_post: track failed (non-fatal)")
+
     return result
 
 
@@ -243,6 +262,19 @@ def add_reaction(
             )
 
     db.commit()
+
+    try:
+        track_event(
+            db=db,
+            event_name="ReactionGiven",
+            user_id=current_user.id,
+            properties={
+                "post_id": post_id,
+                "reaction_type": request.reaction_type,
+            },
+        )
+    except Exception:
+        logger.exception("add_reaction: track failed (non-fatal)")
 
     return result
 
@@ -324,6 +356,19 @@ def add_reply(
 
         db.commit()
 
+    try:
+        track_event(
+            db=db,
+            event_name="ReplyPosted",
+            user_id=current_user.id,
+            properties={
+                "post_id": post_id,
+                "has_video": bool(request.mux_asset_id),
+            },
+        )
+    except Exception:
+        logger.exception("add_reply: track failed (non-fatal)")
+
     return result
 
 
@@ -371,6 +416,20 @@ def mark_solution(
             )
 
         db.commit()
+
+    try:
+        track_event(
+            db=db,
+            event_name="AnswerAccepted",
+            user_id=current_user.id,
+            properties={
+                "post_id": post_id,
+                "reply_id": reply_id,
+                "helper_user_id": str(reply.user_id) if reply else None,
+            },
+        )
+    except Exception:
+        logger.exception("mark_solution: track failed (non-fatal)")
 
     return result
 
