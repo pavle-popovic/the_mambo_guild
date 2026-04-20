@@ -527,24 +527,6 @@ function MeetingTab() {
 
         <div className="mb-4">
           <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
-            Next Meeting Start
-          </label>
-          <div className="relative">
-            <FaCalendarAlt className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 w-3.5 h-3.5" />
-            <input
-              type="datetime-local"
-              value={startsAtLocal}
-              onChange={(e) => setStartsAtLocal(e.target.value)}
-              className="w-full pl-9 pr-4 py-3 bg-white/5 border border-white/10 rounded-lg text-mambo-text placeholder-gray-600 focus:outline-none focus:ring-2 focus:ring-mambo-gold/40 text-sm"
-            />
-          </div>
-          <p className="text-[11px] text-gray-500 mt-1.5">
-            Pick a specific date and time. Uses your browser timezone, stored as UTC. Update this before each session.
-          </p>
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">
             Zoom / Meet URL
           </label>
           <div className="relative">
