@@ -41,27 +41,6 @@ function getYouTubeId(url: string): string | null {
   return m ? m[1] : null;
 }
 
-// Fallback for legacy rows without an explicit meeting_starts_at. Returns the
-// next occurrence of (dayOfWeek, hour:minute) in UTC. Correctly handles the
-// "meeting is today, later" case — previous version forced it to next week
-// via `|| 7`, which made a 2-hours-away meeting show "7d 1h 48m".
-function nextMeetingGMT(dayOfWeek: number, hour: number, minute: number): Date {
-  const now = new Date();
-  const todayCandidate = new Date(now);
-  todayCandidate.setUTCHours(hour, minute, 0, 0);
-
-  let daysUntil = (dayOfWeek - now.getUTCDay() + 7) % 7;
-  // If the meeting is today but already passed, push to next week.
-  if (daysUntil === 0 && todayCandidate.getTime() <= now.getTime()) {
-    daysUntil = 7;
-  }
-
-  const d = new Date(now);
-  d.setUTCDate(d.getUTCDate() + daysUntil);
-  d.setUTCHours(hour, minute, 0, 0);
-  return d;
-}
-
 // Locked Page Component for non-Guild Masters
 function LockedPage({ user }: { user: any }) {
   const t = useTranslations("roundtable");
@@ -161,19 +140,15 @@ export default function RoundtablePage() {
         ]);
         setMeetingConfig(configData);
         setArchives(archivesData);
-        // Prefer the static one-off datetime. Fall back to recurring schedule
-        // for legacy rows that don't have meeting_starts_at set yet.
-        let target: Date;
+        // Admin picks an explicit one-off datetime in /admin/settings. If they
+        // haven't set one, no countdown — the UI shows "Date TBA" instead.
         if (configData.meeting_starts_at) {
-          target = new Date(configData.meeting_starts_at);
+          const target = new Date(configData.meeting_starts_at);
+          const secs = Math.floor((target.getTime() - Date.now()) / 1000);
+          setCountdown(secs > 0 ? secs : 0);
         } else {
-          const dow = configData.meeting_day_of_week ?? 3;
-          const h   = configData.meeting_hour_utc   ?? 19;
-          const m   = configData.meeting_minute_utc  ?? 0;
-          target = nextMeetingGMT(dow, h, m);
+          setCountdown(null);
         }
-        const secs = Math.floor((target.getTime() - Date.now()) / 1000);
-        setCountdown(secs > 0 ? secs : 0);
       } catch (error) {
         console.error("Failed to fetch roundtable data:", error);
       } finally {
@@ -303,10 +278,8 @@ export default function RoundtablePage() {
                   <div className="flex items-center gap-1.5 text-sm text-gray-400">
                     <Calendar size={14} />
                     <span>
-                      {(() => {
-                        if (meetingConfig?.meeting_starts_at) {
-                          const d = new Date(meetingConfig.meeting_starts_at);
-                          return d.toLocaleString(undefined, {
+                      {meetingConfig?.meeting_starts_at
+                        ? new Date(meetingConfig.meeting_starts_at).toLocaleString(undefined, {
                             weekday: "long",
                             month: "long",
                             day: "numeric",
@@ -314,18 +287,8 @@ export default function RoundtablePage() {
                             hour: "numeric",
                             minute: "2-digit",
                             timeZoneName: "short",
-                          });
-                        }
-                        const DAY_NAMES = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-                        const dow = meetingConfig?.meeting_day_of_week ?? 3;
-                        const h   = meetingConfig?.meeting_hour_utc   ?? 19;
-                        const m   = meetingConfig?.meeting_minute_utc  ?? 0;
-                        const day = DAY_NAMES[dow];
-                        const ampm = h >= 12 ? "PM" : "AM";
-                        const h12 = h % 12 === 0 ? 12 : h % 12;
-                        const mStr = m === 0 ? "" : `:${String(m).padStart(2, "0")}`;
-                        return `Every ${day} at ${h12}${mStr} ${ampm} GMT`;
-                      })()}
+                          })
+                        : "Date TBA"}
                     </span>
                   </div>
                   {meetingConfig?.meeting_notes && (
