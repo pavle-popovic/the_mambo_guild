@@ -53,6 +53,17 @@ router = APIRouter(prefix="/premium", tags=["premium"])
 # Helper Functions
 # ============================================
 
+def _as_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    """Attach UTC tzinfo to a naive datetime so Pydantic serializes it with
+    a `+00:00` suffix. Without this, `new Date()` in the browser parses the
+    ISO string as local time, shifting the schedule by the user's offset."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt.astimezone(timezone.utc)
+
+
 def is_guild_master(user: User) -> bool:
     """
     Gate for Guild Master-only perks (1-on-1 feedback, Zoom roundtable, badge,
@@ -758,7 +769,7 @@ def get_weekly_meeting(
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,
         meeting_notes=config.meeting_notes,
-        meeting_starts_at=config.meeting_starts_at,
+        meeting_starts_at=_as_utc(config.meeting_starts_at),
         meeting_day_of_week=config.meeting_day_of_week,
         meeting_hour_utc=config.meeting_hour_utc,
         meeting_minute_utc=config.meeting_minute_utc,
@@ -781,7 +792,7 @@ def get_weekly_meeting_admin(
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,
         meeting_notes=config.meeting_notes,
-        meeting_starts_at=config.meeting_starts_at,
+        meeting_starts_at=_as_utc(config.meeting_starts_at),
         meeting_day_of_week=config.meeting_day_of_week,
         meeting_hour_utc=config.meeting_hour_utc,
         meeting_minute_utc=config.meeting_minute_utc,
@@ -859,7 +870,7 @@ def update_weekly_meeting(
     return WeeklyMeetingConfigResponse(
         meeting_url=config.meeting_url,
         meeting_notes=config.meeting_notes,
-        meeting_starts_at=config.meeting_starts_at,
+        meeting_starts_at=_as_utc(config.meeting_starts_at),
         meeting_day_of_week=config.meeting_day_of_week,
         meeting_hour_utc=config.meeting_hour_utc,
         meeting_minute_utc=config.meeting_minute_utc,
