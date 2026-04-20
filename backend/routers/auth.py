@@ -223,6 +223,20 @@ def register(
         except Exception:
             logger.exception("register: CompleteRegistration tracking failed (non-fatal)")
 
+        # Onboarding welcome email. Non-blocking — a Resend outage must not
+        # fail the registration request. Same template as the waitlist entry
+        # point; the content is general project onboarding, not waitlist-specific.
+        try:
+            referral_link = f"{settings.FRONTEND_URL}/waitlist?ref={new_referral_code}"
+            background_tasks.add_task(
+                send_waitlist_welcome_email,
+                user.email,
+                profile.username,
+                referral_link,
+            )
+        except Exception:
+            logger.exception("register: welcome email enqueue failed (non-fatal)")
+
         # Create tokens
         access_token = create_access_token(data={"sub": str(user_id)})
         refresh_token = create_refresh_token(data={"sub": str(user_id)})

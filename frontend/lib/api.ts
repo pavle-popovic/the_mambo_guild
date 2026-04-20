@@ -210,13 +210,16 @@ class ApiClient {
               } else if (detailObj.msg) {
                 errorMessage = detailObj.msg;
               } else if (Array.isArray(detailObj)) {
-                // Handle Pydantic validation errors array
+                // Pydantic validation errors — user only cares about the
+                // human-readable message. Strip the "body.field" path (the
+                // form already labels the field) and Pydantic's "Value error,"
+                // prefix that's attached to raised ValueErrors.
                 errorMessage = detailObj.map((e: any) => {
                   if (typeof e === 'string') return e;
-                  const loc = e.loc ? e.loc.join('.') : '';
-                  const msg = e.msg || e.message || JSON.stringify(e);
-                  return loc ? `${loc}: ${msg}` : msg;
-                }).join(', ');
+                  let msg: string = e.msg || e.message || JSON.stringify(e);
+                  msg = msg.replace(/^Value error,\s*/i, '');
+                  return msg.charAt(0).toUpperCase() + msg.slice(1);
+                }).join(' ');
               } else {
                 errorMessage = JSON.stringify(errorData.detail);
               }
