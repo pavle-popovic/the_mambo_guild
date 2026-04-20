@@ -26,19 +26,21 @@ interface MeetingConfig {
   updated_at: string | null;
 }
 
-// <input type="datetime-local"> round-trip helpers. The input shows/returns
-// values in the user's local timezone (YYYY-MM-DDTHH:mm); backend stores UTC.
+// <input type="datetime-local"> round-trip helpers. We deliberately treat the
+// typed value as UTC (not browser local) — admins schedule in UTC so the
+// display is stable across their own travel / DST shifts.
 function utcIsoToLocalInput(iso: string | null): string {
   if (!iso) return "";
   const d = new Date(iso);
   if (Number.isNaN(d.getTime())) return "";
   const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+  return `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}`;
 }
 
 function localInputToUtcIso(local: string): string | null {
   if (!local) return null;
-  const d = new Date(local);
+  // Parse the datetime-local string as UTC by appending the Z suffix.
+  const d = new Date(`${local}:00Z`);
   if (Number.isNaN(d.getTime())) return null;
   return d.toISOString();
 }
@@ -343,16 +345,17 @@ export default function AdminLivePage() {
           </h2>
           <p className="text-sm text-white/50 mb-5">
             {config.meeting_starts_at
-              ? `Next session: ${new Date(config.meeting_starts_at).toLocaleString(undefined, {
+              ? `Next session: ${new Date(config.meeting_starts_at).toLocaleString("en-GB", {
                   weekday: "long",
                   month: "long",
                   day: "numeric",
                   year: "numeric",
-                  hour: "numeric",
+                  hour: "2-digit",
                   minute: "2-digit",
-                  timeZoneName: "short",
-                })}. This link is shown to all Guild Master members.`
-              : "Pick the exact date and time for the next session. Update it before each call."}
+                  hour12: false,
+                  timeZone: "UTC",
+                })} UTC. This link is shown to all Guild Master members.`
+              : "Pick the exact date and time (UTC) for the next session. Update it before each call."}
           </p>
 
           <div className="space-y-4">
@@ -373,7 +376,7 @@ export default function AdminLivePage() {
 
             <div>
               <label className="block text-sm font-medium text-white/70 mb-2">
-                Next Meeting Date & Time
+                Next Meeting Date &amp; Time (UTC)
               </label>
               <input
                 type="datetime-local"
@@ -384,7 +387,7 @@ export default function AdminLivePage() {
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-amber-500/50"
               />
               <p className="text-xs text-white/40 mt-1.5">
-                Uses your browser timezone; stored as UTC. Clear the field to hide the next-session info from members.
+                Enter time in UTC (not your browser timezone). Clear the field to hide the next-session info from members.
               </p>
             </div>
             <div>

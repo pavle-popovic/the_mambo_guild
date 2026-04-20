@@ -279,15 +279,16 @@ export default function RoundtablePage() {
                     <Calendar size={14} />
                     <span>
                       {meetingConfig?.meeting_starts_at
-                        ? new Date(meetingConfig.meeting_starts_at).toLocaleString(undefined, {
+                        ? `${new Date(meetingConfig.meeting_starts_at).toLocaleString("en-GB", {
                             weekday: "long",
                             month: "long",
                             day: "numeric",
                             year: "numeric",
-                            hour: "numeric",
+                            hour: "2-digit",
                             minute: "2-digit",
-                            timeZoneName: "short",
-                          })
+                            hour12: false,
+                            timeZone: "UTC",
+                          })} UTC`
                         : "Date TBA"}
                     </span>
                   </div>
