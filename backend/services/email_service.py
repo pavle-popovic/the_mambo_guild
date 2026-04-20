@@ -416,9 +416,9 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
         accent_color = "#D4AF37" # Gold (kept for subtle accents)
         
         result = resend.Emails.send({
-            "from": from_email,
+            "from": f"The Mambo Guild <{from_email}>",
             "to": [email],
-            "subject": "Welcome to The Mambo Guild",
+            "subject": "Welcome to the Mambo Guild",
             "html": f"""
             <!DOCTYPE html>
             <html>
