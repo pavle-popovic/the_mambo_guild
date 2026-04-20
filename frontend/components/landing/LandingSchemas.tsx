@@ -85,7 +85,7 @@ const videoSchema = {
     thumbnailUrl: [`${SITE_URL}/assets/SilentHero-poster.jpg`],
     uploadDate: "2026-01-01",
     contentUrl:
-        "https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v3.mp4",
+        "https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/hero/SilentHero.v4.mp4",
     publisher: {
         "@type": "EducationalOrganization",
         "@id": `${SITE_URL}#organization`,
