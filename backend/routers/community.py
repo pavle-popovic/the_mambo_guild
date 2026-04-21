@@ -139,8 +139,7 @@ def create_post(
 ):
     """
     Create a new post.
-    - Stage posts cost 15 claves
-    - Lab posts cost 5 claves
+    Posting is free; rate limits prevent abuse.
     """
     logger.info(f"[COMMUNITY] Creating post - Type: {request.post_type}, Tags: {request.tags}")
     result = post_service.create_post(
@@ -159,33 +158,43 @@ def create_post(
     
     if not result["success"]:
         error_message = result.get("message", "Failed to create post")
+        if result.get("rate_limited"):
+            status_code = 429
+        elif "Insufficient" in error_message:
+            status_code = 400
+        else:
+            status_code = 422
         raise HTTPException(
-            status_code=400 if "Insufficient" in error_message else 422,
+            status_code=status_code,
             detail={"message": error_message, **result}
         )
-    
+
     db.commit()
-    
-    # Badge triggers
+
+    # Badge triggers — only count posts that passed moderation.
+    from sqlalchemy import func
+    from models.community import Post, ModerationStatus
+    _ACTIVE = ModerationStatus.ACTIVE.value
+
     # Center Stage: Track video posts (Stage posts with video)
     if result["success"] and request.post_type == "stage" and request.mux_asset_id:
-        from sqlalchemy import func
-        from models.community import Post
         video_count = db.query(func.count(Post.id)).filter(
             Post.user_id == current_user.id,
             Post.post_type == "stage",
-            Post.mux_asset_id.isnot(None)
+            Post.mux_asset_id.isnot(None),
+            Post.is_deleted == False,
+            Post.moderation_status == _ACTIVE,
         ).scalar() or 0
         badge_service.check_and_award_badges(str(current_user.id), "videos_posted", video_count, db)
         db.commit()
-    
+
     # Curious Mind: Track questions posted (Lab posts)
     if result["success"] and request.post_type == "lab":
-        from sqlalchemy import func
-        from models.community import Post
         question_count = db.query(func.count(Post.id)).filter(
             Post.user_id == current_user.id,
-            Post.post_type == "lab"
+            Post.post_type == "lab",
+            Post.is_deleted == False,
+            Post.moderation_status == _ACTIVE,
         ).scalar() or 0
         badge_service.check_and_award_badges(str(current_user.id), "questions_posted", question_count, db)
         db.commit()
@@ -220,7 +229,7 @@ def add_reaction(
 ):
     """
     Add or change a reaction on a post.
-    Costs 1 clave (only charged for new reactions, not changes).
+    Reactions are free.
     """
     result = post_service.add_reaction(
         post_id=post_id,
@@ -228,12 +237,13 @@ def add_reaction(
         reaction_type=request.reaction_type,
         db=db
     )
-    
+
     if not result["success"]:
-        raise HTTPException(status_code=400, detail=result)
-    
+        status_code = 429 if result.get("rate_limited") else 400
+        raise HTTPException(status_code=status_code, detail=result)
+
     db.commit()
-    
+
     # Badge triggers
     # 1. User gave a reaction (The Critic)
     badge_service.increment_reaction_given(str(current_user.id), db)
@@ -287,7 +297,6 @@ def remove_reaction(
 ):
     """
     Remove your reaction from a post.
-    Note: Claves are NOT refunded when removing a reaction.
     """
     result = post_service.remove_reaction(
         post_id=post_id,
@@ -311,7 +320,7 @@ def add_reply(
 ):
     """
     Add a reply/comment to a post.
-    Costs 2 claves.
+    Commenting is free.
     Note: Will fail if post has feedback_type='hype' (comments disabled).
     """
     result = post_service.add_reply(
@@ -322,12 +331,13 @@ def add_reply(
         mux_playback_id=request.mux_playback_id,
         db=db
     )
-    
+
     if not result["success"]:
-        raise HTTPException(status_code=400, detail=result)
-    
+        status_code = 429 if result.get("rate_limited") else 400
+        raise HTTPException(status_code=status_code, detail=result)
+
     db.commit()
-    
+
     # Badge triggers
     # The Socialite: Track comments posted
     if result["success"]:
@@ -382,7 +392,7 @@ def mark_solution(
     """
     Mark a reply as the accepted solution.
     Only the original poster can do this.
-    Awards 10 claves to the helper.
+    Awards 15 claves to the helper.
     """
     result = post_service.mark_solution(
         post_id=post_id,
@@ -613,9 +623,16 @@ def get_saved_posts(
     if not post_ids:
         return []
 
+    from sqlalchemy import or_ as _or
+    from models.community import ModerationStatus as _ModStatus
+
     posts = db.query(Post).filter(
         Post.id.in_(post_ids),
-        Post.is_deleted == False
+        Post.is_deleted == False,
+        _or(
+            Post.moderation_status == _ModStatus.ACTIVE.value,
+            Post.user_id == current_user.id,
+        ),
     ).all()
 
     # Preserve saved order

@@ -16,12 +16,16 @@ logger = logging.getLogger(__name__)
 
 
 # ============================================
-# Cost Constants (from PRD)
+# Cost Constants
 # ============================================
-COST_REACTION = 1
-COST_COMMENT = 2
-COST_POST_QUESTION = 5
-COST_POST_VIDEO = 15
+# Engagement is free: reacting, commenting, and posting do not charge claves.
+# Claves remain an earnable currency (daily login, accepted answers, subscription
+# bonuses, referrals) and are spent on streak freezes. Kept as constants so
+# call sites can keep calling spend_claves() — with a 0 amount it's a no-op.
+COST_REACTION = 0
+COST_COMMENT = 0
+COST_POST_QUESTION = 0
+COST_POST_VIDEO = 0
 
 # ============================================
 # Earning Constants (from PRD)

@@ -88,8 +88,14 @@ class Post(Base):
     # Denormalized counts for performance
     reaction_count = Column(Integer, default=0)
     reply_count = Column(Integer, default=0)
-    
+
     is_deleted = Column(Boolean, default=False, nullable=False)
+    moderation_status = Column(
+        String(20),
+        default=ModerationStatus.ACTIVE.value,
+        nullable=False,
+        index=True,
+    )
 
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)

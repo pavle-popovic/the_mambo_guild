@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, desc, case
 
 from models.user import User, UserProfile
-from models.community import Post, PostReply, PostReaction, UserStats
+from models.community import Post, PostReply, PostReaction, UserStats, ModerationStatus
 
 logger = logging.getLogger(__name__)
 
@@ -50,20 +50,26 @@ def get_leaderboard(
     weights = SCORING.get(category, SCORING["overall"])
 
     # Build subqueries for each metric
-    # Posts count
+    # Posts count (exclude flagged posts — they aren't publicly visible)
     posts_q = db.query(
         Post.user_id,
         func.count(Post.id).label("post_count")
-    ).filter(Post.is_deleted == False)
+    ).filter(
+        Post.is_deleted == False,
+        Post.moderation_status == ModerationStatus.ACTIVE.value,
+    )
     if cutoff:
         posts_q = posts_q.filter(Post.created_at >= cutoff)
     posts_q = posts_q.group_by(Post.user_id).subquery()
 
-    # Reactions received count
+    # Reactions received count (only on active posts)
     reactions_recv_q = db.query(
         Post.user_id,
         func.count(PostReaction.id).label("reactions_received")
-    ).join(PostReaction, PostReaction.post_id == Post.id).filter(Post.is_deleted == False)
+    ).join(PostReaction, PostReaction.post_id == Post.id).filter(
+        Post.is_deleted == False,
+        Post.moderation_status == ModerationStatus.ACTIVE.value,
+    )
     if cutoff:
         reactions_recv_q = reactions_recv_q.filter(PostReaction.created_at >= cutoff)
     reactions_recv_q = reactions_recv_q.group_by(Post.user_id).subquery()

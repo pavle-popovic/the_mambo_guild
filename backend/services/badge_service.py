@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, case
 
 from models.community import UserStats, UserBadge, BadgeDefinition, BadgeTier
-from models.community import Post, PostReply, PostReaction, ClaveTransaction
+from models.community import Post, PostReply, PostReaction, ClaveTransaction, ModerationStatus
 from models.user import UserProfile
 
 logger = logging.getLogger(__name__)
@@ -193,6 +193,7 @@ def get_user_stats(user_id: str, db: Session) -> dict:
     stats = get_or_create_stats(user_id, db)
 
     # Query 2: all reaction-type counts in one pass over PostReaction JOIN Post
+    # (flagged posts don't count — they aren't publicly visible)
     reaction_row = db.query(
         func.count(case((PostReaction.reaction_type == "fire", 1))).label("fires"),
         func.count(case((PostReaction.reaction_type == "clap", 1))).label("claps"),
@@ -200,6 +201,7 @@ def get_user_stats(user_id: str, db: Session) -> dict:
     ).join(Post, Post.id == PostReaction.post_id).filter(
         Post.user_id == user_id,
         Post.is_deleted == False,
+        Post.moderation_status == ModerationStatus.ACTIVE.value,
     ).first()
 
     # Query 3: post-type counts + comment count in two tiny aggregations
@@ -208,7 +210,11 @@ def get_user_stats(user_id: str, db: Session) -> dict:
             (Post.post_type == "stage") & Post.mux_asset_id.isnot(None), 1
         ))).label("videos"),
         func.count(case((Post.post_type == "lab", 1))).label("questions"),
-    ).filter(Post.user_id == user_id, Post.is_deleted == False).first()
+    ).filter(
+        Post.user_id == user_id,
+        Post.is_deleted == False,
+        Post.moderation_status == ModerationStatus.ACTIVE.value,
+    ).first()
 
     comments_posted = db.query(func.count(PostReply.id)).filter(
         PostReply.user_id == user_id,

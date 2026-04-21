@@ -12,7 +12,9 @@ import uuid
 
 from models.user import User, UserProfile, Subscription, SubscriptionTier, SubscriptionStatus
 from models.community import Post, PostReply, PostReaction, CommunityTag, ModerationStatus, SavedPost
-from services.moderation_service import evaluate_reply
+from services.moderation_service import evaluate_reply, evaluate_post
+from services.mux_service import delete_asset as delete_mux_asset
+from services import rate_limit_service
 from services.clave_service import (
     spend_claves, can_afford, get_video_slot_status, get_question_slot_status,
     award_accepted_answer, process_reaction_refund, claw_back_reaction_refund,
@@ -211,22 +213,36 @@ def create_post(
     Create a new post.
     Returns: {success, post, message} or {success: False, message}
     """
+    # Hourly rate limit (anti-spam; the only gate now that posting is free).
+    allowed, info = rate_limit_service.check("post", user_id, db)
+    if not allowed:
+        return {"success": False, "message": info["message"], "rate_limited": True}
+
     # Validate tags exist
     if not tags or len(tags) == 0:
         return {"success": False, "message": "At least one tag is required"}
-    
-    valid_tags = db.query(CommunityTag.slug).filter(
+
+    # Fetch (slug, category) so we can also require a channel.
+    valid_tag_rows = db.query(CommunityTag.slug, CommunityTag.category).filter(
         CommunityTag.slug.in_(tags)
     ).all()
-    valid_tag_slugs = [t[0] for t in valid_tags]
-    
+    valid_tag_slugs = [row[0] for row in valid_tag_rows]
+
     if not valid_tag_slugs:
         return {"success": False, "message": "At least one valid tag is required. Invalid tags provided."}
-    
+
     # Check if any tags were invalid
     if len(valid_tag_slugs) < len(tags):
         invalid_tags = set(tags) - set(valid_tag_slugs)
         return {"success": False, "message": f"Invalid tags: {', '.join(invalid_tags)}. Please select valid tags."}
+
+    # Require at least one channel tag so every post lives in a room.
+    has_channel = any((row[1] or "").lower() == "channel" for row in valid_tag_rows)
+    if not has_channel:
+        return {
+            "success": False,
+            "message": "Please pick a channel for your post (e.g. Technique, Music & Rhythm, Check-ins & Wins)."
+        }
     
     # Determine cost
     if post_type == "stage":
@@ -248,16 +264,20 @@ def create_post(
         if not body or not body.strip():
             return {"success": False, "message": "Question body is required for Lab posts"}
     
-    # Check and spend claves
+    # Posting is free. spend_claves() is a no-op when cost == 0 but we keep the
+    # call so anti-abuse (future non-zero pricing) can reuse the same path.
     success, balance = spend_claves(user_id, cost, f"post_{post_type}", db)
     if not success:
         return {
             "success": False,
-            "message": f"Insufficient claves. You need {cost} 🥢 but have {balance} 🥢",
+            "message": f"Unable to post right now. Please try again shortly.",
             "required": cost,
             "balance": balance
         }
     
+    # AI Gatekeeper on post content (fail-closed).
+    moderation_status = evaluate_post(title=title, body=body)
+
     # Create post
     post = Post(
         id=uuid.uuid4(),
@@ -270,24 +290,29 @@ def create_post(
         feedback_type=feedback_type,
         mux_asset_id=mux_asset_id,
         mux_playback_id=mux_playback_id,
-        video_duration_seconds=video_duration_seconds
+        video_duration_seconds=video_duration_seconds,
+        moderation_status=moderation_status,
     )
     db.add(post)
-    
-    # Update tag usage counts
-    for tag_slug in valid_tag_slugs:
-        db.query(CommunityTag).filter(
-            CommunityTag.slug == tag_slug
-        ).update({"usage_count": CommunityTag.usage_count + 1})
-    
+
+    # Only visible posts count toward tag usage — flagged posts must not
+    # inflate channel/trending tag stats.
+    if moderation_status == ModerationStatus.ACTIVE.value:
+        for tag_slug in valid_tag_slugs:
+            db.query(CommunityTag).filter(
+                CommunityTag.slug == tag_slug
+            ).update({"usage_count": CommunityTag.usage_count + 1})
+
     db.flush()
-    
-    logger.info(f"User {user_id} created {post_type} post {post.id}")
-    
+
+    logger.info(f"User {user_id} created {post_type} post {post.id} [moderation={moderation_status}]")
+
+    # Author-friendly message: don't reveal that AI flagged them (shadowban),
+    # just acknowledge. Admin queue handles review.
     return {
         "success": True,
         "post": _format_post_response(post, user_id, db),
-        "message": f"Post created! (-{cost} 🥢)"
+        "message": "Post created"
     }
 
 
@@ -303,16 +328,26 @@ def get_feed(
     """
     Get paginated feed of posts.
     Supports single tag or multi-tag filtering.
+    Shadowban: flagged posts are visible only to their author.
     """
+    from sqlalchemy import or_ as _or
+
     query = db.query(Post).filter(Post.is_deleted == False)
+
+    if current_user_id:
+        query = query.filter(_or(
+            Post.moderation_status == ModerationStatus.ACTIVE.value,
+            Post.user_id == current_user_id,
+        ))
+    else:
+        query = query.filter(Post.moderation_status == ModerationStatus.ACTIVE.value)
 
     if post_type:
         query = query.filter(Post.post_type == post_type)
 
     if tags and len(tags) > 0:
         # Multi-tag filter: post must have ANY of the specified tags
-        from sqlalchemy import or_
-        query = query.filter(or_(*[Post.tags.any(t) for t in tags]))
+        query = query.filter(_or(*[Post.tags.any(t) for t in tags]))
     elif tag:
         query = query.filter(Post.tags.any(tag))
 
@@ -327,10 +362,15 @@ def get_post_detail(
 ) -> Optional[dict]:
     """
     Get full post detail with replies.
+    Shadowban: flagged posts are returned only to their author.
     """
     post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
     if not post:
         return None
+
+    if post.moderation_status != ModerationStatus.ACTIVE.value:
+        if str(post.user_id) != str(current_user_id or ""):
+            return None
 
     # Get replies ordered by accepted answer first, then by date
     replies = db.query(PostReply).filter(
@@ -414,17 +454,12 @@ def add_reaction(
                 "clap_count": int(counts.get("clap", 0)),
             }
 
-    # New reaction - charge claves
-    success, balance = spend_claves(user_id, COST_REACTION, "reaction", db, reference_id=str(post_id))
-    if not success:
-        return {
-            "success": False,
-            "message": f"Insufficient claves. You need {COST_REACTION} 🥢",
-            "required": COST_REACTION,
-            "balance": balance
-        }
+    # Hourly rate limit on new reactions (changing type above is exempt).
+    allowed, info = rate_limit_service.check("reaction", user_id, db)
+    if not allowed:
+        return {"success": False, "message": info["message"], "rate_limited": True}
 
-    # Create reaction
+    # Reactions are free — no charge, no post-owner refund loop.
     reaction = PostReaction(
         id=uuid.uuid4(),
         post_id=post_id,
@@ -436,17 +471,13 @@ def add_reaction(
     # Update post reaction count
     post.reaction_count += 1
 
-    # Process refund for post owner (ANY reaction type triggers it)
-    if str(post.user_id) != user_id:
-        process_reaction_refund(str(post_id), str(post.user_id), db)
-
     db.flush()
 
     counts = _get_type_counts_for_post(post_id, db)
     logger.info(f"User {user_id} reacted {reaction_type} on post {post_id}")
     return {
         "success": True,
-        "message": f"Reacted with {reaction_type}! (-{COST_REACTION} 🥢)",
+        "message": f"Reacted with {reaction_type}",
         "user_reaction": reaction_type,
         "reaction_count": post.reaction_count,
         "fire_count": int(counts.get("fire", 0)),
@@ -474,10 +505,7 @@ def remove_reaction(
     # Get post to update count
     post = db.query(Post).filter(Post.id == post_id).first()
     if post:
-        # Claw back refund if this reaction was within the refund cap
-        # (reaction_count before decrement <= cap means owner earned a refund for it)
-        if post.reaction_count <= EARN_REACTION_REFUND_CAP and str(post.user_id) != user_id:
-            claw_back_reaction_refund(str(post_id), str(post.user_id), db)
+        # Reactions are free — no refund to claw back.
         post.reaction_count = max(0, post.reaction_count - 1)
 
     db.delete(reaction)
@@ -514,13 +542,19 @@ def add_reply(
     # Check feedback_type - "hype" mode disables comments
     if post.feedback_type == "hype":
         return {"success": False, "message": "Comments are disabled on this post (Hype mode)"}
-    
-    # Charge claves
+
+    # Hourly rate limit.
+    allowed, info = rate_limit_service.check("reply", user_id, db)
+    if not allowed:
+        return {"success": False, "message": info["message"], "rate_limited": True}
+
+    # Commenting is free. spend_claves() is a no-op at cost 0 but we keep it
+    # so the same path can gate future pricing or per-user accounting.
     success, balance = spend_claves(user_id, COST_COMMENT, "comment", db, reference_id=str(post_id))
     if not success:
         return {
             "success": False,
-            "message": f"Insufficient claves. You need {COST_COMMENT} 🥢",
+            "message": "Unable to post comment right now. Please try again shortly.",
             "required": COST_COMMENT,
             "balance": balance
         }
@@ -550,7 +584,7 @@ def add_reply(
     return {
         "success": True,
         "reply": _format_reply_response(reply, db),
-        "message": f"Comment posted! (-{COST_COMMENT} 🥢)"
+        "message": "Comment posted"
     }
 
 
@@ -723,6 +757,26 @@ def delete_post(
                 CommunityTag.slug == tag_slug
             ).update({"usage_count": CommunityTag.usage_count - 1})
 
+        # Mux asset cleanup: free the video from Mux so we don't pay for orphaned assets.
+        # Post's own video.
+        if post.mux_asset_id:
+            try:
+                delete_mux_asset(post.mux_asset_id)
+            except Exception:
+                logger.exception(f"Failed to delete Mux asset {post.mux_asset_id} for post {post_id}")
+
+        # Cascade: video replies on this post also get their Mux assets released.
+        reply_assets = db.query(PostReply.mux_asset_id).filter(
+            PostReply.post_id == post_id,
+            PostReply.mux_asset_id.isnot(None),
+            PostReply.is_deleted == False
+        ).all()
+        for (asset_id,) in reply_assets:
+            try:
+                delete_mux_asset(asset_id)
+            except Exception:
+                logger.exception(f"Failed to delete reply Mux asset {asset_id} for post {post_id}")
+
         db.flush()
 
         logger.info(f"User {user_id} (Admin: {is_admin}) soft-deleted post {post_id}")
@@ -764,6 +818,7 @@ def search_posts(
     Search posts by title and/or tags.
     Title search uses ILIKE; also matches if query appears in any tag.
     Additional tag/tags params filter results to specific tags.
+    Shadowban: flagged posts are returned only to their author.
     """
     from sqlalchemy import or_
 
@@ -778,6 +833,16 @@ def search_posts(
             Post.tags.any(query.lower())
         )
     )
+
+    if current_user_id:
+        search_query = search_query.filter(or_(
+            Post.moderation_status == ModerationStatus.ACTIVE.value,
+            Post.user_id == current_user_id,
+        ))
+    else:
+        search_query = search_query.filter(
+            Post.moderation_status == ModerationStatus.ACTIVE.value
+        )
 
     if post_type:
         search_query = search_query.filter(Post.post_type == post_type)
@@ -849,6 +914,13 @@ def delete_reply(
 
     # Soft delete
     reply.is_deleted = True
+
+    # Mux asset cleanup for video replies.
+    if reply.mux_asset_id:
+        try:
+            delete_mux_asset(reply.mux_asset_id)
+        except Exception:
+            logger.exception(f"Failed to delete Mux asset {reply.mux_asset_id} for reply {reply_id}")
 
     # Decrement reply count on parent post
     post = db.query(Post).filter(Post.id == post_id).first()

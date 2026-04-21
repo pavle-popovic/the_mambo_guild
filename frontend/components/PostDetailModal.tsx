@@ -938,9 +938,12 @@ export default function PostDetailModal({
                 {/* Reply Form (if not hype mode and not editing) */}
                 {post.feedback_type !== "hype" && !isEditing && (
                   <div className="mt-6 pt-6 border-t border-white/10">
-                    <h3 className="text-lg font-semibold text-white mb-4">
+                    <h3 className="text-lg font-semibold text-white mb-2">
                       {t("writeReply")}
                     </h3>
+                    <p className="mb-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-100/80 text-xs leading-relaxed">
+                      {t("nudgeReply")}
+                    </p>
                     <div className="space-y-3">
                       <textarea
                         value={replyContent}
@@ -949,10 +952,7 @@ export default function PostDetailModal({
                         rows={4}
                         className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-none"
                       />
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs text-white/50">
-                          {t("replyCost")}
-                        </span>
+                      <div className="flex items-center justify-end">
                         <motion.button
                           onClick={handleSubmitReply}
                           disabled={!replyContent.trim() || isSubmittingReply}

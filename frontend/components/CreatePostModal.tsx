@@ -23,88 +23,99 @@ interface CreatePostModalProps {
   onPostCreated: (postData?: any) => void;
 }
 
+// Static Style/Focus/Level tags (secondary; channel is the required one)
+const STATIC_TAGS: Tag[] = [
+  { slug: "salsa-on2", name: "Salsa On2", category: "Style", usage_count: 0 },
+  { slug: "mambo", name: "Mambo", category: "Style", usage_count: 0 },
+  { slug: "cha-cha-cha", name: "Cha Cha Cha", category: "Style", usage_count: 0 },
+  { slug: "boogaloo", name: "Boogaloo", category: "Style", usage_count: 0 },
+  { slug: "pachanga", name: "Pachanga", category: "Style", usage_count: 0 },
+  { slug: "salsa-fusion", name: "Salsa Fusion", category: "Style", usage_count: 0 },
+  { slug: "timing", name: "Timing", category: "Focus", usage_count: 0 },
+  { slug: "body-movement", name: "Body Movement", category: "Focus", usage_count: 0 },
+  { slug: "styling", name: "Styling", category: "Focus", usage_count: 0 },
+  { slug: "musicality", name: "Musicality", category: "Focus", usage_count: 0 },
+  { slug: "choreo", name: "Choreo", category: "Focus", usage_count: 0 },
+  { slug: "turn", name: "Turn", category: "Focus", usage_count: 0 },
+  { slug: "drills", name: "Drills", category: "Focus", usage_count: 0 },
+  { slug: "beginner", name: "Beginner", category: "Level", usage_count: 0 },
+  { slug: "intermediate", name: "Intermediate", category: "Level", usage_count: 0 },
+  { slug: "advanced", name: "Advanced", category: "Level", usage_count: 0 },
+];
+
+type FbKey = "hype" | "timing" | "footwork" | "frame" | "styling";
+
 export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: CreatePostModalProps) {
   const t = useTranslations("community");
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
+  const [context, setContext] = useState(""); // Stage-only "what you worked on"
+  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [feedbackType, setFeedbackType] = useState<"hype" | "coach">("coach");
+  const [fbSelected, setFbSelected] = useState<Record<FbKey, boolean>>({
+    hype: false,
+    timing: false,
+    footwork: false,
+    frame: false,
+    styling: false,
+  });
   const [isWip, setIsWip] = useState(false);
-  const [tags, setTags] = useState<Tag[]>([]);
+  const [channels, setChannels] = useState<Tag[]>([]);
+  const [channelsLoading, setChannelsLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
   const [showSuccess, setShowSuccess] = useState(false);
 
   // Video upload state (Stage only)
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [uploadStatus, setUploadStatus] = useState<"idle" | "uploading" | "processing" | "error">("idle");
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [muxAssetId, setMuxAssetId] = useState<string | null>(null);
-  const [muxPlaybackId, setMuxPlaybackId] = useState<string | null>(null);
-  const [videoDuration, setVideoDuration] = useState<number | null>(null);
-  const [uploadId, setUploadId] = useState<string | null>(null);
-  const [createdPostId, setCreatedPostId] = useState<string | null>(null);
+  const [muxAssetId] = useState<string | null>(null);
+  const [muxPlaybackId] = useState<string | null>(null);
+  const [videoDuration] = useState<number | null>(null);
+  const [, setUploadId] = useState<string | null>(null);
+  const [, setCreatedPostId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Question slot status (Lab only)
-  const [questionSlots, setQuestionSlots] = useState<{current_slots: number; max_slots: number} | null>(null);
+  const [questionSlots, setQuestionSlots] = useState<{ current_slots: number; max_slots: number } | null>(null);
 
-  // Fetch question slot status when modal opens in lab mode
+  // Fetch channels + slot status when modal opens
   useEffect(() => {
-    if (isOpen && mode === "lab") {
-      apiClient.getQuestionSlotStatus().then(status => {
-        setQuestionSlots({ current_slots: status.current_slots, max_slots: status.max_slots });
-      }).catch(() => {});
+    if (!isOpen) return;
+    setChannelsLoading(true);
+    apiClient
+      .getCommunityTags()
+      .then((tags) => {
+        const chs = (tags || []).filter((t) => (t.category || "").toLowerCase() === "channel");
+        setChannels(chs);
+      })
+      .catch(() => setChannels([]))
+      .finally(() => setChannelsLoading(false));
+
+    if (mode === "lab") {
+      apiClient
+        .getQuestionSlotStatus()
+        .then((status) => {
+          setQuestionSlots({ current_slots: status.current_slots, max_slots: status.max_slots });
+        })
+        .catch(() => {});
     }
   }, [isOpen, mode]);
-
-  // Predefined relevant tags
-  const RELEVANT_TAGS: Tag[] = [
-    // Styles
-    { slug: "salsa-on2", name: "Salsa On2", category: "Style", usage_count: 0 },
-    { slug: "mambo", name: "Mambo", category: "Style", usage_count: 0 },
-    { slug: "cha-cha-cha", name: "Cha Cha Cha", category: "Style", usage_count: 0 },
-    { slug: "boogaloo", name: "Boogaloo", category: "Style", usage_count: 0 },
-    { slug: "pachanga", name: "Pachanga", category: "Style", usage_count: 0 },
-    { slug: "salsa-fusion", name: "Salsa Fusion", category: "Style", usage_count: 0 },
-
-    // Focus
-    { slug: "timing", name: "Timing", category: "Focus", usage_count: 0 },
-    { slug: "body-movement", name: "Body Movement", category: "Focus", usage_count: 0 },
-    { slug: "styling", name: "Styling", category: "Focus", usage_count: 0 },
-    { slug: "musicality", name: "Musicality", category: "Focus", usage_count: 0 },
-    { slug: "choreo", name: "Choreo", category: "Focus", usage_count: 0 },
-    { slug: "turn", name: "Turn", category: "Focus", usage_count: 0 },
-    { slug: "drills", name: "Drills", category: "Focus", usage_count: 0 },
-
-    // Level
-    { slug: "beginner", name: "Beginner", category: "Level", usage_count: 0 },
-    { slug: "intermediate", name: "Intermediate", category: "Level", usage_count: 0 },
-    { slug: "advanced", name: "Advanced", category: "Level", usage_count: 0 },
-  ];
-
-  // Set tags on mount
-  useEffect(() => {
-    if (isOpen) {
-      setTags(RELEVANT_TAGS);
-    }
-  }, [isOpen]);
 
   // Reset form when modal closes
   useEffect(() => {
     if (!isOpen) {
       setTitle("");
       setBody("");
+      setContext("");
+      setSelectedChannel(null);
       setSelectedTags([]);
-      setFeedbackType("coach");
+      setFbSelected({ hype: false, timing: false, footwork: false, frame: false, styling: false });
       setIsWip(false);
       setVideoFile(null);
       setUploadStatus("idle");
       setUploadProgress(0);
-      setMuxAssetId(null);
-      setMuxPlaybackId(null);
-      setVideoDuration(null);
       setUploadId(null);
       setCreatedPostId(null);
       setError(null);
@@ -115,11 +126,39 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
   const handleTagToggle = (tagSlug: string) => {
     UISound.hover();
     setSelectedTags((prev) =>
-      prev.includes(tagSlug)
-        ? prev.filter((t) => t !== tagSlug)
-        : [...prev, tagSlug].slice(0, 5) // Max 5 tags
+      prev.includes(tagSlug) ? prev.filter((t) => t !== tagSlug) : [...prev, tagSlug].slice(0, 5)
     );
   };
+
+  const toggleFb = (key: FbKey) => {
+    UISound.hover();
+    setFbSelected((prev) => {
+      if (key === "hype") {
+        // Hype is exclusive — turn everything else off
+        const next = { hype: !prev.hype, timing: false, footwork: false, frame: false, styling: false };
+        return next;
+      }
+      // Picking a specific area clears hype
+      return { ...prev, [key]: !prev[key], hype: false };
+    });
+  };
+
+  // Derived: feedback_type + optional "Feedback wanted on:" prefix line
+  const derivedFeedbackType: "hype" | "coach" = (() => {
+    const anySpecific = fbSelected.timing || fbSelected.footwork || fbSelected.frame || fbSelected.styling;
+    if (fbSelected.hype && !anySpecific) return "hype";
+    return "coach";
+  })();
+
+  const feedbackPrefixLine = (() => {
+    const labels: string[] = [];
+    if (fbSelected.timing) labels.push(t("fbTiming"));
+    if (fbSelected.footwork) labels.push(t("fbFootwork"));
+    if (fbSelected.frame) labels.push(t("fbFrame"));
+    if (fbSelected.styling) labels.push(t("fbStyling"));
+    if (labels.length === 0) return "";
+    return `${t("feedbackWantedPrefix")} ${labels.join(", ")}`;
+  })();
 
   const handleVideoSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -127,51 +166,32 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
 
     if (!file.type.startsWith("video/")) {
       alert(t("selectVideoFile"));
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
-    // Check slot limit before upload
     try {
       const slotStatus = await apiClient.getSlotStatus();
       if (!slotStatus.allowed) {
         alert(slotStatus.message);
-        if (fileInputRef.current) {
-          fileInputRef.current.value = "";
-        }
+        if (fileInputRef.current) fileInputRef.current.value = "";
         return;
       }
     } catch (err: any) {
       alert(err.message || t("failedCheckSlot"));
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
-    // For community posts, we need the title to create post first
-    // But we'll handle upload after post creation in handleSubmit
     if (!title.trim()) {
       setError(t("enterTitleFirst"));
-      if (fileInputRef.current) {
-        fileInputRef.current.value = "";
-      }
+      if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
 
-    // Store file - will upload after post is created
     setVideoFile(file);
     setError(null);
-
-    // Show message that video will upload after post creation
-    // The actual upload happens in handleSubmit after post is created
   };
-
-  // Note: Video processing is handled by Mux webhook
-  // The backend webhook handler will update the post when video is ready
-  // For now, we create the post immediately after upload completes
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -184,8 +204,8 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
       return;
     }
 
-    if (selectedTags.length === 0) {
-      setError(t("selectOneTag"));
+    if (!selectedChannel) {
+      setError(t("channelRequired"));
       return;
     }
 
@@ -202,15 +222,25 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
     setIsLoading(true);
     setError(null);
 
+    // Build final body: for Stage, prepend optional "Feedback wanted on:" + "What I worked on"
+    let finalBody = mode === "lab" ? body.trim() : "";
+    if (mode === "stage") {
+      const parts: string[] = [];
+      if (feedbackPrefixLine) parts.push(feedbackPrefixLine);
+      if (context.trim()) parts.push(context.trim());
+      finalBody = parts.join("\n\n");
+    }
+
+    // Tags: channel first, then style/focus/level
+    const tagsPayload = [selectedChannel, ...selectedTags.filter((s) => s !== selectedChannel)];
+
     try {
-      // Create post first to get post_id
-      // Wrap in a timeout to prevent indefinite hanging
       const createPostPromise = apiClient.createPost({
         post_type: mode,
         title: title.trim(),
-        body: mode === "lab" ? body.trim() : undefined,
-        tags: selectedTags,
-        feedback_type: feedbackType,
+        body: finalBody || undefined,
+        tags: tagsPayload,
+        feedback_type: derivedFeedbackType,
         is_wip: isWip,
         mux_asset_id: muxAssetId || undefined,
         mux_playback_id: muxPlaybackId || undefined,
@@ -221,82 +251,63 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
         setTimeout(() => reject(new Error(t("requestTimedOut"))), 15000)
       );
 
-      const result = await Promise.race([createPostPromise, timeoutPromise]) as any;
+      const result = (await Promise.race([createPostPromise, timeoutPromise])) as any;
 
-      // Store post_id for video upload (post.id from response)
       const postId = result.post?.id || (result as any).post_id;
-      if (postId) {
-        setCreatedPostId(postId);
-      }
+      if (postId) setCreatedPostId(postId);
 
-      // If video file was selected but not uploaded yet, upload it now with post_id
       if (mode === "stage" && videoFile && !muxPlaybackId && postId) {
         setUploadStatus("uploading");
         setUploadProgress(0);
 
         try {
-          // Upload video with post_id
-          const { upload_url, upload_id } = await apiClient.createMuxUploadUrl(undefined, videoFile.name, undefined, postId);
+          const { upload_url, upload_id } = await apiClient.createMuxUploadUrl(
+            undefined,
+            videoFile.name,
+            undefined,
+            postId
+          );
 
-          if (!upload_url || !upload_id) {
-            throw new Error(t("uploadUrlFailed"));
-          }
+          if (!upload_url || !upload_id) throw new Error(t("uploadUrlFailed"));
 
-          // Upload video and wait for it to complete before closing modal
           await new Promise<void>((resolve, reject) => {
             const xhr = new XMLHttpRequest();
             xhr.upload.addEventListener("progress", (e) => {
-              if (e.lengthComputable) {
-                setUploadProgress((e.loaded / e.total) * 100);
-              }
+              if (e.lengthComputable) setUploadProgress((e.loaded / e.total) * 100);
             });
             xhr.addEventListener("load", () => {
               if (xhr.status === 200 || xhr.status === 201) {
                 setUploadStatus("processing");
                 setUploadProgress(100);
                 setUploadId(upload_id);
-                console.log("[CreatePostModal] Video uploaded successfully, upload_id:", upload_id);
 
-                // Start polling for video processing completion
-                console.log("[CreatePostModal] Starting to poll for video processing...");
                 let pollCount = 0;
-                const maxPolls = 30; // Poll for up to 60 seconds (30 * 2s)
+                const maxPolls = 30;
                 const pollInterval = setInterval(async () => {
                   pollCount++;
                   try {
                     const status = await apiClient.checkMuxUploadStatus(undefined, undefined, postId);
-                    console.log(`[CreatePostModal] Poll ${pollCount}: Status = ${status.status}`);
-
                     if (status.status === "ready" && status.playback_id) {
                       clearInterval(pollInterval);
-                      console.log("[CreatePostModal] Video processing complete! Playback ID:", status.playback_id);
-                      // Post has been updated by the status check endpoint
-                      // Refresh the feed to show the video
                       window.dispatchEvent(new Event("post-video-ready"));
                     } else if (pollCount >= maxPolls) {
                       clearInterval(pollInterval);
-                      console.log("[CreatePostModal] Polling timeout - video may still be processing. Webhook will update it.");
                     }
-                  } catch (err) {
-                    console.error("[CreatePostModal] Poll error:", err);
-                    if (pollCount >= maxPolls) {
-                      clearInterval(pollInterval);
-                    }
+                  } catch {
+                    if (pollCount >= maxPolls) clearInterval(pollInterval);
                   }
                 }, 2000);
 
-                resolve(); // Video uploaded successfully
+                resolve();
               } else {
                 const errorMsg = t("videoUploadFailed", { status: xhr.status });
-                console.error("[CreatePostModal] Video upload failed:", errorMsg);
                 setUploadStatus("error");
                 setError(errorMsg);
                 reject(new Error(errorMsg));
               }
             });
-            xhr.addEventListener("error", (e) => {
+            xhr.addEventListener("error", () => {
               const errorMsg = t("videoUploadError");
-              console.error("[CreatePostModal] Video upload error:", e);
               setUploadStatus("error");
               setError(errorMsg);
               reject(new Error(errorMsg));
@@ -309,69 +320,54 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             });
             xhr.open("PUT", upload_url);
             xhr.setRequestHeader("Content-Type", videoFile.type);
-            console.log("[CreatePostModal] Starting video upload to Mux...");
             xhr.send(videoFile);
           });
-
-          console.log("[CreatePostModal] Video upload completed, post will be updated by webhook");
         } catch (err: any) {
-          console.error("[CreatePostModal] Video upload error:", err);
           setUploadStatus("error");
           setError(err.message || t("videoUploadPostFailed"));
           setIsLoading(false);
-          return; // Don't close modal if video upload fails - let user see the error
+          return;
         }
       }
 
       UISound.click();
-
-      // Refresh wallet
       window.dispatchEvent(new Event("wallet-updated"));
 
-      // Call onPostCreated callback with post data for optimistic update
-      onPostCreated(result.post || {
-        id: postId,
-        title: title.trim(),
-        post_type: mode,
-        body: mode === "lab" ? body.trim() : null,
-        tags: selectedTags,
-        feedback_type: feedbackType,
-        is_wip: isWip,
-        mux_playback_id: muxPlaybackId || null,
-        video_duration_seconds: videoDuration || null,
-        reaction_count: 0,
-        reply_count: 0,
-        user_reaction: null,
-        is_solved: false,
-        created_at: new Date().toISOString(),
-        updated_at: new Date().toISOString(),
-      });
+      onPostCreated(
+        result.post || {
+          id: postId,
+          title: title.trim(),
+          post_type: mode,
+          body: finalBody || null,
+          tags: tagsPayload,
+          feedback_type: derivedFeedbackType,
+          is_wip: isWip,
+          mux_playback_id: muxPlaybackId || null,
+          video_duration_seconds: videoDuration || null,
+          reaction_count: 0,
+          reply_count: 0,
+          user_reaction: null,
+          is_solved: false,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        }
+      );
 
-      // Show success checkmark then close
       setShowSuccess(true);
       setTimeout(() => {
         setShowSuccess(false);
         onClose();
       }, 1200);
     } catch (err: any) {
-      console.error("Error creating post:", err);
-      // Show user-friendly error message
       let errorMessage = err.message || t("createPostFailed");
-
-      // Extract message from error detail if available
       if (err.message && err.message.includes("detail")) {
         try {
           const errorObj = JSON.parse(err.message);
-          if (errorObj.detail?.message) {
-            errorMessage = errorObj.detail.message;
-          } else if (errorObj.detail) {
-            errorMessage = typeof errorObj.detail === 'string' ? errorObj.detail : JSON.stringify(errorObj.detail);
-          }
-        } catch {
-          // Keep original message if parsing fails
-        }
+          if (errorObj.detail?.message) errorMessage = errorObj.detail.message;
+          else if (errorObj.detail)
+            errorMessage = typeof errorObj.detail === "string" ? errorObj.detail : JSON.stringify(errorObj.detail);
+        } catch {}
       }
-
       setError(errorMessage);
       setIsLoading(false);
     }
@@ -397,7 +393,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
           className="w-full max-w-2xl max-h-[90vh] overflow-y-auto"
         >
           <GlassCard className="p-6 relative" enableHover={false}>
-            {/* Close Button */}
             <motion.button
               onClick={onClose}
               className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/10 text-white/60 hover:bg-white/20 hover:text-white transition-all"
@@ -411,18 +406,21 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             </motion.button>
 
             {/* Header */}
-            <div className="mb-6 pr-8">
+            <div className="mb-4 pr-8">
               <h2 className="text-2xl font-bold text-white mb-1">
                 {mode === "stage" ? t("shareProgressTitle") : t("askQuestionTitle")}
               </h2>
               <p className="text-sm text-white/50">
-                {mode === "stage"
-                  ? t("shareProgressSubtitle")
-                  : t("askQuestionSubtitle")}
+                {mode === "stage" ? t("shareProgressSubtitle") : t("askQuestionSubtitle")}
               </p>
             </div>
 
-            {/* Error Message */}
+            {/* Nudge banner */}
+            <div className="mb-5 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-100/80 text-xs leading-relaxed">
+              {t("nudgePoster")}
+            </div>
+
+            {/* Error */}
             {error && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
@@ -430,26 +428,12 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 className="mb-4 p-3 rounded-lg bg-red-500/20 border border-red-500/30 text-red-200 text-sm"
               >
                 {error}
-
-                {/* Show "Get Claves" button if error is about insufficient balance */}
-                {(error.includes("Insufficient") || error.includes("claves")) && (
-                  <div className="mt-3 flex justify-end">
-                    <button
-                      onClick={() => window.open("/pricing", "_blank")}
-                      className="px-3 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-md shadow-lg transition-colors flex items-center gap-1.5"
-                    >
-                      <span className="text-base">🥢</span> {t("getMoreClaves")}
-                    </button>
-                  </div>
-                )}
               </motion.div>
             )}
 
-            {/* Title Input */}
+            {/* Title */}
             <div className="mb-4">
-              <label className="block text-sm font-semibold text-white/70 mb-2">
-                {t("titleLabel")}
-              </label>
+              <label className="block text-sm font-semibold text-white/70 mb-2">{t("titleLabel")}</label>
               <input
                 type="text"
                 value={title}
@@ -460,34 +444,53 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               />
             </div>
 
+            {/* Channel picker (required) */}
+            <div className="mb-4">
+              <label className="block text-sm font-semibold text-white/70 mb-1">{t("channelLabel")}</label>
+              <p className="text-xs text-white/40 mb-2">{t("channelHint")}</p>
+              {channelsLoading ? (
+                <p className="text-xs text-white/40 italic">{t("channelLoading")}</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {channels.map((ch) => (
+                    <motion.button
+                      key={ch.slug}
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => {
+                        UISound.hover();
+                        setSelectedChannel(ch.slug);
+                      }}
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-sm transition-colors",
+                        selectedChannel === ch.slug
+                          ? "bg-amber-500/30 text-amber-100 border border-amber-500/60"
+                          : "bg-white/5 text-white/70 border border-white/10 hover:border-white/25"
+                      )}
+                    >
+                      {ch.name}
+                    </motion.button>
+                  ))}
+                </div>
+              )}
+            </div>
+
             {/* Video Upload (Stage only) */}
             {mode === "stage" && (
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-white/70 mb-2">
-                  {t("videoLabel")}
-                </label>
+                <label className="block text-sm font-semibold text-white/70 mb-2">{t("videoLabel")}</label>
                 <div className="border-2 border-dashed border-white/20 rounded-lg p-6 text-center">
                   {uploadStatus === "idle" && !videoFile && (
                     <>
-                      <input
-                        ref={fileInputRef}
-                        type="file"
-                        accept="video/*"
-                        onChange={handleVideoSelect}
-                        className="hidden"
-                      />
+                      <input ref={fileInputRef} type="file" accept="video/*" onChange={handleVideoSelect} className="hidden" />
                       <button
                         onClick={() => fileInputRef.current?.click()}
                         className="px-4 py-2 bg-white/10 hover:bg-white/20 text-white rounded-lg transition-colors"
                       >
                         {t("chooseVideoFile")}
                       </button>
-                      <p className="text-xs text-white/40 mt-2">
-                        {t("videoFormatsHint")}
-                      </p>
-                      <p className="text-xs text-amber-400/60 mt-1">
-                        {t("videoAutoUploadHint")}
-                      </p>
+                      <p className="text-xs text-white/40 mt-2">{t("videoFormatsHint")}</p>
+                      <p className="text-xs text-amber-400/60 mt-1">{t("videoAutoUploadHint")}</p>
                     </>
                   )}
 
@@ -506,18 +509,14 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                         <button
                           onClick={() => {
                             setVideoFile(null);
-                            if (fileInputRef.current) {
-                              fileInputRef.current.value = "";
-                            }
+                            if (fileInputRef.current) fileInputRef.current.value = "";
                           }}
                           className="text-red-400 hover:text-red-300 text-xs"
                         >
                           {t("removeBtn")}
                         </button>
                       </div>
-                      <p className="text-xs text-blue-300/60 mt-1">
-                        {t("videoWillUpload")}
-                      </p>
+                      <p className="text-xs text-blue-300/60 mt-1">{t("videoWillUpload")}</p>
                     </div>
                   )}
 
@@ -528,10 +527,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                         <span className="text-blue-300 text-xs font-mono">{Math.round(uploadProgress)}%</span>
                       </div>
                       <div className="w-full bg-gray-800 rounded-full h-2">
-                        <div
-                          className="bg-blue-500 h-2 rounded-full transition-all duration-300"
-                          style={{ width: `${uploadProgress}%` }}
-                        />
+                        <div className="bg-blue-500 h-2 rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }} />
                       </div>
                     </div>
                   )}
@@ -553,9 +549,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                           setVideoFile(null);
                           setUploadStatus("idle");
                           setUploadProgress(0);
-                          if (fileInputRef.current) {
-                            fileInputRef.current.value = "";
-                          }
+                          if (fileInputRef.current) fileInputRef.current.value = "";
                         }}
                         className="text-sm text-amber-400 hover:text-amber-300"
                       >
@@ -567,12 +561,24 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               </div>
             )}
 
-            {/* Body Input (Lab only) */}
+            {/* Stage: What you worked on (optional) */}
+            {mode === "stage" && (
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-white/70 mb-2">{t("contextLabel")}</label>
+                <textarea
+                  value={context}
+                  onChange={(e) => setContext(e.target.value)}
+                  placeholder={t("contextPlaceholder")}
+                  rows={3}
+                  className="w-full px-4 py-2 rounded-lg bg-white/10 border border-white/20 text-white placeholder-white/40 focus:outline-none focus:border-amber-500/50 resize-none"
+                />
+              </div>
+            )}
+
+            {/* Lab: Body (required) */}
             {mode === "lab" && (
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-white/70 mb-2">
-                  {t("questionLabel")}
-                </label>
+                <label className="block text-sm font-semibold text-white/70 mb-2">{t("questionLabel")}</label>
                 <textarea
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
@@ -583,17 +589,51 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               </div>
             )}
 
-            {/* Tags */}
+            {/* Feedback wanted (Stage only) */}
+            {mode === "stage" && (
+              <div className="mb-4">
+                <label className="block text-sm font-semibold text-white/70 mb-1">{t("feedbackWantedLabel")}</label>
+                <p className="text-xs text-white/40 mb-2">{t("feedbackWantedHint")}</p>
+                <div className="flex flex-wrap gap-2">
+                  {([
+                    { key: "hype" as FbKey, label: t("fbHype") },
+                    { key: "timing" as FbKey, label: t("fbTiming") },
+                    { key: "footwork" as FbKey, label: t("fbFootwork") },
+                    { key: "frame" as FbKey, label: t("fbFrame") },
+                    { key: "styling" as FbKey, label: t("fbStyling") },
+                  ]).map(({ key, label }) => (
+                    <motion.button
+                      key={key}
+                      whileHover={{ scale: 1.04 }}
+                      whileTap={{ scale: 0.96 }}
+                      onClick={() => toggleFb(key)}
+                      className={cn(
+                        "px-3 py-1.5 rounded-full text-sm transition-colors",
+                        fbSelected[key]
+                          ? key === "hype"
+                            ? "bg-pink-500/25 text-pink-100 border border-pink-400/50"
+                            : "bg-amber-500/25 text-amber-100 border border-amber-400/50"
+                          : "bg-white/5 text-white/60 border border-white/10 hover:border-white/20"
+                      )}
+                    >
+                      {label}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Style / Focus / Level tags (optional) */}
             <div className="mb-4">
               <label className="block text-sm font-semibold text-white/70 mb-2">
                 {t("tagsLabel", { count: selectedTags.length })}
               </label>
               <div className="flex flex-wrap gap-2 max-h-32 overflow-y-auto">
-                {tags.map((tag) => (
+                {STATIC_TAGS.map((tag) => (
                   <motion.button
                     key={tag.slug}
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
                     onClick={() => handleTagToggle(tag.slug)}
                     className={cn(
                       "px-3 py-1 rounded-full text-sm transition-colors",
@@ -607,43 +647,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 ))}
               </div>
             </div>
-
-            {/* Feedback Type (Stage only) */}
-            {mode === "stage" && (
-              <div className="mb-4">
-                <label className="block text-sm font-semibold text-white/70 mb-2">
-                  {t("feedbackTypeLabel")}
-                </label>
-                <div className="flex gap-2">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setFeedbackType("hype")}
-                    className={cn(
-                      "flex-1 px-4 py-2 rounded-lg transition-colors",
-                      feedbackType === "hype"
-                        ? "bg-amber-500/30 text-amber-200 border border-amber-500/50"
-                        : "bg-white/10 text-white/60 border border-white/10 hover:border-white/20"
-                    )}
-                  >
-                    {t("hypeOnly")}
-                  </motion.button>
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => setFeedbackType("coach")}
-                    className={cn(
-                      "flex-1 px-4 py-2 rounded-lg transition-colors",
-                      feedbackType === "coach"
-                        ? "bg-amber-500/30 text-amber-200 border border-amber-500/50"
-                        : "bg-white/10 text-white/60 border border-white/10 hover:border-white/20"
-                    )}
-                  >
-                    {t("coachingAllowed")}
-                  </motion.button>
-                </div>
-              </div>
-            )}
 
             {/* WIP Toggle */}
             <div className="mb-6 flex items-center gap-3">
@@ -659,7 +662,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               </label>
             </div>
 
-            {/* Submit Button */}
+            {/* Submit */}
             <div className="flex gap-3">
               <MagicButton
                 onClick={handleSubmit}
@@ -667,17 +670,20 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 fullWidth
                 disabled={
                   !title.trim() ||
+                  !selectedChannel ||
                   (mode === "lab" && !body.trim()) ||
                   (mode === "stage" && (uploadStatus === "uploading" || uploadStatus === "error"))
                 }
               >
                 {mode === "stage"
-                  ? (uploadStatus === "processing" ? t("shareVideoProcessing") : t("shareVideoBtn"))
+                  ? uploadStatus === "processing"
+                    ? t("shareVideoProcessing")
+                    : t("shareVideoBtn")
                   : t("postQuestionBtn")}
               </MagicButton>
             </div>
 
-            {/* Cost Info */}
+            {/* Free to post footer */}
             <p className="text-xs text-white/40 mt-4 text-center">
               {mode === "stage"
                 ? t("stageCost")
@@ -685,7 +691,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             </p>
           </GlassCard>
 
-          {/* Success Checkmark Overlay */}
           <AnimatePresence>
             {showSuccess && (
               <motion.div
