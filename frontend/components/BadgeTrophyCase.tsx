@@ -26,12 +26,16 @@ interface BadgeTrophyCaseProps {
   userStats?: {
     reactions_given: number;
     reactions_received: number;
+    likes_received?: number;
     solutions_accepted: number;
     fires_received?: number;
     claps_received?: number;
     metronomes_received?: number;
     questions_posted?: number;
     videos_posted?: number;
+    motw_videos?: number;
+    original_videos?: number;
+    guild_videos?: number;
     comments_posted?: number;
     current_streak?: number;
   } | null;
@@ -195,6 +199,9 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
       case 'reactions_received':
         current = userStats?.reactions_received || 0;
         break;
+      case 'likes_received':
+        current = userStats?.likes_received ?? userStats?.reactions_received ?? 0;
+        break;
       case 'fires_received':
         current = userStats?.fires_received || 0;
         break;
@@ -212,6 +219,15 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
         break;
       case 'videos_posted':
         current = userStats?.videos_posted || 0;
+        break;
+      case 'motw_videos':
+        current = userStats?.motw_videos || 0;
+        break;
+      case 'original_videos':
+        current = userStats?.original_videos || 0;
+        break;
+      case 'guild_videos':
+        current = userStats?.guild_videos || 0;
         break;
       case 'comments_posted':
         current = userStats?.comments_posted || 0;

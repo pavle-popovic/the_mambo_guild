@@ -1121,17 +1121,18 @@
     "channelRequired": "Per favore scegli un canale.",
     "contextLabel": "Su cosa hai lavorato (facoltativo)",
     "contextPlaceholder": "Una riga o due su cosa stavi provando...",
-    "feedbackWantedLabel": "Cosa aiuterebbe di più?",
-    "feedbackWantedHint": "Spunta cosa vuoi ricevere, o scegli solo supporto.",
-    "fbHype": "Solo supporto",
-    "fbTiming": "Timing",
-    "fbFootwork": "Gioco di piedi",
-    "fbFrame": "Telaio e connessione",
-    "fbStyling": "Stile e musicalità",
     "nudgePoster": "Esporsi è la parte più dura. Prendi ciò che aiuta, lascia il resto.",
     "nudgeReply": "Dille cosa ha fatto bene e una cosa da sistemare. Attitudine prima di Abilità.",
     "nudgeIntro": "Sii gentile. Attitudine prima di Abilità, sempre.",
-    "feedbackWantedPrefix": "Feedback su:"
+    "videoTypeLabel": "Tipo di video",
+    "videoTypeHint": "Scegli che tipo di video è. Appare sulla card.",
+    "videoTypeRequired": "Scegli un tipo di video.",
+    "videoTypeMotw": "Passo della settimana",
+    "videoTypeMotwHint": "La tua versione della sfida della settimana.",
+    "videoTypeOriginal": "Originale",
+    "videoTypeOriginalHint": "La tua coreografia o freestyle.",
+    "videoTypeGuild": "Guild",
+    "videoTypeGuildHint": "Un combo da una lezione o prova Guild."
   },
   "courseObjectives": {
     "bodymovement-mastery": [

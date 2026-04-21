@@ -1121,17 +1121,18 @@
     "channelRequired": "채널을 선택해 주세요.",
     "contextLabel": "무엇을 연습했나요 (선택)",
     "contextPlaceholder": "이번에 집중한 것을 한두 줄로...",
-    "feedbackWantedLabel": "어떤 피드백이 가장 도움이 될까요?",
-    "feedbackWantedHint": "원하는 항목을 선택하거나 응원만 골라도 돼요.",
-    "fbHype": "그냥 응원만 해주세요",
-    "fbTiming": "타이밍",
-    "fbFootwork": "풋워크",
-    "fbFrame": "프레임과 연결",
-    "fbStyling": "스타일링과 음악성",
     "nudgePoster": "나를 드러내는 게 가장 어려워요. 도움 되는 것만 받아들여요.",
     "nudgeReply": "잘한 점과 개선할 점 하나를 알려주세요. 실력보다 태도.",
     "nudgeIntro": "친절하게. 언제나 실력보다 태도.",
-    "feedbackWantedPrefix": "원하는 피드백:"
+    "videoTypeLabel": "비디오 유형",
+    "videoTypeHint": "어떤 종류의 영상인지 선택하세요. 카드에 표시됩니다.",
+    "videoTypeRequired": "비디오 유형을 선택하세요.",
+    "videoTypeMotw": "이주의 무브",
+    "videoTypeMotwHint": "이번 주 챌린지에 대한 당신의 해석.",
+    "videoTypeOriginal": "오리지널",
+    "videoTypeOriginalHint": "자작 안무 또는 프리스타일.",
+    "videoTypeGuild": "길드",
+    "videoTypeGuildHint": "길드 수업 또는 리허설 콤보."
   },
   "courseObjectives": {
     "bodymovement-mastery": [

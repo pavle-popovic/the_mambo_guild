@@ -27,13 +27,17 @@ interface Post {
     mux_playback_id: string | null;
     is_wip: boolean;
     feedback_type: "coach" | "hype";
+    video_type?: "motw" | "original" | "guild" | null;
     reaction_count: number;
-    fire_count?: number;
-    ruler_count?: number;
-    clap_count?: number;
     reply_count: number;
     has_instructor_comment?: boolean;
 }
+
+const VIDEO_TYPE_EMOJI: Record<string, string> = {
+    motw: "🔥",
+    original: "🎵",
+    guild: "👏",
+};
 
 interface StageVideoCardProps {
     post: Post;
@@ -140,6 +144,20 @@ export default function StageVideoCard({
                         >
                             <Lock size={24} className="text-[#FCE205]" />
                         </motion.div>
+                    </div>
+                )}
+
+                {/* Video Type Pill - top-left */}
+                {post.video_type && VIDEO_TYPE_EMOJI[post.video_type] && (
+                    <div className={cn(
+                        "absolute z-10 rounded-full bg-black/70 backdrop-blur-sm border border-white/15 flex items-center justify-center shadow-lg",
+                        isCompact
+                            ? "top-1 left-1 w-5 h-5 text-[11px]"
+                            : "top-3 left-3 w-7 h-7 text-sm"
+                    )}
+                    title={post.video_type}
+                    >
+                        <span>{VIDEO_TYPE_EMOJI[post.video_type]}</span>
                     </div>
                 )}
 

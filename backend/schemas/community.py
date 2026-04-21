@@ -66,7 +66,8 @@ class PostCreateRequest(BaseModel):
     tags: List[str] = Field(..., min_items=1, max_items=5)
     is_wip: bool = False  # "Work in Progress" mode
     feedback_type: Literal['hype', 'coach'] = 'coach'
-    
+    video_type: Optional[Literal['motw', 'original', 'guild']] = None  # Required when post_type='stage'
+
     # Video info (for stage posts) - set after Mux upload
     mux_asset_id: Optional[str] = None
     mux_playback_id: Optional[str] = None
@@ -76,6 +77,12 @@ class PostCreateRequest(BaseModel):
     def body_required_for_lab(cls, v, values):
         if values.get('post_type') == 'lab' and not v:
             raise ValueError('Body is required for Lab questions')
+        return v
+
+    @validator('video_type')
+    def video_type_required_for_stage(cls, v, values):
+        if values.get('post_type') == 'stage' and not v:
+            raise ValueError('video_type is required for Stage posts (motw, original, or guild)')
         return v
 
 
@@ -118,10 +125,11 @@ class PostResponse(BaseModel):
     tags: List[str] = []
     is_wip: bool = False
     feedback_type: str = 'coach'
+    video_type: Optional[str] = None  # 'motw' | 'original' | 'guild' for Stage posts
     is_solved: bool = False
     reaction_count: int = 0
     reply_count: int = 0
-    user_reaction: Optional[str] = None  # Current user's reaction type, if any
+    user_reaction: Optional[str] = None  # 'like' if the current user has liked, else None
     is_saved: bool = False
     created_at: datetime
     updated_at: datetime
@@ -136,8 +144,8 @@ class PostDetailResponse(PostResponse):
 
 
 class ReactionRequest(BaseModel):
-    """Request to add/change a reaction."""
-    reaction_type: Literal['fire', 'ruler', 'clap']
+    """Request to like/unlike a post. Body is intentionally empty — toggle semantics."""
+    pass
 
 
 class ReplyCreateRequest(BaseModel):
@@ -230,21 +238,26 @@ class TagResponse(BaseModel):
 
 class PublicProfileStats(BaseModel):
     """Stats shown on public profile and used for badge progress calculation."""
-    # Reactions
+    # Reactions given/received
     reactions_given: int = 0
-    reactions_received: int = 0
+    reactions_received: int = 0        # total likes across all your posts — drives Crowd Favorite
+    likes_received: int = 0            # alias of reactions_received for clarity
+    # Legacy per-type counts (kept so old trophies still display accurately)
     fires_received: int = 0
     claps_received: int = 0
     metronomes_received: int = 0
-    
+
     # Solutions & Questions
     solutions_accepted: int = 0
     questions_posted: int = 0
-    
+
     # Content Creation
     videos_posted: int = 0
+    motw_videos: int = 0       # Move of the Week submissions
+    original_videos: int = 0   # Own choreo / freestyle
+    guild_videos: int = 0      # Guild class choreos
     comments_posted: int = 0
-    
+
     # Streaks
     current_streak: int = 0
 

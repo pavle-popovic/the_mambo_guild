@@ -1083,11 +1083,9 @@ class ApiClient {
       tags: string[];
       is_wip: boolean;
       feedback_type: string;
+      video_type?: "motw" | "original" | "guild" | null;
       is_solved: boolean;
       reaction_count: number;
-      fire_count?: number;
-      ruler_count?: number;
-      clap_count?: number;
       reply_count: number;
       user_reaction: string | null;
       created_at: string;
@@ -1116,11 +1114,9 @@ class ApiClient {
       tags: string[];
       is_wip: boolean;
       feedback_type: string;
+      video_type?: "motw" | "original" | "guild" | null;
       is_solved: boolean;
       reaction_count: number;
-      fire_count?: number;
-      ruler_count?: number;
-      clap_count?: number;
       reply_count: number;
       user_reaction: string | null;
       created_at: string;
@@ -1153,6 +1149,7 @@ class ApiClient {
     tags: string[];
     is_wip?: boolean;
     feedback_type?: 'hype' | 'coach';
+    video_type?: 'motw' | 'original' | 'guild';
     mux_asset_id?: string;
     mux_playback_id?: string;
     video_duration_seconds?: number;
@@ -1167,18 +1164,15 @@ class ApiClient {
     });
   }
 
-  async addReaction(postId: string, reactionType: 'fire' | 'ruler' | 'clap') {
+  async addReaction(postId: string) {
     return this.request<{
       success: boolean;
       message: string;
-      user_reaction?: 'fire' | 'ruler' | 'clap' | null;
+      user_reaction?: 'like' | null;
       reaction_count?: number;
-      fire_count?: number;
-      ruler_count?: number;
-      clap_count?: number;
     }>(`/api/community/posts/${postId}/react`, {
       method: "POST",
-      body: JSON.stringify({ reaction_type: reactionType }),
+      body: JSON.stringify({}),
     });
   }
 
@@ -1188,9 +1182,6 @@ class ApiClient {
       message: string;
       user_reaction?: null;
       reaction_count?: number;
-      fire_count?: number;
-      ruler_count?: number;
-      clap_count?: number;
     }>(`/api/community/posts/${postId}/react`, {
       method: "DELETE",
     });

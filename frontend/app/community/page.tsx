@@ -36,11 +36,9 @@ interface Post {
     tags: string[];
     is_wip: boolean;
     feedback_type: "coach" | "hype";
+    video_type?: "motw" | "original" | "guild" | null;
     is_solved: boolean;
     reaction_count: number;
-    fire_count?: number;
-    ruler_count?: number;
-    clap_count?: number;
     reply_count: number;
     user_reaction: string | null;
     is_saved?: boolean;
@@ -211,9 +209,9 @@ export default function CommunityPage() {
         setPosts((prev) => prev.filter((p) => p.id !== postId));
     };
 
-    const handleReaction = async (postId: string, type: "fire" | "ruler" | "clap") => {
+    const handleReaction = async (postId: string) => {
         try {
-            await apiClient.addReaction(postId, type);
+            await apiClient.addReaction(postId);
             loadPosts();
         } catch (err) {
             console.error("Reaction failed:", err);

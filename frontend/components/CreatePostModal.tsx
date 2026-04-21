@@ -43,7 +43,7 @@ const STATIC_TAGS: Tag[] = [
   { slug: "advanced", name: "Advanced", category: "Level", usage_count: 0 },
 ];
 
-type FbKey = "hype" | "timing" | "footwork" | "frame" | "styling";
+type VideoType = "motw" | "original" | "guild";
 
 export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: CreatePostModalProps) {
   const t = useTranslations("community");
@@ -51,13 +51,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
   const [body, setBody] = useState("");
   const [context, setContext] = useState(""); // Stage-only "what you worked on"
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [fbSelected, setFbSelected] = useState<Record<FbKey, boolean>>({
-    hype: false,
-    timing: false,
-    footwork: false,
-    frame: false,
-    styling: false,
-  });
+  const [videoType, setVideoType] = useState<VideoType | null>(null);
   const [isWip, setIsWip] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +91,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
       setBody("");
       setContext("");
       setSelectedTags([]);
-      setFbSelected({ hype: false, timing: false, footwork: false, frame: false, styling: false });
+      setVideoType(null);
       setIsWip(false);
       setVideoFile(null);
       setUploadStatus("idle");
@@ -115,36 +109,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
       prev.includes(tagSlug) ? prev.filter((t) => t !== tagSlug) : [...prev, tagSlug].slice(0, 5)
     );
   };
-
-  const toggleFb = (key: FbKey) => {
-    UISound.hover();
-    setFbSelected((prev) => {
-      if (key === "hype") {
-        // Hype is exclusive — turn everything else off
-        const next = { hype: !prev.hype, timing: false, footwork: false, frame: false, styling: false };
-        return next;
-      }
-      // Picking a specific area clears hype
-      return { ...prev, [key]: !prev[key], hype: false };
-    });
-  };
-
-  // Derived: feedback_type + optional "Feedback wanted on:" prefix line
-  const derivedFeedbackType: "hype" | "coach" = (() => {
-    const anySpecific = fbSelected.timing || fbSelected.footwork || fbSelected.frame || fbSelected.styling;
-    if (fbSelected.hype && !anySpecific) return "hype";
-    return "coach";
-  })();
-
-  const feedbackPrefixLine = (() => {
-    const labels: string[] = [];
-    if (fbSelected.timing) labels.push(t("fbTiming"));
-    if (fbSelected.footwork) labels.push(t("fbFootwork"));
-    if (fbSelected.frame) labels.push(t("fbFrame"));
-    if (fbSelected.styling) labels.push(t("fbStyling"));
-    if (labels.length === 0) return "";
-    return `${t("feedbackWantedPrefix")} ${labels.join(", ")}`;
-  })();
 
   const handleVideoSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -195,6 +159,11 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
       return;
     }
 
+    if (mode === "stage" && !videoType) {
+      setError(t("videoTypeRequired"));
+      return;
+    }
+
     if (mode === "stage" && uploadStatus === "uploading") {
       setError(t("waitForUpload"));
       return;
@@ -203,13 +172,10 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
     setIsLoading(true);
     setError(null);
 
-    // Build final body: for Stage, prepend optional "Feedback wanted on:" + "What I worked on"
+    // Build final body: Stage uses optional "What I worked on" context
     let finalBody = mode === "lab" ? body.trim() : "";
-    if (mode === "stage") {
-      const parts: string[] = [];
-      if (feedbackPrefixLine) parts.push(feedbackPrefixLine);
-      if (context.trim()) parts.push(context.trim());
-      finalBody = parts.join("\n\n");
+    if (mode === "stage" && context.trim()) {
+      finalBody = context.trim();
     }
 
     const tagsPayload = selectedTags;
@@ -220,7 +186,8 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
         title: title.trim(),
         body: finalBody || undefined,
         tags: tagsPayload,
-        feedback_type: derivedFeedbackType,
+        feedback_type: "coach",
+        video_type: mode === "stage" && videoType ? videoType : undefined,
         is_wip: isWip,
         mux_asset_id: muxAssetId || undefined,
         mux_playback_id: muxPlaybackId || undefined,
@@ -320,7 +287,8 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
           post_type: mode,
           body: finalBody || null,
           tags: tagsPayload,
-          feedback_type: derivedFeedbackType,
+          feedback_type: "coach",
+          video_type: mode === "stage" ? videoType : null,
           is_wip: isWip,
           mux_playback_id: muxPlaybackId || null,
           video_duration_seconds: videoDuration || null,
@@ -538,34 +506,34 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               </div>
             )}
 
-            {/* Feedback wanted (Stage only) */}
+            {/* Video Type Picker (Stage only) */}
             {mode === "stage" && (
               <div className="mb-4">
-                <label className="block text-sm font-semibold text-white/70 mb-1">{t("feedbackWantedLabel")}</label>
-                <p className="text-xs text-white/40 mb-2">{t("feedbackWantedHint")}</p>
-                <div className="flex flex-wrap gap-2">
+                <label className="block text-sm font-semibold text-white/70 mb-1">{t("videoTypeLabel")}</label>
+                <p className="text-xs text-white/40 mb-2">{t("videoTypeHint")}</p>
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                   {([
-                    { key: "hype" as FbKey, label: t("fbHype") },
-                    { key: "timing" as FbKey, label: t("fbTiming") },
-                    { key: "footwork" as FbKey, label: t("fbFootwork") },
-                    { key: "frame" as FbKey, label: t("fbFrame") },
-                    { key: "styling" as FbKey, label: t("fbStyling") },
-                  ]).map(({ key, label }) => (
+                    { key: "motw" as VideoType, emoji: "🔥", label: t("videoTypeMotw"), hint: t("videoTypeMotwHint") },
+                    { key: "original" as VideoType, emoji: "🎵", label: t("videoTypeOriginal"), hint: t("videoTypeOriginalHint") },
+                    { key: "guild" as VideoType, emoji: "👏", label: t("videoTypeGuild"), hint: t("videoTypeGuildHint") },
+                  ]).map(({ key, emoji, label, hint }) => (
                     <motion.button
                       key={key}
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={() => toggleFb(key)}
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={() => { UISound.hover(); setVideoType(key); }}
                       className={cn(
-                        "px-3 py-1.5 rounded-full text-sm transition-colors",
-                        fbSelected[key]
-                          ? key === "hype"
-                            ? "bg-pink-500/25 text-pink-100 border border-pink-400/50"
-                            : "bg-amber-500/25 text-amber-100 border border-amber-400/50"
-                          : "bg-white/5 text-white/60 border border-white/10 hover:border-white/20"
+                        "flex flex-col items-start gap-1 px-3 py-2.5 rounded-xl text-left transition-colors border",
+                        videoType === key
+                          ? "bg-amber-500/20 border-amber-400/60 text-amber-100"
+                          : "bg-white/5 border-white/10 text-white/70 hover:border-white/20"
                       )}
                     >
-                      {label}
+                      <span className="flex items-center gap-2 text-sm font-bold">
+                        <span className="text-base leading-none">{emoji}</span>
+                        <span>{label}</span>
+                      </span>
+                      <span className="text-[11px] text-white/50 leading-tight">{hint}</span>
                     </motion.button>
                   ))}
                 </div>
@@ -620,6 +588,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 disabled={
                   !title.trim() ||
                   (mode === "lab" && !body.trim()) ||
+                  (mode === "stage" && !videoType) ||
                   (mode === "stage" && (uploadStatus === "uploading" || uploadStatus === "error"))
                 }
               >

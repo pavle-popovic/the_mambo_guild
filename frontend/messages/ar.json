@@ -1121,17 +1121,18 @@
     "channelRequired": "من فضلك اختر قناة.",
     "contextLabel": "على ماذا كنت تعمل (اختياري)",
     "contextPlaceholder": "سطر أو اثنان عما كنت تحاول إتقانه...",
-    "feedbackWantedLabel": "ما الذي سيساعد أكثر؟",
-    "feedbackWantedHint": "اختر ما تريد ملاحظات عليه، أو اكتفِ بالتشجيع.",
-    "fbHype": "فقط شجعني",
-    "fbTiming": "التوقيت",
-    "fbFootwork": "حركة القدمين",
-    "fbFrame": "الإطار والاتصال",
-    "fbStyling": "التميز والموسيقى",
     "nudgePoster": "أن تُظهر نفسك هو الأصعب. خذ ما يفيد، واترك الباقي.",
     "nudgeReply": "قل ما الذي نجح، وشيئًا واحدًا للتعديل. الموقف قبل المهارة.",
     "nudgeIntro": "كن لطيفًا. الموقف قبل المهارة، دائمًا.",
-    "feedbackWantedPrefix": "أريد ملاحظات على:"
+    "videoTypeLabel": "نوع الفيديو",
+    "videoTypeHint": "اختر نوع هذا الفيديو. يظهر على البطاقة.",
+    "videoTypeRequired": "اختر نوع الفيديو.",
+    "videoTypeMotw": "حركة الأسبوع",
+    "videoTypeMotwHint": "نسختك من تحدي هذا الأسبوع.",
+    "videoTypeOriginal": "أصلي",
+    "videoTypeOriginalHint": "كوريو أو فري ستايل من تأليفك.",
+    "videoTypeGuild": "Guild",
+    "videoTypeGuildHint": "كومبو من حصة أو بروفة Guild."
   },
   "courseObjectives": {
     "bodymovement-mastery": [

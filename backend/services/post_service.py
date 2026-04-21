@@ -56,10 +56,8 @@ def _build_post_dict(
     user_reaction: str | None,
     db: Session,
     is_saved: bool = False,
-    type_counts: dict | None = None,
 ) -> dict:
     """Build the post response dict from pre-loaded objects."""
-    tc = type_counts or {}
     return {
         "id": str(post.id),
         "user": _get_user_info(user, db) if user else None,
@@ -71,27 +69,15 @@ def _build_post_dict(
         "tags": post.tags or [],
         "is_wip": post.is_wip,
         "feedback_type": post.feedback_type,
+        "video_type": post.video_type,
         "is_solved": post.is_solved,
         "reaction_count": post.reaction_count,
-        "fire_count": int(tc.get("fire", 0)),
-        "ruler_count": int(tc.get("ruler", 0)),
-        "clap_count": int(tc.get("clap", 0)),
         "reply_count": post.reply_count,
         "user_reaction": user_reaction,
         "is_saved": is_saved,
         "created_at": post.created_at,
         "updated_at": post.updated_at,
     }
-
-
-def _get_type_counts_for_post(post_id, db: Session) -> dict:
-    """Single-post per-type count query."""
-    rows = db.query(
-        PostReaction.reaction_type, func.count(PostReaction.id)
-    ).filter(
-        PostReaction.post_id == post_id
-    ).group_by(PostReaction.reaction_type).all()
-    return {r[0]: r[1] for r in rows}
 
 
 def _format_post_response(post: Post, current_user_id: str, db: Session) -> dict:
@@ -112,14 +98,13 @@ def _format_post_response(post: Post, current_user_id: str, db: Session) -> dict
             SavedPost.post_id == post.id,
             SavedPost.user_id == current_user_id
         ).first() is not None
-    type_counts = _get_type_counts_for_post(post.id, db)
-    return _build_post_dict(post, user, user_reaction, db, is_saved=is_saved, type_counts=type_counts)
+    return _build_post_dict(post, user, user_reaction, db, is_saved=is_saved)
 
 
 def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
     """
     Format a list of posts for API response using batch queries.
-    Avoids N+1: 3 extra queries regardless of how many posts.
+    Avoids N+1: 2 extra queries regardless of how many posts.
     """
     if not posts:
         return []
@@ -132,18 +117,6 @@ def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
     user_map = {str(u.id): u for u in users}
 
     post_ids = [p.id for p in posts]
-
-    # Batch-load per-type reaction counts for all posts in one query
-    type_count_rows = db.query(
-        PostReaction.post_id,
-        PostReaction.reaction_type,
-        func.count(PostReaction.id)
-    ).filter(
-        PostReaction.post_id.in_(post_ids)
-    ).group_by(PostReaction.post_id, PostReaction.reaction_type).all()
-    type_counts_map: dict = {}
-    for post_id_row, rtype, cnt in type_count_rows:
-        type_counts_map.setdefault(str(post_id_row), {})[rtype] = cnt
 
     # Batch-load current user's reactions and saved status in two queries
     reaction_map: dict = {}
@@ -168,7 +141,6 @@ def _format_posts_bulk(posts: list, current_user_id: str, db: Session) -> list:
             reaction_map.get(str(p.id)),
             db,
             is_saved=str(p.id) in saved_set,
-            type_counts=type_counts_map.get(str(p.id), {}),
         )
         for p in posts
     ]
@@ -204,6 +176,7 @@ def create_post(
     body: str = None,
     is_wip: bool = False,
     feedback_type: str = "coach",
+    video_type: str = None,
     mux_asset_id: str = None,
     mux_playback_id: str = None,
     video_duration_seconds: int = None,
@@ -238,7 +211,12 @@ def create_post(
     # Determine cost
     if post_type == "stage":
         cost = COST_POST_VIDEO
-        
+
+        # video_type is required for Stage posts — UI enforces this, but
+        # defend in service in case a client bypasses the schema.
+        if video_type not in ("motw", "original", "guild"):
+            return {"success": False, "message": "video_type must be one of: motw, original, guild"}
+
         # Check video slot limit
         slot_status = get_video_slot_status(user_id, db)
         if not slot_status["allowed"]:
@@ -279,6 +257,7 @@ def create_post(
         tags=valid_tag_slugs,
         is_wip=is_wip,
         feedback_type=feedback_type,
+        video_type=video_type if post_type == "stage" else None,
         mux_asset_id=mux_asset_id,
         mux_playback_id=mux_playback_id,
         video_duration_seconds=video_duration_seconds,
@@ -398,82 +377,55 @@ def get_post_detail(
 def add_reaction(
     post_id: str,
     user_id: str,
-    reaction_type: str,
     db: Session
 ) -> dict:
     """
-    Add or change a reaction on a post.
+    Like a post. Idempotent — a second call is a no-op.
     """
     post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
     if not post:
         return {"success": False, "message": "Post not found"}
 
-    # Prevent self-reaction (checked first to avoid bypass via existing reaction)
+    # Prevent self-reaction
     if str(post.user_id) == user_id:
-        return {"success": False, "message": "You cannot react to your own posts"}
+        return {"success": False, "message": "You cannot like your own posts"}
 
-    # Check for existing reaction
+    # Already liked → no-op, report current state
     existing = db.query(PostReaction).filter(
         PostReaction.post_id == post_id,
         PostReaction.user_id == user_id
     ).first()
-
     if existing:
-        # Change reaction type (no charge for changing)
-        if existing.reaction_type != reaction_type:
-            existing.reaction_type = reaction_type
-            db.flush()
-            counts = _get_type_counts_for_post(post_id, db)
-            return {
-                "success": True,
-                "message": "Reaction updated",
-                "user_reaction": reaction_type,
-                "reaction_count": post.reaction_count,
-                "fire_count": int(counts.get("fire", 0)),
-                "ruler_count": int(counts.get("ruler", 0)),
-                "clap_count": int(counts.get("clap", 0)),
-            }
-        else:
-            counts = _get_type_counts_for_post(post_id, db)
-            return {
-                "success": True,
-                "message": "Already reacted",
-                "user_reaction": reaction_type,
-                "reaction_count": post.reaction_count,
-                "fire_count": int(counts.get("fire", 0)),
-                "ruler_count": int(counts.get("ruler", 0)),
-                "clap_count": int(counts.get("clap", 0)),
-            }
+        return {
+            "success": True,
+            "message": "Already liked",
+            "user_reaction": "like",
+            "reaction_count": post.reaction_count,
+            "already_reacted": True,
+        }
 
-    # Hourly rate limit on new reactions (changing type above is exempt).
+    # Hourly rate limit on new likes
     allowed, info = rate_limit_service.check("reaction", user_id, db)
     if not allowed:
         return {"success": False, "message": info["message"], "rate_limited": True}
 
-    # Reactions are free — no charge, no post-owner refund loop.
     reaction = PostReaction(
         id=uuid.uuid4(),
         post_id=post_id,
         user_id=user_id,
-        reaction_type=reaction_type
+        reaction_type="like",
     )
     db.add(reaction)
-
-    # Update post reaction count
     post.reaction_count += 1
-
     db.flush()
 
-    counts = _get_type_counts_for_post(post_id, db)
-    logger.info(f"User {user_id} reacted {reaction_type} on post {post_id}")
+    logger.info(f"User {user_id} liked post {post_id}")
     return {
         "success": True,
-        "message": f"Reacted with {reaction_type}",
-        "user_reaction": reaction_type,
+        "message": "Liked",
+        "user_reaction": "like",
         "reaction_count": post.reaction_count,
-        "fire_count": int(counts.get("fire", 0)),
-        "ruler_count": int(counts.get("ruler", 0)),
-        "clap_count": int(counts.get("clap", 0)),
+        "already_reacted": False,
     }
 
 
@@ -483,7 +435,7 @@ def remove_reaction(
     db: Session
 ) -> dict:
     """
-    Remove a reaction from a post (refunds clave).
+    Unlike a post.
     """
     reaction = db.query(PostReaction).filter(
         PostReaction.post_id == post_id,
@@ -491,27 +443,21 @@ def remove_reaction(
     ).first()
 
     if not reaction:
-        return {"success": False, "message": "No reaction to remove"}
+        return {"success": False, "message": "No like to remove"}
 
-    # Get post to update count
     post = db.query(Post).filter(Post.id == post_id).first()
     if post:
-        # Reactions are free — no refund to claw back.
         post.reaction_count = max(0, post.reaction_count - 1)
 
     db.delete(reaction)
     db.flush()
 
-    counts = _get_type_counts_for_post(post_id, db)
     total = post.reaction_count if post else 0
     return {
         "success": True,
-        "message": "Reaction removed",
+        "message": "Unliked",
         "user_reaction": None,
         "reaction_count": total,
-        "fire_count": int(counts.get("fire", 0)),
-        "ruler_count": int(counts.get("ruler", 0)),
-        "clap_count": int(counts.get("clap", 0)),
     }
 
 

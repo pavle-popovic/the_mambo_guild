@@ -1121,17 +1121,18 @@
     "channelRequired": "Παρακαλώ διάλεξε ένα κανάλι.",
     "contextLabel": "Σε τι δούλευες (προαιρετικό)",
     "contextPlaceholder": "Μια δυο γραμμές για το τι προσπαθούσες...",
-    "feedbackWantedLabel": "Τι θα βοηθούσε πιο πολύ;",
-    "feedbackWantedHint": "Τσέκαρε τι θέλεις, ή διάλεξε μόνο ενθάρρυνση.",
-    "fbHype": "Μόνο ενθάρρυνση",
-    "fbTiming": "Χρόνος",
-    "fbFootwork": "Βηματολόγιο",
-    "fbFrame": "Πλαίσιο και σύνδεση",
-    "fbStyling": "Στυλ και μουσικότητα",
     "nudgePoster": "Το να εκτεθείς είναι το δυσκολότερο. Πάρε ό,τι βοηθά, άφησε τα υπόλοιπα.",
     "nudgeReply": "Πες τι πήγε καλά και ένα πράγμα να προσαρμόσει. Στάση πάνω από Ικανότητα.",
     "nudgeIntro": "Να είσαι ευγενικός. Στάση πάνω από Ικανότητα, πάντα.",
-    "feedbackWantedPrefix": "Θέλω feedback σε:"
+    "videoTypeLabel": "Τύπος βίντεο",
+    "videoTypeHint": "Διάλεξε τι είδους βίντεο είναι. Εμφανίζεται στην κάρτα.",
+    "videoTypeRequired": "Διάλεξε τύπο βίντεο.",
+    "videoTypeMotw": "Κίνηση της εβδομάδας",
+    "videoTypeMotwHint": "Η εκδοχή σου στην πρόκληση της εβδομάδας.",
+    "videoTypeOriginal": "Πρωτότυπο",
+    "videoTypeOriginalHint": "Η δική σου χορογραφία ή freestyle.",
+    "videoTypeGuild": "Guild",
+    "videoTypeGuildHint": "Combo από μάθημα ή πρόβα του Guild."
   },
   "courseObjectives": {
     "bodymovement-mastery": [

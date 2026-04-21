@@ -16,7 +16,7 @@ from services.analytics_service import track_event
 logger = logging.getLogger(__name__)
 from schemas.community import (
     PostCreateRequest, PostUpdateRequest, PostResponse, PostDetailResponse,
-    ReactionRequest, ReplyCreateRequest, ReplyUpdateRequest, ReplyResponse,
+    ReplyCreateRequest, ReplyUpdateRequest, ReplyResponse,
     UploadCheckResponse, TagResponse
 )
 
@@ -150,6 +150,7 @@ def create_post(
         tags=request.tags,
         is_wip=request.is_wip,
         feedback_type=request.feedback_type,
+        video_type=request.video_type,
         mux_asset_id=request.mux_asset_id,
         mux_playback_id=request.mux_playback_id,
         video_duration_seconds=request.video_duration_seconds,
@@ -176,7 +177,7 @@ def create_post(
     from models.community import Post, ModerationStatus
     _ACTIVE = ModerationStatus.ACTIVE.value
 
-    # Center Stage: Track video posts (Stage posts with video)
+    # Stage posts: video total + per-type (motw / original / guild).
     if result["success"] and request.post_type == "stage" and request.mux_asset_id:
         video_count = db.query(func.count(Post.id)).filter(
             Post.user_id == current_user.id,
@@ -186,6 +187,22 @@ def create_post(
             Post.moderation_status == _ACTIVE,
         ).scalar() or 0
         badge_service.check_and_award_badges(str(current_user.id), "videos_posted", video_count, db)
+
+        if request.video_type in ("motw", "original", "guild"):
+            vtype_count = db.query(func.count(Post.id)).filter(
+                Post.user_id == current_user.id,
+                Post.post_type == "stage",
+                Post.video_type == request.video_type,
+                Post.mux_asset_id.isnot(None),
+                Post.is_deleted == False,
+                Post.moderation_status == _ACTIVE,
+            ).scalar() or 0
+            badge_service.check_and_award_badges(
+                str(current_user.id),
+                f"{request.video_type}_videos",
+                vtype_count,
+                db,
+            )
         db.commit()
 
     # Curious Mind: Track questions posted (Lab posts)
@@ -208,6 +225,7 @@ def create_post(
             properties={
                 "post_id": result.get("post_id"),
                 "post_type": request.post_type,
+                "video_type": request.video_type,
                 "has_video": bool(request.mux_asset_id),
                 "tags": request.tags or [],
                 "is_wip": bool(request.is_wip),
@@ -223,18 +241,15 @@ def create_post(
 @router.post("/posts/{post_id}/react")
 def add_reaction(
     post_id: str,
-    request: ReactionRequest,
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Add or change a reaction on a post.
-    Reactions are free.
+    Like a post. Idempotent.
     """
     result = post_service.add_reaction(
         post_id=post_id,
         user_id=str(current_user.id),
-        reaction_type=request.reaction_type,
         db=db
     )
 
@@ -244,28 +259,29 @@ def add_reaction(
 
     db.commit()
 
+    # Skip badge + notify logic on repeat calls (idempotent no-op)
+    if result.get("already_reacted"):
+        return result
+
     # Badge triggers
-    # 1. User gave a reaction (The Critic)
+    # 1. User gave a like (The Critic)
     badge_service.increment_reaction_given(str(current_user.id), db)
-    
-    # 2. Post owner received a reaction (The Star + Specific types)
+
+    # 2. Post owner received a like (Crowd Favorite)
     from models.community import Post
     post = db.query(Post).filter(Post.id == post_id).first()
     if post:
-        badge_service.increment_reaction_received(str(post.user_id), request.reaction_type, db)
+        badge_service.increment_reaction_received(str(post.user_id), db)
 
-        # Notify post owner about the reaction (don't notify self)
         if str(post.user_id) != str(current_user.id):
-            emoji_map = {"fire": "🔥", "ruler": "📏", "clap": "👏"}
-            emoji = emoji_map.get(request.reaction_type, "")
             from models.user import UserProfile
             profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
             reactor_name = profile.first_name if profile else "Someone"
             notification_service.create_notification(
                 user_id=str(post.user_id),
                 type="reaction_received",
-                title=f"{emoji} New Reaction",
-                message=f"{reactor_name} reacted {emoji} to your post \"{post.title[:50]}\"",
+                title="❤️ New Like",
+                message=f"{reactor_name} liked your post \"{post.title[:50]}\"",
                 reference_type="post",
                 reference_id=str(post.id),
                 db=db
@@ -280,7 +296,7 @@ def add_reaction(
             user_id=current_user.id,
             properties={
                 "post_id": post_id,
-                "reaction_type": request.reaction_type,
+                "reaction_type": "like",
             },
         )
     except Exception:

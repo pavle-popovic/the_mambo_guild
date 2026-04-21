@@ -1121,17 +1121,18 @@
     "channelRequired": "チャンネルを選んでください。",
     "contextLabel": "取り組んでいたこと（任意）",
     "contextPlaceholder": "今回意識していたことを一言二言...",
-    "feedbackWantedLabel": "どんなフィードバックが役立ちますか？",
-    "feedbackWantedHint": "欲しいものを選ぶか、応援だけでもOK。",
-    "fbHype": "応援だけほしい",
-    "fbTiming": "タイミング",
-    "fbFootwork": "フットワーク",
-    "fbFrame": "フレームとコネクション",
-    "fbStyling": "スタイリングと音楽性",
     "nudgePoster": "自分をさらけ出すのが一番の難関。役立つものだけ受け取って。",
     "nudgeReply": "良かった点と、ひとつ改善できる点を伝えよう。技術より姿勢。",
     "nudgeIntro": "優しくいこう。いつも、技術より姿勢。",
-    "feedbackWantedPrefix": "フィードバック希望："
+    "videoTypeLabel": "ビデオの種類",
+    "videoTypeHint": "どのタイプの動画か選んでください。カードに表示されます。",
+    "videoTypeRequired": "ビデオの種類を選んでください。",
+    "videoTypeMotw": "今週のムーブ",
+    "videoTypeMotwHint": "今週のチャレンジへの挑戦。",
+    "videoTypeOriginal": "オリジナル",
+    "videoTypeOriginalHint": "自作の振付またはフリースタイル。",
+    "videoTypeGuild": "ギルド",
+    "videoTypeGuildHint": "ギルドのクラスやリハのコンボ。"
   },
   "courseObjectives": {
     "bodymovement-mastery": [

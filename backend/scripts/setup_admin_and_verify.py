@@ -137,13 +137,13 @@ def setup_and_verify():
             reaction = PostReaction(
                 user_id=reactor_id,
                 post_id=sim_post.id,
-                reaction_type="fire"
+                reaction_type="like"
             )
             db.add(reaction)
             db.flush()
-            
+
             # Call service
-            badge_service.increment_reaction_received(sim_user_id, "fire", db)
+            badge_service.increment_reaction_received(sim_user_id, db)
             
         # Check if badge awarded
         badge = db.query(UserBadge).filter(UserBadge.user_id == sim_user_id, UserBadge.badge_id == "firestarter_bronze").first()

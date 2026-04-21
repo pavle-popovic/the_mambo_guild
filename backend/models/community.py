@@ -56,9 +56,13 @@ class FeedbackType(str, enum.Enum):
 
 
 class ReactionType(str, enum.Enum):
-    FIRE = "fire"    # 🔥
-    RULER = "ruler"  # 📏 (precision)
-    CLAP = "clap"    # 👏
+    LIKE = "like"  # single "like" reaction; video_type carries categorization
+
+
+class VideoType(str, enum.Enum):
+    MOTW = "motw"          # 🔥 Move of the Week submission
+    ORIGINAL = "original"  # 🎵 Own choreo / freestyle
+    GUILD = "guild"        # 👏 Guild class choreo / combo
 
 
 class Post(Base):
@@ -80,6 +84,7 @@ class Post(Base):
     tags = Column(ARRAY(String(50)), default=list)
     is_wip = Column(Boolean, default=False)  # "Work in Progress" banner
     feedback_type = Column(String(10), default="coach")  # 'hype' or 'coach'
+    video_type = Column(String(20), nullable=True, index=True)  # 'motw' | 'original' | 'guild' (Stage only)
     
     # Lab-specific
     is_solved = Column(Boolean, default=False)
@@ -143,13 +148,13 @@ class PostReply(Base):
 
 
 class PostReaction(Base):
-    """Reactions on posts (Fire, Ruler, Clap)."""
+    """Reactions on posts — single 'like' type."""
     __tablename__ = "post_reactions"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     post_id = Column(UUID(as_uuid=True), ForeignKey("posts.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    reaction_type = Column(String(20), nullable=False)  # 'fire', 'ruler', 'clap'
+    reaction_type = Column(String(20), nullable=False, default="like")
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships
@@ -159,7 +164,7 @@ class PostReaction(Base):
     # Constraints
     __table_args__ = (
         UniqueConstraint("post_id", "user_id", name="unique_post_user_reaction"),
-        CheckConstraint("reaction_type IN ('fire', 'ruler', 'clap')", name="check_reaction_type"),
+        CheckConstraint("reaction_type = 'like'", name="check_reaction_type"),
     )
 
 
@@ -196,7 +201,8 @@ class BadgeDefinition(Base):
     category = Column(String(20), nullable=False)  # 'course', 'community', 'performance'
     requirement_type = Column(String(50), nullable=False)  # 'drills_7_days', 'solutions_count', etc.
     threshold = Column(Integer, nullable=False)  # The value needed to earn (10, 50, 100...)
-    
+    is_active = Column(Boolean, nullable=False, default=True)  # FALSE = legacy/retired; don't show as unearned
+
     created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
 
     # Relationships

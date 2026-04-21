@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { FaTimes, FaTrash, FaEdit, FaFire, FaRuler, FaSave, FaBookmark, FaRegBookmark } from "react-icons/fa";
+import { FaTimes, FaTrash, FaEdit, FaHeart, FaRegHeart, FaSave, FaBookmark, FaRegBookmark } from "react-icons/fa";
 import MuxVideoPlayer from "./MuxVideoPlayer";
 import { apiClient } from "@/lib/api";
 import { useUISound } from "@/hooks/useUISound";
@@ -31,13 +31,11 @@ interface Post {
   tags: string[];
   is_wip: boolean;
   feedback_type: "coach" | "hype";
+  video_type?: "motw" | "original" | "guild" | null;
   is_solved: boolean;
   reaction_count: number;
-  fire_count?: number;
-  ruler_count?: number;
-  clap_count?: number;
   reply_count: number;
-  user_reaction: "fire" | "ruler" | "clap" | null;
+  user_reaction: "like" | null;
   is_saved?: boolean;
   user: {
     id: string;
@@ -76,7 +74,7 @@ interface PostDetailModalProps {
   postId: string;
   currentUserId?: string;
   onPostDeleted?: (postId: string) => void;
-  onReaction?: (postId: string, type: "fire" | "ruler" | "clap") => void;
+  onReaction?: (postId: string) => void;
   onRefresh?: () => void;
   initialEditMode?: boolean;
 }
@@ -111,11 +109,8 @@ export default function PostDetailModal({
 
   // Optimistic state management
   const [optimisticReaction, setOptimisticReaction] = useState<{
-    type: string | null;
+    type: "like" | null;
     count: number;
-    fire_count: number;
-    ruler_count: number;
-    clap_count: number;
   } | null>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -191,11 +186,8 @@ export default function PostDetailModal({
         if (optimisticReaction) {
           setPost({
             ...(postData as Post),
-            user_reaction: optimisticReaction.type as Post['user_reaction'],
+            user_reaction: optimisticReaction.type,
             reaction_count: optimisticReaction.count,
-            fire_count: optimisticReaction.fire_count,
-            ruler_count: optimisticReaction.ruler_count,
-            clap_count: optimisticReaction.clap_count,
           });
         } else {
           setPost(postData as Post);
@@ -236,75 +228,39 @@ export default function PostDetailModal({
     }
   };
 
-  const handleReaction = async (type: "fire" | "ruler" | "clap") => {
+  const handleReaction = async () => {
     if (!post || !onReaction) return;
     UISoundClick();
 
-    // Store current state for potential revert
     const prevReaction = post.user_reaction;
     const prevCount = post.reaction_count;
-    const prevFire = post.fire_count ?? 0;
-    const prevRuler = post.ruler_count ?? 0;
-    const prevClap = post.clap_count ?? 0;
 
-    // Calculate new state
-    const isTogglingOff = prevReaction === type;
-    const newReaction = isTogglingOff ? null : type;
-    const newCount = isTogglingOff
-      ? prevCount - 1  // Removing reaction
-      : prevReaction === null
-        ? prevCount + 1  // New reaction
-        : prevCount;  // Changing type doesn't change total count
+    const isTogglingOff = prevReaction === "like";
+    const newReaction: "like" | null = isTogglingOff ? null : "like";
+    const newCount = isTogglingOff ? Math.max(0, prevCount - 1) : prevCount + 1;
 
-    // Adjust per-type counts: remove from previous type (if any), add to new type (if any)
-    const adjust = (current: number, kind: "fire" | "ruler" | "clap") => {
-      let next = current;
-      if (prevReaction === kind) next = Math.max(0, next - 1);
-      if (newReaction === kind) next = next + 1;
-      return next;
-    };
-    const newFire = adjust(prevFire, "fire");
-    const newRuler = adjust(prevRuler, "ruler");
-    const newClap = adjust(prevClap, "clap");
-
-    // Set optimistic state (separate from post state)
-    setOptimisticReaction({
-      type: newReaction,
-      count: newCount,
-      fire_count: newFire,
-      ruler_count: newRuler,
-      clap_count: newClap,
-    });
-
-    // Update post state optimistically using functional update
+    setOptimisticReaction({ type: newReaction, count: newCount });
     setPost(prev => prev ? {
       ...prev,
       user_reaction: newReaction,
       reaction_count: newCount,
-      fire_count: newFire,
-      ruler_count: newRuler,
-      clap_count: newClap,
     } : null);
 
-    // Call API
     try {
-      await onReaction(postId, type);
-      // Clear optimistic flag after success - server will confirm
-      // Wait longer to allow server processing
+      if (isTogglingOff) {
+        await apiClient.removeReaction(postId);
+      } else {
+        await onReaction(postId);
+      }
       setTimeout(() => {
         setOptimisticReaction(null);
-        // Reload to get server-confirmed state
         loadPost({ forceRefresh: true, isBackground: true });
       }, 3000);
     } catch (err) {
-      // Revert immediately on error
       setPost(prev => prev ? {
         ...prev,
         user_reaction: prevReaction,
         reaction_count: prevCount,
-        fire_count: prevFire,
-        ruler_count: prevRuler,
-        clap_count: prevClap,
       } : null);
       setOptimisticReaction(null);
     }
@@ -763,6 +719,13 @@ export default function PostDetailModal({
                   </div>
                 ) : (
                   <div className="flex flex-wrap gap-2 mb-4">
+                    {post.post_type === "stage" && post.video_type && (
+                      <span className="text-xs px-2 py-1 rounded bg-amber-500/20 text-amber-100 border border-amber-400/30 font-semibold">
+                        {post.video_type === "motw" && `🔥 ${t("videoTypeMotw")}`}
+                        {post.video_type === "original" && `🎵 ${t("videoTypeOriginal")}`}
+                        {post.video_type === "guild" && `👏 ${t("videoTypeGuild")}`}
+                      </span>
+                    )}
                     {post.tags.map((tag) => (
                       <span
                         key={tag}
@@ -869,60 +832,26 @@ export default function PostDetailModal({
                 {/* Reactions */}
                 <div className="flex items-center gap-4 py-4 border-t border-white/10">
                   {(() => {
-                    // Use optimistic state if available, otherwise use post state
                     const displayReaction = optimisticReaction?.type ?? post.user_reaction;
-                    const displayFire = optimisticReaction?.fire_count ?? post.fire_count ?? 0;
-                    const displayRuler = optimisticReaction?.ruler_count ?? post.ruler_count ?? 0;
-                    const displayClap = optimisticReaction?.clap_count ?? post.clap_count ?? 0;
+                    const displayCount = optimisticReaction?.count ?? post.reaction_count;
+                    const isLiked = displayReaction === "like";
 
                     return (
-                      <>
-                        <motion.button
-                          onClick={() => handleReaction("fire")}
-                          whileHover={{ scale: 1.15, rotate: 5 }}
-                          whileTap={{ scale: 0.85 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                          className={cn(
-                            "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
-                            displayReaction === "fire"
-                              ? "bg-orange-500/30 text-orange-200 border border-orange-500/50"
-                              : "bg-white/5 text-white/60 hover:bg-white/10 border border-transparent"
-                          )}
-                        >
-                          <FaFire />
-                          <span className="font-semibold">{displayFire}</span>
-                        </motion.button>
-                        <motion.button
-                          onClick={() => handleReaction("ruler")}
-                          whileHover={{ scale: 1.15, rotate: -5 }}
-                          whileTap={{ scale: 0.85 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                          className={cn(
-                            "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
-                            displayReaction === "ruler"
-                              ? "bg-blue-500/30 text-blue-200 border border-blue-500/50"
-                              : "bg-white/5 text-white/60 hover:bg-white/10 border border-transparent"
-                          )}
-                        >
-                          <FaRuler />
-                          <span className="font-semibold">{displayRuler}</span>
-                        </motion.button>
-                        <motion.button
-                          onClick={() => handleReaction("clap")}
-                          whileHover={{ scale: 1.15, rotate: 5 }}
-                          whileTap={{ scale: 0.85 }}
-                          transition={{ type: "spring", stiffness: 400, damping: 17 }}
-                          className={cn(
-                            "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
-                            displayReaction === "clap"
-                              ? "bg-green-500/30 text-green-200 border border-green-500/50"
-                              : "bg-white/5 text-white/60 hover:bg-white/10 border border-transparent"
-                          )}
-                        >
-                          <span>👏</span>
-                          <span className="font-semibold">{displayClap}</span>
-                        </motion.button>
-                      </>
+                      <motion.button
+                        onClick={() => handleReaction()}
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        transition={{ type: "spring", stiffness: 400, damping: 17 }}
+                        className={cn(
+                          "flex items-center gap-2 px-4 py-2 rounded-lg transition-colors",
+                          isLiked
+                            ? "bg-pink-500/25 text-pink-200 border border-pink-400/50"
+                            : "bg-white/5 text-white/60 hover:bg-white/10 border border-transparent"
+                        )}
+                      >
+                        {isLiked ? <FaHeart /> : <FaRegHeart />}
+                        <span className="font-semibold">{displayCount}</span>
+                      </motion.button>
                     );
                   })()}
 

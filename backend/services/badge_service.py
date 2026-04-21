@@ -41,37 +41,20 @@ def increment_reaction_given(user_id: str, db: Session):
     check_and_award_badges(user_id, TRIGGER_OP_CRITIC, stats.reactions_given_count, db)
 
 
-def increment_reaction_received(user_id: str, reaction_type: str, db: Session):
+def increment_reaction_received(user_id: str, db: Session):
     """
-    Called when user's post receives a reaction.
-    Updates 'reactions_received_count' and checks 'The Star' badges + Specific Types.
+    Called when user's post receives a like.
+    Updates 'reactions_received_count' and checks Crowd Favorite (likes_received).
     """
     stats = get_or_create_stats(user_id, db)
     stats.reactions_received_count += 1
     db.flush()
-    
-    # Check Generic (if any)
+
+    # Both keys point at the same counter — keep 'reactions_received' for any
+    # legacy badge defs that happen to still be active, and drive the new
+    # Crowd Favorite family from 'likes_received'.
     check_and_award_badges(user_id, "reactions_received", stats.reactions_received_count, db)
-    
-    # Check Specific Types (Fire, Clap, Metronome/Ruler)
-    # Map reaction_type string to badge requirement_type
-    type_map = {
-        "fire": "fires_received",
-        "clap": "claps_received",
-        "ruler": "metronomes_received" # 'ruler' is the internal enum for Metronome
-    }
-    
-    if reaction_type in type_map:
-        req_type = type_map[reaction_type]
-        
-        # Count specific reactions for this user
-        # Join PostReaction -> Post to filter by Post author (user_id)
-        count = db.query(func.count(PostReaction.id)).join(Post).filter(
-            Post.user_id == user_id,
-            PostReaction.reaction_type == reaction_type
-        ).scalar()
-        
-        check_and_award_badges(user_id, req_type, count, db)
+    check_and_award_badges(user_id, "likes_received", stats.reactions_received_count, db)
 
 
 def increment_solution_accepted(user_id: str, db: Session):
@@ -184,16 +167,16 @@ def award_badge(user_id: str, badge: Union[BadgeDefinition, str], db: Session):
 def get_user_stats(user_id: str, db: Session) -> dict:
     """
     Calculate and return all badge-related stats for a user.
-    Consolidated from 7 queries to 3 using conditional aggregation.
+    Consolidated using conditional aggregation.
     """
     from models.user import UserProfile
 
-    # Query 1: profile + stats (existing rows)
     profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
     stats = get_or_create_stats(user_id, db)
 
-    # Query 2: all reaction-type counts in one pass over PostReaction JOIN Post
-    # (flagged posts don't count — they aren't publicly visible)
+    # Legacy per-type reaction counts — only preserved so old trophy tiles
+    # keep displaying accurate numbers. With migration 017 collapsing all
+    # reactions to 'like' these will be zero for new data.
     reaction_row = db.query(
         func.count(case((PostReaction.reaction_type == "fire", 1))).label("fires"),
         func.count(case((PostReaction.reaction_type == "clap", 1))).label("claps"),
@@ -204,12 +187,15 @@ def get_user_stats(user_id: str, db: Session) -> dict:
         Post.moderation_status == ModerationStatus.ACTIVE.value,
     ).first()
 
-    # Query 3: post-type counts + comment count in two tiny aggregations
+    # Post counts, including per video_type for the new badge families.
     post_row = db.query(
         func.count(case((
             (Post.post_type == "stage") & Post.mux_asset_id.isnot(None), 1
         ))).label("videos"),
         func.count(case((Post.post_type == "lab", 1))).label("questions"),
+        func.count(case(((Post.video_type == "motw") & Post.mux_asset_id.isnot(None), 1))).label("motw"),
+        func.count(case(((Post.video_type == "original") & Post.mux_asset_id.isnot(None), 1))).label("original"),
+        func.count(case(((Post.video_type == "guild") & Post.mux_asset_id.isnot(None), 1))).label("guild"),
     ).filter(
         Post.user_id == user_id,
         Post.is_deleted == False,
@@ -224,12 +210,16 @@ def get_user_stats(user_id: str, db: Session) -> dict:
     return {
         "reactions_given": stats.reactions_given_count,
         "reactions_received": stats.reactions_received_count,
+        "likes_received": stats.reactions_received_count,
         "fires_received": reaction_row.fires if reaction_row else 0,
         "claps_received": reaction_row.claps if reaction_row else 0,
         "metronomes_received": reaction_row.metronomes if reaction_row else 0,
         "solutions_accepted": stats.solutions_accepted_count,
         "questions_posted": post_row.questions if post_row else 0,
         "videos_posted": post_row.videos if post_row else 0,
+        "motw_videos": post_row.motw if post_row else 0,
+        "original_videos": post_row.original if post_row else 0,
+        "guild_videos": post_row.guild if post_row else 0,
         "comments_posted": comments_posted,
         "current_streak": profile.streak_count if profile else 0,
     }
@@ -312,41 +302,20 @@ def check_all_badges_for_user(user_id: str, db: Session) -> list:
     # Snapshot of badges before check
     before_ids = {ub.badge_id for ub in db.query(UserBadge).filter(UserBadge.user_id == user_id).all()}
 
-    stats = get_or_create_stats(user_id, db)
-    from models.user import UserProfile
-    profile = db.query(UserProfile).filter(UserProfile.user_id == user_id).first()
-
-    fires = db.query(func.count(PostReaction.id)).join(Post).filter(
-        Post.user_id == user_id, PostReaction.reaction_type == "fire"
-    ).scalar() or 0
-    claps = db.query(func.count(PostReaction.id)).join(Post).filter(
-        Post.user_id == user_id, PostReaction.reaction_type == "clap"
-    ).scalar() or 0
-    metronomes = db.query(func.count(PostReaction.id)).join(Post).filter(
-        Post.user_id == user_id, PostReaction.reaction_type == "ruler"
-    ).scalar() or 0
-    videos = db.query(func.count(Post.id)).filter(
-        Post.user_id == user_id, Post.post_type == "stage", Post.mux_asset_id.isnot(None)
-    ).scalar() or 0
-    questions = db.query(func.count(Post.id)).filter(
-        Post.user_id == user_id, Post.post_type == "lab"
-    ).scalar() or 0
-    comments = db.query(func.count(PostReply.id)).filter(
-        PostReply.user_id == user_id
-    ).scalar() or 0
-    streak = profile.streak_count if profile else 0
+    user_stats = get_user_stats(user_id, db)
 
     checks = [
-        ("reactions_given", stats.reactions_given_count),
-        ("reactions_received", stats.reactions_received_count),
-        ("fires_received", fires),
-        ("claps_received", claps),
-        ("metronomes_received", metronomes),
-        ("solutions_accepted", stats.solutions_accepted_count),
-        ("videos_posted", videos),
-        ("questions_posted", questions),
-        ("comments_posted", comments),
-        ("daily_streak", streak),
+        ("reactions_given", user_stats["reactions_given"]),
+        ("reactions_received", user_stats["reactions_received"]),
+        ("likes_received", user_stats["likes_received"]),
+        ("solutions_accepted", user_stats["solutions_accepted"]),
+        ("videos_posted", user_stats["videos_posted"]),
+        ("motw_videos", user_stats["motw_videos"]),
+        ("original_videos", user_stats["original_videos"]),
+        ("guild_videos", user_stats["guild_videos"]),
+        ("questions_posted", user_stats["questions_posted"]),
+        ("comments_posted", user_stats["comments_posted"]),
+        ("daily_streak", user_stats["current_streak"]),
     ]
 
     for req_type, value in checks:
