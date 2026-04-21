@@ -23,7 +23,7 @@ interface CreatePostModalProps {
   onPostCreated: (postData?: any) => void;
 }
 
-// Static Style/Focus/Level tags (secondary; channel is the required one)
+// Static Style/Focus/Level tags (optional)
 const STATIC_TAGS: Tag[] = [
   { slug: "salsa-on2", name: "Salsa On2", category: "Style", usage_count: 0 },
   { slug: "mambo", name: "Mambo", category: "Style", usage_count: 0 },
@@ -50,7 +50,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
   const [title, setTitle] = useState("");
   const [body, setBody] = useState("");
   const [context, setContext] = useState(""); // Stage-only "what you worked on"
-  const [selectedChannel, setSelectedChannel] = useState<string | null>(null);
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [fbSelected, setFbSelected] = useState<Record<FbKey, boolean>>({
     hype: false,
@@ -60,8 +59,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
     styling: false,
   });
   const [isWip, setIsWip] = useState(false);
-  const [channels, setChannels] = useState<Tag[]>([]);
-  const [channelsLoading, setChannelsLoading] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showSuccess, setShowSuccess] = useState(false);
@@ -80,19 +77,9 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
   // Question slot status (Lab only)
   const [questionSlots, setQuestionSlots] = useState<{ current_slots: number; max_slots: number } | null>(null);
 
-  // Fetch channels + slot status when modal opens
+  // Fetch slot status when modal opens (Lab only)
   useEffect(() => {
     if (!isOpen) return;
-    setChannelsLoading(true);
-    apiClient
-      .getCommunityTags()
-      .then((tags) => {
-        const chs = (tags || []).filter((t) => (t.category || "").toLowerCase() === "channel");
-        setChannels(chs);
-      })
-      .catch(() => setChannels([]))
-      .finally(() => setChannelsLoading(false));
-
     if (mode === "lab") {
       apiClient
         .getQuestionSlotStatus()
@@ -109,7 +96,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
       setTitle("");
       setBody("");
       setContext("");
-      setSelectedChannel(null);
       setSelectedTags([]);
       setFbSelected({ hype: false, timing: false, footwork: false, frame: false, styling: false });
       setIsWip(false);
@@ -204,11 +190,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
       return;
     }
 
-    if (!selectedChannel) {
-      setError(t("channelRequired"));
-      return;
-    }
-
     if (mode === "stage" && !videoFile) {
       setError(t("selectVideoRequired"));
       return;
@@ -231,8 +212,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
       finalBody = parts.join("\n\n");
     }
 
-    // Tags: channel first, then style/focus/level
-    const tagsPayload = [selectedChannel, ...selectedTags.filter((s) => s !== selectedChannel)];
+    const tagsPayload = selectedTags;
 
     try {
       const createPostPromise = apiClient.createPost({
@@ -444,37 +424,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               />
             </div>
 
-            {/* Channel picker (required) */}
-            <div className="mb-4">
-              <label className="block text-sm font-semibold text-white/70 mb-1">{t("channelLabel")}</label>
-              <p className="text-xs text-white/40 mb-2">{t("channelHint")}</p>
-              {channelsLoading ? (
-                <p className="text-xs text-white/40 italic">{t("channelLoading")}</p>
-              ) : (
-                <div className="flex flex-wrap gap-2">
-                  {channels.map((ch) => (
-                    <motion.button
-                      key={ch.slug}
-                      whileHover={{ scale: 1.04 }}
-                      whileTap={{ scale: 0.96 }}
-                      onClick={() => {
-                        UISound.hover();
-                        setSelectedChannel(ch.slug);
-                      }}
-                      className={cn(
-                        "px-3 py-1.5 rounded-full text-sm transition-colors",
-                        selectedChannel === ch.slug
-                          ? "bg-amber-500/30 text-amber-100 border border-amber-500/60"
-                          : "bg-white/5 text-white/70 border border-white/10 hover:border-white/25"
-                      )}
-                    >
-                      {ch.name}
-                    </motion.button>
-                  ))}
-                </div>
-              )}
-            </div>
-
             {/* Video Upload (Stage only) */}
             {mode === "stage" && (
               <div className="mb-4">
@@ -670,7 +619,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 fullWidth
                 disabled={
                   !title.trim() ||
-                  !selectedChannel ||
                   (mode === "lab" && !body.trim()) ||
                   (mode === "stage" && (uploadStatus === "uploading" || uploadStatus === "error"))
                 }

@@ -222,11 +222,9 @@ def create_post(
     if not tags or len(tags) == 0:
         return {"success": False, "message": "At least one tag is required"}
 
-    # Fetch (slug, category) so we can also require a channel.
-    valid_tag_rows = db.query(CommunityTag.slug, CommunityTag.category).filter(
+    valid_tag_slugs = [row[0] for row in db.query(CommunityTag.slug).filter(
         CommunityTag.slug.in_(tags)
-    ).all()
-    valid_tag_slugs = [row[0] for row in valid_tag_rows]
+    ).all()]
 
     if not valid_tag_slugs:
         return {"success": False, "message": "At least one valid tag is required. Invalid tags provided."}
@@ -236,14 +234,7 @@ def create_post(
         invalid_tags = set(tags) - set(valid_tag_slugs)
         return {"success": False, "message": f"Invalid tags: {', '.join(invalid_tags)}. Please select valid tags."}
 
-    # Require at least one channel tag so every post lives in a room.
-    has_channel = any((row[1] or "").lower() == "channel" for row in valid_tag_rows)
-    if not has_channel:
-        return {
-            "success": False,
-            "message": "Please pick a channel for your post (e.g. Technique, Music & Rhythm, Check-ins & Wins)."
-        }
-    
+
     # Determine cost
     if post_type == "stage":
         cost = COST_POST_VIDEO
