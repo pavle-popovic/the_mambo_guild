@@ -1232,7 +1232,7 @@
     },
     "founder_diamond": {
       "name": "創設メンバー",
-      "description": "The Mambo Guild のオリジナルメンバー。最初の 1000 人限定。"
+      "description": "One of the founding members of The Mambo Guild."
     },
     "guild_master": {
       "name": "ギルドマスター",
@@ -1320,7 +1320,123 @@
     },
     "unstoppable_silver": {
       "name": "止まらない",
-      "description": "継続して顔を出す姿勢。2 週間連続達成。"
+      "description": "14-day practice streak."
+    },
+    "motw_bronze": {
+      "name": "Move Master I",
+      "description": "Posted your first Move of the Week video. Welcome to the floor."
+    },
+    "motw_silver": {
+      "name": "Move Master II",
+      "description": "Posted 10 Move of the Week videos."
+    },
+    "motw_gold": {
+      "name": "Move Master III",
+      "description": "Posted 30 Move of the Week videos. You're a regular."
+    },
+    "motw_diamond": {
+      "name": "Move Master IV",
+      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+    },
+    "original_bronze": {
+      "name": "The Originator I",
+      "description": "Shared your first original choreo or freestyle."
+    },
+    "original_silver": {
+      "name": "The Originator II",
+      "description": "Shared 10 original choreos or freestyles."
+    },
+    "original_gold": {
+      "name": "The Originator III",
+      "description": "Shared 30 original choreos or freestyles. You have a voice."
+    },
+    "original_diamond": {
+      "name": "The Originator IV",
+      "description": "Shared 100 original choreos or freestyles. A true creator."
+    },
+    "guild_bronze": {
+      "name": "Class Act I",
+      "description": "Posted your first Guild-class choreo."
+    },
+    "guild_silver": {
+      "name": "Class Act II",
+      "description": "Posted 10 Guild-class choreos."
+    },
+    "guild_gold": {
+      "name": "Class Act III",
+      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+    },
+    "guild_diamond": {
+      "name": "Class Act IV",
+      "description": "Posted 100 Guild-class choreos. Guild pillar."
+    },
+    "liked_bronze": {
+      "name": "Crowd Favorite I",
+      "description": "Received your first like."
+    },
+    "liked_silver": {
+      "name": "Crowd Favorite II",
+      "description": "Received 100 total likes across your posts."
+    },
+    "liked_gold": {
+      "name": "Crowd Favorite III",
+      "description": "Received 500 total likes across your posts."
+    },
+    "liked_diamond": {
+      "name": "Crowd Favorite IV",
+      "description": "Received 2,500 total likes. The room loves you."
+    },
+    "motw_love_bronze": {
+      "name": "Move Magnet I",
+      "description": "Got your first like on a Move of the Week video."
+    },
+    "motw_love_silver": {
+      "name": "Move Magnet II",
+      "description": "25 likes across your Move of the Week videos."
+    },
+    "motw_love_gold": {
+      "name": "Move Magnet III",
+      "description": "150 likes across your Move of the Week videos."
+    },
+    "motw_love_diamond": {
+      "name": "Move Magnet IV",
+      "description": "1,000 likes across your Move of the Week videos."
+    },
+    "original_love_bronze": {
+      "name": "Fan Favorite I",
+      "description": "Got your first like on an original post."
+    },
+    "original_love_silver": {
+      "name": "Fan Favorite II",
+      "description": "25 likes across your original posts."
+    },
+    "original_love_gold": {
+      "name": "Fan Favorite III",
+      "description": "150 likes across your original posts."
+    },
+    "original_love_diamond": {
+      "name": "Fan Favorite IV",
+      "description": "1,000 likes across your original posts."
+    },
+    "guild_love_bronze": {
+      "name": "Guild Applause I",
+      "description": "Got your first like on a Guild-class post."
+    },
+    "guild_love_silver": {
+      "name": "Guild Applause II",
+      "description": "25 likes across your Guild-class posts."
+    },
+    "guild_love_gold": {
+      "name": "Guild Applause III",
+      "description": "150 likes across your Guild-class posts."
+    },
+    "guild_love_diamond": {
+      "name": "Guild Applause IV",
+      "description": "1,000 likes across your Guild-class posts."
+    },
+    "promoter": {
+      "name": "Promoter",
+      "description": "Brought 3 dancers into the Guild through your referral link."
     }
   }
 }

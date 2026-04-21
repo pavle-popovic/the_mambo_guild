@@ -27,6 +27,9 @@ interface BadgeTrophyCaseProps {
     reactions_given: number;
     reactions_received: number;
     likes_received?: number;
+    motw_likes?: number;
+    original_likes?: number;
+    guild_likes?: number;
     solutions_accepted: number;
     fires_received?: number;
     claps_received?: number;
@@ -38,6 +41,7 @@ interface BadgeTrophyCaseProps {
     guild_videos?: number;
     comments_posted?: number;
     current_streak?: number;
+    referrals_converted?: number;
   } | null;
 }
 
@@ -229,8 +233,20 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
       case 'guild_videos':
         current = userStats?.guild_videos || 0;
         break;
+      case 'motw_likes':
+        current = userStats?.motw_likes || 0;
+        break;
+      case 'original_likes':
+        current = userStats?.original_likes || 0;
+        break;
+      case 'guild_likes':
+        current = userStats?.guild_likes || 0;
+        break;
       case 'comments_posted':
         current = userStats?.comments_posted || 0;
+        break;
+      case 'referrals_converted':
+        current = userStats?.referrals_converted || 0;
         break;
       default:
         current = 0;

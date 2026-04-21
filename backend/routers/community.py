@@ -267,11 +267,11 @@ def add_reaction(
     # 1. User gave a like (The Critic)
     badge_service.increment_reaction_given(str(current_user.id), db)
 
-    # 2. Post owner received a like (Crowd Favorite)
+    # 2. Post owner received a like (Crowd Favorite + per-type Move Magnet / Fan Favorite / Guild Applause)
     from models.community import Post
     post = db.query(Post).filter(Post.id == post_id).first()
     if post:
-        badge_service.increment_reaction_received(str(post.user_id), db)
+        badge_service.increment_reaction_received(str(post.user_id), db, video_type=post.video_type)
 
         if str(post.user_id) != str(current_user.id):
             from models.user import UserProfile

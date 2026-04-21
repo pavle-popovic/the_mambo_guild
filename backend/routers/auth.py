@@ -1060,10 +1060,11 @@ def join_waitlist(
         # Check Referrer Milestones
         if request.referrer_code and referrer_profile:
             referrer_user_id = str(referrer_profile.user_id)
-            # Example: Invite 3 friends -> Get Beta Tester
+            # Invite 3 friends -> Promoter badge. (Pre-revamp this was
+            # beta_tester; that badge is now a manual founders grant only.)
             if referrer_profile.referral_count >= 3:
                 try:
-                    badge_service.award_badge(referrer_user_id, "beta_tester", db)
+                    badge_service.award_badge(referrer_user_id, "promoter", db)
                 except:
                     pass
         

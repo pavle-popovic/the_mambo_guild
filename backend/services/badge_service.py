@@ -41,10 +41,12 @@ def increment_reaction_given(user_id: str, db: Session):
     check_and_award_badges(user_id, TRIGGER_OP_CRITIC, stats.reactions_given_count, db)
 
 
-def increment_reaction_received(user_id: str, db: Session):
+def increment_reaction_received(user_id: str, db: Session, video_type: Optional[str] = None):
     """
     Called when user's post receives a like.
-    Updates 'reactions_received_count' and checks Crowd Favorite (likes_received).
+    Updates 'reactions_received_count' and checks the total-likes family
+    (Crowd Favorite) plus the matching per-video-type family when
+    `video_type` is provided (Move Magnet / Fan Favorite / Guild Applause).
     """
     stats = get_or_create_stats(user_id, db)
     stats.reactions_received_count += 1
@@ -55,6 +57,24 @@ def increment_reaction_received(user_id: str, db: Session):
     # Crowd Favorite family from 'likes_received'.
     check_and_award_badges(user_id, "reactions_received", stats.reactions_received_count, db)
     check_and_award_badges(user_id, "likes_received", stats.reactions_received_count, db)
+
+    # Per-video-type like families live on live counts rather than a
+    # persisted counter (we never counted them before). Query once, check.
+    if video_type in ("motw", "original", "guild"):
+        per_type_count = _count_likes_on_video_type(user_id, video_type, db)
+        check_and_award_badges(user_id, f"{video_type}_likes", per_type_count, db)
+
+
+def _count_likes_on_video_type(user_id: str, video_type: str, db: Session) -> int:
+    """Live count of likes on this user's posts of the given video_type."""
+    return db.query(func.count(PostReaction.id)).join(
+        Post, Post.id == PostReaction.post_id
+    ).filter(
+        Post.user_id == user_id,
+        Post.video_type == video_type,
+        Post.is_deleted == False,
+        Post.moderation_status == ModerationStatus.ACTIVE.value,
+    ).scalar() or 0
 
 
 def increment_solution_accepted(user_id: str, db: Session):
@@ -202,6 +222,20 @@ def get_user_stats(user_id: str, db: Session) -> dict:
         Post.moderation_status == ModerationStatus.ACTIVE.value,
     ).first()
 
+    # Likes broken down by the post's video_type (Move Magnet / Fan Favorite /
+    # Guild Applause families).
+    likes_row = db.query(
+        func.count(case(((Post.video_type == "motw", 1)))).label("motw"),
+        func.count(case(((Post.video_type == "original", 1)))).label("original"),
+        func.count(case(((Post.video_type == "guild", 1)))).label("guild"),
+    ).select_from(PostReaction).join(
+        Post, Post.id == PostReaction.post_id
+    ).filter(
+        Post.user_id == user_id,
+        Post.is_deleted == False,
+        Post.moderation_status == ModerationStatus.ACTIVE.value,
+    ).first()
+
     comments_posted = db.query(func.count(PostReply.id)).filter(
         PostReply.user_id == user_id,
         PostReply.is_deleted == False,
@@ -211,6 +245,9 @@ def get_user_stats(user_id: str, db: Session) -> dict:
         "reactions_given": stats.reactions_given_count,
         "reactions_received": stats.reactions_received_count,
         "likes_received": stats.reactions_received_count,
+        "motw_likes": likes_row.motw if likes_row else 0,
+        "original_likes": likes_row.original if likes_row else 0,
+        "guild_likes": likes_row.guild if likes_row else 0,
         "fires_received": reaction_row.fires if reaction_row else 0,
         "claps_received": reaction_row.claps if reaction_row else 0,
         "metronomes_received": reaction_row.metronomes if reaction_row else 0,
@@ -222,6 +259,7 @@ def get_user_stats(user_id: str, db: Session) -> dict:
         "guild_videos": post_row.guild if post_row else 0,
         "comments_posted": comments_posted,
         "current_streak": profile.streak_count if profile else 0,
+        "referrals_converted": profile.referral_count if profile and hasattr(profile, "referral_count") else 0,
     }
 
 
@@ -308,6 +346,9 @@ def check_all_badges_for_user(user_id: str, db: Session) -> list:
         ("reactions_given", user_stats["reactions_given"]),
         ("reactions_received", user_stats["reactions_received"]),
         ("likes_received", user_stats["likes_received"]),
+        ("motw_likes", user_stats["motw_likes"]),
+        ("original_likes", user_stats["original_likes"]),
+        ("guild_likes", user_stats["guild_likes"]),
         ("solutions_accepted", user_stats["solutions_accepted"]),
         ("videos_posted", user_stats["videos_posted"]),
         ("motw_videos", user_stats["motw_videos"]),
@@ -316,6 +357,7 @@ def check_all_badges_for_user(user_id: str, db: Session) -> list:
         ("questions_posted", user_stats["questions_posted"]),
         ("comments_posted", user_stats["comments_posted"]),
         ("daily_streak", user_stats["current_streak"]),
+        ("referrals_converted", user_stats["referrals_converted"]),
     ]
 
     for req_type, value in checks:
