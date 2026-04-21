@@ -1,12 +1,13 @@
 "use client";
 
-import { memo, useMemo } from "react";
+import { memo, useMemo, type ReactElement } from "react";
 import { BaseEdge, getStraightPath, type EdgeProps } from "@xyflow/react";
 import { motion } from "framer-motion";
 
 export type GoldEdgeData = {
   status: 'locked' | 'available' | 'mastered';
   progress?: number; // 0-100 percentage
+  lowPower?: boolean;
   [key: string]: unknown;
 };
 
@@ -21,6 +22,7 @@ function GoldEdge({
   const edgeData = data as GoldEdgeData | undefined;
   const status = edgeData?.status || 'locked';
   const progress = edgeData?.progress ?? 0; // 0-100
+  const lowPower = edgeData?.lowPower === true;
   const isLocked = status === 'locked';
   const isAvailable = status === 'available';
   const isMastered = status === 'mastered';
@@ -34,12 +36,105 @@ function GoldEdge({
     targetY,
   });
 
-  // Calculate path length for animations
+  // Hoisted above the low-power early return so the Rules of Hooks stay
+  // satisfied on every render, regardless of which branch we take below.
   const pathLength = useMemo(() => {
     const dx = targetX - sourceX;
     const dy = targetY - sourceY;
     return Math.sqrt(dx * dx + dy * dy);
   }, [sourceX, sourceY, targetX, targetY]);
+
+  // ============================================================
+  // LOW-POWER BRANCH (mobile, reduced-motion)
+  // The default render stacks per-edge feGaussianBlur filters and
+  // 5–10 infinite framer-motion paths. Multiplied by every lit
+  // edge in a course, that's what tanks mobile framerate once a
+  // student has completed several modules. Render a static
+  // equivalent instead — same three states, zero filters, zero
+  // motion loops.
+  // ============================================================
+  if (lowPower) {
+    // Shared straight-path strokes; pick style per status.
+    let strokes: ReactElement[];
+    if (isMastered) {
+      strokes = [
+        <path
+          key="halo"
+          d={edgePath}
+          fill="none"
+          stroke="rgba(255, 215, 0, 0.25)"
+          strokeWidth={6}
+          strokeLinecap="round"
+        />,
+        <path
+          key="main"
+          d={edgePath}
+          fill="none"
+          stroke="#F4D03F"
+          strokeWidth={2.5}
+          strokeLinecap="round"
+        />,
+      ];
+    } else if (isAvailable) {
+      strokes = [
+        <path
+          key="halo"
+          d={edgePath}
+          fill="none"
+          stroke="rgba(255, 215, 0, 0.18)"
+          strokeWidth={5}
+          strokeLinecap="round"
+        />,
+        <path
+          key="main"
+          d={edgePath}
+          fill="none"
+          stroke="#E6C84A"
+          strokeWidth={2}
+          strokeLinecap="round"
+          strokeDasharray="10 6"
+        />,
+      ];
+    } else {
+      strokes = [
+        <path
+          key="main"
+          d={edgePath}
+          fill="none"
+          stroke="rgba(160, 160, 180, 0.45)"
+          strokeWidth={1.5}
+          strokeDasharray="6 10"
+          strokeLinecap="round"
+        />,
+      ];
+    }
+
+    if (!hasProgress) {
+      return <g>{strokes}</g>;
+    }
+
+    // Static progress indicator (no animated badge ring, no glow dot).
+    const midX = (sourceX + targetX) / 2;
+    const midY = (sourceY + targetY) / 2;
+    return (
+      <g>
+        {strokes}
+        <g transform={`translate(${midX}, ${midY})`}>
+          <circle r={12} fill="rgba(15, 15, 20, 0.95)" stroke="rgba(100, 90, 60, 0.5)" strokeWidth={1} />
+          <text
+            textAnchor="middle"
+            dominantBaseline="central"
+            fill="#FFD700"
+            fontSize={8}
+            fontWeight="bold"
+            fontFamily="system-ui, sans-serif"
+          >
+            {Math.round(progress)}%
+          </text>
+        </g>
+      </g>
+    );
+  }
 
   // Calculate midpoint for progress badge
   const midX = (sourceX + targetX) / 2;

@@ -14,11 +14,12 @@ export type SkillNodeData = {
   progress: number; // 0-100 completion percentage
   onClick?: () => void;
   isAdminMode?: boolean; // Hide progress circle in admin mode
+  lowPower?: boolean;    // Skip auras/god-rays/starbursts on mobile
   [key: string]: unknown;
 };
 
 function SkillNode({ data }: NodeProps) {
-  const { id, title, icon, status, progress = 0, isAdminMode = false } = data as SkillNodeData;
+  const { id, title, icon, status, progress = 0, isAdminMode = false, lowPower = false } = data as SkillNodeData;
 
   const isLocked = status === 'locked';
   const isAvailable = status === 'available';
@@ -72,8 +73,25 @@ function SkillNode({ data }: NodeProps) {
 
       {/* ============================================
           GOD RAYS + ETHEREAL AURA (Mastered state ONLY - NOT boss)
+          Skip entirely on low-power: 12 animated god-rays + blurred aura
+          per mastered node destroy mobile framerate once several modules
+          are complete. A static radial gradient carries the "golden" feel.
           ============================================ */}
-      {isMastered && (
+      {isMastered && lowPower && (
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: nodeSize * 2,
+            height: nodeSize * 2,
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            background:
+              'radial-gradient(circle, rgba(255, 215, 0, 0.28) 0%, rgba(255, 200, 100, 0.1) 45%, transparent 70%)',
+          }}
+        />
+      )}
+      {isMastered && !lowPower && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           {/* Outermost ethereal aura - very soft */}
           <motion.div
@@ -143,8 +161,25 @@ function SkillNode({ data }: NodeProps) {
 
       {/* ============================================
           AVAILABLE STATE: Multi-layer ethereal glow
+          Low-power mode replaces the two animated blurred auras with a
+          single static gradient; the main node still has a gold border
+          and boxShadow so the "available" distinction is preserved.
           ============================================ */}
-      {isAvailable && (
+      {isAvailable && lowPower && (
+        <div
+          className="absolute rounded-full pointer-events-none"
+          style={{
+            width: nodeSize * 1.8,
+            height: nodeSize * 1.8,
+            left: '50%',
+            top: '50%',
+            transform: 'translate(-50%, -50%)',
+            background:
+              'radial-gradient(circle, rgba(255, 215, 0, 0.18) 0%, rgba(255, 200, 100, 0.06) 50%, transparent 70%)',
+          }}
+        />
+      )}
+      {isAvailable && !lowPower && (
         <>
           {/* Outer soft aura */}
           <motion.div
@@ -278,8 +313,9 @@ function SkillNode({ data }: NodeProps) {
         </div>
       )}
 
-      {/* Secondary counter-rotating ring (mastered only, NOT boss) */}
-      {isMastered && (
+      {/* Secondary counter-rotating ring (mastered only, NOT boss).
+          Skip on low-power — one transform loop per mastered node adds up. */}
+      {isMastered && !lowPower && (
         <motion.div
           className="absolute inset-0 flex items-center justify-center"
           animate={{ rotate: -360 }}
@@ -364,8 +400,9 @@ function SkillNode({ data }: NodeProps) {
             opacity: isNodeLocked ? 0.75 : 1,
             filter: isNodeLocked ? "grayscale(0.5) brightness(0.9)" : "none",
           }}
-          // Subtle floating for available/mastered, static for boss and locked
-          animate={isNodeLocked || isBoss ? {} : { y: [0, -3, 0] }}
+          // Subtle floating for available/mastered, static for boss and locked.
+          // Low-power skips the y-loop — one per active node adds up fast.
+          animate={isNodeLocked || isBoss || lowPower ? {} : { y: [0, -3, 0] }}
           transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         >
           {/* Inner glow ring */}
@@ -396,8 +433,8 @@ function SkillNode({ data }: NodeProps) {
                       ? "drop-shadow(0 0 4px rgba(184, 134, 11, 0.5))"
                       : "drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))",
                 }}
-                // Only animate icon for mastered, not boss
-                animate={isMastered ? { scale: [1, 1.1, 1] } : {}}
+                // Only animate icon for mastered, not boss. Skip on low-power.
+                animate={isMastered && !lowPower ? { scale: [1, 1.1, 1] } : {}}
                 transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
                 {icon}
@@ -435,8 +472,10 @@ function SkillNode({ data }: NodeProps) {
 
       {/* ============================================
           STARBURST POINTS (Mastered ONLY - not boss)
+          Skip on low-power — 8 infinite opacity/scaleY loops per mastered
+          node compounded across a completed course is a main-thread killer.
           ============================================ */}
-      {isMastered && (
+      {isMastered && !lowPower && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           {[...Array(8)].map((_, i) => (
             <motion.div

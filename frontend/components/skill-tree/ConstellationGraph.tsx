@@ -184,6 +184,32 @@ function ConstellationGraphInner({
     return () => mq.removeEventListener("change", handler);
   }, []);
 
+  // Detect low-power rendering mode: touch devices, reduced-motion users, or
+  // very small viewports. Heavy SVG filters + infinite framer-motion loops on
+  // every lit edge/node crater mobile framerate once a course has many
+  // completed modules. In low-power mode we swap to static SVG equivalents.
+  const [isLowPower, setIsLowPower] = useState(false);
+  useEffect(() => {
+    const compute = () => {
+      const touchCoarse = window.matchMedia(
+        "(hover: none) and (pointer: coarse)"
+      ).matches;
+      const reducedMotion = window.matchMedia(
+        "(prefers-reduced-motion: reduce)"
+      ).matches;
+      setIsLowPower(touchCoarse || reducedMotion);
+    };
+    compute();
+    const mqTouch = window.matchMedia("(hover: none) and (pointer: coarse)");
+    const mqMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    mqTouch.addEventListener("change", compute);
+    mqMotion.addEventListener("change", compute);
+    return () => {
+      mqTouch.removeEventListener("change", compute);
+      mqMotion.removeEventListener("change", compute);
+    };
+  }, []);
+
   // Determine node status
   const getNodeStatus = useCallback(
     (level: Level): "locked" | "available" | "mastered" | "boss" | "boss_locked" => {
@@ -448,6 +474,7 @@ function ConstellationGraphInner({
         status: getNodeStatus(level),
         progress: level.completion_percentage, // Pass progress to node
         isAdminMode: isAdminMode, // Pass admin mode flag to hide progress circles
+        lowPower: isLowPower,
       },
     }));
 
@@ -462,6 +489,7 @@ function ConstellationGraphInner({
         data: {
           status: edgeData.status,
           progress: edgeData.progress,
+          lowPower: isLowPower,
         },
       };
     });
@@ -472,7 +500,7 @@ function ConstellationGraphInner({
       : getLayoutedElements(initialNodes, initialEdges);
 
     return result;
-  }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode]);
+  }, [levels, edges, getNodeStatus, getEdgeData, isAdminMode, isLowPower]);
 
   // ---------- ReactFlow initialization & centering ----------
   const [rfReady, setRfReady] = useState(false);
@@ -554,8 +582,16 @@ function ConstellationGraphInner({
           <StarryBackground />
           {/* Floating ethereal particles overlay */}
           <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {/* Floating orbs of light - using deterministic positions */}
-            {[
+            {/* Floating orbs of light - using deterministic positions.
+                On low-power devices we drop this count from 8 -> 3 to cut
+                running framer-motion loops + blurred paints. */}
+            {(isLowPower
+              ? [
+                  { size: 6, left: 20, top: 25, dur: 6, yMove: 35 },
+                  { size: 7, left: 70, top: 65, dur: 7, yMove: 40 },
+                  { size: 6, left: 45, top: 45, dur: 8, yMove: 35 },
+                ]
+              : [
               { size: 6, left: 15, top: 20, dur: 6, yMove: 35 },
               { size: 8, left: 75, top: 30, dur: 7, yMove: 45 },
               { size: 5, left: 25, top: 60, dur: 8, yMove: 40 },
@@ -564,7 +600,7 @@ function ConstellationGraphInner({
               { size: 9, left: 85, top: 55, dur: 6, yMove: 55 },
               { size: 5, left: 50, top: 15, dur: 7, yMove: 45 },
               { size: 7, left: 30, top: 80, dur: 8, yMove: 40 },
-            ].map((orb, i) => (
+            ]).map((orb, i) => (
               <motion.div
                 key={`orb-${i}`}
                 className="absolute rounded-full"
@@ -593,13 +629,19 @@ function ConstellationGraphInner({
                 }}
               />
             ))}
-            {/* Larger ambient glow spots */}
-            {[
+            {/* Larger ambient glow spots. Big blurred radial gradients are
+                the most expensive paints in the background; halve on mobile. */}
+            {(isLowPower
+              ? [
+                  { size: 160, left: 30, top: 40, dur: 10 },
+                  { size: 180, left: 65, top: 65, dur: 12 },
+                ]
+              : [
               { size: 150, left: 20, top: 30, dur: 10 },
               { size: 200, left: 70, top: 60, dur: 12 },
               { size: 180, left: 50, top: 20, dur: 9 },
               { size: 160, left: 30, top: 70, dur: 11 },
-            ].map((glow, i) => (
+            ]).map((glow, i) => (
               <motion.div
                 key={`glow-${i}`}
                 className="absolute rounded-full"
@@ -623,8 +665,17 @@ function ConstellationGraphInner({
                 }}
               />
             ))}
-            {/* Tiny sparkles */}
-            {[
+            {/* Tiny sparkles. 15 on desktop, 5 on mobile — each is a
+                continuously-animating element with a glow box-shadow. */}
+            {(isLowPower
+              ? [
+                  { left: 18, top: 25, dur: 2.5, delay: 0 },
+                  { left: 80, top: 20, dur: 3, delay: 1 },
+                  { left: 45, top: 55, dur: 2.6, delay: 0.8 },
+                  { left: 25, top: 75, dur: 3.2, delay: 1.5 },
+                  { left: 75, top: 65, dur: 2.4, delay: 2.2 },
+                ]
+              : [
               { left: 12, top: 25, dur: 2.5, delay: 0 },
               { left: 88, top: 15, dur: 3, delay: 1 },
               { left: 35, top: 45, dur: 2.2, delay: 2 },
@@ -640,7 +691,7 @@ function ConstellationGraphInner({
               { left: 42, top: 88, dur: 2.1, delay: 4 },
               { left: 18, top: 62, dur: 3.3, delay: 1.8 },
               { left: 82, top: 28, dur: 2.5, delay: 0.7 },
-            ].map((sparkle, i) => (
+            ]).map((sparkle, i) => (
               <motion.div
                 key={`sparkle-${i}`}
                 className="absolute"
@@ -698,9 +749,15 @@ function ConstellationGraphInner({
           defaultEdgeOptions={{
             type: "gold",
           }}
+          // Only render nodes/edges inside the current viewport. With many
+          // completed modules we ship dozens of lit edges and animated nodes;
+          // culling off-screen ones keeps mobile framerate sane.
+          onlyRenderVisibleElements
           // Disable dragging/connecting but keep clicking
           nodesDraggable={false}
           nodesConnectable={false}
+          nodesFocusable={false}
+          edgesFocusable={false}
           elementsSelectable={false}
           selectNodesOnDrag={false}
           // Pan and zoom settings - in admin mode, allow drag/pinch but not scroll
