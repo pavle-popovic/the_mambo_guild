@@ -878,25 +878,25 @@ export default function LessonPage() {
                           const nextL = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null;
                           return (
                             <>
-                              {/* Prev/Next lesson side buttons — always visible, more prominent */}
+                              {/* Prev/Next lesson side buttons — desktop/tablet only; mobile shows them below captions */}
                               {prevL && (
                                 <button
                                   onClick={() => router.push(`/lesson/${prevL.id}`)}
                                   title={`${tLesson('previousLesson') || 'Previous'}: ${prevL.title}`}
-                                  className="absolute left-2 md:left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
+                                  className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-14 h-14 items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
                                   aria-label="Previous lesson"
                                 >
-                                  <FaChevronLeft className="text-xl md:text-2xl" />
+                                  <FaChevronLeft className="text-2xl" />
                                 </button>
                               )}
                               {nextL && (
                                 <button
                                   onClick={() => router.push(`/lesson/${nextL.id}`)}
                                   title={`${tLesson('nextLesson') || 'Next'}: ${nextL.title}`}
-                                  className="absolute right-2 md:right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 flex items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
+                                  className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-14 h-14 items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
                                   aria-label="Next lesson"
                                 >
-                                  <FaArrowRight className="text-xl md:text-2xl" />
+                                  <FaArrowRight className="text-2xl" />
                                 </button>
                               )}
 
@@ -960,6 +960,38 @@ export default function LessonPage() {
                         </span>
                       </div>
                     )}
+                    {/* Mobile-only prev/next lesson nav — below captions, so it doesn't overlay the video */}
+                    {(() => {
+                      const sorted = [...levelLessons].sort((a, b) => a.order_index - b.order_index);
+                      const idx = sorted.findIndex((l) => l.id === lessonId);
+                      const prevL = idx > 0 ? sorted[idx - 1] : null;
+                      const nextL = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null;
+                      if (!prevL && !nextL) return null;
+                      return (
+                        <div className="md:hidden flex-shrink-0 bg-black px-4 py-3 flex items-center justify-between gap-3 border-t border-white/5">
+                          {prevL ? (
+                            <button
+                              onClick={() => router.push(`/lesson/${prevL.id}`)}
+                              title={`${tLesson('previousLesson') || 'Previous'}: ${prevL.title}`}
+                              className="w-12 h-12 flex items-center justify-center rounded-full bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold transition-all shadow-[0_0_20px_rgba(212,175,55,0.7)]"
+                              aria-label="Previous lesson"
+                            >
+                              <FaChevronLeft className="text-xl" />
+                            </button>
+                          ) : <span className="w-12 h-12" />}
+                          {nextL ? (
+                            <button
+                              onClick={() => router.push(`/lesson/${nextL.id}`)}
+                              title={`${tLesson('nextLesson') || 'Next'}: ${nextL.title}`}
+                              className="w-12 h-12 flex items-center justify-center rounded-full bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold transition-all shadow-[0_0_20px_rgba(212,175,55,0.7)]"
+                              aria-label="Next lesson"
+                            >
+                              <FaArrowRight className="text-xl" />
+                            </button>
+                          ) : <span className="w-12 h-12" />}
+                        </div>
+                      );
+                    })()}
                   </>
 
                 ) : lesson.video_url ? (

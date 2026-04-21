@@ -22,6 +22,7 @@ const STUDIO_SECTIONS = [
     bgGradient: "from-cyan-500/10 to-blue-600/10",
     borderColor: "border-cyan-400/30",
     iconColor: "text-cyan-400",
+    adminOnly: true,
   },
   {
     id: "coaching",
@@ -53,6 +54,10 @@ export default function StudioPage() {
   const { user, loading } = useAuth();
   const router = useRouter();
   const isGuildMaster = user?.tier?.toLowerCase() === "performer";
+  const isAdmin = user?.role?.toLowerCase() === "admin";
+  const visibleSections = STUDIO_SECTIONS.filter(
+    (s) => !("adminOnly" in s && s.adminOnly) || isAdmin
+  );
 
   // Redirect to login if not authenticated
   useEffect(() => {
@@ -110,7 +115,7 @@ export default function StudioPage() {
 
           {/* Studio Sections Grid */}
           <div className="grid md:grid-cols-3 gap-6">
-            {STUDIO_SECTIONS.map((section, index) => {
+            {visibleSections.map((section, index) => {
               const Icon = section.icon;
               const isLocked = !isGuildMaster;
 
