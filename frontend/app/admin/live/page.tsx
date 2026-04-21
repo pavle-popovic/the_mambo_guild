@@ -361,7 +361,7 @@ export default function AdminLivePage() {
           <div className="space-y-4">
             <div>
               <label className="block text-sm font-medium text-white/70 mb-2">
-                Meeting URL (Zoom / Google Meet)
+                Google Meet URL
               </label>
               <input
                 type="url"
@@ -369,9 +369,12 @@ export default function AdminLivePage() {
                 onChange={(e) =>
                   setConfigForm((f) => ({ ...f, meeting_url: e.target.value }))
                 }
-                placeholder="https://zoom.us/j/..."
+                placeholder="https://meet.google.com/xxx-xxxx-xxx"
                 className="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-lg text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50"
               />
+              <p className="text-xs text-white/40 mt-1.5">
+                Tip: create the event in your Google Calendar with Google Meet enabled, then paste the meet.google.com link here. Members get an Add-to-Calendar button on the Roundtable page.
+              </p>
             </div>
 
             <div>

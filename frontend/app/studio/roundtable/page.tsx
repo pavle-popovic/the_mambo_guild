@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Radio, Calendar, Play, Users, Crown, Lock,
-  ArrowLeft, ExternalLink, Tag, X
+  ArrowLeft, ExternalLink, Tag, X, CalendarPlus, Download
 } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -14,6 +14,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/i18n/useTranslations";
+import { buildGoogleCalendarUrl, buildIcsBlobUrl } from "@/lib/calendarLinks";
 
 interface MeetingConfig {
   meeting_url: string | null;
@@ -327,6 +328,41 @@ export default function RoundtablePage() {
                     <ExternalLink size={18} />
                     {meetingConfig?.meeting_url ? t("joinMeeting") : t("linkComingSoon")}
                   </a>
+                  {meetingConfig?.meeting_starts_at && (
+                    <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                      <a
+                        href={buildGoogleCalendarUrl({
+                          title: "Mambo Guild Roundtable",
+                          startUtcIso: meetingConfig.meeting_starts_at,
+                          description:
+                            (meetingConfig.meeting_notes ? meetingConfig.meeting_notes + "\n\n" : "") +
+                            (meetingConfig.meeting_url ? `Join: ${meetingConfig.meeting_url}` : ""),
+                          location: meetingConfig.meeting_url || "",
+                        })}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-white/15 bg-white/5 text-white hover:bg-white/10 transition-colors"
+                      >
+                        <CalendarPlus size={16} />
+                        Add to Google Calendar
+                      </a>
+                      <a
+                        href={buildIcsBlobUrl({
+                          title: "Mambo Guild Roundtable",
+                          startUtcIso: meetingConfig.meeting_starts_at,
+                          description:
+                            (meetingConfig.meeting_notes ? meetingConfig.meeting_notes + "\n\n" : "") +
+                            (meetingConfig.meeting_url ? `Join: ${meetingConfig.meeting_url}` : ""),
+                          location: meetingConfig.meeting_url || "",
+                        })}
+                        download="mambo-guild-roundtable.ics"
+                        className="flex items-center justify-center gap-2 px-4 py-2 rounded-lg text-sm font-medium border border-white/15 bg-white/5 text-white hover:bg-white/10 transition-colors"
+                      >
+                        <Download size={16} />
+                        Apple / Outlook (.ics)
+                      </a>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
