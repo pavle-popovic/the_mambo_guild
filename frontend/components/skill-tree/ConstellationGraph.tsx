@@ -17,6 +17,7 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import SkillNode from "./SkillNode";
 import GoldEdge from "./GoldEdge";
+import SkillTreeDefs from "./SkillTreeDefs";
 import StarryBackground from "../ui/StarryBackground";
 import NodeTooltip from "./NodeTooltip";
 import { useAuth } from "@/contexts/AuthContext";
@@ -576,6 +577,8 @@ function ConstellationGraphInner({
         isolation: 'isolate'
       }}
     >
+      {/* Shared SVG defs + CSS keyframes used by every edge & node. */}
+      <SkillTreeDefs />
       {/* Night Sky Background Layer */}
       {!isAdminMode && (
         <div className="absolute inset-0 z-0">

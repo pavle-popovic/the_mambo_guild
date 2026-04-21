@@ -93,67 +93,55 @@ function SkillNode({ data }: NodeProps) {
       )}
       {isMastered && !lowPower && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          {/* Outermost ethereal aura - very soft */}
-          <motion.div
+          {/* Outermost ethereal aura. CSS keyframe replaces framer-motion — no
+              per-node RAF loop; the compositor can run all mastered nodes on
+              one timeline. */}
+          <div
             className="absolute rounded-full"
             style={{
               width: nodeSize * 3,
               height: nodeSize * 3,
-              background: "radial-gradient(circle, rgba(255, 200, 100, 0.15) 0%, rgba(255, 215, 0, 0.05) 40%, transparent 70%)",
+              background:
+                "radial-gradient(circle, rgba(255, 200, 100, 0.15) 0%, rgba(255, 215, 0, 0.05) 40%, transparent 70%)",
               filter: "blur(8px)",
-            }}
-            animate={{
-              scale: [1, 1.15, 1],
-              opacity: [0.4, 0.7, 0.4],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
+              animation: "st-breathe-soft 3s ease-in-out infinite",
             }}
           />
-          {/* God rays */}
+          {/* God rays. Rotation lives on a static wrapper so the inner div's
+              scaleY/opacity keyframe can run without being overwritten. */}
           {[...Array(12)].map((_, i) => (
-            <motion.div
+            <div
               key={i}
               className="absolute"
               style={{
+                transform: `rotate(${i * 30}deg)`,
+                transformOrigin: "center center",
                 width: 2,
                 height: outerRingSize * 1.4,
-                background: `linear-gradient(to top, transparent, rgba(255, 230, 150, 0.5), rgba(255, 215, 0, 0.3), transparent)`,
-                transformOrigin: "center center",
-                rotate: `${i * 30}deg`,
-                filter: "blur(1px)",
               }}
-              animate={{
-                opacity: [0.2, 0.5, 0.2],
-                scaleY: [0.7, 1.2, 0.7],
-              }}
-              transition={{
-                duration: 2.5,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: i * 0.1,
-              }}
-            />
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  background:
+                    "linear-gradient(to top, transparent, rgba(255, 230, 150, 0.5), rgba(255, 215, 0, 0.3), transparent)",
+                  filter: "blur(1px)",
+                  animation: `st-ray-pulse 2.5s ease-in-out ${i * 0.1}s infinite`,
+                }}
+              />
+            </div>
           ))}
           {/* Inner glow halo */}
-          <motion.div
+          <div
             className="absolute rounded-full"
             style={{
               width: nodeSize * 1.8,
               height: nodeSize * 1.8,
-              background: "radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 200, 100, 0.2) 50%, transparent 70%)",
+              background:
+                "radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 200, 100, 0.2) 50%, transparent 70%)",
               filter: "blur(4px)",
-            }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.6, 1, 0.6],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
+              animation: "st-breathe-strong 2s ease-in-out infinite",
             }}
           />
         </div>
@@ -181,43 +169,29 @@ function SkillNode({ data }: NodeProps) {
       )}
       {isAvailable && !lowPower && (
         <>
-          {/* Outer soft aura */}
-          <motion.div
+          {/* Outer soft aura — positioned via left:50%/top:50% + translate,
+              so we animate using the translate-preserving keyframe. */}
+          <div
             className="absolute rounded-full pointer-events-none"
             style={{
               width: nodeSize * 2.5,
               height: nodeSize * 2.5,
-              left: '50%',
-              top: '50%',
-              transform: 'translate(-50%, -50%)',
-              background: "radial-gradient(circle, rgba(255, 200, 100, 0.12) 0%, rgba(255, 215, 0, 0.05) 50%, transparent 70%)",
+              left: "50%",
+              top: "50%",
+              background:
+                "radial-gradient(circle, rgba(255, 200, 100, 0.12) 0%, rgba(255, 215, 0, 0.05) 50%, transparent 70%)",
               filter: "blur(6px)",
-            }}
-            animate={{
-              scale: [1, 1.2, 1],
-              opacity: [0.3, 0.6, 0.3],
-            }}
-            transition={{
-              duration: 3,
-              repeat: Infinity,
-              ease: "easeInOut",
+              animation: "st-breathe-soft-t 3s ease-in-out infinite",
             }}
           />
-          {/* Inner pulsing glow */}
-          <motion.div
+          {/* Inner pulsing glow — inset-0, scales from its own bounds. */}
+          <div
             className="absolute inset-0 rounded-full pointer-events-none"
             style={{
-              background: "radial-gradient(circle, rgba(255, 223, 128, 0.35) 0%, rgba(255, 215, 0, 0.15) 50%, transparent 70%)",
+              background:
+                "radial-gradient(circle, rgba(255, 223, 128, 0.35) 0%, rgba(255, 215, 0, 0.15) 50%, transparent 70%)",
               filter: "blur(3px)",
-            }}
-            animate={{
-              scale: [1, 1.4, 1],
-              opacity: [0.5, 0.9, 0.5],
-            }}
-            transition={{
-              duration: 2,
-              repeat: Infinity,
-              ease: "easeInOut",
+              animation: "st-breathe-strong 2s ease-in-out infinite",
             }}
           />
         </>
@@ -226,15 +200,20 @@ function SkillNode({ data }: NodeProps) {
       {/* ============================================
           OUTER ROTATING RING (The Astrolabe)
           Boss: Slower rotation, no animation for calm feel
+          CSS @keyframes replaces framer-motion — one composited transform
+          loop per node, no main-thread involvement.
           ============================================ */}
-      <motion.div
+      <div
         className="absolute inset-0 flex items-center justify-center"
-        animate={isNodeLocked ? {} : { rotate: 360 }}
-        transition={{
-          duration: isBoss ? 30 : isMastered ? 8 : 20, // Boss rotates very slowly
-          repeat: Infinity,
-          ease: "linear",
-        }}
+        style={
+          isNodeLocked
+            ? undefined
+            : {
+                animation: `st-rotate ${
+                  isBoss ? 30 : isMastered ? 8 : 20
+                }s linear infinite`,
+              }
+        }
       >
         <svg
           width={outerRingSize}
@@ -261,7 +240,7 @@ function SkillNode({ data }: NodeProps) {
             opacity={isNodeLocked ? 0.5 : isBoss ? 0.85 : isMastered ? 1 : 0.7}
           />
         </svg>
-      </motion.div>
+      </div>
 
       {/* ============================================
           PROGRESS RING (Shows completion percentage)
@@ -314,12 +293,11 @@ function SkillNode({ data }: NodeProps) {
       )}
 
       {/* Secondary counter-rotating ring (mastered only, NOT boss).
-          Skip on low-power — one transform loop per mastered node adds up. */}
+          CSS keyframe replaces framer-motion. */}
       {isMastered && !lowPower && (
-        <motion.div
+        <div
           className="absolute inset-0 flex items-center justify-center"
-          animate={{ rotate: -360 }}
-          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
+          style={{ animation: "st-rotate-rev 12s linear infinite" }}
         >
           <svg
             width={outerRingSize - 16}
@@ -339,7 +317,7 @@ function SkillNode({ data }: NodeProps) {
               opacity={0.6}
             />
           </svg>
-        </motion.div>
+        </div>
       )}
 
       {/* Boss: Static decorative inner ring (show for both boss and boss_locked) */}
@@ -370,7 +348,7 @@ function SkillNode({ data }: NodeProps) {
           MAIN NODE (Glassmorphism circle)
           ============================================ */}
       <div className="absolute inset-0 flex items-center justify-center">
-        <motion.div
+        <div
           className="relative rounded-full flex items-center justify-center"
           style={{
             width: nodeSize,
@@ -398,12 +376,15 @@ function SkillNode({ data }: NodeProps) {
                   ? `inset 0 2px 15px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 200, 0, 0.2)`
                   : `inset 0 2px 10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.2)`,
             opacity: isNodeLocked ? 0.75 : 1,
+            // Subtle floating for available/mastered, CSS-driven so we don't
+            // spawn a framer-motion instance per node. Locked/boss/low-power
+            // stay static. Combine grayscale filter with no animation for locked.
             filter: isNodeLocked ? "grayscale(0.5) brightness(0.9)" : "none",
+            animation:
+              isNodeLocked || isBoss || lowPower
+                ? undefined
+                : "st-node-float 3s ease-in-out infinite",
           }}
-          // Subtle floating for available/mastered, static for boss and locked.
-          // Low-power skips the y-loop — one per active node adds up fast.
-          animate={isNodeLocked || isBoss || lowPower ? {} : { y: [0, -3, 0] }}
-          transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
         >
           {/* Inner glow ring */}
           <div
@@ -424,7 +405,7 @@ function SkillNode({ data }: NodeProps) {
             {isNodeLocked ? (
               <Lock className="text-gray-400" size={isBossSize ? 24 : 18} strokeWidth={2} />
             ) : icon ? (
-              <motion.span
+              <span
                 style={{
                   fontSize: isBoss ? 28 : 22,
                   filter: isMastered
@@ -432,13 +413,15 @@ function SkillNode({ data }: NodeProps) {
                     : isBoss
                       ? "drop-shadow(0 0 4px rgba(184, 134, 11, 0.5))"
                       : "drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))",
+                  display: "inline-block",
+                  animation:
+                    isMastered && !lowPower
+                      ? "st-icon-pop 2s ease-in-out infinite"
+                      : undefined,
                 }}
-                // Only animate icon for mastered, not boss. Skip on low-power.
-                animate={isMastered && !lowPower ? { scale: [1, 1.1, 1] } : {}}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
               >
                 {icon}
-              </motion.span>
+              </span>
             ) : isBoss ? (
               // Boss: Static crown icon (no animation)
               <Crown
@@ -467,30 +450,36 @@ function SkillNode({ data }: NodeProps) {
               filter: "blur(1px)",
             }}
           />
-        </motion.div>
+        </div>
       </div>
 
       {/* ============================================
           STARBURST POINTS (Mastered ONLY - not boss)
-          Skip on low-power — 8 infinite opacity/scaleY loops per mastered
-          node compounded across a completed course is a main-thread killer.
+          CSS keyframe + wrapper rotation. Skip on low-power since even the
+          compositor path adds paint cost per node.
           ============================================ */}
       {isMastered && !lowPower && (
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           {[...Array(8)].map((_, i) => (
-            <motion.div
+            <div
               key={i}
               className="absolute"
               style={{
                 width: 2,
                 height: 9,
-                background: `linear-gradient(to top, transparent, #C9A227)`,
+                transform: `rotate(${i * 45}deg)`,
                 transformOrigin: `center ${nodeSize / 2 + 9}px`,
-                rotate: `${i * 45}deg`,
               }}
-              animate={{ opacity: [0.6, 1, 0.6], scaleY: [0.8, 1, 0.8] }}
-              transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.1 }}
-            />
+            >
+              <div
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  background: "linear-gradient(to top, transparent, #C9A227)",
+                  animation: `st-starburst 1.5s ease-in-out ${i * 0.1}s infinite`,
+                }}
+              />
+            </div>
           ))}
         </div>
       )}
