@@ -386,17 +386,32 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
     }, [getVideoElement, playbackId]);
 
     // Custom caption overlay: read cues from TextTrack API.
-    // Tracks stay in "showing" mode so Mux's CC language menu works.
-    // Native rendering is hidden by the style injection above.
+    // We flip any "showing" track to "hidden" so the browser never renders
+    // native captions (shadow DOM CSS suppression is unreliable across
+    // devices — iOS, Android Chrome, and Mux Player's own caption layer
+    // have all leaked through). In "hidden" mode, cuechange still fires
+    // and activeCues is populated, so our external overlay keeps working.
     useEffect(() => {
       const cleanupFns: Array<() => void> = [];
+
+      const suppressNativeRender = (tracks: TextTrackList) => {
+        for (let i = 0; i < tracks.length; i++) {
+          const t = tracks[i];
+          if (
+            (t.kind === "subtitles" || t.kind === "captions") &&
+            t.mode === "showing"
+          ) {
+            t.mode = "hidden";
+          }
+        }
+      };
 
       const getActiveCueText = (tracks: TextTrackList): string => {
         for (let i = 0; i < tracks.length; i++) {
           const track = tracks[i];
           if (
             (track.kind === "subtitles" || track.kind === "captions") &&
-            track.mode === "showing" &&
+            (track.mode === "showing" || track.mode === "hidden") &&
             track.activeCues &&
             track.activeCues.length > 0
           ) {
@@ -408,7 +423,10 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       };
 
       const addTrackListener = (track: TextTrack, tracks: TextTrackList) => {
-        const onCueChange = () => setCaptionText(getActiveCueText(tracks));
+        const onCueChange = () => {
+          suppressNativeRender(tracks);
+          setCaptionText(getActiveCueText(tracks));
+        };
         track.addEventListener("cuechange", onCueChange);
         cleanupFns.push(() => track.removeEventListener("cuechange", onCueChange));
       };
@@ -418,17 +436,25 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
         if (!video) return false;
         const tracks = video.textTracks;
 
+        suppressNativeRender(tracks);
+
         for (let i = 0; i < tracks.length; i++) {
           addTrackListener(tracks[i], tracks);
         }
 
         const onAddTrack = (e: TrackEvent) => {
-          if (e.track) addTrackListener(e.track, tracks);
+          if (e.track) {
+            addTrackListener(e.track, tracks);
+            suppressNativeRender(tracks);
+          }
         };
         tracks.addEventListener("addtrack", onAddTrack as EventListener);
         cleanupFns.push(() => tracks.removeEventListener("addtrack", onAddTrack as EventListener));
 
-        const onTracksChange = () => setCaptionText(getActiveCueText(tracks));
+        const onTracksChange = () => {
+          suppressNativeRender(tracks);
+          setCaptionText(getActiveCueText(tracks));
+        };
         tracks.addEventListener("change", onTracksChange);
         cleanupFns.push(() => tracks.removeEventListener("change", onTracksChange));
 
