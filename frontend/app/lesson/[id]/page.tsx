@@ -108,7 +108,10 @@ export default function LessonPage() {
   const [videoDuration, setVideoDuration] = useState(0);
   const [captionText, setCaptionText] = useState("");
   const [videoEnded, setVideoEnded] = useState(false);
-  const [videoAspect, setVideoAspect] = useState<string>("16 / 9");
+  // Default matches the current lesson library (4:3). On loadedmetadata we
+  // replace it with the actual videoWidth/videoHeight, so future non-4:3
+  // uploads still hug correctly — this is just the pre-metadata fallback.
+  const [videoAspect, setVideoAspect] = useState<string>("4 / 3");
   // True only on mobile portrait. Lets the video wrapper size itself to the
   // real aspect ratio instead of stretching with flex-1 — otherwise
   // object-contain centers the video inside a taller black box, leaving a
