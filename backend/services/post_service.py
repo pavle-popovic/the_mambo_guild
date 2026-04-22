@@ -441,7 +441,15 @@ def remove_reaction(
 ) -> dict:
     """
     Unlike a post.
+
+    Decrements the reactor's `reactions_given_count` and the post
+    owner's `reactions_received_count` so the Talent Scout and Crowd
+    Favorite badge progressions reflect real state. Without this, a
+    like/unlike loop would ratchet the counters upward forever and
+    let users farm badge thresholds without actually holding likes.
     """
+    from models.community import UserStats
+
     reaction = db.query(PostReaction).filter(
         PostReaction.post_id == post_id,
         PostReaction.user_id == user_id
@@ -453,6 +461,17 @@ def remove_reaction(
     post = db.query(Post).filter(Post.id == post_id).first()
     if post:
         post.reaction_count = max(0, post.reaction_count - 1)
+
+    # Reactor: decrement reactions_given_count.
+    reactor_stats = db.query(UserStats).filter(UserStats.user_id == user_id).first()
+    if reactor_stats and reactor_stats.reactions_given_count > 0:
+        reactor_stats.reactions_given_count -= 1
+
+    # Post owner: decrement reactions_received_count.
+    if post:
+        owner_stats = db.query(UserStats).filter(UserStats.user_id == post.user_id).first()
+        if owner_stats and owner_stats.reactions_received_count > 0:
+            owner_stats.reactions_received_count -= 1
 
     db.delete(reaction)
     db.flush()

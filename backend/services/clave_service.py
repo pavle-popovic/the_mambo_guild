@@ -254,10 +254,9 @@ def process_daily_login(user_id: str, db: Session) -> dict:
         streak_bonus = bonus_amount
         logger.info(f"User {user_id} hit streak milestone {profile.streak_count}, bonus: {bonus_amount}")
     
-    # Check for Metronome Badge (Streak)
-    from services import badge_service
-    badge_service.check_streak_badges(user_id, profile.streak_count, db)
-    
+    # Streak badges are already checked inside `gamification_service.update_streak`
+    # above — no need for a second pass here.
+
     db.flush()
     
     message = f"You earned {daily_amount} 🥢"

@@ -377,12 +377,14 @@ def add_reply(
     db.commit()
 
     # Badge triggers
-    # The Socialite: Track comments posted
+    # The Socialite: Track comments posted. Filters soft-deleted replies so
+    # the badge count reflects real state (deleting a comment un-counts it).
     if result["success"]:
         from sqlalchemy import func
         from models.community import PostReply, Post
         comment_count = db.query(func.count(PostReply.id)).filter(
-            PostReply.user_id == current_user.id
+            PostReply.user_id == current_user.id,
+            PostReply.is_deleted == False,
         ).scalar() or 0
         badge_service.check_and_award_badges(str(current_user.id), "comments_posted", comment_count, db)
 
