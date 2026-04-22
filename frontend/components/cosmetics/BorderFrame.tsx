@@ -39,12 +39,13 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
   return (
     <svg
       aria-hidden
-      viewBox="0 0 100 100"
+      viewBox="-20 -20 140 140"
+      overflow="visible"
       className="pointer-events-none absolute"
       style={{
-        inset: "-8%",
-        width: "116%",
-        height: "116%",
+        inset: "-30%",
+        width: "160%",
+        height: "160%",
         overflow: "visible",
       }}
     >
