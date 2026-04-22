@@ -530,7 +530,9 @@ def get_current_user_profile(
         reputation=profile.reputation if hasattr(profile, 'reputation') else 0,
         current_claves=profile.current_claves if hasattr(profile, 'current_claves') else 0,
         badges=badges_data,
-        stats=stats_dict
+        stats=stats_dict,
+        equipped_border_sku=profile.equipped_border_sku if hasattr(profile, 'equipped_border_sku') else None,
+        equipped_title_sku=profile.equipped_title_sku if hasattr(profile, 'equipped_title_sku') else None,
     )
 
 

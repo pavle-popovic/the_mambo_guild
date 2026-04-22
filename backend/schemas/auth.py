@@ -114,6 +114,10 @@ class UserProfileResponse(BaseModel):
     badges: List[BadgeResponse] = []
     stats: Optional[UserStatsResponse] = None
 
+    # Equipped shop cosmetics — SKUs from shop_items. Null when nothing equipped.
+    equipped_border_sku: Optional[str] = None
+    equipped_title_sku: Optional[str] = None
+
     class Config:
         from_attributes = True
 

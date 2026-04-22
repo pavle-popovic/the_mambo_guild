@@ -14,6 +14,8 @@ import { ReferralSection } from "@/components/ReferralSection";
 import SubscriptionManager from "@/components/SubscriptionManager";
 import { useTranslations } from "@/i18n/useTranslations";
 import { ShoppingBag, Package } from "lucide-react";
+import { BorderFrame } from "@/components/cosmetics/BorderFrame";
+import { BORDER_FRAME_SPECS } from "@/lib/borderFrames";
 
 interface Course {
   id: string;
@@ -199,6 +201,7 @@ export default function ProfilePage() {
           <div className="flex items-center gap-3 relative">
             {/* Avatar */}
             <div className="relative group cursor-pointer shrink-0">
+              <div className="relative w-12 h-12">
               {user.avatar_url ? (
                 <div className="w-12 h-12 rounded-full overflow-hidden shadow-lg">
                   <Image
@@ -214,6 +217,10 @@ export default function ProfilePage() {
                   {(user.username?.[0] || user.first_name[0]).toUpperCase()}
                 </div>
               )}
+              {user.equipped_border_sku && BORDER_FRAME_SPECS[user.equipped_border_sku] && (
+                <BorderFrame sku={user.equipped_border_sku} />
+              )}
+              </div>
               {/* Level badge */}
               <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-green-500 text-white text-[9px] font-bold rounded-full border-2 border-mambo-dark flex items-center justify-center z-10">
                 {user.level}
@@ -367,6 +374,7 @@ export default function ProfilePage() {
           <div className="flex flex-col md:flex-row items-center md:items-start gap-5 sm:gap-10 mb-8 sm:mb-16">
             <div className="flex flex-col items-center gap-4">
               <div className="relative group cursor-pointer">
+                <div className="relative w-24 h-24 sm:w-32 sm:h-32">
                 {user.avatar_url ? (
                   <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-full shadow-2xl overflow-hidden transition-transform group-hover:scale-105">
                     <Image
@@ -382,6 +390,10 @@ export default function ProfilePage() {
                     {(user.username?.[0] || user.first_name[0]).toUpperCase()}
                   </div>
                 )}
+                {user.equipped_border_sku && BORDER_FRAME_SPECS[user.equipped_border_sku] && (
+                  <BorderFrame sku={user.equipped_border_sku} />
+                )}
+                </div>
                 {/* Level badge - green and visible */}
                 <div className="absolute bottom-1 right-1 bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full border-2 border-white shadow-lg z-10">
                   {t("levelBadge", { level: user.level })}

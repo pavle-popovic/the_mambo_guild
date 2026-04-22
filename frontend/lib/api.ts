@@ -67,6 +67,8 @@ export interface UserProfile {
     reactions_received: number;
     solutions_accepted: number;
   } | null;
+  equipped_border_sku?: string | null;
+  equipped_title_sku?: string | null;
 }
 
 class ApiClient {

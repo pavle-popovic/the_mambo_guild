@@ -161,7 +161,9 @@ def read_users_me(
         reputation=current_user.profile.reputation,
         current_claves=current_user.profile.current_claves,
         badges=badges_data,
-        stats=stats_dict
+        stats=stats_dict,
+        equipped_border_sku=current_user.profile.equipped_border_sku,
+        equipped_title_sku=current_user.profile.equipped_title_sku,
     )
 
 
@@ -233,7 +235,9 @@ def update_user_profile(
         reputation=current_user.profile.reputation,
         current_claves=current_user.profile.current_claves,
         badges=badges_data,
-        stats=stats_dict
+        stats=stats_dict,
+        equipped_border_sku=current_user.profile.equipped_border_sku,
+        equipped_title_sku=current_user.profile.equipped_title_sku,
     )
 
 
@@ -287,7 +291,9 @@ def get_public_profile(
         reputation=profile.reputation,
         current_claves=profile.current_claves,
         badges=badges_data,
-        stats=stats_dict
+        stats=stats_dict,
+        equipped_border_sku=profile.equipped_border_sku,
+        equipped_title_sku=profile.equipped_title_sku,
     )
 
 
