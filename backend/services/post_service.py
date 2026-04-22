@@ -46,7 +46,12 @@ def _get_user_info(user: User, db: Session) -> dict:
         "avatar_url": profile.avatar_url if profile else None,
         "is_pro": is_pro,
         "is_guild_master": is_guild_master,
-        "level": profile.level if profile else 1
+        "level": profile.level if profile else 1,
+        # Shop cosmetic overlays (null when nothing equipped). Surfaced on
+        # every post.user payload so feed cards can render borders + title
+        # chips without an extra round-trip.
+        "equipped_border_sku": profile.equipped_border_sku if profile else None,
+        "equipped_title_sku": profile.equipped_title_sku if profile else None,
     }
 
 

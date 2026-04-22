@@ -322,8 +322,13 @@ def get_video_slot_status(user_id: str, db: Session) -> dict:
     Returns: {allowed, current, limit, message}
     """
     is_pro = is_user_pro(user_id, db)
-    limit = PRO_VIDEO_SLOTS if is_pro else BASE_VIDEO_SLOTS
-    
+    base_limit = PRO_VIDEO_SLOTS if is_pro else BASE_VIDEO_SLOTS
+
+    # Shop-purchased bonus slots (utility_video_slots_5) stack onto the tier cap.
+    profile = get_user_profile(user_id, db)
+    bonus = (profile.bonus_video_slots or 0) if profile else 0
+    limit = base_limit + bonus
+
     # Count Post videos (Stage/Lab posts with video)
     post_count = db.query(func.count(Post.id)).filter(
         Post.user_id == user_id,
@@ -336,9 +341,9 @@ def get_video_slot_status(user_id: str, db: Session) -> dict:
         PostReply.mux_asset_id.isnot(None),
         PostReply.is_accepted_answer == False
     ).scalar() or 0
-    
+
     current = post_count + reply_count
-    
+
     allowed = current < limit
     
     if allowed:
@@ -360,7 +365,11 @@ def get_question_slot_status(user_id: str, db: Session) -> dict:
     Returns: {allowed, current_slots, max_slots, message}
     """
     is_pro = is_user_pro(user_id, db)
-    limit = PRO_QUESTION_SLOTS if is_pro else BASE_QUESTION_SLOTS
+    base_limit = PRO_QUESTION_SLOTS if is_pro else BASE_QUESTION_SLOTS
+
+    profile = get_user_profile(user_id, db)
+    bonus = (profile.bonus_question_slots or 0) if profile else 0
+    limit = base_limit + bonus
 
     current = db.query(func.count(Post.id)).filter(
         Post.user_id == user_id,

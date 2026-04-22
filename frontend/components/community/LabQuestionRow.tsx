@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { CheckCircle, Lock } from "lucide-react";
 import { cn } from "@/lib/utils";
 import GuildMasterBadge from "@/components/ui/GuildMasterBadge";
+import { TitleChip } from "@/components/ui/GuildMasterAvatar";
+import { getTitleSpec } from "@/lib/cosmetics";
 import { useTranslations } from "@/i18n/useTranslations";
 
 interface Post {
@@ -17,6 +19,8 @@ interface Post {
         is_pro: boolean;
         is_guild_master?: boolean;
         level: number;
+        equipped_border_sku?: string | null;
+        equipped_title_sku?: string | null;
     };
     post_type: "stage" | "lab";
     title: string;
@@ -122,6 +126,12 @@ export default function LabQuestionRow({
                     <span className="flex items-center gap-1">
                         {post.user.username || t("anonymous")}
                         {post.user.is_guild_master && <GuildMasterBadge size="sm" animate={false} />}
+                        {(() => {
+                            const title = getTitleSpec(post.user.equipped_title_sku);
+                            return title ? (
+                                <TitleChip label={title.label} tone={title.tone} />
+                            ) : null;
+                        })()}
                     </span>
                     <span>•</span>
                     <span>{timeAgo}</span>

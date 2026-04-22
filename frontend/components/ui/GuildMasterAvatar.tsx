@@ -2,6 +2,12 @@
 
 import Image from "next/image";
 import { cn } from "@/lib/utils";
+import {
+  getBorderSpec,
+  getTitleSpec,
+  TITLE_TONE_CLASS,
+  type TitleTone,
+} from "@/lib/cosmetics";
 import GuildMasterBadge from "./GuildMasterBadge";
 
 interface GuildMasterAvatarProps {
@@ -16,6 +22,12 @@ interface GuildMasterAvatarProps {
   showBadge?: boolean;
   className?: string;
   onClick?: () => void;
+  /**
+   * SKU of the equipped shop border (e.g. "border_aurora"). When set, its
+   * CSS class is layered on top of the subscription ring (Guild Master /
+   * PRO) via a wrapper div, so both effects remain visible.
+   */
+  equippedBorderSku?: string | null;
 }
 
 const sizeMap = {
@@ -40,6 +52,7 @@ export default function GuildMasterAvatar({
   showBadge = true,
   className,
   onClick,
+  equippedBorderSku,
 }: GuildMasterAvatarProps) {
   const { container, text, badge, badgeOffset } = sizeMap[size];
   const displayName = username || "Anonymous";
@@ -52,6 +65,8 @@ export default function GuildMasterAvatar({
     ? "ring-2 ring-amber-400/70 ring-offset-1 ring-offset-black"
     : "";
 
+  const border = getBorderSpec(equippedBorderSku ?? null);
+
   return (
     <div
       className={cn("relative inline-block", className)}
@@ -59,29 +74,38 @@ export default function GuildMasterAvatar({
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      {/* Avatar with ring */}
+      {/* Cosmetic border wrapper. When no border equipped, this div just
+       * holds the avatar. When equipped, its class provides either a
+       * box-shadow ring or a conic-gradient padding wrapper. */}
       <div
         className={cn(
-          container,
-          "rounded-full overflow-hidden flex items-center justify-center",
-          "bg-gradient-to-br from-amber-400 to-orange-500",
-          "text-white font-semibold",
-          text,
-          ringStyles,
+          "rounded-full",
+          border?.className,
           onClick && "cursor-pointer transition-transform hover:scale-105"
         )}
       >
-        {avatarUrl ? (
-          <Image
-            src={avatarUrl}
-            alt={displayName}
-            width={64}
-            height={64}
-            className="w-full h-full object-cover"
-          />
-        ) : (
-          initials
-        )}
+        <div
+          className={cn(
+            container,
+            "rounded-full overflow-hidden flex items-center justify-center",
+            "bg-gradient-to-br from-amber-400 to-orange-500",
+            "text-white font-semibold",
+            text,
+            ringStyles
+          )}
+        >
+          {avatarUrl ? (
+            <Image
+              src={avatarUrl}
+              alt={displayName}
+              width={64}
+              height={64}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            initials
+          )}
+        </div>
       </div>
 
       {/* Guild Master badge overlay */}
@@ -114,6 +138,7 @@ export function GuildMasterUsername({
   className,
   showLevel,
   level,
+  equippedTitleSku,
 }: {
   username?: string;
   // Accepted for legacy callers; not rendered.
@@ -124,14 +149,47 @@ export function GuildMasterUsername({
   className?: string;
   showLevel?: boolean;
   level?: number;
+  /** SKU of the equipped shop title; rendered as a chip next to the username. */
+  equippedTitleSku?: string | null;
 }) {
+  const title = getTitleSpec(equippedTitleSku ?? null);
   return (
     <span className={cn("inline-flex items-center gap-1.5", className)}>
       <span className="font-semibold text-white">{username || "Anonymous"}</span>
       {isGuildMaster && <GuildMasterBadge size="sm" />}
+      {title && (
+        <TitleChip label={title.label} tone={title.tone} />
+      )}
       {showLevel && level && (
         <span className="text-xs text-white/50">Lvl {level}</span>
       )}
+    </span>
+  );
+}
+
+/**
+ * Small tone-coloured chip that renders an equipped title next to a
+ * username. Exported so the shop preview / inventory pages can reuse it
+ * without re-threading tone-class lookups.
+ */
+export function TitleChip({
+  label,
+  tone,
+  className,
+}: {
+  label: string;
+  tone: TitleTone;
+  className?: string;
+}) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center rounded-full border px-2 py-[1px] text-[10px] font-medium tracking-wide uppercase",
+        TITLE_TONE_CLASS[tone],
+        className
+      )}
+    >
+      {label}
     </span>
   );
 }

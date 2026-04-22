@@ -1860,6 +1860,97 @@ class ApiClient {
     const params = new URLSearchParams({ skip: String(skip), limit: String(limit) });
     return this.request<any[]>(`/api/community/saved?${params.toString()}`);
   }
+
+  // ============================================
+  // The Guild Shop
+  // ============================================
+
+  async shopListItems(kind?: "ticket" | "border" | "title" | "utility") {
+    const q = kind ? `?kind=${kind}` : "";
+    return this.request<ShopItem[]>(`/api/shop/items${q}`, { forceRefresh: true });
+  }
+
+  async shopListInventory() {
+    return this.request<InventoryItem[]>(`/api/shop/inventory`, { forceRefresh: true });
+  }
+
+  async shopPurchase(sku: string) {
+    return this.request<ShopPurchaseResponse>(`/api/shop/purchase`, {
+      method: "POST",
+      body: JSON.stringify({ sku }),
+    });
+  }
+
+  async shopEquip(sku: string | null, slot: "border" | "title") {
+    return this.request<ShopEquipResponse>(`/api/shop/equip`, {
+      method: "POST",
+      body: JSON.stringify({ sku, slot }),
+    });
+  }
+
+  async coachingTicketStatus() {
+    return this.request<{ unfulfilled_tickets: number; can_redeem: boolean }>(
+      `/api/premium/coaching/ticket-status`,
+      { forceRefresh: true }
+    );
+  }
+
+  async coachingSubmitWithTicket(payload: {
+    video_mux_playback_id: string;
+    video_mux_asset_id: string;
+    video_duration_seconds?: number;
+    specific_question?: string;
+    allow_social_share?: boolean;
+  }) {
+    return this.request<any>(`/api/premium/coaching/submit-ticket`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+    });
+  }
+}
+
+// ============================================
+// Shop types (kept loose — backend schemas are the source of truth)
+// ============================================
+
+export interface ShopItem {
+  sku: string;
+  kind: "ticket" | "border" | "title" | "utility";
+  name: string;
+  description: string | null;
+  price_claves: number;
+  rarity: "common" | "rare" | "epic" | "legendary" | null;
+  tier_required: "advanced" | "performer" | null;
+  stock_total: number | null;
+  stock_period: "monthly" | "lifetime" | null;
+  max_per_user: number | null;
+  remaining_stock: number | null;
+  grants: Record<string, any>;
+  metadata: Record<string, any>;
+  sort_order: number;
+}
+
+export interface InventoryItem extends ShopItem {
+  owned_count: number;
+  is_equipped: boolean;
+  first_purchased_at: string;
+}
+
+export interface ShopPurchaseResponse {
+  purchase_id: string;
+  sku: string;
+  price_paid: number;
+  new_balance: number;
+  grants: Record<string, any>;
+  fulfillment_id: string | null;
+  item: ShopItem;
+}
+
+export interface ShopEquipResponse {
+  slot: "border" | "title";
+  equipped_sku: string | null;
+  equipped_border_sku: string | null;
+  equipped_title_sku: string | null;
 }
 
 export const apiClient = new ApiClient(API_BASE_URL);

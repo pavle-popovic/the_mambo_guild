@@ -10,7 +10,7 @@ from typing import Optional, List
 from models import get_db
 from models.user import User
 from dependencies import get_current_user, get_current_user_optional
-from services import post_service, badge_service, notification_service
+from services import post_service, badge_service, notification_service, posting_reward_service
 from services.analytics_service import track_event
 
 logger = logging.getLogger(__name__)
@@ -171,6 +171,28 @@ def create_post(
         )
 
     db.commit()
+
+    # Posting rewards: credit claves for stage videos / lab questions.
+    # Enforces daily cap + cooldown internally, so calling unconditionally
+    # is safe — ineligible posts just no-op.
+    reward_outcome = {"awarded": False}
+    post_id_for_reward = (result.get("post") or {}).get("id")
+    if post_id_for_reward:
+        try:
+            reward_outcome = posting_reward_service.award_post_reward(post_id_for_reward, db)
+            if reward_outcome.get("awarded"):
+                db.commit()
+        except Exception:
+            logger.exception("create_post: posting reward failed (non-fatal)")
+            db.rollback()
+
+    # Surface the reward on the response so the client can flash "+10 🥢".
+    if reward_outcome.get("awarded"):
+        result["reward"] = {
+            "amount": reward_outcome["amount"],
+            "reason": reward_outcome["reason"],
+            "new_balance": reward_outcome["new_balance"],
+        }
 
     # Badge triggers — only count posts that passed moderation.
     from sqlalchemy import func
@@ -563,10 +585,17 @@ def delete_post(
         user_id=str(current_user.id),
         db=db
     )
-    
+
     if not result["success"]:
         raise HTTPException(status_code=400, detail=result)
-    
+
+    # Reverse any post-reward claves so deleting a rewarded post within the
+    # 72h window can't be used to farm.
+    try:
+        posting_reward_service.clawback_post_reward(post_id, db)
+    except Exception:
+        logger.exception("delete_post: clawback failed (non-fatal)")
+
     db.commit()
     return result
 

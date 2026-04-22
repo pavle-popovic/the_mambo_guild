@@ -600,11 +600,14 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               </MagicButton>
             </div>
 
-            {/* Free to post footer */}
+            {/* Free to post footer + reward hint */}
             <p className="text-xs text-white/40 mt-4 text-center">
               {mode === "stage"
                 ? t("stageCost")
                 : `${t("labCost")}${questionSlots ? t("questionSlotsRemaining", { remaining: questionSlots.max_slots - questionSlots.current_slots }) : ""}`}
+            </p>
+            <p className="text-[11px] text-amber-300/80 mt-1 text-center">
+              {mode === "stage" ? "Earn +10 🥢 on post" : "Earn +3 🥢 on post"}
             </p>
           </GlassCard>
 

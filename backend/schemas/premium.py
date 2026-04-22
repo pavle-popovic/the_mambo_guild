@@ -126,6 +126,9 @@ class CoachingSubmissionResponse(BaseModel):
     submission_month: int
     submission_year: int
     submitted_at: datetime
+    # 'subscription' (Performer's free monthly slot) or 'golden_ticket'
+    # (bought from the shop). Admin queue uses this to badge tickets.
+    source: str = "subscription"
 
     class Config:
         from_attributes = True
@@ -137,6 +140,8 @@ class CoachingSubmissionAdminResponse(CoachingSubmissionResponse):
     user_last_name: str
     user_email: str
     user_avatar_url: Optional[str] = None
+    # Inherits `source` from CoachingSubmissionResponse so the admin queue can
+    # badge Golden Ticket tickets separately from subscription slots.
 
 
 class CoachingStatusResponse(BaseModel):

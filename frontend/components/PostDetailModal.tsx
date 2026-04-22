@@ -46,6 +46,8 @@ interface Post {
     is_pro: boolean;
     is_guild_master?: boolean;
     level: number;
+    equipped_border_sku?: string | null;
+    equipped_title_sku?: string | null;
   };
   replies?: Array<{
     id: string;
@@ -58,6 +60,8 @@ interface Post {
       is_pro: boolean;
       is_guild_master?: boolean;
       level: number;
+      equipped_border_sku?: string | null;
+      equipped_title_sku?: string | null;
     };
     content: string;
     mux_playback_id: string | null;
@@ -654,6 +658,7 @@ export default function PostDetailModal({
                     isPro={post.user.is_pro}
                     isGuildMaster={post.user.is_guild_master}
                     size="lg"
+                    equippedBorderSku={post.user.equipped_border_sku}
                   />
                   <div className="flex-1">
                     <div className="flex items-center gap-2">
@@ -663,6 +668,7 @@ export default function PostDetailModal({
                         lastName={post.user.last_name}
                         isPro={post.user.is_pro}
                         isGuildMaster={post.user.is_guild_master}
+                        equippedTitleSku={post.user.equipped_title_sku}
                       />
                       {post.user.is_guild_master ? (
                         <GuildMasterTag />
@@ -951,6 +957,7 @@ export default function PostDetailModal({
                                   isPro={reply.user.is_pro}
                                   isGuildMaster={reply.user.is_guild_master}
                                   size="sm"
+                                  equippedBorderSku={reply.user.equipped_border_sku}
                                 />
                               </button>
                               <div className="flex-1">
@@ -966,6 +973,7 @@ export default function PostDetailModal({
                                       lastName={reply.user.last_name}
                                       isPro={reply.user.is_pro}
                                       isGuildMaster={reply.user.is_guild_master}
+                                      equippedTitleSku={reply.user.equipped_title_sku}
                                       className="text-sm"
                                     />
                                   </button>

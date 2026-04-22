@@ -1438,5 +1438,57 @@
       "name": "Promoter",
       "description": "Brought 3 dancers into the Guild through your referral link."
     }
+  },
+  "shop": {
+    "pageTitle": "The Guild Shop",
+    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
+    "balanceLabel": "Balance",
+    "viewInventory": "View inventory →",
+    "inventoryTitle": "Inventory",
+    "inventorySubtitle": "Equip what you own. Everything is permanent.",
+    "backToShop": "← Back to shop",
+    "empty": "Nothing here yet. Check back soon.",
+    "emptyInventory": "You don't own anything yet.",
+    "loading": "Loading catalog...",
+    "loadError": "Failed to load shop",
+    "tabs": {
+      "ticket": "Tickets",
+      "border": "Borders",
+      "title": "Titles",
+      "utility": "Utility"
+    },
+    "rarity": {
+      "common": "Common",
+      "rare": "Rare",
+      "epic": "Epic",
+      "legendary": "Legendary"
+    },
+    "actions": {
+      "buy": "Buy",
+      "buyNow": "Buy now",
+      "cancel": "Cancel",
+      "equip": "Equip",
+      "unequip": "Unequip",
+      "owned": "Owned",
+      "soldOut": "Sold out",
+      "locked": "Locked",
+      "notEnough": "Not enough",
+      "purchasing": "Purchasing...",
+      "equipped": "Equipped",
+      "redeemTicket": "Redeem ticket →"
+    },
+    "purchase": {
+      "confirmTitle": "Confirm purchase",
+      "priceLabel": "Price",
+      "yourBalance": "Your balance",
+      "afterPurchase": "After purchase",
+      "stockRemaining": "{count} left",
+      "success": "Purchase complete 🎉",
+      "genericError": "Purchase failed. Please try again."
+    },
+    "earn": {
+      "stagePost": "Earn +10 🥢 on post",
+      "labQuestion": "Earn +3 🥢 on post"
+    }
   }
 }

@@ -37,6 +37,9 @@ from .support import router as support_router
 # Analytics (Meta CAPI + ML event log)
 from .analytics import router as analytics_router
 
+# The Guild Shop
+from .shop import router as shop_router
+
 # Register routers
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(courses_router, prefix="/courses", tags=["courses"])
@@ -71,3 +74,6 @@ api_router.include_router(support_router, prefix="/support", tags=["support"])
 
 # Analytics (Meta CAPI + ML event log)
 api_router.include_router(analytics_router, prefix="/analytics", tags=["analytics"])
+
+# The Guild Shop
+api_router.include_router(shop_router, tags=["shop"])

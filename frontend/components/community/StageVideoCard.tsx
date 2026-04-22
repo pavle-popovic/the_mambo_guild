@@ -21,6 +21,8 @@ interface Post {
         is_pro: boolean;
         is_guild_master?: boolean;
         level: number;
+        equipped_border_sku?: string | null;
+        equipped_title_sku?: string | null;
     };
     post_type: "stage" | "lab";
     title: string;
@@ -216,6 +218,7 @@ export default function StageVideoCard({
                                     isGuildMaster={post.user.is_guild_master}
                                     size="sm"
                                     showBadge={true}
+                                    equippedBorderSku={post.user.equipped_border_sku}
                                 />
                             </button>
                         </div>

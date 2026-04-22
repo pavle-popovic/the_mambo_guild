@@ -160,15 +160,16 @@ class CoachingSubmission(Base):
     """
     __tablename__ = "coaching_submissions"
     __table_args__ = (
-        # DB-level backstop for the "1 submission per user per month" rule.
-        # The application check in POST /premium/coaching/submit is racy under
-        # concurrent double-clicks — this constraint collapses the race so the
-        # second insert fails with IntegrityError instead of creating a duplicate.
+        # DB-level backstop for the "1 submission per user per month per source"
+        # rule. Performer's subscription grants one free submission per month;
+        # a Golden Ticket purchase is a second, distinct source — both can
+        # coexist in the same month.
         UniqueConstraint(
             "user_id",
             "submission_month",
             "submission_year",
-            name="uq_coaching_submissions_user_month_year",
+            "source",
+            name="uq_coaching_submissions_user_month_year_source",
         ),
     )
 
@@ -197,9 +198,14 @@ class CoachingSubmission(Base):
     reviewed_by = Column(UUID(as_uuid=True), ForeignKey("users.id"), nullable=True)
     reviewed_at = Column(DateTime, nullable=True)
     
-    # Billing cycle tracking (for "1 per month" limit)
+    # Billing cycle tracking (for "1 per month per source" limit)
     submission_month = Column(Integer, nullable=False)  # 1-12
     submission_year = Column(Integer, nullable=False)  # 2024, 2025, etc.
+
+    # 'subscription' (Performer's free monthly slot) | 'golden_ticket' (shop purchase).
+    # Distinguishes fulfilment flows + relaxes the uniqueness rule so both can
+    # land in the same month.
+    source = Column(String(20), nullable=False, default="subscription", server_default="subscription")
     
     # Timestamps
     submitted_at = Column(DateTime, default=datetime.utcnow, nullable=False)

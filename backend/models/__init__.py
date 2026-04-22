@@ -64,6 +64,7 @@ from models.premium import (
 )
 from models.payment import StripeWebhookEvent, MuxWebhookEvent, XPAuditLog
 from models.analytics import UserEvent
+from models.shop import ShopItem, ShopPurchase
 
 # Dependency to get database session
 def get_db():

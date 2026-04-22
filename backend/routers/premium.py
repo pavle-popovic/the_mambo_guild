@@ -330,18 +330,20 @@ def get_coaching_status(
     Guild Master only.
     """
     require_guild_master(current_user)
-    
+
     now = datetime.now(timezone.utc)
     current_month = now.month
     current_year = now.year
-    
-    # Check for existing submission this month
+
+    # Only the subscription-slot submission consumes the monthly credit. A
+    # Golden Ticket submission from the shop doesn't count against it.
     existing = db.query(CoachingSubmission).filter(
         CoachingSubmission.user_id == current_user.id,
         CoachingSubmission.submission_month == current_month,
-        CoachingSubmission.submission_year == current_year
+        CoachingSubmission.submission_year == current_year,
+        CoachingSubmission.source == "subscription",
     ).first()
-    
+
     if existing:
         # Calculate next month's first day
         if current_month == 12:
@@ -380,26 +382,28 @@ def submit_coaching_video(
     current_month = now.month
     current_year = now.year
     
-    # Check for existing submission
+    # Only the subscription-slot submission is gated here. Golden Ticket
+    # submissions go through /coaching/submit-ticket and don't conflict.
     existing = db.query(CoachingSubmission).filter(
         CoachingSubmission.user_id == current_user.id,
         CoachingSubmission.submission_month == current_month,
-        CoachingSubmission.submission_year == current_year
+        CoachingSubmission.submission_year == current_year,
+        CoachingSubmission.source == "subscription",
     ).first()
-    
+
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You have already submitted a coaching video this month."
         )
-    
+
     # Validate video duration (max 100 seconds)
     if data.video_duration_seconds and data.video_duration_seconds > 100:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Video must be 100 seconds or less."
         )
-    
+
     submission = CoachingSubmission(
         id=uuid.uuid4(),
         user_id=current_user.id,
@@ -410,7 +414,8 @@ def submit_coaching_video(
         allow_social_share=data.allow_social_share,
         status=CoachingSubmissionStatus.PENDING,
         submission_month=current_month,
-        submission_year=current_year
+        submission_year=current_year,
+        source="subscription",
     )
 
     db.add(submission)
@@ -430,6 +435,112 @@ def submit_coaching_video(
     db.refresh(submission)
 
     return _format_submission_response(submission)
+
+
+@router.post("/coaching/submit-ticket", response_model=CoachingSubmissionResponse)
+def submit_coaching_video_with_ticket(
+    data: CoachingSubmissionCreate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    """
+    Redeem an unfulfilled Golden Ticket purchase against a new coaching
+    submission. Unlike the subscription slot, this is not gated by tier
+    (anyone who owns a ticket can use it) and does not consume the
+    monthly subscription credit.
+    """
+    # Local imports to avoid pulling the shop subsystem into premium's
+    # top-level import graph.
+    from models.shop import ShopPurchase
+    from services import shop_service
+
+    now = datetime.now(timezone.utc)
+    current_month = now.month
+    current_year = now.year
+
+    # Find an unfulfilled Golden Ticket for this user. We don't scope by
+    # stock_period_key — a ticket bought in a prior month is still valid
+    # to redeem later; the global stock cap was on purchase, not redemption.
+    purchase = (
+        db.query(ShopPurchase)
+        .filter(
+            ShopPurchase.user_id == current_user.id,
+            ShopPurchase.sku == "ticket_golden",
+            ShopPurchase.status == "fulfilled",
+            ShopPurchase.fulfillment_id.is_(None),
+        )
+        .order_by(ShopPurchase.created_at.asc())
+        .first()
+    )
+    if not purchase:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You don't have an unused Golden Ticket. Buy one from the shop first."
+        )
+
+    if data.video_duration_seconds and data.video_duration_seconds > 100:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Video must be 100 seconds or less."
+        )
+
+    submission = CoachingSubmission(
+        id=uuid.uuid4(),
+        user_id=current_user.id,
+        video_mux_playback_id=data.video_mux_playback_id,
+        video_mux_asset_id=data.video_mux_asset_id,
+        video_duration_seconds=data.video_duration_seconds,
+        specific_question=data.specific_question,
+        allow_social_share=data.allow_social_share,
+        status=CoachingSubmissionStatus.PENDING,
+        submission_month=current_month,
+        submission_year=current_year,
+        source="golden_ticket",
+    )
+    db.add(submission)
+
+    try:
+        db.flush()
+    except IntegrityError:
+        # (user_id, month, year, source) unique: can't stack two tickets
+        # in the same calendar month. Rare; the shop hard-caps global stock
+        # at 2/month so a single user racing two redemptions in one month
+        # would have to have bought twice. Still reject cleanly.
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="You've already redeemed a Golden Ticket this month."
+        )
+
+    shop_service.mark_fulfilled(str(purchase.id), str(submission.id), db)
+    db.commit()
+    db.refresh(submission)
+
+    return _format_submission_response(submission)
+
+
+@router.get("/coaching/ticket-status")
+def get_coaching_ticket_status(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Return whether the current user holds any unfulfilled Golden Tickets.
+    Used by the coaching upload page to show the "Redeem Ticket" path.
+    """
+    from models.shop import ShopPurchase
+
+    count = (
+        db.query(ShopPurchase)
+        .filter(
+            ShopPurchase.user_id == current_user.id,
+            ShopPurchase.sku == "ticket_golden",
+            ShopPurchase.status == "fulfilled",
+            ShopPurchase.fulfillment_id.is_(None),
+        )
+        .count()
+    )
+    return {"unfulfilled_tickets": count, "can_redeem": count > 0}
 
 
 @router.get("/coaching/my-submissions", response_model=List[CoachingSubmissionResponse])
@@ -462,7 +573,8 @@ def _format_submission_response(sub: CoachingSubmission) -> CoachingSubmissionRe
         reviewed_at=sub.reviewed_at,
         submission_month=sub.submission_month,
         submission_year=sub.submission_year,
-        submitted_at=sub.submitted_at
+        submitted_at=sub.submitted_at,
+        source=sub.source or "subscription",
     )
 
 
@@ -508,6 +620,7 @@ def get_coaching_queue(
             submission_month=sub.submission_month,
             submission_year=sub.submission_year,
             submitted_at=sub.submitted_at,
+            source=sub.source or "subscription",
             user_first_name=profile.first_name if profile else "Unknown",
             user_last_name=profile.last_name if profile else "User",
             user_email=user.email if user else "",

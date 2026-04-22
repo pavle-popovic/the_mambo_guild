@@ -99,6 +99,16 @@ class UserProfile(Base):
     first_touch_referrer = Column(String(500), nullable=True)
     first_touch_at = Column(DateTime(timezone=True), nullable=True)
 
+    # Guild Shop (v1)
+    # Equipped cosmetic SKUs are free-text FKs (soft-referenced against
+    # shop_items.sku); we don't use an FK constraint so a retired SKU doesn't
+    # brick a user's avatar.
+    equipped_border_sku = Column(String(64), nullable=True)
+    equipped_title_sku = Column(String(64), nullable=True)
+    # Bonus slots bought from utility SKUs; stacked onto the base tier caps.
+    bonus_video_slots = Column(Integer, default=0, nullable=False, server_default="0")
+    bonus_question_slots = Column(Integer, default=0, nullable=False, server_default="0")
+
     # Relationships
     user = relationship("User", back_populates="profile")
 
