@@ -428,3 +428,45 @@ def award_subscription_badge(user_id: str, tier: str, db: Session):
             if not existing_pro:
                 award_badge(user_id, pro_badge, db)
                 logger.info(f"🏆 Also awarded pro_member badge to Guild Master {user_id}")
+
+
+def revoke_subscription_badges(user_id: str, current_tier: str, db: Session) -> int:
+    """
+    Revoke subscription badges so the trophy case mirrors the current
+    subscription tier (not lifetime achievement).
+
+    Called from Stripe webhooks when tier drops:
+      - current_tier='rookie'    (cancellation)   -> remove pro_member + guild_master
+      - current_tier='advanced'  (Performer->Pro) -> remove guild_master only; pro_member is still earned
+      - current_tier='performer' (upgrade/steady) -> no-op (user is fully subscribed)
+
+    Idempotent. Returns the number of UserBadge rows deleted.
+    """
+    tier_lower = (current_tier or "").lower()
+
+    if tier_lower == "performer":
+        return 0
+
+    if tier_lower == "rookie":
+        badges_to_remove = ["pro_member", "guild_master"]
+    elif tier_lower == "advanced":
+        badges_to_remove = ["guild_master"]
+    else:
+        # Unknown tier — don't touch anything rather than silently deleting.
+        logger.warning(
+            "revoke_subscription_badges: unknown tier '%s' for user %s; skipping",
+            current_tier, user_id,
+        )
+        return 0
+
+    removed = db.query(UserBadge).filter(
+        UserBadge.user_id == user_id,
+        UserBadge.badge_id.in_(badges_to_remove),
+    ).delete(synchronize_session=False)
+
+    if removed:
+        logger.info(
+            "Revoked %d subscription badge(s) from user %s on tier change to %s",
+            removed, user_id, tier_lower,
+        )
+    return removed

@@ -18,7 +18,7 @@ from models.user import User, UserProfile, Subscription, SubscriptionStatus, Sub
 from models.payment import StripeWebhookEvent
 from services import stripe_service
 from services.clave_service import award_subscription_bonus
-from services.badge_service import award_subscription_badge
+from services.badge_service import award_subscription_badge, revoke_subscription_badges
 from services.analytics_service import track_event
 from config import settings
 
@@ -486,6 +486,21 @@ async def stripe_webhook(
             db.commit()
             db.refresh(db_subscription)
 
+            # Mirror trophy case to current tier: revokes guild_master on
+            # Performer→Advanced downgrade, revokes both on canceled→rookie.
+            # No-op when the tier is still Performer. Safe to run on every
+            # subscription.updated event.
+            try:
+                revoke_subscription_badges(
+                    str(db_subscription.user_id),
+                    db_subscription.tier.value if db_subscription.tier else "rookie",
+                    db,
+                )
+                db.commit()
+            except Exception:
+                logger.exception("webhook: revoke_subscription_badges failed (non-fatal)")
+                db.rollback()
+
             # Burn the one-time trial flag the moment Stripe confirms a trial
             # started for this user. Prevents re-using the 7 free days on a
             # second checkout after cancelling.
@@ -674,6 +689,15 @@ async def stripe_webhook(
             db_subscription.cancel_at_period_end = False
             db.commit()
             db.refresh(db_subscription)
+
+            # Revoke pro_member + guild_master on final cancellation so the
+            # trophy case reflects current (rookie) status, not lifetime.
+            try:
+                revoke_subscription_badges(str(cancelled_user_id), "rookie", db)
+                db.commit()
+            except Exception:
+                logger.exception("webhook: revoke_subscription_badges failed on cancellation (non-fatal)")
+                db.rollback()
 
             # Churn label for ML — not forwarded to Meta.
             try:
