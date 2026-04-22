@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useEffect, useRef } from "react";
-import { FaLock, FaCheck, FaPlay, FaSkull } from "react-icons/fa";
+import { FaLock, FaCheck, FaPlay } from "react-icons/fa";
 import Link from "next/link";
 
 interface Lesson {
@@ -159,10 +159,8 @@ export default function QuestLogSidebar({
               .map(Number)
               .sort((a, b) => a - b);
             
-            return { week, days: days.map(day => ({ day, lessons: weekGroups[week][day].filter(l => !l.is_boss_battle) })) };
+            return { week, days: days.map(day => ({ day, lessons: weekGroups[week][day] })) };
           });
-
-          const bossLessons = sortedLessons.filter(l => l.is_boss_battle);
 
           return (
             <>
@@ -267,7 +265,7 @@ export default function QuestLogSidebar({
               ))}
               
               {/* Ungrouped lessons (no week/day) */}
-              {ungroupedLessons.filter(l => !l.is_boss_battle).map((lesson) => {
+              {ungroupedLessons.map((lesson) => {
                 const isActive = lesson.id === currentLessonId;
                 const isCompleted = lesson.is_completed;
                 const isLocked = lesson.is_locked;
@@ -340,48 +338,6 @@ export default function QuestLogSidebar({
                   </Link>
                 );
               })}
-
-              {bossLessons.length > 0 && (
-                <>
-                  {bossLessons.map((lesson) => {
-                    const isActive = lesson.id === currentLessonId;
-                    const isLocked = lesson.is_locked;
-
-                    return (
-                      <Link
-                        data-lesson-id={lesson.id}
-                        key={lesson.id}
-                        href={isLocked ? "#" : `/lesson/${lesson.id}`}
-                        className={`mt-6 p-4 border rounded-xl flex gap-3 items-center transition ${
-                          isLocked
-                            ? "border-red-900/30 bg-red-900/5 opacity-50 grayscale hover:grayscale-0 cursor-not-allowed"
-                            : isActive
-                            ? "border-red-900/50 bg-red-900/10"
-                            : "border-red-900/30 bg-red-900/5 hover:bg-red-900/10 cursor-pointer"
-                        }`}
-                        onClick={(e) => {
-                          if (isLocked) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        <div className="w-8 h-8 rounded-full bg-red-900/50 flex items-center justify-center text-xs text-red-200 border border-red-500/30">
-                          <FaSkull className="text-xs" />
-                        </div>
-                        <div className="flex-1">
-                          <div className="text-sm font-bold text-red-200">{lesson.title}</div>
-                          <div className="text-[10px] text-red-400">
-                            {isLocked ? "Locked • " : ""}
-                            {lesson.duration_minutes ? `${lesson.duration_minutes} min • ` : ""}
-                            {lesson.xp_value} XP
-                          </div>
-                        </div>
-                        {isLocked && <FaLock className="text-xs text-gray-700 shrink-0" />}
-                      </Link>
-                    );
-                  })}
-                </>
-              )}
             </>
           );
         })()}
