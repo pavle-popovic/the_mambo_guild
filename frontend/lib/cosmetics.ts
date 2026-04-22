@@ -67,7 +67,7 @@ export const BORDER_REGISTRY: Record<string, BorderSpec> = {
 
   // Legendary
   border_disco_inferno: { sku: "border_disco_inferno", name: "Disco Inferno", rarity: "legendary", className: "cosmetic-border-disco-inferno", description: "Full conic rainbow, slow spin, bright." },
-  border_crown_jewel:   { sku: "border_crown_jewel",   name: "Crown Jewel",   rarity: "legendary", className: "cosmetic-border-crown-jewel",   description: "Diamond tiara with a gold crown topper." },
+  border_crown_jewel:   { sku: "border_crown_jewel",   name: "Crown Jewel",   rarity: "legendary", className: "cosmetic-border-crown-jewel",   description: "Polished platinum ring, diamond crystals, gold crown topper." },
   border_eternal_clave: { sku: "border_eternal_clave", name: "Eternal Clave", rarity: "legendary", className: "cosmetic-border-eternal-clave", description: "Golden clave glyph in rotation." },
 };
 

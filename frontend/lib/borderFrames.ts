@@ -426,31 +426,32 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
     ],
   },
 
-  // Diamond-and-platinum legendary. Mirrors Eternal Clave's template
-  // exactly (same counts + radii) but in diamond-white instead of gold,
-  // with a small gold crown on top as the regal centrepiece.
+  // Shiny platinum legendary. Bright SILVER_STOPS ring (same template as
+  // Platinum Spark so it reads as polished metal), plus Eternal Clave's
+  // ornament structure (4 big + 4 small crystals, full filigree ring, inner
+  // dot ring) in diamond-white, topped by a prominent gold crown.
   border_crown_jewel: {
     id: "crown-jewel",
     ring: {
-      color: DIAMOND_STOPS,
-      thickness: 4,
+      color: SILVER_STOPS,
+      thickness: 4.2,
       opacity: 1,
-      inner: { color: "#ffffff", thickness: 0.9, opacity: 0.9, offset: 3.2 },
+      inner: { color: "#ffffff", thickness: 1, opacity: 0.95, offset: 3.2 },
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(147,197,253,0.95)", blur: 9 },
+    glow: { color: "rgba(255,255,255,0.95)", blur: 10 },
     ornaments: [
-      // Four big diamond crystals at cardinals (mirrors eternal_clave's claves)
-      { shape: "crystal", count: 4, startAngle: 0, radius: 53, size: 8.5, color: "#ffffff" },
-      // Four smaller ice-blue crystals between (at 45s)
-      { shape: "crystal", count: 4, startAngle: 45, radius: 53, size: 5.5, color: "#bfdbfe" },
-      // Filigree scrolls on the inner arc (full ring of 8)
+      // Four big white crystals at cardinals (mirrors eternal_clave's claves)
+      { shape: "crystal", count: 4, startAngle: 45, radius: 53, size: 7.5, color: "#ffffff" },
+      // Four gold sparks between them for warmth + contrast against silver
+      { shape: "spark", count: 4, startAngle: 90, radius: 54, size: 4.5, color: [GOLD_HI, GOLD] },
+      // Full ring of filigree scrolls on the inner arc
       { shape: "filigree", count: 8, startAngle: 22.5, radius: 47.5, size: 3.8, color: "#ffffff", opacity: 0.95 },
       // Inner ring of tiny sparks
-      { shape: "dot", count: 16, startAngle: 0, radius: 45.5, size: 1.3, color: "#ffffff", opacity: 0.85 },
-      // Small gold crown on top — the royal centrepiece
-      { shape: "crown", count: 1, startAngle: 0, radius: 58, size: 8.5, color: [GOLD_HI, GOLD], rotateOut: true },
+      { shape: "dot", count: 16, startAngle: 0, radius: 45.5, size: 1.3, color: "#ffffff", opacity: 0.9 },
+      // Prominent gold crown on top — the royal centrepiece
+      { shape: "crown", count: 1, startAngle: 0, radius: 59, size: 13, color: [GOLD_HI, GOLD], rotateOut: true },
     ],
   },
 

@@ -48,12 +48,25 @@ export function ClaveWallet({ onOpenWallet, className }: ClaveWalletProps) {
     return () => clearInterval(interval);
   }, [fetchBalance]);
 
-  // Listen for wallet updates from other components
+  // Listen for wallet updates from other components. If the dispatcher
+  // knows the new balance (e.g. purchase response), it can pass it in
+  // `event.detail.balance` for an optimistic update so the UI doesn't wait
+  // on a round-trip. Falls back to a fetch when no balance is supplied.
   useEffect(() => {
-    const handler = () => fetchBalance();
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent<{ balance?: number }>).detail;
+      if (typeof detail?.balance === "number") {
+        setPrevBalance(balance);
+        setBalance(detail.balance);
+        setIsAnimating(true);
+        setTimeout(() => setIsAnimating(false), 600);
+      } else {
+        fetchBalance();
+      }
+    };
     window.addEventListener("wallet-updated", handler);
     return () => window.removeEventListener("wallet-updated", handler);
-  }, [fetchBalance]);
+  }, [fetchBalance, balance]);
 
   const handleClick = () => {
     UISound.click();

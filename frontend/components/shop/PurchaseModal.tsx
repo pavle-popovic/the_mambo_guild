@@ -37,7 +37,11 @@ export default function PurchaseModal({
     setError(null);
     try {
       const res = await apiClient.shopPurchase(item.sku);
-      window.dispatchEvent(new CustomEvent("wallet-updated"));
+      // Include new_balance so ClaveWallet can update optimistically
+      // instead of waiting on a round-trip to /api/wallet.
+      window.dispatchEvent(
+        new CustomEvent("wallet-updated", { detail: { balance: res.new_balance } })
+      );
       window.dispatchEvent(new CustomEvent("shop-inventory-updated"));
       onSuccess(res.new_balance);
     } catch (e: any) {

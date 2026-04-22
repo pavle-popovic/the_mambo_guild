@@ -20,7 +20,7 @@ import { cn } from "@/lib/utils";
 
 export default function InventoryPage() {
   const router = useRouter();
-  const { user, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, refreshUser } = useAuth();
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [equipped, setEquipped] = useState<{ border: string | null; title: string | null }>({
     border: null,
@@ -68,7 +68,10 @@ export default function InventoryPage() {
         border: res.equipped_border_sku,
         title: res.equipped_title_sku,
       });
-      await fetchInventory();
+      // Refresh both the local inventory list AND the global AuthContext user
+      // so NavBar / profile / any surface reading equipped_border_sku or
+      // equipped_title_sku re-renders immediately.
+      await Promise.all([fetchInventory(), refreshUser()]);
     } catch (e: any) {
       setError(e?.detail?.message || e?.message || "Equip failed");
     } finally {
