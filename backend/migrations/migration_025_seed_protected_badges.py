@@ -125,9 +125,13 @@ def run():
             # 3. Backfill Founder to every existing user who doesn't have it.
             #    `ON CONFLICT (user_id, badge_id) DO NOTHING` relies on
             #    the `unique_user_badge` constraint from migration 003.
+            #    Supplying `id` explicitly because prod doesn't have a
+            #    DEFAULT gen_random_uuid() on user_badges.id (schema drift
+            #    from tables having been created via SQLAlchemy rather
+            #    than migration 003 on this environment).
             backfilled = conn.execute(text("""
-                INSERT INTO user_badges (user_id, badge_id, earned_at)
-                SELECT u.id, 'founder_diamond', NOW()
+                INSERT INTO user_badges (id, user_id, badge_id, earned_at)
+                SELECT gen_random_uuid(), u.id, 'founder_diamond', NOW()
                 FROM users u
                 ON CONFLICT (user_id, badge_id) DO NOTHING
             """)).rowcount
