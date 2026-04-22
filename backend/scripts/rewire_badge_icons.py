@@ -57,6 +57,36 @@ MAPPING: dict[str, str] = {
 
     # promoter (singleton, referrals_converted) — star_style for star referrer.
     "promoter": "star_style",
+
+    # --- Fallback singletons for the remaining families ---
+    # No tiered orphan PNGs exist for these four families, so all four tiers
+    # in a family share one thematic singleton. Intended as a temporary fix
+    # until proper per-tier artwork is uploaded; swapping later only requires
+    # editing this map.
+
+    # guild_love_* (Guild Applause — likes on guild posts): responder vibe.
+    "guild_love_bronze":  "responder_style",
+    "guild_love_silver":  "responder_style",
+    "guild_love_gold":    "responder_style",
+    "guild_love_diamond": "responder_style",
+
+    # motw_* (Move Master — MOTW video count): maestro.
+    "motw_bronze":  "maestro_style",
+    "motw_silver":  "maestro_style",
+    "motw_gold":    "maestro_style",
+    "motw_diamond": "maestro_style",
+
+    # original_* (The Originator — original video count): camera = creator.
+    "original_bronze":  "camera_style",
+    "original_silver":  "camera_style",
+    "original_gold":    "camera_style",
+    "original_diamond": "camera_style",
+
+    # original_love_* (Fan Favorite — likes on original posts): fire = love.
+    "original_love_bronze":  "fire_style",
+    "original_love_silver":  "fire_style",
+    "original_love_gold":    "fire_style",
+    "original_love_diamond": "fire_style",
 }
 
 
