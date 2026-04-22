@@ -8,6 +8,8 @@ import {
   TITLE_TONE_CLASS,
   type TitleTone,
 } from "@/lib/cosmetics";
+import { BORDER_FRAME_SPECS } from "@/lib/borderFrames";
+import { BorderFrame } from "@/components/cosmetics/BorderFrame";
 import GuildMasterBadge from "./GuildMasterBadge";
 
 interface GuildMasterAvatarProps {
@@ -66,6 +68,7 @@ export default function GuildMasterAvatar({
     : "";
 
   const border = getBorderSpec(equippedBorderSku ?? null);
+  const hasFrame = !!(border && BORDER_FRAME_SPECS[border.sku]);
 
   return (
     <div
@@ -74,13 +77,14 @@ export default function GuildMasterAvatar({
       role={onClick ? "button" : undefined}
       tabIndex={onClick ? 0 : undefined}
     >
-      {/* Cosmetic border wrapper. When no border equipped, this div just
-       * holds the avatar. When equipped, its class provides either a
-       * box-shadow ring or a conic-gradient padding wrapper. */}
+      {/* Avatar + cosmetic frame container. The SVG frame is absolutely
+       * positioned and extends beyond the avatar bounds via negative insets
+       * so corner ornaments float outside the circle. Falls back to the
+       * legacy CSS-class ring when the SKU lacks a frame spec. */}
       <div
         className={cn(
-          "rounded-full",
-          border?.className,
+          "relative rounded-full",
+          !hasFrame && border?.className,
           onClick && "cursor-pointer transition-transform hover:scale-105"
         )}
       >
@@ -106,6 +110,8 @@ export default function GuildMasterAvatar({
             initials
           )}
         </div>
+
+        {hasFrame && <BorderFrame sku={border?.sku ?? null} />}
       </div>
 
       {/* Guild Master badge overlay */}
