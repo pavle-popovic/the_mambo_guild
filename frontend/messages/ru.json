@@ -529,7 +529,10 @@
       "pillarImageAltPlayerBack": "Плеер урока в виде со спины для повторения как на живом занятии",
       "pillarImageAltSkillTree": "Дерево навыков в виде созвездия с соединёнными открываемыми модулями",
       "pillarImageAltCommunity": "Лента сообщества с постами танцоров, реакциями и комментариями",
-      "pillarImageAltVip": "Guild Master VIP-хаб — индивидуальный коучинг, The Roundtable-созвоны и закрытая группа"
+      "pillarImageAltVip": "Guild Master VIP-хаб — индивидуальный коучинг, The Roundtable-созвоны и закрытая группа",
+      "pillarCommunityFeedCaption": "ЛЕНТА",
+      "pillarCommunityProfileCaption": "ТВОЙ ПРОФИЛЬ",
+      "pillarImageAltCommunityProfile": "Профиль со стриком, XP, тиром, клавами и витриной трофеев"
     },
     "skillTree": {
       "badge": "Геймифицированное обучение",

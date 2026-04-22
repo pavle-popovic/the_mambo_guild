@@ -668,7 +668,10 @@
       "pillarImageAltPlayerBack": "ライブクラス風に一緒に踊れる背面表示のレッスンプレイヤー",
       "pillarImageAltSkillTree": "アンロック可能なモジュールが繋がる星座型スキルツリー",
       "pillarImageAltCommunity": "ダンサーの投稿、リアクション、コメントが並ぶコミュニティフィード",
-      "pillarImageAltVip": "Guild Master VIPハブ — 1対1コーチング、Roundtableコール、プライベートグループ"
+      "pillarImageAltVip": "Guild Master VIPハブ — 1対1コーチング、Roundtableコール、プライベートグループ",
+      "pillarCommunityFeedCaption": "フィード",
+      "pillarCommunityProfileCaption": "あなたのプロフィール",
+      "pillarImageAltCommunityProfile": "連続記録、XP、ティア、クラベ、トロフィーケースを示すプロフィールページ"
     },
     "skillTree": {
       "badge": "ゲーミフィケーション学習",

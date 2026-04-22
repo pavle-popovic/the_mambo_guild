@@ -841,7 +841,10 @@
       "pillarImageAltPlayerBack": "Lesson player in back view for live-class follow-along practice",
       "pillarImageAltSkillTree": "Constellation skill tree showing connected unlockable modules",
       "pillarImageAltCommunity": "Community feed with dancer posts, reactions and comments",
-      "pillarImageAltVip": "Guild Master VIP hub — 1-on-1 coaching, Roundtable calls and private group"
+      "pillarImageAltVip": "Guild Master VIP hub — 1-on-1 coaching, Roundtable calls and private group",
+      "pillarCommunityFeedCaption": "THE FEED",
+      "pillarCommunityProfileCaption": "YOUR PROFILE",
+      "pillarImageAltCommunityProfile": "Profile page showing streak, XP, tier, claves and trophy case"
     },
     "skillTree": {
       "badge": "Gamified Learning",

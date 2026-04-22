@@ -668,7 +668,10 @@
       "pillarImageAltPlayerBack": "مشغّل الدروس في العرض الخلفي للتمرّن على غرار الحصة المباشرة",
       "pillarImageAltSkillTree": "شجرة مهارات على شكل كوكبة تعرض وحدات مترابطة قابلة للفتح",
       "pillarImageAltCommunity": "خلاصة المجتمع بمنشورات الراقصين والتفاعلات والتعليقات",
-      "pillarImageAltVip": "مركز Guild Master لأعضاء VIP — تدريب فردي وجلسات Roundtable ومجموعة خاصة"
+      "pillarImageAltVip": "مركز Guild Master لأعضاء VIP — تدريب فردي وجلسات Roundtable ومجموعة خاصة",
+      "pillarCommunityFeedCaption": "الخلاصة",
+      "pillarCommunityProfileCaption": "ملفك الشخصي",
+      "pillarImageAltCommunityProfile": "صفحة الملف الشخصي تعرض streak وXP والتير وclaves وخزانة الكؤوس"
     },
     "skillTree": {
       "badge": "تعلّم مُلعَّب",

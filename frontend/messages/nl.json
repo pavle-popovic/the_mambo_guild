@@ -529,7 +529,10 @@
       "pillarImageAltPlayerBack": "Lesspeler in rugweergave om live-class mee te dansen",
       "pillarImageAltSkillTree": "Constellation skill tree met verbonden unlockbare modules",
       "pillarImageAltCommunity": "Community-feed met posts, reacties en comments van dansers",
-      "pillarImageAltVip": "Guild Master VIP-hub — 1-op-1 coaching, Roundtable-calls en privégroep"
+      "pillarImageAltVip": "Guild Master VIP-hub — 1-op-1 coaching, Roundtable-calls en privégroep",
+      "pillarCommunityFeedCaption": "DE FEED",
+      "pillarCommunityProfileCaption": "JOUW PROFIEL",
+      "pillarImageAltCommunityProfile": "Profiel met streak, XP, tier, claves en trofeeënkast"
     },
     "skillTree": {
       "badge": "Gamified Learning",

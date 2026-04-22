@@ -668,7 +668,10 @@
       "pillarImageAltPlayerBack": "라이브 수업처럼 따라 연습할 수 있는 백 뷰 레슨 플레이어",
       "pillarImageAltSkillTree": "연결된 해금형 모듈을 보여주는 별자리형 스킬 트리",
       "pillarImageAltCommunity": "댄서들의 게시물, 반응, 댓글이 있는 커뮤니티 피드",
-      "pillarImageAltVip": "Guild Master VIP 허브 — 1:1 코칭, Roundtable 콜, 프라이빗 그룹"
+      "pillarImageAltVip": "Guild Master VIP 허브 — 1:1 코칭, Roundtable 콜, 프라이빗 그룹",
+      "pillarCommunityFeedCaption": "피드",
+      "pillarCommunityProfileCaption": "내 프로필",
+      "pillarImageAltCommunityProfile": "연속 기록, XP, 티어, 클라베, 트로피 케이스가 보이는 프로필"
     },
     "skillTree": {
       "badge": "게이미피케이션 학습",

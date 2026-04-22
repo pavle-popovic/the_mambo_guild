@@ -529,7 +529,10 @@
       "pillarImageAltPlayerBack": "Player de aula em visão de costas para prática no estilo aula ao vivo",
       "pillarImageAltSkillTree": "Árvore de habilidades em constelação mostrando módulos conectados e desbloqueáveis",
       "pillarImageAltCommunity": "Feed da comunidade com posts de dançarinos, reações e comentários",
-      "pillarImageAltVip": "Hub VIP do Guild Master — coaching 1-a-1, chamadas do Roundtable e grupo privado"
+      "pillarImageAltVip": "Hub VIP do Guild Master — coaching 1-a-1, chamadas do Roundtable e grupo privado",
+      "pillarCommunityFeedCaption": "O FEED",
+      "pillarCommunityProfileCaption": "SEU PERFIL",
+      "pillarImageAltCommunityProfile": "Perfil com streak, XP, tier, claves e vitrine de troféus"
     },
     "skillTree": {
       "badge": "Aprendizado Gamificado",

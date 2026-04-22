@@ -668,7 +668,10 @@
       "pillarImageAltPlayerBack": "Player μαθήματος σε πίσω προβολή για εξάσκηση τύπου live μαθήματος",
       "pillarImageAltSkillTree": "Αστρικό skill tree με συνδεδεμένα modules που ξεκλειδώνουν",
       "pillarImageAltCommunity": "Community feed με posts χορευτών, αντιδράσεις και σχόλια",
-      "pillarImageAltVip": "Guild Master VIP hub — 1-προς-1 coaching, The Roundtable calls και ιδιωτικό group"
+      "pillarImageAltVip": "Guild Master VIP hub — 1-προς-1 coaching, The Roundtable calls και ιδιωτικό group",
+      "pillarCommunityFeedCaption": "ΤΟ FEED",
+      "pillarCommunityProfileCaption": "ΤΟ ΠΡΟΦΙΛ ΣΟΥ",
+      "pillarImageAltCommunityProfile": "Προφίλ με streak, XP, tier, claves και προθήκη τροπαίων"
     },
     "skillTree": {
       "badge": "Gamified Μάθηση",

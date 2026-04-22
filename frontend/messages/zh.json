@@ -529,7 +529,10 @@
       "pillarImageAltPlayerBack": "背面视角的课程播放器，便于跟练",
       "pillarImageAltSkillTree": "星座式技能树，展示可解锁的关联模块",
       "pillarImageAltCommunity": "社区动态，舞者发布内容、互动与评论",
-      "pillarImageAltVip": "Guild Master VIP 专区 — 1对1教练、Roundtable通话与私密小组"
+      "pillarImageAltVip": "Guild Master VIP 专区 — 1对1教练、Roundtable通话与私密小组",
+      "pillarCommunityFeedCaption": "动态",
+      "pillarCommunityProfileCaption": "你的主页",
+      "pillarImageAltCommunityProfile": "显示连击、经验、等级、claves 和奖杯陈列的个人主页"
     },
     "skillTree": {
       "badge": "游戏化学习",
