@@ -17,7 +17,7 @@ import SuccessNotification from "@/components/SuccessNotification";
 import AuthPromptModal from "@/components/AuthPromptModal";
 import QuizResultModal from "@/components/QuizResultModal";
 import CourseCompletionModal from "@/components/CourseCompletionModal";
-import { FaBolt, FaPlay, FaPause, FaCheck, FaLock, FaArrowRight, FaCheckCircle, FaChevronLeft, FaSkull } from "react-icons/fa";
+import { FaBolt, FaPlay, FaPause, FaCheck, FaLock, FaArrowRight, FaCheckCircle, FaChevronLeft } from "react-icons/fa";
 import { MdScreenRotation } from "react-icons/md";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -816,28 +816,23 @@ export default function LessonPage() {
                           const isActive = l.id === lessonId;
                           const isDone = l.is_completed;
                           const isLocked = l.is_locked;
-                          const isBoss = l.is_boss_battle;
                           return (
                             <Link
                               key={l.id}
                               href={isLocked ? '#' : `/lesson/${l.id}`}
                               onClick={(e) => { if (isLocked) e.preventDefault(); }}
                               className={`flex-shrink-0 flex items-center justify-center rounded-full transition-all ${
-                                isBoss
-                                  ? `w-7 h-7 ${isActive ? 'bg-red-600 border-2 border-red-400' : isDone ? 'bg-red-800 opacity-60' : 'bg-red-900/50 border border-red-500/30'}`
-                                  : isActive
-                                    ? 'w-7 h-7 bg-mambo-blue border-2 border-blue-400 shadow-md shadow-blue-500/30'
-                                    : isDone
-                                      ? 'w-7 h-7 bg-green-600'
-                                      : isLocked
-                                        ? 'w-7 h-7 bg-gray-800 border border-gray-600'
-                                        : 'w-7 h-7 bg-gray-700 border border-gray-500 hover:bg-gray-600'
+                                isActive
+                                  ? 'w-7 h-7 bg-mambo-blue border-2 border-blue-400 shadow-md shadow-blue-500/30'
+                                  : isDone
+                                    ? 'w-7 h-7 bg-green-600'
+                                    : isLocked
+                                      ? 'w-7 h-7 bg-gray-800 border border-gray-600'
+                                      : 'w-7 h-7 bg-gray-700 border border-gray-500 hover:bg-gray-600'
                               }`}
                               title={l.title}
                             >
-                              {isBoss ? (
-                                <FaSkull className="text-[9px] text-red-200" />
-                              ) : isActive ? (
+                              {isActive ? (
                                 <FaPlay className="text-[8px] text-white ml-px" />
                               ) : isDone ? (
                                 <FaCheck className="text-[8px] text-white" />
