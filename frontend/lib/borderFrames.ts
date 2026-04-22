@@ -124,17 +124,19 @@ const GOLD_HI = "#fde68a";
  * Multi-stop metallic palettes. Rendered at 35° on rings for a brushed-metal
  * dispersion rather than a flat top-to-bottom fade.
  */
-const BRONZE_STOPS = ["#7c2d12", "#b45309", "#f59e0b", "#fcd34d", "#d97706", "#92400e"];
-const SILVER_STOPS = ["#64748b", "#cbd5e1", "#ffffff", "#e2e8f0", "#94a3b8"];
-const GOLD_STOPS   = ["#78350f", "#d97706", "#fbbf24", "#fef3c7", "#f59e0b", "#92400e"];
-const DIAMOND_STOPS = ["#c4b5fd", "#e0f2fe", "#ffffff", "#93c5fd", "#c4b5fd"];
-const AMBER_STOPS = ["#b45309", "#fbbf24", "#fef3c7", "#f59e0b"];
-const COPPER_STOPS = ["#7c2d12", "#c2410c", "#fb923c", "#fcd34d", "#c2410c"];
-const ROSE_STOPS = ["#be185d", "#fb7185", "#fecdd3", "#fda4af", "#be185d"];
-const EMERALD_STOPS = ["#064e3b", "#10b981", "#a7f3d0", "#34d399", "#065f46"];
-const ROYAL_STOPS = ["#1e3a8a", "#3b82f6", "#bfdbfe", "#60a5fa", "#1e40af"];
-const VELVET_STOPS = ["#4c1d95", "#7c3aed", "#c4b5fd", "#8b5cf6", "#4c1d95"];
-const RUBY_STOPS = ["#7f1d1d", "#e11d48", "#fecdd3", "#fb7185", "#881337"];
+const BRONZE_STOPS = ["#451a03", "#9a3412", "#f97316", "#fed7aa", "#fbbf24", "#9a3412", "#451a03"];
+const SILVER_STOPS = ["#334155", "#94a3b8", "#ffffff", "#f8fafc", "#cbd5e1", "#475569", "#1e293b"];
+const GOLD_STOPS   = ["#451a03", "#b45309", "#fbbf24", "#ffffff", "#fde68a", "#d97706", "#78350f"];
+const DIAMOND_STOPS = ["#7c3aed", "#60a5fa", "#ffffff", "#ede9fe", "#93c5fd", "#7c3aed"];
+const AMBER_STOPS = ["#78350f", "#d97706", "#ffffff", "#fde68a", "#b45309"];
+const COPPER_STOPS = ["#431407", "#9a3412", "#fb923c", "#ffffff", "#fcd34d", "#9a3412", "#431407"];
+const ROSE_STOPS = ["#881337", "#e11d48", "#ffffff", "#fecdd3", "#be185d", "#881337"];
+const EMERALD_STOPS = ["#022c22", "#059669", "#34d399", "#ffffff", "#a7f3d0", "#047857", "#022c22"];
+const ROYAL_STOPS = ["#172554", "#1e40af", "#60a5fa", "#ffffff", "#bfdbfe", "#1d4ed8", "#172554"];
+const VELVET_STOPS = ["#2e1065", "#6d28d9", "#a78bfa", "#ffffff", "#c4b5fd", "#5b21b6", "#2e1065"];
+const RUBY_STOPS = ["#4c0519", "#be123c", "#f43f5e", "#ffffff", "#fecdd3", "#9f1239", "#4c0519"];
+const NEON_STOPS = ["#831843", "#ec4899", "#ffffff", "#fbcfe8", "#db2777", "#831843"];
+const OBSIDIAN_STOPS = ["#020617", "#1e293b", "#475569", "#e2e8f0", "#334155", "#0f172a", "#020617"];
 
 // ---------------------------------------------------------------------------
 // Spec registry
@@ -147,65 +149,73 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
 
   border_amber_glow: {
     id: "amber-glow",
-    ring: { color: AMBER_STOPS, thickness: 1.6, opacity: 0.9 },
-    glow: { color: "rgba(251,191,36,0.35)", blur: 3 },
+    ring: { color: AMBER_STOPS, thickness: 2.4, opacity: 1 },
+    specular: true,
+    glow: { color: "rgba(251,191,36,0.55)", blur: 5 },
     ornaments: [
-      { shape: "dot", count: 6, startAngle: 30, radius: 46, size: 2.2, color: AMBER },
+      { shape: "dot", count: 8, startAngle: 22.5, radius: 47, size: 2.4, color: AMBER },
     ],
   },
 
   border_ivory_etch: {
     id: "ivory-etch",
     ring: {
-      color: [IVORY, "#ffffff", IVORY],
-      thickness: 1.3,
-      opacity: 0.95,
-      inner: { color: IVORY, thickness: 0.5, opacity: 0.55, offset: 3, dash: "1 2" },
+      color: ["#c0b89e", "#f5f1e0", "#ffffff", "#f5f1e0", "#a89e80"],
+      thickness: 2.4,
+      opacity: 1,
+      inner: { color: IVORY, thickness: 0.6, opacity: 0.7, offset: 3.2, dash: "1 2" },
     },
+    specular: true,
+    glow: { color: "rgba(245,241,224,0.4)", blur: 4 },
     ornaments: [
-      { shape: "dot", count: 12, startAngle: 0, radius: 46.5, size: 0.9, color: IVORY, opacity: 0.8 },
+      { shape: "dot", count: 16, startAngle: 0, radius: 47, size: 1, color: "#ffffff", opacity: 0.9 },
     ],
   },
 
   border_sunset: {
     id: "sunset",
-    ring: { color: [ORANGE, PINK, ORANGE], thickness: 1.9, opacity: 0.92 },
-    glow: { color: "rgba(251,146,60,0.35)", blur: 3 },
+    ring: { color: ["#9a3412", ORANGE, PINK, "#ffffff", PINK, ORANGE, "#9a3412"], thickness: 2.5, opacity: 1 },
+    specular: true,
+    glow: { color: "rgba(251,146,60,0.5)", blur: 5 },
     ornaments: [
-      { shape: "petal", count: 4, startAngle: 45, radius: 48, size: 4, color: [ORANGE, PINK], rotateOut: true },
-      { shape: "dot", count: 4, startAngle: 0, radius: 46, size: 1.8, color: PINK, opacity: 0.85 },
+      { shape: "petal", count: 4, startAngle: 45, radius: 49, size: 4.5, color: [ORANGE, PINK], rotateOut: true },
+      { shape: "dot", count: 4, startAngle: 0, radius: 47, size: 1.8, color: PINK, opacity: 0.9 },
     ],
   },
 
   border_mint_ice: {
     id: "mint-ice",
-    ring: { color: [MINT, "#ffffff", MINT], thickness: 1.6, opacity: 0.9 },
-    glow: { color: "rgba(110,231,183,0.35)", blur: 3 },
+    ring: { color: ["#047857", MINT, "#ffffff", MINT, "#047857"], thickness: 2.4, opacity: 1 },
+    specular: true,
+    glow: { color: "rgba(110,231,183,0.5)", blur: 5 },
     ornaments: [
-      { shape: "diamond", count: 8, radius: 46, size: 2, color: MINT, opacity: 0.75 },
+      { shape: "diamond", count: 8, radius: 47, size: 2.3, color: MINT, opacity: 0.9 },
     ],
   },
 
   border_lavender_haze: {
     id: "lavender-haze",
-    ring: { color: [LAVENDER, "#ede9fe", LAVENDER], thickness: 1.6, opacity: 0.9 },
-    glow: { color: "rgba(196,181,253,0.4)", blur: 4 },
+    ring: { color: ["#6d28d9", LAVENDER, "#ffffff", LAVENDER, "#6d28d9"], thickness: 2.4, opacity: 1 },
+    specular: true,
+    glow: { color: "rgba(196,181,253,0.55)", blur: 5 },
     ornaments: [
-      { shape: "star", count: 5, radius: 47, size: 2.9, color: LAVENDER },
-      { shape: "dot", count: 10, startAngle: 18, radius: 45.5, size: 0.8, color: "#ddd6fe", opacity: 0.7 },
+      { shape: "star", count: 5, radius: 48, size: 3.2, color: LAVENDER },
+      { shape: "dot", count: 10, startAngle: 18, radius: 46, size: 0.9, color: "#ddd6fe", opacity: 0.85 },
     ],
   },
 
   border_charcoal: {
     id: "charcoal",
     ring: {
-      color: ["#374151", CHARCOAL, "#9ca3af", CHARCOAL],
-      thickness: 2.2,
-      opacity: 0.95,
-      inner: { color: "#9ca3af", thickness: 0.4, opacity: 0.4, offset: 2 },
+      color: ["#0f172a", "#475569", "#cbd5e1", "#ffffff", "#64748b", "#1e293b"],
+      thickness: 2.8,
+      opacity: 1,
+      inner: { color: "#9ca3af", thickness: 0.5, opacity: 0.55, offset: 2.2 },
     },
+    specular: true,
+    glow: { color: "rgba(148,163,184,0.4)", blur: 4 },
     ornaments: [
-      { shape: "notch", count: 4, startAngle: 45, radius: 46, size: 3.5, color: "#9ca3af", rotateOut: true },
+      { shape: "notch", count: 4, startAngle: 45, radius: 47, size: 3.8, color: "#cbd5e1", rotateOut: true },
     ],
   },
 
@@ -215,24 +225,27 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
 
   border_neon_salsa: {
     id: "neon-salsa",
-    ring: { color: [NEON_PINK, "#fb7185", NEON_PINK], thickness: 2, opacity: 1 },
+    ring: { color: NEON_STOPS, thickness: 3, opacity: 1 },
     specular: true,
-    glow: { color: "rgba(236,72,153,0.6)", blur: 5 },
+    bevel: true,
+    glow: { color: "rgba(236,72,153,0.75)", blur: 6 },
     ornaments: [
-      { shape: "diamond", count: 4, startAngle: 45, radius: 48, size: 4, color: NEON_PINK },
-      { shape: "spark", count: 4, startAngle: 0, radius: 50, size: 3.2, color: "#fbcfe8" },
-      { shape: "dot", count: 8, startAngle: 22.5, radius: 46, size: 1.4, color: NEON_PINK, opacity: 0.7 },
+      { shape: "diamond", count: 4, startAngle: 45, radius: 49, size: 4.5, color: [NEON_PINK, "#fbcfe8"] },
+      { shape: "spark", count: 4, startAngle: 0, radius: 51, size: 3.8, color: "#ffffff" },
+      { shape: "dot", count: 8, startAngle: 22.5, radius: 46, size: 1.5, color: NEON_PINK, opacity: 0.85 },
     ],
   },
 
   border_copper_flame: {
     id: "copper-flame",
-    ring: { color: COPPER_STOPS, thickness: 2.1, opacity: 1 },
+    ring: { color: COPPER_STOPS, thickness: 3, opacity: 1 },
     specular: true,
-    glow: { color: "rgba(217,119,6,0.55)", blur: 5 },
+    bevel: true,
+    glow: { color: "rgba(217,119,6,0.7)", blur: 6 },
     ornaments: [
-      { shape: "flame", count: 4, startAngle: 45, radius: 50, size: 5, color: [COPPER, COPPER_HI], rotateOut: true },
-      { shape: "dot", count: 4, startAngle: 0, radius: 46.5, size: 1.5, color: COPPER_HI },
+      { shape: "flame", count: 4, startAngle: 45, radius: 51, size: 5.5, color: [COPPER, COPPER_HI], rotateOut: true },
+      { shape: "spark", count: 4, startAngle: 0, radius: 52, size: 3, color: "#ffffff" },
+      { shape: "dot", count: 8, startAngle: 22.5, radius: 46, size: 1.4, color: COPPER_HI, opacity: 0.9 },
     ],
   },
 
@@ -240,15 +253,16 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
     id: "emerald-vein",
     ring: {
       color: EMERALD_STOPS,
-      thickness: 2.1,
+      thickness: 3,
       opacity: 1,
-      inner: { color: GOLD_HI, thickness: 0.6, opacity: 0.7, offset: 3 },
+      inner: { color: GOLD_HI, thickness: 0.7, opacity: 0.85, offset: 3 },
     },
     specular: true,
-    glow: { color: "rgba(16,185,129,0.5)", blur: 5 },
+    bevel: true,
+    glow: { color: "rgba(16,185,129,0.65)", blur: 6 },
     ornaments: [
-      { shape: "leaf", count: 4, startAngle: 0, radius: 50, size: 5, color: [EMERALD, "#6ee7b7"], rotateOut: true },
-      { shape: "dot", count: 4, startAngle: 45, radius: 47, size: 1.4, color: GOLD_HI },
+      { shape: "leaf", count: 4, startAngle: 0, radius: 51, size: 5.5, color: [EMERALD, "#6ee7b7"], rotateOut: true },
+      { shape: "dot", count: 8, startAngle: 22.5, radius: 47, size: 1.5, color: GOLD_HI },
     ],
   },
 
@@ -256,37 +270,40 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
     id: "royal-blue",
     ring: {
       color: ROYAL_STOPS,
-      thickness: 2.1,
+      thickness: 3,
       opacity: 1,
-      inner: { color: SILVER, thickness: 0.6, opacity: 0.8, offset: 3 },
+      inner: { color: "#ffffff", thickness: 0.7, opacity: 0.85, offset: 3 },
     },
     specular: true,
-    glow: { color: "rgba(59,130,246,0.55)", blur: 5 },
+    bevel: true,
+    glow: { color: "rgba(59,130,246,0.7)", blur: 6 },
     ornaments: [
-      { shape: "fleur", count: 4, startAngle: 45, radius: 50, size: 5, color: [SILVER, "#ffffff"], rotateOut: true },
-      { shape: "dot", count: 4, startAngle: 0, radius: 47, size: 1.6, color: "#ffffff" },
+      { shape: "fleur", count: 4, startAngle: 45, radius: 51, size: 5.5, color: [SILVER, "#ffffff"], rotateOut: true },
+      { shape: "dot", count: 8, startAngle: 22.5, radius: 47, size: 1.6, color: "#ffffff" },
     ],
   },
 
   border_midnight_velvet: {
     id: "midnight-velvet",
-    ring: { color: VELVET_STOPS, thickness: 2.3, opacity: 1 },
+    ring: { color: VELVET_STOPS, thickness: 3, opacity: 1 },
     specular: true,
-    glow: { color: "rgba(124,58,237,0.6)", blur: 5 },
+    bevel: true,
+    glow: { color: "rgba(124,58,237,0.75)", blur: 6 },
     ornaments: [
-      { shape: "diamond", count: 8, startAngle: 22.5, radius: 48, size: 3, color: [VELVET, "#a78bfa"] },
-      { shape: "dot", count: 8, startAngle: 0, radius: 46, size: 1.2, color: "#c4b5fd" },
+      { shape: "diamond", count: 8, startAngle: 22.5, radius: 49, size: 3.4, color: [VELVET, "#ffffff"] },
+      { shape: "dot", count: 8, startAngle: 0, radius: 46.5, size: 1.3, color: "#c4b5fd" },
     ],
   },
 
   border_rose_gold: {
     id: "rose-gold",
-    ring: { color: ROSE_STOPS, thickness: 2.1, opacity: 1 },
+    ring: { color: ROSE_STOPS, thickness: 3, opacity: 1 },
     specular: true,
-    glow: { color: "rgba(253,164,175,0.55)", blur: 5 },
+    bevel: true,
+    glow: { color: "rgba(253,164,175,0.7)", blur: 6 },
     ornaments: [
-      { shape: "scroll", count: 4, startAngle: 45, radius: 48, size: 6, color: [ROSE, ROSE_HI], rotateOut: true },
-      { shape: "dot", count: 4, startAngle: 0, radius: 48, size: 2, color: ROSE_HI },
+      { shape: "scroll", count: 4, startAngle: 45, radius: 49, size: 6.5, color: [ROSE, ROSE_HI], rotateOut: true },
+      { shape: "dot", count: 8, startAngle: 22.5, radius: 47, size: 1.6, color: ROSE_HI },
     ],
   },
 
@@ -297,50 +314,53 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
   border_aurora: {
     id: "aurora",
     ring: {
-      color: [AURORA_1, AURORA_2, AURORA_3, AURORA_4, AURORA_1],
-      thickness: 2.8,
+      color: [AURORA_1, AURORA_2, "#ffffff", AURORA_3, AURORA_4, "#ffffff", AURORA_1],
+      thickness: 3.8,
       opacity: 1,
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(236,72,153,0.55)", blur: 6 },
+    glow: { color: "rgba(236,72,153,0.75)", blur: 7 },
     ornaments: [
-      { shape: "gem", count: 8, startAngle: 22.5, radius: 50, size: 5, color: [AURORA_2, AURORA_3] },
-      { shape: "spark", count: 4, startAngle: 0, radius: 53, size: 4, color: AURORA_1 },
-      { shape: "dot", count: 8, startAngle: 22.5, radius: 46, size: 1, color: AURORA_4, opacity: 0.85 },
+      { shape: "gem", count: 8, startAngle: 22.5, radius: 51, size: 5.5, color: [AURORA_2, AURORA_3] },
+      { shape: "spark", count: 4, startAngle: 0, radius: 54, size: 5, color: AURORA_1 },
+      { shape: "crystal", count: 4, startAngle: 45, radius: 54, size: 4, color: AURORA_2 },
+      { shape: "dot", count: 8, startAngle: 22.5, radius: 46, size: 1.1, color: AURORA_4, opacity: 0.9 },
     ],
   },
 
   border_obsidian_flame: {
     id: "obsidian-flame",
     ring: {
-      color: ["#111827", OBSIDIAN, "#374151", OBSIDIAN, "#111827"],
-      thickness: 3.1,
+      color: OBSIDIAN_STOPS,
+      thickness: 4,
       opacity: 1,
-      inner: { color: FLAME, thickness: 1, opacity: 0.85, offset: 3.5 },
+      inner: { color: FLAME, thickness: 1.1, opacity: 1, offset: 3.8 },
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(249,115,22,0.65)", blur: 6 },
+    glow: { color: "rgba(249,115,22,0.85)", blur: 8 },
     ornaments: [
-      { shape: "flame", count: 8, startAngle: 0, radius: 52, size: 5, color: [FLAME, "#facc15"], rotateOut: true },
-      { shape: "diamond", count: 8, startAngle: 22.5, radius: 48, size: 2.4, color: [FLAME, "#fbbf24"] },
+      { shape: "flame", count: 8, startAngle: 0, radius: 53, size: 5.5, color: [FLAME, "#facc15"], rotateOut: true },
+      { shape: "diamond", count: 8, startAngle: 22.5, radius: 48, size: 2.6, color: [FLAME, "#fbbf24"] },
+      { shape: "spark", count: 8, startAngle: 0, radius: 55, size: 2.5, color: "#fde68a", opacity: 0.95 },
     ],
   },
 
   border_holographic: {
     id: "holographic",
     ring: {
-      color: [HOLO_1, HOLO_2, HOLO_3, HOLO_4, HOLO_1, HOLO_2],
-      thickness: 2.8,
+      color: [HOLO_1, HOLO_2, "#ffffff", HOLO_3, HOLO_4, "#ffffff", HOLO_1, HOLO_2],
+      thickness: 3.8,
       opacity: 1,
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(167,139,250,0.6)", blur: 6 },
+    glow: { color: "rgba(167,139,250,0.8)", blur: 7 },
     ornaments: [
-      { shape: "spark", count: 12, startAngle: 0, radius: 51, size: 4, color: [HOLO_2, HOLO_3] },
-      { shape: "dot", count: 12, startAngle: 15, radius: 47, size: 1, color: HOLO_1, opacity: 0.85 },
+      { shape: "spark", count: 12, startAngle: 0, radius: 52, size: 4.5, color: [HOLO_2, HOLO_3] },
+      { shape: "crystal", count: 4, startAngle: 22.5, radius: 54, size: 3.8, color: HOLO_1 },
+      { shape: "dot", count: 12, startAngle: 15, radius: 47, size: 1.1, color: HOLO_1, opacity: 0.9 },
     ],
   },
 
@@ -348,17 +368,18 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
     id: "platinum-spark",
     ring: {
       color: SILVER_STOPS,
-      thickness: 2.8,
+      thickness: 3.8,
       opacity: 1,
-      inner: { color: "#ffffff", thickness: 0.7, opacity: 0.75, offset: 3 },
+      inner: { color: "#ffffff", thickness: 0.9, opacity: 0.9, offset: 3.2 },
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(229,228,226,0.65)", blur: 6 },
+    glow: { color: "rgba(229,228,226,0.8)", blur: 7 },
     ornaments: [
-      { shape: "spark", count: 8, startAngle: 22.5, radius: 52, size: 5, color: "#ffffff" },
-      { shape: "emblem", count: 4, startAngle: 0, radius: 50, size: 5, color: [PLATINUM, "#ffffff"] },
-      { shape: "dot", count: 8, startAngle: 22.5, radius: 47, size: 1.4, color: "#ffffff", opacity: 0.85 },
+      { shape: "spark", count: 8, startAngle: 22.5, radius: 53, size: 5.5, color: "#ffffff" },
+      { shape: "emblem", count: 4, startAngle: 0, radius: 51, size: 5.5, color: [PLATINUM, "#ffffff"] },
+      { shape: "crystal", count: 4, startAngle: 45, radius: 55, size: 3.5, color: "#ffffff" },
+      { shape: "dot", count: 8, startAngle: 22.5, radius: 47, size: 1.5, color: "#ffffff", opacity: 0.9 },
     ],
   },
 
@@ -366,17 +387,17 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
     id: "ruby-pulse",
     ring: {
       color: RUBY_STOPS,
-      thickness: 2.8,
+      thickness: 3.8,
       opacity: 1,
-      inner: { color: RUBY_HI, thickness: 0.8, opacity: 0.85, offset: 3 },
+      inner: { color: RUBY_HI, thickness: 0.9, opacity: 0.9, offset: 3.2 },
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(225,29,72,0.65)", blur: 6 },
+    glow: { color: "rgba(225,29,72,0.8)", blur: 7 },
     ornaments: [
-      { shape: "gem", count: 4, startAngle: 0, radius: 51, size: 6, color: [RUBY, RUBY_HI] },
-      { shape: "gem", count: 4, startAngle: 45, radius: 49, size: 3.6, color: RUBY_HI },
-      { shape: "spark", count: 8, startAngle: 22.5, radius: 53, size: 2.2, color: "#ffe4e6", opacity: 0.85 },
+      { shape: "crystal", count: 4, startAngle: 0, radius: 52, size: 6, color: RUBY },
+      { shape: "gem", count: 4, startAngle: 45, radius: 50, size: 3.8, color: RUBY_HI },
+      { shape: "spark", count: 8, startAngle: 22.5, radius: 54, size: 2.5, color: "#ffe4e6", opacity: 0.95 },
     ],
   },
 
@@ -390,18 +411,18 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
     id: "disco-inferno",
     ring: {
       color: BRONZE_STOPS,
-      thickness: 3.2,
+      thickness: 4.2,
       opacity: 1,
-      inner: { color: "#fef3c7", thickness: 0.7, opacity: 0.75, offset: 3.5 },
+      inner: { color: "#fef3c7", thickness: 0.9, opacity: 0.9, offset: 3.8 },
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(249,115,22,0.75)", blur: 8 },
+    glow: { color: "rgba(249,115,22,0.9)", blur: 9 },
     ornaments: [
-      { shape: "flame", count: 8, startAngle: 0, radius: 53, size: 7, color: [FLAME, "#fcd34d"], rotateOut: true },
-      { shape: "flame", count: 8, startAngle: 22.5, radius: 51, size: 4.5, color: [RUBY, FLAME], rotateOut: true },
-      { shape: "crystal", count: 4, startAngle: 45, radius: 54, size: 4, color: "#fcd34d" },
-      { shape: "spark", count: 16, startAngle: 11.25, radius: 56, size: 2.2, color: "#fef3c7", opacity: 0.85 },
+      { shape: "flame", count: 8, startAngle: 0, radius: 53, size: 7.5, color: [FLAME, "#fcd34d"], rotateOut: true },
+      { shape: "flame", count: 8, startAngle: 22.5, radius: 51, size: 5, color: [RUBY, FLAME], rotateOut: true },
+      { shape: "crystal", count: 4, startAngle: 45, radius: 55, size: 5, color: "#fcd34d" },
+      { shape: "spark", count: 16, startAngle: 11.25, radius: 56, size: 2.6, color: "#fef3c7", opacity: 0.9 },
     ],
   },
 
@@ -411,24 +432,24 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
     id: "crown-jewel",
     ring: {
       color: GOLD_STOPS,
-      thickness: 3.2,
+      thickness: 4.2,
       opacity: 1,
-      inner: { color: "#fef3c7", thickness: 0.9, opacity: 0.85, offset: 3.5 },
+      inner: { color: "#fef3c7", thickness: 1, opacity: 0.95, offset: 3.8 },
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(245,158,11,0.8)", blur: 8 },
+    glow: { color: "rgba(245,158,11,0.9)", blur: 9 },
     ornaments: [
       // Big crown on top
-      { shape: "crown", count: 1, startAngle: 0, radius: 55, size: 13, color: [GOLD_HI, GOLD], rotateOut: true },
+      { shape: "crown", count: 1, startAngle: 0, radius: 55, size: 14, color: [GOLD_HI, GOLD], rotateOut: true },
       // Crystal jewel trio beneath (ruby / royal / emerald heraldic set)
-      { shape: "crystal", count: 1, startAngle: 180, radius: 53, size: 7, color: RUBY },
-      { shape: "crystal", count: 1, startAngle: 150, radius: 52, size: 5.5, color: ROYAL },
-      { shape: "crystal", count: 1, startAngle: 210, radius: 52, size: 5.5, color: EMERALD },
+      { shape: "crystal", count: 1, startAngle: 180, radius: 54, size: 7.5, color: RUBY },
+      { shape: "crystal", count: 1, startAngle: 150, radius: 53, size: 6, color: ROYAL },
+      { shape: "crystal", count: 1, startAngle: 210, radius: 53, size: 6, color: EMERALD },
       // Filigree scrolls at side quarters
-      { shape: "filigree", count: 2, startAngle: 90, radius: 51, size: 6, color: [GOLD_HI, GOLD], rotateOut: true },
+      { shape: "filigree", count: 2, startAngle: 90, radius: 52, size: 6.5, color: [GOLD_HI, GOLD], rotateOut: true },
       // Small gold sparks filling the gaps
-      { shape: "spark", count: 8, startAngle: 22.5, radius: 48, size: 2.8, color: GOLD_HI, opacity: 0.9 },
+      { shape: "spark", count: 8, startAngle: 22.5, radius: 48, size: 3, color: GOLD_HI, opacity: 0.95 },
     ],
   },
 
@@ -438,22 +459,22 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
     id: "eternal-clave",
     ring: {
       color: GOLD_STOPS,
-      thickness: 3,
+      thickness: 4,
       opacity: 1,
-      inner: { color: GOLD_HI, thickness: 0.7, opacity: 0.8, offset: 3 },
+      inner: { color: GOLD_HI, thickness: 0.9, opacity: 0.9, offset: 3.2 },
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(245,158,11,0.8)", blur: 8 },
+    glow: { color: "rgba(245,158,11,0.9)", blur: 9 },
     ornaments: [
       // Four crossed-clave glyphs at cardinals
-      { shape: "clave", count: 4, startAngle: 0, radius: 53, size: 8, color: [GOLD_HI, GOLD] },
+      { shape: "clave", count: 4, startAngle: 0, radius: 53, size: 8.5, color: [GOLD_HI, GOLD] },
       // Diamond crystals between claves (at 45s)
-      { shape: "crystal", count: 4, startAngle: 45, radius: 52, size: 5, color: DIAMOND_STOPS[2] },
+      { shape: "crystal", count: 4, startAngle: 45, radius: 53, size: 5.5, color: "#ffffff" },
       // Filigree scrolls on the inner arc
-      { shape: "filigree", count: 8, startAngle: 22.5, radius: 47.5, size: 3.5, color: GOLD_HI, opacity: 0.9 },
+      { shape: "filigree", count: 8, startAngle: 22.5, radius: 47.5, size: 3.8, color: GOLD_HI, opacity: 0.95 },
       // Inner ring of tiny sparks
-      { shape: "dot", count: 16, startAngle: 0, radius: 45.5, size: 1.2, color: GOLD_HI, opacity: 0.65 },
+      { shape: "dot", count: 16, startAngle: 0, radius: 45.5, size: 1.3, color: GOLD_HI, opacity: 0.75 },
     ],
   },
 };

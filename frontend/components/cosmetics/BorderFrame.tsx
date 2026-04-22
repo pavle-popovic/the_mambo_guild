@@ -85,19 +85,29 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
         </>
       )}
 
-      {/* Specular highlight — thin white-to-transparent arc at top-left.
+      {/* Specular highlight — bright white-to-transparent arc at top-left.
        * Drawn AFTER the ring so it sits on top and reads as reflected light.
-       * Uses a gradient stop so the arc fades at both ends rather than
-       * cutting sharply. */}
+       * Thick enough to be obvious at small preview sizes (thumbnails). */}
       {spec.specular && spec.ring && (
-        <path
-          d={buildArcPath(50, 50, ringRadius, 200, 255)}
-          fill="none"
-          stroke={`url(#specular-${spec.id})`}
-          strokeWidth={ringThickness * 0.55}
-          strokeLinecap="round"
-          opacity={0.85}
-        />
+        <>
+          <path
+            d={buildArcPath(50, 50, ringRadius, 190, 270)}
+            fill="none"
+            stroke={`url(#specular-${spec.id})`}
+            strokeWidth={ringThickness * 0.9}
+            strokeLinecap="round"
+            opacity={1}
+          />
+          {/* Secondary short gleam for extra dimension */}
+          <path
+            d={buildArcPath(50, 50, ringRadius, 210, 245)}
+            fill="none"
+            stroke="white"
+            strokeWidth={ringThickness * 0.35}
+            strokeLinecap="round"
+            opacity={0.95}
+          />
+        </>
       )}
 
       {/* Ornaments */}
@@ -372,14 +382,15 @@ function buildArcPath(
 }
 
 function renderBevelFilter(id: string): JSX.Element {
-  // Composite inner-shadow: blurred offset dark beneath, then the stroke on top.
-  // Gives engraved metal a subtle 3D depth.
+  // Composite drop-shadow + highlight to make rings read as embossed metal
+  // at small sizes. Stronger offset + dedicated highlight give obvious 3D.
   return (
-    <filter key={id} id={id} x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur in="SourceAlpha" stdDeviation="0.6" result="shadow" />
-      <feOffset in="shadow" dx="0.25" dy="0.4" result="offsetShadow" />
+    <filter key={id} id={id} x="-40%" y="-40%" width="180%" height="180%">
+      {/* Dark underside shadow */}
+      <feGaussianBlur in="SourceAlpha" stdDeviation="0.9" result="shadowBlur" />
+      <feOffset in="shadowBlur" dx="0.6" dy="1" result="offsetShadow" />
       <feComponentTransfer in="offsetShadow" result="fadedShadow">
-        <feFuncA type="linear" slope="0.55" />
+        <feFuncA type="linear" slope="0.9" />
       </feComponentTransfer>
       <feMerge>
         <feMergeNode in="fadedShadow" />
