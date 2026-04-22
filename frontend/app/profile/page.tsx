@@ -16,6 +16,8 @@ import { useTranslations } from "@/i18n/useTranslations";
 import { ShoppingBag, Package } from "lucide-react";
 import { BorderFrame } from "@/components/cosmetics/BorderFrame";
 import { BORDER_FRAME_SPECS } from "@/lib/borderFrames";
+import { TitleChip } from "@/components/ui/GuildMasterAvatar";
+import { getTitleSpec } from "@/lib/cosmetics";
 
 interface Course {
   id: string;
@@ -286,6 +288,14 @@ export default function ProfilePage() {
                 </>
               )}
               {usernameError && <div className="text-red-500 text-[10px] mt-0.5">{usernameError}</div>}
+              {(() => {
+                const title = getTitleSpec(user.equipped_title_sku);
+                return title ? (
+                  <div className="mt-1">
+                    <TitleChip label={title.label} tone={title.tone} />
+                  </div>
+                ) : null;
+              })()}
               <div className="inline-flex items-center gap-1 mt-0.5 text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-full border border-mambo-gold/30 text-mambo-gold bg-mambo-gold/10">
                 <FaMedal className="text-[8px]" />
                 <span className="capitalize">{user.tier}</span>
@@ -502,10 +512,14 @@ export default function ProfilePage() {
                     </button>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-3 group/username">
+                  <div className="flex items-center gap-3 group/username flex-wrap">
                     <h1 className="text-xl sm:text-3xl font-bold text-mambo-text break-all">
                       @{user.username || `${user.first_name}${user.last_name}`}
                     </h1>
+                    {(() => {
+                      const title = getTitleSpec(user.equipped_title_sku);
+                      return title ? <TitleChip label={title.label} tone={title.tone} /> : null;
+                    })()}
                     <button
                       onClick={() => {
                         setNewUsername(user.username || "");
