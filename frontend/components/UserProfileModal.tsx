@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Flame, Zap, Award, Star, Lock } from "lucide-react";
+import { X, Flame, Zap, Award, Star, CheckCircle2, Lock } from "lucide-react";
 import { apiClient, type UserProfile } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import GuildMasterAvatar from "@/components/ui/GuildMasterAvatar";
+import GuildMasterAvatar, { TitleChip } from "@/components/ui/GuildMasterAvatar";
 import { GuildMasterTag } from "@/components/ui/GuildMasterBadge";
+import { getTitleSpec } from "@/lib/cosmetics";
 
 interface UserProfileModalProps {
   isOpen: boolean;
@@ -52,12 +53,29 @@ export default function UserProfileModal({ isOpen, onClose, username }: UserProf
   }, [isOpen, onClose]);
 
   const earnedBadges = (profile?.badges || []).filter((b) => b.is_earned);
-  const displayedBadge = earnedBadges[0] || null;
-  const otherBadges = earnedBadges.slice(1);
+  // The profile page's BadgeTrophyCase treats the first 5 earned badges
+  // (ordered by display_order, then earn date) as the user's "displayed"
+  // trophy set. We surface the same five here so the preview matches.
+  const displayedBadges = earnedBadges.slice(0, 5);
 
   const isGuildMaster = profile?.tier === "performer";
   const isPro =
     profile?.tier === "advanced" || profile?.tier === "performer";
+
+  const title = getTitleSpec(profile?.equipped_title_sku ?? null);
+
+  // Match the profile page's level curve: Math.pow(level, 2) * 100.
+  const currentLevelXP = profile ? Math.pow(profile.level, 2) * 100 : 0;
+  const nextLevelXP = profile ? Math.pow(profile.level + 1, 2) * 100 : 0;
+  const xpProgress = profile
+    ? Math.max(
+        0,
+        Math.min(
+          100,
+          ((profile.xp - currentLevelXP) / (nextLevelXP - currentLevelXP)) * 100
+        )
+      )
+    : 0;
 
   return (
     <AnimatePresence>
@@ -126,10 +144,16 @@ export default function UserProfileModal({ isOpen, onClose, username }: UserProf
                       isPro={isPro}
                       isGuildMaster={isGuildMaster}
                       size="xl"
+                      equippedBorderSku={profile.equipped_border_sku}
                     />
                     <h2 className="mt-3 text-xl font-bold text-white">
                       {profile.username || "Anonymous"}
                     </h2>
+                    {title && (
+                      <div className="mt-1.5">
+                        <TitleChip label={title.label} tone={title.tone} />
+                      </div>
+                    )}
                     <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
                       {isGuildMaster ? (
                         <GuildMasterTag />
@@ -141,6 +165,27 @@ export default function UserProfileModal({ isOpen, onClose, username }: UserProf
                       <span className="rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[11px] uppercase tracking-wider text-white/60">
                         {profile.tier} tier
                       </span>
+                    </div>
+
+                    {/* LEVEL + XP PROGRESS (desktop identity column) */}
+                    <div className="mt-4 w-full rounded-xl border border-white/10 bg-black/30 p-3">
+                      <div className="mb-1.5 flex items-center justify-between">
+                        <span className="text-[11px] font-bold uppercase tracking-wider text-mambo-gold">
+                          Lvl {profile.level}
+                        </span>
+                        <span className="font-mono text-[10px] text-white/50">
+                          {profile.xp.toLocaleString()} / {nextLevelXP.toLocaleString()} XP
+                        </span>
+                      </div>
+                      <div className="h-2 w-full overflow-hidden rounded-full bg-white/10">
+                        <div
+                          className="h-full rounded-full bg-gradient-to-r from-mambo-blue to-purple-500 transition-all"
+                          style={{ width: `${xpProgress}%` }}
+                        />
+                      </div>
+                      <p className="mt-1 text-[10px] text-white/40">
+                        {Math.max(0, nextLevelXP - profile.xp).toLocaleString()} XP to Lvl {profile.level + 1}
+                      </p>
                     </div>
                   </div>
 
@@ -161,103 +206,61 @@ export default function UserProfileModal({ isOpen, onClose, username }: UserProf
                       </a>
                     )}
 
-                    {/* DISPLAYED BADGE */}
-                    <section>
-                      <h3 className="mb-2 text-[10px] font-bold uppercase tracking-[0.15em] text-mambo-gold">
-                        Displayed Badge
-                      </h3>
-                      {displayedBadge ? (
-                        <div className="flex items-center gap-3 rounded-xl border border-mambo-gold/30 bg-gradient-to-br from-amber-500/10 to-amber-900/5 p-3">
-                          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-black/40 ring-1 ring-mambo-gold/40">
-                            {displayedBadge.icon_url ? (
-                              <Image
-                                src={displayedBadge.icon_url}
-                                alt={displayedBadge.name}
-                                width={48}
-                                height={48}
-                                className="object-contain"
-                              />
-                            ) : (
-                              <Award className="h-7 w-7 text-mambo-gold" />
-                            )}
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <div className="truncate font-semibold text-white">
-                              {displayedBadge.name}
-                            </div>
-                            <div className="line-clamp-2 text-xs text-white/60">
-                              {displayedBadge.description}
-                            </div>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-center text-xs text-white/40">
-                          <Lock className="mx-auto mb-1 h-4 w-4" />
-                          No badge displayed yet
-                        </div>
-                      )}
-                    </section>
-
-                    {/* ACQUIRED BADGES */}
+                    {/* DISPLAYED BADGES — the 5 the user chose to showcase */}
                     <section>
                       <h3 className="mb-2 flex items-center justify-between text-[10px] font-bold uppercase tracking-[0.15em] text-mambo-gold">
-                        <span>Acquired Badges</span>
-                        <span className="text-white/40">{earnedBadges.length}</span>
+                        <span>Displayed Badges</span>
+                        <span className="text-white/40">
+                          {displayedBadges.length} / {earnedBadges.length}
+                        </span>
                       </h3>
-                      {otherBadges.length > 0 ? (
-                        <div className="grid grid-cols-5 gap-2 sm:grid-cols-6 landscape:grid-cols-6">
-                          {otherBadges.map((b) => (
+                      {displayedBadges.length > 0 ? (
+                        <div className="grid grid-cols-5 gap-2">
+                          {displayedBadges.map((b) => (
                             <div
                               key={b.id}
                               title={`${b.name} — ${b.description}`}
-                              className="group relative flex aspect-square items-center justify-center rounded-lg border border-white/10 bg-black/30 transition hover:border-mambo-gold/40 hover:bg-amber-500/5"
+                              className="group relative flex aspect-square items-center justify-center rounded-lg border border-mambo-gold/30 bg-gradient-to-br from-amber-500/10 to-amber-900/5 transition hover:border-mambo-gold/60"
                             >
                               {b.icon_url ? (
                                 <Image
                                   src={b.icon_url}
                                   alt={b.name}
-                                  width={36}
-                                  height={36}
+                                  width={40}
+                                  height={40}
                                   className="object-contain"
                                 />
                               ) : (
-                                <Award className="h-5 w-5 text-white/50 group-hover:text-mambo-gold" />
+                                <Award className="h-5 w-5 text-mambo-gold" />
                               )}
+                            </div>
+                          ))}
+                          {/* Empty slots so the row always shows 5 cells */}
+                          {Array.from({ length: Math.max(0, 5 - displayedBadges.length) }).map((_, i) => (
+                            <div
+                              key={`empty-${i}`}
+                              className="flex aspect-square items-center justify-center rounded-lg border border-white/5 bg-white/[0.02]"
+                            >
+                              <Lock className="h-3.5 w-3.5 text-white/20" />
                             </div>
                           ))}
                         </div>
                       ) : (
-                        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-3 text-center text-xs text-white/40">
-                          {displayedBadge ? "Only one badge earned so far" : "No badges earned yet"}
+                        <div className="rounded-xl border border-white/5 bg-white/[0.02] p-4 text-center text-xs text-white/40">
+                          <Lock className="mx-auto mb-1 h-4 w-4" />
+                          No badges earned yet
                         </div>
                       )}
                     </section>
 
-                    {/* LEVEL + XP */}
-                    <section className="rounded-xl border border-white/10 bg-black/30 p-3">
-                      <div className="flex items-center justify-between text-xs text-white/60">
-                        <span className="font-semibold uppercase tracking-wider text-white/50">
-                          Level
-                        </span>
-                        <span className="text-base font-bold text-mambo-gold">
-                          Lvl {profile.level}
-                        </span>
-                      </div>
-                      <div className="mt-1 flex items-center justify-between text-xs text-white/60">
-                        <span className="font-semibold uppercase tracking-wider text-white/50">
-                          XP
-                        </span>
-                        <span className="font-mono text-white">
-                          {profile.xp.toLocaleString()}
-                        </span>
-                      </div>
-                    </section>
-
-                    {/* STAT CHIPS */}
+                    {/* STAT CHIPS — streak / rep / claves / badges / solutions */}
                     <section className="grid grid-cols-3 gap-2">
                       <Stat icon={<Flame className="h-4 w-4 text-orange-400" />} label="Streak" value={`${profile.streak_count}d`} />
                       <Stat icon={<Zap className="h-4 w-4 text-amber-400" />} label="Rep" value={profile.reputation ?? 0} />
+                      <Stat icon={<span className="text-sm leading-none">🥢</span>} label="Claves" value={profile.current_claves ?? 0} />
                       <Stat icon={<Star className="h-4 w-4 text-sky-400" />} label="Badges" value={earnedBadges.length} />
+                      <Stat icon={<CheckCircle2 className="h-4 w-4 text-emerald-400" />} label="Solved" value={profile.stats?.solutions_accepted ?? 0} />
+                      <Stat icon={<Award className="h-4 w-4 text-purple-400" />} label="Reactions" value={profile.stats?.reactions_received ?? 0} />
                     </section>
 
                   </div>

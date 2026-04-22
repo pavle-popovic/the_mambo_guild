@@ -353,26 +353,27 @@ World (Course) → Level (Module/Week) → Lesson
 ### Earning Claves
 | Action | Amount |
 |---|---|
-| New user starter pack | 15 |
+| New user starter pack | 20 |
 | Daily login (free tier) | 1–3 (RNG) |
 | Daily login (pro tier) | 4–8 (RNG) |
 | Streak bonus (every 5 days, free) | 10 |
 | Streak bonus (every 5 days, pro) | 20 |
+| Stage video post (rewarded post) | 10 (see Section 37) |
+| Lab question post (body ≥ 40 chars) | 3 (see Section 37) |
 | Accepted answer in The Lab | 15 |
 | Reaction refund (per reaction, capped at 5/video) | 1 |
 | Referral bonus | 50 |
-| Subscription bonus (Advanced monthly) | 10 |
-| Subscription bonus (Performer monthly) | 20 |
+| Subscription bonus (Advanced, one-time) | 10 |
+| Subscription bonus (Performer, one-time) | 20 |
 
 ### Spending Claves
+Engagement is now free — reacting, commenting, and posting do not charge claves. Claves are earned and then sunk into:
+
 | Action | Cost |
 |---|---|
-| React to a post | 1 |
-| Comment on a post | 2 |
-| Post a question (The Lab) | 5 |
-| Post a video (The Stage) | 15 |
 | Streak freeze repair | 10 |
 | Buy inventory freeze | 10 |
+| The Guild Shop (cosmetics, utility, Golden Tickets) | see Section 38 |
 
 ### Slot Limits
 | Resource | Free | Pro |
@@ -380,10 +381,14 @@ World (Course) → Level (Module/Week) → Lesson
 | Video slots | 5 | 20 |
 | Question slots | 10 | 50 |
 
+Shop-purchased utility SKUs add **permanent bonus slots on top of these caps** (`+5 video` stacks up to 5 times → +25 total; `+10 lab` stacks up to 3 times → +30 total). See Section 38.
+
 ### Anti-Abuse
-- **Self-reaction ban**: Users cannot react to their own posts
-- **Race condition prevention**: `SELECT FOR UPDATE` on balance operations
-- Transaction log: all earnings/spending recorded in `ClaveTransaction` table
+- **Self-reaction ban**: Users cannot react to their own posts.
+- **Race-condition prevention**: both `spend_claves()` *and* `earn_claves()` take `SELECT ... FOR UPDATE` on the user's `user_profiles` row. Re-locking an already-locked row inside the same transaction is a Postgres no-op, so nested callers (e.g. `process_reaction_refund` → `earn_claves`) stay correct. This closes a lost-update class of bug where concurrent earn paths (multi-reaction, multi-tab posting, simultaneous daily-login + post-reward) would drift `profile.current_claves` below the ledger sum.
+- **Post-reward serialization**: `posting_reward_service.award_post_reward` also takes the profile lock at the top of the function so check-then-earn sequences (cooldown + daily cap + idempotency) are atomic against concurrent posts from the same user. See Section 37.
+- **Subscription-bonus idempotency**: `award_subscription_bonus` refuses to grant a second `subscription_bonus:{tier}` transaction for the same user, blocking downgrade → upgrade → downgrade farming cycles.
+- Transaction log: every earning and spending event recorded in `clave_transactions` (namespaced `reason` strings: `daily_login`, `streak_bonus`, `accepted_answer`, `reaction_refund`, `reaction_refund_clawback`, `post_reward:{stage|lab}`, `post_reward_clawback:{stage|lab}`, `shop_purchase:{sku}`, `subscription_bonus:{tier}`, etc.) so balances can always be rebuilt from the ledger and filtered for audits.
 
 ### Wallet Modal
 - Shows current balance
@@ -637,7 +642,9 @@ All premium features require **Performer (Guild Master)** subscription.
 - Displayed to Guild Master users
 
 ### 14d. 1-on-1 Video Coaching
-- **1 submission per month** per Guild Master user
+- **1 submission per month** per Guild Master user on the subscription slot; a Golden Ticket purchased from The Guild Shop (Section 38) creates a parallel submission that does **not** consume the monthly slot.
+- `coaching_submissions.source` column distinguishes `subscription` vs `golden_ticket`; the `(user_id, submission_month, submission_year, source)` unique constraint lets a Performer stack both in the same month.
+- Golden Ticket redemption: `POST /api/premium/coaching/submit-ticket` finds the user's earliest unfulfilled `ShopPurchase` for `sku=ticket_golden`, creates the `CoachingSubmission` with `source='golden_ticket'`, and links it back via `shop_service.mark_fulfilled(purchase_id, submission_id)`. Admin queue surfaces the `source` so tickets get a small badge in the review UI.
 - Upload dance video via **real Mux direct upload** (file picker, client-side size/duration validation, status polling); replaced the earlier placeholder drop zone
 - Optional "specific question" (140 chars) — "What should I look at?"
 - Marketing consent: `allow_social_share` (the +50 XP bonus was removed; the field is now pure marketing-consent signal)
@@ -990,6 +997,7 @@ All premium features require **Performer (Guild Master)** subscription.
   - **Pavle Popović**: founder, 2x European Champion, Learning Experience Design certified
   - **Timothé Fournier**: profile added April 19, with `TimothePic.png` asset
 - Copy and bios fully translated via the `instructors` namespace
+- **Guild Ambassador application flow** on `/instructors`: amber-accented card opens `AmbassadorApplyModal.tsx`, a 5-field form (name, email, Instagram, location, message min 20 chars) that POSTs to `/api/support/ambassador-application`. The backend rate-limits 5/hr per-IP (via `utils.request.client_ip` with `TRUSTED_PROXY_HOPS`), HTML-escapes everything, and dispatches to `pavlepopovic@themamboguild.com` with `reply_to` set to the applicant so replies land in the applicant's inbox directly. Unauthenticated-friendly — pre-fills from `AuthContext` when available but does not require login. Fully i18n'd via the `ambassador` namespace.
 
 ### Founder Authority Strip
 - New section under the hero with one-line founder headline and tightened bio
@@ -1371,7 +1379,8 @@ community_tags
 - Download URLs expire in 1 hour
 - Download daily limit (5/day)
 - Community video downloads restricted to owner only
-- SELECT FOR UPDATE for race condition prevention on financial operations
+- `SELECT FOR UPDATE` for race-condition prevention on every financial operation: `spend_claves`, `earn_claves`, shop item stock + `max_per_user` checks, shop purchase grants, cosmetic equip, and reaction-refund bookkeeping. Re-locking within a transaction is a no-op, so nested paths (e.g. `award_post_reward` → `earn_claves`, or `purchase` → `spend_claves` → `_apply_grants`) stay correct and avoid ABBA deadlocks.
+- `posting_reward_service.award_post_reward` takes the author's profile lock at entry so multi-tab posting can't bypass the 10-minute cooldown or 30/day cap by firing requests before either committed.
 - Postgres advisory lock serializes Guild Master seat-cap checks
 
 ### Stripe-Specific Security (April beta hardening)
@@ -1381,7 +1390,7 @@ community_tags
 - See Section 13 for the full Stripe hardening list
 
 ### IP Handling
-- All IP-based rate limiters (auth, bug report) respect `X-Forwarded-For` so one abuser behind Cloudflare / Railway doesn't share a rate-limit bucket with every user
+- All IP-based rate limiters (auth, bug report, ambassador application, analytics) route through `utils.request.client_ip`, a shared helper that resists `X-Forwarded-For` spoofing. Instead of naïvely taking the leftmost XFF entry — which is client-controlled and trivially cycled to get a fresh rate-limit bucket per request — the helper reads the entry at position `-TRUSTED_PROXY_HOPS` (the value the first trusted proxy added, which no client can forge). `TRUSTED_PROXY_HOPS` is configurable per environment: `0` for local dev (falls back to socket peer, XFF/X-Real-IP ignored), `1` for Railway-only, `2` for Cloudflare + Railway stacks.
 
 ---
 
@@ -1636,6 +1645,219 @@ Browsers block `new Worker(crossOriginUrl)` **even when CORS headers are set** (
 - **No migrations required** — no new DB tables
 - Railway auto-deploys backend on push; Vercel auto-deploys frontend
 - Redis must be reachable (same as existing auth rate limits)
+
+---
+
+## 37. Posting Rewards — Claves Payouts for Content
+
+Posting rewards close the earning half of the claves loop. Creating content pays out claves, with guardrails designed around *one abuser opening ten tabs* as the threat model rather than sophisticated sybil farming.
+
+### Reward Shape
+
+Implemented in `backend/services/posting_reward_service.py`. Called from `backend/routers/community.py` immediately after a post is created and committed.
+
+| Trigger | Amount | Reason string | Eligibility |
+|---|---|---|---|
+| Stage post | **+10 🥢** | `post_reward:stage` | must have `mux_asset_id`; `video_duration_seconds` > 0 |
+| Lab question | **+3 🥢** | `post_reward:lab` | `body` ≥ 40 chars (prevents `"a?"` farming) |
+| Comments / reactions / other | 0 🥢 | — | engagement is free |
+
+### Guardrails (tunables at top of `posting_reward_service.py`)
+
+```python
+REWARD_STAGE_POST    = 10
+REWARD_LAB_QUESTION  = 3
+DAILY_REWARD_CAP     = 30        # across all post_reward:* txns per user per day (UTC)
+COOLDOWN_SECONDS     = 10 * 60   # 10 min between reward-earning posts
+LAB_BODY_MIN_CHARS   = 40
+CLAWBACK_WINDOW_HOURS = 72
+REASON_PREFIX        = "post_reward:"
+CLAWBACK_PREFIX      = "post_reward_clawback:"
+```
+
+- **Daily cap (30 🥢)** — computed by `SUM(amount)` over today's `clave_transactions` rows with `reason LIKE 'post_reward:%'`. If the full reward would exceed the cap, the reward is *trimmed to what's left* (the post that tips you over still gets a partial payout, instead of being blackholed).
+- **Cooldown (10 min)** — `MAX(created_at)` query over same-user reward txns. Spamming 3 posts in a minute only rewards the first.
+- **Idempotency** — `(user_id, reference_id=post_id, reason LIKE 'post_reward:%')` lookup before award. Republishing the same post or triggering the handler twice cannot double-pay.
+
+### Concurrency Fix (Mar 2026)
+
+The original implementation read `existing rewards today` without a row lock, so two simultaneous post-creates from different tabs both saw the same pre-award ledger state and both got rewarded — bypassing the daily cap by up to N×.
+
+Fixed by taking a `SELECT ... FOR UPDATE` on the author's `user_profiles` row at the top of `award_post_reward`:
+
+```python
+profile_lock = (
+    db.query(UserProfile)
+    .filter(UserProfile.user_id == user_id)
+    .with_for_update()
+    .first()
+)
+```
+
+Any concurrent `award_post_reward` or `earn_claves` / `spend_claves` call for the same user now serializes behind this lock. Inside the lock we re-check `_already_rewarded` / `_on_cooldown` / `_sum_today_rewards` against a consistent snapshot.
+
+### Clawback
+
+On soft-delete or moderation rejection, `clawback_post_reward(post_id, db)` runs:
+
+1. Look up the original reward by `reference_id=post_id + reason LIKE 'post_reward:%'`.
+2. If the reward is older than `CLAWBACK_WINDOW_HOURS` (72 h), skip — we don't retroactively wipe balances from ancient moderator actions.
+3. Idempotency check: if a `post_reward_clawback:*` row already exists for this `reference_id`, no-op.
+4. Insert a single negative-amount `ClaveTransaction` (reason `post_reward_clawback:{kind}`) and decrement `user_profiles.current_claves` directly — bypassing `spend_claves()` because the balance is *allowed to go negative* here. Future earnings backfill the debt; this is the simplest way to keep the ledger correct without racing against concurrent spends.
+
+### Integration Points
+
+- `backend/routers/community.py::create_post` — calls `award_post_reward(post.id, db)` after `db.commit()`, wraps in try/except so a reward failure never blocks post creation.
+- `backend/routers/community.py::delete_post` — calls `clawback_post_reward` inside the same transaction as the soft-delete.
+- `backend/routers/moderation.py` — moderation-reject path calls clawback.
+
+### Explicitly Out of Scope (V1)
+
+- **MOTW-specific post bonus** — collapsed to flat +10 for any stage post to avoid farming-by-category.
+- **IP velocity / device fingerprinting** — separate infrastructure; the daily cap + cooldown + clawback handle the realistic abuse surface.
+- **Nightly audit jobs** — if the ledger ever drifts from `user_profiles.current_claves`, we'll detect via end-of-day reconciliation. Not wired yet.
+
+### Files
+
+- `backend/services/posting_reward_service.py` — award / clawback logic
+- `backend/routers/community.py` — wire-up after create/delete
+- `backend/services/clave_service.py` — `earn_claves()` (now locks profile inside, see Section 32)
+
+---
+
+## 38. The Guild Shop
+
+The spending half of the claves loop. A dedicated storefront at `/shop` turns accumulated balances into status goods and utility upgrades. Four tabs: **Tickets**, **Borders**, **Titles**, **Utility**, plus a fifth **Inventory** view for owned items and equip/unequip.
+
+### Catalog Architecture
+
+Single source of truth is `backend/scripts/shop_catalog.py` — a Python list of dicts with every SKU's price, rarity, stock rules, tier gate, and grant. Consumed by migration 021 (initial seed) and by any admin scripts that want to inspect/restore the catalog.
+
+**Tables** (migration 020):
+
+```sql
+CREATE TABLE shop_items (
+  sku              VARCHAR(64) PRIMARY KEY,
+  kind             VARCHAR(20) NOT NULL,        -- 'ticket'|'border'|'title'|'utility'
+  name             VARCHAR(120) NOT NULL,
+  description      TEXT,
+  price_claves     INTEGER NOT NULL CHECK (price_claves >= 0),
+  rarity           VARCHAR(20),                 -- 'common'|'rare'|'epic'|'legendary'
+  tier_required    VARCHAR(20),                 -- NULL | 'advanced' | 'performer'
+  stock_total      INTEGER,                     -- NULL = unlimited
+  stock_period     VARCHAR(20),                 -- NULL | 'monthly' | 'lifetime'
+  max_per_user     INTEGER,                     -- NULL = unlimited
+  grants           JSONB NOT NULL DEFAULT '{}',
+  metadata         JSONB NOT NULL DEFAULT '{}',
+  is_active        BOOLEAN NOT NULL DEFAULT TRUE,
+  sort_order       INTEGER NOT NULL DEFAULT 0,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE TABLE shop_purchases (
+  id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id           UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  sku               VARCHAR(64) NOT NULL REFERENCES shop_items(sku),
+  price_paid        INTEGER NOT NULL,
+  clave_txn_id      UUID REFERENCES clave_transactions(id),
+  status            VARCHAR(20) NOT NULL DEFAULT 'fulfilled',
+  fulfillment_id    UUID,                       -- coaching_submissions.id for Golden Ticket
+  stock_period_key  VARCHAR(20),                -- '2026-04' for monthly stock tracking
+  created_at        TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  refunded_at       TIMESTAMPTZ
+);
+```
+
+`user_profiles` also gains four columns: `equipped_border_sku`, `equipped_title_sku`, `bonus_video_slots INT DEFAULT 0`, `bonus_question_slots INT DEFAULT 0`.
+
+### Item Kinds
+
+#### Tickets — Golden Ticket (`ticket_golden`)
+- **3000 🥢**, `tier_required='advanced'` (Advanced + Performer both qualify via `require_tier_at_least`)
+- **Global stock: 10 per calendar month** — enforced via `stock_total=10 + stock_period='monthly'`. Denormalized `stock_period_key='YYYY-MM'` on `shop_purchases` makes the count query an index scan
+- **No per-user cap** — any eligible user can buy as many as are left each month
+- Purchase creates a `coaching_submissions` row with `source='golden_ticket'`; the existing admin coaching queue surfaces it side-by-side with subscription submissions with a small ticket badge
+- The `(user_id, submission_month, submission_year, source)` composite unique constraint lets a Performer stack their free monthly submission *and* a ticket-purchased one in the same month
+
+#### Borders (20 SKUs)
+Permanent ownership; one equipped slot on `user_profiles`. Rendered via CSS class registry at `frontend/lib/cosmetics.ts` mapping SKU → `{ className, description }`. Actual CSS (conic-gradients, keyframe animations) lives in `globals.css`. `GuildMasterAvatar.tsx` accepts an `equippedBorderSku` prop and composes its existing PRO/Performer ring logic with the cosmetic border.
+
+- **Common (6)** — 100 🥢 each: Amber Glow, Ivory Etch, Sunset, Mint Ice, Lavender Haze, Charcoal
+- **Rare (6)** — 300 🥢 each: Neon Salsa, Copper Flame, Emerald Vein, Royal Blue, Midnight Velvet, Rose Gold
+- **Epic (5)** — 800 🥢 each: Aurora, Obsidian Flame, Holographic, Platinum Spark, Ruby Pulse
+- **Legendary (3)** — 2000 🥢 each: Disco Inferno, Crown Jewel, Eternal Clave
+
+#### Titles (20 SKUs)
+Same permanent / one-equipped model. SKU → `{ label, tone }` (tone controls gradient colors). Rendered under the username via `UsernameWithTitle.tsx`.
+
+- **Common (6)** — 50 🥢 each: Beat Keeper, Floor Regular, On Count, The Learner, Rhythm Cat, Smooth Operator
+- **Rare (6)** — 200 🥢 each: Iron Feet, Heart of Timing, The Lyrical, The Metronome, Shine King, Showstopper Apprentice
+- **Epic (5)** — 500 🥢 each: Salsa Phenom, Guild Luminary, The Showstopper, Flame Dancer, The Phoenix
+- **Legendary (3)** — 1500 🥢 each: Dance Immortal, The Maestro, Living Clave
+
+#### Utility (2 SKUs)
+- `utility_video_slots_5` — **1000 🥢**, `max_per_user=5`: +5 permanent stage video slots, stackable up to +25. Grant `{"bonus_video_slots": 5}` increments `user_profiles.bonus_video_slots`. `clave_service.get_video_slot_status` honors the bonus when computing the cap.
+- `utility_question_slots_10` — **500 🥢**, `max_per_user=3`: +10 permanent Lab question slots, stackable up to +30. Same mechanism via `bonus_question_slots`.
+
+### Purchase Flow — `POST /api/shop/purchase`
+
+Implemented in `backend/services/shop_service.py::purchase`. Atomic because every guard lives inside one transaction with the item row locked:
+
+1. `SELECT ... FOR UPDATE` on `shop_items WHERE sku=:sku AND is_active=TRUE` — serializes all concurrent buys of the same SKU
+2. **Tier check** — `require_tier_at_least(user, item.tier_required)` via `tier_service.py`
+3. **Stock check** — if `stock_total` set, `COUNT(*)` fulfilled `shop_purchases` for this SKU at the current `stock_period_key` (or all-time if `stock_period IS NULL`) must be `< stock_total`
+4. **Per-user cap** — same-user count must be `< max_per_user` (borders/titles = 1 enforces single-ownership)
+5. **Debit** — `clave_service.spend_claves(user_id, item.price_claves, reason=f"shop_purchase:{sku}", db=db)` — itself takes `FOR UPDATE` on the user's profile row; returns 402 if balance insufficient
+6. **Grant** — write `shop_purchases` row (with `stock_period_key` if applicable, `clave_txn_id` linked); for Golden Ticket, immediately create a `coaching_submissions` row with `source='golden_ticket'` and set `shop_purchases.fulfillment_id` to the new submission's ID; for utility SKUs, bump the bonus counter on `user_profiles`
+7. Commit. Return the purchase row + updated balance.
+
+Concurrency: two users racing for the last Golden Ticket both block on step 1; whoever gets the row lock first passes step 3, the other sees `stock_total` reached and gets `409 OutOfStock`.
+
+### Equip Flow — `POST /api/shop/equip`
+
+1. Ownership check — `shop_purchases WHERE user_id=:me AND sku=:sku AND status='fulfilled'` must exist
+2. Kind must match the target slot (border → `equipped_border_sku`; title → `equipped_title_sku`)
+3. `UPDATE user_profiles SET equipped_*_sku = :sku WHERE user_id = :me` (row lock to serialize concurrent equips)
+4. `POST /api/shop/unequip` with no body clears the slot
+
+The frontend reads `equipped_border_sku` and `equipped_title_sku` from every user payload in feed responses and passes them to `<GuildMasterAvatar>` and `<UsernameWithTitle>` — purchased cosmetics appear on all posts/comments/avatars immediately.
+
+### Frontend
+
+- `frontend/app/shop/page.tsx` — 4-tab shop (Tickets / Borders / Titles / Utility)
+- `frontend/app/shop/inventory/page.tsx` — owned items with equip/unequip
+- `frontend/components/shop/ShopItemCard.tsx` — rarity-styled card
+- `frontend/components/shop/PurchaseModal.tsx` — confirmation + balance preview
+- `frontend/components/shop/BorderPreview.tsx`, `TitlePreview.tsx` — live previews
+- `frontend/components/ui/UsernameWithTitle.tsx` — renders username + equipped title chip
+- `frontend/components/ui/GuildMasterAvatar.tsx` — accepts `equippedBorderSku`, composes cosmetic border with existing ring
+- `frontend/lib/cosmetics.ts` — SKU → visual metadata registry (single source of truth for frontend visuals)
+- `frontend/lib/api.ts` — `apiClient.shop.listItems()`, `purchase(sku)`, `equip(sku)`, `listInventory()`
+- `frontend/components/ClaveWallet.tsx` — dispatches `wallet-updated` after purchase so the NavBar balance flashes immediately
+
+### Migrations
+
+- **020** — create `shop_items`, `shop_purchases`, add `user_profiles` columns, add composite index on `clave_transactions(user_id, reason, created_at DESC)` for the daily-cap query
+- **021** — seed all 40+ cosmetic SKUs + 2 utility SKUs + Golden Ticket from `shop_catalog.py` (idempotent: `INSERT ... ON CONFLICT (sku) DO UPDATE`)
+- **022** — add `source VARCHAR(20) NOT NULL DEFAULT 'subscription'` to `coaching_submissions`, drop + recreate unique index as `(user_id, submission_month, submission_year, source)`
+- **024** — cosmetic backfill / cleanup migration (minor adjustments)
+
+Run order in prod: 020 → 022 → 021 → 024, then push backend + frontend.
+
+### i18n
+
+Keys under `shop.*` across all 14 locales: tab labels, purchase confirmation microcopy, rarity names, out-of-stock + tier-gate error messages. Border and title **names are locale-agnostic** (kept English across all locales) — too many SKUs to translate cleanly, and the names are effectively proper nouns. Descriptions under each are short and localized.
+
+### Economics Sanity
+
+Owning every cosmetic costs ~24,800 🥢. At a 30 🥢/day earning cap + daily login (4-8 🥢 for pro, 1-3 🥢 for free), a heavily active pro user earns ~35 🥢/day → ~2 years to own everything. Intentional — cosmetics are long-tail status goods, not disposable currency sinks.
+
+### Explicitly Out of Scope (V1)
+
+- **Shop rotation / limited-time drops** — schema supports `stock_period='weekly'` but V1 only uses `'monthly'` for the Golden Ticket. Rotating mystery boxes are a future play.
+- **Badge-gated cosmetics** — no *"must hold Move Master III to buy border_disco_inferno"* at launch. Pure price + tier gating. Can add later via a `requires_badge_id` column.
+- **User-facing refunds** — purchases are final in V1. Backend supports `status='refunded'` for manual admin overrides; no user-visible refund button.
+- **Social proof** (*"X users own this"*) — nice-to-have for post-launch, wire in once the shop has traffic worth showing.
 
 ---
 
