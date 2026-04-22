@@ -13,6 +13,11 @@ export interface ABLoopState {
   toggle: () => void;
   setATime: (t: number) => void;
   setBTime: (t: number) => void;
+  /** Seek the underlying video to an absolute time. Exposed so the loop bar
+   * can act as a scrubber — on mobile the bar visually reads as a play bar
+   * (yellow loop segment + current-time indicator), and users expect to tap
+   * it to advance the video. */
+  seek: (t: number) => void;
 }
 
 export function useABLoop(
@@ -71,5 +76,13 @@ export function useABLoop(
     setBTimeRaw(Math.max(t, aRef.current + MIN_LOOP));
   }, []);
 
-  return { enabled, aTime, bTime, currentTime, toggle, setATime, setBTime };
+  const seek = useCallback((t: number) => {
+    const p = playerRef.current;
+    if (!p) return;
+    const clamped = Math.max(0, Math.min(t, duration || t));
+    p.setCurrentTime(clamped);
+    setCurrentTime(clamped);
+  }, [playerRef, duration]);
+
+  return { enabled, aTime, bTime, currentTime, toggle, setATime, setBTime, seek };
 }

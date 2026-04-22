@@ -16,7 +16,7 @@ function fmt(t: number): string {
 }
 
 export default function ABLoopBar({ state, duration, className }: Props) {
-  const { enabled, aTime, bTime, currentTime, setATime, setBTime } = state;
+  const { enabled, aTime, bTime, currentTime, setATime, setBTime, seek } = state;
   const railRef = useRef<HTMLDivElement>(null);
   const [drag, setDrag] = useState<null | "A" | "B">(null);
 
@@ -30,6 +30,17 @@ export default function ABLoopBar({ state, duration, className }: Props) {
       );
     },
     [duration]
+  );
+
+  // Tap/click the rail (not the A or B handles) = seek the video. The bar
+  // reads visually as a play bar, so users expect this — especially on
+  // mobile, where the only way to reach the A marker previously was to
+  // disable the loop, scrub the Mux controls, and re-enable.
+  const handleRailPointer = useCallback(
+    (clientX: number) => {
+      seek(toTime(clientX));
+    },
+    [seek, toTime]
   );
 
   useEffect(() => {
@@ -65,7 +76,23 @@ export default function ABLoopBar({ state, duration, className }: Props) {
       <span className="text-[10px] font-bold text-green-400 tabular-nums shrink-0">
         A {fmt(aTime)}
       </span>
-      <div ref={railRef} className="relative flex-1 h-6 select-none">
+      <div
+        ref={railRef}
+        className="relative flex-1 h-6 select-none cursor-pointer touch-none"
+        onClick={(e) => {
+          // Don't scrub if the click originated on a handle (handles stop
+          // propagation on mousedown, but onClick can still bubble in some
+          // browsers after a tap).
+          const target = e.target as HTMLElement;
+          if (target.closest("[data-ab-handle]")) return;
+          handleRailPointer(e.clientX);
+        }}
+        onTouchStart={(e) => {
+          const target = e.target as HTMLElement;
+          if (target.closest("[data-ab-handle]")) return;
+          if (e.touches[0]) handleRailPointer(e.touches[0].clientX);
+        }}
+      >
         <div className="absolute inset-x-0 top-1/2 -translate-y-1/2 h-1.5 bg-white/20 rounded-full" />
         {bTime > aTime && (
           <div
@@ -78,6 +105,7 @@ export default function ABLoopBar({ state, duration, className }: Props) {
           style={{ left: `${pct(currentTime)}%` }}
         />
         <div
+          data-ab-handle="A"
           className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing touch-none ${
             drag === "A" ? "bg-green-300 scale-110" : "bg-green-500"
           }`}
@@ -92,9 +120,10 @@ export default function ABLoopBar({ state, duration, className }: Props) {
             setDrag("A");
           }}
         >
-          <span className="text-[10px] font-black text-white leading-none">A</span>
+          <span className="text-[10px] font-black text-white leading-none pointer-events-none">A</span>
         </div>
         <div
+          data-ab-handle="B"
           className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing touch-none ${
             drag === "B" ? "bg-red-300 scale-110" : "bg-red-500"
           }`}
@@ -109,7 +138,7 @@ export default function ABLoopBar({ state, duration, className }: Props) {
             setDrag("B");
           }}
         >
-          <span className="text-[10px] font-black text-white leading-none">B</span>
+          <span className="text-[10px] font-black text-white leading-none pointer-events-none">B</span>
         </div>
       </div>
       <span className="text-[10px] font-bold text-red-400 tabular-nums shrink-0">
