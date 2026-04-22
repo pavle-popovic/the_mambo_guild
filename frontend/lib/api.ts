@@ -76,11 +76,28 @@ class ApiClient {
   private token: string | null = null;
   private cache: Map<string, CacheEntry> = new Map();
   private readonly CACHE_TTL = 30000; // 30 seconds cache
+  // Shared in-flight refresh promise so concurrent 401s trigger only one
+  // refresh call (avoids thundering herd against /auth/refresh).
+  private refreshInFlight: Promise<void> | null = null;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
     // Auth is handled via httpOnly cookies (set automatically by backend)
     // In-memory token is only used for the current session after login/register
+  }
+
+  // Single-flight wrapper around refreshToken() so concurrent callers share
+  // one network call. Resolves when the refresh finishes (ok or failed).
+  private async refreshTokenOnce(): Promise<void> {
+    if (this.refreshInFlight) return this.refreshInFlight;
+    this.refreshInFlight = (async () => {
+      try {
+        await this.refreshToken();
+      } finally {
+        this.refreshInFlight = null;
+      }
+    })();
+    return this.refreshInFlight;
   }
 
   private getCacheKey(endpoint: string, options: RequestInit): string {
@@ -121,7 +138,7 @@ class ApiClient {
 
   private async request<T>(
     endpoint: string,
-    options: RequestInit & { signal?: AbortSignal; forceRefresh?: boolean } = {}
+    options: RequestInit & { signal?: AbortSignal; forceRefresh?: boolean; _retriedAfterRefresh?: boolean } = {}
   ): Promise<T> {
     // Skip cache for non-GET requests or if cache is disabled or if forceRefresh is true
     const method = options.method || "GET";
@@ -188,6 +205,33 @@ class ApiClient {
       }
 
       if (!response.ok) {
+        // If unauthorized (401), try a single refresh + retry before giving up.
+        // Mobile browsers suspend JS timers when the tab is backgrounded, so
+        // the 25-min silent refresh can miss cycles and the access-token
+        // cookie expires mid-session. Attempting a refresh transparently here
+        // keeps the user signed in across backgrounding without changing any
+        // existing call sites. Guarded against:
+        //  - recursion on the refresh endpoint itself
+        //  - infinite loops via the _retriedAfterRefresh flag
+        const isRefreshEndpoint = endpoint === "/api/auth/refresh";
+        if (
+          response.status === 401 &&
+          !isRefreshEndpoint &&
+          !options._retriedAfterRefresh
+        ) {
+          try {
+            await this.refreshTokenOnce();
+            // Refresh succeeded — retry the original request exactly once.
+            return this.request<T>(endpoint, {
+              ...options,
+              _retriedAfterRefresh: true,
+            });
+          } catch {
+            // Refresh failed (refresh token expired or server error). Fall
+            // through to the standard 401 error path below.
+          }
+        }
+
         // If unauthorized (401), clear token as it's invalid/expired
         if (response.status === 401) {
           this.setToken(null);
