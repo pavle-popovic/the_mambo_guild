@@ -859,18 +859,18 @@ export default function LessonPage() {
 
                 {lesson.mux_playback_id ? (
                   <>
-                    {/* A/B loop bar — always rendered directly above the video,
-                        full-width so it lines up edge-to-edge with the player on
-                        mobile portrait, mobile landscape, and desktop. */}
-                    {abLoop.enabled && (
-                      <div className="w-full flex-shrink-0 bg-black px-3 sm:px-4 md:px-6 py-2 border-b border-white/5">
-                        <ABLoopBar state={abLoop} duration={videoDuration} />
-                      </div>
-                    )}
                     <div
                       className="relative w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0"
                       onTouchStart={doubleTapSeek.onTouchStart}
                     >
+                      {/* A/B loop bar — sits inside the player frame, just above
+                          Mux's control strip. bottom offset clears the scrubber
+                          on desktop and mobile. */}
+                      {abLoop.enabled && (
+                        <div className="absolute left-0 right-0 bottom-[52px] md:bottom-[56px] z-20 px-3 sm:px-4 md:px-6 py-2 bg-black/70 backdrop-blur-sm">
+                          <ABLoopBar state={abLoop} duration={videoDuration} />
+                        </div>
+                      )}
                       <MuxVideoPlayer
                         ref={videoPlayerRef}
                         playbackId={lesson.mux_playback_id}
