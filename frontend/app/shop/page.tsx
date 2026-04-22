@@ -68,6 +68,20 @@ export default function ShopPage() {
     [items, activeTab]
   );
 
+  // Short-circuit the render until auth settles. The useEffect above handles
+  // the actual redirect; this just prevents flashing the shop to logged-out
+  // visitors (and prevents leaking stale balance + inventory state).
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <NavBar user={user || undefined} />
+        <div className="flex items-center justify-center min-h-[60vh] text-white/50">
+          <div className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
   const handleBuy = (sku: string) => {
     const item = items.find((i) => i.sku === sku);
     if (item) setPurchaseItem(item);
@@ -83,7 +97,7 @@ export default function ShopPage() {
 
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavBar />
+      <NavBar user={user || undefined} />
 
       <main className="max-w-6xl mx-auto px-4 pt-24 pb-16">
         <header className="mb-10 text-center">

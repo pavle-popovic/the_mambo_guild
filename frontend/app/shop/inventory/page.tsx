@@ -79,9 +79,20 @@ export default function InventoryPage() {
   const cosmetics = items.filter((i) => i.kind === "border" || i.kind === "title");
   const utilities = items.filter((i) => i.kind === "utility" || i.kind === "ticket");
 
+  if (authLoading || !user) {
+    return (
+      <div className="min-h-screen bg-black text-white">
+        <NavBar user={user || undefined} />
+        <div className="flex items-center justify-center min-h-[60vh] text-white/50">
+          <div className="w-8 h-8 border-2 border-amber-500/30 border-t-amber-500 rounded-full animate-spin" />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-black text-white">
-      <NavBar />
+      <NavBar user={user || undefined} />
 
       <main className="max-w-6xl mx-auto px-4 pt-24 pb-16">
         <header className="mb-8 flex items-end justify-between gap-4 flex-wrap">
