@@ -385,6 +385,69 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       };
     }, [getVideoElement, playbackId]);
 
+    // Mux Player wraps media-chrome's <media-captions-display>, which
+    // renders captions to screen *independently* of the underlying <video>
+    // element's track.mode. Forcing track.mode = hidden stops native
+    // rendering but media-captions-display keeps drawing from activeCues,
+    // so captions still appear in the player. Nuke it by walking all
+    // nested shadow roots and injecting a style tag that hides the
+    // element wherever it shows up (Mux Player nests media-theme ->
+    // media-controller -> slotted children, each with their own shadow).
+    useEffect(() => {
+      const injected: Array<{ root: ShadowRoot | Document; style: HTMLStyleElement }> = [];
+      const KILL_CAPTIONS_STYLE = `
+        media-captions-display,
+        media-caption-display,
+        [class*="captions-display"],
+        [class*="caption-display"] {
+          display: none !important;
+          visibility: hidden !important;
+          opacity: 0 !important;
+        }
+      `;
+
+      const injectInto = (root: ShadowRoot | Document) => {
+        const style = document.createElement("style");
+        style.textContent = KILL_CAPTIONS_STYLE;
+        root.appendChild(style);
+        injected.push({ root, style });
+      };
+
+      const walk = (node: Element) => {
+        if ((node as any).shadowRoot) {
+          injectInto((node as any).shadowRoot);
+          (node as any).shadowRoot
+            .querySelectorAll("*")
+            .forEach((el: Element) => walk(el));
+        }
+      };
+
+      const run = () => {
+        const player = muxPlayerRef.current as unknown as HTMLElement | null;
+        if (!player) return false;
+        walk(player);
+        return injected.length > 0;
+      };
+
+      if (!run()) {
+        // Mux Player mounts its shadow tree asynchronously; retry once
+        // after a tick in case the tree isn't ready at first paint.
+        const t = setTimeout(run, 800);
+        return () => {
+          clearTimeout(t);
+          injected.forEach(({ root, style }) => {
+            try { root.removeChild(style); } catch {}
+          });
+        };
+      }
+
+      return () => {
+        injected.forEach(({ root, style }) => {
+          try { root.removeChild(style); } catch {}
+        });
+      };
+    }, [playbackId]);
+
     // Custom caption overlay: read cues from TextTrack API.
     // We flip any "showing" track to "hidden" so the browser never renders
     // native captions (shadow DOM CSS suppression is unreliable across
