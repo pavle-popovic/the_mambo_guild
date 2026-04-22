@@ -3,14 +3,14 @@
 import { memo } from "react";
 import { Handle, Position, type NodeProps } from "@xyflow/react";
 import { motion } from "framer-motion";
-import { Lock, Star, Crown } from "lucide-react";
+import { Lock, Star } from "lucide-react";
 
 // Data passed to the node
 export type SkillNodeData = {
   id: string;
   title: string;
   icon?: string;
-  status: 'locked' | 'available' | 'mastered' | 'boss' | 'boss_locked';
+  status: 'locked' | 'available' | 'mastered';
   progress: number; // 0-100 completion percentage
   onClick?: () => void;
   isAdminMode?: boolean; // Hide progress circle in admin mode
@@ -21,19 +21,12 @@ export type SkillNodeData = {
 function SkillNode({ data }: NodeProps) {
   const { id, title, icon, status, progress = 0, isAdminMode = false, lowPower = false } = data as SkillNodeData;
 
-  const isLocked = status === 'locked';
+  const isNodeLocked = status === 'locked';
   const isAvailable = status === 'available';
   const isMastered = status === 'mastered';
-  const isBoss = status === 'boss';
-  const isBossLocked = status === 'boss_locked';
 
-  // Combined locked state for styling (includes both regular locked and boss_locked)
-  const isNodeLocked = isLocked || isBossLocked;
-
-  // Size configuration - boss_locked nodes keep boss size
-  const isBossSize = isBoss || isBossLocked;
-  const nodeSize = isBossSize ? 72 : 52;
-  const outerRingSize = isBossSize ? 90 : 70;
+  const nodeSize = 52;
+  const outerRingSize = 70;
 
   // Hover animation config (CourseCard-style)
   const hoverAnimation = {
@@ -72,7 +65,7 @@ function SkillNode({ data }: NodeProps) {
       />
 
       {/* ============================================
-          GOD RAYS + ETHEREAL AURA (Mastered state ONLY - NOT boss)
+          GOD RAYS + ETHEREAL AURA (Mastered state)
           Skip entirely on low-power: 12 animated god-rays + blurred aura
           per mastered node destroy mobile framerate once several modules
           are complete. A static radial gradient carries the "golden" feel.
@@ -199,7 +192,6 @@ function SkillNode({ data }: NodeProps) {
 
       {/* ============================================
           OUTER ROTATING RING (The Astrolabe)
-          Boss: Slower rotation, no animation for calm feel
           CSS @keyframes replaces framer-motion — one composited transform
           loop per node, no main-thread involvement.
           ============================================ */}
@@ -209,9 +201,7 @@ function SkillNode({ data }: NodeProps) {
           isNodeLocked
             ? undefined
             : {
-                animation: `st-rotate ${
-                  isBoss ? 30 : isMastered ? 8 : 20
-                }s linear infinite`,
+                animation: `st-rotate ${isMastered ? 8 : 20}s linear infinite`,
               }
         }
       >
@@ -223,9 +213,9 @@ function SkillNode({ data }: NodeProps) {
         >
           <defs>
             <linearGradient id={`ring-grad-${id}`} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor={isNodeLocked ? "#7a7a8a" : isBoss ? "#B8860B" : "#C9A227"} />
-              <stop offset="50%" stopColor={isNodeLocked ? "#9a9aaa" : isBoss ? "#DAA520" : "#FFE066"} />
-              <stop offset="100%" stopColor={isNodeLocked ? "#7a7a8a" : isBoss ? "#B8860B" : "#C9A227"} />
+              <stop offset="0%" stopColor={isNodeLocked ? "#7a7a8a" : "#C9A227"} />
+              <stop offset="50%" stopColor={isNodeLocked ? "#9a9aaa" : "#FFE066"} />
+              <stop offset="100%" stopColor={isNodeLocked ? "#7a7a8a" : "#C9A227"} />
             </linearGradient>
           </defs>
           <circle
@@ -234,10 +224,10 @@ function SkillNode({ data }: NodeProps) {
             r={(outerRingSize - 4) / 2}
             fill="none"
             stroke={`url(#ring-grad-${id})`}
-            strokeWidth={isBossSize ? 2.5 : isMastered ? 2.5 : 1.5}
-            strokeDasharray={isBossSize ? "10 5" : "6 4"}
+            strokeWidth={isMastered ? 2.5 : 1.5}
+            strokeDasharray="6 4"
             strokeLinecap="round"
-            opacity={isNodeLocked ? 0.5 : isBoss ? 0.85 : isMastered ? 1 : 0.7}
+            opacity={isNodeLocked ? 0.5 : isMastered ? 1 : 0.7}
           />
         </svg>
       </div>
@@ -284,7 +274,7 @@ function SkillNode({ data }: NodeProps) {
             className="absolute bg-black/80 text-yellow-400 text-[9px] font-bold px-1.5 py-0.5 rounded-full border border-yellow-600/50"
             style={{
               top: -4,
-              right: isBossSize ? 2 : -2,
+              right: -2,
             }}
           >
             {Math.round(progress)}%
@@ -292,7 +282,7 @@ function SkillNode({ data }: NodeProps) {
         </div>
       )}
 
-      {/* Secondary counter-rotating ring (mastered only, NOT boss).
+      {/* Secondary counter-rotating ring (mastered only).
           CSS keyframe replaces framer-motion. */}
       {isMastered && !lowPower && (
         <div
@@ -320,30 +310,6 @@ function SkillNode({ data }: NodeProps) {
         </div>
       )}
 
-      {/* Boss: Static decorative inner ring (show for both boss and boss_locked) */}
-      {isBossSize && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <svg
-            width={outerRingSize - 12}
-            height={outerRingSize - 12}
-            viewBox={`0 0 ${outerRingSize - 12} ${outerRingSize - 12}`}
-            className="absolute"
-          >
-            <circle
-              cx={(outerRingSize - 12) / 2}
-              cy={(outerRingSize - 12) / 2}
-              r={(outerRingSize - 16) / 2}
-              fill="none"
-              stroke={isBossLocked ? "#7a7a8a" : "#B8860B"}
-              strokeWidth={1.5}
-              strokeDasharray="2 6"
-              strokeLinecap="round"
-              opacity={isBossLocked ? 0.3 : 0.5}
-            />
-          </svg>
-        </div>
-      )}
-
       {/* ============================================
           MAIN NODE (Glassmorphism circle)
           ============================================ */}
@@ -355,33 +321,26 @@ function SkillNode({ data }: NodeProps) {
             height: nodeSize,
             background: isNodeLocked
               ? "radial-gradient(circle at 30% 30%, rgba(80, 80, 95, 0.95), rgba(45, 45, 55, 0.98))"
-              : isBoss
-                ? "radial-gradient(circle at 30% 30%, rgba(60, 50, 30, 0.95), rgba(35, 28, 15, 0.98))"
-                : isMastered
-                  ? "radial-gradient(circle at 30% 30%, rgba(50, 45, 30, 0.95), rgba(25, 22, 15, 0.98))"
-                  : "radial-gradient(circle at 30% 30%, rgba(40, 40, 50, 0.9), rgba(20, 20, 30, 0.95))",
+              : isMastered
+                ? "radial-gradient(circle at 30% 30%, rgba(50, 45, 30, 0.95), rgba(25, 22, 15, 0.98))"
+                : "radial-gradient(circle at 30% 30%, rgba(40, 40, 50, 0.9), rgba(20, 20, 30, 0.95))",
             border: isNodeLocked
               ? "2px solid rgba(150, 150, 170, 0.6)"
-              : isBoss
-                ? "3px solid #B8860B" // Darker gold for boss, no intense glow
-                : isMastered
-                  ? "2px solid #FFD700"
-                  : "2px solid rgba(255, 215, 0, 0.5)",
-            // Boss: Subtle shadow, no outer glow
+              : isMastered
+                ? "2px solid #FFD700"
+                : "2px solid rgba(255, 215, 0, 0.5)",
             boxShadow: isNodeLocked
               ? "inset 0 2px 10px rgba(0, 0, 0, 0.4), 0 0 20px rgba(100, 100, 120, 0.2)"
-              : isBoss
-                ? "inset 0 2px 15px rgba(0, 0, 0, 0.5), 0 4px 20px rgba(0, 0, 0, 0.4)"
-                : isMastered
-                  ? `inset 0 2px 15px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 200, 0, 0.2)`
-                  : `inset 0 2px 10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.2)`,
+              : isMastered
+                ? `inset 0 2px 15px rgba(0, 0, 0, 0.4), 0 0 20px rgba(255, 215, 0, 0.4), 0 0 40px rgba(255, 200, 0, 0.2)`
+                : `inset 0 2px 10px rgba(0, 0, 0, 0.4), 0 0 15px rgba(255, 215, 0, 0.2)`,
             opacity: isNodeLocked ? 0.75 : 1,
             // Subtle floating for available/mastered, CSS-driven so we don't
-            // spawn a framer-motion instance per node. Locked/boss/low-power
-            // stay static. Combine grayscale filter with no animation for locked.
+            // spawn a framer-motion instance per node. Locked/low-power stay
+            // static; locked also gets grayscale.
             filter: isNodeLocked ? "grayscale(0.5) brightness(0.9)" : "none",
             animation:
-              isNodeLocked || isBoss || lowPower
+              isNodeLocked || lowPower
                 ? undefined
                 : "st-node-float 3s ease-in-out infinite",
           }}
@@ -392,27 +351,23 @@ function SkillNode({ data }: NodeProps) {
             style={{
               border: isNodeLocked
                 ? "1px solid rgba(120, 120, 140, 0.4)"
-                : isBoss
-                  ? "1px solid rgba(184, 134, 11, 0.4)"
-                  : isMastered
-                    ? "1px solid rgba(255, 215, 0, 0.4)"
-                    : "1px solid rgba(255, 215, 0, 0.2)",
+                : isMastered
+                  ? "1px solid rgba(255, 215, 0, 0.4)"
+                  : "1px solid rgba(255, 215, 0, 0.2)",
             }}
           />
 
           {/* Icon */}
           <div className="relative z-10 flex items-center justify-center">
             {isNodeLocked ? (
-              <Lock className="text-gray-400" size={isBossSize ? 24 : 18} strokeWidth={2} />
+              <Lock className="text-gray-400" size={18} strokeWidth={2} />
             ) : icon ? (
               <span
                 style={{
-                  fontSize: isBoss ? 28 : 22,
+                  fontSize: 22,
                   filter: isMastered
                     ? "drop-shadow(0 0 8px rgba(255, 215, 0, 0.8))"
-                    : isBoss
-                      ? "drop-shadow(0 0 4px rgba(184, 134, 11, 0.5))"
-                      : "drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))",
+                    : "drop-shadow(0 0 4px rgba(255, 215, 0, 0.4))",
                   display: "inline-block",
                   animation:
                     isMastered && !lowPower
@@ -422,19 +377,10 @@ function SkillNode({ data }: NodeProps) {
               >
                 {icon}
               </span>
-            ) : isBoss ? (
-              // Boss: Static crown icon (no animation)
-              <Crown
-                className="text-amber-600"
-                size={30}
-                strokeWidth={1.5}
-                fill="rgba(184, 134, 11, 0.3)"
-                style={{ filter: "drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4))" }}
-              />
             ) : (
               <Star
                 className={isMastered ? "text-yellow-400" : "text-yellow-500/70"}
-                size={isBoss ? 24 : 18}
+                size={18}
                 fill={isMastered ? "currentColor" : "none"}
                 strokeWidth={isMastered ? 1.5 : 2}
                 style={{ filter: isMastered ? "drop-shadow(0 0 6px rgba(255, 215, 0, 0.8))" : "none" }}
@@ -454,7 +400,7 @@ function SkillNode({ data }: NodeProps) {
       </div>
 
       {/* ============================================
-          STARBURST POINTS (Mastered ONLY - not boss)
+          STARBURST POINTS (Mastered only)
           CSS keyframe + wrapper rotation. Skip on low-power since even the
           compositor path adds paint cost per node.
           ============================================ */}
@@ -484,28 +430,6 @@ function SkillNode({ data }: NodeProps) {
         </div>
       )}
 
-      {/* Boss: Static corner accents (no animation) - show for both boss and boss_locked */}
-      {isBossSize && (
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-          {[0, 90, 180, 270].map((angle) => (
-            <div
-              key={angle}
-              className="absolute"
-              style={{
-                width: 3,
-                height: 8,
-                background: isBossLocked
-                  ? "linear-gradient(to top, transparent, #7a7a8a)"
-                  : "linear-gradient(to top, transparent, #B8860B)",
-                transformOrigin: `center ${nodeSize / 2 + 10}px`,
-                transform: `rotate(${angle}deg)`,
-                opacity: isBossLocked ? 0.3 : 0.6,
-              }}
-            />
-          ))}
-        </div>
-      )}
-
       {/* ============================================
           TITLE LABEL
           ============================================ */}
@@ -518,18 +442,14 @@ function SkillNode({ data }: NodeProps) {
           style={{
             color: isNodeLocked
               ? "rgba(180, 180, 195, 0.8)"
-              : isBoss
-                ? "#FFD700" // Brighter gold for boss
-                : isMastered
-                  ? "#FFE566" // Bright shiny gold
-                  : "#FFF5CC", // Bright warm white-gold
+              : isMastered
+                ? "#FFE566" // Bright shiny gold
+                : "#FFF5CC", // Bright warm white-gold
             textShadow: isNodeLocked
               ? "0 1px 2px rgba(0, 0, 0, 0.5)"
-              : isBoss
-                ? "0 0 12px rgba(255, 215, 0, 0.8), 0 0 25px rgba(255, 200, 0, 0.4)"
-                : isMastered
-                  ? "0 0 15px rgba(255, 215, 0, 0.7), 0 0 30px rgba(255, 200, 0, 0.3)"
-                  : "0 0 10px rgba(255, 230, 150, 0.6), 0 0 20px rgba(255, 215, 0, 0.25)",
+              : isMastered
+                ? "0 0 15px rgba(255, 215, 0, 0.7), 0 0 30px rgba(255, 200, 0, 0.3)"
+                : "0 0 10px rgba(255, 230, 150, 0.6), 0 0 20px rgba(255, 215, 0, 0.25)",
             background: "rgba(0, 0, 0, 0.6)",
             backdropFilter: "blur(4px)",
             letterSpacing: "0.03em",

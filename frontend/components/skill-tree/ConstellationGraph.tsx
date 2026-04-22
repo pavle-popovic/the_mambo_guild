@@ -211,24 +211,12 @@ function ConstellationGraphInner({
     };
   }, []);
 
-  // Determine node status
+  // Determine node status. Boss/combo levels render the same as any other
+  // node — the old skull/crown treatment was dropped so the tree has one
+  // consistent visual language.
   const getNodeStatus = useCallback(
-    (level: Level): "locked" | "available" | "mastered" | "boss" | "boss_locked" => {
-      // In admin mode, show all nodes as available (no locks)
-      if (isAdminMode) {
-        const isBoss =
-          level.title.toUpperCase().includes("BOSS") ||
-          level.title.toUpperCase().includes("COMBO");
-        return isBoss ? "boss" : "available";
-      }
-
-      const isBoss =
-        level.title.toUpperCase().includes("BOSS") ||
-        level.title.toUpperCase().includes("COMBO");
-
-      // Handle locked boss/combo nodes - they should appear grayed out
-      if (isBoss && !level.is_unlocked) return "boss_locked";
-      if (isBoss) return "boss";
+    (level: Level): "locked" | "available" | "mastered" => {
+      if (isAdminMode) return "available";
       if (level.completion_percentage >= 100) return "mastered";
       if (level.is_unlocked) return "available";
       return "locked";
