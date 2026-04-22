@@ -34,6 +34,7 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
   const ringRadius = spec.ring?.radius ?? 43;
   const ringThickness = spec.ring?.thickness ?? 2;
   const bevelId = `bevel-${spec.id}`;
+  const glowId = `glow-${spec.id}`;
 
   return (
     <svg
@@ -45,15 +46,14 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
         width: "116%",
         height: "116%",
         overflow: "visible",
-        filter: spec.glow
-          ? `drop-shadow(0 0 ${spec.glow.blur}px ${spec.glow.color})`
-          : undefined,
       }}
     >
       <defs>
         {renderGradients(spec)}
         {spec.bevel && renderBevelFilter(bevelId)}
+        {spec.glow && renderGlowFilter(glowId, spec.glow.color, spec.glow.blur)}
       </defs>
+      <g filter={spec.glow ? `url(#${glowId})` : undefined}>
 
       {/* Base ring */}
       {spec.ring && (
@@ -132,6 +132,7 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
         }
         return items;
       })}
+      </g>
     </svg>
   );
 }
@@ -379,6 +380,23 @@ function buildArcPath(
   const y2 = cy + r * Math.sin(toRad(endAngle));
   const largeArc = Math.abs(endAngle - startAngle) > 180 ? 1 : 0;
   return `M ${x1.toFixed(2)} ${y1.toFixed(2)} A ${r} ${r} 0 ${largeArc} 1 ${x2.toFixed(2)} ${y2.toFixed(2)}`;
+}
+
+function renderGlowFilter(id: string, color: string, blur: number): JSX.Element {
+  // Glow via feGaussianBlur -> feMerge. Filter region extended well past the
+  // bbox (x/y=-50%, 200% w/h) so far-radius ornaments at viewBox r>50 don't
+  // get clipped out of the filter's source graphic.
+  return (
+    <filter key={id} id={id} x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur in="SourceAlpha" stdDeviation={blur / 2} result="glowBlur" />
+      <feFlood floodColor={color} result="glowColor" />
+      <feComposite in="glowColor" in2="glowBlur" operator="in" result="glow" />
+      <feMerge>
+        <feMergeNode in="glow" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  );
 }
 
 function renderBevelFilter(id: string): JSX.Element {
