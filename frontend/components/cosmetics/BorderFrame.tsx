@@ -1,6 +1,6 @@
 "use client";
 
-import { memo } from "react";
+import { memo, useId } from "react";
 import { BORDER_FRAME_SPECS, type BorderFrameSpec, type OrnamentShape } from "@/lib/borderFrames";
 
 /**
@@ -27,14 +27,22 @@ interface BorderFrameProps {
 }
 
 function BorderFrameInner({ sku }: BorderFrameProps) {
+  // Per-instance id suffix — SVG ids are globally scoped in the DOM, so
+  // rendering the same spec in more than one place (e.g. navbar avatar +
+  // shop card) would otherwise produce colliding ids like `ring-eternal-
+  // clave`, and `url(#...)` references resolve non-deterministically.
+  const rawInstance = useId();
   if (!sku) return null;
   const spec = BORDER_FRAME_SPECS[sku];
   if (!spec) return null;
 
+  const instanceKey = rawInstance.replace(/[^a-zA-Z0-9]/g, "");
+  const scope = `${spec.id}-${instanceKey}`;
+
   const ringRadius = spec.ring?.radius ?? 43;
   const ringThickness = spec.ring?.thickness ?? 2;
-  const bevelId = `bevel-${spec.id}`;
-  const glowId = `glow-${spec.id}`;
+  const bevelId = `bevel-${scope}`;
+  const glowId = `glow-${scope}`;
 
   return (
     <svg
@@ -50,7 +58,7 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
       }}
     >
       <defs>
-        {renderGradients(spec)}
+        {renderGradients(spec, scope)}
         {spec.bevel && renderBevelFilter(bevelId)}
         {spec.glow && renderGlowFilter(glowId, spec.glow.color, spec.glow.blur)}
       </defs>
@@ -64,7 +72,7 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
             cy="50"
             r={ringRadius}
             fill="none"
-            stroke={gradientRef(`ring-${spec.id}`, spec.ring.color)}
+            stroke={gradientRef(`ring-${scope}`, spec.ring.color)}
             strokeWidth={ringThickness}
             strokeOpacity={spec.ring.opacity ?? 1}
             strokeDasharray={spec.ring.dash}
@@ -77,7 +85,7 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
               cy="50"
               r={ringRadius - (spec.ring.inner.offset ?? 3)}
               fill="none"
-              stroke={gradientRef(`ring-inner-${spec.id}`, spec.ring.inner.color)}
+              stroke={gradientRef(`ring-inner-${scope}`, spec.ring.inner.color)}
               strokeWidth={spec.ring.inner.thickness}
               strokeOpacity={spec.ring.inner.opacity ?? 0.7}
               strokeDasharray={spec.ring.inner.dash}
@@ -94,7 +102,7 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
           <path
             d={buildArcPath(50, 50, ringRadius, 190, 270)}
             fill="none"
-            stroke={`url(#specular-${spec.id})`}
+            stroke={`url(#specular-${scope})`}
             strokeWidth={ringThickness * 0.9}
             strokeLinecap="round"
             opacity={1}
@@ -127,7 +135,7 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
               transform={`translate(${x},${y}) rotate(${rot}) scale(${size / 10})`}
               opacity={opacity ?? 1}
             >
-              {renderShape(shape, gradientRef(`orn-${spec.id}-${li}`, color), spec.id, li)}
+              {renderShape(shape, gradientRef(`orn-${scope}-${li}`, color), scope, li)}
             </g>
           );
         }
@@ -408,28 +416,28 @@ function renderBevelFilter(id: string): JSX.Element {
 // Gradient helpers
 // ---------------------------------------------------------------------------
 
-function renderGradients(spec: BorderFrameSpec): JSX.Element[] {
+function renderGradients(spec: BorderFrameSpec, scope: string): JSX.Element[] {
   const defs: JSX.Element[] = [];
 
   // Ring gradient — use 35° angle so multi-stop metallic palettes read
   // as brushed metal rather than a flat top-to-bottom fade.
   if (spec.ring && Array.isArray(spec.ring.color)) {
-    defs.push(linearGrad(`ring-${spec.id}`, spec.ring.color, 35));
+    defs.push(linearGrad(`ring-${scope}`, spec.ring.color, 35));
   }
   if (spec.ring?.inner && Array.isArray(spec.ring.inner.color)) {
-    defs.push(linearGrad(`ring-inner-${spec.id}`, spec.ring.inner.color, 35));
+    defs.push(linearGrad(`ring-inner-${scope}`, spec.ring.inner.color, 35));
   }
   spec.ornaments?.forEach((layer, li) => {
     if (Array.isArray(layer.color)) {
-      defs.push(linearGrad(`orn-${spec.id}-${li}`, layer.color));
+      defs.push(linearGrad(`orn-${scope}-${li}`, layer.color));
     }
     // Hoist shape-specific gradients once per layer. renderShape references
     // these by id, so declaring them inside renderShape would produce N
     // duplicate <defs> blocks per layer (one per ornament instance), which
     // collides across specs and breaks rendering in sibling SVGs.
     if (layer.shape === "crystal") {
-      const prismId = `crystal-prism-${spec.id}-${li}`;
-      const rimId = `crystal-rim-${spec.id}-${li}`;
+      const prismId = `crystal-prism-${scope}-${li}`;
+      const rimId = `crystal-rim-${scope}-${li}`;
       defs.push(
         <linearGradient key={prismId} id={prismId} x1="0" y1="-1" x2="0" y2="1">
           <stop offset="0%" stopColor="#ffffff" />
@@ -447,7 +455,7 @@ function renderGradients(spec: BorderFrameSpec): JSX.Element[] {
       );
     }
     if (layer.shape === "gem") {
-      const shineId = `gem-shine-${spec.id}-${li}`;
+      const shineId = `gem-shine-${scope}-${li}`;
       defs.push(
         <linearGradient key={shineId} id={shineId} x1="0" y1="0" x2="0" y2="1">
           <stop offset="0%" stopColor="white" stopOpacity="0.6" />
@@ -460,7 +468,7 @@ function renderGradients(spec: BorderFrameSpec): JSX.Element[] {
   // Specular gradient — white highlight that fades at both arc ends.
   if (spec.specular) {
     defs.push(
-      <linearGradient key={`spec-${spec.id}`} id={`specular-${spec.id}`} x1="0%" y1="0%" x2="100%" y2="100%">
+      <linearGradient key={`spec-${scope}`} id={`specular-${scope}`} x1="0%" y1="0%" x2="100%" y2="100%">
         <stop offset="0%" stopColor="white" stopOpacity="0" />
         <stop offset="50%" stopColor="white" stopOpacity="0.95" />
         <stop offset="100%" stopColor="white" stopOpacity="0" />
