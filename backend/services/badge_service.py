@@ -138,7 +138,15 @@ def award_badge(user_id: str, badge: Union[BadgeDefinition, str], db: Session):
     if isinstance(badge, str):
         badge_def = db.query(BadgeDefinition).get(badge)
         if not badge_def:
-            logger.error(f"Cannot award unknown badge_id: {badge}")
+            # Loud, actionable log. If this fires on the signup path,
+            # the protected specials are missing from badge_definitions.
+            # Run migration 025 to seed + backfill.
+            logger.error(
+                "BADGE_DEF_MISSING: cannot award '%s'. "
+                "Definition row not in badge_definitions. "
+                "Run migration_025_seed_protected_badges.",
+                badge,
+            )
             return
 
     logger.info(f"🏆 Awarding Badge {badge_def.id} to user {user_id}")
