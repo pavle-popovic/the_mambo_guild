@@ -196,6 +196,8 @@ function renderShape(
       );
     case "gem": {
       // Faceted hex gem with top-face highlight and inner shine line.
+      // The shine gradient is defined once in the top-level <defs> by
+      // renderGradients; we just reference it here.
       const shineId = `gem-shine-${specId}-${layerIndex}`;
       return (
         <>
@@ -207,12 +209,6 @@ function renderShape(
             d="M 0 -5 L 4.3 -2.5 L 2 -1 L -2 -1 L -4.3 -2.5 Z"
             fill={`url(#${shineId})`}
           />
-          <defs>
-            <linearGradient id={shineId} x1="0" y1="0" x2="0" y2="1">
-              <stop offset="0%" stopColor="white" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="white" stopOpacity="0.1" />
-            </linearGradient>
-          </defs>
         </>
       );
     }
@@ -264,23 +260,12 @@ function renderShape(
       // Faceted crystalline gem: diamond silhouette split into 5 facets
       // with a prism gradient (white → cool blue → violet) for dispersion.
       // Reads as a multi-cut jewel rather than a flat polygon.
+      // Gradient defs are hoisted to the top-level <defs> by renderGradients
+      // so each id exists exactly once per SVG.
       const prismId = `crystal-prism-${specId}-${layerIndex}`;
       const rimId = `crystal-rim-${specId}-${layerIndex}`;
       return (
         <>
-          <defs>
-            <linearGradient id={prismId} x1="0" y1="-1" x2="0" y2="1">
-              <stop offset="0%" stopColor="#ffffff" />
-              <stop offset="30%" stopColor="#e0f2fe" />
-              <stop offset="55%" stopColor="#93c5fd" />
-              <stop offset="80%" stopColor="#c4b5fd" />
-              <stop offset="100%" stopColor="#ffffff" />
-            </linearGradient>
-            <linearGradient id={rimId} x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
-              <stop offset="100%" stopColor="#ffffff" stopOpacity="0.2" />
-            </linearGradient>
-          </defs>
           {/* Body */}
           <path
             d="M 0 -6 L 4.5 -1.5 L 0 6 L -4.5 -1.5 Z"
@@ -437,6 +422,38 @@ function renderGradients(spec: BorderFrameSpec): JSX.Element[] {
   spec.ornaments?.forEach((layer, li) => {
     if (Array.isArray(layer.color)) {
       defs.push(linearGrad(`orn-${spec.id}-${li}`, layer.color));
+    }
+    // Hoist shape-specific gradients once per layer. renderShape references
+    // these by id, so declaring them inside renderShape would produce N
+    // duplicate <defs> blocks per layer (one per ornament instance), which
+    // collides across specs and breaks rendering in sibling SVGs.
+    if (layer.shape === "crystal") {
+      const prismId = `crystal-prism-${spec.id}-${li}`;
+      const rimId = `crystal-rim-${spec.id}-${li}`;
+      defs.push(
+        <linearGradient key={prismId} id={prismId} x1="0" y1="-1" x2="0" y2="1">
+          <stop offset="0%" stopColor="#ffffff" />
+          <stop offset="30%" stopColor="#e0f2fe" />
+          <stop offset="55%" stopColor="#93c5fd" />
+          <stop offset="80%" stopColor="#c4b5fd" />
+          <stop offset="100%" stopColor="#ffffff" />
+        </linearGradient>
+      );
+      defs.push(
+        <linearGradient key={rimId} id={rimId} x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0%" stopColor="#ffffff" stopOpacity="0.9" />
+          <stop offset="100%" stopColor="#ffffff" stopOpacity="0.2" />
+        </linearGradient>
+      );
+    }
+    if (layer.shape === "gem") {
+      const shineId = `gem-shine-${spec.id}-${li}`;
+      defs.push(
+        <linearGradient key={shineId} id={shineId} x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0%" stopColor="white" stopOpacity="0.6" />
+          <stop offset="100%" stopColor="white" stopOpacity="0.1" />
+        </linearGradient>
+      );
     }
   });
 
