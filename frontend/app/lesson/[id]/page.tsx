@@ -867,7 +867,7 @@ export default function LessonPage() {
                           Mux's control strip. bottom offset clears the scrubber
                           on desktop and mobile. */}
                       {abLoop.enabled && (
-                        <div className="absolute left-0 right-0 bottom-[52px] md:bottom-[56px] z-20 px-3 md:px-4 py-2 bg-black/70 backdrop-blur-sm">
+                        <div className="absolute left-0 right-0 bottom-[52px] md:bottom-[56px] z-20 px-1 md:px-2 py-2 bg-black/70 backdrop-blur-sm">
                           <ABLoopBar state={abLoop} duration={videoDuration} />
                         </div>
                       )}

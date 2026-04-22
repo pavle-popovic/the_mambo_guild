@@ -108,11 +108,12 @@ export default function ABLoopBar({ state, duration, className }: Props) {
           className="absolute top-1/2 -translate-y-1/2 w-0.5 h-5 bg-white pointer-events-none"
           style={{ left: `${pct(currentTime)}%` }}
         />
+        {/* A handle — thin vertical bar with an A label on top. The outer
+            div is intentionally wider than the visible bar (px-2) so it
+            remains easy to grab on touch. */}
         <div
           data-ab-handle="A"
-          className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing touch-none ${
-            drag === "A" ? "bg-green-300 scale-110" : "bg-green-500"
-          }`}
+          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-9 px-2 flex flex-col items-center cursor-grab active:cursor-grabbing touch-none"
           style={{ left: `${pct(aTime)}%` }}
           onMouseDown={(e) => {
             e.preventDefault();
@@ -124,13 +125,19 @@ export default function ABLoopBar({ state, duration, className }: Props) {
             setDrag("A");
           }}
         >
-          <span className="text-[10px] font-black text-white leading-none pointer-events-none">A</span>
+          <span className="text-[10px] font-black text-green-400 leading-none pointer-events-none mb-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+            A
+          </span>
+          <div
+            className={`flex-1 w-1 rounded-full pointer-events-none shadow-lg transition-colors ${
+              drag === "A" ? "bg-green-300" : "bg-green-500"
+            }`}
+          />
         </div>
+        {/* B handle — mirror of A. */}
         <div
           data-ab-handle="B"
-          className={`absolute top-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 rounded-full border-2 border-white shadow-lg flex items-center justify-center cursor-grab active:cursor-grabbing touch-none ${
-            drag === "B" ? "bg-red-300 scale-110" : "bg-red-500"
-          }`}
+          className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 h-9 px-2 flex flex-col items-center cursor-grab active:cursor-grabbing touch-none"
           style={{ left: `${pct(bTime)}%` }}
           onMouseDown={(e) => {
             e.preventDefault();
@@ -142,7 +149,14 @@ export default function ABLoopBar({ state, duration, className }: Props) {
             setDrag("B");
           }}
         >
-          <span className="text-[10px] font-black text-white leading-none pointer-events-none">B</span>
+          <span className="text-[10px] font-black text-red-400 leading-none pointer-events-none mb-0.5 drop-shadow-[0_1px_2px_rgba(0,0,0,0.9)]">
+            B
+          </span>
+          <div
+            className={`flex-1 w-1 rounded-full pointer-events-none shadow-lg transition-colors ${
+              drag === "B" ? "bg-red-300" : "bg-red-500"
+            }`}
+          />
         </div>
       </div>
     </div>
