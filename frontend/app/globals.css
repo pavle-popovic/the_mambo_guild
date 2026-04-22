@@ -594,11 +594,22 @@ media-controller [aria-label*="repeat" i] {
     display: none !important;
   }
   /* External caption strip is hidden on phone landscape — MuxVideoPlayer's
-     internal overlay (same one desktop uses, pinned just above the
-     control bar) is unhidden for landscape instead, so captions match
-     desktop exactly. */
+     internal overlay (same one desktop uses) is unhidden for landscape
+     instead. */
   .lesson-mobile-captions {
     display: none !important;
+  }
+  /* Force the internal overlay to sit very low on landscape phones. The
+     tailwind bottom-[70px] was authored for desktop proportions and looks
+     way too high on a 390px-tall landscape viewport. Override with a
+     small fixed offset so captions sit right above the control bar. */
+  .mux-caption-overlay {
+    bottom: 6px !important;
+  }
+  .mux-caption-overlay > span {
+    font-size: 1rem !important;
+    line-height: 1.3 !important;
+    font-weight: 600 !important;
   }
 }
 

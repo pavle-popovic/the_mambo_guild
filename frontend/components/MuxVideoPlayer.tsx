@@ -576,7 +576,7 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
             On desktop, always show here above controls. */}
         {captionText && !nativeCaptionsActive && (
           <div
-            className={`absolute inset-x-0 pointer-events-none flex justify-center bottom-[70px] lg:bottom-[60px] ${onCaptionChange ? 'hidden landscape:flex lg:flex' : ''}`}
+            className={`mux-caption-overlay absolute inset-x-0 pointer-events-none flex justify-center bottom-[70px] lg:bottom-[60px] ${onCaptionChange ? 'hidden landscape:flex lg:flex' : ''}`}
             style={{ zIndex: 10, padding: "0 10%" }}
           >
             <span
