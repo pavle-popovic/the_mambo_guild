@@ -991,7 +991,7 @@ export default function LessonPage() {
                     </div>
                     {/* External caption display — below video on mobile, hidden on desktop (internal overlay used) */}
                     {captionText && (
-                      <div className="lg:hidden flex-shrink-0 bg-black px-4 py-2 landscape:pt-6 flex justify-center lesson-mobile-captions">
+                      <div className="lg:hidden flex-shrink-0 bg-black px-4 py-2 landscape:mt-16 flex justify-center lesson-mobile-captions">
                         <span
                           className="text-white text-sm font-medium text-center leading-relaxed"
                           style={{ fontFamily: '"Helvetica Neue", Helvetica, Arial, sans-serif' }}
