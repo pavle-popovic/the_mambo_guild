@@ -13,10 +13,10 @@ import { apiClient, type ShopItem } from "@/lib/api";
 type TabKind = "ticket" | "border" | "title" | "utility";
 
 const TABS: { key: TabKind; label: string; blurb: string }[] = [
-  { key: "ticket",  label: "Tickets",  blurb: "Unlock 1-on-1 coaching reviews." },
   { key: "border",  label: "Borders",  blurb: "Avatar rings across every rarity." },
   { key: "title",   label: "Titles",   blurb: "Earned words under your name." },
   { key: "utility", label: "Utility",  blurb: "More stage + lab slots, permanent." },
+  { key: "ticket",  label: "Tickets",  blurb: "Unlock 1-on-1 coaching reviews." },
 ];
 
 /** Tier rank for gate comparison. Matches backend `tier_service._TIER_RANK`. */
@@ -25,7 +25,7 @@ const TIER_RANK: Record<string, number> = { rookie: 0, advanced: 1, performer: 2
 export default function ShopPage() {
   const router = useRouter();
   const { user, loading: authLoading, refreshUser } = useAuth();
-  const [activeTab, setActiveTab] = useState<TabKind>("ticket");
+  const [activeTab, setActiveTab] = useState<TabKind>("border");
   const [items, setItems] = useState<ShopItem[]>([]);
   const [inventory, setInventory] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
