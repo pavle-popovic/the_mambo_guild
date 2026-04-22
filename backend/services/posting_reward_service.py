@@ -138,6 +138,12 @@ def award_post_reward(post_id: str, db: Session) -> dict:
     Silent on every reason-to-skip path; returns a dict the caller can log
     but should not surface to users (we don't want to tip people off to
     the exact cap / cooldown heuristics).
+
+    Concurrency: we take `SELECT ... FOR UPDATE` on the author's
+    user_profiles row at the top so that a user posting from multiple
+    tabs serialises here. Without the lock, two simultaneous posts both
+    pass the cooldown + daily-cap checks against the same pre-award
+    ledger state and both get rewarded, bypassing the cap by up to N×.
     """
     post = db.query(Post).filter(Post.id == post_id).first()
     if not post:
@@ -149,6 +155,18 @@ def award_post_reward(post_id: str, db: Session) -> dict:
 
     kind, amount = shape
     user_id = str(post.user_id)
+
+    # Lock the author's profile for the duration of the check+award
+    # sequence. Any concurrent award_post_reward / earn_claves for this
+    # user will wait until we commit or rollback.
+    profile_lock = (
+        db.query(UserProfile)
+        .filter(UserProfile.user_id == user_id)
+        .with_for_update()
+        .first()
+    )
+    if not profile_lock:
+        return {"awarded": False, "reason": "profile_not_found"}
 
     if _already_rewarded(user_id, str(post.id), db):
         return {"awarded": False, "reason": "already_rewarded"}

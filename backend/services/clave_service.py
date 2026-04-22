@@ -92,16 +92,24 @@ def earn_claves(
     """
     Award claves to a user.
     Returns: new balance
+
+    Uses SELECT FOR UPDATE on user_profiles so concurrent earn paths (e.g.
+    multiple reactions landing at once, post-reward races) can't lose
+    updates against the cached balance. Re-locking an already-locked row
+    inside the same transaction is a no-op, so callers that already hold
+    the profile lock (e.g. process_reaction_refund) are unaffected.
     """
     if amount <= 0:
         logger.warning(f"Attempted to earn {amount} claves (must be positive)")
         return get_balance(user_id, db)
-    
-    profile = get_user_profile(user_id, db)
+
+    profile = db.query(UserProfile).filter(
+        UserProfile.user_id == user_id
+    ).with_for_update().first()
     if not profile:
         logger.error(f"Profile not found for user {user_id}")
         return 0
-    
+
     # Create transaction
     transaction = ClaveTransaction(
         user_id=user_id,
@@ -110,7 +118,7 @@ def earn_claves(
         reference_id=reference_id
     )
     db.add(transaction)
-    
+
     # Update balance
     profile.current_claves += amount
     db.flush()

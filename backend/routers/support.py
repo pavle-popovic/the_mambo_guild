@@ -18,6 +18,7 @@ from services.email_service import (
 )
 from services.redis_service import check_rate_limit
 from services.storage_service import get_storage_service
+from utils.request import client_ip as _client_ip
 
 logger = logging.getLogger(__name__)
 
@@ -88,18 +89,6 @@ def _upload_screenshot(data_uri: str) -> Optional[str]:
     if storage.public_domain:
         return f"{storage.public_domain}/{object_key}"
     return f"{storage.bucket_name}/{object_key}"
-
-
-def _client_ip(request: Request) -> str:
-    """
-    Best-effort client IP extraction. Respects X-Forwarded-For when the app
-    is behind Railway / Cloudflare so one abuser behind a proxy doesn't share
-    a rate-limit bucket with the rest of the platform.
-    """
-    xff = request.headers.get("x-forwarded-for")
-    if xff:
-        return xff.split(",")[0].strip()
-    return request.client.host if request.client else "unknown"
 
 
 @router.post("/bug-report")
