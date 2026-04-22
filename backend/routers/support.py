@@ -12,7 +12,10 @@ from typing import List, Optional
 from fastapi import APIRouter, HTTPException, Request
 from pydantic import BaseModel, Field
 
-from services.email_service import send_bug_report_email
+from services.email_service import (
+    send_ambassador_application_email,
+    send_bug_report_email,
+)
 from services.redis_service import check_rate_limit
 from services.storage_service import get_storage_service
 
@@ -152,3 +155,64 @@ def submit_bug_report(payload: BugReportRequest, request: Request):
         raise HTTPException(status_code=500, detail="Failed to send bug report. Please try again or email support@themamboguild.com directly.")
 
     return {"status": "ok", "screenshots_uploaded": len(screenshot_urls)}
+
+
+class AmbassadorApplicationRequest(BaseModel):
+    name: str = Field(..., min_length=2, max_length=120)
+    email: str = Field(..., min_length=5, max_length=320)
+    instagram_url: Optional[str] = Field(None, max_length=300)
+    location: Optional[str] = Field(None, max_length=200)
+    message: str = Field(..., min_length=20, max_length=4000)
+    page_url: str = Field(..., max_length=2000)
+
+
+_EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+
+
+@router.post("/ambassador-application")
+def submit_ambassador_application(
+    payload: AmbassadorApplicationRequest, request: Request
+):
+    """
+    Receive a "become a Guild Ambassador" application and forward it to
+    pavlepopovic@themamboguild.com. Unauthenticated so the instructors
+    page can accept applications from new-to-platform dancers too.
+
+    Rate-limited to 5 applications per IP per hour. That's generous for a
+    legitimate applicant (who only sends one) and tight enough to blunt
+    bot spam of Pavle's inbox.
+    """
+    client_ip = _client_ip(request)
+
+    if not _EMAIL_RE.match(payload.email.strip()):
+        raise HTTPException(status_code=400, detail="Please enter a valid email address.")
+
+    if not check_rate_limit(
+        identifier=client_ip,
+        action="ambassador_application",
+        max_requests=5,
+        window_seconds=3600,
+    ):
+        logger.warning(f"Ambassador application rate limit exceeded for IP {client_ip}")
+        raise HTTPException(
+            status_code=429,
+            detail="You've already sent a few applications. Please wait a bit before sending another, or email pavlepopovic@themamboguild.com directly.",
+        )
+
+    sent = send_ambassador_application_email(
+        applicant_name=payload.name.strip(),
+        applicant_email=payload.email.strip(),
+        instagram_url=(payload.instagram_url or "").strip() or None,
+        location=(payload.location or "").strip() or None,
+        message=payload.message.strip(),
+        page_url=payload.page_url,
+        client_ip=client_ip,
+    )
+
+    if not sent:
+        raise HTTPException(
+            status_code=500,
+            detail="Could not send your application right now. Please try again or email pavlepopovic@themamboguild.com directly.",
+        )
+
+    return {"status": "ok"}

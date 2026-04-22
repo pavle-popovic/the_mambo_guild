@@ -620,7 +620,7 @@
       "pillarCoursesBullet2": "풀 안무 세밀한 분석",
       "pillarCoursesBullet3": "살사의 역사 — 20개 모듈",
       "pillarCoursesBullet4": "훈련의 과학 — 18개 모듈",
-      "pillarCoursesBullet5": "테크닉, 스타일링, 음악성, 파트너링",
+      "pillarCoursesBullet5": "기술, 스타일링, 음악성",
       "pillarPlayerEyebrow": "비디오 플레이어",
       "pillarPlayerTitlePre": "프로들이 기다려온",
       "pillarPlayerTitleAccent": "연습실",
@@ -648,12 +648,12 @@
       "pillarCommunityEyebrow": "커뮤니티",
       "pillarCommunityTitlePre": "영상을 공유하세요.",
       "pillarCommunityTitleAccent": "혼자 추지 마세요.",
-      "pillarCommunityBody": "진행 영상. 진짜 피드백. 해결되는 질문. 실제로 훈련하는 댄서들.",
-      "pillarCommunityBullet1": "The Stage — 진행 영상 공유",
-      "pillarCommunityBullet2": "The Lab — 질문하고 답하기",
-      "pillarCommunityBullet3": "Hype 또는 코치 피드백",
-      "pillarCommunityBullet4": "38개의 배지, 브론즈 → 다이아몬드",
-      "pillarCommunityBullet5": "주간 & 역대 리더보드",
+      "pillarCommunityBody": "영상을 올리세요. 질문하세요. 클라베를 얻고 길드 상점에서 쓰세요.",
+      "pillarCommunityBullet1": "The Stage: 진행 영상 게시, +10 클라베",
+      "pillarCommunityBullet2": "The Lab: 질문하고 답하기, +3 클라베",
+      "pillarCommunityBullet3": "Hype 또는 Coach 피드백",
+      "pillarCommunityBullet4": "38개 배지, 브론즈부터 다이아몬드까지",
+      "pillarCommunityBullet5": "주간 및 역대 리더보드",
       "pillarVipEyebrow": "VIP — 1:1 코칭 & 프라이빗 그룹",
       "pillarVipTitlePre": "마에스트로와",
       "pillarVipTitleAccent": "직접",
@@ -901,7 +901,10 @@
     "timotheHistoryBody": "오랜 세월 살사의 역사를 연구했고, Roly Maden처럼 살사 씬의 역사적 전설들을 직접 인터뷰해 왔어요. 맘보와 라틴 댄스의 역사에 관한 책도 집필했어요.",
     "timotheMamboTitle": "맘보에 뿌리를 둔 스타일",
     "timotheMamboBody": "맘보에 깊이 뿌리를 두면서도 퓨전과 개인적인 해석이 더해진 스타일을 지녔어요. Paris와 Mexico에서 훈련을 쌓았고, Black and White Mambo로 세계 무대에서 공연했으며, 자신의 팀 Mambo All Stars를 이끌었어요.",
-    "timotheQuote": "살사는 스텝 그 이상이에요. 그것은 기억이고, 문화이며, 그것을 만들어 온 사람들의 이야기예요."
+    "timotheQuote": "살사는 스텝 그 이상이에요. 그것은 기억이고, 문화이며, 그것을 만들어 온 사람들의 이야기예요.",
+    "ambassadorTitle": "길드 앰버서더가 되세요",
+    "ambassadorBody": "The Mambo Guild을 사랑하고 지역 씬에서 대표하고 싶나요? 길드 앰버서더에 지원해 커뮤니티 성장을 함께하세요.",
+    "ambassadorCta": "앰버서더 지원하기"
   },
   "coaching": {
     "lockedTitle": "코칭 코너는 Guild Master 전용이에요",
@@ -1231,8 +1234,8 @@
       "description": "당신의 춤이 무대를 달구고 있어요. 화염 절정."
     },
     "founder_diamond": {
-      "name": "창립 멤버",
-      "description": "One of the founding members of The Mambo Guild."
+      "name": "파운더",
+      "description": "The Mambo Guild의 창립 멤버 중 한 명."
     },
     "guild_master": {
       "name": "길드 마스터",
@@ -1323,172 +1326,218 @@
       "description": "14-day practice streak."
     },
     "motw_bronze": {
-      "name": "Move Master I",
-      "description": "Posted your first Move of the Week video. Welcome to the floor."
+      "name": "무브 마스터 I",
+      "description": "첫 Move of the Week 영상을 올렸습니다. 플로어에 오신 것을 환영합니다."
     },
     "motw_silver": {
-      "name": "Move Master II",
-      "description": "Posted 10 Move of the Week videos."
+      "name": "무브 마스터 II",
+      "description": "Move of the Week 영상 10개를 올렸습니다."
     },
     "motw_gold": {
-      "name": "Move Master III",
-      "description": "Posted 30 Move of the Week videos. You're a regular."
+      "name": "무브 마스터 III",
+      "description": "Move of the Week 영상 30개를 올렸습니다. 단골이군요."
     },
     "motw_diamond": {
-      "name": "Move Master IV",
-      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+      "name": "무브 마스터 IV",
+      "description": "Move of the Week 영상 100개를 올렸습니다. 공인된 위클리 레전드."
     },
     "original_bronze": {
-      "name": "The Originator I",
-      "description": "Shared your first original choreo or freestyle."
+      "name": "오리지네이터 I",
+      "description": "첫 오리지널 안무 또는 프리스타일을 공유했습니다."
     },
     "original_silver": {
-      "name": "The Originator II",
-      "description": "Shared 10 original choreos or freestyles."
+      "name": "오리지네이터 II",
+      "description": "오리지널 안무 또는 프리스타일 10개를 공유했습니다."
     },
     "original_gold": {
-      "name": "The Originator III",
-      "description": "Shared 30 original choreos or freestyles. You have a voice."
+      "name": "오리지네이터 III",
+      "description": "오리지널 안무 또는 프리스타일 30개를 공유했습니다. 자신만의 목소리가 있군요."
     },
     "original_diamond": {
-      "name": "The Originator IV",
-      "description": "Shared 100 original choreos or freestyles. A true creator."
+      "name": "오리지네이터 IV",
+      "description": "오리지널 안무 또는 프리스타일 100개를 공유했습니다. 진정한 크리에이터."
     },
     "guild_bronze": {
-      "name": "Class Act I",
-      "description": "Posted your first Guild-class choreo."
+      "name": "클래스 액트 I",
+      "description": "첫 길드급 안무를 올렸습니다."
     },
     "guild_silver": {
-      "name": "Class Act II",
-      "description": "Posted 10 Guild-class choreos."
+      "name": "클래스 액트 II",
+      "description": "길드급 안무 10개를 올렸습니다."
     },
     "guild_gold": {
-      "name": "Class Act III",
-      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+      "name": "클래스 액트 III",
+      "description": "길드급 안무 30개를 올렸습니다. 앙상블급 수준."
     },
     "guild_diamond": {
-      "name": "Class Act IV",
-      "description": "Posted 100 Guild-class choreos. Guild pillar."
+      "name": "클래스 액트 IV",
+      "description": "길드급 안무 100개를 올렸습니다. 길드의 기둥."
     },
     "liked_bronze": {
-      "name": "Crowd Favorite I",
-      "description": "Received your first like."
+      "name": "관객의 총애 I",
+      "description": "첫 좋아요를 받았습니다."
     },
     "liked_silver": {
-      "name": "Crowd Favorite II",
-      "description": "Received 100 total likes across your posts."
+      "name": "관객의 총애 II",
+      "description": "게시글에 총 100개의 좋아요를 받았습니다."
     },
     "liked_gold": {
-      "name": "Crowd Favorite III",
-      "description": "Received 500 total likes across your posts."
+      "name": "관객의 총애 III",
+      "description": "게시글에 총 500개의 좋아요를 받았습니다."
     },
     "liked_diamond": {
-      "name": "Crowd Favorite IV",
-      "description": "Received 2,500 total likes. The room loves you."
+      "name": "관객의 총애 IV",
+      "description": "총 2,500개의 좋아요를 받았습니다. 온 플로어가 당신을 사랑합니다."
     },
     "motw_love_bronze": {
-      "name": "Move Magnet I",
-      "description": "Got your first like on a Move of the Week video."
+      "name": "무브 마그넷 I",
+      "description": "Move of the Week 영상에서 첫 좋아요를 받았습니다."
     },
     "motw_love_silver": {
-      "name": "Move Magnet II",
-      "description": "25 likes across your Move of the Week videos."
+      "name": "무브 마그넷 II",
+      "description": "Move of the Week 영상에 총 25개의 좋아요."
     },
     "motw_love_gold": {
-      "name": "Move Magnet III",
-      "description": "150 likes across your Move of the Week videos."
+      "name": "무브 마그넷 III",
+      "description": "Move of the Week 영상에 총 150개의 좋아요."
     },
     "motw_love_diamond": {
-      "name": "Move Magnet IV",
-      "description": "1,000 likes across your Move of the Week videos."
+      "name": "무브 마그넷 IV",
+      "description": "Move of the Week 영상에 총 1,000개의 좋아요."
     },
     "original_love_bronze": {
-      "name": "Fan Favorite I",
-      "description": "Got your first like on an original post."
+      "name": "팬 최애 I",
+      "description": "오리지널 게시물에서 첫 좋아요를 받았습니다."
     },
     "original_love_silver": {
-      "name": "Fan Favorite II",
-      "description": "25 likes across your original posts."
+      "name": "팬 최애 II",
+      "description": "오리지널 게시물에 총 25개의 좋아요."
     },
     "original_love_gold": {
-      "name": "Fan Favorite III",
-      "description": "150 likes across your original posts."
+      "name": "팬 최애 III",
+      "description": "오리지널 게시물에 총 150개의 좋아요."
     },
     "original_love_diamond": {
-      "name": "Fan Favorite IV",
-      "description": "1,000 likes across your original posts."
+      "name": "팬 최애 IV",
+      "description": "오리지널 게시물에 총 1,000개의 좋아요."
     },
     "guild_love_bronze": {
-      "name": "Guild Applause I",
-      "description": "Got your first like on a Guild-class post."
+      "name": "길드의 박수 I",
+      "description": "길드급 게시물에서 첫 좋아요를 받았습니다."
     },
     "guild_love_silver": {
-      "name": "Guild Applause II",
-      "description": "25 likes across your Guild-class posts."
+      "name": "길드의 박수 II",
+      "description": "길드급 게시물에 총 25개의 좋아요."
     },
     "guild_love_gold": {
-      "name": "Guild Applause III",
-      "description": "150 likes across your Guild-class posts."
+      "name": "길드의 박수 III",
+      "description": "길드급 게시물에 총 150개의 좋아요."
     },
     "guild_love_diamond": {
-      "name": "Guild Applause IV",
-      "description": "1,000 likes across your Guild-class posts."
+      "name": "길드의 박수 IV",
+      "description": "길드급 게시물에 총 1,000개의 좋아요."
     },
     "promoter": {
-      "name": "Promoter",
-      "description": "Brought 3 dancers into the Guild through your referral link."
+      "name": "프로모터",
+      "description": "추천 링크로 댄서 3명을 길드에 데려왔습니다."
     }
   },
   "shop": {
-    "pageTitle": "The Guild Shop",
-    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
-    "balanceLabel": "Balance",
-    "viewInventory": "View inventory →",
-    "inventoryTitle": "Inventory",
-    "inventorySubtitle": "Equip what you own. Everything is permanent.",
-    "backToShop": "← Back to shop",
-    "empty": "Nothing here yet. Check back soon.",
-    "emptyInventory": "You don't own anything yet.",
-    "loading": "Loading catalog...",
-    "loadError": "Failed to load shop",
+    "pageTitle": "길드 상점",
+    "pageSubtitle": "클라베스를 코칭 티켓, 꾸미기, 슬롯 업그레이드에 사용하세요. 모든 구매는 최종입니다.",
+    "balanceLabel": "잔액",
+    "viewInventory": "인벤토리 보기 →",
+    "visitShop": "상점으로 가기",
+    "inventoryTitle": "인벤토리",
+    "inventorySubtitle": "보유한 아이템을 장착하세요. 모든 것은 영구적입니다.",
+    "backToShop": "← 상점으로 돌아가기",
+    "empty": "아직 아무것도 없습니다. 곧 다시 확인하세요.",
+    "emptyInventory": "아직 보유한 아이템이 없습니다.",
+    "loading": "카탈로그 불러오는 중...",
+    "loadingInventory": "인벤토리 불러오는 중...",
+    "loadError": "상점을 불러오지 못했습니다",
+    "loadInventoryError": "인벤토리를 불러오지 못했습니다",
+    "equipError": "장착에 실패했습니다",
+    "stockRemaining": "{count}개 남음",
+    "ownedCount": "보유: {count}",
     "tabs": {
-      "ticket": "Tickets",
-      "border": "Borders",
-      "title": "Titles",
-      "utility": "Utility"
+      "ticket": "티켓",
+      "border": "보더",
+      "title": "칭호",
+      "utility": "유틸리티"
+    },
+    "tabBlurbs": {
+      "border": "아바타 보더. 당신의 희귀도를 뽐내세요.",
+      "title": "길드 전체에서 이름 아래에 표시되는 칭호.",
+      "utility": "게시 용량의 영구 업그레이드.",
+      "ticket": "골든 티켓은 1:1 코칭 제출을 잠금 해제합니다. 수량 한정."
+    },
+    "sections": {
+      "cosmetics": "꾸미기",
+      "other": "기타 아이템"
     },
     "rarity": {
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
+      "common": "커먼",
+      "rare": "레어",
+      "epic": "에픽",
+      "legendary": "레전더리"
     },
     "actions": {
-      "buy": "Buy",
-      "buyNow": "Buy now",
-      "cancel": "Cancel",
-      "equip": "Equip",
-      "unequip": "Unequip",
-      "owned": "Owned",
-      "soldOut": "Sold out",
-      "locked": "Locked",
-      "notEnough": "Not enough",
-      "purchasing": "Purchasing...",
-      "equipped": "Equipped",
-      "redeemTicket": "Redeem ticket →"
+      "buy": "구매",
+      "buyNow": "바로 구매",
+      "cancel": "취소",
+      "equip": "장착",
+      "unequip": "해제",
+      "owned": "보유 중",
+      "soldOut": "품절",
+      "locked": "잠김",
+      "notEnough": "잔액 부족",
+      "purchasing": "구매 중...",
+      "equipped": "장착됨",
+      "redeemTicket": "티켓 사용 →"
     },
     "purchase": {
-      "confirmTitle": "Confirm purchase",
-      "priceLabel": "Price",
-      "yourBalance": "Your balance",
-      "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
-      "success": "Purchase complete 🎉",
-      "genericError": "Purchase failed. Please try again."
+      "confirmTitle": "구매 확인",
+      "priceLabel": "가격",
+      "yourBalance": "내 잔액",
+      "afterPurchase": "구매 후",
+      "success": "구매 완료 🎉",
+      "genericError": "구매에 실패했습니다. 다시 시도해 주세요."
+    },
+    "preview": {
+      "unavailable": "미리보기 없음",
+      "goldenTicket": "골든 티켓",
+      "stageSlots": "스테이지 슬롯 +{count}",
+      "labSlots": "랩 슬롯 +{count}",
+      "utility": "유틸리티"
     },
     "earn": {
-      "stagePost": "Earn +10 🥢 on post",
-      "labQuestion": "Earn +3 🥢 on post"
+      "stagePost": "게시 시 +10 🥢",
+      "labQuestion": "게시 시 +3 🥢"
     }
+  },
+  "ambassador": {
+    "title": "길드 앰버서더 지원",
+    "subtitle": "자신에 대해 간단히 알려주고 왜 The Mambo Guild을 대표하고 싶은지 말씀해 주세요.",
+    "nameLabel": "이름 (전체)",
+    "emailLabel": "이메일",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/you (선택)",
+    "locationLabel": "도시 / 씬",
+    "locationPlaceholder": "예: 서울, 부산 (선택)",
+    "messageLabel": "왜 당신인가요?",
+    "messagePlaceholder": "댄스 배경, 소속 씬, 그리고 어떻게 길드를 대표할지 알려주세요. 최소 20자.",
+    "messageHint": "{count} / 4000",
+    "submit": "지원서 보내기",
+    "sending": "전송 중…",
+    "cancel": "취소",
+    "close": "닫기",
+    "successTitle": "지원서가 전송됨",
+    "successBody": "지원해 주셔서 감사합니다. Pavle이 모든 지원서를 직접 읽고 적합하면 연락드립니다.",
+    "genericError": "지원서를 보낼 수 없습니다. 잠시 후 다시 시도해 주세요."
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "쓰러지고, 일어나고, 계속 춤춘다."
   }
 }

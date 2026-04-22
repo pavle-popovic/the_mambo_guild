@@ -481,7 +481,7 @@
       "pillarCoursesBullet2": "Coreografias completas, detalhadas passo a passo",
       "pillarCoursesBullet3": "História da Salsa — 20 módulos",
       "pillarCoursesBullet4": "Ciência do Treinamento — 18 módulos",
-      "pillarCoursesBullet5": "Técnica, estilo, musicalidade, dança a dois",
+      "pillarCoursesBullet5": "Técnica, estilo, musicalidade",
       "pillarPlayerEyebrow": "O PLAYER DE VÍDEO",
       "pillarPlayerTitlePre": "A",
       "pillarPlayerTitleAccent": "sala de treino",
@@ -509,12 +509,12 @@
       "pillarCommunityEyebrow": "A COMUNIDADE",
       "pillarCommunityTitlePre": "Poste seus vídeos.",
       "pillarCommunityTitleAccent": "Não dance sozinho.",
-      "pillarCommunityBody": "Vídeos de progresso. Feedback real. Perguntas respondidas. Dançarinos que realmente treinam.",
-      "pillarCommunityBullet1": "The Stage — poste vídeos de progresso",
-      "pillarCommunityBullet2": "The Lab — pergunte e responda",
-      "pillarCommunityBullet3": "Feedback de Hype ou Coach",
-      "pillarCommunityBullet4": "38 emblemas, Bronze → Diamante",
-      "pillarCommunityBullet5": "Rankings semanais e gerais",
+      "pillarCommunityBody": "Poste vídeos. Faça perguntas. Ganhe claves. Gaste na Loja da Guilda.",
+      "pillarCommunityBullet1": "The Stage: poste vídeos de progresso, +10 claves",
+      "pillarCommunityBullet2": "The Lab: pergunte e responda, +3 claves",
+      "pillarCommunityBullet3": "Feedback Hype ou Coach",
+      "pillarCommunityBullet4": "38 insígnias, do Bronze ao Diamante",
+      "pillarCommunityBullet5": "Rankings semanais e de todos os tempos",
       "pillarVipEyebrow": "VIP — COACHING 1-A-1 E GRUPO PRIVADO",
       "pillarVipTitlePre": "Treine",
       "pillarVipTitleAccent": "diretamente",
@@ -762,7 +762,10 @@
     "timotheHistoryBody": "Pesquisou a história da salsa por muitos anos e entrevistou lendas históricas da cena como Roly Maden. Escreveu um livro sobre a história do mambo e das danças latinas.",
     "timotheMamboTitle": "Estilo Enraizado no Mambo",
     "timotheMamboBody": "Profundamente enraizado no mambo, com um toque de fusão e interpretação pessoal. Formou-se em Paris e no Mexico, apresentou-se pelo mundo com Black and White Mambo e liderou seu próprio grupo Mambo All Stars.",
-    "timotheQuote": "A salsa é mais do que passos. É memória, cultura e a história de quem a moldou."
+    "timotheQuote": "A salsa é mais do que passos. É memória, cultura e a história de quem a moldou.",
+    "ambassadorTitle": "Seja um Embaixador da Guilda",
+    "ambassadorBody": "Ama a The Mambo Guild e quer representá-la na sua cena? Candidate-se a Embaixador da Guilda e ajude a crescer a comunidade.",
+    "ambassadorCta": "Candidatar-se a embaixador"
   },
   "coaching": {
     "lockedTitle": "O Cantinho do Coaching é para Guild Masters",
@@ -1232,7 +1235,7 @@
     },
     "founder_diamond": {
       "name": "Fundador",
-      "description": "One of the founding members of The Mambo Guild."
+      "description": "Membro fundador de The Mambo Guild."
     },
     "guild_master": {
       "name": "Mestre da Guilda",
@@ -1323,172 +1326,218 @@
       "description": "Dedicação constante em comparecer. Duas semanas firme."
     },
     "motw_bronze": {
-      "name": "Move Master I",
-      "description": "Posted your first Move of the Week video. Welcome to the floor."
+      "name": "Mestre do Movimento I",
+      "description": "Postou seu primeiro vídeo de Move of the Week. Bem-vindo à pista."
     },
     "motw_silver": {
-      "name": "Move Master II",
-      "description": "Posted 10 Move of the Week videos."
+      "name": "Mestre do Movimento II",
+      "description": "Postou 10 vídeos de Move of the Week."
     },
     "motw_gold": {
-      "name": "Move Master III",
-      "description": "Posted 30 Move of the Week videos. You're a regular."
+      "name": "Mestre do Movimento III",
+      "description": "Postou 30 vídeos de Move of the Week. Você é frequente."
     },
     "motw_diamond": {
-      "name": "Move Master IV",
-      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+      "name": "Mestre do Movimento IV",
+      "description": "Postou 100 vídeos de Move of the Week. Lenda semanal certificada."
     },
     "original_bronze": {
-      "name": "The Originator I",
-      "description": "Shared your first original choreo or freestyle."
+      "name": "O Originador I",
+      "description": "Compartilhou sua primeira coreografia ou freestyle original."
     },
     "original_silver": {
-      "name": "The Originator II",
-      "description": "Shared 10 original choreos or freestyles."
+      "name": "O Originador II",
+      "description": "Compartilhou 10 coreografias ou freestyles originais."
     },
     "original_gold": {
-      "name": "The Originator III",
-      "description": "Shared 30 original choreos or freestyles. You have a voice."
+      "name": "O Originador III",
+      "description": "Compartilhou 30 coreografias ou freestyles originais. Você tem voz."
     },
     "original_diamond": {
-      "name": "The Originator IV",
-      "description": "Shared 100 original choreos or freestyles. A true creator."
+      "name": "O Originador IV",
+      "description": "Compartilhou 100 coreografias ou freestyles originais. Um verdadeiro criador."
     },
     "guild_bronze": {
-      "name": "Class Act I",
-      "description": "Posted your first Guild-class choreo."
+      "name": "Classe Magistral I",
+      "description": "Postou sua primeira coreografia nível Guilda."
     },
     "guild_silver": {
-      "name": "Class Act II",
-      "description": "Posted 10 Guild-class choreos."
+      "name": "Classe Magistral II",
+      "description": "Postou 10 coreografias nível Guilda."
     },
     "guild_gold": {
-      "name": "Class Act III",
-      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+      "name": "Classe Magistral III",
+      "description": "Postou 30 coreografias nível Guilda. Material de companhia."
     },
     "guild_diamond": {
-      "name": "Class Act IV",
-      "description": "Posted 100 Guild-class choreos. Guild pillar."
+      "name": "Classe Magistral IV",
+      "description": "Postou 100 coreografias nível Guilda. Pilar da Guilda."
     },
     "liked_bronze": {
-      "name": "Crowd Favorite I",
-      "description": "Received your first like."
+      "name": "Favorito do Público I",
+      "description": "Recebeu seu primeiro like."
     },
     "liked_silver": {
-      "name": "Crowd Favorite II",
-      "description": "Received 100 total likes across your posts."
+      "name": "Favorito do Público II",
+      "description": "Recebeu 100 likes no total em seus posts."
     },
     "liked_gold": {
-      "name": "Crowd Favorite III",
-      "description": "Received 500 total likes across your posts."
+      "name": "Favorito do Público III",
+      "description": "Recebeu 500 likes no total em seus posts."
     },
     "liked_diamond": {
-      "name": "Crowd Favorite IV",
-      "description": "Received 2,500 total likes. The room loves you."
+      "name": "Favorito do Público IV",
+      "description": "Recebeu 2.500 likes no total. A sala te ama."
     },
     "motw_love_bronze": {
-      "name": "Move Magnet I",
-      "description": "Got your first like on a Move of the Week video."
+      "name": "Ímã do Movimento I",
+      "description": "Recebeu seu primeiro like em um vídeo Move of the Week."
     },
     "motw_love_silver": {
-      "name": "Move Magnet II",
-      "description": "25 likes across your Move of the Week videos."
+      "name": "Ímã do Movimento II",
+      "description": "25 likes nos seus vídeos Move of the Week."
     },
     "motw_love_gold": {
-      "name": "Move Magnet III",
-      "description": "150 likes across your Move of the Week videos."
+      "name": "Ímã do Movimento III",
+      "description": "150 likes nos seus vídeos Move of the Week."
     },
     "motw_love_diamond": {
-      "name": "Move Magnet IV",
-      "description": "1,000 likes across your Move of the Week videos."
+      "name": "Ímã do Movimento IV",
+      "description": "1.000 likes nos seus vídeos Move of the Week."
     },
     "original_love_bronze": {
-      "name": "Fan Favorite I",
-      "description": "Got your first like on an original post."
+      "name": "Favorito dos Fãs I",
+      "description": "Recebeu seu primeiro like em um post original."
     },
     "original_love_silver": {
-      "name": "Fan Favorite II",
-      "description": "25 likes across your original posts."
+      "name": "Favorito dos Fãs II",
+      "description": "25 likes nos seus posts originais."
     },
     "original_love_gold": {
-      "name": "Fan Favorite III",
-      "description": "150 likes across your original posts."
+      "name": "Favorito dos Fãs III",
+      "description": "150 likes nos seus posts originais."
     },
     "original_love_diamond": {
-      "name": "Fan Favorite IV",
-      "description": "1,000 likes across your original posts."
+      "name": "Favorito dos Fãs IV",
+      "description": "1.000 likes nos seus posts originais."
     },
     "guild_love_bronze": {
-      "name": "Guild Applause I",
-      "description": "Got your first like on a Guild-class post."
+      "name": "Aplauso da Guilda I",
+      "description": "Recebeu seu primeiro like em um post nível Guilda."
     },
     "guild_love_silver": {
-      "name": "Guild Applause II",
-      "description": "25 likes across your Guild-class posts."
+      "name": "Aplauso da Guilda II",
+      "description": "25 likes nos seus posts nível Guilda."
     },
     "guild_love_gold": {
-      "name": "Guild Applause III",
-      "description": "150 likes across your Guild-class posts."
+      "name": "Aplauso da Guilda III",
+      "description": "150 likes nos seus posts nível Guilda."
     },
     "guild_love_diamond": {
-      "name": "Guild Applause IV",
-      "description": "1,000 likes across your Guild-class posts."
+      "name": "Aplauso da Guilda IV",
+      "description": "1.000 likes nos seus posts nível Guilda."
     },
     "promoter": {
-      "name": "Promoter",
-      "description": "Brought 3 dancers into the Guild through your referral link."
+      "name": "Promotor",
+      "description": "Trouxe 3 dançarinos para a Guilda pelo seu link de indicação."
     }
   },
   "shop": {
-    "pageTitle": "The Guild Shop",
-    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
-    "balanceLabel": "Balance",
-    "viewInventory": "View inventory →",
-    "inventoryTitle": "Inventory",
-    "inventorySubtitle": "Equip what you own. Everything is permanent.",
-    "backToShop": "← Back to shop",
-    "empty": "Nothing here yet. Check back soon.",
-    "emptyInventory": "You don't own anything yet.",
-    "loading": "Loading catalog...",
-    "loadError": "Failed to load shop",
+    "pageTitle": "A Loja da Guilda",
+    "pageSubtitle": "Gaste seus claves em tickets de coaching, cosméticos e upgrades de vagas. Toda compra é definitiva.",
+    "balanceLabel": "Saldo",
+    "viewInventory": "Ver inventário →",
+    "visitShop": "Visite a loja",
+    "inventoryTitle": "Inventário",
+    "inventorySubtitle": "Equipe o que você tem. Tudo é permanente.",
+    "backToShop": "← Voltar à loja",
+    "empty": "Ainda nada por aqui. Volte em breve.",
+    "emptyInventory": "Você ainda não possui nada.",
+    "loading": "Carregando catálogo...",
+    "loadingInventory": "Carregando inventário...",
+    "loadError": "Falha ao carregar a loja",
+    "loadInventoryError": "Falha ao carregar o inventário",
+    "equipError": "Falha ao equipar",
+    "stockRemaining": "Restam {count}",
+    "ownedCount": "Você tem: {count}",
     "tabs": {
       "ticket": "Tickets",
-      "border": "Borders",
-      "title": "Titles",
-      "utility": "Utility"
+      "border": "Bordas",
+      "title": "Títulos",
+      "utility": "Utilidades"
+    },
+    "tabBlurbs": {
+      "border": "Bordas de avatar. Mostre sua raridade.",
+      "title": "Títulos exibidos abaixo do seu nome em toda a Guilda.",
+      "utility": "Upgrades permanentes da sua capacidade de postagem.",
+      "ticket": "Tickets Dourados liberam um envio de coaching 1 a 1. Estoque limitado."
+    },
+    "sections": {
+      "cosmetics": "Cosméticos",
+      "other": "Outros itens"
     },
     "rarity": {
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
+      "common": "Comum",
+      "rare": "Raro",
+      "epic": "Épico",
+      "legendary": "Lendário"
     },
     "actions": {
-      "buy": "Buy",
-      "buyNow": "Buy now",
-      "cancel": "Cancel",
-      "equip": "Equip",
-      "unequip": "Unequip",
-      "owned": "Owned",
-      "soldOut": "Sold out",
-      "locked": "Locked",
-      "notEnough": "Not enough",
-      "purchasing": "Purchasing...",
-      "equipped": "Equipped",
-      "redeemTicket": "Redeem ticket →"
+      "buy": "Comprar",
+      "buyNow": "Comprar agora",
+      "cancel": "Cancelar",
+      "equip": "Equipar",
+      "unequip": "Remover",
+      "owned": "Adquirido",
+      "soldOut": "Esgotado",
+      "locked": "Bloqueado",
+      "notEnough": "Saldo insuficiente",
+      "purchasing": "Comprando...",
+      "equipped": "Equipado",
+      "redeemTicket": "Usar ticket →"
     },
     "purchase": {
-      "confirmTitle": "Confirm purchase",
-      "priceLabel": "Price",
-      "yourBalance": "Your balance",
-      "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
-      "success": "Purchase complete 🎉",
-      "genericError": "Purchase failed. Please try again."
+      "confirmTitle": "Confirmar compra",
+      "priceLabel": "Preço",
+      "yourBalance": "Seu saldo",
+      "afterPurchase": "Após a compra",
+      "success": "Compra concluída 🎉",
+      "genericError": "A compra falhou. Tente novamente."
+    },
+    "preview": {
+      "unavailable": "prévia indisponível",
+      "goldenTicket": "Ticket Dourado",
+      "stageSlots": "+{count} vagas de palco",
+      "labSlots": "+{count} vagas do lab",
+      "utility": "Utilidade"
     },
     "earn": {
-      "stagePost": "Earn +10 🥢 on post",
-      "labQuestion": "Earn +3 🥢 on post"
+      "stagePost": "Ganhe +10 🥢 ao postar",
+      "labQuestion": "Ganhe +3 🥢 ao postar"
     }
+  },
+  "ambassador": {
+    "title": "Candidate-se a Embaixador da Guilda",
+    "subtitle": "Conte um pouco sobre você e por que quer representar a The Mambo Guild.",
+    "nameLabel": "Nome completo",
+    "emailLabel": "E-mail",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/voce (opcional)",
+    "locationLabel": "Cidade / cena",
+    "locationPlaceholder": "ex. Lisboa, São Paulo (opcional)",
+    "messageLabel": "Por que você?",
+    "messagePlaceholder": "Compartilhe seu histórico de dança, a cena da qual faz parte e como representaria a Guilda. Mínimo 20 caracteres.",
+    "messageHint": "{count} / 4000",
+    "submit": "Enviar candidatura",
+    "sending": "Enviando…",
+    "cancel": "Cancelar",
+    "close": "Fechar",
+    "successTitle": "Candidatura enviada",
+    "successBody": "Obrigado por se candidatar. Pavle lê cada candidatura pessoalmente e responderá se houver encaixe.",
+    "genericError": "Não foi possível enviar sua candidatura. Tente novamente em breve."
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "Cai, levanta, continua dançando."
   }
 }

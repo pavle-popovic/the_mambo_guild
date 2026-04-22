@@ -19,10 +19,15 @@ Usage:
 import os
 import sys
 
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+script_dir = os.path.abspath(os.path.dirname(__file__)) # .../backend/scripts
+backend_dir = os.path.dirname(script_dir)             # .../backend
+project_root = os.path.dirname(backend_dir)           # .../salsa_lab_v2
+
 env_path = os.path.join(project_root, ".env")
 from dotenv import load_dotenv
 load_dotenv(env_path)
+
+sys.path.insert(0, backend_dir)
 
 backend_path = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, backend_path)
@@ -42,12 +47,11 @@ MAPPING: dict[str, str] = {
     "liked_gold":    "crowd_favorite_gold",
     "liked_diamond": "crowd_favorite_diamond",
 
-    # motw_love_* (Move Magnet — likes on Move of the Week) — firestarter fits
-    # the "hot moves draw attention" metaphor.
-    "motw_love_bronze":  "firestarter_bronze",
-    "motw_love_silver":  "firestarter_silver",
-    "motw_love_gold":    "firestarter_gold",
-    "motw_love_diamond": "firestarter_diamond",
+    # motw_love_* (Move Magnet) — now has dedicated artwork!
+    "motw_love_bronze":  "motw_love_bronze",
+    "motw_love_silver":  "motw_love_silver",
+    "motw_love_gold":    "motw_love_gold",
+    "motw_love_diamond": "motw_love_diamond",
 
     # guild_* (Class Act — guild training videos) — rhythm/discipline works.
     "guild_bronze":  "human_metronome_bronze",
@@ -55,8 +59,13 @@ MAPPING: dict[str, str] = {
     "guild_gold":    "human_metronome_gold",
     "guild_diamond": "human_metronome_diamond",
 
-    # promoter (singleton, referrals_converted) — star_style for star referrer.
-    "promoter": "star_style",
+    # promoter — now has dedicated artwork!
+    "promoter": "promoter",
+    
+    # pro_member, guild_master, founder_diamond
+    "pro_member": "pro_member",
+    "guild_master": "guild_master",
+    "founder_diamond": "founder_diamond",
 
     # --- Fallback singletons for the remaining families ---
     # No tiered orphan PNGs exist for these four families, so all four tiers
@@ -76,11 +85,11 @@ MAPPING: dict[str, str] = {
     "motw_gold":    "maestro_style",
     "motw_diamond": "maestro_style",
 
-    # original_* (The Originator — original video count): camera = creator.
-    "original_bronze":  "camera_style",
-    "original_silver":  "camera_style",
-    "original_gold":    "camera_style",
-    "original_diamond": "camera_style",
+    # original_* (The Originator — original video count) — now has dedicated artwork!
+    "original_bronze":  "original_bronze",
+    "original_silver":  "original_silver",
+    "original_gold":    "original_gold",
+    "original_diamond": "original_diamond",
 
     # original_love_* (Fan Favorite — likes on original posts): fire = love.
     "original_love_bronze":  "fire_style",

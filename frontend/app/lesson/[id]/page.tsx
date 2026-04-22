@@ -11,6 +11,7 @@ import MuxVideoPlayer, { type MuxVideoPlayerHandle } from "@/components/MuxVideo
 import VideoControls from "@/components/ProVideoControls";
 import ABLoopBar from "@/components/ABLoopBar";
 import { useABLoop } from "@/hooks/useABLoop";
+import { useDoubleTapSeek } from "@/hooks/useDoubleTapSeek";
 import DownloadButton from "@/components/DownloadButton";
 import SuccessNotification from "@/components/SuccessNotification";
 import AuthPromptModal from "@/components/AuthPromptModal";
@@ -108,6 +109,7 @@ export default function LessonPage() {
   const [captionText, setCaptionText] = useState("");
   const [videoEnded, setVideoEnded] = useState(false);
   const abLoop = useABLoop(videoPlayerRef, videoDuration);
+  const doubleTapSeek = useDoubleTapSeek(videoPlayerRef);
 
   useEffect(() => {
     // Wait for auth to finish loading before making any decisions
@@ -857,7 +859,10 @@ export default function LessonPage() {
 
                 {lesson.mux_playback_id ? (
                   <>
-                    <div className="relative w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0">
+                    <div
+                      className="relative w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0"
+                      onTouchStart={doubleTapSeek.onTouchStart}
+                    >
                       <MuxVideoPlayer
                         ref={videoPlayerRef}
                         playbackId={lesson.mux_playback_id}
@@ -878,6 +883,24 @@ export default function LessonPage() {
                           const nextL = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null;
                           return (
                             <>
+                              {/* Double-tap-to-skip flash (mobile). Purely visual —
+                                  the seek itself is handled in the touch handler on
+                                  the wrapper. pointer-events-none so taps pass
+                                  through to Mux's controls. */}
+                              {doubleTapSeek.flash && (
+                                <div
+                                  className={`md:hidden absolute inset-y-0 ${
+                                    doubleTapSeek.flash === "left" ? "left-0 right-1/2" : "left-1/2 right-0"
+                                  } flex items-center justify-center pointer-events-none z-30`}
+                                >
+                                  <div className="flex flex-col items-center gap-1 bg-black/55 rounded-full px-4 py-3 animate-fade-skip">
+                                    <span className="text-white text-2xl font-bold leading-none">
+                                      {doubleTapSeek.flash === "left" ? "« 10s" : "10s »"}
+                                    </span>
+                                  </div>
+                                </div>
+                              )}
+
                               {/* Prev/Next lesson side buttons — desktop/tablet only; mobile shows them below captions */}
                               {prevL && (
                                 <button

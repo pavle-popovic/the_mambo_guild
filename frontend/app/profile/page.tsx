@@ -7,7 +7,7 @@ import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
 import { useAuth } from "@/contexts/AuthContext";
-import { FaFire, FaBolt, FaMedal, FaStar, FaCheck, FaSignOutAlt } from "react-icons/fa";
+import { FaFire, FaBolt, FaMedal, FaCheck, FaSignOutAlt } from "react-icons/fa";
 import { apiClient } from "@/lib/api";
 import { BadgeTrophyCase } from "@/components/BadgeTrophyCase";
 import { ReferralSection } from "@/components/ReferralSection";
@@ -347,11 +347,6 @@ export default function ProfilePage() {
               <span className="text-sm font-bold text-mambo-text capitalize">{user.tier}</span>
             </div>
             <div className="bg-mambo-panel border border-gray-800/60 rounded-lg p-2 flex flex-col items-center text-center">
-              <FaStar className="text-sm text-yellow-400 mb-0.5" />
-              <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">{t("statReputationShort")}</span>
-              <span className="text-sm font-bold text-mambo-text">{user.reputation}</span>
-            </div>
-            <div className="bg-mambo-panel border border-gray-800/60 rounded-lg p-2 flex flex-col items-center text-center">
               <span className="text-sm mb-0.5">🥢</span>
               <span className="text-[9px] text-gray-500 uppercase font-semibold tracking-wider">{t("statClavesLabel")}</span>
               <span className="text-sm font-bold text-mambo-text">{user.current_claves}</span>
@@ -376,6 +371,13 @@ export default function ProfilePage() {
               </div>
             </div>
           )}
+
+          {/* 5. Trophy Case (mobile) — right under the stats */}
+          <BadgeTrophyCase
+            initialBadges={user.badges}
+            streakCount={user.streak_count}
+            userStats={user.stats}
+          />
 
         </div>
 
@@ -642,14 +644,6 @@ export default function ProfilePage() {
                     <div className="font-bold text-mambo-text capitalize">{user.tier}</div>
                   </div>
                 </div>
-                {/* Gamification Stats */}
-                <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
-                  <FaStar className="text-yellow-400" />
-                  <div>
-                    <div className="text-xs text-gray-500 uppercase font-bold">{t("statReputationLabel")}</div>
-                    <div className="font-bold text-mambo-text">{user.reputation}</div>
-                  </div>
-                </div>
                 <div className="bg-mambo-panel border border-gray-800 px-4 py-2 rounded-lg flex items-center gap-3">
                   <span className="text-lg">🥢</span>
                   <div>
@@ -659,6 +653,15 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
+          </div>
+
+          {/* Trophy Case (desktop) — right under the stats row */}
+          <div className="mb-6 sm:mb-8">
+            <BadgeTrophyCase
+              initialBadges={user.badges}
+              streakCount={user.streak_count}
+              userStats={user.stats}
+            />
           </div>
 
           {/* Detailed Stats Row */}
@@ -699,16 +702,8 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        {/* Badges first on every viewport, then referrals, then continue learning */}
+        {/* Shop, referrals, continue learning (trophy case now lives under the stats rows above) */}
         <div className="flex flex-col">
-          <div className="mt-5 sm:mt-8 order-1">
-            <BadgeTrophyCase
-              initialBadges={user.badges}
-              streakCount={user.streak_count}
-              userStats={user.stats}
-            />
-          </div>
-
           <div className="mt-5 sm:mt-8 order-2">
             <div className="relative overflow-hidden rounded-2xl border border-amber-500/30 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-transparent p-5 sm:p-6">
               <div className="pointer-events-none absolute -top-10 -right-10 w-40 h-40 rounded-full bg-amber-500/10 blur-3xl" />

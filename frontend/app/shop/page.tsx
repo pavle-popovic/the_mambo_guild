@@ -9,15 +9,11 @@ import ShopItemCard from "@/components/shop/ShopItemCard";
 import PurchaseModal from "@/components/shop/PurchaseModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient, type ShopItem } from "@/lib/api";
+import { useTranslations } from "@/i18n/useTranslations";
 
 type TabKind = "ticket" | "border" | "title" | "utility";
 
-const TABS: { key: TabKind; label: string; blurb: string }[] = [
-  { key: "border",  label: "Borders",  blurb: "Avatar rings across every rarity." },
-  { key: "title",   label: "Titles",   blurb: "Earned words under your name." },
-  { key: "utility", label: "Utility",  blurb: "More stage + lab slots, permanent." },
-  { key: "ticket",  label: "Tickets",  blurb: "Unlock 1-on-1 coaching reviews." },
-];
+const TAB_ORDER: TabKind[] = ["border", "title", "utility", "ticket"];
 
 /** Tier rank for gate comparison. Matches backend `tier_service._TIER_RANK`. */
 const TIER_RANK: Record<string, number> = { rookie: 0, advanced: 1, performer: 2 };
@@ -25,6 +21,7 @@ const TIER_RANK: Record<string, number> = { rookie: 0, advanced: 1, performer: 2
 export default function ShopPage() {
   const router = useRouter();
   const { user, loading: authLoading, refreshUser } = useAuth();
+  const t = useTranslations("shop");
   const [activeTab, setActiveTab] = useState<TabKind>("border");
   const [items, setItems] = useState<ShopItem[]>([]);
   const [inventory, setInventory] = useState<Set<string>>(new Set());
@@ -49,11 +46,11 @@ export default function ShopPage() {
       setItems(allItems);
       setInventory(new Set(inv.map((i) => i.sku)));
     } catch (e: any) {
-      setError(e?.message || "Failed to load shop");
+      setError(e?.message || t("loadError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (user) fetchAll();
@@ -89,7 +86,7 @@ export default function ShopPage() {
 
   const handleSuccess = async (_newBalance: number) => {
     setPurchaseItem(null);
-    setToast("Purchase complete 🎉");
+    setToast(t("purchase.success"));
     // Refresh the user's clave balance + catalog stock + inventory in parallel.
     await Promise.all([refreshUser(), fetchAll()]);
     setTimeout(() => setToast(null), 3000);
@@ -101,13 +98,10 @@ export default function ShopPage() {
 
       <main className="max-w-6xl mx-auto px-4 pt-24 pb-16">
         <header className="mb-10 text-center">
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight">The Guild Shop</h1>
-          <p className="text-white/60 mt-3 max-w-2xl mx-auto">
-            Spend your claves on coaching tickets, cosmetics, and slot upgrades.
-            Every purchase is final.
-          </p>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight">{t("pageTitle")}</h1>
+          <p className="text-white/60 mt-3 max-w-2xl mx-auto">{t("pageSubtitle")}</p>
           <div className="mt-6 inline-flex items-center gap-6 bg-white/5 rounded-full px-6 py-2 border border-white/10">
-            <span className="text-white/60 text-sm">Balance</span>
+            <span className="text-white/60 text-sm">{t("balanceLabel")}</span>
             <span className="text-amber-300 font-bold text-lg">
               {balance} <span className="text-xs">🥢</span>
             </span>
@@ -115,39 +109,35 @@ export default function ShopPage() {
               href="/shop/inventory"
               className="text-sm text-white/80 hover:text-amber-300 underline underline-offset-2"
             >
-              View inventory →
+              {t("viewInventory")}
             </Link>
           </div>
         </header>
 
         <nav className="flex gap-2 mb-6 overflow-x-auto no-scrollbar">
-          {TABS.map((t) => (
+          {TAB_ORDER.map((key) => (
             <button
-              key={t.key}
-              onClick={() => setActiveTab(t.key)}
+              key={key}
+              onClick={() => setActiveTab(key)}
               className={`shrink-0 px-4 py-2 rounded-full text-sm font-medium transition border ${
-                activeTab === t.key
+                activeTab === key
                   ? "bg-amber-400 text-black border-amber-400"
                   : "bg-white/5 text-white/80 border-white/10 hover:bg-white/10"
               }`}
             >
-              {t.label}
+              {t(`tabs.${key}`)}
             </button>
           ))}
         </nav>
 
-        <p className="text-white/50 text-sm mb-6">
-          {TABS.find((t) => t.key === activeTab)?.blurb}
-        </p>
+        <p className="text-white/50 text-sm mb-6">{t(`tabBlurbs.${activeTab}`)}</p>
 
         {loading ? (
-          <div className="text-center text-white/50 py-20">Loading catalog...</div>
+          <div className="text-center text-white/50 py-20">{t("loading")}</div>
         ) : error ? (
           <div className="text-center text-red-400 py-20">{error}</div>
         ) : visibleItems.length === 0 ? (
-          <div className="text-center text-white/40 py-20">
-            Nothing here yet. Check back soon.
-          </div>
+          <div className="text-center text-white/40 py-20">{t("empty")}</div>
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {visibleItems.map((item) => {

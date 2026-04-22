@@ -620,7 +620,7 @@
       "pillarCoursesBullet2": "Πλήρεις χορογραφίες, αναλυμένες βήμα-βήμα",
       "pillarCoursesBullet3": "Ιστορία της Σάλσα — 20 modules",
       "pillarCoursesBullet4": "Επιστήμη της Προπόνησης — 18 modules",
-      "pillarCoursesBullet5": "Τεχνική, styling, musicality, partnering",
+      "pillarCoursesBullet5": "Τεχνική, στυλ, μουσικότητα",
       "pillarPlayerEyebrow": "Ο VIDEO PLAYER",
       "pillarPlayerTitlePre": "Το",
       "pillarPlayerTitleAccent": "δωμάτιο εξάσκησης",
@@ -648,12 +648,12 @@
       "pillarCommunityEyebrow": "Η ΚΟΙΝΟΤΗΤΑ",
       "pillarCommunityTitlePre": "Ανέβασε τα βίντεό σου.",
       "pillarCommunityTitleAccent": "Μη χορεύεις μόνος.",
-      "pillarCommunityBody": "Βίντεο προόδου. Πραγματικό feedback. Απαντήσεις σε ερωτήσεις. Χορευτές που όντως προπονούνται.",
-      "pillarCommunityBullet1": "The Stage — ανέβασε βίντεο προόδου",
-      "pillarCommunityBullet2": "The Lab — ρώτα & απάντα ερωτήσεις",
-      "pillarCommunityBullet3": "Hype ή Coach feedback",
-      "pillarCommunityBullet4": "38 badges, από Bronze → Diamond",
-      "pillarCommunityBullet5": "Εβδομαδιαίοι & all-time πίνακες κατάταξης",
+      "pillarCommunityBody": "Δημοσίευσε βίντεο. Ρώτα. Κέρδισε claves. Ξόδεψέ τα στο κατάστημα της Συντεχνίας.",
+      "pillarCommunityBullet1": "The Stage: δημοσίευσε βίντεο προόδου, +10 claves",
+      "pillarCommunityBullet2": "The Lab: ρώτα και απάντα, +3 claves",
+      "pillarCommunityBullet3": "Feedback τύπου Hype ή Coach",
+      "pillarCommunityBullet4": "38 σήματα, από Χάλκινο ως Διαμαντένιο",
+      "pillarCommunityBullet5": "Εβδομαδιαίες και all-time κατατάξεις",
       "pillarVipEyebrow": "VIP — 1-ΠΡΟΣ-1 COACHING & ΙΔΙΩΤΙΚΟ GROUP",
       "pillarVipTitlePre": "Προπονήσου",
       "pillarVipTitleAccent": "απευθείας",
@@ -901,7 +901,10 @@
     "timotheHistoryBody": "Ερεύνησε την ιστορία της σάλσα για πολλά χρόνια και πήρε συνεντεύξεις από ιστορικούς θρύλους της σκηνής, όπως τον Roly Maden. Έγραψε βιβλίο για την ιστορία του mambo και των λατινικών χορών.",
     "timotheMamboTitle": "Στυλ με Ρίζες στο Mambo",
     "timotheMamboBody": "Βαθιά ριζωμένος στο mambo, με μια πινελιά fusion και προσωπικής ερμηνείας. Εκπαιδεύτηκε στο Paris και στο Mexico, εμφανίστηκε σε όλο τον κόσμο με τους Black and White Mambo και οδήγησε τη δική του ομάδα Mambo All Stars.",
-    "timotheQuote": "Η σάλσα είναι κάτι περισσότερο από βήματα. Είναι μνήμη, κουλτούρα και η ιστορία εκείνων που τη διαμόρφωσαν."
+    "timotheQuote": "Η σάλσα είναι κάτι περισσότερο από βήματα. Είναι μνήμη, κουλτούρα και η ιστορία εκείνων που τη διαμόρφωσαν.",
+    "ambassadorTitle": "Γίνε Πρεσβευτής της Συντεχνίας",
+    "ambassadorBody": "Αγαπάς το The Mambo Guild και θες να το εκπροσωπείς στη σκηνή σου; Κάνε αίτηση για Πρεσβευτής της Συντεχνίας και βοήθησε την κοινότητα να μεγαλώσει.",
+    "ambassadorCta": "Κάνε αίτηση για πρεσβευτής"
   },
   "coaching": {
     "lockedTitle": "Το Coaching Corner είναι για Guild Masters",
@@ -1231,8 +1234,8 @@
       "description": "Ο χορός σου ζεσταίνει τη σκηνή. Πλήρης πυρκαγιά."
     },
     "founder_diamond": {
-      "name": "Ιδρυτικό Μέλος",
-      "description": "One of the founding members of The Mambo Guild."
+      "name": "Ιδρυτής",
+      "description": "Ένας από τους ιδρυτές του The Mambo Guild."
     },
     "guild_master": {
       "name": "Αρχηγός Συντεχνίας",
@@ -1323,172 +1326,218 @@
       "description": "Σταθερή αφοσίωση στο να εμφανίζεσαι. Δυο εβδομάδες δυνατός."
     },
     "motw_bronze": {
-      "name": "Move Master I",
-      "description": "Posted your first Move of the Week video. Welcome to the floor."
+      "name": "Δάσκαλος Κίνησης I",
+      "description": "Δημοσίευσες το πρώτο σου βίντεο Move of the Week. Καλώς ήρθες στην πίστα."
     },
     "motw_silver": {
-      "name": "Move Master II",
-      "description": "Posted 10 Move of the Week videos."
+      "name": "Δάσκαλος Κίνησης II",
+      "description": "Δημοσίευσες 10 βίντεο Move of the Week."
     },
     "motw_gold": {
-      "name": "Move Master III",
-      "description": "Posted 30 Move of the Week videos. You're a regular."
+      "name": "Δάσκαλος Κίνησης III",
+      "description": "30 βίντεο Move of the Week. Τακτικός/ή."
     },
     "motw_diamond": {
-      "name": "Move Master IV",
-      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+      "name": "Δάσκαλος Κίνησης IV",
+      "description": "100 βίντεο Move of the Week. Επίσημος εβδομαδιαίος θρύλος."
     },
     "original_bronze": {
-      "name": "The Originator I",
-      "description": "Shared your first original choreo or freestyle."
+      "name": "Ο Δημιουργός I",
+      "description": "Μοιράστηκες την πρώτη σου πρωτότυπη χορογραφία ή freestyle."
     },
     "original_silver": {
-      "name": "The Originator II",
-      "description": "Shared 10 original choreos or freestyles."
+      "name": "Ο Δημιουργός II",
+      "description": "Μοιράστηκες 10 πρωτότυπες χορογραφίες ή freestyles."
     },
     "original_gold": {
-      "name": "The Originator III",
-      "description": "Shared 30 original choreos or freestyles. You have a voice."
+      "name": "Ο Δημιουργός III",
+      "description": "30 πρωτότυπες χορογραφίες ή freestyles. Έχεις δική σου φωνή."
     },
     "original_diamond": {
-      "name": "The Originator IV",
-      "description": "Shared 100 original choreos or freestyles. A true creator."
+      "name": "Ο Δημιουργός IV",
+      "description": "100 πρωτότυπες χορογραφίες ή freestyles. Πραγματικός δημιουργός."
     },
     "guild_bronze": {
-      "name": "Class Act I",
-      "description": "Posted your first Guild-class choreo."
+      "name": "Υψηλή Κλάση I",
+      "description": "Δημοσίευσες την πρώτη σου χορογραφία επιπέδου Συντεχνίας."
     },
     "guild_silver": {
-      "name": "Class Act II",
-      "description": "Posted 10 Guild-class choreos."
+      "name": "Υψηλή Κλάση II",
+      "description": "Δημοσίευσες 10 χορογραφίες επιπέδου Συντεχνίας."
     },
     "guild_gold": {
-      "name": "Class Act III",
-      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+      "name": "Υψηλή Κλάση III",
+      "description": "30 χορογραφίες επιπέδου Συντεχνίας. Υλικό για πλήρες ensemble."
     },
     "guild_diamond": {
-      "name": "Class Act IV",
-      "description": "Posted 100 Guild-class choreos. Guild pillar."
+      "name": "Υψηλή Κλάση IV",
+      "description": "100 χορογραφίες επιπέδου Συντεχνίας. Στυλοβάτης της Συντεχνίας."
     },
     "liked_bronze": {
-      "name": "Crowd Favorite I",
-      "description": "Received your first like."
+      "name": "Αγαπημένος του Κοινού I",
+      "description": "Πήρες το πρώτο σου like."
     },
     "liked_silver": {
-      "name": "Crowd Favorite II",
-      "description": "Received 100 total likes across your posts."
+      "name": "Αγαπημένος του Κοινού II",
+      "description": "100 likes συνολικά στις δημοσιεύσεις σου."
     },
     "liked_gold": {
-      "name": "Crowd Favorite III",
-      "description": "Received 500 total likes across your posts."
+      "name": "Αγαπημένος του Κοινού III",
+      "description": "500 likes συνολικά στις δημοσιεύσεις σου."
     },
     "liked_diamond": {
-      "name": "Crowd Favorite IV",
-      "description": "Received 2,500 total likes. The room loves you."
+      "name": "Αγαπημένος του Κοινού IV",
+      "description": "2.500 likes συνολικά. Όλη η αίθουσα σε λατρεύει."
     },
     "motw_love_bronze": {
-      "name": "Move Magnet I",
-      "description": "Got your first like on a Move of the Week video."
+      "name": "Μαγνήτης Κίνησης I",
+      "description": "Πήρες το πρώτο σου like σε βίντεο Move of the Week."
     },
     "motw_love_silver": {
-      "name": "Move Magnet II",
-      "description": "25 likes across your Move of the Week videos."
+      "name": "Μαγνήτης Κίνησης II",
+      "description": "25 likes συνολικά στα βίντεο Move of the Week."
     },
     "motw_love_gold": {
-      "name": "Move Magnet III",
-      "description": "150 likes across your Move of the Week videos."
+      "name": "Μαγνήτης Κίνησης III",
+      "description": "150 likes συνολικά στα βίντεο Move of the Week."
     },
     "motw_love_diamond": {
-      "name": "Move Magnet IV",
-      "description": "1,000 likes across your Move of the Week videos."
+      "name": "Μαγνήτης Κίνησης IV",
+      "description": "1.000 likes συνολικά στα βίντεο Move of the Week."
     },
     "original_love_bronze": {
-      "name": "Fan Favorite I",
-      "description": "Got your first like on an original post."
+      "name": "Αγαπημένος των Φαν I",
+      "description": "Πήρες το πρώτο σου like σε πρωτότυπη δημοσίευση."
     },
     "original_love_silver": {
-      "name": "Fan Favorite II",
-      "description": "25 likes across your original posts."
+      "name": "Αγαπημένος των Φαν II",
+      "description": "25 likes στις πρωτότυπες δημοσιεύσεις σου."
     },
     "original_love_gold": {
-      "name": "Fan Favorite III",
-      "description": "150 likes across your original posts."
+      "name": "Αγαπημένος των Φαν III",
+      "description": "150 likes στις πρωτότυπες δημοσιεύσεις σου."
     },
     "original_love_diamond": {
-      "name": "Fan Favorite IV",
-      "description": "1,000 likes across your original posts."
+      "name": "Αγαπημένος των Φαν IV",
+      "description": "1.000 likes στις πρωτότυπες δημοσιεύσεις σου."
     },
     "guild_love_bronze": {
-      "name": "Guild Applause I",
-      "description": "Got your first like on a Guild-class post."
+      "name": "Χειροκρότημα Συντεχνίας I",
+      "description": "Πήρες το πρώτο σου like σε δημοσίευση επιπέδου Συντεχνίας."
     },
     "guild_love_silver": {
-      "name": "Guild Applause II",
-      "description": "25 likes across your Guild-class posts."
+      "name": "Χειροκρότημα Συντεχνίας II",
+      "description": "25 likes στις δημοσιεύσεις επιπέδου Συντεχνίας."
     },
     "guild_love_gold": {
-      "name": "Guild Applause III",
-      "description": "150 likes across your Guild-class posts."
+      "name": "Χειροκρότημα Συντεχνίας III",
+      "description": "150 likes στις δημοσιεύσεις επιπέδου Συντεχνίας."
     },
     "guild_love_diamond": {
-      "name": "Guild Applause IV",
-      "description": "1,000 likes across your Guild-class posts."
+      "name": "Χειροκρότημα Συντεχνίας IV",
+      "description": "1.000 likes στις δημοσιεύσεις επιπέδου Συντεχνίας."
     },
     "promoter": {
-      "name": "Promoter",
-      "description": "Brought 3 dancers into the Guild through your referral link."
+      "name": "Προωθητής",
+      "description": "Έφερες 3 χορευτές στη Συντεχνία μέσω του συνδέσμου πρόσκλησής σου."
     }
   },
   "shop": {
-    "pageTitle": "The Guild Shop",
-    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
-    "balanceLabel": "Balance",
-    "viewInventory": "View inventory →",
-    "inventoryTitle": "Inventory",
-    "inventorySubtitle": "Equip what you own. Everything is permanent.",
-    "backToShop": "← Back to shop",
-    "empty": "Nothing here yet. Check back soon.",
-    "emptyInventory": "You don't own anything yet.",
-    "loading": "Loading catalog...",
-    "loadError": "Failed to load shop",
+    "pageTitle": "Το κατάστημα της Συντεχνίας",
+    "pageSubtitle": "Ξόδεψε τα claves σου σε εισιτήρια coaching, κοσμητικά και αναβαθμίσεις θέσεων. Κάθε αγορά είναι τελεσίδικη.",
+    "balanceLabel": "Υπόλοιπο",
+    "viewInventory": "Δες την αποθήκη →",
+    "visitShop": "Πήγαινε στο κατάστημα",
+    "inventoryTitle": "Αποθήκη",
+    "inventorySubtitle": "Εξόπλισε ό,τι έχεις. Όλα είναι μόνιμα.",
+    "backToShop": "← Πίσω στο κατάστημα",
+    "empty": "Τίποτα εδώ ακόμα. Ξαναδοκίμασε σύντομα.",
+    "emptyInventory": "Δεν έχεις τίποτα ακόμα.",
+    "loading": "Φόρτωση καταλόγου...",
+    "loadingInventory": "Φόρτωση αποθήκης...",
+    "loadError": "Αποτυχία φόρτωσης καταστήματος",
+    "loadInventoryError": "Αποτυχία φόρτωσης αποθήκης",
+    "equipError": "Αποτυχία εξοπλισμού",
+    "stockRemaining": "Απομένουν {count}",
+    "ownedCount": "Σε κατοχή: {count}",
     "tabs": {
-      "ticket": "Tickets",
-      "border": "Borders",
-      "title": "Titles",
-      "utility": "Utility"
+      "ticket": "Εισιτήρια",
+      "border": "Περιγράμματα",
+      "title": "Τίτλοι",
+      "utility": "Βοηθητικά"
+    },
+    "tabBlurbs": {
+      "border": "Περιγράμματα avatar. Δείξε τη σπανιότητά σου.",
+      "title": "Τίτλοι που εμφανίζονται κάτω από το όνομά σου σε όλη τη Συντεχνία.",
+      "utility": "Μόνιμες αναβαθμίσεις της ικανότητας δημοσίευσης.",
+      "ticket": "Τα Χρυσά Εισιτήρια ξεκλειδώνουν coaching 1 προς 1. Περιορισμένο απόθεμα."
+    },
+    "sections": {
+      "cosmetics": "Κοσμητικά",
+      "other": "Άλλα αντικείμενα"
     },
     "rarity": {
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
+      "common": "Κοινό",
+      "rare": "Σπάνιο",
+      "epic": "Επικό",
+      "legendary": "Μυθικό"
     },
     "actions": {
-      "buy": "Buy",
-      "buyNow": "Buy now",
-      "cancel": "Cancel",
-      "equip": "Equip",
-      "unequip": "Unequip",
-      "owned": "Owned",
-      "soldOut": "Sold out",
-      "locked": "Locked",
-      "notEnough": "Not enough",
-      "purchasing": "Purchasing...",
-      "equipped": "Equipped",
-      "redeemTicket": "Redeem ticket →"
+      "buy": "Αγορά",
+      "buyNow": "Αγορά τώρα",
+      "cancel": "Ακύρωση",
+      "equip": "Εξοπλισμός",
+      "unequip": "Αφαίρεση",
+      "owned": "Σε κατοχή",
+      "soldOut": "Εξαντλήθηκε",
+      "locked": "Κλειδωμένο",
+      "notEnough": "Δεν αρκεί",
+      "purchasing": "Αγορά...",
+      "equipped": "Εξοπλισμένο",
+      "redeemTicket": "Εξαργύρωση →"
     },
     "purchase": {
-      "confirmTitle": "Confirm purchase",
-      "priceLabel": "Price",
-      "yourBalance": "Your balance",
-      "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
-      "success": "Purchase complete 🎉",
-      "genericError": "Purchase failed. Please try again."
+      "confirmTitle": "Επιβεβαίωση αγοράς",
+      "priceLabel": "Τιμή",
+      "yourBalance": "Το υπόλοιπό σου",
+      "afterPurchase": "Μετά την αγορά",
+      "success": "Η αγορά ολοκληρώθηκε 🎉",
+      "genericError": "Η αγορά απέτυχε. Δοκίμασε ξανά."
+    },
+    "preview": {
+      "unavailable": "μη διαθέσιμη προεπισκόπηση",
+      "goldenTicket": "Χρυσό Εισιτήριο",
+      "stageSlots": "+{count} θέσεις σκηνής",
+      "labSlots": "+{count} θέσεις lab",
+      "utility": "Βοηθητικό"
     },
     "earn": {
-      "stagePost": "Earn +10 🥢 on post",
-      "labQuestion": "Earn +3 🥢 on post"
+      "stagePost": "Κέρδισε +10 🥢 ανά δημοσίευση",
+      "labQuestion": "Κέρδισε +3 🥢 ανά δημοσίευση"
     }
+  },
+  "ambassador": {
+    "title": "Αίτηση για Πρεσβευτή της Συντεχνίας",
+    "subtitle": "Πες μας λίγα για σένα και γιατί θες να εκπροσωπείς το The Mambo Guild.",
+    "nameLabel": "Ονοματεπώνυμο",
+    "emailLabel": "Email",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/εσύ (προαιρετικό)",
+    "locationLabel": "Πόλη / σκηνή",
+    "locationPlaceholder": "π.χ. Αθήνα, Θεσσαλονίκη (προαιρετικό)",
+    "messageLabel": "Γιατί εσύ;",
+    "messagePlaceholder": "Μοιράσου το χορευτικό σου υπόβαθρο, τη σκηνή σου και πώς θα εκπροσωπούσες τη Συντεχνία. Τουλάχιστον 20 χαρακτήρες.",
+    "messageHint": "{count} / 4000",
+    "submit": "Αποστολή αίτησης",
+    "sending": "Αποστολή…",
+    "cancel": "Άκυρο",
+    "close": "Κλείσιμο",
+    "successTitle": "Η αίτηση στάλθηκε",
+    "successBody": "Ευχαριστούμε. Ο Pavle διαβάζει προσωπικά κάθε αίτηση και θα επικοινωνήσει αν ταιριάζει.",
+    "genericError": "Δεν ήταν δυνατή η αποστολή. Δοκίμασε ξανά σε λίγο."
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "Πέφτει, σηκώνεται, συνεχίζει να χορεύει."
   }
 }

@@ -97,7 +97,7 @@ export const TITLE_REGISTRY: Record<string, TitleSpec> = {
   title_guild_luminary:  { sku: "title_guild_luminary",  label: "Guild Luminary",  rarity: "epic", tone: "platinum", description: "Lights the path for the Guild." },
   title_the_showstopper: { sku: "title_the_showstopper", label: "The Showstopper", rarity: "epic", tone: "gold",     description: "Closes every set." },
   title_flame_dancer:    { sku: "title_flame_dancer",    label: "Flame Dancer",    rarity: "epic", tone: "ember",    description: "Pure heat on the floor." },
-  title_the_ambassador:  { sku: "title_the_ambassador",  label: "The Ambassador",  rarity: "epic", tone: "platinum", description: "Represents the Guild everywhere." },
+  title_the_phoenix:     { sku: "title_the_phoenix",     label: "The Phoenix",     rarity: "epic", tone: "ember",    description: "Falls, rises, keeps dancing." },
 
   // Legendary
   title_dance_immortal: { sku: "title_dance_immortal", label: "Dance Immortal", rarity: "legendary", tone: "aurora", description: "Your name survives this scene." },

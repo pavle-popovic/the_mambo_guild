@@ -562,6 +562,24 @@ class ApiClient {
     );
   }
 
+  // Ambassador application submission (instructors page)
+  async submitAmbassadorApplication(payload: {
+    name: string;
+    email: string;
+    instagram_url: string | null;
+    location: string | null;
+    message: string;
+    page_url: string;
+  }) {
+    return this.request<{ status: string }>(
+      "/api/support/ambassador-application",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
   // Image upload endpoints (R2 presigned URLs)
   async getPresignedUploadUrl(fileType: string, folder: "avatars" | "thumbnails") {
     return this.request<{

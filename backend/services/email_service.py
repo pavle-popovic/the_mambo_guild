@@ -390,6 +390,74 @@ def send_bug_report_email(
         return False
 
 
+def send_ambassador_application_email(
+    applicant_name: str,
+    applicant_email: str,
+    instagram_url: Optional[str],
+    location: Optional[str],
+    message: str,
+    page_url: str,
+    client_ip: str,
+) -> bool:
+    """
+    Forward an "apply to become a Guild Ambassador" submission to
+    pavlepopovic@themamboguild.com.
+
+    Mirrors the bug-report pattern: Resend with reply_to set to the applicant
+    so Pavle can reply directly from his inbox.
+    """
+    if not resend or not settings.RESEND_API_KEY:
+        logger.error("Resend client not configured. Cannot send ambassador application email.")
+        return False
+
+    try:
+        from_email = settings.FROM_EMAIL
+        to_email = "pavlepopovic@themamboguild.com"
+
+        from html import escape
+        safe_name = escape(applicant_name)
+        safe_email = escape(applicant_email)
+        safe_ig = escape(instagram_url or "—")
+        safe_location = escape(location or "—")
+        safe_message = escape(message).replace("\n", "<br>")
+        safe_page_url = escape(page_url)
+        safe_ip = escape(client_ip)
+
+        result = resend.Emails.send({
+            "from": from_email,
+            "to": [to_email],
+            "reply_to": applicant_email,
+            "subject": f"[Ambassador] {applicant_name} wants to represent the Guild",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family: -apple-system, Segoe UI, Arial, sans-serif; color:#222; max-width:720px; margin:0 auto; padding:24px;">
+                <h2 style="border-bottom:2px solid #D4AF37; padding-bottom:8px;">Ambassador Application</h2>
+                <table style="border-collapse:collapse; margin-bottom:16px;">
+                    <tr><td style="padding:4px 12px;color:#666;">Name</td><td style="padding:4px 12px;">{safe_name}</td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Email</td><td style="padding:4px 12px;"><a href="mailto:{safe_email}">{safe_email}</a></td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Instagram</td><td style="padding:4px 12px;">{safe_ig if not instagram_url else f'<a href="{safe_ig}" target="_blank">{safe_ig}</a>'}</td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Location</td><td style="padding:4px 12px;">{safe_location}</td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Submitted from</td><td style="padding:4px 12px;"><a href="{safe_page_url}">{safe_page_url}</a></td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Client IP</td><td style="padding:4px 12px;font-family:monospace;">{safe_ip}</td></tr>
+                </table>
+
+                <h3>Why they want to represent the Guild</h3>
+                <div style="background:#f9f7f1; border-left:3px solid #D4AF37; padding:12px 16px; white-space:pre-wrap;">{safe_message}</div>
+
+                <p style="color:#888; font-size:12px; margin-top:32px;">Reply to this email to contact {safe_name} directly.</p>
+            </body>
+            </html>
+            """,
+        })
+
+        logger.info(f"Ambassador application email sent to {to_email} (applicant: {applicant_email})")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send ambassador application email: {str(e)}")
+        return False
+
+
 def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -> bool:
     """
     Send welcome email to new waitlist members.

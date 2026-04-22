@@ -481,7 +481,7 @@
       "pillarCoursesBullet2": "Полные хореографии с разбором",
       "pillarCoursesBullet3": "История сальсы — 20 модулей",
       "pillarCoursesBullet4": "Наука тренировки — 18 модулей",
-      "pillarCoursesBullet5": "Техника, стайлинг, музыкальность, партнёринг",
+      "pillarCoursesBullet5": "Техника, стиль, музыкальность",
       "pillarPlayerEyebrow": "ВИДЕОПЛЕЕР",
       "pillarPlayerTitlePre": "Репетиционный",
       "pillarPlayerTitleAccent": "зал",
@@ -509,12 +509,12 @@
       "pillarCommunityEyebrow": "СООБЩЕСТВО",
       "pillarCommunityTitlePre": "Выкладывайте свои видео.",
       "pillarCommunityTitleAccent": "Не танцуйте в одиночку.",
-      "pillarCommunityBody": "Видео прогресса. Реальная обратная связь. Ответы на вопросы. Танцоры, которые действительно тренируются.",
-      "pillarCommunityBullet1": "The Stage — публикуйте видео прогресса",
-      "pillarCommunityBullet2": "The Lab — задавайте и отвечайте на вопросы",
-      "pillarCommunityBullet3": "Поддержка или коучинг-фидбек",
-      "pillarCommunityBullet4": "38 бейджей, от Bronze до Diamond",
-      "pillarCommunityBullet5": "Еженедельные и общие рейтинги",
+      "pillarCommunityBody": "Выкладывайте видео. Задавайте вопросы. Зарабатывайте клавы. Тратьте в Магазине Гильдии.",
+      "pillarCommunityBullet1": "The Stage: публикуйте видео прогресса, +10 клав",
+      "pillarCommunityBullet2": "The Lab: задавайте и отвечайте, +3 клав",
+      "pillarCommunityBullet3": "Фидбэк Hype или Coach",
+      "pillarCommunityBullet4": "38 значков, от Бронзы до Алмаза",
+      "pillarCommunityBullet5": "Недельные и общие рейтинги",
       "pillarVipEyebrow": "VIP — ИНДИВИДУАЛЬНЫЙ КОУЧИНГ И ЗАКРЫТАЯ ГРУППА",
       "pillarVipTitlePre": "Тренируйтесь",
       "pillarVipTitleAccent": "напрямую",
@@ -762,7 +762,10 @@
     "timotheHistoryBody": "Много лет изучал историю salsa и брал интервью у исторических легенд сцены, таких как Roly Maden. Написал книгу об истории mambo и латиноамериканских танцев.",
     "timotheMamboTitle": "Стиль с корнями в mambo",
     "timotheMamboBody": "Глубоко укоренён в mambo, с ноткой фьюжн и личной интерпретации. Обучался в Paris и Mexico, выступал по всему миру с Black and White Mambo и возглавлял собственную команду Mambo All Stars.",
-    "timotheQuote": "Salsa, это больше, чем шаги. Это память, культура и история тех, кто её создал."
+    "timotheQuote": "Salsa, это больше, чем шаги. Это память, культура и история тех, кто её создал.",
+    "ambassadorTitle": "Стань послом Гильдии",
+    "ambassadorBody": "Любишь The Mambo Guild и хочешь представлять её в своей сцене? Подай заявку на посла Гильдии и помоги расти сообществу.",
+    "ambassadorCta": "Стать послом"
   },
   "coaching": {
     "lockedTitle": "Уголок коучинга — для Guild Masters",
@@ -1232,7 +1235,7 @@
     },
     "founder_diamond": {
       "name": "Основатель",
-      "description": "One of the founding members of The Mambo Guild."
+      "description": "Один из основателей The Mambo Guild."
     },
     "guild_master": {
       "name": "Мастер Гильдии",
@@ -1323,172 +1326,218 @@
       "description": "Постоянная преданность быть на связи. Две недели подряд."
     },
     "motw_bronze": {
-      "name": "Move Master I",
-      "description": "Posted your first Move of the Week video. Welcome to the floor."
+      "name": "Мастер Движения I",
+      "description": "Первое видео Move of the Week. Добро пожаловать на пол."
     },
     "motw_silver": {
-      "name": "Move Master II",
-      "description": "Posted 10 Move of the Week videos."
+      "name": "Мастер Движения II",
+      "description": "10 видео Move of the Week."
     },
     "motw_gold": {
-      "name": "Move Master III",
-      "description": "Posted 30 Move of the Week videos. You're a regular."
+      "name": "Мастер Движения III",
+      "description": "30 видео Move of the Week. Вы здесь свой."
     },
     "motw_diamond": {
-      "name": "Move Master IV",
-      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+      "name": "Мастер Движения IV",
+      "description": "100 видео Move of the Week. Подтверждённая еженедельная легенда."
     },
     "original_bronze": {
-      "name": "The Originator I",
-      "description": "Shared your first original choreo or freestyle."
+      "name": "Создатель I",
+      "description": "Первая оригинальная хореография или фристайл."
     },
     "original_silver": {
-      "name": "The Originator II",
-      "description": "Shared 10 original choreos or freestyles."
+      "name": "Создатель II",
+      "description": "10 оригинальных хореографий или фристайлов."
     },
     "original_gold": {
-      "name": "The Originator III",
-      "description": "Shared 30 original choreos or freestyles. You have a voice."
+      "name": "Создатель III",
+      "description": "30 оригинальных хореографий или фристайлов. У вас есть голос."
     },
     "original_diamond": {
-      "name": "The Originator IV",
-      "description": "Shared 100 original choreos or freestyles. A true creator."
+      "name": "Создатель IV",
+      "description": "100 оригинальных хореографий или фристайлов. Настоящий творец."
     },
     "guild_bronze": {
-      "name": "Class Act I",
-      "description": "Posted your first Guild-class choreo."
+      "name": "Высший Класс I",
+      "description": "Первая хореография гильдийного уровня."
     },
     "guild_silver": {
-      "name": "Class Act II",
-      "description": "Posted 10 Guild-class choreos."
+      "name": "Высший Класс II",
+      "description": "10 хореографий гильдийного уровня."
     },
     "guild_gold": {
-      "name": "Class Act III",
-      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+      "name": "Высший Класс III",
+      "description": "30 хореографий гильдийного уровня. Уровень труппы."
     },
     "guild_diamond": {
-      "name": "Class Act IV",
-      "description": "Posted 100 Guild-class choreos. Guild pillar."
+      "name": "Высший Класс IV",
+      "description": "100 хореографий гильдийного уровня. Опора гильдии."
     },
     "liked_bronze": {
-      "name": "Crowd Favorite I",
-      "description": "Received your first like."
+      "name": "Любимец Публики I",
+      "description": "Первый лайк получен."
     },
     "liked_silver": {
-      "name": "Crowd Favorite II",
-      "description": "Received 100 total likes across your posts."
+      "name": "Любимец Публики II",
+      "description": "100 лайков суммарно на постах."
     },
     "liked_gold": {
-      "name": "Crowd Favorite III",
-      "description": "Received 500 total likes across your posts."
+      "name": "Любимец Публики III",
+      "description": "500 лайков суммарно на постах."
     },
     "liked_diamond": {
-      "name": "Crowd Favorite IV",
-      "description": "Received 2,500 total likes. The room loves you."
+      "name": "Любимец Публики IV",
+      "description": "2 500 лайков суммарно. Зал вас обожает."
     },
     "motw_love_bronze": {
-      "name": "Move Magnet I",
-      "description": "Got your first like on a Move of the Week video."
+      "name": "Магнит Движения I",
+      "description": "Первый лайк на видео Move of the Week."
     },
     "motw_love_silver": {
-      "name": "Move Magnet II",
-      "description": "25 likes across your Move of the Week videos."
+      "name": "Магнит Движения II",
+      "description": "25 лайков на ваших видео Move of the Week."
     },
     "motw_love_gold": {
-      "name": "Move Magnet III",
-      "description": "150 likes across your Move of the Week videos."
+      "name": "Магнит Движения III",
+      "description": "150 лайков на ваших видео Move of the Week."
     },
     "motw_love_diamond": {
-      "name": "Move Magnet IV",
-      "description": "1,000 likes across your Move of the Week videos."
+      "name": "Магнит Движения IV",
+      "description": "1 000 лайков на ваших видео Move of the Week."
     },
     "original_love_bronze": {
-      "name": "Fan Favorite I",
-      "description": "Got your first like on an original post."
+      "name": "Любимец Фанатов I",
+      "description": "Первый лайк на оригинальном посте."
     },
     "original_love_silver": {
-      "name": "Fan Favorite II",
-      "description": "25 likes across your original posts."
+      "name": "Любимец Фанатов II",
+      "description": "25 лайков на оригинальных постах."
     },
     "original_love_gold": {
-      "name": "Fan Favorite III",
-      "description": "150 likes across your original posts."
+      "name": "Любимец Фанатов III",
+      "description": "150 лайков на оригинальных постах."
     },
     "original_love_diamond": {
-      "name": "Fan Favorite IV",
-      "description": "1,000 likes across your original posts."
+      "name": "Любимец Фанатов IV",
+      "description": "1 000 лайков на оригинальных постах."
     },
     "guild_love_bronze": {
-      "name": "Guild Applause I",
-      "description": "Got your first like on a Guild-class post."
+      "name": "Аплодисменты Гильдии I",
+      "description": "Первый лайк на посте гильдийного уровня."
     },
     "guild_love_silver": {
-      "name": "Guild Applause II",
-      "description": "25 likes across your Guild-class posts."
+      "name": "Аплодисменты Гильдии II",
+      "description": "25 лайков на постах гильдийного уровня."
     },
     "guild_love_gold": {
-      "name": "Guild Applause III",
-      "description": "150 likes across your Guild-class posts."
+      "name": "Аплодисменты Гильдии III",
+      "description": "150 лайков на постах гильдийного уровня."
     },
     "guild_love_diamond": {
-      "name": "Guild Applause IV",
-      "description": "1,000 likes across your Guild-class posts."
+      "name": "Аплодисменты Гильдии IV",
+      "description": "1 000 лайков на постах гильдийного уровня."
     },
     "promoter": {
-      "name": "Promoter",
-      "description": "Brought 3 dancers into the Guild through your referral link."
+      "name": "Промоутер",
+      "description": "Привели 3 танцоров в Гильдию по реферальной ссылке."
     }
   },
   "shop": {
-    "pageTitle": "The Guild Shop",
-    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
-    "balanceLabel": "Balance",
-    "viewInventory": "View inventory →",
-    "inventoryTitle": "Inventory",
-    "inventorySubtitle": "Equip what you own. Everything is permanent.",
-    "backToShop": "← Back to shop",
-    "empty": "Nothing here yet. Check back soon.",
-    "emptyInventory": "You don't own anything yet.",
-    "loading": "Loading catalog...",
-    "loadError": "Failed to load shop",
+    "pageTitle": "Магазин Гильдии",
+    "pageSubtitle": "Тратьте клавы на тикеты для коучинга, косметику и апгрейды слотов. Все покупки окончательны.",
+    "balanceLabel": "Баланс",
+    "viewInventory": "Посмотреть инвентарь →",
+    "visitShop": "Перейти в магазин",
+    "inventoryTitle": "Инвентарь",
+    "inventorySubtitle": "Экипируйте то, чем владеете. Всё навсегда.",
+    "backToShop": "← Назад в магазин",
+    "empty": "Здесь пока ничего нет. Загляните позже.",
+    "emptyInventory": "У вас пока ничего нет.",
+    "loading": "Загрузка каталога...",
+    "loadingInventory": "Загрузка инвентаря...",
+    "loadError": "Не удалось загрузить магазин",
+    "loadInventoryError": "Не удалось загрузить инвентарь",
+    "equipError": "Не удалось экипировать",
+    "stockRemaining": "Осталось {count}",
+    "ownedCount": "В наличии: {count}",
     "tabs": {
-      "ticket": "Tickets",
-      "border": "Borders",
-      "title": "Titles",
-      "utility": "Utility"
+      "ticket": "Тикеты",
+      "border": "Рамки",
+      "title": "Титулы",
+      "utility": "Утилиты"
+    },
+    "tabBlurbs": {
+      "border": "Рамки для аватара. Покажи свою редкость.",
+      "title": "Титулы, отображаемые под вашим именем по всей Гильдии.",
+      "utility": "Постоянные апгрейды вашей публикационной ёмкости.",
+      "ticket": "Золотые тикеты открывают коучинг 1 на 1. Количество ограничено."
+    },
+    "sections": {
+      "cosmetics": "Косметика",
+      "other": "Другие предметы"
     },
     "rarity": {
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
+      "common": "Обычный",
+      "rare": "Редкий",
+      "epic": "Эпический",
+      "legendary": "Легендарный"
     },
     "actions": {
-      "buy": "Buy",
-      "buyNow": "Buy now",
-      "cancel": "Cancel",
-      "equip": "Equip",
-      "unequip": "Unequip",
-      "owned": "Owned",
-      "soldOut": "Sold out",
-      "locked": "Locked",
-      "notEnough": "Not enough",
-      "purchasing": "Purchasing...",
-      "equipped": "Equipped",
-      "redeemTicket": "Redeem ticket →"
+      "buy": "Купить",
+      "buyNow": "Купить сейчас",
+      "cancel": "Отмена",
+      "equip": "Экипировать",
+      "unequip": "Снять",
+      "owned": "В наличии",
+      "soldOut": "Распродано",
+      "locked": "Заблокировано",
+      "notEnough": "Недостаточно",
+      "purchasing": "Покупка...",
+      "equipped": "Экипировано",
+      "redeemTicket": "Использовать тикет →"
     },
     "purchase": {
-      "confirmTitle": "Confirm purchase",
-      "priceLabel": "Price",
-      "yourBalance": "Your balance",
-      "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
-      "success": "Purchase complete 🎉",
-      "genericError": "Purchase failed. Please try again."
+      "confirmTitle": "Подтвердить покупку",
+      "priceLabel": "Цена",
+      "yourBalance": "Ваш баланс",
+      "afterPurchase": "После покупки",
+      "success": "Покупка совершена 🎉",
+      "genericError": "Покупка не удалась. Попробуйте ещё раз."
+    },
+    "preview": {
+      "unavailable": "предпросмотр недоступен",
+      "goldenTicket": "Золотой тикет",
+      "stageSlots": "+{count} слотов сцены",
+      "labSlots": "+{count} слотов лаборатории",
+      "utility": "Утилита"
     },
     "earn": {
-      "stagePost": "Earn +10 🥢 on post",
-      "labQuestion": "Earn +3 🥢 on post"
+      "stagePost": "Получите +10 🥢 за пост",
+      "labQuestion": "Получите +3 🥢 за пост"
     }
+  },
+  "ambassador": {
+    "title": "Заявка на посла Гильдии",
+    "subtitle": "Расскажи немного о себе и почему ты хочешь представлять The Mambo Guild.",
+    "nameLabel": "Полное имя",
+    "emailLabel": "Email",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/вы (опционально)",
+    "locationLabel": "Город / сцена",
+    "locationPlaceholder": "напр. Москва, Киев (опционально)",
+    "messageLabel": "Почему ты?",
+    "messagePlaceholder": "Расскажи о танцевальном бэкграунде, своей сцене и о том, как будешь представлять Гильдию. Минимум 20 символов.",
+    "messageHint": "{count} / 4000",
+    "submit": "Отправить заявку",
+    "sending": "Отправка…",
+    "cancel": "Отмена",
+    "close": "Закрыть",
+    "successTitle": "Заявка отправлена",
+    "successBody": "Спасибо за заявку. Pavle читает каждую заявку лично и свяжется, если подойдёт.",
+    "genericError": "Не удалось отправить заявку. Попробуйте ещё раз чуть позже."
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "Падает, поднимается, продолжает танцевать."
   }
 }

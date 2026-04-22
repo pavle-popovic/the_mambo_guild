@@ -1074,7 +1074,10 @@
     "timotheHistoryBody": "Researched the history of salsa for many years and interviewed historical legends from the scene like Roly Maden. Wrote a book on the history of mambo and Latin dances.",
     "timotheMamboTitle": "Mambo-Rooted Style",
     "timotheMamboBody": "Deeply rooted in mambo with a touch of fusion and personal interpretation. Trained in Paris and Mexico, performed worldwide with Black and White Mambo, and led his own team Mambo All Stars.",
-    "timotheQuote": "Salsa is more than steps. It is memory, culture, and the story of those who shaped it."
+    "timotheQuote": "Salsa is more than steps. It is memory, culture, and the story of those who shaped it.",
+    "ambassadorTitle": "Become a Guild Ambassador",
+    "ambassadorBody": "Love The Mambo Guild and want to represent it in your scene? Apply to become a Guild Ambassador and help grow the community.",
+    "ambassadorCta": "Apply to become an ambassador"
   },
   "coaching": {
     "lockedTitle": "The Coaching Corner is for Guild Masters",
@@ -1444,18 +1447,34 @@
     "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
     "balanceLabel": "Balance",
     "viewInventory": "View inventory →",
+    "visitShop": "Visit the shop",
     "inventoryTitle": "Inventory",
     "inventorySubtitle": "Equip what you own. Everything is permanent.",
     "backToShop": "← Back to shop",
     "empty": "Nothing here yet. Check back soon.",
     "emptyInventory": "You don't own anything yet.",
     "loading": "Loading catalog...",
+    "loadingInventory": "Loading inventory...",
     "loadError": "Failed to load shop",
+    "loadInventoryError": "Failed to load inventory",
+    "equipError": "Failed to equip",
+    "stockRemaining": "{count} left",
+    "ownedCount": "Owned: {count}",
     "tabs": {
       "ticket": "Tickets",
       "border": "Borders",
       "title": "Titles",
       "utility": "Utility"
+    },
+    "tabBlurbs": {
+      "border": "Avatar borders. Wear your rarity.",
+      "title": "Titles shown under your name across the Guild.",
+      "utility": "Permanent upgrades to your posting capacity.",
+      "ticket": "Golden Tickets unlock a 1-on-1 coaching submission. Limited stock."
+    },
+    "sections": {
+      "cosmetics": "Cosmetics",
+      "other": "Other items"
     },
     "rarity": {
       "common": "Common",
@@ -1482,13 +1501,43 @@
       "priceLabel": "Price",
       "yourBalance": "Your balance",
       "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
       "success": "Purchase complete 🎉",
       "genericError": "Purchase failed. Please try again."
+    },
+    "preview": {
+      "unavailable": "preview unavailable",
+      "goldenTicket": "Golden Ticket",
+      "stageSlots": "+{count} stage slots",
+      "labSlots": "+{count} lab slots",
+      "utility": "Utility"
     },
     "earn": {
       "stagePost": "Earn +10 🥢 on post",
       "labQuestion": "Earn +3 🥢 on post"
     }
+  },
+  "ambassador": {
+    "title": "Apply to become a Guild Ambassador",
+    "subtitle": "Tell us a bit about yourself and why you want to represent The Mambo Guild.",
+    "nameLabel": "Full name",
+    "emailLabel": "Email",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/you (optional)",
+    "locationLabel": "City / scene",
+    "locationPlaceholder": "e.g. Barcelona, NYC (optional)",
+    "messageLabel": "Why you?",
+    "messagePlaceholder": "Share your dance background, the scene you're part of, and how you'd represent the Guild. Minimum 20 characters.",
+    "messageHint": "{count} / 4000",
+    "submit": "Send application",
+    "sending": "Sending…",
+    "cancel": "Cancel",
+    "close": "Close",
+    "successTitle": "Application sent",
+    "successBody": "Thanks for applying. Pavle will read every application personally and reach out if there's a fit.",
+    "genericError": "Could not send your application. Please try again in a bit."
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "Falls, rises, keeps dancing."
   }
 }

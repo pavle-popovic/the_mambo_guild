@@ -4,7 +4,6 @@ import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import {
   RARITY_BORDER_CLASS,
-  RARITY_LABELS,
   RARITY_TEXT_CLASS,
   getBorderSpec,
   getTitleSpec,
@@ -12,6 +11,7 @@ import {
 } from "@/lib/cosmetics";
 import GuildMasterAvatar, { TitleChip } from "@/components/ui/GuildMasterAvatar";
 import type { ShopItem } from "@/lib/api";
+import { useTranslations } from "@/i18n/useTranslations";
 
 /**
  * Card for a single shop item. Renders:
@@ -36,10 +36,11 @@ export default function ShopItemCard({
   meetsTier: boolean;
   onBuy: (sku: string) => void;
 }) {
+  const t = useTranslations("shop");
   const rarity: CosmeticRarity | null = item.rarity as CosmeticRarity | null;
   const rarityBorder = rarity ? RARITY_BORDER_CLASS[rarity] : "border-white/10";
   const rarityText = rarity ? RARITY_TEXT_CLASS[rarity] : "text-white/60";
-  const rarityLabel = rarity ? RARITY_LABELS[rarity] : "";
+  const rarityLabel = rarity ? t(`rarity.${rarity}`) : "";
 
   const outOfStock = item.remaining_stock !== null && item.remaining_stock <= 0;
   const maxed =
@@ -66,13 +67,13 @@ export default function ShopItemCard({
         </div>
         {item.remaining_stock !== null && (
           <span className="shrink-0 rounded-full border border-white/10 bg-white/5 px-2 py-0.5 text-[10px] text-white/70">
-            {item.remaining_stock} left
+            {t("stockRemaining", { count: item.remaining_stock })}
           </span>
         )}
       </div>
 
       <div className="min-h-[84px] flex items-center justify-center bg-white/5 rounded-xl border border-white/5 p-3">
-        <ItemPreview item={item} />
+        <ItemPreview item={item} t={t} />
       </div>
 
       {item.description && (
@@ -94,21 +95,27 @@ export default function ShopItemCard({
           )}
         >
           {maxed
-            ? "Owned"
+            ? t("actions.owned")
             : outOfStock
-            ? "Sold out"
+            ? t("actions.soldOut")
             : !meetsTier
-            ? "Locked"
+            ? t("actions.locked")
             : !canAfford
-            ? "Not enough"
-            : "Buy"}
+            ? t("actions.notEnough")
+            : t("actions.buy")}
         </button>
       </div>
     </motion.div>
   );
 }
 
-function ItemPreview({ item }: { item: ShopItem }) {
+function ItemPreview({
+  item,
+  t,
+}: {
+  item: ShopItem;
+  t: (key: string, params?: Record<string, string | number>) => string;
+}) {
   if (item.kind === "border") {
     const spec = getBorderSpec(item.sku);
     return (
@@ -123,14 +130,14 @@ function ItemPreview({ item }: { item: ShopItem }) {
   }
   if (item.kind === "title") {
     const spec = getTitleSpec(item.sku);
-    if (!spec) return <span className="text-white/40 text-xs">preview unavailable</span>;
+    if (!spec) return <span className="text-white/40 text-xs">{t("preview.unavailable")}</span>;
     return <TitleChip label={spec.label} tone={spec.tone} className="!text-sm !py-1 !px-3" />;
   }
   if (item.kind === "ticket") {
     return (
       <div className="text-amber-300 text-3xl font-black tracking-tight">
         🎟️
-        <span className="block text-xs text-white/60 font-normal mt-1">Golden Ticket</span>
+        <span className="block text-xs text-white/60 font-normal mt-1">{t("preview.goldenTicket")}</span>
       </div>
     );
   }
@@ -140,10 +147,10 @@ function ItemPreview({ item }: { item: ShopItem }) {
       <div className="text-2xl">🎁</div>
       <div className="text-xs text-white/50 mt-1">
         {item.grants?.bonus_video_slots
-          ? `+${item.grants.bonus_video_slots} stage slots`
+          ? t("preview.stageSlots", { count: item.grants.bonus_video_slots })
           : item.grants?.bonus_question_slots
-          ? `+${item.grants.bonus_question_slots} lab slots`
-          : "Utility"}
+          ? t("preview.labSlots", { count: item.grants.bonus_question_slots })
+          : t("preview.utility")}
       </div>
     </div>
   );

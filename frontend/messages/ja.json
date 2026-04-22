@@ -620,7 +620,7 @@
       "pillarCoursesBullet2": "コレオグラフィを細部まで分解",
       "pillarCoursesBullet3": "サルサの歴史 — 20モジュール",
       "pillarCoursesBullet4": "トレーニングの科学 — 18モジュール",
-      "pillarCoursesBullet5": "テクニック、スタイリング、音楽性、パートナリング",
+      "pillarCoursesBullet5": "テクニック、スタイリング、音楽性",
       "pillarPlayerEyebrow": "ビデオプレイヤー",
       "pillarPlayerTitlePre": "プロが待ち望んでいた",
       "pillarPlayerTitleAccent": "練習部屋",
@@ -648,11 +648,11 @@
       "pillarCommunityEyebrow": "コミュニティ",
       "pillarCommunityTitlePre": "動画を投稿しよう。",
       "pillarCommunityTitleAccent": "ひとりで踊らないで。",
-      "pillarCommunityBody": "進捗動画。本物のフィードバック。質問への回答。本気でトレーニングするダンサーたち。",
-      "pillarCommunityBullet1": "The Stage — 進捗動画を投稿",
-      "pillarCommunityBullet2": "The Lab — 質問と回答",
+      "pillarCommunityBody": "動画を投稿。質問を投げる。クラベを稼ぐ。ギルドショップで使う。",
+      "pillarCommunityBullet1": "The Stage: 進捗動画を投稿、+10 クラベ",
+      "pillarCommunityBullet2": "The Lab: 質問と回答、+3 クラベ",
       "pillarCommunityBullet3": "応援コメントまたはコーチングのフィードバック",
-      "pillarCommunityBullet4": "38個のバッジ、ブロンズ → ダイヤモンド",
+      "pillarCommunityBullet4": "38個のバッジ、ブロンズからダイヤモンドまで",
       "pillarCommunityBullet5": "週間＆歴代ランキング",
       "pillarVipEyebrow": "VIP — 1対1コーチング＆プライベートグループ",
       "pillarVipTitlePre": "Maestroと",
@@ -901,7 +901,10 @@
     "timotheHistoryBody": "長年にわたりサルサの歴史を研究し、Roly Madenのようなシーンの歴史的なレジェンドたちにインタビューを重ねてきました。マンボとラテンダンスの歴史に関する書籍も執筆しています。",
     "timotheMamboTitle": "マンボに根ざしたスタイル",
     "timotheMamboBody": "マンボに深く根ざしつつ、フュージョンと個人的な解釈を織り交ぜたスタイル。ParisとMexicoでトレーニングを積み、Black and White Mamboとして世界各地で公演し、自身のチームMambo All Starsを率いてきました。",
-    "timotheQuote": "サルサはステップ以上のものです。それは記憶であり、文化であり、それをかたちづくってきた人々の物語です。"
+    "timotheQuote": "サルサはステップ以上のものです。それは記憶であり、文化であり、それをかたちづくってきた人々の物語です。",
+    "ambassadorTitle": "ギルド・アンバサダーになる",
+    "ambassadorBody": "The Mambo Guildを愛し、地元シーンで代表したい方へ。ギルド・アンバサダーに応募して、コミュニティの成長を一緒に。",
+    "ambassadorCta": "アンバサダーに応募する"
   },
   "coaching": {
     "lockedTitle": "コーチングコーナーはGuild Master専用です",
@@ -1231,8 +1234,8 @@
       "description": "あなたのダンスがステージを熱くしています。全開の炎。"
     },
     "founder_diamond": {
-      "name": "創設メンバー",
-      "description": "One of the founding members of The Mambo Guild."
+      "name": "ファウンダー",
+      "description": "The Mambo Guild の創設メンバーの一人。"
     },
     "guild_master": {
       "name": "ギルドマスター",
@@ -1323,172 +1326,218 @@
       "description": "14-day practice streak."
     },
     "motw_bronze": {
-      "name": "Move Master I",
-      "description": "Posted your first Move of the Week video. Welcome to the floor."
+      "name": "ムーブ・マスター I",
+      "description": "初めての Move of the Week 動画を投稿。フロアへようこそ。"
     },
     "motw_silver": {
-      "name": "Move Master II",
-      "description": "Posted 10 Move of the Week videos."
+      "name": "ムーブ・マスター II",
+      "description": "Move of the Week 動画を 10 本投稿。"
     },
     "motw_gold": {
-      "name": "Move Master III",
-      "description": "Posted 30 Move of the Week videos. You're a regular."
+      "name": "ムーブ・マスター III",
+      "description": "Move of the Week 動画を 30 本投稿。常連ですね。"
     },
     "motw_diamond": {
-      "name": "Move Master IV",
-      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+      "name": "ムーブ・マスター IV",
+      "description": "Move of the Week 動画を 100 本投稿。公認のウィークリー・レジェンド。"
     },
     "original_bronze": {
-      "name": "The Originator I",
-      "description": "Shared your first original choreo or freestyle."
+      "name": "オリジネーター I",
+      "description": "初めてのオリジナル振付またはフリースタイルを公開。"
     },
     "original_silver": {
-      "name": "The Originator II",
-      "description": "Shared 10 original choreos or freestyles."
+      "name": "オリジネーター II",
+      "description": "オリジナル振付またはフリースタイルを 10 作品公開。"
     },
     "original_gold": {
-      "name": "The Originator III",
-      "description": "Shared 30 original choreos or freestyles. You have a voice."
+      "name": "オリジネーター III",
+      "description": "オリジナル振付またはフリースタイルを 30 作品公開。独自の声を持つダンサー。"
     },
     "original_diamond": {
-      "name": "The Originator IV",
-      "description": "Shared 100 original choreos or freestyles. A true creator."
+      "name": "オリジネーター IV",
+      "description": "オリジナル振付またはフリースタイルを 100 作品公開。真のクリエイター。"
     },
     "guild_bronze": {
-      "name": "Class Act I",
-      "description": "Posted your first Guild-class choreo."
+      "name": "クラス・アクト I",
+      "description": "初めてのギルド級振付を投稿。"
     },
     "guild_silver": {
-      "name": "Class Act II",
-      "description": "Posted 10 Guild-class choreos."
+      "name": "クラス・アクト II",
+      "description": "ギルド級振付を 10 本投稿。"
     },
     "guild_gold": {
-      "name": "Class Act III",
-      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+      "name": "クラス・アクト III",
+      "description": "ギルド級振付を 30 本投稿。カンパニー級の素材。"
     },
     "guild_diamond": {
-      "name": "Class Act IV",
-      "description": "Posted 100 Guild-class choreos. Guild pillar."
+      "name": "クラス・アクト IV",
+      "description": "ギルド級振付を 100 本投稿。ギルドの大黒柱。"
     },
     "liked_bronze": {
-      "name": "Crowd Favorite I",
-      "description": "Received your first like."
+      "name": "オーディエンスの人気者 I",
+      "description": "初めての「いいね」を獲得。"
     },
     "liked_silver": {
-      "name": "Crowd Favorite II",
-      "description": "Received 100 total likes across your posts."
+      "name": "オーディエンスの人気者 II",
+      "description": "投稿に合計 100 の「いいね」を獲得。"
     },
     "liked_gold": {
-      "name": "Crowd Favorite III",
-      "description": "Received 500 total likes across your posts."
+      "name": "オーディエンスの人気者 III",
+      "description": "投稿に合計 500 の「いいね」を獲得。"
     },
     "liked_diamond": {
-      "name": "Crowd Favorite IV",
-      "description": "Received 2,500 total likes. The room loves you."
+      "name": "オーディエンスの人気者 IV",
+      "description": "合計 2,500 の「いいね」を獲得。会場中が君を愛してる。"
     },
     "motw_love_bronze": {
-      "name": "Move Magnet I",
-      "description": "Got your first like on a Move of the Week video."
+      "name": "ムーブ・マグネット I",
+      "description": "Move of the Week 動画で初めて「いいね」を獲得。"
     },
     "motw_love_silver": {
-      "name": "Move Magnet II",
-      "description": "25 likes across your Move of the Week videos."
+      "name": "ムーブ・マグネット II",
+      "description": "Move of the Week 動画で「いいね」を合計 25 獲得。"
     },
     "motw_love_gold": {
-      "name": "Move Magnet III",
-      "description": "150 likes across your Move of the Week videos."
+      "name": "ムーブ・マグネット III",
+      "description": "Move of the Week 動画で「いいね」を合計 150 獲得。"
     },
     "motw_love_diamond": {
-      "name": "Move Magnet IV",
-      "description": "1,000 likes across your Move of the Week videos."
+      "name": "ムーブ・マグネット IV",
+      "description": "Move of the Week 動画で「いいね」を合計 1,000 獲得。"
     },
     "original_love_bronze": {
-      "name": "Fan Favorite I",
-      "description": "Got your first like on an original post."
+      "name": "ファンの人気者 I",
+      "description": "オリジナル投稿で初めて「いいね」を獲得。"
     },
     "original_love_silver": {
-      "name": "Fan Favorite II",
-      "description": "25 likes across your original posts."
+      "name": "ファンの人気者 II",
+      "description": "オリジナル投稿で合計 25 の「いいね」。"
     },
     "original_love_gold": {
-      "name": "Fan Favorite III",
-      "description": "150 likes across your original posts."
+      "name": "ファンの人気者 III",
+      "description": "オリジナル投稿で合計 150 の「いいね」。"
     },
     "original_love_diamond": {
-      "name": "Fan Favorite IV",
-      "description": "1,000 likes across your original posts."
+      "name": "ファンの人気者 IV",
+      "description": "オリジナル投稿で合計 1,000 の「いいね」。"
     },
     "guild_love_bronze": {
-      "name": "Guild Applause I",
-      "description": "Got your first like on a Guild-class post."
+      "name": "ギルドの喝采 I",
+      "description": "ギルド級の投稿で初めて「いいね」を獲得。"
     },
     "guild_love_silver": {
-      "name": "Guild Applause II",
-      "description": "25 likes across your Guild-class posts."
+      "name": "ギルドの喝采 II",
+      "description": "ギルド級投稿で合計 25 の「いいね」。"
     },
     "guild_love_gold": {
-      "name": "Guild Applause III",
-      "description": "150 likes across your Guild-class posts."
+      "name": "ギルドの喝采 III",
+      "description": "ギルド級投稿で合計 150 の「いいね」。"
     },
     "guild_love_diamond": {
-      "name": "Guild Applause IV",
-      "description": "1,000 likes across your Guild-class posts."
+      "name": "ギルドの喝采 IV",
+      "description": "ギルド級投稿で合計 1,000 の「いいね」。"
     },
     "promoter": {
-      "name": "Promoter",
-      "description": "Brought 3 dancers into the Guild through your referral link."
+      "name": "プロモーター",
+      "description": "紹介リンク経由で 3 人のダンサーをギルドに招待。"
     }
   },
   "shop": {
-    "pageTitle": "The Guild Shop",
-    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
-    "balanceLabel": "Balance",
-    "viewInventory": "View inventory →",
-    "inventoryTitle": "Inventory",
-    "inventorySubtitle": "Equip what you own. Everything is permanent.",
-    "backToShop": "← Back to shop",
-    "empty": "Nothing here yet. Check back soon.",
-    "emptyInventory": "You don't own anything yet.",
-    "loading": "Loading catalog...",
-    "loadError": "Failed to load shop",
+    "pageTitle": "ギルドショップ",
+    "pageSubtitle": "クラベをコーチングチケット、コスメ、スロット拡張に使おう。購入は最終確定です。",
+    "balanceLabel": "残高",
+    "viewInventory": "インベントリを見る →",
+    "visitShop": "ショップへ",
+    "inventoryTitle": "インベントリ",
+    "inventorySubtitle": "所持品を装備しよう。すべて永続です。",
+    "backToShop": "← ショップに戻る",
+    "empty": "まだ何もありません。また後ほど。",
+    "emptyInventory": "まだ何も持っていません。",
+    "loading": "カタログを読み込み中...",
+    "loadingInventory": "インベントリを読み込み中...",
+    "loadError": "ショップの読み込みに失敗",
+    "loadInventoryError": "インベントリの読み込みに失敗",
+    "equipError": "装備に失敗しました",
+    "stockRemaining": "残り {count}",
+    "ownedCount": "所持数: {count}",
     "tabs": {
-      "ticket": "Tickets",
-      "border": "Borders",
-      "title": "Titles",
-      "utility": "Utility"
+      "ticket": "チケット",
+      "border": "ボーダー",
+      "title": "称号",
+      "utility": "便利"
+    },
+    "tabBlurbs": {
+      "border": "アバターのボーダー。レアリティを身にまとおう。",
+      "title": "ギルド内であなたの名前の下に表示される称号。",
+      "utility": "投稿キャパシティの恒久アップグレード。",
+      "ticket": "ゴールデンチケットは1on1コーチングを解放します。在庫限定。"
+    },
+    "sections": {
+      "cosmetics": "コスメ",
+      "other": "その他"
     },
     "rarity": {
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
+      "common": "コモン",
+      "rare": "レア",
+      "epic": "エピック",
+      "legendary": "レジェンダリー"
     },
     "actions": {
-      "buy": "Buy",
-      "buyNow": "Buy now",
-      "cancel": "Cancel",
-      "equip": "Equip",
-      "unequip": "Unequip",
-      "owned": "Owned",
-      "soldOut": "Sold out",
-      "locked": "Locked",
-      "notEnough": "Not enough",
-      "purchasing": "Purchasing...",
-      "equipped": "Equipped",
-      "redeemTicket": "Redeem ticket →"
+      "buy": "購入",
+      "buyNow": "購入する",
+      "cancel": "キャンセル",
+      "equip": "装備",
+      "unequip": "外す",
+      "owned": "所持済み",
+      "soldOut": "売り切れ",
+      "locked": "ロック",
+      "notEnough": "残高不足",
+      "purchasing": "購入中...",
+      "equipped": "装備中",
+      "redeemTicket": "チケットを使う →"
     },
     "purchase": {
-      "confirmTitle": "Confirm purchase",
-      "priceLabel": "Price",
-      "yourBalance": "Your balance",
-      "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
-      "success": "Purchase complete 🎉",
-      "genericError": "Purchase failed. Please try again."
+      "confirmTitle": "購入の確認",
+      "priceLabel": "価格",
+      "yourBalance": "現在の残高",
+      "afterPurchase": "購入後",
+      "success": "購入完了 🎉",
+      "genericError": "購入に失敗しました。再度お試しください。"
+    },
+    "preview": {
+      "unavailable": "プレビュー不可",
+      "goldenTicket": "ゴールデンチケット",
+      "stageSlots": "ステージ枠 +{count}",
+      "labSlots": "ラボ枠 +{count}",
+      "utility": "便利"
     },
     "earn": {
-      "stagePost": "Earn +10 🥢 on post",
-      "labQuestion": "Earn +3 🥢 on post"
+      "stagePost": "投稿で +10 🥢",
+      "labQuestion": "投稿で +3 🥢"
     }
+  },
+  "ambassador": {
+    "title": "ギルド・アンバサダーに応募",
+    "subtitle": "あなたのことと、なぜThe Mambo Guildを代表したいかを教えてください。",
+    "nameLabel": "フルネーム",
+    "emailLabel": "メール",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/you（任意）",
+    "locationLabel": "都市 / シーン",
+    "locationPlaceholder": "例：東京、大阪（任意）",
+    "messageLabel": "なぜあなた？",
+    "messagePlaceholder": "ダンス歴、所属するシーン、ギルドをどう代表したいかを教えてください。最低20文字。",
+    "messageHint": "{count} / 4000",
+    "submit": "応募を送信",
+    "sending": "送信中…",
+    "cancel": "キャンセル",
+    "close": "閉じる",
+    "successTitle": "応募を送信しました",
+    "successBody": "ご応募ありがとうございます。Pavleがすべての応募を個別に読み、合う場合にご連絡します。",
+    "genericError": "応募を送信できませんでした。しばらくしてから再度お試しください。"
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "倒れて、立ち上がって、踊り続ける。"
   }
 }

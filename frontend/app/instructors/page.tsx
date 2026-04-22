@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useState } from "react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+import AmbassadorApplyModal from "@/components/AmbassadorApplyModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { FaInstagram, FaYoutube, FaTrophy, FaMusic, FaBook, FaHistory } from "react-icons/fa";
 import { useTranslations } from "@/i18n/useTranslations";
@@ -11,6 +13,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 export default function InstructorsPage() {
   const { user } = useAuth();
   const t = useTranslations("instructors");
+  const [ambassadorOpen, setAmbassadorOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-mambo-dark">
@@ -187,7 +190,7 @@ export default function InstructorsPage() {
         </div>
 
         {/* Additional Info Section */}
-        <div className="grid md:grid-cols-3 gap-6 max-w-5xl mx-auto mt-12">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-6xl mx-auto mt-12">
           <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
             <h3 className="text-xl font-bold text-mambo-text mb-4">{t("joinTeamTitle")}</h3>
             <p className="text-gray-400 mb-4 text-sm leading-relaxed">
@@ -199,6 +202,20 @@ export default function InstructorsPage() {
             >
               {t("joinTeamCta")}
             </Link>
+          </div>
+
+          <div className="bg-gradient-to-br from-amber-500/10 to-orange-600/10 border border-amber-500/30 rounded-xl p-6">
+            <h3 className="text-xl font-bold text-mambo-text mb-4">{t("ambassadorTitle")}</h3>
+            <p className="text-gray-400 mb-4 text-sm leading-relaxed">
+              {t("ambassadorBody")}
+            </p>
+            <button
+              type="button"
+              onClick={() => setAmbassadorOpen(true)}
+              className="inline-block px-6 py-3 bg-amber-500 hover:bg-amber-400 text-black font-bold rounded-lg transition text-sm"
+            >
+              {t("ambassadorCta")}
+            </button>
           </div>
 
           <div className="bg-mambo-panel border border-gray-800 rounded-xl p-6">
@@ -222,6 +239,11 @@ export default function InstructorsPage() {
           </div>
         </div>
       </div>
+
+      <AmbassadorApplyModal
+        open={ambassadorOpen}
+        onClose={() => setAmbassadorOpen(false)}
+      />
 
       <Footer />
     </div>

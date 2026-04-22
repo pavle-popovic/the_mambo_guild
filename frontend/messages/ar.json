@@ -620,7 +620,7 @@
       "pillarCoursesBullet2": "كوريغرافيات كاملة، مُفصّلة خطوة بخطوة",
       "pillarCoursesBullet3": "تاريخ السالسا — 20 وحدة",
       "pillarCoursesBullet4": "علم التدريب — 18 وحدة",
-      "pillarCoursesBullet5": "تقنية، ستايل، موسيقية، رقص ثنائي",
+      "pillarCoursesBullet5": "تقنية، ستايل، موسيقية",
       "pillarPlayerEyebrow": "مشغّل الفيديو",
       "pillarPlayerTitlePre": "غرفة التدريب",
       "pillarPlayerTitleAccent": "التي",
@@ -648,9 +648,9 @@
       "pillarCommunityEyebrow": "المجتمع",
       "pillarCommunityTitlePre": "انشر فيديوهاتك.",
       "pillarCommunityTitleAccent": "لا ترقص وحدك.",
-      "pillarCommunityBody": "فيديوهات التقدّم. ملاحظات حقيقية. إجابات لأسئلتك. راقصون يتدربون فعلاً.",
-      "pillarCommunityBullet1": "The Stage — انشر فيديوهات تقدّمك",
-      "pillarCommunityBullet2": "The Lab — اسأل وأجب",
+      "pillarCommunityBody": "انشر الفيديوهات. اطرح الأسئلة. اكسب claves. أنفقها في متجر النقابة.",
+      "pillarCommunityBullet1": "The Stage: انشر فيديوهات التقدّم، +10 claves",
+      "pillarCommunityBullet2": "The Lab: اسأل وأجب، +3 claves",
       "pillarCommunityBullet3": "تشجيع أو ملاحظات مدرّب",
       "pillarCommunityBullet4": "38 شارة، من البرونزية إلى الماسية",
       "pillarCommunityBullet5": "لوحات صدارة أسبوعية ودائمة",
@@ -901,7 +901,10 @@
     "timotheHistoryBody": "بحث في تاريخ السالسا لسنوات طويلة وأجرى مقابلات مع أساطير المشهد التاريخية مثل Roly Maden. كتب كتاباً حول تاريخ المامبو والرقصات اللاتينية.",
     "timotheMamboTitle": "أسلوب متجذّر في المامبو",
     "timotheMamboBody": "متجذّر بعمق في المامبو مع لمسة من الفيوجن والتأويل الشخصي. تدرّب في Paris وMexico، وقدّم عروضه حول العالم مع Black and White Mambo، وقاد فريقه الخاص Mambo All Stars.",
-    "timotheQuote": "السالسا أكثر من مجرد خطوات. إنها ذاكرة وثقافة وحكاية الذين صنعوها."
+    "timotheQuote": "السالسا أكثر من مجرد خطوات. إنها ذاكرة وثقافة وحكاية الذين صنعوها.",
+    "ambassadorTitle": "كن سفيرًا للنقابة",
+    "ambassadorBody": "تحب The Mambo Guild وترغب في تمثيلها في مجتمعك؟ قدّم طلبك لتصبح سفيرًا للنقابة وساعد في نمو المجتمع.",
+    "ambassadorCta": "تقديم طلب السفير"
   },
   "coaching": {
     "lockedTitle": "The Coaching Corner مخصّص لأعضاء Guild Master",
@@ -1232,7 +1235,7 @@
     },
     "founder_diamond": {
       "name": "مؤسس",
-      "description": "One of the founding members of The Mambo Guild."
+      "description": "أحد الأعضاء المؤسسين لـ The Mambo Guild."
     },
     "guild_master": {
       "name": "سيّد النقابة",
@@ -1323,172 +1326,218 @@
       "description": "التزام مستمر بالحضور. أسبوعان متتاليان."
     },
     "motw_bronze": {
-      "name": "Move Master I",
-      "description": "Posted your first Move of the Week video. Welcome to the floor."
+      "name": "سيّد الحركة I",
+      "description": "نشرت أول فيديو Move of the Week. أهلاً بك على حلبة الرقص."
     },
     "motw_silver": {
-      "name": "Move Master II",
-      "description": "Posted 10 Move of the Week videos."
+      "name": "سيّد الحركة II",
+      "description": "نشرت 10 فيديوهات Move of the Week."
     },
     "motw_gold": {
-      "name": "Move Master III",
-      "description": "Posted 30 Move of the Week videos. You're a regular."
+      "name": "سيّد الحركة III",
+      "description": "نشرت 30 فيديو Move of the Week. أصبحت من الوجوه المعتادة."
     },
     "motw_diamond": {
-      "name": "Move Master IV",
-      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+      "name": "سيّد الحركة IV",
+      "description": "نشرت 100 فيديو Move of the Week. أسطورة أسبوعية موثّقة."
     },
     "original_bronze": {
-      "name": "The Originator I",
-      "description": "Shared your first original choreo or freestyle."
+      "name": "المُبدِع I",
+      "description": "شاركت أول تصميم رقص أصلي أو freestyle."
     },
     "original_silver": {
-      "name": "The Originator II",
-      "description": "Shared 10 original choreos or freestyles."
+      "name": "المُبدِع II",
+      "description": "شاركت 10 تصاميم رقص أصلية أو freestyles."
     },
     "original_gold": {
-      "name": "The Originator III",
-      "description": "Shared 30 original choreos or freestyles. You have a voice."
+      "name": "المُبدِع III",
+      "description": "شاركت 30 تصميماً أصلياً أو freestyle. لديك صوت خاص."
     },
     "original_diamond": {
-      "name": "The Originator IV",
-      "description": "Shared 100 original choreos or freestyles. A true creator."
+      "name": "المُبدِع IV",
+      "description": "شاركت 100 تصميم أصلي أو freestyle. مبدع حقيقي."
     },
     "guild_bronze": {
-      "name": "Class Act I",
-      "description": "Posted your first Guild-class choreo."
+      "name": "أداء راقٍ I",
+      "description": "نشرت أول تصميم رقص بمستوى النقابة."
     },
     "guild_silver": {
-      "name": "Class Act II",
-      "description": "Posted 10 Guild-class choreos."
+      "name": "أداء راقٍ II",
+      "description": "نشرت 10 تصاميم بمستوى النقابة."
     },
     "guild_gold": {
-      "name": "Class Act III",
-      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+      "name": "أداء راقٍ III",
+      "description": "نشرت 30 تصميماً بمستوى النقابة. مستوى فرقة كاملة."
     },
     "guild_diamond": {
-      "name": "Class Act IV",
-      "description": "Posted 100 Guild-class choreos. Guild pillar."
+      "name": "أداء راقٍ IV",
+      "description": "نشرت 100 تصميماً بمستوى النقابة. ركيزة النقابة."
     },
     "liked_bronze": {
-      "name": "Crowd Favorite I",
-      "description": "Received your first like."
+      "name": "مُفضّل الجمهور I",
+      "description": "حصلت على أول إعجاب."
     },
     "liked_silver": {
-      "name": "Crowd Favorite II",
-      "description": "Received 100 total likes across your posts."
+      "name": "مُفضّل الجمهور II",
+      "description": "حصلت على 100 إعجاب إجمالي على منشوراتك."
     },
     "liked_gold": {
-      "name": "Crowd Favorite III",
-      "description": "Received 500 total likes across your posts."
+      "name": "مُفضّل الجمهور III",
+      "description": "حصلت على 500 إعجاب إجمالي على منشوراتك."
     },
     "liked_diamond": {
-      "name": "Crowd Favorite IV",
-      "description": "Received 2,500 total likes. The room loves you."
+      "name": "مُفضّل الجمهور IV",
+      "description": "حصلت على 2,500 إعجاب إجمالي. الجمهور يحبّك."
     },
     "motw_love_bronze": {
-      "name": "Move Magnet I",
-      "description": "Got your first like on a Move of the Week video."
+      "name": "مغناطيس الحركة I",
+      "description": "حصلت على أول إعجاب على فيديو Move of the Week."
     },
     "motw_love_silver": {
-      "name": "Move Magnet II",
-      "description": "25 likes across your Move of the Week videos."
+      "name": "مغناطيس الحركة II",
+      "description": "25 إعجاباً على فيديوهات Move of the Week الخاصة بك."
     },
     "motw_love_gold": {
-      "name": "Move Magnet III",
-      "description": "150 likes across your Move of the Week videos."
+      "name": "مغناطيس الحركة III",
+      "description": "150 إعجاباً على فيديوهات Move of the Week الخاصة بك."
     },
     "motw_love_diamond": {
-      "name": "Move Magnet IV",
-      "description": "1,000 likes across your Move of the Week videos."
+      "name": "مغناطيس الحركة IV",
+      "description": "1,000 إعجاب على فيديوهات Move of the Week الخاصة بك."
     },
     "original_love_bronze": {
-      "name": "Fan Favorite I",
-      "description": "Got your first like on an original post."
+      "name": "مُفضّل المعجبين I",
+      "description": "حصلت على أول إعجاب على منشور أصلي."
     },
     "original_love_silver": {
-      "name": "Fan Favorite II",
-      "description": "25 likes across your original posts."
+      "name": "مُفضّل المعجبين II",
+      "description": "25 إعجاباً على منشوراتك الأصلية."
     },
     "original_love_gold": {
-      "name": "Fan Favorite III",
-      "description": "150 likes across your original posts."
+      "name": "مُفضّل المعجبين III",
+      "description": "150 إعجاباً على منشوراتك الأصلية."
     },
     "original_love_diamond": {
-      "name": "Fan Favorite IV",
-      "description": "1,000 likes across your original posts."
+      "name": "مُفضّل المعجبين IV",
+      "description": "1,000 إعجاب على منشوراتك الأصلية."
     },
     "guild_love_bronze": {
-      "name": "Guild Applause I",
-      "description": "Got your first like on a Guild-class post."
+      "name": "تصفيق النقابة I",
+      "description": "حصلت على أول إعجاب على منشور بمستوى النقابة."
     },
     "guild_love_silver": {
-      "name": "Guild Applause II",
-      "description": "25 likes across your Guild-class posts."
+      "name": "تصفيق النقابة II",
+      "description": "25 إعجاباً على منشوراتك بمستوى النقابة."
     },
     "guild_love_gold": {
-      "name": "Guild Applause III",
-      "description": "150 likes across your Guild-class posts."
+      "name": "تصفيق النقابة III",
+      "description": "150 إعجاباً على منشوراتك بمستوى النقابة."
     },
     "guild_love_diamond": {
-      "name": "Guild Applause IV",
-      "description": "1,000 likes across your Guild-class posts."
+      "name": "تصفيق النقابة IV",
+      "description": "1,000 إعجاب على منشوراتك بمستوى النقابة."
     },
     "promoter": {
-      "name": "Promoter",
-      "description": "Brought 3 dancers into the Guild through your referral link."
+      "name": "مُروّج",
+      "description": "جلبت 3 راقصين إلى النقابة عبر رابط الإحالة."
     }
   },
   "shop": {
-    "pageTitle": "The Guild Shop",
-    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
-    "balanceLabel": "Balance",
-    "viewInventory": "View inventory →",
-    "inventoryTitle": "Inventory",
-    "inventorySubtitle": "Equip what you own. Everything is permanent.",
-    "backToShop": "← Back to shop",
-    "empty": "Nothing here yet. Check back soon.",
-    "emptyInventory": "You don't own anything yet.",
-    "loading": "Loading catalog...",
-    "loadError": "Failed to load shop",
+    "pageTitle": "متجر النقابة",
+    "pageSubtitle": "أنفق كلافاتك على تذاكر التدريب والكماليات وترقيات الفتحات. كل عملية شراء نهائية.",
+    "balanceLabel": "الرصيد",
+    "viewInventory": "عرض المخزون →",
+    "visitShop": "زيارة المتجر",
+    "inventoryTitle": "المخزون",
+    "inventorySubtitle": "جهّز ما تملكه. كل شيء دائم.",
+    "backToShop": "← العودة إلى المتجر",
+    "empty": "لا شيء هنا بعد. تحقق لاحقًا.",
+    "emptyInventory": "لا تملك أي شيء بعد.",
+    "loading": "جار تحميل القائمة...",
+    "loadingInventory": "جار تحميل المخزون...",
+    "loadError": "فشل تحميل المتجر",
+    "loadInventoryError": "فشل تحميل المخزون",
+    "equipError": "فشل التجهيز",
+    "stockRemaining": "المتبقي {count}",
+    "ownedCount": "تملك: {count}",
     "tabs": {
-      "ticket": "Tickets",
-      "border": "Borders",
-      "title": "Titles",
-      "utility": "Utility"
+      "ticket": "التذاكر",
+      "border": "الإطارات",
+      "title": "الألقاب",
+      "utility": "مرافق"
+    },
+    "tabBlurbs": {
+      "border": "إطارات الصورة الرمزية. أظهر ندرتك.",
+      "title": "ألقاب تظهر تحت اسمك في كامل النقابة.",
+      "utility": "ترقيات دائمة لسعة النشر لديك.",
+      "ticket": "التذاكر الذهبية تفتح جلسة تدريب فردية. المخزون محدود."
+    },
+    "sections": {
+      "cosmetics": "كماليات",
+      "other": "عناصر أخرى"
     },
     "rarity": {
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
+      "common": "عادي",
+      "rare": "نادر",
+      "epic": "ملحمي",
+      "legendary": "أسطوري"
     },
     "actions": {
-      "buy": "Buy",
-      "buyNow": "Buy now",
-      "cancel": "Cancel",
-      "equip": "Equip",
-      "unequip": "Unequip",
-      "owned": "Owned",
-      "soldOut": "Sold out",
-      "locked": "Locked",
-      "notEnough": "Not enough",
-      "purchasing": "Purchasing...",
-      "equipped": "Equipped",
-      "redeemTicket": "Redeem ticket →"
+      "buy": "شراء",
+      "buyNow": "اشتر الآن",
+      "cancel": "إلغاء",
+      "equip": "تجهيز",
+      "unequip": "إزالة",
+      "owned": "مملوك",
+      "soldOut": "نفدت الكمية",
+      "locked": "مقفل",
+      "notEnough": "الرصيد غير كافٍ",
+      "purchasing": "جار الشراء...",
+      "equipped": "مجهز",
+      "redeemTicket": "استبدال التذكرة →"
     },
     "purchase": {
-      "confirmTitle": "Confirm purchase",
-      "priceLabel": "Price",
-      "yourBalance": "Your balance",
-      "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
-      "success": "Purchase complete 🎉",
-      "genericError": "Purchase failed. Please try again."
+      "confirmTitle": "تأكيد الشراء",
+      "priceLabel": "السعر",
+      "yourBalance": "رصيدك",
+      "afterPurchase": "بعد الشراء",
+      "success": "اكتمل الشراء 🎉",
+      "genericError": "فشل الشراء. حاول مرة أخرى."
+    },
+    "preview": {
+      "unavailable": "المعاينة غير متاحة",
+      "goldenTicket": "التذكرة الذهبية",
+      "stageSlots": "+{count} فتحات منصة",
+      "labSlots": "+{count} فتحات مختبر",
+      "utility": "مرفق"
     },
     "earn": {
-      "stagePost": "Earn +10 🥢 on post",
-      "labQuestion": "Earn +3 🥢 on post"
+      "stagePost": "اكسب +10 🥢 لكل منشور",
+      "labQuestion": "اكسب +3 🥢 لكل منشور"
     }
+  },
+  "ambassador": {
+    "title": "التقديم لسفير النقابة",
+    "subtitle": "أخبرنا عن نفسك ولماذا تريد تمثيل The Mambo Guild.",
+    "nameLabel": "الاسم الكامل",
+    "emailLabel": "البريد الإلكتروني",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/you (اختياري)",
+    "locationLabel": "المدينة / المجتمع",
+    "locationPlaceholder": "مثال: دبي، الرياض (اختياري)",
+    "messageLabel": "لماذا أنت؟",
+    "messagePlaceholder": "شارك خلفيتك في الرقص، المجتمع الذي تنتمي إليه، وكيف ستمثّل النقابة. 20 حرفًا على الأقل.",
+    "messageHint": "{count} / 4000",
+    "submit": "إرسال الطلب",
+    "sending": "جارٍ الإرسال…",
+    "cancel": "إلغاء",
+    "close": "إغلاق",
+    "successTitle": "تم إرسال الطلب",
+    "successBody": "شكرًا على تقديمك. سيقرأ Pavle كل طلب شخصيًا وسيتواصل إن كان هناك توافق.",
+    "genericError": "تعذّر إرسال الطلب. حاول مرة أخرى بعد قليل."
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "يسقط، ينهض، يستمر في الرقص."
   }
 }

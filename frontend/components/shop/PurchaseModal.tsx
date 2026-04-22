@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { apiClient, type ShopItem } from "@/lib/api";
+import { useTranslations } from "@/i18n/useTranslations";
 
 /**
  * Confirmation dialog for a pending shop purchase.
@@ -25,6 +26,7 @@ export default function PurchaseModal({
   onClose: () => void;
   onSuccess: (newBalance: number) => void;
 }) {
+  const t = useTranslations("shop");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,7 +51,7 @@ export default function PurchaseModal({
       const msg =
         e?.detail?.message ||
         e?.message ||
-        "Purchase failed. Please try again.";
+        t("purchase.genericError");
       setError(msg);
     } finally {
       setLoading(false);
@@ -72,15 +74,15 @@ export default function PurchaseModal({
           className="w-full max-w-md rounded-2xl border border-white/10 bg-neutral-950 p-6"
           onClick={(e) => e.stopPropagation()}
         >
-          <h2 className="text-white font-bold text-xl mb-1">Confirm purchase</h2>
+          <h2 className="text-white font-bold text-xl mb-1">{t("purchase.confirmTitle")}</h2>
           <p className="text-white/60 text-sm mb-5">{item.name}</p>
 
           <div className="space-y-2 border border-white/10 rounded-xl p-4 bg-white/5">
-            <Row label="Price" value={`${item.price_claves} 🥢`} />
-            <Row label="Your balance" value={`${currentBalance} 🥢`} />
+            <Row label={t("purchase.priceLabel")} value={`${item.price_claves} 🥢`} />
+            <Row label={t("purchase.yourBalance")} value={`${currentBalance} 🥢`} />
             <div className="h-px bg-white/10 my-2" />
             <Row
-              label="After purchase"
+              label={t("purchase.afterPurchase")}
               value={`${projected} 🥢`}
               highlight={projected < 0}
             />
@@ -98,14 +100,14 @@ export default function PurchaseModal({
               className="flex-1 px-4 py-2 rounded-full border border-white/15 text-white/80 hover:bg-white/5 transition"
               disabled={loading}
             >
-              Cancel
+              {t("actions.cancel")}
             </button>
             <button
               onClick={confirm}
               disabled={loading || projected < 0}
               className="flex-1 px-4 py-2 rounded-full bg-amber-400 text-black font-semibold hover:bg-amber-300 disabled:opacity-50 disabled:cursor-not-allowed transition"
             >
-              {loading ? "Purchasing..." : "Buy now"}
+              {loading ? t("actions.purchasing") : t("actions.buyNow")}
             </button>
           </div>
         </motion.div>

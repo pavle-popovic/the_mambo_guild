@@ -481,7 +481,7 @@
       "pillarCoursesBullet2": "Volledige choreografieën, stap voor stap uitgelegd",
       "pillarCoursesBullet3": "Geschiedenis van Salsa — 20 modules",
       "pillarCoursesBullet4": "Trainingswetenschap — 18 modules",
-      "pillarCoursesBullet5": "Techniek, styling, muzikaliteit, partnerwerk",
+      "pillarCoursesBullet5": "Techniek, styling, musicaliteit",
       "pillarPlayerEyebrow": "DE VIDEOSPELER",
       "pillarPlayerTitlePre": "De",
       "pillarPlayerTitleAccent": "oefenruimte",
@@ -509,12 +509,12 @@
       "pillarCommunityEyebrow": "DE COMMUNITY",
       "pillarCommunityTitlePre": "Post je video's.",
       "pillarCommunityTitleAccent": "Dans niet alleen.",
-      "pillarCommunityBody": "Voortgangsvideo's. Echte feedback. Vragen beantwoord. Dansers die écht trainen.",
-      "pillarCommunityBullet1": "The Stage — post je voortgangsvideo's",
-      "pillarCommunityBullet2": "The Lab — vraag & beantwoord",
+      "pillarCommunityBody": "Post video's. Stel vragen. Verdien claves. Geef ze uit in de Gilde-winkel.",
+      "pillarCommunityBullet1": "The Stage: post voortgangsvideo's, +10 claves",
+      "pillarCommunityBullet2": "The Lab: stel en beantwoord vragen, +3 claves",
       "pillarCommunityBullet3": "Hype- of Coach-feedback",
-      "pillarCommunityBullet4": "38 badges, van Brons tot Diamond",
-      "pillarCommunityBullet5": "Wekelijkse en all-time leaderboards",
+      "pillarCommunityBullet4": "38 badges, Brons tot Diamant",
+      "pillarCommunityBullet5": "Weekranglijsten en all-time",
       "pillarVipEyebrow": "VIP — 1-OP-1 COACHING & PRIVÉGROEP",
       "pillarVipTitlePre": "Train",
       "pillarVipTitleAccent": "direct",
@@ -762,7 +762,10 @@
     "timotheHistoryBody": "Onderzocht jarenlang de geschiedenis van salsa en interviewde historische legendes uit de scene zoals Roly Maden. Schreef een boek over de geschiedenis van mambo en Latijnse dansen.",
     "timotheMamboTitle": "Een in mambo gewortelde stijl",
     "timotheMamboBody": "Diep geworteld in mambo, met een vleugje fusion en persoonlijke interpretatie. Opgeleid in Paris en Mexico, trad wereldwijd op met Black and White Mambo en leidde zijn eigen team Mambo All Stars.",
-    "timotheQuote": "Salsa is meer dan stappen. Het is herinnering, cultuur en het verhaal van wie haar vorm hebben gegeven."
+    "timotheQuote": "Salsa is meer dan stappen. Het is herinnering, cultuur en het verhaal van wie haar vorm hebben gegeven.",
+    "ambassadorTitle": "Word Gilde-Ambassadeur",
+    "ambassadorBody": "Hou je van The Mambo Guild en wil je haar in jouw scene vertegenwoordigen? Solliciteer als Gilde-Ambassadeur en help de community groeien.",
+    "ambassadorCta": "Solliciteer als ambassadeur"
   },
   "coaching": {
     "lockedTitle": "The Coaching Corner is voor Guild Masters",
@@ -1232,7 +1235,7 @@
     },
     "founder_diamond": {
       "name": "Oprichter",
-      "description": "One of the founding members of The Mambo Guild."
+      "description": "Een van de oprichtende leden van The Mambo Guild."
     },
     "guild_master": {
       "name": "Gildenmeester",
@@ -1323,172 +1326,218 @@
       "description": "Consistente toewijding om te verschijnen. Twee weken sterk."
     },
     "motw_bronze": {
-      "name": "Move Master I",
-      "description": "Posted your first Move of the Week video. Welcome to the floor."
+      "name": "Move Meester I",
+      "description": "Je eerste Move of the Week-video gepost. Welkom op de dansvloer."
     },
     "motw_silver": {
-      "name": "Move Master II",
-      "description": "Posted 10 Move of the Week videos."
+      "name": "Move Meester II",
+      "description": "10 Move of the Week-video's gepost."
     },
     "motw_gold": {
-      "name": "Move Master III",
-      "description": "Posted 30 Move of the Week videos. You're a regular."
+      "name": "Move Meester III",
+      "description": "30 Move of the Week-video's gepost. Je bent een vaste gast."
     },
     "motw_diamond": {
-      "name": "Move Master IV",
-      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+      "name": "Move Meester IV",
+      "description": "100 Move of the Week-video's gepost. Gecertificeerde weeklegende."
     },
     "original_bronze": {
-      "name": "The Originator I",
-      "description": "Shared your first original choreo or freestyle."
+      "name": "De Originator I",
+      "description": "Je eerste originele choreo of freestyle gedeeld."
     },
     "original_silver": {
-      "name": "The Originator II",
-      "description": "Shared 10 original choreos or freestyles."
+      "name": "De Originator II",
+      "description": "10 originele choreo's of freestyles gedeeld."
     },
     "original_gold": {
-      "name": "The Originator III",
-      "description": "Shared 30 original choreos or freestyles. You have a voice."
+      "name": "De Originator III",
+      "description": "30 originele choreo's of freestyles gedeeld. Je hebt een eigen stem."
     },
     "original_diamond": {
-      "name": "The Originator IV",
-      "description": "Shared 100 original choreos or freestyles. A true creator."
+      "name": "De Originator IV",
+      "description": "100 originele choreo's of freestyles gedeeld. Een echte creator."
     },
     "guild_bronze": {
-      "name": "Class Act I",
-      "description": "Posted your first Guild-class choreo."
+      "name": "Klassestuk I",
+      "description": "Je eerste Gilde-klasse choreo gepost."
     },
     "guild_silver": {
-      "name": "Class Act II",
-      "description": "Posted 10 Guild-class choreos."
+      "name": "Klassestuk II",
+      "description": "10 Gilde-klasse choreo's gepost."
     },
     "guild_gold": {
-      "name": "Class Act III",
-      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+      "name": "Klassestuk III",
+      "description": "30 Gilde-klasse choreo's gepost. Ensemble-niveau."
     },
     "guild_diamond": {
-      "name": "Class Act IV",
-      "description": "Posted 100 Guild-class choreos. Guild pillar."
+      "name": "Klassestuk IV",
+      "description": "100 Gilde-klasse choreo's gepost. Pijler van het Gilde."
     },
     "liked_bronze": {
-      "name": "Crowd Favorite I",
-      "description": "Received your first like."
+      "name": "Publiekslieveling I",
+      "description": "Je eerste like ontvangen."
     },
     "liked_silver": {
-      "name": "Crowd Favorite II",
-      "description": "Received 100 total likes across your posts."
+      "name": "Publiekslieveling II",
+      "description": "100 likes in totaal op je posts."
     },
     "liked_gold": {
-      "name": "Crowd Favorite III",
-      "description": "Received 500 total likes across your posts."
+      "name": "Publiekslieveling III",
+      "description": "500 likes in totaal op je posts."
     },
     "liked_diamond": {
-      "name": "Crowd Favorite IV",
-      "description": "Received 2,500 total likes. The room loves you."
+      "name": "Publiekslieveling IV",
+      "description": "2.500 likes in totaal. De zaal is weg van je."
     },
     "motw_love_bronze": {
-      "name": "Move Magnet I",
-      "description": "Got your first like on a Move of the Week video."
+      "name": "Move Magneet I",
+      "description": "Je eerste like op een Move of the Week-video."
     },
     "motw_love_silver": {
-      "name": "Move Magnet II",
-      "description": "25 likes across your Move of the Week videos."
+      "name": "Move Magneet II",
+      "description": "25 likes op je Move of the Week-video's."
     },
     "motw_love_gold": {
-      "name": "Move Magnet III",
-      "description": "150 likes across your Move of the Week videos."
+      "name": "Move Magneet III",
+      "description": "150 likes op je Move of the Week-video's."
     },
     "motw_love_diamond": {
-      "name": "Move Magnet IV",
-      "description": "1,000 likes across your Move of the Week videos."
+      "name": "Move Magneet IV",
+      "description": "1.000 likes op je Move of the Week-video's."
     },
     "original_love_bronze": {
-      "name": "Fan Favorite I",
-      "description": "Got your first like on an original post."
+      "name": "Fanfavoriet I",
+      "description": "Je eerste like op een originele post."
     },
     "original_love_silver": {
-      "name": "Fan Favorite II",
-      "description": "25 likes across your original posts."
+      "name": "Fanfavoriet II",
+      "description": "25 likes op je originele posts."
     },
     "original_love_gold": {
-      "name": "Fan Favorite III",
-      "description": "150 likes across your original posts."
+      "name": "Fanfavoriet III",
+      "description": "150 likes op je originele posts."
     },
     "original_love_diamond": {
-      "name": "Fan Favorite IV",
-      "description": "1,000 likes across your original posts."
+      "name": "Fanfavoriet IV",
+      "description": "1.000 likes op je originele posts."
     },
     "guild_love_bronze": {
-      "name": "Guild Applause I",
-      "description": "Got your first like on a Guild-class post."
+      "name": "Gilde-applaus I",
+      "description": "Je eerste like op een Gilde-klasse post."
     },
     "guild_love_silver": {
-      "name": "Guild Applause II",
-      "description": "25 likes across your Guild-class posts."
+      "name": "Gilde-applaus II",
+      "description": "25 likes op je Gilde-klasse posts."
     },
     "guild_love_gold": {
-      "name": "Guild Applause III",
-      "description": "150 likes across your Guild-class posts."
+      "name": "Gilde-applaus III",
+      "description": "150 likes op je Gilde-klasse posts."
     },
     "guild_love_diamond": {
-      "name": "Guild Applause IV",
-      "description": "1,000 likes across your Guild-class posts."
+      "name": "Gilde-applaus IV",
+      "description": "1.000 likes op je Gilde-klasse posts."
     },
     "promoter": {
       "name": "Promoter",
-      "description": "Brought 3 dancers into the Guild through your referral link."
+      "description": "Drie dansers via je verwijslink het Gilde in gebracht."
     }
   },
   "shop": {
-    "pageTitle": "The Guild Shop",
-    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
-    "balanceLabel": "Balance",
-    "viewInventory": "View inventory →",
-    "inventoryTitle": "Inventory",
-    "inventorySubtitle": "Equip what you own. Everything is permanent.",
-    "backToShop": "← Back to shop",
-    "empty": "Nothing here yet. Check back soon.",
-    "emptyInventory": "You don't own anything yet.",
-    "loading": "Loading catalog...",
-    "loadError": "Failed to load shop",
+    "pageTitle": "De Gilde-winkel",
+    "pageSubtitle": "Geef je claves uit aan coachingtickets, cosmetica en slot-upgrades. Elke aankoop is definitief.",
+    "balanceLabel": "Saldo",
+    "viewInventory": "Inventaris bekijken →",
+    "visitShop": "Naar de winkel",
+    "inventoryTitle": "Inventaris",
+    "inventorySubtitle": "Uitrusten wat je bezit. Alles is permanent.",
+    "backToShop": "← Terug naar de winkel",
+    "empty": "Hier staat nog niets. Kom snel terug.",
+    "emptyInventory": "Je hebt nog niets in bezit.",
+    "loading": "Catalogus laden...",
+    "loadingInventory": "Inventaris laden...",
+    "loadError": "Winkel laden mislukt",
+    "loadInventoryError": "Inventaris laden mislukt",
+    "equipError": "Uitrusten mislukt",
+    "stockRemaining": "Nog {count}",
+    "ownedCount": "In bezit: {count}",
     "tabs": {
       "ticket": "Tickets",
-      "border": "Borders",
-      "title": "Titles",
-      "utility": "Utility"
+      "border": "Randen",
+      "title": "Titels",
+      "utility": "Nuttig"
+    },
+    "tabBlurbs": {
+      "border": "Avatarranden. Laat je zeldzaamheid zien.",
+      "title": "Titels onder je naam in het hele Gilde.",
+      "utility": "Permanente upgrades van je plaatsingscapaciteit.",
+      "ticket": "Gouden Tickets ontgrendelen een 1-op-1 coachingsessie. Beperkte voorraad."
+    },
+    "sections": {
+      "cosmetics": "Cosmetica",
+      "other": "Overige items"
     },
     "rarity": {
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
+      "common": "Gewoon",
+      "rare": "Zeldzaam",
+      "epic": "Episch",
+      "legendary": "Legendarisch"
     },
     "actions": {
-      "buy": "Buy",
-      "buyNow": "Buy now",
-      "cancel": "Cancel",
-      "equip": "Equip",
-      "unequip": "Unequip",
-      "owned": "Owned",
-      "soldOut": "Sold out",
-      "locked": "Locked",
-      "notEnough": "Not enough",
-      "purchasing": "Purchasing...",
-      "equipped": "Equipped",
-      "redeemTicket": "Redeem ticket →"
+      "buy": "Kopen",
+      "buyNow": "Nu kopen",
+      "cancel": "Annuleren",
+      "equip": "Uitrusten",
+      "unequip": "Afleggen",
+      "owned": "In bezit",
+      "soldOut": "Uitverkocht",
+      "locked": "Vergrendeld",
+      "notEnough": "Onvoldoende",
+      "purchasing": "Bezig met kopen...",
+      "equipped": "Uitgerust",
+      "redeemTicket": "Ticket inwisselen →"
     },
     "purchase": {
-      "confirmTitle": "Confirm purchase",
-      "priceLabel": "Price",
-      "yourBalance": "Your balance",
-      "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
-      "success": "Purchase complete 🎉",
-      "genericError": "Purchase failed. Please try again."
+      "confirmTitle": "Aankoop bevestigen",
+      "priceLabel": "Prijs",
+      "yourBalance": "Jouw saldo",
+      "afterPurchase": "Na aankoop",
+      "success": "Aankoop voltooid 🎉",
+      "genericError": "Aankoop mislukt. Probeer het opnieuw."
+    },
+    "preview": {
+      "unavailable": "voorbeeld niet beschikbaar",
+      "goldenTicket": "Gouden Ticket",
+      "stageSlots": "+{count} podiumplekken",
+      "labSlots": "+{count} labplekken",
+      "utility": "Nuttig"
     },
     "earn": {
-      "stagePost": "Earn +10 🥢 on post",
-      "labQuestion": "Earn +3 🥢 on post"
+      "stagePost": "Verdien +10 🥢 per post",
+      "labQuestion": "Verdien +3 🥢 per post"
     }
+  },
+  "ambassador": {
+    "title": "Solliciteer als Gilde-Ambassadeur",
+    "subtitle": "Vertel iets over jezelf en waarom je The Mambo Guild wil vertegenwoordigen.",
+    "nameLabel": "Volledige naam",
+    "emailLabel": "E-mail",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/jij (optioneel)",
+    "locationLabel": "Stad / scene",
+    "locationPlaceholder": "bijv. Amsterdam, Antwerpen (optioneel)",
+    "messageLabel": "Waarom jij?",
+    "messagePlaceholder": "Deel je dansachtergrond, de scene waarin je zit en hoe je de Gilde zou vertegenwoordigen. Minstens 20 tekens.",
+    "messageHint": "{count} / 4000",
+    "submit": "Sollicitatie versturen",
+    "sending": "Versturen…",
+    "cancel": "Annuleren",
+    "close": "Sluiten",
+    "successTitle": "Sollicitatie verzonden",
+    "successBody": "Bedankt voor je sollicitatie. Pavle leest iedere sollicitatie persoonlijk en neemt contact op als het past.",
+    "genericError": "Sollicitatie kon niet worden verstuurd. Probeer het zo nog eens."
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "Valt, staat op, blijft dansen."
   }
 }

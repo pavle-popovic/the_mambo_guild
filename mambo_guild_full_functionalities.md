@@ -1,7 +1,7 @@
 # The Mambo Guild — Complete Codebase Functionality Reference
 
-> **Last Updated**: April 19, 2026  
-> **Status**: Platform is live in beta. Mux upload pipeline is wired end-to-end (lesson editor + VIP 1-on-1 coaching both use real Mux direct upload with status polling). Diego AI concierge is shipped and running on Gemini 2.0 Flash. **i18n is fully deployed across 14 locales** (en, es, pt, fr, de, it, ja, ko, zh, ru, pl, nl, ar, el) on landing, pricing, instructors, coaching, roundtable, community, profile, skill tree, and auth surfaces via a homegrown `useTranslations` hook (no `next-intl` runtime). Stripe is hardened for beta (7-day free trial on Advanced, live Guild Master seat cap, grandfather pricing lock-in, cancel-at-period-end, retention flow). Two-instructor landing (Pavle + Timothé Fournier) and release schedule roadmap are live. Global in-app **Bug Report Widget** (Section 36).
+> **Last Updated**: April 22, 2026  
+> **Status**: Platform is live in beta. Mux upload pipeline is wired end-to-end (lesson editor + VIP 1-on-1 coaching both use real Mux direct upload with status polling). Diego AI concierge is shipped and running on Gemini 2.0 Flash. **i18n is fully deployed across 14 locales** (en, es, pt, fr, de, it, ja, ko, zh, ru, pl, nl, ar, el) on landing, pricing, instructors, coaching, roundtable, community, profile, skill tree, and auth surfaces via a homegrown `useTranslations` hook (no `next-intl` runtime). Stripe is hardened for beta (7-day free trial on Advanced, live Guild Master seat cap, grandfather pricing lock-in, cancel-at-period-end, retention flow). Two-instructor landing (Pavle + Timothé Fournier) and release schedule roadmap are live. Global in-app **Bug Report Widget** (Section 36). **Claves economy is now a closed loop**: posting pays out (Section 37), and The Guild Shop (Section 38) sinks balances into coaching tickets, avatar-border + username-title cosmetics across four rarities, and permanent slot upgrades.
 
 ---
 
@@ -43,6 +43,8 @@
 34. [Scripts & Utilities](#34-scripts--utilities)
 35. [Global Translation Architecture (i18n)](#35-global-translation-architecture-i18n)
 36. [Bug Report Widget (Global)](#36-bug-report-widget-global)
+37. [Posting Rewards (Claves Payouts)](#37-posting-rewards-claves-payouts)
+38. [The Guild Shop](#38-the-guild-shop)
 
 ---
 

@@ -17,10 +17,12 @@ import {
 import { apiClient, type InventoryItem } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/i18n/useTranslations";
 
 export default function InventoryPage() {
   const router = useRouter();
   const { user, loading: authLoading, refreshUser } = useAuth();
+  const t = useTranslations("shop");
   const [items, setItems] = useState<InventoryItem[]>([]);
   const [equipped, setEquipped] = useState<{ border: string | null; title: string | null }>({
     border: null,
@@ -50,11 +52,11 @@ export default function InventoryPage() {
       }
       setEquipped({ border, title });
     } catch (e: any) {
-      setError(e?.message || "Failed to load inventory");
+      setError(e?.message || t("loadInventoryError"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     if (user) fetchInventory();
@@ -73,7 +75,7 @@ export default function InventoryPage() {
       // equipped_title_sku re-renders immediately.
       await Promise.all([fetchInventory(), refreshUser()]);
     } catch (e: any) {
-      setError(e?.detail?.message || e?.message || "Equip failed");
+      setError(e?.detail?.message || e?.message || t("equipError"));
     } finally {
       setBusy(null);
     }
@@ -100,26 +102,26 @@ export default function InventoryPage() {
       <main className="max-w-6xl mx-auto px-4 pt-24 pb-16">
         <header className="mb-8 flex items-end justify-between gap-4 flex-wrap">
           <div>
-            <h1 className="text-3xl md:text-4xl font-black tracking-tight">Inventory</h1>
-            <p className="text-white/60 mt-2">Equip what you own. Everything is permanent.</p>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight">{t("inventoryTitle")}</h1>
+            <p className="text-white/60 mt-2">{t("inventorySubtitle")}</p>
           </div>
           <Link
             href="/shop"
             className="text-sm text-white/80 hover:text-amber-300 underline underline-offset-2"
           >
-            ← Back to shop
+            {t("backToShop")}
           </Link>
         </header>
 
         {loading ? (
-          <div className="text-center text-white/50 py-20">Loading inventory...</div>
+          <div className="text-center text-white/50 py-20">{t("loadingInventory")}</div>
         ) : error ? (
           <div className="text-center text-red-400 py-20">{error}</div>
         ) : items.length === 0 ? (
           <div className="text-center text-white/40 py-20">
-            You don't own anything yet.{" "}
+            {t("emptyInventory")}{" "}
             <Link href="/shop" className="underline text-amber-300">
-              Visit the shop
+              {t("visitShop")}
             </Link>
             .
           </div>
@@ -127,7 +129,7 @@ export default function InventoryPage() {
           <>
             {cosmetics.length > 0 && (
               <section className="mb-10">
-                <h2 className="text-xl font-semibold mb-4">Cosmetics</h2>
+                <h2 className="text-xl font-semibold mb-4">{t("sections.cosmetics")}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {cosmetics.map((item) => (
                     <InventoryCard
@@ -142,6 +144,7 @@ export default function InventoryPage() {
                       onEquip={(unequip) =>
                         handleEquip(item.sku, item.kind as "border" | "title", unequip)
                       }
+                      t={t}
                     />
                   ))}
                 </div>
@@ -150,7 +153,7 @@ export default function InventoryPage() {
 
             {utilities.length > 0 && (
               <section>
-                <h2 className="text-xl font-semibold mb-4">Other</h2>
+                <h2 className="text-xl font-semibold mb-4">{t("sections.other")}</h2>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {utilities.map((item) => (
                     <div
@@ -160,14 +163,14 @@ export default function InventoryPage() {
                       <h3 className="font-semibold text-white">{item.name}</h3>
                       <p className="text-sm text-white/50 mt-1">{item.description}</p>
                       <p className="text-xs text-white/40 mt-3">
-                        Owned: {item.owned_count}
+                        {t("ownedCount", { count: item.owned_count })}
                       </p>
                       {item.sku === "ticket_golden" && item.owned_count > 0 && (
                         <Link
                           href="/guild-master"
                           className="mt-3 inline-block text-sm text-amber-300 hover:text-amber-200 underline"
                         >
-                          Redeem ticket →
+                          {t("actions.redeemTicket")}
                         </Link>
                       )}
                     </div>
@@ -189,11 +192,13 @@ function InventoryCard({
   equipped,
   busy,
   onEquip,
+  t,
 }: {
   item: InventoryItem;
   equipped: boolean;
   busy: boolean;
   onEquip: (unequip: boolean) => void;
+  t: (key: string, params?: Record<string, string | number>) => string;
 }) {
   const rarity: CosmeticRarity | null = item.rarity as CosmeticRarity | null;
   const rarityBorder = rarity ? RARITY_BORDER_CLASS[rarity] : "border-white/10";
@@ -211,13 +216,13 @@ function InventoryCard({
           <h3 className="text-white font-semibold truncate">{item.name}</h3>
           {rarity && (
             <div className={cn("text-xs uppercase tracking-wider", rarityText)}>
-              {RARITY_LABELS[rarity]}
+              {t(`rarity.${rarity}`)}
             </div>
           )}
         </div>
         {equipped && (
           <span className="shrink-0 rounded-full bg-emerald-500/20 border border-emerald-400/40 px-2 py-0.5 text-[10px] text-emerald-200 uppercase tracking-wider">
-            Equipped
+            {t("actions.equipped")}
           </span>
         )}
       </div>
@@ -252,7 +257,7 @@ function InventoryCard({
           busy && "opacity-50 cursor-wait"
         )}
       >
-        {busy ? "..." : equipped ? "Unequip" : "Equip"}
+        {busy ? "..." : equipped ? t("actions.unequip") : t("actions.equip")}
       </button>
     </div>
   );

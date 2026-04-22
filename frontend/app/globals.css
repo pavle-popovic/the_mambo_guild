@@ -347,6 +347,17 @@ media-controller [aria-label*="repeat" i] {
   50%      { box-shadow: 0 0 36px rgba(34, 197, 94, 1), 0 0 14px rgba(34, 197, 94, 0.75); }
 }
 
+/* Double-tap-to-skip flash on mobile video. Quick fade-in + scale-in,
+   then fades out — matches YouTube-style skip indicator. */
+.animate-fade-skip {
+  animation: fadeSkipFlash 0.55s ease-out forwards;
+}
+@keyframes fadeSkipFlash {
+  0%   { opacity: 0; transform: scale(0.85); }
+  25%  { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(1.05); }
+}
+
 @keyframes guildMasterPulse {
   0%, 100% {
     box-shadow: 

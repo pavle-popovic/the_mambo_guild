@@ -481,7 +481,7 @@
       "pillarCoursesBullet2": "Pełne choreografie, rozłożone na czynniki pierwsze",
       "pillarCoursesBullet3": "Historia Salsy — 20 modułów",
       "pillarCoursesBullet4": "Nauka o treningu — 18 modułów",
-      "pillarCoursesBullet5": "Technika, styling, muzykalność, taniec w parze",
+      "pillarCoursesBullet5": "Technika, styl, muzykalność",
       "pillarPlayerEyebrow": "ODTWARZACZ WIDEO",
       "pillarPlayerTitlePre": "",
       "pillarPlayerTitleAccent": "Sala treningowa",
@@ -509,12 +509,12 @@
       "pillarCommunityEyebrow": "SPOŁECZNOŚĆ",
       "pillarCommunityTitlePre": "Publikuj swoje filmy.",
       "pillarCommunityTitleAccent": "Nie tańcz sam.",
-      "pillarCommunityBody": "Filmy z postępów. Prawdziwy feedback. Odpowiedzi na pytania. Tancerze, którzy naprawdę trenują.",
-      "pillarCommunityBullet1": "The Stage — publikuj filmy z postępów",
-      "pillarCommunityBullet2": "The Lab — pytaj i odpowiadaj",
-      "pillarCommunityBullet3": "Feedback typu Hype lub Coach",
-      "pillarCommunityBullet4": "38 odznak, od brązu do diamentu",
-      "pillarCommunityBullet5": "Tygodniowe i ogólne rankingi",
+      "pillarCommunityBody": "Wrzucaj filmy. Zadawaj pytania. Zdobywaj klawe. Wydawaj je w Sklepie Gildii.",
+      "pillarCommunityBullet1": "The Stage: wrzucaj filmy z postępami, +10 klawe",
+      "pillarCommunityBullet2": "The Lab: pytaj i odpowiadaj, +3 klawe",
+      "pillarCommunityBullet3": "Feedback Hype lub Coach",
+      "pillarCommunityBullet4": "38 odznak, od Brązu do Diamentu",
+      "pillarCommunityBullet5": "Tygodniowe i wiecznotrwałe rankingi",
       "pillarVipEyebrow": "VIP — COACHING 1-NA-1 I PRYWATNA GRUPA",
       "pillarVipTitlePre": "Trenuj",
       "pillarVipTitleAccent": "bezpośrednio",
@@ -762,7 +762,10 @@
     "timotheHistoryBody": "Przez wiele lat badał historię salsy i przeprowadzał wywiady z historycznymi legendami sceny, takimi jak Roly Maden. Napisał książkę o historii mambo i tańców latynoamerykańskich.",
     "timotheMamboTitle": "Styl zakorzeniony w mambo",
     "timotheMamboBody": "Głęboko zakorzeniony w mambo, z nutą fuzji i osobistej interpretacji. Szkolił się w Paris i Mexico, występował na całym świecie z Black and White Mambo i prowadził własną grupę Mambo All Stars.",
-    "timotheQuote": "Salsa to coś więcej niż kroki. To pamięć, kultura i historia tych, którzy ją stworzyli."
+    "timotheQuote": "Salsa to coś więcej niż kroki. To pamięć, kultura i historia tych, którzy ją stworzyli.",
+    "ambassadorTitle": "Zostań ambasadorem Gildii",
+    "ambassadorBody": "Kochasz The Mambo Guild i chcesz reprezentować ją w swojej scenie? Zgłoś się na ambasadora Gildii i pomóż społeczności rosnąć.",
+    "ambassadorCta": "Zgłoś się jako ambasador"
   },
   "coaching": {
     "lockedTitle": "Kącik Coachingu jest dla Guild Masters",
@@ -1232,7 +1235,7 @@
     },
     "founder_diamond": {
       "name": "Założyciel",
-      "description": "One of the founding members of The Mambo Guild."
+      "description": "Jeden z członków założycieli The Mambo Guild."
     },
     "guild_master": {
       "name": "Mistrz Gildii",
@@ -1323,172 +1326,218 @@
       "description": "Konsekwentne zaangażowanie. Dwa tygodnie z rzędu."
     },
     "motw_bronze": {
-      "name": "Move Master I",
-      "description": "Posted your first Move of the Week video. Welcome to the floor."
+      "name": "Mistrz Ruchu I",
+      "description": "Wrzuciłeś pierwsze wideo Move of the Week. Witaj na parkiecie."
     },
     "motw_silver": {
-      "name": "Move Master II",
-      "description": "Posted 10 Move of the Week videos."
+      "name": "Mistrz Ruchu II",
+      "description": "Wrzuciłeś 10 wideo Move of the Week."
     },
     "motw_gold": {
-      "name": "Move Master III",
-      "description": "Posted 30 Move of the Week videos. You're a regular."
+      "name": "Mistrz Ruchu III",
+      "description": "30 wideo Move of the Week. Jesteś stałym bywalcem."
     },
     "motw_diamond": {
-      "name": "Move Master IV",
-      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+      "name": "Mistrz Ruchu IV",
+      "description": "100 wideo Move of the Week. Tygodniowa legenda."
     },
     "original_bronze": {
-      "name": "The Originator I",
-      "description": "Shared your first original choreo or freestyle."
+      "name": "Twórca I",
+      "description": "Udostępniłeś pierwszą autorską choreo lub freestyle."
     },
     "original_silver": {
-      "name": "The Originator II",
-      "description": "Shared 10 original choreos or freestyles."
+      "name": "Twórca II",
+      "description": "Udostępniłeś 10 autorskich choreo lub freestyle."
     },
     "original_gold": {
-      "name": "The Originator III",
-      "description": "Shared 30 original choreos or freestyles. You have a voice."
+      "name": "Twórca III",
+      "description": "30 autorskich choreo lub freestyle. Masz własny styl."
     },
     "original_diamond": {
-      "name": "The Originator IV",
-      "description": "Shared 100 original choreos or freestyles. A true creator."
+      "name": "Twórca IV",
+      "description": "100 autorskich choreo lub freestyle. Prawdziwy twórca."
     },
     "guild_bronze": {
-      "name": "Class Act I",
-      "description": "Posted your first Guild-class choreo."
+      "name": "Klasa Sama w Sobie I",
+      "description": "Pierwsza choreo na poziomie Gildii."
     },
     "guild_silver": {
-      "name": "Class Act II",
-      "description": "Posted 10 Guild-class choreos."
+      "name": "Klasa Sama w Sobie II",
+      "description": "10 choreo na poziomie Gildii."
     },
     "guild_gold": {
-      "name": "Class Act III",
-      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+      "name": "Klasa Sama w Sobie III",
+      "description": "30 choreo na poziomie Gildii. Materiał na cały zespół."
     },
     "guild_diamond": {
-      "name": "Class Act IV",
-      "description": "Posted 100 Guild-class choreos. Guild pillar."
+      "name": "Klasa Sama w Sobie IV",
+      "description": "100 choreo na poziomie Gildii. Filar Gildii."
     },
     "liked_bronze": {
-      "name": "Crowd Favorite I",
-      "description": "Received your first like."
+      "name": "Ulubieniec Publiczności I",
+      "description": "Pierwsze polubienie."
     },
     "liked_silver": {
-      "name": "Crowd Favorite II",
-      "description": "Received 100 total likes across your posts."
+      "name": "Ulubieniec Publiczności II",
+      "description": "Łącznie 100 polubień pod postami."
     },
     "liked_gold": {
-      "name": "Crowd Favorite III",
-      "description": "Received 500 total likes across your posts."
+      "name": "Ulubieniec Publiczności III",
+      "description": "Łącznie 500 polubień pod postami."
     },
     "liked_diamond": {
-      "name": "Crowd Favorite IV",
-      "description": "Received 2,500 total likes. The room loves you."
+      "name": "Ulubieniec Publiczności IV",
+      "description": "Łącznie 2 500 polubień. Cała sala cię kocha."
     },
     "motw_love_bronze": {
-      "name": "Move Magnet I",
-      "description": "Got your first like on a Move of the Week video."
+      "name": "Magnes Ruchu I",
+      "description": "Pierwsze polubienie na filmie Move of the Week."
     },
     "motw_love_silver": {
-      "name": "Move Magnet II",
-      "description": "25 likes across your Move of the Week videos."
+      "name": "Magnes Ruchu II",
+      "description": "25 polubień pod twoimi filmami Move of the Week."
     },
     "motw_love_gold": {
-      "name": "Move Magnet III",
-      "description": "150 likes across your Move of the Week videos."
+      "name": "Magnes Ruchu III",
+      "description": "150 polubień pod twoimi filmami Move of the Week."
     },
     "motw_love_diamond": {
-      "name": "Move Magnet IV",
-      "description": "1,000 likes across your Move of the Week videos."
+      "name": "Magnes Ruchu IV",
+      "description": "1 000 polubień pod twoimi filmami Move of the Week."
     },
     "original_love_bronze": {
-      "name": "Fan Favorite I",
-      "description": "Got your first like on an original post."
+      "name": "Ulubieniec Fanów I",
+      "description": "Pierwsze polubienie pod autorskim postem."
     },
     "original_love_silver": {
-      "name": "Fan Favorite II",
-      "description": "25 likes across your original posts."
+      "name": "Ulubieniec Fanów II",
+      "description": "25 polubień pod autorskimi postami."
     },
     "original_love_gold": {
-      "name": "Fan Favorite III",
-      "description": "150 likes across your original posts."
+      "name": "Ulubieniec Fanów III",
+      "description": "150 polubień pod autorskimi postami."
     },
     "original_love_diamond": {
-      "name": "Fan Favorite IV",
-      "description": "1,000 likes across your original posts."
+      "name": "Ulubieniec Fanów IV",
+      "description": "1 000 polubień pod autorskimi postami."
     },
     "guild_love_bronze": {
-      "name": "Guild Applause I",
-      "description": "Got your first like on a Guild-class post."
+      "name": "Oklaski Gildii I",
+      "description": "Pierwsze polubienie pod postem na poziomie Gildii."
     },
     "guild_love_silver": {
-      "name": "Guild Applause II",
-      "description": "25 likes across your Guild-class posts."
+      "name": "Oklaski Gildii II",
+      "description": "25 polubień pod postami na poziomie Gildii."
     },
     "guild_love_gold": {
-      "name": "Guild Applause III",
-      "description": "150 likes across your Guild-class posts."
+      "name": "Oklaski Gildii III",
+      "description": "150 polubień pod postami na poziomie Gildii."
     },
     "guild_love_diamond": {
-      "name": "Guild Applause IV",
-      "description": "1,000 likes across your Guild-class posts."
+      "name": "Oklaski Gildii IV",
+      "description": "1 000 polubień pod postami na poziomie Gildii."
     },
     "promoter": {
-      "name": "Promoter",
-      "description": "Brought 3 dancers into the Guild through your referral link."
+      "name": "Promotor",
+      "description": "Sprowadziłeś 3 tancerzy do Gildii przez swój link referencyjny."
     }
   },
   "shop": {
-    "pageTitle": "The Guild Shop",
-    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
-    "balanceLabel": "Balance",
-    "viewInventory": "View inventory →",
-    "inventoryTitle": "Inventory",
-    "inventorySubtitle": "Equip what you own. Everything is permanent.",
-    "backToShop": "← Back to shop",
-    "empty": "Nothing here yet. Check back soon.",
-    "emptyInventory": "You don't own anything yet.",
-    "loading": "Loading catalog...",
-    "loadError": "Failed to load shop",
+    "pageTitle": "Sklep Gildii",
+    "pageSubtitle": "Wydawaj swoje klawe na bilety coachingowe, kosmetyki i ulepszenia slotów. Każdy zakup jest ostateczny.",
+    "balanceLabel": "Saldo",
+    "viewInventory": "Zobacz ekwipunek →",
+    "visitShop": "Odwiedź sklep",
+    "inventoryTitle": "Ekwipunek",
+    "inventorySubtitle": "Załóż to, co posiadasz. Wszystko jest trwałe.",
+    "backToShop": "← Wróć do sklepu",
+    "empty": "Jeszcze nic tu nie ma. Wróć później.",
+    "emptyInventory": "Nie masz jeszcze niczego.",
+    "loading": "Ładowanie katalogu...",
+    "loadingInventory": "Ładowanie ekwipunku...",
+    "loadError": "Nie udało się załadować sklepu",
+    "loadInventoryError": "Nie udało się załadować ekwipunku",
+    "equipError": "Nie udało się założyć",
+    "stockRemaining": "Pozostało {count}",
+    "ownedCount": "Posiadasz: {count}",
     "tabs": {
-      "ticket": "Tickets",
-      "border": "Borders",
-      "title": "Titles",
-      "utility": "Utility"
+      "ticket": "Bilety",
+      "border": "Ramki",
+      "title": "Tytuły",
+      "utility": "Narzędzia"
+    },
+    "tabBlurbs": {
+      "border": "Ramki awatara. Pokaż swoją rzadkość.",
+      "title": "Tytuły wyświetlane pod twoim imieniem w całej Gildii.",
+      "utility": "Stałe ulepszenia twojej pojemności publikacji.",
+      "ticket": "Złote Bilety odblokowują sesję coachingową 1 na 1. Ograniczony zapas."
+    },
+    "sections": {
+      "cosmetics": "Kosmetyki",
+      "other": "Inne przedmioty"
     },
     "rarity": {
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
+      "common": "Zwykły",
+      "rare": "Rzadki",
+      "epic": "Epicki",
+      "legendary": "Legendarny"
     },
     "actions": {
-      "buy": "Buy",
-      "buyNow": "Buy now",
-      "cancel": "Cancel",
-      "equip": "Equip",
-      "unequip": "Unequip",
-      "owned": "Owned",
-      "soldOut": "Sold out",
-      "locked": "Locked",
-      "notEnough": "Not enough",
-      "purchasing": "Purchasing...",
-      "equipped": "Equipped",
-      "redeemTicket": "Redeem ticket →"
+      "buy": "Kup",
+      "buyNow": "Kup teraz",
+      "cancel": "Anuluj",
+      "equip": "Załóż",
+      "unequip": "Zdejmij",
+      "owned": "Posiadasz",
+      "soldOut": "Wyprzedane",
+      "locked": "Zablokowane",
+      "notEnough": "Za mało",
+      "purchasing": "Kupowanie...",
+      "equipped": "Założone",
+      "redeemTicket": "Zrealizuj bilet →"
     },
     "purchase": {
-      "confirmTitle": "Confirm purchase",
-      "priceLabel": "Price",
-      "yourBalance": "Your balance",
-      "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
-      "success": "Purchase complete 🎉",
-      "genericError": "Purchase failed. Please try again."
+      "confirmTitle": "Potwierdź zakup",
+      "priceLabel": "Cena",
+      "yourBalance": "Twoje saldo",
+      "afterPurchase": "Po zakupie",
+      "success": "Zakup zakończony 🎉",
+      "genericError": "Zakup nie powiódł się. Spróbuj ponownie."
+    },
+    "preview": {
+      "unavailable": "podgląd niedostępny",
+      "goldenTicket": "Złoty Bilet",
+      "stageSlots": "+{count} slotów sceny",
+      "labSlots": "+{count} slotów laboratorium",
+      "utility": "Narzędzie"
     },
     "earn": {
-      "stagePost": "Earn +10 🥢 on post",
-      "labQuestion": "Earn +3 🥢 on post"
+      "stagePost": "Zdobądź +10 🥢 za post",
+      "labQuestion": "Zdobądź +3 🥢 za post"
     }
+  },
+  "ambassador": {
+    "title": "Zgłoś się na ambasadora Gildii",
+    "subtitle": "Opowiedz trochę o sobie i dlaczego chcesz reprezentować The Mambo Guild.",
+    "nameLabel": "Imię i nazwisko",
+    "emailLabel": "Email",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/ty (opcjonalnie)",
+    "locationLabel": "Miasto / scena",
+    "locationPlaceholder": "np. Warszawa, Kraków (opcjonalnie)",
+    "messageLabel": "Dlaczego ty?",
+    "messagePlaceholder": "Opisz swoje tło taneczne, scenę, do której należysz, i jak reprezentowałbyś Gildię. Minimum 20 znaków.",
+    "messageHint": "{count} / 4000",
+    "submit": "Wyślij zgłoszenie",
+    "sending": "Wysyłanie…",
+    "cancel": "Anuluj",
+    "close": "Zamknij",
+    "successTitle": "Zgłoszenie wysłane",
+    "successBody": "Dzięki za zgłoszenie. Pavle osobiście czyta każde zgłoszenie i odezwie się, jeśli będzie pasować.",
+    "genericError": "Nie udało się wysłać zgłoszenia. Spróbuj ponownie za chwilę."
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "Upada, wstaje, dalej tańczy."
   }
 }

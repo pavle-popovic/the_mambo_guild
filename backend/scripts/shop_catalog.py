@@ -149,7 +149,7 @@ CATALOG: list[dict[str, Any]] = [
     _title("title_guild_luminary",    "Guild Luminary",     "epic", "platinum", "Lights the path for the Guild.",             701),
     _title("title_the_showstopper",   "The Showstopper",    "epic", "gold",     "Closes every set.",                          702),
     _title("title_flame_dancer",      "Flame Dancer",       "epic", "ember",    "Pure heat on the floor.",                    703),
-    _title("title_the_ambassador",    "The Ambassador",     "epic", "platinum", "Represents the Guild everywhere.",           704),
+    _title("title_the_phoenix",       "The Phoenix",        "epic", "ember",    "Falls, rises, keeps dancing.",               704),
 
     # ------------------------------------------------------------------
     # Titles — Legendary (3)

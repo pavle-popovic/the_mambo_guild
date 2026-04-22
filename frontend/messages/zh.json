@@ -481,7 +481,7 @@
       "pillarCoursesBullet2": "完整编舞，逐步拆解",
       "pillarCoursesBullet3": "Salsa历史 — 20个模块",
       "pillarCoursesBullet4": "训练科学 — 18个模块",
-      "pillarCoursesBullet5": "技术、风格、音乐性、双人配合",
+      "pillarCoursesBullet5": "技术、风格、乐感",
       "pillarPlayerEyebrow": "视频播放器",
       "pillarPlayerTitlePre": "专业舞者苦等已久的",
       "pillarPlayerTitleAccent": "练习室",
@@ -509,12 +509,12 @@
       "pillarCommunityEyebrow": "社区",
       "pillarCommunityTitlePre": "上传你的视频。",
       "pillarCommunityTitleAccent": "不要一个人跳。",
-      "pillarCommunityBody": "进步视频。真实反馈。问题有答。真正训练的舞者。",
-      "pillarCommunityBullet1": "The Stage — 发布你的进步视频",
-      "pillarCommunityBullet2": "The Lab — 提问与解答",
-      "pillarCommunityBullet3": "加油打气或教练点评",
-      "pillarCommunityBullet4": "38枚徽章，青铜 → 钻石",
-      "pillarCommunityBullet5": "每周榜与历史总榜",
+      "pillarCommunityBody": "发布视频。提问。赚取 claves。到公会商店花掉。",
+      "pillarCommunityBullet1": "The Stage: 发布进度视频，+10 claves",
+      "pillarCommunityBullet2": "The Lab: 提问和回答，+3 claves",
+      "pillarCommunityBullet3": "Hype 或 Coach 反馈",
+      "pillarCommunityBullet4": "38 枚徽章，从青铜到钻石",
+      "pillarCommunityBullet5": "每周与历代榜单",
       "pillarVipEyebrow": "VIP — 一对一教练与私密群组",
       "pillarVipTitlePre": "与大师",
       "pillarVipTitleAccent": "直接",
@@ -762,7 +762,10 @@
     "timotheHistoryBody": "多年来潜心研究 salsa 的历史，并访谈过 Roly Maden 等舞坛历史级传奇人物。撰写了一本关于 mambo 与拉丁舞历史的书籍。",
     "timotheMamboTitle": "植根于 Mambo 的风格",
     "timotheMamboBody": "深深植根于 mambo，融入了少许融合元素与个人诠释。在 Paris 与 Mexico 受训，曾随 Black and White Mambo 在世界各地演出，并带领自己的团队 Mambo All Stars。",
-    "timotheQuote": "salsa 不仅是舞步。它是记忆，是文化，也是那些塑造它的人们的故事。"
+    "timotheQuote": "salsa 不仅是舞步。它是记忆，是文化，也是那些塑造它的人们的故事。",
+    "ambassadorTitle": "成为公会大使",
+    "ambassadorBody": "热爱 The Mambo Guild 并想在你的舞蹈圈代表它？申请成为公会大使，帮助社区成长。",
+    "ambassadorCta": "申请成为大使"
   },
   "coaching": {
     "lockedTitle": "教练角是 Guild Master 专属",
@@ -1231,8 +1234,8 @@
       "description": "你的舞步正在加热舞台。熊熊燃烧。"
     },
     "founder_diamond": {
-      "name": "创始成员",
-      "description": "One of the founding members of The Mambo Guild."
+      "name": "创始人",
+      "description": "The Mambo Guild 的创始成员之一。"
     },
     "guild_master": {
       "name": "公会大师",
@@ -1323,172 +1326,218 @@
       "description": "持续到场的坚持。连续两周。"
     },
     "motw_bronze": {
-      "name": "Move Master I",
-      "description": "Posted your first Move of the Week video. Welcome to the floor."
+      "name": "动作大师 I",
+      "description": "发布了你的第一个 Move of the Week 视频。欢迎来到舞池。"
     },
     "motw_silver": {
-      "name": "Move Master II",
-      "description": "Posted 10 Move of the Week videos."
+      "name": "动作大师 II",
+      "description": "发布了 10 个 Move of the Week 视频。"
     },
     "motw_gold": {
-      "name": "Move Master III",
-      "description": "Posted 30 Move of the Week videos. You're a regular."
+      "name": "动作大师 III",
+      "description": "发布了 30 个 Move of the Week 视频。你是常客。"
     },
     "motw_diamond": {
-      "name": "Move Master IV",
-      "description": "Posted 100 Move of the Week videos. Certified weekly legend."
+      "name": "动作大师 IV",
+      "description": "发布了 100 个 Move of the Week 视频。名副其实的每周传奇。"
     },
     "original_bronze": {
-      "name": "The Originator I",
-      "description": "Shared your first original choreo or freestyle."
+      "name": "原创者 I",
+      "description": "分享了你的第一个原创编舞或 freestyle。"
     },
     "original_silver": {
-      "name": "The Originator II",
-      "description": "Shared 10 original choreos or freestyles."
+      "name": "原创者 II",
+      "description": "分享了 10 个原创编舞或 freestyle。"
     },
     "original_gold": {
-      "name": "The Originator III",
-      "description": "Shared 30 original choreos or freestyles. You have a voice."
+      "name": "原创者 III",
+      "description": "分享了 30 个原创编舞或 freestyle。你有自己的声音。"
     },
     "original_diamond": {
-      "name": "The Originator IV",
-      "description": "Shared 100 original choreos or freestyles. A true creator."
+      "name": "原创者 IV",
+      "description": "分享了 100 个原创编舞或 freestyle。真正的创作者。"
     },
     "guild_bronze": {
-      "name": "Class Act I",
-      "description": "Posted your first Guild-class choreo."
+      "name": "一流表演 I",
+      "description": "发布了你的第一个公会级编舞。"
     },
     "guild_silver": {
-      "name": "Class Act II",
-      "description": "Posted 10 Guild-class choreos."
+      "name": "一流表演 II",
+      "description": "发布了 10 个公会级编舞。"
     },
     "guild_gold": {
-      "name": "Class Act III",
-      "description": "Posted 30 Guild-class choreos. Full ensemble material."
+      "name": "一流表演 III",
+      "description": "发布了 30 个公会级编舞。整团级水准。"
     },
     "guild_diamond": {
-      "name": "Class Act IV",
-      "description": "Posted 100 Guild-class choreos. Guild pillar."
+      "name": "一流表演 IV",
+      "description": "发布了 100 个公会级编舞。公会支柱。"
     },
     "liked_bronze": {
-      "name": "Crowd Favorite I",
-      "description": "Received your first like."
+      "name": "大众最爱 I",
+      "description": "收到了第一个点赞。"
     },
     "liked_silver": {
-      "name": "Crowd Favorite II",
-      "description": "Received 100 total likes across your posts."
+      "name": "大众最爱 II",
+      "description": "所有帖子累计获得 100 个点赞。"
     },
     "liked_gold": {
-      "name": "Crowd Favorite III",
-      "description": "Received 500 total likes across your posts."
+      "name": "大众最爱 III",
+      "description": "所有帖子累计获得 500 个点赞。"
     },
     "liked_diamond": {
-      "name": "Crowd Favorite IV",
-      "description": "Received 2,500 total likes. The room loves you."
+      "name": "大众最爱 IV",
+      "description": "累计获得 2,500 个点赞。全场都爱你。"
     },
     "motw_love_bronze": {
-      "name": "Move Magnet I",
-      "description": "Got your first like on a Move of the Week video."
+      "name": "动作磁石 I",
+      "description": "在 Move of the Week 视频上收到第一个点赞。"
     },
     "motw_love_silver": {
-      "name": "Move Magnet II",
-      "description": "25 likes across your Move of the Week videos."
+      "name": "动作磁石 II",
+      "description": "你的 Move of the Week 视频共获得 25 个点赞。"
     },
     "motw_love_gold": {
-      "name": "Move Magnet III",
-      "description": "150 likes across your Move of the Week videos."
+      "name": "动作磁石 III",
+      "description": "你的 Move of the Week 视频共获得 150 个点赞。"
     },
     "motw_love_diamond": {
-      "name": "Move Magnet IV",
-      "description": "1,000 likes across your Move of the Week videos."
+      "name": "动作磁石 IV",
+      "description": "你的 Move of the Week 视频共获得 1,000 个点赞。"
     },
     "original_love_bronze": {
-      "name": "Fan Favorite I",
-      "description": "Got your first like on an original post."
+      "name": "粉丝最爱 I",
+      "description": "在原创帖子上收到第一个点赞。"
     },
     "original_love_silver": {
-      "name": "Fan Favorite II",
-      "description": "25 likes across your original posts."
+      "name": "粉丝最爱 II",
+      "description": "原创帖子共获得 25 个点赞。"
     },
     "original_love_gold": {
-      "name": "Fan Favorite III",
-      "description": "150 likes across your original posts."
+      "name": "粉丝最爱 III",
+      "description": "原创帖子共获得 150 个点赞。"
     },
     "original_love_diamond": {
-      "name": "Fan Favorite IV",
-      "description": "1,000 likes across your original posts."
+      "name": "粉丝最爱 IV",
+      "description": "原创帖子共获得 1,000 个点赞。"
     },
     "guild_love_bronze": {
-      "name": "Guild Applause I",
-      "description": "Got your first like on a Guild-class post."
+      "name": "公会喝彩 I",
+      "description": "在公会级帖子上收到第一个点赞。"
     },
     "guild_love_silver": {
-      "name": "Guild Applause II",
-      "description": "25 likes across your Guild-class posts."
+      "name": "公会喝彩 II",
+      "description": "公会级帖子共获得 25 个点赞。"
     },
     "guild_love_gold": {
-      "name": "Guild Applause III",
-      "description": "150 likes across your Guild-class posts."
+      "name": "公会喝彩 III",
+      "description": "公会级帖子共获得 150 个点赞。"
     },
     "guild_love_diamond": {
-      "name": "Guild Applause IV",
-      "description": "1,000 likes across your Guild-class posts."
+      "name": "公会喝彩 IV",
+      "description": "公会级帖子共获得 1,000 个点赞。"
     },
     "promoter": {
-      "name": "Promoter",
-      "description": "Brought 3 dancers into the Guild through your referral link."
+      "name": "推广者",
+      "description": "通过你的推荐链接带了 3 位舞者加入公会。"
     }
   },
   "shop": {
-    "pageTitle": "The Guild Shop",
-    "pageSubtitle": "Spend your claves on coaching tickets, cosmetics, and slot upgrades. Every purchase is final.",
-    "balanceLabel": "Balance",
-    "viewInventory": "View inventory →",
-    "inventoryTitle": "Inventory",
-    "inventorySubtitle": "Equip what you own. Everything is permanent.",
-    "backToShop": "← Back to shop",
-    "empty": "Nothing here yet. Check back soon.",
-    "emptyInventory": "You don't own anything yet.",
-    "loading": "Loading catalog...",
-    "loadError": "Failed to load shop",
+    "pageTitle": "公会商店",
+    "pageSubtitle": "用你的 claves 兑换教练票、装饰和槽位升级。每笔交易均为最终。",
+    "balanceLabel": "余额",
+    "viewInventory": "查看背包 →",
+    "visitShop": "前往商店",
+    "inventoryTitle": "背包",
+    "inventorySubtitle": "装备你拥有的物品。一切都是永久的。",
+    "backToShop": "← 返回商店",
+    "empty": "这里还空空如也。稍后再来。",
+    "emptyInventory": "你还没有任何物品。",
+    "loading": "加载商品目录...",
+    "loadingInventory": "加载背包...",
+    "loadError": "商店加载失败",
+    "loadInventoryError": "背包加载失败",
+    "equipError": "装备失败",
+    "stockRemaining": "剩余 {count}",
+    "ownedCount": "已拥有: {count}",
     "tabs": {
-      "ticket": "Tickets",
-      "border": "Borders",
-      "title": "Titles",
-      "utility": "Utility"
+      "ticket": "票券",
+      "border": "边框",
+      "title": "称号",
+      "utility": "实用"
+    },
+    "tabBlurbs": {
+      "border": "头像边框。彰显你的稀有度。",
+      "title": "在公会各处显示于你名字下方的称号。",
+      "utility": "发布容量的永久升级。",
+      "ticket": "金票可解锁一次 1 对 1 教练点评。库存有限。"
+    },
+    "sections": {
+      "cosmetics": "装饰",
+      "other": "其他物品"
     },
     "rarity": {
-      "common": "Common",
-      "rare": "Rare",
-      "epic": "Epic",
-      "legendary": "Legendary"
+      "common": "普通",
+      "rare": "稀有",
+      "epic": "史诗",
+      "legendary": "传奇"
     },
     "actions": {
-      "buy": "Buy",
-      "buyNow": "Buy now",
-      "cancel": "Cancel",
-      "equip": "Equip",
-      "unequip": "Unequip",
-      "owned": "Owned",
-      "soldOut": "Sold out",
-      "locked": "Locked",
-      "notEnough": "Not enough",
-      "purchasing": "Purchasing...",
-      "equipped": "Equipped",
-      "redeemTicket": "Redeem ticket →"
+      "buy": "购买",
+      "buyNow": "立即购买",
+      "cancel": "取消",
+      "equip": "装备",
+      "unequip": "卸下",
+      "owned": "已拥有",
+      "soldOut": "售罄",
+      "locked": "锁定",
+      "notEnough": "余额不足",
+      "purchasing": "购买中...",
+      "equipped": "已装备",
+      "redeemTicket": "使用票券 →"
     },
     "purchase": {
-      "confirmTitle": "Confirm purchase",
-      "priceLabel": "Price",
-      "yourBalance": "Your balance",
-      "afterPurchase": "After purchase",
-      "stockRemaining": "{count} left",
-      "success": "Purchase complete 🎉",
-      "genericError": "Purchase failed. Please try again."
+      "confirmTitle": "确认购买",
+      "priceLabel": "价格",
+      "yourBalance": "你的余额",
+      "afterPurchase": "购买后",
+      "success": "购买成功 🎉",
+      "genericError": "购买失败，请重试。"
+    },
+    "preview": {
+      "unavailable": "预览不可用",
+      "goldenTicket": "金票",
+      "stageSlots": "舞台槽位 +{count}",
+      "labSlots": "实验槽位 +{count}",
+      "utility": "实用"
     },
     "earn": {
-      "stagePost": "Earn +10 🥢 on post",
-      "labQuestion": "Earn +3 🥢 on post"
+      "stagePost": "发布可得 +10 🥢",
+      "labQuestion": "发布可得 +3 🥢"
     }
+  },
+  "ambassador": {
+    "title": "申请成为公会大使",
+    "subtitle": "告诉我们一点关于你的信息，以及你为什么想代表 The Mambo Guild。",
+    "nameLabel": "全名",
+    "emailLabel": "邮箱",
+    "instagramLabel": "Instagram",
+    "instagramPlaceholder": "instagram.com/你（可选）",
+    "locationLabel": "城市 / 舞蹈圈",
+    "locationPlaceholder": "如：北京、上海（可选）",
+    "messageLabel": "为什么是你？",
+    "messagePlaceholder": "分享你的舞蹈背景、所在舞蹈圈，以及你会如何代表公会。至少 20 个字符。",
+    "messageHint": "{count} / 4000",
+    "submit": "发送申请",
+    "sending": "发送中…",
+    "cancel": "取消",
+    "close": "关闭",
+    "successTitle": "申请已发送",
+    "successBody": "感谢申请。Pavle 会亲自阅读每一份申请，合适时将与您联系。",
+    "genericError": "无法发送申请。请稍后再试。"
+  },
+  "cosmetics": {
+    "title_the_phoenix_label": "The Phoenix",
+    "title_the_phoenix_description": "跌倒，起身，继续跳舞。"
   }
 }
