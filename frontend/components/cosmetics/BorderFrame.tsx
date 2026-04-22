@@ -5,8 +5,8 @@ import { BORDER_FRAME_SPECS, type BorderFrameSpec, type OrnamentShape } from "@/
 
 /**
  * BorderFrame — renders an elaborate SVG ornament frame around a round
- * avatar. Positioned absolutely with `inset: -22%` so ornaments can float
- * outside the avatar bounds.
+ * avatar. Positioned absolutely with `inset: -8%` so the ring sits at the
+ * avatar edge and ornaments extend just past it (not floating in space).
  *
  * The base avatar is a circle of radius ~40 centred at (50,50); ornaments
  * sit at radii 42–60 depending on how far they extend past the ring.
@@ -41,9 +41,9 @@ function BorderFrameInner({ sku }: BorderFrameProps) {
       viewBox="0 0 100 100"
       className="pointer-events-none absolute"
       style={{
-        inset: "-22%",
-        width: "144%",
-        height: "144%",
+        inset: "-8%",
+        width: "116%",
+        height: "116%",
         overflow: "visible",
         filter: spec.glow
           ? `drop-shadow(0 0 ${spec.glow.blur}px ${spec.glow.color})`
