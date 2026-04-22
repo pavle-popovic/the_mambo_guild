@@ -904,25 +904,27 @@ export default function LessonPage() {
                                 </div>
                               )}
 
-                              {/* Prev/Next lesson side buttons — desktop/tablet only; mobile shows them below captions */}
+                              {/* Prev/Next lesson side buttons — shown on desktop/tablet
+                                  AND on mobile landscape; mobile portrait shows them
+                                  below captions instead. */}
                               {prevL && (
                                 <button
                                   onClick={() => router.push(`/lesson/${prevL.id}`)}
                                   title={`${tLesson('previousLesson') || 'Previous'}: ${prevL.title}`}
-                                  className="hidden md:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-14 h-14 items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
+                                  className="hidden md:flex landscape:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
                                   aria-label="Previous lesson"
                                 >
-                                  <FaChevronLeft className="text-2xl" />
+                                  <FaChevronLeft className="text-xl md:text-2xl" />
                                 </button>
                               )}
                               {nextL && (
                                 <button
                                   onClick={() => router.push(`/lesson/${nextL.id}`)}
                                   title={`${tLesson('nextLesson') || 'Next'}: ${nextL.title}`}
-                                  className="hidden md:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-14 h-14 items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
+                                  className="hidden md:flex landscape:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
                                   aria-label="Next lesson"
                                 >
-                                  <FaArrowRight className="text-2xl" />
+                                  <FaArrowRight className="text-xl md:text-2xl" />
                                 </button>
                               )}
 
@@ -968,7 +970,9 @@ export default function LessonPage() {
                         </span>
                       </div>
                     )}
-                    {/* Mobile-only prev/next lesson nav — below captions, so it doesn't overlay the video */}
+                    {/* Mobile portrait prev/next lesson nav — below captions.
+                        Hidden in landscape (where the overlay arrows appear) and
+                        on desktop (where the overlay is always visible). */}
                     {(() => {
                       const sorted = [...levelLessons].sort((a, b) => a.order_index - b.order_index);
                       const idx = sorted.findIndex((l) => l.id === lessonId);
@@ -976,7 +980,7 @@ export default function LessonPage() {
                       const nextL = idx >= 0 && idx < sorted.length - 1 ? sorted[idx + 1] : null;
                       if (!prevL && !nextL) return null;
                       return (
-                        <div className="md:hidden flex-shrink-0 bg-black px-4 py-3 flex items-center justify-between gap-3 border-t border-white/5">
+                        <div className="md:hidden landscape:hidden flex-shrink-0 bg-black px-4 py-3 flex items-center justify-between gap-3 border-t border-white/5">
                           {prevL ? (
                             <button
                               onClick={() => router.push(`/lesson/${prevL.id}`)}
