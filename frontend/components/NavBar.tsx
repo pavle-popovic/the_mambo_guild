@@ -12,6 +12,8 @@ import { ClaveWallet } from "./ClaveWallet";
 import { WalletModal } from "./WalletModal";
 import NotificationBell from "./NotificationBell";
 import LocaleSwitcher from "./LocaleSwitcher";
+import { BorderFrame } from "./cosmetics/BorderFrame";
+import { BORDER_FRAME_SPECS } from "@/lib/borderFrames";
 import { useTranslations } from "@/i18n/useTranslations";
 import { UISound } from "@/hooks/useUISound";
 
@@ -26,6 +28,8 @@ interface NavBarProps {
     avatar_url?: string | null;
     tier?: string;
     role?: string;
+    equipped_border_sku?: string | null;
+    equipped_title_sku?: string | null;
   };
 }
 
@@ -170,21 +174,26 @@ export default function NavBar({ user }: NavBarProps) {
             )}
             {isAuthenticated && <NotificationBell />}
             {isAuthenticated && (
-              <Link
-                href="/profile"
-                className={cn(
-                  "w-8 h-8 rounded-full bg-gray-700 overflow-hidden flex items-center justify-center",
-                  "ring-2 ring-transparent"
+              <div className="relative w-8 h-8">
+                <Link
+                  href="/profile"
+                  className={cn(
+                    "w-8 h-8 rounded-full bg-gray-700 overflow-hidden flex items-center justify-center",
+                    "ring-2 ring-transparent"
+                  )}
+                >
+                  {user?.avatar_url ? (
+                    <Image src={user.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover rounded-full" />
+                  ) : (
+                    <div className="w-full h-full rounded-full bg-gradient-to-br from-[#FCE205] to-[#D4AF37] flex items-center justify-center text-black text-xs font-bold">
+                      {(user?.username?.[0] || user?.first_name?.[0] || "U").toUpperCase()}
+                    </div>
+                  )}
+                </Link>
+                {user?.equipped_border_sku && BORDER_FRAME_SPECS[user.equipped_border_sku] && (
+                  <BorderFrame sku={user.equipped_border_sku} />
                 )}
-              >
-                {user?.avatar_url ? (
-                  <Image src={user.avatar_url} alt="" width={32} height={32} className="w-full h-full object-cover rounded-full" />
-                ) : (
-                  <div className="w-full h-full rounded-full bg-gradient-to-br from-[#FCE205] to-[#D4AF37] flex items-center justify-center text-black text-xs font-bold">
-                    {(user?.username?.[0] || user?.first_name?.[0] || "U").toUpperCase()}
-                  </div>
-                )}
-              </Link>
+              </div>
             )}
             <button
               className="p-2 text-gray-300 hover:text-white transition-colors"
@@ -368,12 +377,13 @@ export default function NavBar({ user }: NavBarProps) {
                     transition: { type: "spring", stiffness: 400, damping: 17 }
                   } : {})}
                   onMouseEnter={handleNavHover}
+                  className="relative w-10 h-10"
                 >
                   <Link
-                    href="/profile" 
+                    href="/profile"
                     className={cn(
                       "w-10 h-10 rounded-full bg-gray-700 overflow-hidden transition-all flex items-center justify-center",
-                      user.tier?.toLowerCase() === "performer" 
+                      user.tier?.toLowerCase() === "performer"
                         ? "ring-2 ring-amber-400/50 hover:ring-amber-400"
                         : user.tier?.toLowerCase() === "advanced"
                         ? "ring-2 ring-blue-400/50 hover:ring-blue-400"
@@ -394,6 +404,9 @@ export default function NavBar({ user }: NavBarProps) {
                       </div>
                     )}
                   </Link>
+                  {user.equipped_border_sku && BORDER_FRAME_SPECS[user.equipped_border_sku] && (
+                    <BorderFrame sku={user.equipped_border_sku} />
+                  )}
                 </MotionDiv>
 
                 {/* Language Switcher - far right */}
