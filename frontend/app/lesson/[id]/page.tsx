@@ -108,8 +108,27 @@ export default function LessonPage() {
   const [videoDuration, setVideoDuration] = useState(0);
   const [captionText, setCaptionText] = useState("");
   const [videoEnded, setVideoEnded] = useState(false);
+  const [videoAspect, setVideoAspect] = useState<string>("16 / 9");
+  // True only on mobile portrait. Lets the video wrapper size itself to the
+  // real aspect ratio instead of stretching with flex-1 — otherwise
+  // object-contain centers the video inside a taller black box, leaving a
+  // gap between the quest bar and the video's top edge.
+  const [hugVideoAspect, setHugVideoAspect] = useState(false);
   const abLoop = useABLoop(videoPlayerRef, videoDuration);
   const doubleTapSeek = useDoubleTapSeek(videoPlayerRef);
+
+  useEffect(() => {
+    const mqLandscape = window.matchMedia("(orientation: landscape)");
+    const mqLg = window.matchMedia("(min-width: 1024px)");
+    const update = () => setHugVideoAspect(!mqLandscape.matches && !mqLg.matches);
+    update();
+    mqLandscape.addEventListener("change", update);
+    mqLg.addEventListener("change", update);
+    return () => {
+      mqLandscape.removeEventListener("change", update);
+      mqLg.removeEventListener("change", update);
+    };
+  }, []);
 
   useEffect(() => {
     // Wait for auth to finish loading before making any decisions
@@ -855,7 +874,8 @@ export default function LessonPage() {
                 {lesson.mux_playback_id ? (
                   <>
                     <div
-                      className="relative w-full flex-1 min-h-0 max-h-[calc(100dvh-220px)] landscape:max-h-none lg:max-h-none"
+                      className="relative w-full min-h-0 landscape:flex-1 lg:flex-1 max-h-[calc(100dvh-220px)] landscape:max-h-none lg:max-h-none"
+                      style={hugVideoAspect ? { aspectRatio: videoAspect } : undefined}
                       onTouchStart={doubleTapSeek.onTouchStart}
                     >
                       {/* A/B loop bar — sits inside the player frame, just above
@@ -871,7 +891,13 @@ export default function LessonPage() {
                         playbackId={lesson.mux_playback_id}
                         onEnded={() => { setVideoPlaying(false); setVideoEnded(true); }}
                         onPlay={() => setVideoEnded(false)}
-                        onLoadedMetadata={(duration) => setVideoDuration(duration)}
+                        onLoadedMetadata={(duration) => {
+                          setVideoDuration(duration);
+                          const v = videoPlayerRef.current?.getVideoElement();
+                          if (v?.videoWidth && v?.videoHeight) {
+                            setVideoAspect(`${v.videoWidth} / ${v.videoHeight}`);
+                          }
+                        }}
                         onCaptionChange={setCaptionText}
                         autoPlay={videoPlaying}
                         durationMinutes={lesson.duration_minutes}
