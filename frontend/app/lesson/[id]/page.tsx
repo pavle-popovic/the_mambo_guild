@@ -17,7 +17,7 @@ import SuccessNotification from "@/components/SuccessNotification";
 import AuthPromptModal from "@/components/AuthPromptModal";
 import QuizResultModal from "@/components/QuizResultModal";
 import CourseCompletionModal from "@/components/CourseCompletionModal";
-import { FaBolt, FaPlay, FaPause, FaCheck, FaLock, FaArrowRight, FaCheckCircle, FaChevronLeft } from "react-icons/fa";
+import { FaBolt, FaPlay, FaPause, FaCheck, FaLock, FaArrowRight, FaCheckCircle, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { MdScreenRotation } from "react-icons/md";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -904,27 +904,28 @@ export default function LessonPage() {
                                 </div>
                               )}
 
-                              {/* Prev/Next lesson side buttons — shown on desktop/tablet
-                                  AND on mobile landscape; mobile portrait shows them
-                                  below captions instead. */}
+                              {/* Prev/Next lesson side arrows — bare chevrons flush
+                                  to the video edges so they stay out of the dancer's
+                                  way. Shown on desktop/tablet AND mobile landscape;
+                                  mobile portrait keeps the below-captions row. */}
                               {prevL && (
                                 <button
                                   onClick={() => router.push(`/lesson/${prevL.id}`)}
                                   title={`${tLesson('previousLesson') || 'Previous'}: ${prevL.title}`}
-                                  className="hidden md:flex landscape:flex absolute left-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
+                                  className="hidden md:flex landscape:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 px-1 items-center justify-center text-mambo-gold hover:text-white transition-colors drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
                                   aria-label="Previous lesson"
                                 >
-                                  <FaChevronLeft className="text-xl md:text-2xl" />
+                                  <FaChevronLeft className="text-2xl md:text-3xl" />
                                 </button>
                               )}
                               {nextL && (
                                 <button
                                   onClick={() => router.push(`/lesson/${nextL.id}`)}
                                   title={`${tLesson('nextLesson') || 'Next'}: ${nextL.title}`}
-                                  className="hidden md:flex landscape:flex absolute right-3 top-1/2 -translate-y-1/2 z-20 w-12 h-12 md:w-14 md:h-14 items-center justify-center rounded-full bg-black/80 hover:bg-black text-mambo-gold border-2 border-mambo-gold/80 hover:border-mambo-gold backdrop-blur-sm transition-all hover:scale-110 shadow-[0_0_20px_rgba(212,175,55,0.7)] hover:shadow-[0_0_30px_rgba(212,175,55,0.9)] animate-pulse-glow"
+                                  className="hidden md:flex landscape:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 px-1 items-center justify-center text-mambo-gold hover:text-white transition-colors drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
                                   aria-label="Next lesson"
                                 >
-                                  <FaArrowRight className="text-xl md:text-2xl" />
+                                  <FaChevronRight className="text-2xl md:text-3xl" />
                                 </button>
                               )}
 
