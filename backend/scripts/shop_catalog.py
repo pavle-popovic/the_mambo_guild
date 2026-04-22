@@ -119,7 +119,7 @@ CATALOG: list[dict[str, Any]] = [
     # Borders — Legendary (3)
     # ------------------------------------------------------------------
     _border("border_disco_inferno",     "Disco Inferno",     "legendary", "cosmetic-border-disco-inferno",     "Full conic rainbow, slow spin, bright.", 400),
-    _border("border_crown_jewel",       "Crown Jewel",       "legendary", "cosmetic-border-crown-jewel",       "Gilded crown motif with gem sparkle.",   401),
+    _border("border_crown_jewel",       "Crown Jewel",       "legendary", "cosmetic-border-crown-jewel",       "Diamond tiara with a gold crown topper.", 401),
     _border("border_eternal_clave",     "Eternal Clave",     "legendary", "cosmetic-border-eternal-clave",     "Golden clave glyph in rotation.",        402),
 
     # ------------------------------------------------------------------

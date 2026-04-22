@@ -426,35 +426,31 @@ export const BORDER_FRAME_SPECS: Record<string, BorderFrameSpec> = {
     ],
   },
 
-  // Platinum-and-diamond tiara: gold crown centrepiece, full ring of diamond
-  // crystals, ruby/royal/emerald accent trio, filigree scrolls at every
-  // ordinal, outer ring of sparks for dispersion. The crown-jewel legendary.
+  // Diamond-and-platinum legendary. Mirrors Eternal Clave's template
+  // exactly (same counts + radii) but in diamond-white instead of gold,
+  // with a small gold crown on top as the regal centrepiece.
   border_crown_jewel: {
     id: "crown-jewel",
     ring: {
-      color: SILVER_STOPS,
-      thickness: 4.5,
+      color: DIAMOND_STOPS,
+      thickness: 4,
       opacity: 1,
-      inner: { color: DIAMOND_STOPS, thickness: 1.1, opacity: 0.95, offset: 3.8 },
+      inner: { color: "#ffffff", thickness: 0.9, opacity: 0.9, offset: 3.2 },
     },
     specular: true,
     bevel: true,
-    glow: { color: "rgba(191,219,254,0.95)", blur: 10 },
+    glow: { color: "rgba(147,197,253,0.95)", blur: 9 },
     ornaments: [
-      // Gold crown centrepiece on top — the only gold element, pops against platinum
-      { shape: "crown", count: 1, startAngle: 0, radius: 56, size: 15, color: [GOLD_HI, GOLD], rotateOut: true },
-      // Full ring of 8 diamond crystals forming the tiara
-      { shape: "crystal", count: 8, startAngle: 22.5, radius: 52, size: 5.5, color: "#ffffff" },
-      // Ruby / royal / emerald heraldic accents at sides + bottom (skipping top where crown sits)
-      { shape: "crystal", count: 1, startAngle: 90, radius: 54, size: 7, color: RUBY },
-      { shape: "crystal", count: 1, startAngle: 180, radius: 54, size: 7.5, color: ROYAL },
-      { shape: "crystal", count: 1, startAngle: 270, radius: 54, size: 7, color: EMERALD },
-      // Full ring of filigree scrolls at every ordinal
+      // Four big diamond crystals at cardinals (mirrors eternal_clave's claves)
+      { shape: "crystal", count: 4, startAngle: 0, radius: 53, size: 8.5, color: "#ffffff" },
+      // Four smaller ice-blue crystals between (at 45s)
+      { shape: "crystal", count: 4, startAngle: 45, radius: 53, size: 5.5, color: "#bfdbfe" },
+      // Filigree scrolls on the inner arc (full ring of 8)
       { shape: "filigree", count: 8, startAngle: 22.5, radius: 47.5, size: 3.8, color: "#ffffff", opacity: 0.95 },
-      // Outer ring of 16 sparks for prismatic dispersion
-      { shape: "spark", count: 16, startAngle: 11.25, radius: 56, size: 2.5, color: "#ffffff", opacity: 0.9 },
-      // Inner ring of tiny sparks filling the gap against the ring
-      { shape: "dot", count: 16, startAngle: 0, radius: 45.5, size: 1.1, color: "#ffffff", opacity: 0.8 },
+      // Inner ring of tiny sparks
+      { shape: "dot", count: 16, startAngle: 0, radius: 45.5, size: 1.3, color: "#ffffff", opacity: 0.85 },
+      // Small gold crown on top — the royal centrepiece
+      { shape: "crown", count: 1, startAngle: 0, radius: 58, size: 8.5, color: [GOLD_HI, GOLD], rotateOut: true },
     ],
   },
 
