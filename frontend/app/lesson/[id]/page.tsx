@@ -859,6 +859,14 @@ export default function LessonPage() {
 
                 {lesson.mux_playback_id ? (
                   <>
+                    {/* A/B loop bar — always rendered directly above the video,
+                        full-width so it lines up edge-to-edge with the player on
+                        mobile portrait, mobile landscape, and desktop. */}
+                    {abLoop.enabled && (
+                      <div className="w-full flex-shrink-0 bg-black px-3 sm:px-4 md:px-6 py-2 border-b border-white/5">
+                        <ABLoopBar state={abLoop} duration={videoDuration} />
+                      </div>
+                    )}
                     <div
                       className="relative w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0"
                       onTouchStart={doubleTapSeek.onTouchStart}
@@ -923,18 +931,6 @@ export default function LessonPage() {
                                 </button>
                               )}
 
-                              {/* A/B loop overlay — only on desktop/landscape; mobile portrait shows it below */}
-                              {abLoop.enabled && (
-                                <div
-                                  className="hidden md:block absolute inset-x-0 px-20 pointer-events-none"
-                                  style={{ bottom: 44, zIndex: 15 }}
-                                >
-                                  <div className="pointer-events-auto">
-                                    <ABLoopBar state={abLoop} duration={videoDuration} />
-                                  </div>
-                                </div>
-                              )}
-
                               {/* End-of-video "Mark complete & next" overlay */}
                               {videoEnded && (
                                 <div className="absolute inset-0 z-30 flex items-center justify-center bg-black/60 backdrop-blur-sm">
@@ -966,12 +962,6 @@ export default function LessonPage() {
                         })()}
                       />
                     </div>
-                    {/* Mobile portrait: AB loop bar above captions, below video */}
-                    {abLoop.enabled && (
-                      <div className="md:hidden flex-shrink-0 bg-black px-4 py-2 border-t border-white/5">
-                        <ABLoopBar state={abLoop} duration={videoDuration} />
-                      </div>
-                    )}
                     {/* External caption display — below video on mobile, hidden on desktop (internal overlay used) */}
                     {captionText && (
                       <div className="lg:hidden flex-shrink-0 bg-black px-4 py-2 flex justify-center lesson-mobile-captions">
