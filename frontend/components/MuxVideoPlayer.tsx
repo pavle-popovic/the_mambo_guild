@@ -294,12 +294,14 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           text-shadow: none !important;
           outline: none !important;
           opacity: 0 !important;
+          font-size: 0 !important;
         }
-        video::-webkit-media-text-track-container {
+        video::-webkit-media-text-track-container,
+        video::-webkit-media-text-track-display,
+        video::-webkit-media-text-track-display-backdrop {
+          display: none !important;
           visibility: hidden !important;
-        }
-        video::-webkit-media-text-track-display {
-          visibility: hidden !important;
+          opacity: 0 !important;
         }
       `;
 
