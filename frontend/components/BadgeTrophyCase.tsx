@@ -60,6 +60,20 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
     const v = tBadges(key);
     return v && v !== key ? v : b.description;
   };
+  // DB stores names like "Move Magnet I/II/III/IV" for bronze/silver/gold/diamond,
+  // but the UI wants the stylised I/III/V/X progression. Strip any trailing
+  // Roman numeral from the raw name, then re-append the mapped tier suffix.
+  const tierSuffix = (id: string): string =>
+    id.includes("bronze") ? " I"
+      : id.includes("silver") ? " III"
+      : id.includes("gold") ? " V"
+      : id.includes("diamond") ? " X"
+      : "";
+  const badgeDisplayName = (b: Badge): string => {
+    const raw = badgeName(b);
+    const base = raw.replace(/\s+(IV|I{1,3}|V)\s*$/, "").trim();
+    return base + tierSuffix(b.id);
+  };
   console.log("🏆 BadgeTrophyCase Rendered", { badgeCount: initialBadges?.length, streakCount, userStats });
   const [badges, setBadges] = useState<Badge[]>([]);
   const [featuredBadges, setFeaturedBadges] = useState<Badge[]>([]);
@@ -373,11 +387,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                     ) : "🏆"}
                   </div>
                   <h4 className="font-bold text-white text-sm leading-tight">
-                    {badgeName(badge)}
-                    {badge.id.includes('bronze') && " I"}
-                    {badge.id.includes('silver') && " III"}
-                    {badge.id.includes('gold') && " V"}
-                    {badge.id.includes('diamond') && " X"}
+                    {badgeDisplayName(badge)}
                   </h4>
                   <div className="absolute top-2 right-2 text-amber-200 text-xs">
                     ★
@@ -463,11 +473,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                     ) : "🏅"}
                   </div>
                   <h4 className="font-medium text-white text-xs">
-                    {badgeName(badge)}
-                    {badge.id.includes('bronze') && " I"}
-                    {badge.id.includes('silver') && " III"}
-                    {badge.id.includes('gold') && " V"}
-                    {badge.id.includes('diamond') && " X"}
+                    {badgeDisplayName(badge)}
                   </h4>
                   <p className="text-[10px] text-white/50 mt-1 line-clamp-1 hidden lg:block">{badgeDesc(badge)}</p>
 
@@ -510,11 +516,7 @@ export function BadgeTrophyCase({ userId, initialBadges, streakCount = 0, userSt
                   </div>
 
                   <h4 className="font-medium text-white/40 text-xs mb-2 opacity-50 relative z-10">
-                    {badgeName(badge)}
-                    {badge.id.includes('bronze') && " I"}
-                    {badge.id.includes('silver') && " III"}
-                    {badge.id.includes('gold') && " V"}
-                    {badge.id.includes('diamond') && " X"}
+                    {badgeDisplayName(badge)}
                   </h4>
 
                   {/* Progress Bar */}
