@@ -912,7 +912,7 @@ export default function LessonPage() {
                                 <button
                                   onClick={() => router.push(`/lesson/${prevL.id}`)}
                                   title={`${tLesson('previousLesson') || 'Previous'}: ${prevL.title}`}
-                                  className="hidden md:flex landscape:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 px-1 items-center justify-center text-mambo-gold hover:text-white transition-colors drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
+                                  className="hidden md:flex landscape:flex absolute left-0 [@media(max-height:500px)]:-left-3 top-1/2 -translate-y-1/2 z-20 px-1 items-center justify-center text-mambo-gold hover:text-white transition-colors [filter:drop-shadow(0_0_6px_rgba(212,175,55,0.95))_drop-shadow(0_0_12px_rgba(212,175,55,0.6))_drop-shadow(0_1px_3px_rgba(0,0,0,0.9))]"
                                   aria-label="Previous lesson"
                                 >
                                   <FaChevronLeft className="text-2xl md:text-3xl" />
@@ -922,7 +922,7 @@ export default function LessonPage() {
                                 <button
                                   onClick={() => router.push(`/lesson/${nextL.id}`)}
                                   title={`${tLesson('nextLesson') || 'Next'}: ${nextL.title}`}
-                                  className="hidden md:flex landscape:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 px-1 items-center justify-center text-mambo-gold hover:text-white transition-colors drop-shadow-[0_1px_3px_rgba(0,0,0,0.9)]"
+                                  className="hidden md:flex landscape:flex absolute right-0 [@media(max-height:500px)]:-right-3 top-1/2 -translate-y-1/2 z-20 px-1 items-center justify-center text-mambo-gold hover:text-white transition-colors [filter:drop-shadow(0_0_6px_rgba(212,175,55,0.95))_drop-shadow(0_0_12px_rgba(212,175,55,0.6))_drop-shadow(0_1px_3px_rgba(0,0,0,0.9))]"
                                   aria-label="Next lesson"
                                 >
                                   <FaChevronRight className="text-2xl md:text-3xl" />
