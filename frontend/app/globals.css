@@ -593,8 +593,27 @@ media-controller [aria-label*="repeat" i] {
   .lesson-mobile-nav {
     display: none !important;
   }
+  /* Caption strip floats over the video, pinned to the very bottom of the
+     viewport in landscape. The video fills the available height and the
+     captions overlay the lower portion — which is where they sat on every
+     prior device the team tested. */
   .lesson-mobile-captions {
-    display: none !important;
+    display: flex !important;
+    position: absolute !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 4px !important;
+    background: transparent !important;
+    padding: 0 10% !important;
+    z-index: 15 !important;
+    pointer-events: none !important;
+  }
+  .lesson-mobile-captions > span {
+    text-shadow:
+      -1px -1px 0 rgba(0,0,0,0.95),
+      1px -1px 0 rgba(0,0,0,0.95),
+      -1px 1px 0 rgba(0,0,0,0.95),
+      1px 1px 0 rgba(0,0,0,0.95) !important;
   }
 }
 
