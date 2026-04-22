@@ -855,7 +855,7 @@ export default function LessonPage() {
                 {lesson.mux_playback_id ? (
                   <>
                     <div
-                      className="relative w-full aspect-video lg:aspect-auto lg:flex-1 lg:min-h-0"
+                      className="relative w-full flex-1 min-h-0"
                       onTouchStart={doubleTapSeek.onTouchStart}
                     >
                       {/* A/B loop bar — sits inside the player frame, just above
