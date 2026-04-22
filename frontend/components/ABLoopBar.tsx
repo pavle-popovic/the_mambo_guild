@@ -72,13 +72,17 @@ export default function ABLoopBar({ state, duration, className }: Props) {
   const pct = (t: number) => (t / duration) * 100;
 
   return (
-    <div className={`flex items-center gap-3 ${className || ""}`}>
-      <span className="text-[10px] font-bold text-green-400 tabular-nums shrink-0">
-        A {fmt(aTime)}
-      </span>
+    <div className={`flex flex-col gap-0.5 ${className || ""}`}>
+      {/* Time labels stacked above the rail so the rail can span edge-to-edge
+          and line up with Mux's scrubber. Hidden on very small screens to
+          save vertical space over a tall portrait video. */}
+      <div className="hidden sm:flex justify-between px-0.5 text-[10px] font-bold tabular-nums">
+        <span className="text-green-400">A {fmt(aTime)}</span>
+        <span className="text-red-400">B {fmt(bTime)}</span>
+      </div>
       <div
         ref={railRef}
-        className="relative flex-1 h-6 select-none cursor-pointer touch-none"
+        className="relative w-full h-6 select-none cursor-pointer touch-none"
         onClick={(e) => {
           // Don't scrub if the click originated on a handle (handles stop
           // propagation on mousedown, but onClick can still bubble in some
@@ -141,9 +145,6 @@ export default function ABLoopBar({ state, duration, className }: Props) {
           <span className="text-[10px] font-black text-white leading-none pointer-events-none">B</span>
         </div>
       </div>
-      <span className="text-[10px] font-bold text-red-400 tabular-nums shrink-0">
-        B {fmt(bTime)}
-      </span>
     </div>
   );
 }
