@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, X, Tv, FlaskConical, ChevronDown, Bookmark } from "lucide-react";
+import { Plus, Search, X, Tv, FlaskConical, ChevronDown, Bookmark, ShoppingBag } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -51,6 +52,7 @@ type ViewMode = "stage" | "lab" | "saved" | "my_posts";
 
 export default function CommunityPage() {
     const t = useTranslations("community");
+    const tShop = useTranslations("shop");
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const [viewMode, setViewMode] = useState<ViewMode>("stage");
@@ -323,6 +325,15 @@ export default function CommunityPage() {
                                     {t("myPostsTab")}
                                 </button>
                             </div>
+
+                            {/* Shop shortcut (mobile) */}
+                            <Link
+                                href="/shop"
+                                aria-label={tShop("pageTitle")}
+                                className="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-amber-300 hover:text-amber-100 hover:from-amber-500/30 hover:to-orange-500/30 hover:border-amber-500/60 transition-all"
+                            >
+                                <ShoppingBag size={15} />
+                            </Link>
 
                             {/* Level Dropdown */}
                             <div className="relative flex-1" ref={levelDropdownRef}>

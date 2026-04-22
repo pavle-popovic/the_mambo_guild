@@ -1,8 +1,9 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { motion } from "framer-motion";
-import { Tv, FlaskConical, Bookmark } from "lucide-react";
+import { Tv, FlaskConical, Bookmark, ShoppingBag } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/i18n/useTranslations";
 
@@ -30,6 +31,7 @@ export default function CommunitySidebar({
     posts = [],
 }: CommunitySidebarProps) {
     const t = useTranslations("community");
+    const tShop = useTranslations("shop");
     const levels = [
         { id: "level-1", label: t("beginner"), value: "beginner", keywords: ["beginner", "level 1", "level-1", "I"] },
         { id: "level-2", label: t("intermediate"), value: "intermediate", keywords: ["intermediate", "level 2", "level-2", "II"] },
@@ -95,6 +97,25 @@ export default function CommunitySidebar({
 
             {/* Separator */}
             <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+            {/* Shop CTA */}
+            <Link
+                href="/shop"
+                className="group relative overflow-hidden flex items-center gap-3 px-4 py-3 rounded-xl bg-gradient-to-r from-amber-500/15 to-orange-500/10 border border-amber-500/30 hover:border-amber-500/60 hover:from-amber-500/25 hover:to-orange-500/20 transition-all"
+            >
+                <div className="flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-sm shadow-lg shadow-amber-500/20">
+                    🥢
+                </div>
+                <div className="flex-1 min-w-0">
+                    <div className="font-serif tracking-wide text-sm font-bold text-amber-200 group-hover:text-amber-100 transition-colors">
+                        {tShop("pageTitle")}
+                    </div>
+                    <div className="text-[10px] text-white/40 uppercase tracking-wider mt-0.5">
+                        {tShop("inventoryTitle")} →
+                    </div>
+                </div>
+                <ShoppingBag size={16} className="text-amber-400/80 group-hover:text-amber-300 transition-colors" />
+            </Link>
 
             {/* Level Filter */}
             <div className="flex-1 overflow-y-auto pr-2 custom-scrollbar">
