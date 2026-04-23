@@ -96,14 +96,16 @@ Respond with ONLY a JSON object, no other text:
 
 def _evaluate(system_prompt: str, user_content: str, kind: str) -> str:
     """
-    Shared moderation call. Returns 'active' on pass, 'flagged_by_ai' on fail
-    or any error (fail-closed). The author still sees their own flagged
-    content via the shadowban filter in post_service.
+    Shared moderation call. Fail-OPEN: only flag when Claude explicitly
+    returns verdict=fail. Missing API key, network errors, JSON parse
+    failures, or unexpected verdicts all pass the content through as
+    'active'. False "fail" silences a real community member; a false
+    "pass" is recoverable via human review.
     """
     api_key = settings.ANTHROPIC_API_KEY
     if not api_key:
-        logger.error(f"ANTHROPIC_API_KEY not set — flagging {kind} for manual review")
-        return "flagged_by_ai"
+        logger.error(f"[MODERATION] ANTHROPIC_API_KEY not set — passing {kind} through without AI review")
+        return "active"
 
     try:
         import anthropic
@@ -122,23 +124,22 @@ def _evaluate(system_prompt: str, user_content: str, kind: str) -> str:
         result = json.loads(result_text)
         verdict = result.get("verdict")
 
-        if verdict == "pass":
-            return "active"
-
         if verdict == "fail":
             reason = result.get("reason", "no reason given")
             logger.info(f"[MODERATION] {kind} flagged: {reason} | Preview: {user_content[:80]}")
             return "flagged_by_ai"
 
-        logger.warning(f"[MODERATION] Unknown verdict ({verdict!r}) — flagging {kind} for manual review")
-        return "flagged_by_ai"
+        if verdict != "pass":
+            logger.warning(f"[MODERATION] Unknown verdict ({verdict!r}) — passing {kind} through")
+
+        return "active"
 
     except json.JSONDecodeError:
-        logger.warning(f"[MODERATION] Failed to parse AI response — flagging {kind} for manual review")
-        return "flagged_by_ai"
+        logger.warning(f"[MODERATION] Failed to parse AI response — passing {kind} through")
+        return "active"
     except Exception as e:
-        logger.error(f"[MODERATION] Error during {kind} evaluation: {e} — flagging for manual review", exc_info=True)
-        return "flagged_by_ai"
+        logger.error(f"[MODERATION] Error during {kind} evaluation: {e} — passing through", exc_info=True)
+        return "active"
 
 
 def _sanitize_for_delimiter(text: str, tag: str) -> str:
