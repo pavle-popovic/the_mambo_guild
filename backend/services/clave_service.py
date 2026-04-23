@@ -36,8 +36,6 @@ EARN_STREAK_BONUS_BASE = 10
 EARN_STREAK_BONUS_PRO = 20
 EARN_STREAK_INTERVAL = 5      # Every 5 consecutive days
 EARN_ACCEPTED_ANSWER = 15
-EARN_REACTION_REFUND = 1          # Refund when post gets ANY reaction (capped)
-EARN_REACTION_REFUND_CAP = 5      # Max refunds per video
 EARN_REFERRAL_BONUS = 50
 EARN_NEW_USER_STARTER = 20
 EARN_SUB_ADVANCED = 10
@@ -94,10 +92,10 @@ def earn_claves(
     Returns: new balance
 
     Uses SELECT FOR UPDATE on user_profiles so concurrent earn paths (e.g.
-    multiple reactions landing at once, post-reward races) can't lose
+    post-reward races, admin grants landing simultaneously) can't lose
     updates against the cached balance. Re-locking an already-locked row
     inside the same transaction is a no-op, so callers that already hold
-    the profile lock (e.g. process_reaction_refund) are unaffected.
+    the profile lock are unaffected.
     """
     if amount <= 0:
         logger.warning(f"Attempted to earn {amount} claves (must be positive)")
@@ -407,11 +405,41 @@ def award_new_user_bonus(user_id: str, db: Session) -> int:
     return earn_claves(user_id, EARN_NEW_USER_STARTER, "new_user_bonus", db)
 
 
-def award_referral_bonus(referrer_user_id: str, db: Session) -> int:
+def award_referral_bonus(
+    referrer_user_id: str,
+    db: Session,
+    referred_user_id: Optional[str] = None,
+) -> int:
     """
     Award referral bonus when someone signs up with a referral link.
+
+    Idempotent when `referred_user_id` is supplied: writes it as
+    `reference_id` so a second call for the same (referrer, referred)
+    pair no-ops instead of double-paying. Callers should always pass
+    referred_user_id; it is Optional only for legacy callers that
+    haven't been migrated.
     """
-    return earn_claves(referrer_user_id, EARN_REFERRAL_BONUS, "referral_bonus", db)
+    if referred_user_id is not None:
+        existing = db.query(ClaveTransaction).filter(
+            ClaveTransaction.user_id == referrer_user_id,
+            ClaveTransaction.reason == "referral_bonus",
+            ClaveTransaction.reference_id == referred_user_id,
+        ).first()
+        if existing:
+            logger.info(
+                "award_referral_bonus: already paid for referrer=%s referred=%s; skipping",
+                referrer_user_id, referred_user_id,
+            )
+            profile = get_user_profile(referrer_user_id, db)
+            return profile.current_claves if profile else 0
+
+    return earn_claves(
+        referrer_user_id,
+        EARN_REFERRAL_BONUS,
+        "referral_bonus",
+        db,
+        reference_id=referred_user_id,
+    )
 
 
 def award_accepted_answer(user_id: str, post_id: str, db: Session) -> int:
@@ -430,67 +458,6 @@ def award_accepted_answer(user_id: str, post_id: str, db: Session) -> int:
         return get_balance(user_id, db)
 
     return earn_claves(user_id, EARN_ACCEPTED_ANSWER, "accepted_answer", db, reference_id=post_id)
-
-
-def process_reaction_refund(post_id: str, post_owner_id: str, db: Session) -> bool:
-    """
-    Process reaction refund (max 5 per video).
-    Triggered by ANY reaction type.
-    Uses SELECT FOR UPDATE to prevent race conditions on the refund cap.
-    """
-    # Lock the user profile row to serialize refund operations
-    profile = db.query(UserProfile).filter(
-        UserProfile.user_id == post_owner_id
-    ).with_for_update().first()
-    if not profile:
-        return False
-
-    # Count existing refunds for this post (reason='reaction_refund')
-    existing_refunds = db.query(func.count(ClaveTransaction.id)).filter(
-        ClaveTransaction.user_id == post_owner_id,
-        ClaveTransaction.reference_id == post_id,
-        ClaveTransaction.reason == "reaction_refund"
-    ).scalar() or 0
-
-    if existing_refunds < EARN_REACTION_REFUND_CAP:
-        earn_claves(post_owner_id, EARN_REACTION_REFUND, "reaction_refund", db, reference_id=post_id)
-        return True
-
-    return False
-
-
-def claw_back_reaction_refund(post_id: str, post_owner_id: str, db: Session) -> bool:
-    """
-    Claw back one reaction refund when a reaction is removed, if any were issued.
-    This reverses the earning that was previously granted to the post owner.
-    Only claws back if there are active refund transactions for this post.
-    """
-    existing_refunds = db.query(func.count(ClaveTransaction.id)).filter(
-        ClaveTransaction.user_id == post_owner_id,
-        ClaveTransaction.reference_id == post_id,
-        ClaveTransaction.reason == "reaction_refund"
-    ).scalar() or 0
-
-    if existing_refunds <= 0:
-        return False
-
-    profile = db.query(UserProfile).filter(
-        UserProfile.user_id == post_owner_id
-    ).with_for_update().first()
-    if not profile:
-        return False
-
-    # Record clawback transaction (negative amount recorded separately)
-    transaction = ClaveTransaction(
-        user_id=post_owner_id,
-        amount=-EARN_REACTION_REFUND,
-        reason="reaction_refund_clawback",
-        reference_id=post_id
-    )
-    db.add(transaction)
-    profile.current_claves = max(0, profile.current_claves - EARN_REACTION_REFUND)
-    db.flush()
-    return True
 
 
 def award_subscription_bonus(user_id: str, tier: SubscriptionTier, db: Session, reference_id: str = None) -> int:

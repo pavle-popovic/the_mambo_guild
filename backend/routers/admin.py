@@ -10,6 +10,7 @@ from models.progress import BossSubmission, SubmissionStatus, UserProgress
 from models.course import World, Level, Lesson
 from schemas.submissions import SubmissionResponse, GradeSubmissionRequest
 from services.gamification_service import award_xp
+from services.clave_service import earn_claves
 from dependencies import get_admin_user
 import uuid
 
@@ -566,26 +567,44 @@ def grant_claves_to_student(
     admin_user: User = Depends(get_admin_user),
     db: Session = Depends(get_db),
 ):
-    """Manually grant claves to a student. Admin only."""
+    """Manually grant claves to a student. Admin only.
+
+    Routes through `earn_claves` so the grant lands in the ledger
+    (`clave_transactions`) — not just on the balance column. The reason
+    string encodes which admin did it and any optional note, so the
+    audit trail lives entirely in the ledger.
+    """
     if data.amount <= 0 or data.amount > 100000:
         raise HTTPException(status_code=400, detail="Amount must be between 1 and 100000")
 
     profile = (
         db.query(UserProfile)
         .filter(UserProfile.user_id == user_id)
-        .with_for_update()
         .first()
     )
     if not profile:
         raise HTTPException(status_code=404, detail="Student not found")
 
-    profile.current_claves = (profile.current_claves or 0) + data.amount
+    # Pack actor + note into the reason. Keeps schema unchanged; LIKE
+    # 'admin_grant:%' surfaces every manual grant for audits.
+    # reason column is String(100); 'admin_grant:' + 36-char UUID + '|'
+    # consumes 49 chars, leaving 51 for the operator note.
+    note_slug = (data.reason or "").strip().replace("|", "_")[:51] or "unspecified"
+    reason_str = f"admin_grant:{admin_user.id}|{note_slug}"
+
+    new_balance = earn_claves(
+        user_id=str(user_id),
+        amount=data.amount,
+        reason=reason_str,
+        db=db,
+        reference_id=str(admin_user.id),
+    )
     db.commit()
     db.refresh(profile)
 
     return {
         "success": True,
-        "new_claves": profile.current_claves,
+        "new_claves": new_balance,
         "message": f"Granted {data.amount} claves to {profile.first_name} {profile.last_name}",
     }
 

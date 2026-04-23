@@ -17,9 +17,8 @@ from services.mux_service import delete_asset as delete_mux_asset
 from services import rate_limit_service
 from services.clave_service import (
     spend_claves, can_afford, get_video_slot_status, get_question_slot_status,
-    award_accepted_answer, process_reaction_refund, claw_back_reaction_refund,
+    award_accepted_answer,
     COST_REACTION, COST_COMMENT, COST_POST_QUESTION, COST_POST_VIDEO,
-    EARN_REACTION_REFUND_CAP
 )
 
 logger = logging.getLogger(__name__)

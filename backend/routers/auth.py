@@ -941,7 +941,11 @@ def reset_password(
                     ).first()
                     if referrer_profile_paid and referrer_profile_paid.user_id != user.id:
                         referrer_profile_paid.referral_count += 1
-                        award_referral_bonus(str(referrer_profile_paid.user_id), db)
+                        award_referral_bonus(
+                            str(referrer_profile_paid.user_id),
+                            db,
+                            referred_user_id=str(user.id),
+                        )
                         # Invite 3 verified friends -> Promoter badge.
                         if referrer_profile_paid.referral_count >= 3:
                             from services import badge_service
