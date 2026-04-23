@@ -49,8 +49,13 @@ class Settings:
     # Access token expires in 30 minutes (short-lived for security)
     # Refresh tokens should be used for longer sessions
     ACCESS_TOKEN_EXPIRE_MINUTES: int = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "30"))
-    # Refresh token expires in 7 days
-    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "7"))
+    # Refresh token expires in 30 days. Bumped from 7 to reduce "logged out
+    # again" reports from weekly-active users on mobile (iOS Safari suspends
+    # background tabs and aggressively drops third-party cookies under ITP —
+    # a 7-day window clips users who dip in less than once a week). Sliding
+    # renewal happens on every /auth/refresh, so active users functionally
+    # never expire.
+    REFRESH_TOKEN_EXPIRE_DAYS: int = int(os.getenv("REFRESH_TOKEN_EXPIRE_DAYS", "30"))
 
     # CORS - validate and parse origins
     @property

@@ -1,4 +1,5 @@
 import logging
+import uuid
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from typing import Optional
@@ -76,7 +77,15 @@ def generate_coaching_feedback_url(
     """
     _require_admin(current_user)
 
-    object_key = f"coaching-feedback/{request.submission_id}.webm"
+    # Reject anything that isn't a well-formed UUID so the submission_id
+    # cannot smuggle slashes, "..", or arbitrary prefixes into the R2 key
+    # and overwrite objects outside the coaching-feedback/ namespace.
+    try:
+        submission_uuid = uuid.UUID(request.submission_id)
+    except (ValueError, AttributeError, TypeError):
+        raise HTTPException(status_code=400, detail="Invalid submission_id")
+
+    object_key = f"coaching-feedback/{submission_uuid}.webm"
     try:
         storage_service = get_storage_service()
         result = storage_service.generate_presigned_url_for_key(

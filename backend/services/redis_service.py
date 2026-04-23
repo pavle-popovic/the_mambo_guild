@@ -275,6 +275,72 @@ def is_token_blacklisted(token: str) -> bool:
 
 
 # ============================================
+# Refresh token rotation (grace-window variant)
+# ============================================
+#
+# Refresh rotation needs different semantics than the access-token blacklist.
+# The access-token list is strict (logout revokes immediately) because only
+# the one client that called /logout should be kicked. Refresh rotation, by
+# contrast, can race against legitimate in-flight requests: if Tab A refreshes
+# and Tab B had a /refresh already in flight with the old cookie, a strict
+# blacklist would 401 Tab B and log the user out of a tab they never
+# touched.
+#
+# We solve this by recording a short grace window (default 60s) during which
+# the rotated token is still accepted. Enforcement kicks in only after the
+# window elapses — plenty for in-flight requests, short enough that a
+# stolen refresh token can't be reused at leisure.
+
+_REFRESH_ROTATED_PREFIX = "rotated:refresh:"
+REFRESH_ROTATION_GRACE_SECONDS = 60
+
+
+def mark_refresh_rotated(token: str, ttl_seconds: int, grace_seconds: int = REFRESH_ROTATION_GRACE_SECONDS) -> bool:
+    """Record that this refresh token has been rotated. A `grace_seconds`
+    window is allowed before the token is treated as rejected, so
+    concurrent in-flight requests with the old cookie still succeed.
+    """
+    if ttl_seconds <= 0:
+        return True
+    try:
+        import time as _time
+        client = get_redis_client()
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        key = f"{_REFRESH_ROTATED_PREFIX}{token_hash}"
+        enforce_at = int(_time.time()) + max(0, grace_seconds)
+        client.setex(key, ttl_seconds, str(enforce_at))
+        return True
+    except Exception as e:
+        logger.error(f"Failed to mark refresh rotation: {e}")
+        return False
+
+
+def is_refresh_token_rejected(token: str) -> bool:
+    """Return True only if this refresh token was rotated *and* its grace
+    window has elapsed. Fails open on Redis errors — consistent with the
+    access-token blacklist.
+    """
+    try:
+        import time as _time
+        client = get_redis_client()
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        key = f"{_REFRESH_ROTATED_PREFIX}{token_hash}"
+        enforce_at_raw = client.get(key)
+        if enforce_at_raw is None:
+            return False
+        try:
+            enforce_at = int(enforce_at_raw)
+        except (TypeError, ValueError):
+            # Unexpected legacy value (e.g. "1" from the old blacklist).
+            # Treat as immediate rejection.
+            return True
+        return int(_time.time()) >= enforce_at
+    except Exception as e:
+        logger.error(f"Failed to check refresh rotation: {e}")
+        return False  # Fail open
+
+
+# ============================================
 # Mux direct-upload ownership (IDOR guard)
 # ============================================
 

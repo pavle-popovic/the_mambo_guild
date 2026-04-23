@@ -221,12 +221,26 @@ def create_post(
         if video_type not in ("motw", "original", "guild"):
             return {"success": False, "message": "video_type must be one of: motw, original, guild"}
 
+        # Serialize concurrent uploads by this user behind the profile row
+        # lock so the slot-count read is not racy against a sibling request
+        # that is about to INSERT. Without this, two parallel uploads can
+        # both see `current < limit` and both insert, exceeding the cap.
+        # The lock is released when this request's transaction commits.
+        db.query(UserProfile).filter(
+            UserProfile.user_id == user_id
+        ).with_for_update().first()
+
         # Check video slot limit
         slot_status = get_video_slot_status(user_id, db)
         if not slot_status["allowed"]:
             return {"success": False, "message": slot_status["message"]}
     else:
         cost = COST_POST_QUESTION
+
+        # See note above — same TOCTOU applies to lab question slots.
+        db.query(UserProfile).filter(
+            UserProfile.user_id == user_id
+        ).with_for_update().first()
 
         # Check question slot limit
         q_slot_status = get_question_slot_status(user_id, db)

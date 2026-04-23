@@ -131,7 +131,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         await apiClient.refreshToken();
         await refreshUser(true);
       } catch {
-        // Refresh token expired (7 days) — user must re-login
+        // Refresh token expired (30 days) — user must re-login
         setUser(null);
         apiClient.setToken(null);
       }

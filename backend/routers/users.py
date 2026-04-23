@@ -284,12 +284,16 @@ def get_public_profile(
         streak_count=profile.streak_count,
         tier=subscription_tier,
         # Role logic: if we want to hide role or not. Let's expose it.
-        role=user.role, 
+        role=user.role,
         avatar_url=profile.avatar_url,
         instagram_url=profile.instagram_url,
         current_level_tag=profile.current_level_tag.value,
         reputation=profile.reputation,
-        current_claves=profile.current_claves,
+        # Claves balance is the user's private in-app currency; do not
+        # expose it on the unauthenticated public-profile endpoint. The
+        # frontend public page does not render this field. The owner
+        # sees their real balance via `/users/me` and the wallet modal.
+        current_claves=0,
         badges=badges_data,
         stats=stats_dict,
         equipped_border_sku=profile.equipped_border_sku,

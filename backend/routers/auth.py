@@ -397,6 +397,8 @@ def refresh_access_token(
     """
     from services.auth_service import decode_refresh_token
     
+    from services.redis_service import mark_refresh_rotated, is_refresh_token_rejected
+
     refresh_token = request.cookies.get("refresh_token")
     if not refresh_token:
         raise HTTPException(
@@ -404,7 +406,21 @@ def refresh_access_token(
             detail="Refresh token not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
+    # Rotation: reject any refresh token that has already been exchanged,
+    # but only once the grace window has elapsed. The grace window absorbs
+    # cross-tab / in-flight races where Tab B sent /refresh with the old
+    # cookie a fraction of a second before Tab A's response rotated it —
+    # previously that would log both tabs out. A stolen token can still
+    # only be used inside the grace window (default 60s).
+    if is_refresh_token_rejected(refresh_token):
+        _clear_auth_cookies(response)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token already used",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
     payload = decode_refresh_token(refresh_token)
     if not payload:
         _clear_auth_cookies(response)
@@ -413,7 +429,7 @@ def refresh_access_token(
             detail="Invalid or expired refresh token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     user_id_str = payload.get("sub")
     if not user_id_str:
         _clear_auth_cookies(response)
@@ -422,7 +438,7 @@ def refresh_access_token(
             detail="Invalid refresh token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     # Verify user still exists
     try:
         user_id = uuid.UUID(user_id_str)
@@ -433,7 +449,7 @@ def refresh_access_token(
             detail="Invalid refresh token",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
     user = db.query(User).filter(User.id == user_id).first()
     if not user:
         _clear_auth_cookies(response)
@@ -442,14 +458,30 @@ def refresh_access_token(
             detail="User not found",
             headers={"WWW-Authenticate": "Bearer"},
         )
-    
+
+    # Mark the OLD refresh token as rotated (with a grace window) so any
+    # fresh /refresh attempt using it beyond the grace window 401s. TTL
+    # is derived from the `exp` claim; if the claim is missing we fall
+    # back to the configured max window so we never under-cover a
+    # still-valid token.
+    try:
+        old_exp = payload.get("exp")
+        if old_exp:
+            remaining_ttl = int(old_exp - datetime.now(timezone.utc).timestamp())
+        else:
+            remaining_ttl = settings.REFRESH_TOKEN_EXPIRE_DAYS * 24 * 60 * 60
+        if remaining_ttl > 0:
+            mark_refresh_rotated(refresh_token, remaining_ttl)
+    except Exception:
+        logger.exception("refresh: failed to mark old refresh token as rotated (non-fatal)")
+
     # Create new tokens
     new_access_token = create_access_token(data={"sub": str(user.id)})
     new_refresh_token = create_refresh_token(data={"sub": str(user.id)})
-    
+
     # Set new cookies
     _set_auth_cookies(response, new_access_token, new_refresh_token)
-    
+
     return TokenResponse(access_token=new_access_token, token_type="bearer")
 
 
@@ -751,10 +783,19 @@ async def google_callback(
         if user:
             # User exists - check if we need to link OAuth account
             if user.auth_provider == "email" and not user.social_id:
-                # Link OAuth to existing email account
+                # Link OAuth to existing email account. Google has verified
+                # ownership of this address, so whoever registered the
+                # password account without verification cannot be trusted —
+                # wipe hashed_password so password login can no longer be
+                # used to sign in as this account. This closes an account-
+                # takeover vector where an attacker registers with a victim's
+                # email (verification is not yet enforced at signup), then
+                # the real owner signs in via Google and unknowingly shares
+                # the session with the attacker's stored password.
                 user.auth_provider = "google"
                 user.social_id = social_id
                 user.is_verified = True
+                user.hashed_password = None
                 if avatar_url and not user.profile.avatar_url:
                     user.profile.avatar_url = avatar_url
                 db.commit()
@@ -879,14 +920,26 @@ def reset_password(
     """
     Reset password using token from email.
     """
+    from services.redis_service import blacklist_token, is_token_blacklisted
+
     try:
+        # Single-use enforcement: reject any reset token that has already
+        # been exchanged for a password change. Without this, a token
+        # intercepted or replayed within the TTL window could be used
+        # repeatedly.
+        if is_token_blacklisted(request_data.token):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This reset link has already been used. Please request a new one.",
+            )
+
         # Verify and decode token
         user_id_str = reset_serializer.loads(
             request_data.token,
             salt="password-reset",
             max_age=settings.PASSWORD_RESET_EXPIRE_MINUTES * 60  # Convert to seconds
         )
-        
+
         user_id = uuid.UUID(user_id_str)
         user = db.query(User).filter(User.id == user_id).first()
         
@@ -959,9 +1012,22 @@ def reset_password(
                 logger.exception("Deferred referral payout failed (non-fatal)")
 
         db.commit()
-        
+
+        # Burn the token so it cannot be used again. We blacklist for the
+        # token's full configured lifetime — the itsdangerous serializer
+        # doesn't expose the embedded timestamp here without re-parsing,
+        # and over-covering is harmless (the entry is keyed by the token's
+        # SHA-256 and Redis evicts it automatically).
+        try:
+            blacklist_token(
+                request_data.token,
+                settings.PASSWORD_RESET_EXPIRE_MINUTES * 60,
+            )
+        except Exception:
+            logger.exception("reset_password: failed to blacklist used token (non-fatal)")
+
         return {"message": "Password reset successfully"}
-    
+
     except HTTPException:
         raise
     except Exception as e:

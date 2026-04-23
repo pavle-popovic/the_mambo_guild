@@ -79,6 +79,13 @@ class ApiClient {
   // Shared in-flight refresh promise so concurrent 401s trigger only one
   // refresh call (avoids thundering herd against /auth/refresh).
   private refreshInFlight: Promise<void> | null = null;
+  // Epoch ms of the last successful refresh/login. Drives the pro-active
+  // refresh below. null = "no known active session" (don't refresh).
+  private lastRefreshAt: number | null = null;
+  // Access token expires at 30 min server-side; refresh pro-actively at
+  // 25 min so a user returning from a backgrounded mobile tab doesn't
+  // hit 401 on their first click.
+  private readonly PROACTIVE_REFRESH_MS = 25 * 60 * 1000;
 
   constructor(baseUrl: string) {
     this.baseUrl = baseUrl;
@@ -98,6 +105,14 @@ class ApiClient {
       }
     })();
     return this.refreshInFlight;
+  }
+
+  // Endpoints that must never trigger a pro-active refresh — either they
+  // manage auth state themselves (login, register, refresh, logout) or
+  // they are public (waitlist, forgot/reset password). Pro-actively
+  // refreshing against them would recurse or leak an unwanted side effect.
+  private shouldSkipProactiveRefresh(endpoint: string): boolean {
+    return endpoint.startsWith("/api/auth/");
   }
 
   private getCacheKey(endpoint: string, options: RequestInit): string {
@@ -132,6 +147,11 @@ class ApiClient {
 
   setToken(token: string | null) {
     this.token = token;
+    // Track the moment we acquired a fresh token so the pro-active refresh
+    // check in request() can tell when we're within the 25-min safety window.
+    // Clearing the token nulls the timer so logged-out requests don't try to
+    // refresh.
+    this.lastRefreshAt = token ? Date.now() : null;
     // Clear cache when token changes (user logged in/out)
     this.clearCache();
   }
@@ -150,6 +170,25 @@ class ApiClient {
       const cached = this.getCached<T>(cacheKey);
       if (cached !== null) {
         return cached;
+      }
+    }
+
+    // Pro-active refresh: if our last login/refresh was more than
+    // PROACTIVE_REFRESH_MS ago, refresh BEFORE sending so the user doesn't
+    // hit a stale-token 401 on the first click after returning from a
+    // backgrounded mobile tab. The AuthContext silent-refresh timer can
+    // miss cycles while the tab is suspended; this is the belt-and-braces.
+    if (
+      !this.shouldSkipProactiveRefresh(endpoint) &&
+      !options._retriedAfterRefresh &&
+      this.lastRefreshAt !== null &&
+      Date.now() - this.lastRefreshAt > this.PROACTIVE_REFRESH_MS
+    ) {
+      try {
+        await this.refreshTokenOnce();
+      } catch {
+        // If refresh fails the original request still goes out — the 401
+        // interceptor below is the final safety net.
       }
     }
 
