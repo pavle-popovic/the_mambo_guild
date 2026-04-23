@@ -4,7 +4,7 @@ Handles all clave transactions, daily bonuses, and balance checks.
 """
 import random
 import logging
-from datetime import datetime, date
+from datetime import datetime, date, timezone
 from typing import Optional, Tuple
 from sqlalchemy.orm import Session
 from sqlalchemy import func
@@ -217,9 +217,11 @@ def process_daily_login(user_id: str, db: Session) -> dict:
     profile = get_user_profile(user_id, db)
     if not profile:
         return {"success": False, "message": "Profile not found"}
-    
-    today = date.today()
-    
+
+    # UTC-day boundary: one claim per 24h window regardless of the server's
+    # local TZ or the user's device clock. Prevents TZ-rollover double-claims.
+    today = datetime.now(timezone.utc).date()
+
     # Check if already claimed today
     if profile.last_daily_claim == today:
         return {

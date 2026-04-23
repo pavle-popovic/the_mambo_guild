@@ -927,6 +927,33 @@ def reset_password(
             except Exception as e:
                 logger.warning(f"Failed to award claim bonus for {user.id}: {e}")
 
+            # Deferred referral payout. We stored `referred_by_code` on the
+            # profile at waitlist signup but held the 50🥢 + count increment
+            # until now so burner-email farms can't collect unverified bounties.
+            # Self-referral is blocked by checking the referrer is a different
+            # user. Idempotent: we clear `referred_by_code` after paying so
+            # re-running the claim flow (rare) doesn't double-pay.
+            try:
+                claim_profile = db.query(UserProfile).filter(UserProfile.user_id == user.id).first()
+                if claim_profile and claim_profile.referred_by_code:
+                    referrer_profile_paid = db.query(UserProfile).filter(
+                        UserProfile.referral_code == claim_profile.referred_by_code
+                    ).first()
+                    if referrer_profile_paid and referrer_profile_paid.user_id != user.id:
+                        referrer_profile_paid.referral_count += 1
+                        award_referral_bonus(str(referrer_profile_paid.user_id), db)
+                        # Invite 3 verified friends -> Promoter badge.
+                        if referrer_profile_paid.referral_count >= 3:
+                            from services import badge_service
+                            try:
+                                badge_service.award_badge(str(referrer_profile_paid.user_id), "promoter", db)
+                            except Exception:
+                                logger.exception("Promoter badge grant failed (non-fatal)")
+                        # Consume the code so a second claim can't replay the payout.
+                        claim_profile.referred_by_code = None
+            except Exception:
+                logger.exception("Deferred referral payout failed (non-fatal)")
+
         db.commit()
         
         return {"message": "Password reset successfully"}
@@ -1009,16 +1036,14 @@ def join_waitlist(
         db.add(user)
         db.flush()
 
-        # Handle Referral
-        referrer_id = None
+        # Referral link is STORED at waitlist time but NOT paid out yet.
+        # The 50🥢 bonus + referral_count increment + promoter-milestone check
+        # all fire when the referred user verifies (claims their account via
+        # /reset-password). This kills burner-email farming: an attacker now
+        # needs a working inbox per fake account, not just a fresh address.
         referrer_profile = None
         if request.referrer_code:
             referrer_profile = db.query(UserProfile).filter(UserProfile.referral_code == request.referrer_code).first()
-            if referrer_profile:
-                # Increment referrer count
-                referrer_profile.referral_count += 1
-                # Award referral claves to the referrer (50 claves)
-                award_referral_bonus(str(referrer_profile.user_id), db)
 
         # Generate Referral Code for new user
         # Simple 8 char uppercase alphanumeric
@@ -1059,17 +1084,9 @@ def join_waitlist(
         except Exception as e:
             logger.error(f"Failed to award founder badge: {e}")
 
-        # Check Referrer Milestones
-        if request.referrer_code and referrer_profile:
-            referrer_user_id = str(referrer_profile.user_id)
-            # Invite 3 friends -> Promoter badge. (Pre-revamp this was
-            # beta_tester; that badge is now a manual founders grant only.)
-            if referrer_profile.referral_count >= 3:
-                try:
-                    badge_service.award_badge(referrer_user_id, "promoter", db)
-                except:
-                    pass
-        
+        # NOTE: referrer promoter-milestone check also deferred to claim time.
+        # See /reset-password handler for the payout + milestone logic.
+
         db.commit()
 
         # Send Welcome Email
