@@ -58,10 +58,10 @@ def seed_mambo_101_edges(conn):
     Taps 1, Son Step, Arm Styling 1, Braid, Suzy Q 2 -> Combo 2
 
     WEEK 3: TECHNIQUE
-    Combo 2 -> Flares 1, Twist 1, Basic 2
+    Combo 2 -> Flares 1, Twist 1, Basic 2, Basic Step 3
     Suzy Q 2 -> Suzy Q 3
     Taps 1 -> Taps 2
-    Flares 1, Twist 1, Basic 2, Suzy Q 3, Taps 2 -> Combo 3
+    Flares 1, Twist 1, Basic 2, Basic Step 3, Suzy Q 3, Taps 2 -> Combo 3
 
     WEEK 4: RHYTHM
     Combo 3 -> Swing Step 1, Syncopation 1
@@ -98,14 +98,20 @@ def seed_mambo_101_edges(conn):
     edges.append(create_edge(world_id, levels["Suzy Q 2"], levels["Combo 2"]))
 
     # Week 3
+    # Note: "Basic 2" and "Basic Step 3" are both sibling skill modules in this
+    # rank. If the current DB has only one of them, remove the missing entry
+    # here (or use .get lookups) before re-running — the script will KeyError
+    # on a missing title.
     edges.append(create_edge(world_id, levels["Combo 2"], levels["Flares 1"]))
     edges.append(create_edge(world_id, levels["Combo 2"], levels["Twist 1"]))
     edges.append(create_edge(world_id, levels["Combo 2"], levels["Basic 2"]))
+    edges.append(create_edge(world_id, levels["Combo 2"], levels["Basic Step 3"]))
     edges.append(create_edge(world_id, levels["Suzy Q 2"], levels["Suzy Q 3"]))  # Skill track bypass
     edges.append(create_edge(world_id, levels["Taps 1"], levels["Taps 2"]))  # Skill track bypass
     edges.append(create_edge(world_id, levels["Flares 1"], levels["Combo 3"]))
     edges.append(create_edge(world_id, levels["Twist 1"], levels["Combo 3"]))
     edges.append(create_edge(world_id, levels["Basic 2"], levels["Combo 3"]))
+    edges.append(create_edge(world_id, levels["Basic Step 3"], levels["Combo 3"]))
     edges.append(create_edge(world_id, levels["Suzy Q 3"], levels["Combo 3"]))
     edges.append(create_edge(world_id, levels["Taps 2"], levels["Combo 3"]))
 
