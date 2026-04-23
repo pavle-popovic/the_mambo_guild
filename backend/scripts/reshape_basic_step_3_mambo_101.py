@@ -7,6 +7,12 @@ After:   Combo 2 -> Basic Step 3 -> Combo 3
 Combo 4 remains reachable via Swing Step 2 and Syncopation 2, so no
 orphaning occurs. Other courses and other modules are untouched.
 
+Also updates stored x_position / y_position for Basic Step 3, Flares 1,
+and Twist 1 so the student-facing ConstellationGraph (which uses stored
+positions when available) renders the new middle-rank layout:
+
+    Taps 2 (20) — Flares 1 (35) — Basic Step 3 (50) — Twist 1 (65) — Suzy Q 3 (80)
+
 Idempotent: safe to re-run. Supports --dry-run to preview without writing.
 
 Usage:
@@ -31,6 +37,16 @@ COURSE_SLUG = "mambo-101"
 TARGET_TITLE = "Basic Step 3"
 NEW_PARENT_TITLE = "COMBO 2"    # Basic Step 3's new prerequisite
 NEW_CHILD_TITLE = "COMBO 3"     # what Basic Step 3 now unlocks
+
+# New stored positions for the middle-rank relayout. Keeps existing
+# siblings Taps 2 (x=20) and Suzy Q 3 (x=80) at the same x, evenly
+# spacing the three centered nodes at 15-unit intervals. y=37 is the
+# existing rank between COMBO 2 (y=46) and COMBO 3 (y=28).
+POSITION_UPDATES = {
+    "Basic Step 3": (50.0, 37.0),
+    "Flares 1":     (35.0, 37.0),
+    "Twist 1":      (65.0, 37.0),
+}
 
 
 def find_level_id(conn, world_id: str, title: str) -> str | None:
@@ -194,6 +210,47 @@ def main(dry_run: bool) -> int:
                         },
                     )
 
+            # ── Position updates ────────────────────────────────────────
+            # The student-facing ConstellationGraph uses stored x/y when
+            # any level has non-zero position; Dagre is bypassed. So
+            # edge changes alone don't move nodes on screen — we have
+            # to update x_position / y_position too.
+            print("\nPosition updates:")
+            for title, (new_x, new_y) in POSITION_UPDATES.items():
+                row = conn.execute(
+                    text(
+                        """
+                        SELECT id, x_position, y_position
+                        FROM levels
+                        WHERE world_id = :wid AND title = :title
+                        LIMIT 1
+                        """
+                    ),
+                    {"wid": world_id, "title": title},
+                ).fetchone()
+                if not row:
+                    print(f"  SKIP (not found): {title}")
+                    continue
+                lvl_id, old_x, old_y = str(row[0]), float(row[1]), float(row[2])
+                if old_x == new_x and old_y == new_y:
+                    print(f"  SKIP (already set): {title} at ({new_x}, {new_y})")
+                    continue
+                print(
+                    f"  MOVE: {title:16s} "
+                    f"({old_x:5.1f}, {old_y:5.1f}) -> ({new_x:5.1f}, {new_y:5.1f})"
+                )
+                if not dry_run:
+                    conn.execute(
+                        text(
+                            """
+                            UPDATE levels
+                            SET x_position = :x, y_position = :y
+                            WHERE id = :id
+                            """
+                        ),
+                        {"x": new_x, "y": new_y, "id": lvl_id},
+                    )
+
             if dry_run:
                 print("\n[DRY-RUN] Rolling back — no changes written.")
                 trans.rollback()
@@ -205,6 +262,20 @@ def main(dry_run: bool) -> int:
             print("\nFinal edges touching Basic Step 3:")
             for e in list_edges_touching(conn, world_id, target_id):
                 print(f"  {e['from_title']} -> {e['to_title']}")
+
+            print("\nFinal positions at middle rank (y=37):")
+            for row in conn.execute(
+                text(
+                    """
+                    SELECT l.title, l.x_position, l.y_position
+                    FROM levels l
+                    WHERE l.world_id = :wid AND l.y_position = 37
+                    ORDER BY l.x_position
+                    """
+                ),
+                {"wid": world_id},
+            ).fetchall():
+                print(f"  {row[0]:16s} x={row[1]:5.1f} y={row[2]:5.1f}")
 
             return 0
         except Exception as exc:
