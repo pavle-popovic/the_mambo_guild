@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import NavBar from "@/components/NavBar";
+import NavBarAuth from "@/components/NavBarAuth";
 import Footer from "@/components/Footer";
 import { SITE_URL, SITE_NAME, FOUNDER } from "@/lib/site";
 
@@ -163,7 +163,7 @@ export default function WhatIsSalsaOn2Page() {
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(faqSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(breadcrumbSchema) }} />
 
-            <NavBar />
+            <NavBarAuth />
 
             <main className="relative min-h-screen bg-mambo-dark text-white selection:bg-[#39FF14] selection:text-black overflow-x-hidden">
                 {/* Hero */}
@@ -206,8 +206,8 @@ export default function WhatIsSalsaOn2Page() {
                                 The Short Answer
                             </p>
                             <p className="text-base leading-relaxed text-white/90 sm:text-lg landscape-phone:!text-sm landscape-phone:!leading-relaxed">
-                                Salsa On2 is a timing style of salsa dancing where you break &mdash; change
-                                direction &mdash; on the <strong className="text-mambo-gold">second beat</strong> of
+                                Salsa On2 is a timing style of salsa dancing where you break (change
+                                direction) on the <strong className="text-mambo-gold">second beat</strong> of
                                 the music instead of the first. It is also called{" "}
                                 <strong className="text-mambo-gold">New York Style</strong> or{" "}
                                 <strong className="text-mambo-gold">Mambo</strong>. The style was formalized at
@@ -228,18 +228,18 @@ export default function WhatIsSalsaOn2Page() {
                             <p>
                                 Every salsa song is written in 4/4 time, which dancers count as a repeating
                                 8-count measure (1, 2, 3, 4, 5, 6, 7, 8). Whether you dance On1 or On2, you take
-                                six steps inside each 8-count &mdash; three in the first half and three in the
-                                second half &mdash; with pauses on the 4 and the 8.
+                                six steps inside each 8-count: three in the first half and three in the
+                                second half, with pauses on the 4 and the 8.
                             </p>
                             <p>
                                 What changes between the two styles is{" "}
-                                <em>when</em> you change direction &mdash; what dancers call the &ldquo;break
+                                <em>when</em> you change direction, what dancers call the &ldquo;break
                                 step.&rdquo; An On1 dancer changes direction on the 1. An On2 dancer changes
                                 direction on the 2. The rest of the footwork follows from that single decision.
                             </p>
                             <p>
                                 The reason this matters is musical. In Afro-Cuban music, the conga drum plays a
-                                pattern called the tumbao. Its defining accent &mdash; the open-tone slap &mdash;
+                                pattern called the tumbao. Its defining accent, the open-tone slap,
                                 falls on the 2 and the 6 of every 8-count measure, not on the 1 and the 5. When
                                 you break on the 2, your weight change lands on that slap. Your body is moving in
                                 sync with the rhythm section of the band instead of the melody.
@@ -272,7 +272,7 @@ export default function WhatIsSalsaOn2Page() {
                             <p>
                                 In the early 1950s, New York&rsquo;s Palladium Ballroom became the crucible of
                                 the Mambo Craze. Working-class dancers from the Bronx, Brooklyn, and Spanish
-                                Harlem &mdash; Puerto Rican, Italian, Jewish, and African American &mdash; were
+                                Harlem (Puerto Rican, Italian, Jewish, and African American) were
                                 dancing to big-band Mambo led by Tito Puente, Tito Rodriguez, and Machito. The
                                 era&rsquo;s legendary dancers like Cuban Pete, Millie Donay, and Killer Joe Piro
                                 fused Afro-Cuban grounding with Lindy Hop acrobatics, tap phrasing, and ballroom
@@ -280,7 +280,7 @@ export default function WhatIsSalsaOn2Page() {
                             </p>
                             <p>
                                 The Palladium Mambo that emerged was not a single, standardized style. It was a
-                                competitive subculture of ad-hoc variations &mdash; some dancers broke on the 1,
+                                competitive subculture of ad-hoc variations. Some dancers broke on the 1,
                                 some on the 2, some floated between them. What unified the style was the
                                 aesthetic: grounded lower body, locked frame, fast footwork, quiet chest.
                             </p>
@@ -298,8 +298,8 @@ export default function WhatIsSalsaOn2Page() {
                         <Section title="Why On2 feels different in your body">
                             <p>
                                 The biomechanics of On2 are a controlled tug-of-war. Your lower body surrenders
-                                to the floor &mdash; knees soft, center of gravity low, weight rolling through
-                                the ball of the foot before the heel drops. Your upper body reaches up &mdash;
+                                to the floor: knees soft, center of gravity low, weight rolling through
+                                the ball of the foot before the heel drops. Your upper body reaches up:
                                 spine lifted, shoulders down, chest quiet.
                             </p>
                             <p>
@@ -332,8 +332,8 @@ export default function WhatIsSalsaOn2Page() {
                                 </li>
                                 <li>
                                     <strong className="text-white">Add music at a slow tempo (~90 BPM).</strong>{" "}
-                                    Once the step is boring, put on a slow Mambo track &mdash; Tito Puente or
-                                    Eddie Torres Big Band are canonical &mdash; and match your basic step to the
+                                    Once the step is boring, put on a slow Mambo track (Tito Puente or
+                                    Eddie Torres Big Band are canonical) and match your basic step to the
                                     music while continuing to count aloud.
                                 </li>
                                 <li>
@@ -361,12 +361,12 @@ export default function WhatIsSalsaOn2Page() {
                                 <li>
                                     <strong className="text-white">&ldquo;On2 is only for advanced dancers.&rdquo;</strong>{" "}
                                     False. Absolute beginners can start with On2. The adjustment is harder if
-                                    you already trained your body to On1 for years &mdash; not if you are new.
+                                    you already trained your body to On1 for years, not if you are new.
                                 </li>
                                 <li>
                                     <strong className="text-white">&ldquo;Salsa On2 is a different dance from salsa.&rdquo;</strong>{" "}
                                     It is the same dance with a different timing. The partner work, the
-                                    connection frame, the shines, the combinations &mdash; the vocabulary is
+                                    connection frame, the shines, the combinations. The vocabulary is
                                     shared.
                                 </li>
                                 <li>

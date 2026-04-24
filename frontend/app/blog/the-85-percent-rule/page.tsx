@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import NavBar from "@/components/NavBar";
+import NavBarAuth from "@/components/NavBarAuth";
 import Footer from "@/components/Footer";
 import { SITE_URL, SITE_NAME, FOUNDER } from "@/lib/site";
 
@@ -164,7 +164,7 @@ export default function EightyFivePercentRulePage() {
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(faqSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(breadcrumbSchema) }} />
 
-            <NavBar />
+            <NavBarAuth />
 
             <main className="relative min-h-screen bg-mambo-dark text-white selection:bg-[#39FF14] selection:text-black overflow-x-hidden">
                 <header className="relative px-5 pt-28 pb-10 sm:px-8 sm:pt-32 sm:pb-14 lg:px-12 lg:pt-40 lg:pb-20 landscape-phone:!pt-24 landscape-phone:!pb-6">
@@ -210,7 +210,7 @@ export default function EightyFivePercentRulePage() {
                                 A 2019 paper in <em>Nature Human Behaviour</em> by Wilson, Shenhav,
                                 Steine-Hanson, and Cohen found the mathematically optimal error rate for skill
                                 acquisition is exactly{" "}
-                                <strong className="text-mambo-gold">15.87% failure</strong> &mdash; around 85%
+                                <strong className="text-mambo-gold">15.87% failure</strong>, or about 85%
                                 success. Higher than that, your brain cannot lock onto a clear pattern. Lower
                                 than that, your brain files the skill as &ldquo;done&rdquo; and stops
                                 upgrading it. This is the math behind why clean practice stalls progress and
@@ -234,11 +234,11 @@ export default function EightyFivePercentRulePage() {
                                 would the dial be set to in order to learn as fast as mathematically possible?
                             </p>
                             <p>
-                                The answer comes out of the shape of a standard learning curve &mdash; an
+                                The answer comes out of the shape of a standard learning curve: an
                                 S-shaped sigmoid. The curve rises slowly when the skill is new, rises
                                 fastest in the middle, and plateaus at the top when the skill is mastered.
-                                Wilson asked: at which point on the curve is the slope &mdash; the rate of
-                                improvement per rep &mdash; steepest?
+                                Wilson asked: at which point on the curve is the slope (the rate of
+                                improvement per rep) steepest?
                             </p>
                             <p>
                                 That point, derived from the math, is{" "}
@@ -253,8 +253,8 @@ export default function EightyFivePercentRulePage() {
                                 Movement learning is an error-correction loop. You try something, your body
                                 does a version of it, and your brain compares what you <em>meant</em> to do
                                 against what <em>actually happened</em>. The mismatch generates a signal in
-                                the cerebellum &mdash; the region at the back of your brain that fine-tunes
-                                movement &mdash; and that signal is what tells your motor cortex to update.
+                                the cerebellum (the region at the back of your brain that fine-tunes
+                                movement), and that signal is what tells your motor cortex to update.
                             </p>
                             <p>
                                 If every rep lands perfectly, there is no mismatch. No signal. Your brain
@@ -281,8 +281,8 @@ export default function EightyFivePercentRulePage() {
                                 The 85% rule has a behavioural sibling: Robert Bjork&rsquo;s concept of{" "}
                                 <strong className="text-white">desirable difficulty</strong>. Bjork spent
                                 decades showing that practice conditions which feel{" "}
-                                <em>harder in the moment</em> &mdash; spacing reps out, interleaving
-                                different skills, reducing feedback &mdash; produce better{" "}
+                                <em>harder in the moment</em> (spacing reps out, interleaving
+                                different skills, reducing feedback) produce better{" "}
                                 <em>long-term</em> retention. Massed practice of a single skill with constant
                                 feedback feels better while you are doing it and produces noticeably worse
                                 retention a week later.
@@ -290,8 +290,8 @@ export default function EightyFivePercentRulePage() {
                             <p>
                                 The practical implication for dance: if your practice session feels
                                 effortless and seamless, you are probably not learning much. If it feels
-                                slightly above your current level &mdash; uncomfortable, a little chaotic,
-                                lots of honest misses &mdash; you are probably learning at close to the
+                                slightly above your current level (uncomfortable, a little chaotic,
+                                lots of honest misses), you are probably learning at close to the
                                 maximum rate your brain allows.
                             </p>
                         </Section>
@@ -332,7 +332,7 @@ export default function EightyFivePercentRulePage() {
                                 drilling at the edge of your ability.
                             </p>
                             <p>
-                                The brain does not reward exertion. It rewards prediction error &mdash;
+                                The brain does not reward exertion. It rewards prediction error, and
                                 specifically, a manageable amount of it. An hour of rehearsing what you
                                 already know keeps the dance safely inside your comfort zone and generates
                                 almost no update signal. Twenty minutes of drilling at 85% success, where
@@ -351,13 +351,13 @@ export default function EightyFivePercentRulePage() {
                                 The Mambo Guild curriculum is built around this principle. Every lesson
                                 gates to the next at an explicit mastery criterion. Every drill has a
                                 difficulty slider. The Skill Tree only unlocks a new branch once you can
-                                execute the current branch consistently &mdash; not flawlessly, but
+                                execute the current branch consistently, not flawlessly, but
                                 consistently. The whole point is to keep you in the 85% band without having
                                 to measure your own hit rate with a clipboard.
                             </p>
                             <p>
-                                The alternative &mdash; taking random classes, drilling whatever the teacher
-                                happened to cover this week &mdash; almost always puts you either too low
+                                The alternative (taking random classes, drilling whatever the teacher
+                                happened to cover this week) almost always puts you either too low
                                 (bored, repeating what you know) or too high (lost, learning nothing). Both
                                 failure modes are visible in the plateaus self-taught salsa dancers hit
                                 around six to nine months of casual learning.

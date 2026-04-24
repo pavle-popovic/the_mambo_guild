@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import NavBar from "@/components/NavBar";
+import NavBarAuth from "@/components/NavBarAuth";
 import Footer from "@/components/Footer";
 import { SITE_URL, SITE_NAME, FOUNDER } from "@/lib/site";
 
@@ -157,7 +157,7 @@ export default function SalsaOn1VsOn2Page() {
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(faqSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(breadcrumbSchema) }} />
 
-            <NavBar />
+            <NavBarAuth />
 
             <main className="relative min-h-screen bg-mambo-dark text-white selection:bg-[#39FF14] selection:text-black overflow-x-hidden">
                 <header className="relative px-5 pt-28 pb-10 sm:px-8 sm:pt-32 sm:pb-14 lg:px-12 lg:pt-40 lg:pb-20 landscape-phone:!pt-24 landscape-phone:!pb-6">
@@ -198,9 +198,9 @@ export default function SalsaOn1VsOn2Page() {
                                 The Short Answer
                             </p>
                             <p className="text-base leading-relaxed text-white/90 sm:text-lg landscape-phone:!text-sm landscape-phone:!leading-relaxed">
-                                <strong className="text-mambo-gold">On1</strong> breaks on the 1st beat &mdash;
+                                <strong className="text-mambo-gold">On1</strong> breaks on the 1st beat.
                                 LA Style, easier onboarding. <strong className="text-mambo-gold">On2</strong>{" "}
-                                breaks on the 2nd beat &mdash; New York Style, truer to the conga, dominant in
+                                breaks on the 2nd beat. New York Style, truer to the conga, dominant in
                                 competition. <strong className="text-white">Best first choice:</strong> learn
                                 whichever style dominates your local scene so you have people to dance with.
                                 Serious long-term dancers typically end up learning both, with one as their
@@ -220,7 +220,7 @@ export default function SalsaOn1VsOn2Page() {
                                 vocabulary, the same shines, the same turn patterns.
                             </p>
                             <p>
-                                The single distinction is <strong>which beat you break on</strong> &mdash; which
+                                The single distinction is <strong>which beat you break on</strong>: which
                                 beat you change direction on. On1 dancers break forward on the 1 and back on
                                 the 5. On2 dancers break back on the 2 and forward on the 6.
                             </p>
@@ -262,10 +262,10 @@ export default function SalsaOn1VsOn2Page() {
                             <p>
                                 On1 lands your weight change on the same beat the melody tends to emphasize.
                                 The dance is punchy and synchronized to the vocal line. Styling hits happen on
-                                the 1, the 3, the 5, the 7 &mdash; predictable, satisfying, and easy to spot.
+                                the 1, the 3, the 5, the 7: predictable, satisfying, and easy to spot.
                             </p>
                             <p>
-                                On2 lands your weight change on the conga slap &mdash; the 2 and the 6. That
+                                On2 lands your weight change on the conga slap: the 2 and the 6. That
                                 alignment with the percussion section is the source of the &ldquo;smoother&rdquo;
                                 quality people associate with On2. The break step coincides with the rhythm,
                                 not the melody, which gives the dance a deeper, more patient feel.
@@ -329,8 +329,8 @@ export default function SalsaOn1VsOn2Page() {
 
                         <Section title="Transitioning from On1 to On2 (or vice versa)">
                             <p>
-                                The good news: 80% of what you learned in one timing &mdash; the partner work,
-                                the turn patterns, the lead-follow technique &mdash; transfers directly. The
+                                The good news: 80% of what you learned in one timing (the partner work,
+                                the turn patterns, the lead-follow technique) transfers directly. The
                                 work is mostly ear training and re-wiring the break-step habit.
                             </p>
                             <ol className="list-decimal space-y-4 pl-5 marker:text-mambo-gold marker:font-semibold">

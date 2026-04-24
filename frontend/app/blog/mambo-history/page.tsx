@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import NavBar from "@/components/NavBar";
+import NavBarAuth from "@/components/NavBarAuth";
 import Footer from "@/components/Footer";
 import { SITE_URL, SITE_NAME, FOUNDER } from "@/lib/site";
 
@@ -93,7 +93,7 @@ export default function MamboHistoryPage() {
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(articleSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(breadcrumbSchema) }} />
 
-            <NavBar />
+            <NavBarAuth />
 
             <main className="relative min-h-screen bg-mambo-dark text-white selection:bg-[#39FF14] selection:text-black overflow-x-hidden">
                 <header className="relative px-5 pt-28 pb-10 sm:px-8 sm:pt-32 sm:pb-14 lg:px-12 lg:pt-40 lg:pb-20 landscape-phone:!pt-24 landscape-phone:!pb-6">
@@ -170,7 +170,7 @@ export default function MamboHistoryPage() {
                             <p>
                                 On the other side, the{" "}
                                 <strong className="text-white">Afro-Cuban tradition</strong>, preserved in the{" "}
-                                <em>solares</em> (courtyards) and working-class neighborhoods: Rumba &mdash;
+                                <em>solares</em> (courtyards) and working-class neighborhoods: Rumba, including
                                 Guaguanco, Yambu, Columbia. The posture was low, with bent knees and a grounded
                                 center of gravity. Movement lived in the shoulders, the ribs, the hips. The
                                 phrasing emphasized the offbeats and the empty spaces between them.
@@ -180,7 +180,7 @@ export default function MamboHistoryPage() {
                                 and race. The bridge between them emerged in the 1920s in the form of{" "}
                                 <strong className="text-white">Son</strong>. Originating in the eastern Oriente
                                 province, Son combined Spanish guitar and lyrical structures with Afro-Cuban
-                                percussion &mdash; bongos, maracas, the clave. It was the first music that was
+                                percussion (bongos, maracas, the clave). It was the first music that was
                                 socially acceptable in the upper-class clubs and authentically driven by the
                                 street rhythm traditions.
                             </p>
@@ -191,8 +191,8 @@ export default function MamboHistoryPage() {
                                 In the 1930s and 1940s, a blind tres-guitar player named{" "}
                                 <strong className="text-white">Arsenio Rodriguez</strong> decided the Son
                                 ensemble needed more drive. He expanded the traditional septeto into a{" "}
-                                <em>conjunto</em>, adding multiple trumpets, the piano, and &mdash; most
-                                controversially &mdash; the conga drum. The conga had previously been
+                                <em>conjunto</em>, adding multiple trumpets, the piano, and (most
+                                controversially) the conga drum. The conga had previously been
                                 dismissed as too &ldquo;street&rdquo; for formal ensembles. Arsenio put it at
                                 the heart of the sound.
                             </p>
@@ -210,7 +210,7 @@ export default function MamboHistoryPage() {
                                 the feel of every subsequent layer. Danced correctly, the music asks your body
                                 to soften the knees, lower the center of gravity, and delay the weight transfer
                                 so that the step settles into the rhythm rather than marching over it. That
-                                delay is what causes Cuban motion &mdash; the figure-eight of the hips &mdash;
+                                delay is what causes Cuban motion (the figure-eight of the hips)
                                 to happen naturally instead of mechanically.
                             </p>
                         </Section>
@@ -221,7 +221,7 @@ export default function MamboHistoryPage() {
                                 racially integrated Latin music nights. Within a few years, it was the
                                 epicenter of the{" "}
                                 <strong className="text-white">Mambo Craze</strong>. Three house bandleaders
-                                &mdash; Tito Puente, Tito Rodriguez, and Machito &mdash; drove the music.
+                                (Tito Puente, Tito Rodriguez, and Machito) drove the music.
                                 Dancers from the Bronx, Brooklyn, and Spanish Harlem drove the dance.
                             </p>
                             <p>
@@ -251,7 +251,7 @@ export default function MamboHistoryPage() {
                                 <li>
                                     <strong className="text-white">Killer Joe Piro</strong>, an
                                     Italian-American dancer, became the most famous Mambo instructor in the
-                                    country &mdash; the figure who codified the chaos of the Palladium floor
+                                    country, the figure who codified the chaos of the Palladium floor
                                     into steps that could be sold to middle-class America.
                                 </li>
                                 <li>
@@ -273,7 +273,7 @@ export default function MamboHistoryPage() {
                         <Section title="Part 4: Eddie Torres and the codification of On2">
                             <p>
                                 The Palladium closed in 1966. By the 1970s, what had been called &ldquo;Mambo&rdquo;
-                                was being rebranded by the record industry as &ldquo;Salsa&rdquo; &mdash; the
+                                was being rebranded by the record industry as &ldquo;Salsa&rdquo;, the
                                 same Afro-Cuban musical traditions under a new, market-friendly label.
                             </p>
                             <p>
@@ -281,7 +281,7 @@ export default function MamboHistoryPage() {
                                 <strong className="text-white">Eddie Torres</strong>. Torres studied under
                                 Tito Puente, who personally told him that breaking on the 2 was truer to the
                                 clave and the conga than breaking on the 1. Torres took that musical principle
-                                and built a teachable system around it &mdash; a specific count structure, a
+                                and built a teachable system around it: a specific count structure, a
                                 specific basic step, a pedagogy that could be learned class by class rather
                                 than absorbed by years of club osmosis.
                             </p>

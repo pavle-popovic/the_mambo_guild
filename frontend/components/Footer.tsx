@@ -56,6 +56,11 @@ export default function Footer({ className = "" }: FooterProps) {
                 {t("learnCommunity")}
               </Link>
             </li>
+            <li>
+              <Link href="/blog" className="hover:text-mambo-blue transition">
+                Blog
+              </Link>
+            </li>
           </ul>
         </div>
         <div>

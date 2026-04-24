@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import NavBar from "@/components/NavBar";
+import NavBarAuth from "@/components/NavBarAuth";
 import Footer from "@/components/Footer";
 import { SITE_URL, SITE_NAME } from "@/lib/site";
 
@@ -117,7 +117,7 @@ export default function BlogIndexPage() {
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(breadcrumbSchema) }} />
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: esc(blogSchema) }} />
 
-            <NavBar />
+            <NavBarAuth />
 
             <main className="relative min-h-screen bg-mambo-dark text-white selection:bg-[#39FF14] selection:text-black overflow-x-hidden">
                 <header className="relative px-5 pt-28 pb-10 sm:px-8 sm:pt-32 sm:pb-14 lg:px-12 lg:pt-40 lg:pb-16 landscape-phone:!pt-24 landscape-phone:!pb-6">

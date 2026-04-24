@@ -164,6 +164,7 @@ export default function NavBar({ user }: NavBarProps) {
             <NavLink href="/community" activePaths={["/community"]}>{t('community')}</NavLink>
             <NavLink href="/pricing">{t('pricing')}</NavLink>
             <NavLink href="/instructors">Instructors</NavLink>
+            <NavLink href="/blog" activePaths={["/blog", "/what-is-salsa-on2", "/salsa-on1-vs-on2"]}>Blog</NavLink>
           </div>
 
           {/* Mobile: Hamburger + minimal icons */}
@@ -467,6 +468,7 @@ export default function NavBar({ user }: NavBarProps) {
                   { href: "/community", label: t('community') },
                   { href: "/pricing", label: t('pricing') },
                   { href: "/instructors", label: "Instructors" },
+                  { href: "/blog", label: "Blog" },
                 ].map((item) => (
                   <Link
                     key={item.href}
