@@ -138,11 +138,11 @@ def get_beautiful_html(username, referral_link):
             <p>You can post your video as a <strong>Reel</strong> or an <strong>IG Story</strong>.<br>
             ⚠️ <strong>Crucial:</strong> If you post it as a Story, you <strong>MUST</strong> send the raw video to my DMs after posting. Stories disappear in 24 hours. (Posting a Reel is highly preferred).</p>
 
-            <p>💪 Feel like you're more advanced? The <strong>Open Challenge</strong> below is for you — check it out.</p>
+            <p>💪 Feel like you're more advanced? The <strong>Open Challenge</strong> below is for you. Check it out.</p>
 
-            <h2>🏆 The Mambo Guild Open Challenge — Mambo Gozón</h2>
+            <h2>🏆 The Mambo Guild Open Challenge: Mambo Gozón</h2>
 
-            <p>Same prize, same rules, same deadline (<strong>April 26th</strong>) — just a harder choreo for the more experienced dancers. Learn the <strong>Mambo Gozón</strong> Choreography (the choreo starts at <strong>13min47</strong>):<br>
+            <p>Same prize, same rules, same deadline (<strong>April 26th</strong>). Just a harder choreo for the more experienced dancers. Learn the <strong>Mambo Gozón</strong> Choreography (the choreo starts at <strong>13min47</strong>):<br>
             <a href="https://www.youtube.com/watch?v=omiwxSIxnyc" class="link">https://www.youtube.com/watch?v=omiwxSIxnyc</a></p>
 
             <p>Film it, follow me on Instagram, tag me, and you're in. Let's go.</p>
@@ -262,6 +262,8 @@ def send_broadcast():
         "alicia.adamfe@gmail.com",
         "tine.heggernes@gmail.com",
         "lancekaplan@gmail.com",
+        "nycoach@ymail.com",
+        "karlasutlovic@yahoo.com",
     }
 
 
@@ -289,7 +291,7 @@ def send_broadcast():
         referral_link = f"{base_url}/waitlist?ref={code}"
 
         # 2. Prepare the Email Content
-        subject = "🌱 Beginner Challenge — Win Lifetime Access"
+        subject = "🌱 Beginner Challenge: Win Lifetime Access"
         html_content = get_beautiful_html(username, referral_link)
 
         # 3. Send (or Print)

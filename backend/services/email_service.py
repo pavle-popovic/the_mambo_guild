@@ -99,7 +99,7 @@ def send_coaching_feedback_email(student_email: str, student_name: str, feedback
         result = resend.Emails.send({
             "from": from_email,
             "to": [student_email],
-            "subject": "Your video feedback is ready — The Mambo Guild",
+            "subject": "Your video feedback is ready",
             "html": f"""
             <!DOCTYPE html>
             <html>
@@ -173,12 +173,12 @@ def send_coaching_feedback_email(student_email: str, student_name: str, feedback
                     <div class="badge">Guild Master</div>
                     <h1>Your feedback is ready, {student_name}.</h1>
                     <p>Your 1-on-1 video analysis has been reviewed and your personalised feedback video is now waiting for you in the Guild Master Hub.</p>
-                    <p>Head over to your coaching dashboard to watch it — your instructor has recorded a full breakdown just for you.</p>
+                    <p>Head over to your coaching dashboard to watch it. Your instructor has recorded a full breakdown just for you.</p>
                     <a href="{view_url}" class="cta-button">Watch My Feedback</a>
                     <hr class="divider">
                     <p class="footer">
                         You're receiving this because you submitted a coaching video through The Mambo Guild.<br>
-                        &mdash; The Mambo Guild Team
+                        The Mambo Guild Team
                     </p>
                 </div>
             </body>
@@ -278,7 +278,7 @@ def send_announcement_email(email: str, name: str, subject: str, message: str) -
                     <hr class="divider">
                     <p class="footer">
                         You're receiving this because you're a member of The Mambo Guild.<br>
-                        &mdash; Pavle &amp; The Mambo Guild Team
+                        Pavle &amp; The Mambo Guild Team
                     </p>
                 </div>
             </body>
@@ -331,7 +331,7 @@ def send_bug_report_email(
         safe_page_url = escape(page_url)
         safe_ua = escape(user_agent)
         safe_reporter = escape(reporter_email or "anonymous")
-        safe_name = escape(reporter_name or "—")
+        safe_name = escape(reporter_name or "(not provided)")
 
         screenshots_html = ""
         if screenshot_urls:
@@ -417,8 +417,8 @@ def send_ambassador_application_email(
         from html import escape
         safe_name = escape(applicant_name)
         safe_email = escape(applicant_email)
-        safe_ig = escape(instagram_url or "—")
-        safe_location = escape(location or "—")
+        safe_ig = escape(instagram_url or "(not provided)")
+        safe_location = escape(location or "(not provided)")
         safe_message = escape(message).replace("\n", "<br>")
         safe_page_url = escape(page_url)
         safe_ip = escape(client_ip)
@@ -530,31 +530,75 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
                         border-radius: 4px;
                         margin: 30px 0;
                     }}
-                    .link {{ 
-                        color: #b5952f; 
-                        text-decoration: underline; 
+                    .link {{
+                        color: #b5952f;
+                        text-decoration: underline;
                     }}
-                    .footer {{ 
-                        margin-top: 50px; 
-                        font-size: 14px; 
-                        color: #666; 
-                        border-top: 1px solid #ddd; 
-                        padding-top: 20px; 
+                    .footer {{
+                        margin-top: 50px;
+                        font-size: 14px;
+                        color: #666;
+                        border-top: 1px solid #ddd;
+                        padding-top: 20px;
                         font-style: italic;
                     }}
                     .emoji {{
                         font-style: normal;
+                    }}
+                    .badge {{
+                        display: inline-block;
+                        background-color: #D4AF37;
+                        color: #000;
+                        font-size: 12px;
+                        font-weight: bold;
+                        letter-spacing: 2px;
+                        text-transform: uppercase;
+                        padding: 6px 14px;
+                        border-radius: 2px;
+                        font-family: Arial, sans-serif;
+                    }}
+                    .bonus-callout {{
+                        background-color: #fff;
+                        border: 1px solid #e0e0e0;
+                        border-left: 4px solid #D4AF37;
+                        padding: 24px 24px 20px;
+                        margin: 24px 0 40px;
+                        border-radius: 4px;
+                    }}
+                    .bonus-callout h3 {{
+                        font-family: Georgia, 'Times New Roman', serif;
+                        color: #111;
+                        font-size: 24px;
+                        margin: 10px 0 12px 0;
+                        line-height: 1.3;
+                    }}
+                    .bonus-callout p {{ margin-bottom: 12px; }}
+                    .feature-img {{
+                        width: 100%;
+                        max-width: 560px;
+                        height: auto;
+                        display: block;
+                        margin: 18px auto;
+                        border: 1px solid #e0e0e0;
+                        border-radius: 4px;
                     }}
                 </style>
             </head>
             <body>
                 <div class="container">
                     <p>Hi {username},</p>
-                    
-                    <p><strong>🌱 Beginner Challenge — Mambo Inn (less than 2 years dancing, Win Lifetime Access!):</strong><br>
+
+                    <div class="bonus-callout">
+                        <div class="badge">Weekend Bonus</div>
+                        <h3><span class="emoji">🎶</span> Bruno Mars Cha Cha Cha</h3>
+                        <p>A fresh intermediate cha cha cha routine set to a beloved Bruno Mars banger. Something to move to this weekend before the Guild opens.</p>
+                        <p style="margin-bottom:0;"><a href="https://www.youtube.com/watch?v=c-01Oo_Pzso" class="link"><strong>Watch the choreo &rarr;</strong></a></p>
+                    </div>
+
+                    <p><strong>🌱 Beginner Challenge: Mambo Inn (less than 2 years dancing, Win Lifetime Access!):</strong><br>
                     <a href="https://www.youtube.com/watch?v=ticP-zMdeUk" class="link">https://www.youtube.com/watch?v=ticP-zMdeUk</a></p>
 
-                    <p><strong>🏆 Open Challenge — Mambo Gozón Choreo (more advanced, Win Lifetime Access!):</strong><br>
+                    <p><strong>🏆 Open Challenge: Mambo Gozón Choreo (more advanced, Win Lifetime Access!):</strong><br>
                     <a href="https://www.youtube.com/watch?v=omiwxSIxnyc" class="link">https://www.youtube.com/watch?v=omiwxSIxnyc</a></p>
 
                     <p><strong>8 Free Classes:</strong><br>
@@ -573,31 +617,27 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
 
                     <p>I have studied and hold certifications in Learning Experience Design and Gamification; and decided to apply those scientific principles to this curriculum to ensure you aren't just memorizing steps, but actually <em>learning to dance</em>.</p>
 
-                    <p>To kick things off properly, I want to give you a head start. Here are two critical insights you need to know right now. <span class="emoji">👇</span></p>
+                    <p>The Guild opens its doors <strong>Wednesday, April 29th</strong>. Here's a quick tour of what you're about to step into. <span class="emoji">👇</span></p>
 
-                    <h2><span class="emoji">🧠</span> The Science: What is "Segmentation" ?</h2>
-                    <p>In cognitive science, there is a concept called <strong>Chunking</strong> (or Segmentation).</p>
-                    <p>Your working memory has a limit. If you try to learn the feet, the arms, the timing, and the partner connection all at once, your brain gets "Cognitive Overload." You freeze. <span class="emoji">🥶</span></p>
-                    <p>At the Guild, we use <strong>Modular Segmentation</strong>: We break complex patterns into isolated "chunks" so your brain can digest them faster.</p>
+                    <h2><span class="emoji">📚</span> The Vault</h2>
+                    <p><em>Your arsenal of dance mastery.</em></p>
                     <ul>
-                        <li><span class="emoji">🦶</span> <strong>The Feet</strong>: We isolate the footwork first until it becomes automatic.</li>
-                        <li><span class="emoji">👐</span> <strong>The Styling</strong>: We layer on the arm mechanics and styling options which can be applied to all footworks.</li>
-                        <li><span class="emoji">🧩</span> <strong>The Integration</strong>: We only combine them once the individual parts are semi-automatic.</li>
+                        <li>500+ lessons, from your first basic step to pro-level mechanics</li>
+                        <li>Three full Mambo courses and a complete Pachanga course</li>
+                        <li>A full course on Salsa History and a full course on Effective Training Science</li>
+                        <li>Bi-weekly choreographies and new courses, with expert guest teachers</li>
                     </ul>
-                    <p>The Result: You learn faster, have more fun, and stop feeling overwhelmed!</p>
+                    <img src="https://www.themamboguild.com/assets/Course_page.png" alt="The Vault" width="560" style="width:100%;max-width:560px;height:auto;display:block;margin:18px auto;border:1px solid #e0e0e0;border-radius:4px;" />
 
-                    <h2><span class="emoji">📜</span> The History: What are we actually dancing?</h2>
-                    <p>You'll hear "Salsa" and "Mambo" used interchangeably, but context is everything. Here is the 30-second breakdown:</p>
-                    <ul>
-                        <li><span class="emoji">🥁</span> <strong>The Roots (Mambo)</strong>: In the 1950s, the "Mambo Craze" exploded at New York's Palladium Ballroom. Dancers moved strictly to the rhythm of the conga drum, accenting the "slap" on the second beat.</li>
-                        <li><span class="emoji">🎺</span> <strong>The Evolution (Salsa)</strong>: By the 70s, Latin Jazz music was evolving and starting to become increasingly "popular". The marketing term "Salsa" was born to package this incredible blend of rhythms for the world.</li>
-                        <li><span class="emoji">🗽</span> <strong>The Structure (On2)</strong>: While many danced "On1" (following the melody), the legendary Eddie Torres formalized "New York Style On2" to preserve that original Palladium connection to the rhythm section.</li>
-                    </ul>
+                    <h2><span class="emoji">🌳</span> The RPG of Dance</h2>
+                    <p>Visualize your growth from Basic Steps to Boss Level. Every lesson unlocks a new node on your skill tree. Track your progress like a true gamer.</p>
+                    <img src="https://www.themamboguild.com/assets/skill-tree.png" alt="Skill tree" width="560" style="width:100%;max-width:560px;height:auto;display:block;margin:18px auto;border:1px solid #e0e0e0;border-radius:4px;" />
 
-                    <p>For more information I strongly recommend the following documentary: <br>
-                    <a href="https://www.youtube.com/watch?v=hlYgFQjTyTc" class="link">https://www.youtube.com/watch?v=hlYgFQjTyTc</a></p>
+                    <h2><span class="emoji">🏆</span> The Stage</h2>
+                    <p>Compete, collaborate, and get feedback from real pros. Climb the High Rollers leaderboard and earn legendary badges.</p>
+                    <img src="https://www.themamboguild.com/assets/community-ui.png" alt="The Stage" width="560" style="width:100%;max-width:560px;height:auto;display:block;margin:18px auto;border:1px solid #e0e0e0;border-radius:4px;" />
 
-                    <p>Keep an eye on your inbox, because I will be sending you free choreographies, full classes, and deep dives into dance science and history every single week.</p>
+                    <p>Doors open <strong>Wednesday, April 29th</strong>. Keep an eye on your inbox.</p>
 
                     <p>Pavle<br>
                     Founder, The Mambo Guild</p>
