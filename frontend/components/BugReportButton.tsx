@@ -6,6 +6,7 @@ import { Bug, X, Camera, Paperclip, Loader2, Check } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
+import { useTranslations } from "@/i18n/useTranslations";
 
 // modern-screenshot handles Tailwind v4 oklch() colors, CSS variables, and gradients
 // that html2canvas cannot parse. Loaded lazily from CDN — zero bundle cost.
@@ -141,6 +142,7 @@ function getDeviceInfo() {
 }
 
 export default function BugReportButton() {
+  const t = useTranslations("bugReport");
   const { user } = useAuth();
   const [open, setOpen] = useState(false);
   const [message, setMessage] = useState("");
@@ -251,11 +253,11 @@ export default function BugReportButton() {
       ]);
     } catch (err) {
       console.error("Screenshot capture failed:", err);
-      toast.error("Couldn't capture a screenshot automatically — you can still attach one manually.");
+      toast.error(t("screenshotFailed"));
     } finally {
       setCapturing(false);
     }
-  }, []);
+  }, [t]);
 
   const close = useCallback(() => {
     setOpen(false);
@@ -270,11 +272,11 @@ export default function BugReportButton() {
 
   const addFile = useCallback((file: File) => {
     if (!file.type.startsWith("image/")) {
-      toast.error("Only image files are supported.");
+      toast.error(t("onlyImagesError"));
       return;
     }
     if (file.size > MAX_IMAGE_BYTES) {
-      toast.error("Image too large (max 2 MB).");
+      toast.error(t("imageTooLarge"));
       return;
     }
     const reader = new FileReader();
@@ -282,14 +284,14 @@ export default function BugReportButton() {
       const dataUrl = reader.result as string;
       setAttachments((prev) => {
         if (prev.length >= MAX_IMAGES) {
-          toast.error(`Max ${MAX_IMAGES} attachments.`);
+          toast.error(t("maxAttachments", { count: MAX_IMAGES }));
           return prev;
         }
         return [...prev, { id: crypto.randomUUID(), dataUrl, label: file.name }];
       });
     };
     reader.readAsDataURL(file);
-  }, []);
+  }, [t]);
 
   // Pre-warm the screenshot library on idle so it's ready the instant the user clicks.
   // Uses requestIdleCallback to avoid costing any real performance — only runs
@@ -336,7 +338,7 @@ export default function BugReportButton() {
 
   const submit = async () => {
     if (message.trim().length < 3) {
-      toast.error("Please describe the bug (at least 3 characters).");
+      toast.error(t("describeBugError"));
       return;
     }
     setSubmitting(true);
@@ -356,11 +358,11 @@ export default function BugReportButton() {
       });
 
       setSuccess(true);
-      toast.success("Bug report sent — thank you!");
+      toast.success(t("reportSent"));
       setTimeout(close, 1500);
     } catch (err: any) {
       console.error("Bug report failed:", err);
-      toast.error(err?.message || "Failed to send bug report. Please email support@themamboguild.com.");
+      toast.error(err?.message || t("sendFailed"));
     } finally {
       setSubmitting(false);
     }
@@ -373,7 +375,7 @@ export default function BugReportButton() {
         type="button"
         data-bug-report-ignore
         onClick={openAndCapture}
-        aria-label="Report a bug"
+        aria-label={t("triggerAriaLabel")}
         style={{
           bottom: "calc(env(safe-area-inset-bottom, 0px) + 7rem)",
           left: "calc(env(safe-area-inset-left, 0px) + 0.5rem)",
@@ -409,7 +411,7 @@ export default function BugReportButton() {
               <div className="flex items-center justify-between px-6 py-4 border-b border-white/10">
                 <div className="flex items-center gap-2">
                   <Bug className="h-4 w-4 text-[#D4AF37]" />
-                  <h2 className="text-sm font-semibold tracking-widest uppercase text-[#D4AF37]">Report a bug</h2>
+                  <h2 className="text-sm font-semibold tracking-widest uppercase text-[#D4AF37]">{t("title")}</h2>
                 </div>
                 <button onClick={close} className="text-white/50 hover:text-white transition-colors">
                   <X className="h-5 w-5" />
@@ -423,19 +425,19 @@ export default function BugReportButton() {
                     <div className="h-14 w-14 rounded-full bg-[#D4AF37]/20 flex items-center justify-center mb-3">
                       <Check className="h-7 w-7 text-[#D4AF37]" />
                     </div>
-                    <p className="text-white font-medium">Thank you!</p>
-                    <p className="text-white/60 text-sm mt-1">Our team will look into this.</p>
+                    <p className="text-white font-medium">{t("thankYou")}</p>
+                    <p className="text-white/60 text-sm mt-1">{t("thankYouBody")}</p>
                   </div>
                 ) : (
                   <>
                     <div>
-                      <label className="block text-xs text-white/60 mb-1.5">What went wrong?</label>
+                      <label className="block text-xs text-white/60 mb-1.5">{t("whatWentWrong")}</label>
                       <textarea
                         autoFocus
                         rows={4}
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
-                        placeholder="Describe the issue. What were you doing when it happened?"
+                        placeholder={t("messagePlaceholder")}
                         className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#D4AF37]/60 resize-none"
                         maxLength={5000}
                       />
@@ -443,12 +445,12 @@ export default function BugReportButton() {
 
                     {!user && (
                       <div>
-                        <label className="block text-xs text-white/60 mb-1.5">Your email (optional, so we can follow up)</label>
+                        <label className="block text-xs text-white/60 mb-1.5">{t("emailLabel")}</label>
                         <input
                           type="email"
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
-                          placeholder="you@example.com"
+                          placeholder={t("emailPlaceholder")}
                           className="w-full bg-black/40 border border-white/10 rounded-md px-3 py-2 text-sm text-white placeholder:text-white/30 focus:outline-none focus:border-[#D4AF37]/60"
                         />
                       </div>
@@ -457,11 +459,11 @@ export default function BugReportButton() {
                     {/* Attachments */}
                     <div>
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-xs text-white/60">Attachments</span>
+                        <span className="text-xs text-white/60">{t("attachmentsLabel")}</span>
                         <div className="flex items-center gap-3">
                           {capturing && (
                             <span className="flex items-center gap-1.5 text-xs text-white/50">
-                              <Loader2 className="h-3 w-3 animate-spin" /> capturing…
+                              <Loader2 className="h-3 w-3 animate-spin" /> {t("capturingStatus")}
                             </span>
                           )}
                           <button
@@ -469,7 +471,7 @@ export default function BugReportButton() {
                             onClick={() => fileInputRef.current?.click()}
                             className="flex items-center gap-1 text-xs text-[#D4AF37] hover:underline"
                           >
-                            <Paperclip className="h-3 w-3" /> Add image
+                            <Paperclip className="h-3 w-3" /> {t("addImage")}
                           </button>
                         </div>
                       </div>
@@ -482,7 +484,7 @@ export default function BugReportButton() {
                         className="hidden"
                       />
                       {attachments.length === 0 && !capturing && (
-                        <p className="text-xs text-white/30 italic">No attachments yet. You can paste images too.</p>
+                        <p className="text-xs text-white/30 italic">{t("noAttachments")}</p>
                       )}
                       {attachments.length > 0 && (
                         <div className="grid grid-cols-3 gap-2">
@@ -495,7 +497,7 @@ export default function BugReportButton() {
                                 type="button"
                                 onClick={() => removeAttachment(a.id)}
                                 className="absolute top-1 right-1 bg-black/70 rounded-full p-0.5 text-white/80 opacity-0 group-hover:opacity-100 transition-opacity"
-                                aria-label="Remove"
+                                aria-label={t("removeAttachment")}
                               >
                                 <X className="h-3 w-3" />
                               </button>
@@ -509,7 +511,7 @@ export default function BugReportButton() {
                     </div>
 
                     <p className="text-[11px] text-white/30 leading-relaxed">
-                      We'll automatically include your browser, OS, screen size, and the current page URL to help debug.
+                      {t("autoInclude")}
                     </p>
                   </>
                 )}
@@ -524,17 +526,17 @@ export default function BugReportButton() {
                     disabled={submitting}
                     className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button
                     type="button"
                     onClick={submit}
                     disabled={submitting || capturing || message.trim().length < 3}
-                    title={capturing ? "Waiting for screenshot to finish capturing…" : undefined}
+                    title={capturing ? t("capturingTooltip") : undefined}
                     className="flex items-center gap-2 px-4 py-2 text-sm font-semibold bg-[#D4AF37] text-black rounded-md hover:bg-[#e6c34a] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
                   >
                     {submitting || capturing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Camera className="h-4 w-4" />}
-                    {submitting ? "Sending…" : capturing ? "Capturing…" : "Send report"}
+                    {submitting ? t("sending") : capturing ? t("capturingButton") : t("sendReport")}
                   </button>
                 </div>
               )}

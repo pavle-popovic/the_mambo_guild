@@ -1,8 +1,12 @@
+"use client";
+
 import React from 'react';
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface FeatureGridProps { }
 
 const FeatureGrid: React.FC<FeatureGridProps> = () => {
+    const t = useTranslations("featureGrid");
     return (
         <section id="about" className="py-32 px-6 max-w-7xl mx-auto">
             <div className="grid md:grid-cols-2 gap-16 items-center">
@@ -13,16 +17,16 @@ const FeatureGrid: React.FC<FeatureGridProps> = () => {
                     <div data-aos="zoom-in" data-aos-delay="300" className="absolute -bottom-6 -right-6 bg-gray-900 p-4 rounded-xl border border-white/10 shadow-xl flex items-center gap-3">
                         <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-black font-bold"><i className="fa-solid fa-check"></i></div>
                         <div>
-                            <div className="text-xs text-gray-400 font-bold uppercase">Streak</div>
-                            <div className="text-sm font-bold">14 Days Active</div>
+                            <div className="text-xs text-gray-400 font-bold uppercase">{t("streakLabel")}</div>
+                            <div className="text-sm font-bold">{t("streakDays")}</div>
                         </div>
                     </div>
                 </div>
 
                 <div>
-                    <h2 data-aos="fade-up" className="text-4xl font-bold mb-6">Don't just watch.<br /><span className="text-mambo-blue">Play the game.</span></h2>
+                    <h2 data-aos="fade-up" className="text-4xl font-bold mb-6">{t("headingLine1")}<br /><span className="text-mambo-blue">{t("headingLine2")}</span></h2>
                     <p data-aos="fade-up" data-aos-delay="100" className="text-gray-400 text-lg mb-8 leading-relaxed">
-                        Most online courses leave you lonely. At The Salsa Lab, every step is a level. Every combo is a boss battle. Track your XP, earn badges, and get verified feedback from our instructors.
+                        {t("body")}
                     </p>
 
                     <div className="space-y-6">
@@ -31,8 +35,8 @@ const FeatureGrid: React.FC<FeatureGridProps> = () => {
                                 <i className="fa-solid fa-layer-group"></i>
                             </div>
                             <div>
-                                <h3 className="font-bold text-lg">Structured Worlds</h3>
-                                <p className="text-gray-500 text-sm">No random videos. A clear path from Beginner to Pro.</p>
+                                <h3 className="font-bold text-lg">{t("structuredWorldsTitle")}</h3>
+                                <p className="text-gray-500 text-sm">{t("structuredWorldsBody")}</p>
                             </div>
                         </div>
 
@@ -41,8 +45,8 @@ const FeatureGrid: React.FC<FeatureGridProps> = () => {
                                 <i className="fa-solid fa-trophy"></i>
                             </div>
                             <div>
-                                <h3 className="font-bold text-lg">Earn Your Rank</h3>
-                                <p className="text-gray-500 text-sm">Unlock advanced styling only when you master the basics.</p>
+                                <h3 className="font-bold text-lg">{t("earnRankTitle")}</h3>
+                                <p className="text-gray-500 text-sm">{t("earnRankBody")}</p>
                             </div>
                         </div>
                     </div>

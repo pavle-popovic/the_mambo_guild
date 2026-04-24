@@ -6,6 +6,7 @@ import { Download, Loader2, AlertTriangle, CheckCircle } from "lucide-react";
 import { apiClient } from "@/lib/api";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface DownloadButtonProps {
   lessonId: string;
@@ -20,6 +21,7 @@ export default function DownloadButton({
   className,
   variant = "default",
 }: DownloadButtonProps) {
+  const t = useTranslations("download");
   const [isLoading, setIsLoading] = useState(false);
   const [showWarning, setShowWarning] = useState(false);
   const [downloadStatus, setDownloadStatus] = useState<{
@@ -44,14 +46,14 @@ export default function DownloadButton({
         });
         
         if (status.downloads_remaining <= 0) {
-          toast.error("Daily download limit reached. Try again tomorrow!");
+          toast.error(t("limitReached"));
           return;
         }
-        
+
         // Show warning for first download
         setShowWarning(true);
       } catch (error: any) {
-        toast.error(error.message || "Failed to check download status");
+        toast.error(error.message || t("statusCheckFailed"));
       }
       return;
     }
@@ -154,13 +156,13 @@ export default function DownloadButton({
       const remainingAfter = downloadStatus?.remaining ? downloadStatus.remaining - 1 : 0;
       toast.success(
         <div className="flex flex-col gap-1">
-          <span className="font-semibold">Download Started! ✓</span>
+          <span className="font-semibold">{t("started")}</span>
           <span className="text-sm text-gray-400">
-            The video file is downloading to your device. Check your Downloads folder.
+            {t("startedBody")}
           </span>
           {remainingAfter > 0 && (
             <span className="text-xs text-gray-500 mt-1">
-              {remainingAfter} downloads remaining today
+              {t("remainingToday", { remaining: remainingAfter })}
             </span>
           )}
         </div>,
@@ -168,16 +170,16 @@ export default function DownloadButton({
       );
     } catch (error: any) {
       console.error("Download error:", error);
-      
+
       // Prevent any navigation - make sure we never navigate to URLs
       if (error.message?.includes("429") || error.message?.includes("limit")) {
-        toast.error("Daily download limit reached (5/day). Try again tomorrow!");
+        toast.error(t("limitReachedHard"));
       } else if (error.message?.includes("Failed to fetch") || error.message?.includes("NetworkError")) {
-        toast.error("Network error. Please check your connection and try again.");
+        toast.error(t("networkError"));
       } else if (error.message?.includes("CORS")) {
-        toast.error("Download failed due to security restrictions. Please contact support.");
+        toast.error(t("corsError"));
       } else {
-        toast.error(error.message || "Failed to start download. Please try again.");
+        toast.error(error.message || t("genericError"));
       }
     } finally {
       setIsLoading(false);
@@ -201,14 +203,14 @@ export default function DownloadButton({
             "disabled:opacity-50 disabled:cursor-not-allowed",
             className
           )}
-          title="Download for offline practice"
+          title={t("tooltip")}
         >
           {isLoading ? (
             <Loader2 size={16} className="animate-spin" />
           ) : (
             <Download size={16} />
           )}
-          Download
+          {t("button")}
         </button>
 
         {/* Warning Modal */}
@@ -233,9 +235,9 @@ export default function DownloadButton({
                     <AlertTriangle size={24} className="text-amber-400" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-white mb-1">Secure Download</h3>
+                    <h3 className="font-bold text-white mb-1">{t("secureTitle")}</h3>
                     <p className="text-sm text-gray-400">
-                      Download links are generated exclusively for your account and expire in 1 hour.
+                      {t("secureBody")}
                     </p>
                   </div>
                 </div>
@@ -243,7 +245,7 @@ export default function DownloadButton({
                 {downloadStatus && (
                   <div className="bg-gray-800 rounded-lg p-3 mb-4 text-sm">
                     <div className="flex justify-between text-gray-300">
-                      <span>Downloads remaining today:</span>
+                      <span>{t("remainingLabel")}</span>
                       <span className="font-bold text-white">
                         {downloadStatus.remaining}/{downloadStatus.limit}
                       </span>
@@ -256,7 +258,7 @@ export default function DownloadButton({
                     onClick={cancelDownload}
                     className="flex-1 px-4 py-2 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 font-medium transition"
                   >
-                    Cancel
+                    {t("cancel")}
                   </button>
                   <button
                     onClick={handleDownload}
@@ -268,7 +270,7 @@ export default function DownloadButton({
                     ) : (
                       <Download size={16} />
                     )}
-                    Download
+                    {t("button")}
                   </button>
                 </div>
               </motion.div>
@@ -302,10 +304,10 @@ export default function DownloadButton({
           <Download size={20} />
         )}
         <div className="text-left">
-          <div>Download for Offline</div>
+          <div>{t("buttonOffline")}</div>
           {downloadStatus && (
             <div className="text-xs text-gray-400">
-              {downloadStatus.remaining}/{downloadStatus.limit} today
+              {t("todayCount", { remaining: downloadStatus.remaining, limit: downloadStatus.limit })}
             </div>
           )}
         </div>
@@ -333,9 +335,9 @@ export default function DownloadButton({
                   <AlertTriangle size={24} className="text-amber-400" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-white mb-1">Secure Download</h3>
+                  <h3 className="font-bold text-white mb-1">{t("secureTitle")}</h3>
                   <p className="text-sm text-gray-400">
-                    Download links are generated exclusively for your account and expire in 1 hour.
+                    {t("secureBody")}
                   </p>
                 </div>
               </div>
@@ -368,7 +370,7 @@ export default function DownloadButton({
                   ) : (
                     <Download size={16} />
                   )}
-                  Download Now
+                  {t("buttonNow")}
                 </button>
               </div>
             </motion.div>

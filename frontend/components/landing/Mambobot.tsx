@@ -6,9 +6,10 @@ import { FaTimes, FaPaperPlane, FaRedo } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi";
 import { useGemini, Message } from "@/hooks/useGemini";
 import RecommendationCard from "./RecommendationCard";
+import { useTranslations } from "@/i18n/useTranslations";
 
 // Message bubble component
-const MessageBubble = ({ message }: { message: Message }) => {
+const MessageBubble = ({ message, knowledgeBaseLabel }: { message: Message; knowledgeBaseLabel: string }) => {
   const isUser = message.role === "user";
   const hasRecommendation = message.functionCall?.result?.type === "recommendation";
   const hasKnowledgeBase = message.functionCall?.result?.type === "knowledge_base";
@@ -85,7 +86,7 @@ const MessageBubble = ({ message }: { message: Message }) => {
           <div className="px-4 py-2.5 text-sm bg-purple-500/10 border border-purple-500/30 rounded-2xl rounded-bl-md">
             <div className="text-[10px] text-purple-400 uppercase tracking-wider mb-1 font-semibold flex items-center gap-1">
               <HiSparkles className="text-xs" />
-              Knowledge Base
+              {knowledgeBaseLabel}
             </div>
             <div className="text-gray-300">{knowledgeBaseData.result}</div>
           </div>
@@ -96,6 +97,7 @@ const MessageBubble = ({ message }: { message: Message }) => {
 };
 
 export default function Mambobot() {
+  const t = useTranslations("mambobot");
   const [isOpen, setIsOpen] = useState(false);
   const [inputValue, setInputValue] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -149,7 +151,7 @@ export default function Mambobot() {
                   <h3 className="font-bold text-white text-sm">Tito P</h3>
                   <div className="flex items-center gap-1.5">
                     <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-[11px] text-gray-400">AI Concierge</span>
+                    <span className="text-[11px] text-gray-400">{t("role")}</span>
                   </div>
                 </div>
               </div>
@@ -160,7 +162,7 @@ export default function Mambobot() {
                   whileHover={{ rotate: -180 }}
                   whileTap={{ scale: 0.9 }}
                   transition={{ duration: 0.3 }}
-                  title="Reset conversation"
+                  title={t("resetTooltip")}
                 >
                   <FaRedo size={10} />
                 </motion.button>
@@ -194,7 +196,7 @@ export default function Mambobot() {
                     </div>
                   );
                 }
-                return <MessageBubble key={message.id} message={message} />;
+                return <MessageBubble key={message.id} message={message} knowledgeBaseLabel={t("knowledgeBase")} />;
               })}
               <div ref={messagesEndRef} />
             </div>
@@ -208,7 +210,7 @@ export default function Mambobot() {
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   onKeyDown={handleKeyDown}
-                  placeholder="Ask Tito P anything..."
+                  placeholder={t("inputPlaceholder")}
                   className="flex-1 bg-transparent border-none outline-none text-sm text-white placeholder-gray-500"
                   disabled={isLoading}
                 />
@@ -248,7 +250,7 @@ export default function Mambobot() {
             {/* Text */}
             <div className="relative text-left pr-2">
               <div className="text-sm font-bold text-white">Tito P</div>
-              <div className="text-[11px] text-gray-400">AI Concierge</div>
+              <div className="text-[11px] text-gray-400">{t("role")}</div>
             </div>
 
             {/* Chat icon indicator */}

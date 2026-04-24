@@ -2,31 +2,33 @@
 
 import { useRouter } from "next/navigation";
 import { FaLock, FaCrown, FaStepForward, FaTachometerAlt, FaRedo } from "react-icons/fa";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface UpgradePromptProps {
   onUpgrade?: () => void;
 }
 
-const PRO_FEATURES = [
-  {
-    icon: FaStepForward,
-    name: "Precision Player",
-    description: "Frame-by-frame stepping for detailed analysis",
-  },
-  {
-    icon: FaTachometerAlt,
-    name: "Smart Speed",
-    description: "Pitch-corrected playback from 0.5x to 1.5x",
-  },
-  {
-    icon: FaRedo,
-    name: "AB Looper",
-    description: "Set custom loop regions to practice sections",
-  },
-];
-
 export default function UpgradePrompt({ onUpgrade }: UpgradePromptProps) {
+  const t = useTranslations("upgradePrompt");
   const router = useRouter();
+
+  const PRO_FEATURES = [
+    {
+      icon: FaStepForward,
+      name: t("precisionPlayerName"),
+      description: t("precisionPlayerDesc"),
+    },
+    {
+      icon: FaTachometerAlt,
+      name: t("smartSpeedName"),
+      description: t("smartSpeedDesc"),
+    },
+    {
+      icon: FaRedo,
+      name: t("abLooperName"),
+      description: t("abLooperDesc"),
+    },
+  ];
 
   const handleUpgrade = () => {
     if (onUpgrade) {
@@ -42,9 +44,9 @@ export default function UpgradePrompt({ onUpgrade }: UpgradePromptProps) {
         <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-mambo-gold/10 mb-3">
           <FaCrown className="text-mambo-gold text-xl" />
         </div>
-        <h3 className="text-lg font-bold text-white mb-1">Unlock Pro Mastery Tools</h3>
+        <h3 className="text-lg font-bold text-white mb-1">{t("title")}</h3>
         <p className="text-sm text-gray-400">
-          Upgrade to Guild Master to access advanced video controls
+          {t("subtitle")}
         </p>
       </div>
 
@@ -78,12 +80,12 @@ export default function UpgradePrompt({ onUpgrade }: UpgradePromptProps) {
           flex items-center justify-center gap-2"
       >
         <FaCrown />
-        Upgrade to Guild Master
+        {t("cta")}
       </button>
 
       {/* Subtle hint */}
       <p className="text-center text-xs text-gray-500 mt-3">
-        Join hundreds of dancers mastering their craft
+        {t("hint")}
       </p>
     </div>
   );

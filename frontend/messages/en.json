@@ -25,52 +25,182 @@
   "auth": {
     "login": {
       "title": "Welcome Back",
-      "subtitle": "Continue your On2 journey",
-      "email": "Email",
-      "password": "Password",
+      "subtitle": "Ready to level up?",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "submit": "Log In",
+      "submitting": "Logging in...",
+      "orContinueWith": "Or continue with",
+      "continueWithGoogle": "Continue with Google",
       "forgotPassword": "Forgot password?",
-      "submit": "Sign In",
-      "noAccount": "Don't have an account?",
-      "signupLink": "Start your $1 trial",
-      "orContinueWith": "or continue with",
-      "google": "Continue with Google"
+      "createAccount": "Create new account",
+      "genericError": "Login failed. Please check your credentials."
     },
     "register": {
-      "title": "Join The Guild",
-      "subtitle": "7 days for $1. No excuses.",
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "username": "Gamertag (username)",
-      "email": "Email",
-      "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "danceLevel": "Your current level",
-      "levels": {
-        "beginner": "Beginner",
-        "novice": "Novice",
-        "intermediate": "Intermediate",
-        "advanced": "Advanced"
-      },
-      "submit": "Start $1 Trial",
+      "title": "Join The Stage",
+      "subtitle": "Create your dancer profile.",
+      "handleLabel": "Choose your Handle (Username)",
+      "handlePlaceholder": "e.g. MamboKing",
+      "handleHelper": "This is how you will appear in the community.",
+      "emailLabel": "Email",
+      "passwordLabel": "Password",
+      "passwordHelper": "Must be at least 8 characters",
+      "confirmPasswordLabel": "Confirm Password",
+      "submit": "Start My Journey",
+      "submitting": "Creating account...",
       "haveAccount": "Already have an account?",
-      "loginLink": "Sign In",
-      "terms": "By signing up you agree to our Terms of Service and Privacy Policy."
+      "loginLink": "Log in",
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 8 characters long",
+      "genericError": "Registration failed. Please try again."
     },
     "forgotPassword": {
-      "title": "Reset Password",
-      "subtitle": "Enter your email and we'll send you a link",
-      "email": "Email",
+      "title": "Forgot Password",
+      "subtitle": "Enter your email address and we'll send you a link to reset your password.",
+      "emailLabel": "Email",
+      "emailPlaceholder": "your@email.com",
       "submit": "Send Reset Link",
-      "backToLogin": "Back to login",
-      "successMessage": "Check your inbox — a reset link is on its way."
+      "submitting": "Sending...",
+      "successTitle": "Check your email!",
+      "successBody": "If an account exists with that email, we've sent you a password reset link. Please check your inbox and follow the instructions.",
+      "backToLogin": "Back to Login",
+      "failedToSend": "Failed to send reset email",
+      "genericError": "Failed to send reset email. Please try again."
     },
     "resetPassword": {
-      "title": "Set New Password",
-      "newPassword": "New Password",
-      "confirmPassword": "Confirm Password",
+      "title": "Reset Password",
+      "subtitle": "Enter your new password below.",
+      "newPasswordLabel": "New Password",
+      "newPasswordPlaceholder": "At least 8 characters",
+      "newPasswordHelper": "Must be at least 8 characters",
+      "confirmPasswordLabel": "Confirm Password",
+      "confirmPasswordPlaceholder": "Confirm your password",
+      "passwordMismatch": "Passwords do not match",
+      "passwordTooShort": "Password must be at least 8 characters long",
       "submit": "Reset Password",
-      "successMessage": "Password updated. You can now log in."
+      "submitting": "Resetting...",
+      "successTitle": "Password reset successful!",
+      "successBody": "Redirecting to login page...",
+      "backToLogin": "Back to Login",
+      "invalidToken": "Invalid reset token",
+      "invalidOrMissingToken": "Invalid or missing reset token. Please request a new password reset link.",
+      "failedToReset": "Failed to reset password",
+      "genericError": "Failed to reset password. The link may have expired.",
+      "loading": "Loading..."
     }
+  },
+  "authPrompt": {
+    "loginRequiredTitle": "Login Required",
+    "loginRequiredBody": "Please log in to access this lesson. Would you like to log in now?",
+    "logIn": "Log In",
+    "register": "Register",
+    "backToCourses": "Back to Courses",
+    "subscriptionRequiredTitle": "Subscription Required",
+    "subscriptionRequiredBody": "This course requires a subscription to access.",
+    "viewPricing": "View Pricing & Subscribe"
+  },
+  "download": {
+    "limitReached": "Daily download limit reached. Try again tomorrow!",
+    "limitReachedHard": "Daily download limit reached (5/day). Try again tomorrow!",
+    "statusCheckFailed": "Failed to check download status",
+    "started": "Download Started! ✓",
+    "startedBody": "The video file is downloading to your device. Check your Downloads folder.",
+    "remainingToday": "{remaining} downloads remaining today",
+    "networkError": "Network error. Please check your connection and try again.",
+    "corsError": "Download failed due to security restrictions. Please contact support.",
+    "genericError": "Failed to start download. Please try again.",
+    "button": "Download",
+    "buttonOffline": "Download for Offline",
+    "buttonNow": "Download Now",
+    "tooltip": "Download for offline practice",
+    "todayCount": "{remaining}/{limit} today",
+    "secureTitle": "Secure Download",
+    "secureBody": "Download links are generated exclusively for your account and expire in 1 hour.",
+    "remainingLabel": "Downloads remaining today:",
+    "cancel": "Cancel"
+  },
+  "pricingAlerts": {
+    "sessionExpired": "Your session has expired. Please log in again.",
+    "checkoutFailed": "Failed to start checkout. Please try again."
+  },
+  "bugReport": {
+    "triggerAriaLabel": "Report a bug",
+    "title": "Report a bug",
+    "whatWentWrong": "What went wrong?",
+    "messagePlaceholder": "Describe the issue. What were you doing when it happened?",
+    "emailLabel": "Your email (optional, so we can follow up)",
+    "emailPlaceholder": "you@example.com",
+    "attachmentsLabel": "Attachments",
+    "capturingStatus": "capturing…",
+    "addImage": "Add image",
+    "noAttachments": "No attachments yet. You can paste images too.",
+    "removeAttachment": "Remove",
+    "autoInclude": "We'll automatically include your browser, OS, screen size, and the current page URL to help debug.",
+    "thankYou": "Thank you!",
+    "thankYouBody": "Our team will look into this.",
+    "cancel": "Cancel",
+    "sendReport": "Send report",
+    "sending": "Sending…",
+    "capturingButton": "Capturing…",
+    "capturingTooltip": "Waiting for screenshot to finish capturing…",
+    "screenshotFailed": "Couldn't capture a screenshot automatically, you can still attach one manually.",
+    "onlyImagesError": "Only image files are supported.",
+    "imageTooLarge": "Image too large (max 2 MB).",
+    "maxAttachments": "Max {count} attachments.",
+    "describeBugError": "Please describe the bug (at least 3 characters).",
+    "reportSent": "Bug report sent, thank you!",
+    "sendFailed": "Failed to send bug report. Please email support@themamboguild.com."
+  },
+  "featureGrid": {
+    "streakLabel": "Streak",
+    "streakDays": "14 Days Active",
+    "headingLine1": "Don't just watch.",
+    "headingLine2": "Play the game.",
+    "body": "Most online courses leave you lonely. At The Salsa Lab, every step is a level. Every combo is a boss battle. Track your XP, earn badges, and get verified feedback from our instructors.",
+    "structuredWorldsTitle": "Structured Worlds",
+    "structuredWorldsBody": "No random videos. A clear path from Beginner to Pro.",
+    "earnRankTitle": "Earn Your Rank",
+    "earnRankBody": "Unlock advanced styling only when you master the basics."
+  },
+  "constellation": {
+    "headingLine1": "Stop guessing what to learn next.",
+    "headingLine2": "Follow the roadmap.",
+    "body": "Our unique Constellation System guides you step-by-step. Master one skill to unlock the next. Only on The Mambo Guild.",
+    "viewMap": "View Interactive Map",
+    "liveDemo": "Live Demo",
+    "nodes": {
+      "rhythm": "Rhythm & Timing",
+      "basicStep": "Basic Step",
+      "rightTurn": "Right Turn",
+      "crossBodyLead": "Cross Body Lead",
+      "musicality": "Musicality"
+    }
+  },
+  "courseExplorer": {
+    "title": "Explore Courses",
+    "searchPlaceholder": "Search library...",
+    "levelFilter": "Level",
+    "styleFilter": "Style",
+    "unlock": "Unlock",
+    "startJourney": "Start Journey"
+  },
+  "mambobot": {
+    "role": "AI Concierge",
+    "inputPlaceholder": "Ask Tito P anything...",
+    "resetTooltip": "Reset conversation",
+    "knowledgeBase": "Knowledge Base"
+  },
+  "upgradePrompt": {
+    "title": "Unlock Pro Mastery Tools",
+    "subtitle": "Upgrade to Guild Master to access advanced video controls",
+    "precisionPlayerName": "Precision Player",
+    "precisionPlayerDesc": "Frame-by-frame stepping for detailed analysis",
+    "smartSpeedName": "Smart Speed",
+    "smartSpeedDesc": "Pitch-corrected playback from 0.5x to 1.5x",
+    "abLooperName": "AB Looper",
+    "abLooperDesc": "Set custom loop regions to practice sections",
+    "cta": "Upgrade to Guild Master",
+    "hint": "Join hundreds of dancers mastering their craft"
   },
   "dashboard": {
     "greeting": "Welcome back",
@@ -1538,6 +1668,45 @@
     "successTitle": "Application sent",
     "successBody": "Thanks for applying. Pavle will read every application personally and reach out if there's a fit.",
     "genericError": "Could not send your application. Please try again in a bit."
+  },
+  "notifications": {
+    "header": "Notifications",
+    "markAllRead": "Mark all read",
+    "loading": "Loading…",
+    "empty": "No notifications yet",
+    "loadError": "Failed to load notifications",
+    "time": {
+      "justNow": "just now",
+      "minutesAgo": "{minutes}m ago",
+      "hoursAgo": "{hours}h ago",
+      "daysAgo": "{days}d ago"
+    },
+    "types": {
+      "reaction_received": {
+        "title": "❤️ New Like",
+        "message": "{name} liked your post \"{postTitle}\""
+      },
+      "reply_received": {
+        "title": "💬 New Reply",
+        "message": "{name} replied to your post \"{postTitle}\""
+      },
+      "answer_accepted": {
+        "title": "✅ Answer Accepted!",
+        "message": "Your answer was marked as the solution! (+15 🥢)"
+      },
+      "coaching_feedback_ready": {
+        "title": "Your Feedback is Ready",
+        "message": "Your 1-on-1 video feedback has been uploaded. Watch it now!"
+      },
+      "weekly_meeting_scheduled": {
+        "title": "New Roundtable Scheduled",
+        "message": "The next Roundtable is set. Tap to see the new time and link."
+      },
+      "badge_earned": {
+        "title": "Badge Earned!",
+        "message": "You earned the {badgeName} badge!"
+      }
+    }
   },
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",

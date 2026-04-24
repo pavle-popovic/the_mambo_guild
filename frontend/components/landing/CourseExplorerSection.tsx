@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion } from "framer-motion";
 import { Search, ChevronDown, Lock, Play, Star } from "lucide-react";
 import Image from "next/image";
+import { useTranslations } from "@/i18n/useTranslations";
 
 // Mock Data for Courses
 const ALL_COURSES = [
@@ -29,7 +30,7 @@ const FilterPill = ({ label }: { label: string }) => (
     </button>
 );
 
-const CourseCard = ({ course }: { course: any }) => (
+const CourseCard = ({ course, unlockLabel, startLabel }: { course: any; unlockLabel: string; startLabel: string }) => (
     <motion.div
         className="relative aspect-[16/9] rounded-xl overflow-hidden cursor-pointer group border border-white/10 bg-zinc-900 transition-all duration-300 hover:border-mambo-gold/50 hover:shadow-2xl hover:shadow-mambo-gold/10 hover:scale-[1.02] z-0 hover:z-10"
     >
@@ -51,11 +52,11 @@ const CourseCard = ({ course }: { course: any }) => (
         <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-20">
             {course.locked ? (
                 <button className="px-5 py-2 bg-mambo-gold/20 border border-mambo-gold/60 text-mambo-gold rounded-full font-serif font-bold text-sm backdrop-blur-md flex items-center gap-2">
-                    <Lock size={14} /> Unlock
+                    <Lock size={14} /> {unlockLabel}
                 </button>
             ) : (
                 <button className="px-5 py-2 bg-mambo-gold text-black rounded-full font-serif font-bold text-sm shadow-[0_0_20px_rgba(212,175,55,0.4)] flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-all">
-                    <Play size={14} fill="currentColor" /> Start Journey
+                    <Play size={14} fill="currentColor" /> {startLabel}
                 </button>
             )}
         </div>
@@ -84,6 +85,7 @@ const CourseCard = ({ course }: { course: any }) => (
 );
 
 export default function CourseExplorerSection() {
+    const t = useTranslations("courseExplorer");
     return (
         <section className="relative min-h-screen bg-transparent pb-32">
             {/* Sticky Control Bar */}
@@ -91,7 +93,7 @@ export default function CourseExplorerSection() {
                 <div className="max-w-[1800px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
                     {/* Left: Title */}
                     <div className="flex items-center gap-3">
-                        <h2 className="text-2xl font-serif font-bold text-mambo-gold tracking-wide">Explore Courses</h2>
+                        <h2 className="text-2xl font-serif font-bold text-mambo-gold tracking-wide">{t("title")}</h2>
                     </div>
 
                     {/* Center: Search Bar */}
@@ -101,15 +103,15 @@ export default function CourseExplorerSection() {
                         </div>
                         <input
                             type="text"
-                            placeholder="Search library..."
+                            placeholder={t("searchPlaceholder")}
                             className="w-full bg-white/5 hover:bg-white/10 focus:bg-white/10 border border-white/10 focus:border-mambo-gold/50 rounded-full py-2 pl-10 pr-4 text-sm text-white placeholder-gray-500 outline-none transition-all duration-300 backdrop-blur-md"
                         />
                     </div>
 
                     {/* Right: Filters */}
                     <div className="flex items-center gap-3">
-                        <FilterPill label="Level" />
-                        <FilterPill label="Style" />
+                        <FilterPill label={t("levelFilter")} />
+                        <FilterPill label={t("styleFilter")} />
                     </div>
                 </div>
             </div>
@@ -118,7 +120,7 @@ export default function CourseExplorerSection() {
             <div className="max-w-[1800px] mx-auto px-6 md:px-12 mt-8">
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     {ALL_COURSES.map((course) => (
-                        <CourseCard key={course.id} course={course} />
+                        <CourseCard key={course.id} course={course} unlockLabel={t("unlock")} startLabel={t("startJourney")} />
                     ))}
                 </div>
             </div>

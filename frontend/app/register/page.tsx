@@ -6,8 +6,10 @@ import Link from "next/link";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslations } from "@/i18n/useTranslations";
 
 export default function RegisterPage() {
+  const t = useTranslations("auth.register");
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -28,14 +30,14 @@ export default function RegisterPage() {
 
     // Client-side validation: passwords must match
     if (formData.password !== formData.confirmPassword) {
-      setPasswordError("Passwords do not match");
+      setPasswordError(t("passwordMismatch"));
       setLoading(false);
       return;
     }
 
     // Password strength check
     if (formData.password.length < 8) {
-      setPasswordError("Password must be at least 8 characters long");
+      setPasswordError(t("passwordTooShort"));
       setLoading(false);
       return;
     }
@@ -49,7 +51,7 @@ export default function RegisterPage() {
       });
       router.push("/courses");
     } catch (err: any) {
-      setError(err.message || "Registration failed. Please try again.");
+      setError(err.message || t("genericError"));
     } finally {
       setLoading(false);
     }
@@ -63,8 +65,8 @@ export default function RegisterPage() {
 
         <div className="relative z-10 w-full max-w-md bg-zinc-900/90 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl mx-4">
           <div className="text-center mb-6">
-            <h1 className="text-2xl font-bold mb-1 text-mambo-text">Join The Stage</h1>
-            <p className="text-gray-400 text-sm">Create your dancer profile.</p>
+            <h1 className="text-2xl font-bold mb-1 text-mambo-text">{t("title")}</h1>
+            <p className="text-gray-400 text-sm">{t("subtitle")}</p>
           </div>
 
           {error && (
@@ -78,7 +80,7 @@ export default function RegisterPage() {
             {/* Handle / Username */}
             <div>
               <label className="block text-xs font-bold text-mambo-blue uppercase mb-1 drop-shadow-sm">
-                Choose your Handle (Username)
+                {t("handleLabel")}
               </label>
               <input
                 type="text"
@@ -88,15 +90,15 @@ export default function RegisterPage() {
                 }
                 required
                 minLength={3}
-                placeholder="e.g. MamboKing"
+                placeholder={t("handlePlaceholder")}
                 className="w-full bg-black/60 border border-mambo-blue/50 rounded-lg p-3 text-white focus:border-mambo-blue focus:ring-1 focus:ring-mambo-blue focus:outline-none transition shadow-inner"
               />
-              <p className="text-[10px] text-gray-500 mt-1">This is how you will appear in the community.</p>
+              <p className="text-[10px] text-gray-500 mt-1">{t("handleHelper")}</p>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                Email
+                {t("emailLabel")}
               </label>
               <input
                 type="email"
@@ -111,7 +113,7 @@ export default function RegisterPage() {
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                Password
+                {t("passwordLabel")}
               </label>
               <input
                 type="password"
@@ -124,12 +126,12 @@ export default function RegisterPage() {
                 minLength={8}
                 className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue focus:outline-none transition"
               />
-              <p className="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
+              <p className="text-xs text-gray-500 mt-1">{t("passwordHelper")}</p>
             </div>
 
             <div>
               <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                Confirm Password
+                {t("confirmPasswordLabel")}
               </label>
               <input
                 type="password"
@@ -153,14 +155,14 @@ export default function RegisterPage() {
               disabled={loading}
               className="w-full bg-mambo-blue hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-blue-600/20 mt-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? "Creating account..." : "Start My Journey"}
+              {loading ? t("submitting") : t("submit")}
             </button>
           </form>
 
           <div className="mt-6 text-center text-sm text-gray-500">
-            Already have an account?{" "}
+            {t("haveAccount")}{" "}
             <Link href="/login" className="text-mambo-text hover:underline">
-              Log in
+              {t("loginLink")}
             </Link>
           </div>
         </div>

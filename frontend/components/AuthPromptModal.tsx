@@ -3,6 +3,7 @@
 import { FaTimes, FaSignInAlt, FaUserPlus, FaArrowLeft, FaLock, FaCreditCard } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface AuthPromptModalProps {
   isOpen: boolean;
@@ -17,6 +18,7 @@ export default function AuthPromptModal({
   type,
   courseTitle,
 }: AuthPromptModalProps) {
+  const t = useTranslations("authPrompt");
   const router = useRouter();
 
   if (!isOpen) return null;
@@ -48,7 +50,7 @@ export default function AuthPromptModal({
               <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
                 <FaLock className="text-white text-lg" />
               </div>
-              <h2 className="text-xl font-bold text-white">Login Required</h2>
+              <h2 className="text-xl font-bold text-white">{t("loginRequiredTitle")}</h2>
             </div>
             <button
               onClick={onClose}
@@ -61,7 +63,7 @@ export default function AuthPromptModal({
           {/* Content */}
           <div className="p-6">
             <p className="text-mambo-text-light mb-6 text-center">
-              Please log in to access this lesson. Would you like to log in now?
+              {t("loginRequiredBody")}
             </p>
 
             {/* Actions */}
@@ -76,7 +78,7 @@ export default function AuthPromptModal({
                   className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/20 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
                 />
                 <FaSignInAlt className="relative z-10" />
-                <span className="relative z-10">Log In</span>
+                <span className="relative z-10">{t("logIn")}</span>
               </motion.button>
               <motion.button
                 onClick={handleRegister}
@@ -88,7 +90,7 @@ export default function AuthPromptModal({
                   className="absolute inset-0 bg-gradient-to-r from-white/0 via-white/10 to-white/0 translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-700"
                 />
                 <FaUserPlus className="relative z-10" />
-                <span className="relative z-10">Register</span>
+                <span className="relative z-10">{t("register")}</span>
               </motion.button>
               <motion.button
                 onClick={handleBackToCourses}
@@ -103,7 +105,7 @@ export default function AuthPromptModal({
                 >
                   <FaArrowLeft />
                 </motion.div>
-                <span className="relative z-10">Back to Courses</span>
+                <span className="relative z-10">{t("backToCourses")}</span>
               </motion.button>
             </div>
           </div>
@@ -122,7 +124,7 @@ export default function AuthPromptModal({
             <div className="w-10 h-10 bg-white/20 rounded-full flex items-center justify-center">
               <FaCreditCard className="text-white text-lg" />
             </div>
-            <h2 className="text-xl font-bold text-white">Subscription Required</h2>
+            <h2 className="text-xl font-bold text-white">{t("subscriptionRequiredTitle")}</h2>
           </div>
           <button
             onClick={onClose}
@@ -135,7 +137,7 @@ export default function AuthPromptModal({
         {/* Content */}
         <div className="p-6">
           <p className="text-mambo-text-light mb-2 text-center">
-            This course requires a subscription to access.
+            {t("subscriptionRequiredBody")}
           </p>
           {courseTitle && (
             <p className="text-mambo-text font-semibold mb-6 text-center">
@@ -161,7 +163,7 @@ export default function AuthPromptModal({
               >
                 <FaCreditCard />
               </motion.div>
-              <span className="relative z-10">View Pricing & Subscribe</span>
+              <span className="relative z-10">{t("viewPricing")}</span>
             </motion.button>
             <motion.button
               onClick={handleBackToCourses}
@@ -176,7 +178,7 @@ export default function AuthPromptModal({
               >
                 <FaArrowLeft />
               </motion.div>
-              <span className="relative z-10">Back to Courses</span>
+              <span className="relative z-10">{t("backToCourses")}</span>
             </motion.button>
           </div>
         </div>

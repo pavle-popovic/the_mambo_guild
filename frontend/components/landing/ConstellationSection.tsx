@@ -2,16 +2,17 @@
 
 import { motion } from "framer-motion";
 import { FaPlay, FaCheck, FaLock, FaStar } from "react-icons/fa";
-
-const nodes = [
-    { id: 1, title: "Rhythm & Timing", x: 20, y: 80, status: "completed" },
-    { id: 2, title: "Basic Step", x: 35, y: 60, status: "active" },
-    { id: 3, title: "Right Turn", x: 50, y: 70, status: "locked" },
-    { id: 4, title: "Cross Body Lead", x: 65, y: 40, status: "locked" },
-    { id: 5, title: "Musicality", x: 80, y: 50, status: "locked" },
-];
+import { useTranslations } from "@/i18n/useTranslations";
 
 export default function ConstellationSection() {
+    const t = useTranslations("constellation");
+    const nodes = [
+        { id: 1, title: t("nodes.rhythm"), x: 20, y: 80, status: "completed" },
+        { id: 2, title: t("nodes.basicStep"), x: 35, y: 60, status: "active" },
+        { id: 3, title: t("nodes.rightTurn"), x: 50, y: 70, status: "locked" },
+        { id: 4, title: t("nodes.crossBodyLead"), x: 65, y: 40, status: "locked" },
+        { id: 5, title: t("nodes.musicality"), x: 80, y: 50, status: "locked" },
+    ];
     return (
         <section className="relative py-24 px-6 overflow-hidden bg-transparent">
             {/* Subtle Overlay to ensure text readability if needed */}
@@ -27,15 +28,14 @@ export default function ConstellationSection() {
                         transition={{ duration: 0.6 }}
                     >
                         <h2 className="text-4xl md:text-5xl font-bold font-serif mb-6 text-white leading-tight">
-                            Stop guessing what to learn next. <br />
-                            <span className="text-mambo-gold">Follow the roadmap.</span>
+                            {t("headingLine1")} <br />
+                            <span className="text-mambo-gold">{t("headingLine2")}</span>
                         </h2>
                         <p className="text-xl text-gray-300 mb-8 font-light leading-relaxed">
-                            Our unique <strong className="text-white">Constellation System</strong> guides you step-by-step.
-                            Master one skill to unlock the next. Only on The Mambo Guild.
+                            {t("body")}
                         </p>
                         <button className="bg-white text-black font-bold py-3 px-8 rounded-full text-lg hover:bg-gray-200 transition shadow-[0_0_15px_rgba(255,255,255,0.3)]">
-                            View Interactive Map
+                            {t("viewMap")}
                         </button>
                     </motion.div>
                 </div>
@@ -43,7 +43,7 @@ export default function ConstellationSection() {
                 {/* Right: Visual Map Demo */}
                 <div className="flex-1 w-full relative h-[400px] bg-black/40 rounded-2xl border border-white/10 backdrop-blur-sm shadow-2xl p-6">
                     <div className="absolute top-4 left-4 text-xs text-gray-500 uppercase tracking-widest font-bold">
-                        Live Demo
+                        {t("liveDemo")}
                     </div>
 
                     {/* SVG Connection Lines */}

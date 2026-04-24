@@ -35,6 +35,7 @@ type Plan = {
 
 export default function LandingPricingSection() {
   const t = useTranslations("landing.pricing");
+  const tAlerts = useTranslations("pricingAlerts");
   const plans: Plan[] = [
     {
       id: "guest-list",
@@ -145,7 +146,7 @@ export default function LandingPricingSection() {
         await refreshUser();
       } catch (refreshError) {
         console.error("Failed to refresh user:", refreshError);
-        alert("Your session has expired. Please log in again.");
+        alert(tAlerts("sessionExpired"));
         router.push(`/login?redirect=/pricing`);
         setLoading("");
         return;
@@ -181,10 +182,10 @@ export default function LandingPricingSection() {
         error.message?.includes("401") ||
         error.message?.includes("Unauthorized")
       ) {
-        alert("Your session has expired. Please log in again.");
+        alert(tAlerts("sessionExpired"));
         router.push(`/login?redirect=/pricing`);
       } else {
-        alert(error.message || "Failed to start checkout. Please try again.");
+        alert(error.message || tAlerts("checkoutFailed"));
       }
       setLoading("");
     }

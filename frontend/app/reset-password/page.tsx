@@ -4,8 +4,10 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
+import { useTranslations } from "@/i18n/useTranslations";
 
 function ResetPasswordPageContent() {
+  const t = useTranslations("auth.resetPassword");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,10 +20,11 @@ function ResetPasswordPageContent() {
   useEffect(() => {
     const tokenParam = searchParams.get("token");
     if (!tokenParam) {
-      setError("Invalid or missing reset token. Please request a new password reset link.");
+      setError(t("invalidOrMissingToken"));
     } else {
       setToken(tokenParam);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -30,17 +33,17 @@ function ResetPasswordPageContent() {
 
     // Client-side validation
     if (password.length < 8) {
-      setError("Password must be at least 8 characters long");
+      setError(t("passwordTooShort"));
       return;
     }
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      setError(t("passwordMismatch"));
       return;
     }
 
     if (!token) {
-      setError("Invalid reset token");
+      setError(t("invalidToken"));
       return;
     }
 
@@ -61,7 +64,7 @@ function ResetPasswordPageContent() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || "Failed to reset password");
+        throw new Error(errorData.detail || t("failedToReset"));
       }
 
       setSuccess(true);
@@ -70,7 +73,7 @@ function ResetPasswordPageContent() {
         router.push("/login");
       }, 2000);
     } catch (err: any) {
-      setError(err.message || "Failed to reset password. The link may have expired.");
+      setError(err.message || t("genericError"));
     } finally {
       setLoading(false);
     }
@@ -79,7 +82,7 @@ function ResetPasswordPageContent() {
   if (!token && !error) {
     return (
       <div className="min-h-screen bg-mambo-dark flex items-center justify-center">
-        <div className="text-center text-gray-400">Loading...</div>
+        <div className="text-center text-gray-400">{t("loading")}</div>
       </div>
     );
   }
@@ -101,9 +104,9 @@ function ResetPasswordPageContent() {
 
         <div className="relative z-10 w-full max-w-md bg-black/80 backdrop-blur-xl border border-white/10 p-8 rounded-2xl shadow-2xl mx-4">
           <div className="text-center mb-8">
-            <h1 className="text-2xl font-bold mb-1 text-mambo-text">Reset Password</h1>
+            <h1 className="text-2xl font-bold mb-1 text-mambo-text">{t("title")}</h1>
             <p className="text-gray-400 text-sm">
-              Enter your new password below.
+              {t("subtitle")}
             </p>
           </div>
 
@@ -116,15 +119,15 @@ function ResetPasswordPageContent() {
           {success ? (
             <div className="space-y-4">
               <div className="p-4 bg-green-900/50 border border-green-500/50 rounded-lg text-green-200 text-sm">
-                <p className="font-semibold mb-2">Password reset successful!</p>
-                <p>Redirecting to login page...</p>
+                <p className="font-semibold mb-2">{t("successTitle")}</p>
+                <p>{t("successBody")}</p>
               </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                  New Password
+                  {t("newPasswordLabel")}
                 </label>
                 <input
                   type="password"
@@ -133,14 +136,14 @@ function ResetPasswordPageContent() {
                   required
                   minLength={8}
                   className="w-full bg-white/5 border border-white/10 rounded-lg p-3 text-mambo-text-light focus:outline-none focus:border-mambo-blue transition"
-                  placeholder="At least 8 characters"
+                  placeholder={t("newPasswordPlaceholder")}
                 />
-                <p className="text-xs text-gray-500 mt-1">Must be at least 8 characters</p>
+                <p className="text-xs text-gray-500 mt-1">{t("newPasswordHelper")}</p>
               </div>
 
               <div>
                 <label className="block text-xs font-bold text-gray-500 uppercase mb-1">
-                  Confirm Password
+                  {t("confirmPasswordLabel")}
                 </label>
                 <input
                   type="password"
@@ -153,10 +156,10 @@ function ResetPasswordPageContent() {
                       ? "border-red-500"
                       : "border-white/10 focus:border-mambo-blue"
                   }`}
-                  placeholder="Confirm your password"
+                  placeholder={t("confirmPasswordPlaceholder")}
                 />
                 {confirmPassword && password !== confirmPassword && (
-                  <p className="text-xs text-red-400 mt-1">Passwords do not match</p>
+                  <p className="text-xs text-red-400 mt-1">{t("passwordMismatch")}</p>
                 )}
               </div>
 
@@ -165,14 +168,14 @@ function ResetPasswordPageContent() {
                 disabled={loading || !token}
                 className="w-full bg-mambo-blue hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-blue-600/20 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                {loading ? "Resetting..." : "Reset Password"}
+                {loading ? t("submitting") : t("submit")}
               </button>
             </form>
           )}
 
           <div className="mt-6 text-center text-sm text-gray-500">
             <Link href="/login" className="hover:text-mambo-text transition">
-              Back to Login
+              {t("backToLogin")}
             </Link>
           </div>
         </div>

@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { apiClient } from "@/lib/api";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface Notification {
   id: string;
@@ -16,6 +17,21 @@ interface Notification {
   created_at: string;
 }
 
+const KNOWN_TYPES = new Set([
+  "reaction_received",
+  "reply_received",
+  "answer_accepted",
+  "coaching_feedback_ready",
+  "weekly_meeting_scheduled",
+  "badge_earned",
+]);
+
+const MESSAGE_PATTERNS: Record<string, RegExp> = {
+  reaction_received: /^(.+?) liked your post "(.+)"$/,
+  reply_received: /^(.+?) replied to your post "(.+)"$/,
+  badge_earned: /^You earned the (.+) badge!$/,
+};
+
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -25,6 +41,8 @@ export default function NotificationBell() {
 
   const [loadError, setLoadError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+
+  const t = useTranslations("notifications");
 
   const fetchUnreadCount = useCallback(async () => {
     try {
@@ -117,12 +135,47 @@ export default function NotificationBell() {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
     const diffMins = Math.floor(diffMs / 60000);
-    if (diffMins < 1) return "just now";
-    if (diffMins < 60) return `${diffMins}m ago`;
+    if (diffMins < 1) return t("time.justNow");
+    if (diffMins < 60) return t("time.minutesAgo", { minutes: diffMins });
     const diffHours = Math.floor(diffMins / 60);
-    if (diffHours < 24) return `${diffHours}h ago`;
+    if (diffHours < 24) return t("time.hoursAgo", { hours: diffHours });
     const diffDays = Math.floor(diffHours / 24);
-    return `${diffDays}d ago`;
+    return t("time.daysAgo", { days: diffDays });
+  };
+
+  const translateTitle = (n: Notification): string => {
+    if (KNOWN_TYPES.has(n.type)) {
+      const translated = t(`types.${n.type}.title`);
+      if (translated && !translated.startsWith("types.")) return translated;
+    }
+    return n.title;
+  };
+
+  const translateMessage = (n: Notification): string => {
+    if (!KNOWN_TYPES.has(n.type)) return n.message;
+    const pattern = MESSAGE_PATTERNS[n.type];
+    if (pattern) {
+      const match = n.message.match(pattern);
+      if (match) {
+        if (n.type === "reaction_received" || n.type === "reply_received") {
+          const translated = t(`types.${n.type}.message`, {
+            name: match[1],
+            postTitle: match[2],
+          });
+          if (translated && !translated.startsWith("types.")) return translated;
+        }
+        if (n.type === "badge_earned") {
+          const translated = t(`types.${n.type}.message`, {
+            badgeName: match[1],
+          });
+          if (translated && !translated.startsWith("types.")) return translated;
+        }
+      }
+      return n.message;
+    }
+    const translated = t(`types.${n.type}.message`);
+    if (translated && !translated.startsWith("types.")) return translated;
+    return n.message;
   };
 
   return (
@@ -158,27 +211,27 @@ export default function NotificationBell() {
           >
             {/* Header */}
             <div className="flex items-center justify-between p-3 border-b border-white/10">
-              <h3 className="text-sm font-semibold text-white">Notifications</h3>
+              <h3 className="text-sm font-semibold text-white">{t("header")}</h3>
               {unreadCount > 0 && (
                 <button
                   onClick={handleMarkAllRead}
                   className="text-xs text-[#D4AF37] hover:text-[#FCE205] transition-colors"
                 >
-                  Mark all read
+                  {t("markAllRead")}
                 </button>
               )}
             </div>
 
             {/* Notification list */}
             {isLoading ? (
-              <div className="p-6 text-center text-white/40 text-sm">Loading…</div>
+              <div className="p-6 text-center text-white/40 text-sm">{t("loading")}</div>
             ) : loadError ? (
               <div className="p-6 text-center text-red-400/80 text-xs">
-                {loadError}
+                {t("loadError")}
               </div>
             ) : notifications.length === 0 ? (
               <div className="p-6 text-center text-white/40 text-sm">
-                No notifications yet
+                {t("empty")}
               </div>
             ) : (
               <div className="divide-y divide-white/5">
@@ -197,8 +250,8 @@ export default function NotificationBell() {
                         <div className="w-2 h-2 rounded-full bg-[#D4AF37] mt-1.5 flex-shrink-0" />
                       )}
                       <div className={!notification.is_read ? "" : "ml-4"}>
-                        <p className="text-sm font-medium text-white/90">{notification.title}</p>
-                        <p className="text-xs text-white/50 mt-0.5">{notification.message}</p>
+                        <p className="text-sm font-medium text-white/90">{translateTitle(notification)}</p>
+                        <p className="text-xs text-white/50 mt-0.5">{translateMessage(notification)}</p>
                         <p className="text-[10px] text-white/30 mt-1">{formatTime(notification.created_at)}</p>
                       </div>
                     </div>
