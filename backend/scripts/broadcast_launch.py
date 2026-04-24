@@ -308,6 +308,89 @@ def get_launch_html(username: str) -> str:
     return html.replace("__USERNAME__", username).replace("__ASSETS__", ASSETS_BASE)
 
 
+def get_launch_text(username: str) -> str:
+    """Plain-text companion to the HTML body (Resend best-practice multipart)."""
+    return f"""Hi {username},
+
+===========================================
+NEW CHOREO
+===========================================
+
+BRUNO MARS CHA CHA CHA
+An intermediate cha cha cha routine to a beloved Bruno Mars banger.
+
+A little weekend bonus before the Guild doors open. I put together an intermediate cha cha cha to a song you already know. Bruno Mars doing what Bruno Mars does best. Film it, post it, tag me.
+
+Watch the choreo:
+https://www.youtube.com/watch?v=c-01Oo_Pzso
+
+
+LAST CHANCE: THE LAUNCH CHALLENGES
+-------------------------------------------
+
+Before the doors open, I'm giving away lifetime access to the Guild. Two challenges, one winner each. Deadline is April 26th. Only days left.
+
+> Beginner Challenge: Mambo Inn
+  For dancers with less than 2 years of salsa. Learn the choreo, film yourself, tag me on Instagram.
+  https://www.youtube.com/watch?v=ticP-zMdeUk
+
+> Open Challenge: Mambo Gozon
+  For experienced dancers. Same prize, same rules, harder choreo (starts at 13:47).
+  https://www.youtube.com/watch?v=omiwxSIxnyc
+
+Film a Reel or a Story (if Story, DM me the raw video so it doesn't disappear). Tag me. That's it.
+
+
+YOUR 8 EXCLUSIVE FREE CHOREOGRAPHIES
+-------------------------------------------
+
+While you wait for launch day, here are the eight classes I've dropped for this list. Save them, dance them, use them to warm up.
+
+- Salsa Bodymovement Musicality (La Gripe): https://www.youtube.com/watch?v=Ol54zPvVpx0
+- 14 Salsa Moves Ep. 1: https://www.youtube.com/watch?v=5u_56JspFX8
+- 14 Salsa Moves Ep. 2: https://www.youtube.com/watch?v=-Y4By7n2KCQ
+- Pachanga Fundamentals: https://www.youtube.com/watch?v=A12yU-b2O_s
+- Pachanga Module 11 (The Kick Tap Chuck): https://www.youtube.com/watch?v=ER1CMXeoAao
+- Rankankan Choreography: https://www.youtube.com/watch?v=57-zwVE1VXI
+- Salsa Romantica: https://www.youtube.com/watch?v=wcDocNANEVY
+- Afro Mambo Fusion: https://www.youtube.com/watch?v=RIMp6J02Th0
+
+
+===========================================
+LAUNCH WEEK
+===========================================
+
+THE GUILD OPENS WEDNESDAY, APRIL 29.
+After three months of building, The Mambo Guild goes live next Wednesday.
+
+You've been on this list since the start, and I wanted you to be the first to hear it: The Mambo Guild launches Wednesday, April 29th.
+
+Everything I've been teasing, the courses, the skill tree, the community, all of it is ready. Here's a quick tour of what you're about to step into.
+
+THE VAULT
+Your arsenal of dance mastery.
+- 500+ lessons, from your first basic step to pro-level mechanics
+- Three full Mambo courses and a complete Pachanga course
+- A full course on Salsa History and a full course on Effective Training Science
+- Bi-weekly choreographies and new courses, with expert guest teachers
+
+THE RPG OF DANCE
+Visualize your growth from Basic Steps to Boss Level. Every lesson unlocks a new node on your skill tree. Track your progress like a true gamer.
+
+THE STAGE
+Compete, collaborate, and get feedback from real pros. Climb the High Rollers leaderboard and earn legendary badges.
+
+Doors open Wednesday, April 29. Keep an eye on your inbox.
+
+Pavle
+Founder, The Mambo Guild
+
+-------------------------------------------
+You're receiving this because you joined the waitlist for The Mambo Guild.
+To unsubscribe, reply to pavlepopovic@themamboguild.com with "Unsubscribe".
+"""
+
+
 def send_broadcast():
     if not resend.api_key and not DRY_RUN:
         print("Error: RESEND_API_KEY env var not set.")
@@ -355,6 +438,7 @@ def send_broadcast():
             continue
 
         html = get_launch_html(username)
+        text = get_launch_text(username)
 
         if DRY_RUN:
             print(f"  [DRY RUN] would send to {email}")
@@ -366,6 +450,7 @@ def send_broadcast():
                 "to": [email],
                 "subject": SUBJECT,
                 "html": html,
+                "text": text,
             })
             print(f"Sent to {email}")
             sent += 1

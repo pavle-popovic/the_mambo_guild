@@ -169,6 +169,64 @@ def get_beautiful_html(username, referral_link):
     </html>
     """
 
+
+def get_text_version(username, referral_link):
+    """Plain-text companion (Resend best-practice multipart)."""
+    return f"""Hi {username},
+
+THE MAMBO GUILD BEGINNER CHALLENGE
+===========================================
+
+This Challenge is for dancers that have been dancing salsa for less than 2 years. Obviously, this is not rocket science, but if you are a more experienced dancer please share this with someone that is getting started.
+
+THE PRIZE
+-------------------------------------------
+The first place, winner of the challenge gets a lifetime free access to the entire Mambo Guild platform. That means 30+ hours of mechanics, practice drills, and full access to our interactive Skill Tree and "Clave" point system.
+
+HOW TO ENTER
+-------------------------------------------
+1. Learn this choreo (Mambo Inn):
+   https://www.youtube.com/watch?v=ticP-zMdeUk
+2. Film yourself executing the sequence.
+3. Post your video and tag me before April 26th.
+
+SUBMISSION RULES
+-------------------------------------------
+You can post your video as a Reel or an IG Story.
+Crucial: If you post it as a Story, you MUST send the raw video to my DMs after posting. Stories disappear in 24 hours. Posting a Reel is highly preferred.
+
+Feel like you're more advanced? The Open Challenge below is for you. Check it out.
+
+
+THE MAMBO GUILD OPEN CHALLENGE: MAMBO GOZON
+===========================================
+
+Same prize, same rules, same deadline (April 26th). Just a harder choreo for the more experienced dancers. Learn the Mambo Gozon Choreography (the choreo starts at 13min47):
+https://www.youtube.com/watch?v=omiwxSIxnyc
+
+Film it, follow me on Instagram, tag me, and you're in. Let's go.
+
+
+8 FREE CLASSES
+===========================================
+- Salsa Bodymovement Musicality (La Gripe): https://www.youtube.com/watch?v=Ol54zPvVpx0
+- 14 Salsa Moves Ep. 2: https://www.youtube.com/watch?v=-Y4By7n2KCQ
+- Pachanga Fundamentals: https://www.youtube.com/watch?v=A12yU-b2O_s
+- Rankankan Choreography: https://www.youtube.com/watch?v=57-zwVE1VXI
+- 14 Salsa Moves Ep. 1: https://www.youtube.com/watch?v=5u_56JspFX8
+- Salsa Romantica: https://www.youtube.com/watch?v=wcDocNANEVY
+- Afro Mambo Fusion: https://www.youtube.com/watch?v=RIMp6J02Th0
+- Pachanga Module 11 (The Kick Tap Chuck): https://www.youtube.com/watch?v=ER1CMXeoAao
+
+See you in the next one,
+
+Pavle
+
+-------------------------------------------
+To unsubscribe, reply to pavlepopovic@themamboguild.com with "Unsubscribe".
+"""
+
+
 def send_broadcast():
     if not os.path.exists(JSON_FILE):
         print(f"❌ Error: Could not find {JSON_FILE}")
@@ -293,6 +351,7 @@ def send_broadcast():
         # 2. Prepare the Email Content
         subject = "🌱 Beginner Challenge: Win Lifetime Access"
         html_content = get_beautiful_html(username, referral_link)
+        text_content = get_text_version(username, referral_link)
 
         # 3. Send (or Print)
         print(f"Preparing to send to: {email} (User: {username})")
@@ -307,7 +366,8 @@ def send_broadcast():
                     "from": FROM_EMAIL,
                     "to": [email],
                     "subject": subject,
-                    "html": html_content
+                    "html": html_content,
+                    "text": text_content,
                 })
                 print(f"Sent to: {email}")
                 count += 1

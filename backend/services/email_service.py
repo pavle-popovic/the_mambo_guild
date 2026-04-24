@@ -482,11 +482,79 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
         bg_color = "#F9F7F1"  # Cream/Paper
         text_color = "#333333" # Dark Gray/Black
         accent_color = "#D4AF37" # Gold (kept for subtle accents)
-        
+
+        text_body = f"""Hi {username},
+
+===========================================
+WEEKEND BONUS
+===========================================
+
+BRUNO MARS CHA CHA CHA
+A fresh intermediate cha cha cha routine set to a beloved Bruno Mars banger. Something to move to this weekend before the Guild opens.
+
+Watch the choreo:
+https://www.youtube.com/watch?v=c-01Oo_Pzso
+
+
+BEGINNER CHALLENGE: MAMBO INN
+(less than 2 years dancing, Win Lifetime Access)
+https://www.youtube.com/watch?v=ticP-zMdeUk
+
+OPEN CHALLENGE: MAMBO GOZON CHOREO
+(more advanced, Win Lifetime Access)
+https://www.youtube.com/watch?v=omiwxSIxnyc
+
+
+8 FREE CLASSES
+-------------------------------------------
+- Salsa Bodymovement Musicality (La Gripe): https://www.youtube.com/watch?v=Ol54zPvVpx0
+- 14 Salsa Moves Ep. 2: https://www.youtube.com/watch?v=-Y4By7n2KCQ
+- Pachanga Fundamentals: https://www.youtube.com/watch?v=A12yU-b2O_s
+- Rankankan Choreography: https://www.youtube.com/watch?v=57-zwVE1VXI
+- 14 Salsa Moves Ep. 1: https://www.youtube.com/watch?v=5u_56JspFX8
+- Salsa Romantica: https://www.youtube.com/watch?v=wcDocNANEVY
+- Afro Mambo Fusion: https://www.youtube.com/watch?v=RIMp6J02Th0
+- Pachanga Module 11 (The Kick Tap Chuck): https://www.youtube.com/watch?v=ER1CMXeoAao
+
+
+Welcome to The Mambo Guild. I really appreciate your trust in joining this project and I am sure that together, we are going to build a beautiful community.
+
+Firstly, a quick intro: My name is Pavle Popovic, I am a professional dancer and have been devoting the past 10 years of my life mastering the art of training and learning about dancing. I started this project because I wanted to create the dance academy I wish I had when I started. I saw too many students getting stuck because most online classes lack a clear structure and path to mastery.
+
+I have studied and hold certifications in Learning Experience Design and Gamification, and decided to apply those scientific principles to this curriculum to ensure you aren't just memorizing steps, but actually learning to dance.
+
+The Guild opens its doors Wednesday, April 29th. Here's a quick tour of what you're about to step into.
+
+THE VAULT
+Your arsenal of dance mastery.
+- 500+ lessons, from your first basic step to pro-level mechanics
+- Three full Mambo courses and a complete Pachanga course
+- A full course on Salsa History and a full course on Effective Training Science
+- Bi-weekly choreographies and new courses, with expert guest teachers
+
+THE RPG OF DANCE
+Visualize your growth from Basic Steps to Boss Level. Every lesson unlocks a new node on your skill tree. Track your progress like a true gamer.
+
+THE STAGE
+Compete, collaborate, and get feedback from real pros. Climb the High Rollers leaderboard and earn legendary badges.
+
+Doors open Wednesday, April 29th. Keep an eye on your inbox.
+
+Pavle
+Founder, The Mambo Guild
+
+-------------------------------------------
+P.S. Want to unlock 'Beta Tester' status early? Invite 3 friends using your unique extraction link:
+{referral_link}
+
+To unsubscribe, reply to pavlepopovic@themamboguild.com with "Unsubscribe".
+"""
+
         result = resend.Emails.send({
             "from": f"The Mambo Guild <{from_email}>",
             "to": [email],
             "subject": "Welcome to the Mambo Guild",
+            "text": text_body,
             "html": f"""
             <!DOCTYPE html>
             <html>
