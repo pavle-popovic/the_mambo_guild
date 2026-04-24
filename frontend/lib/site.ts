@@ -3,7 +3,7 @@ export const SITE_URL = "https://themamboguild.com";
 export const SITE_NAME = "The Mambo Guild";
 export const SITE_TAGLINE = "Salsa On2 from Level 0 to 100";
 export const SITE_DESCRIPTION =
-    "A structured Salsa On2 (New York Style Mambo) curriculum built on Learning Experience Design. 500+ classes, a visual Skill Tree, and a dancer community. 7-day free trial.";
+    "Learn Salsa On2 (New York Style Mambo) with a 500-lesson structured curriculum by a 2x European Champion. Visual Skill Tree, global community, and expert guest teachers. 7-day free trial.";
 
 export const FOUNDER = {
     name: "Pavle Popovic",

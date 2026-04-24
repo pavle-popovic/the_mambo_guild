@@ -6,9 +6,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     const routes: { path: string; priority: number; changeFrequency: MetadataRoute.Sitemap[number]["changeFrequency"] }[] = [
         { path: "/", priority: 1.0, changeFrequency: "weekly" },
+        { path: "/what-is-salsa-on2", priority: 0.9, changeFrequency: "monthly" },
+        { path: "/salsa-on1-vs-on2", priority: 0.9, changeFrequency: "monthly" },
         { path: "/pricing", priority: 0.9, changeFrequency: "monthly" },
         { path: "/courses", priority: 0.9, changeFrequency: "weekly" },
         { path: "/guild-master", priority: 0.8, changeFrequency: "monthly" },
+        { path: "/blog", priority: 0.8, changeFrequency: "weekly" },
+        { path: "/blog/mambo-history", priority: 0.8, changeFrequency: "monthly" },
+        { path: "/blog/the-85-percent-rule", priority: 0.8, changeFrequency: "monthly" },
         { path: "/instructors", priority: 0.7, changeFrequency: "monthly" },
         { path: "/community", priority: 0.7, changeFrequency: "daily" },
         { path: "/pro", priority: 0.6, changeFrequency: "monthly" },
