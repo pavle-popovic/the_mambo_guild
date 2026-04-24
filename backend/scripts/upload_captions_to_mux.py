@@ -209,6 +209,18 @@ CHOREO_ASSETS = {
 
 VIDEO_EXTS = {".mp4", ".mov", ".wav", ".MP4", ".MOV", ".WAV"}
 
+# Per-lesson title overrides for cases where a lesson lives in a level
+# whose LEVEL_FILE_MAP prefixes don't match the actual video file (e.g.
+# the whole-course intro videos sit inside the first content level).
+# Without these, stem_from_passthrough's idx=0 fallback would attach the
+# level's first lesson VTT to the intro asset.
+# Keys: (world_slug, lesson_title).  Values: (course_folder, stem).
+LESSON_TITLE_OVERRIDES = {
+    ("mambo-101", "Intro to Mambo 101"): ("Mambo101Edited", "IntroMambo101"),
+    ("mambo-201", "Intro to Mambo 201"): ("Mambo201Edited", "IntroMambo201"),
+    ("mambo-301", "Intro to Mambo 301"): ("Mambo301Edited", "IntroMambo301"),
+}
+
 
 def db_connect():
     p = urlparse(DATABASE_URL)
@@ -261,7 +273,14 @@ def find_files_by_prefixes(course_folder: str, prefixes: list) -> dict:
     return {"lessons": lessons, "drills": drills, "preview": prev}
 
 
-def stem_from_passthrough(passthrough: str, level_title: str, world_slug: str):
+def stem_from_passthrough(passthrough: str, level_title: str, world_slug: str, lesson_title: str = ""):
+    # Highest priority: a per-lesson override pinning a (slug, title) to a
+    # specific (folder, stem). Used for whole-course intros that don't follow
+    # the parent level's prefix convention.
+    override = LESSON_TITLE_OVERRIDES.get((world_slug, lesson_title))
+    if override:
+        return override
+
     mapping = LEVEL_FILE_MAP.get(world_slug, {}).get(level_title)
     if not mapping:
         return None
@@ -274,6 +293,21 @@ def stem_from_passthrough(passthrough: str, level_title: str, world_slug: str):
     # Some assets were re-uploaded with passthrough `reupload:<stem>`.
     if kind == "reupload" and len(parts) >= 2 and parts[1]:
         return (course_folder, parts[1])
+
+    # `lesson:<id>:<stem>` with a non-numeric stem is an explicit pin (e.g.
+    # `lesson:uuid:Basic_Step_1_Drill_1`). Honor it when the named video
+    # actually exists in the course folder; otherwise fall through to the
+    # legacy idx=0 behavior.
+    if kind == "lesson" and len(parts) >= 3 and parts[2] and not parts[2].isdigit():
+        explicit_stem = parts[2]
+        course_dir = MG_BASE / course_folder
+        if course_dir.exists() and any(
+            f.is_file()
+            and f.stem == explicit_stem
+            and f.suffix.lower() in {ext.lower() for ext in VIDEO_EXTS}
+            for f in course_dir.iterdir()
+        ):
+            return (course_folder, explicit_stem)
 
     if kind == "lesson":
         idx = int(parts[2]) - 1 if len(parts) >= 3 and parts[2].isdigit() else 0
@@ -449,7 +483,7 @@ def main():
                     pt = a.data.passthrough or ""
                 except Exception:
                     pt = ""
-                res = stem_from_passthrough(pt, level_title, slug)
+                res = stem_from_passthrough(pt, level_title, slug, lesson_title)
                 if not res:
                     skipped.append((slug, level_title, lesson_title, "no stem"))
                     continue
