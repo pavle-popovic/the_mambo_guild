@@ -539,6 +539,25 @@ export default function ProfilePage() {
                 {usernameError && <div className="text-red-500 text-sm mt-1 mb-2">{usernameError}</div>}
 
                 <div className="flex gap-2 mt-2 sm:mt-0">
+                  {(() => {
+                    // Only surface the Subscription shortcut when the user has
+                    // billing state worth managing. Mirrors SubscriptionManager's
+                    // own render guard so the link never points at empty space.
+                    const subTier = (user.tier || "").toLowerCase();
+                    const subStatus = (user.subscription_status || "").toLowerCase();
+                    const showSubLink =
+                      subTier === "advanced" ||
+                      subTier === "performer" ||
+                      subStatus === "past_due";
+                    return showSubLink ? (
+                      <a
+                        href="#subscription"
+                        className="px-4 py-2 bg-gray-800 hover:bg-gray-700 border border-gray-700 rounded-lg text-sm font-bold text-gray-300 transition shrink-0"
+                      >
+                        Subscription
+                      </a>
+                    ) : null;
+                  })()}
                   <button
                     onClick={() => {
                       logout();

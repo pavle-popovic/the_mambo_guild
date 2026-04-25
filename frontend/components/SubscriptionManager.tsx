@@ -128,7 +128,7 @@ export default function SubscriptionManager() {
   // makes sense here.
   if (isPastDue) {
     return (
-      <section aria-labelledby="subscription-heading">
+      <section id="subscription" aria-labelledby="subscription-heading" className="scroll-mt-24">
         <h2
           id="subscription-heading"
           className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3"
@@ -151,7 +151,7 @@ export default function SubscriptionManager() {
           <button
             onClick={handleManageBilling}
             disabled={submitting === "portal"}
-            className="px-4 py-2.5 rounded-lg bg-mambo-gold text-black font-bold text-sm hover:bg-mambo-gold/90 transition disabled:opacity-50"
+            className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black font-bold text-sm shadow-lg shadow-amber-500/20 transition disabled:opacity-50"
           >
             {submitting === "portal" ? "Opening..." : "Update payment method"}
           </button>
@@ -163,7 +163,7 @@ export default function SubscriptionManager() {
   // ---- Active / trialing / scheduled-to-cancel
   return (
     <>
-      <section aria-labelledby="subscription-heading">
+      <section id="subscription" aria-labelledby="subscription-heading" className="scroll-mt-24">
         <h2
           id="subscription-heading"
           className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3"
@@ -229,7 +229,7 @@ export default function SubscriptionManager() {
             <button
               onClick={handleManageBilling}
               disabled={submitting === "portal"}
-              className="px-4 py-2 rounded-lg bg-mambo-gold text-black font-bold text-sm hover:bg-mambo-gold/90 transition disabled:opacity-50"
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black font-bold text-sm shadow-lg shadow-amber-500/20 transition disabled:opacity-50"
             >
               {submitting === "portal" ? "Opening..." : "Manage billing"}
             </button>
