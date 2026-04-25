@@ -20,9 +20,15 @@ export type SeoRoute = {
   readyLocales: readonly Exclude<Locale, "en">[];
 };
 
+const ALL_NON_EN: readonly Exclude<Locale, "en">[] = [
+  "es", "pt", "fr", "de", "it",
+  "ja", "ko", "zh", "ru", "pl",
+  "nl", "ar", "el", "sr", "tr",
+] as const;
+
 /** Routes that opt into URL-based locale routing. */
 export const SEO_ROUTES: readonly SeoRoute[] = [
-  { path: "/blog",                     readyLocales: [] },
+  { path: "/blog",                     readyLocales: ALL_NON_EN },
   { path: "/blog/mambo-history",       readyLocales: [] },
   { path: "/blog/the-85-percent-rule", readyLocales: [] },
   { path: "/what-is-salsa-on2",        readyLocales: [] },
