@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { LOCALES, DEFAULT_LOCALE } from './i18n/config';
-import { isReadyVariant } from './i18n/seo-routing';
+import { isReadyVariant, SEO_ROUTES } from './i18n/seo-routing';
 
 const API_BASE_URL = process.env.API_DIRECT_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
 
@@ -32,10 +32,15 @@ async function fetchUserRole(request: NextRequest): Promise<string | null> {
 
 // Routes accessible even when the waitlist velvet rope is up.
 // Auth routes must be reachable so beta testers can claim accounts.
+// SEO routes (and their /<locale>/... variants — handled by the locale-prefix
+// branch above) must stay crawlable so Google can index them pre-launch and
+// hreflang stays consistent. Any path declared in SEO_ROUTES auto-propagates
+// here on next deploy.
 const PUBLIC_WHEN_WAITLIST = [
     '/waitlist', '/api', '/_next', '/favicon.ico',
     '/login', '/register', '/forgot-password', '/reset-password',
     '/beta', // magic-link landing that sets the bypass cookie
+    ...SEO_ROUTES.map((r) => r.path),
 ];
 
 export async function middleware(request: NextRequest) {
