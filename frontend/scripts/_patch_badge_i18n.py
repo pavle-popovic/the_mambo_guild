@@ -19,7 +19,7 @@ from pathlib import Path
 
 MESSAGES_DIR = Path(__file__).resolve().parents[1] / "messages"
 
-LOCALES = ["en", "es", "pt", "fr", "de", "it", "ja", "ko", "zh", "ru", "pl", "nl", "el", "ar"]
+LOCALES = ["en", "es", "pt", "fr", "de", "it", "ja", "ko", "zh", "ru", "pl", "nl", "el", "ar", "sr", "tr"]
 
 
 # English master strings for every currently-active badge_definition ID.

@@ -5,7 +5,8 @@
 
 export const LOCALES = [
   'en', 'es', 'pt', 'fr', 'de', 'it',
-  'ja', 'ko', 'zh', 'ru', 'pl', 'nl', 'ar', 'el'
+  'ja', 'ko', 'zh', 'ru', 'pl', 'nl', 'ar', 'el',
+  'sr', 'tr'
 ] as const;
 
 export type Locale = (typeof LOCALES)[number];
@@ -35,26 +36,31 @@ export const LOCALE_META: Record<Locale, {
   nl: { nativeName: 'Nederlands',        englishName: 'Dutch',      flag: '🇳🇱', dir: 'ltr' },
   ar: { nativeName: 'العربية',           englishName: 'Arabic',     flag: '🇸🇦', dir: 'rtl' },
   el: { nativeName: 'Ελληνικά',          englishName: 'Greek',      flag: '🇬🇷', dir: 'ltr' },
+  sr: { nativeName: 'Српски',            englishName: 'Serbian',    flag: '🇷🇸', dir: 'ltr' },
+  tr: { nativeName: 'Türkçe',            englishName: 'Turkish',    flag: '🇹🇷', dir: 'ltr' },
 };
 
 /**
- * Maps locale code → Mux text-track language code.
- * Mux uses BCP-47 tags, so zh → zh-Hans, pt → pt-BR, etc.
- * All others are identical to the locale code.
+ * Maps locale code → Mux text-track language_code (must match exactly what
+ * upload_captions_to_mux.py creates). Mux tracks are uploaded with plain
+ * BCP-47 primary tags (no region subtag), so this mapping is currently
+ * 1:1 with the locale code.
  */
 export const LOCALE_TO_MUX_LANG: Record<Locale, string> = {
   en: 'en',
   es: 'es',
-  pt: 'pt-BR',
+  pt: 'pt',
   fr: 'fr',
   de: 'de',
   it: 'it',
   ja: 'ja',
   ko: 'ko',
-  zh: 'zh-Hans',
+  zh: 'zh',
   ru: 'ru',
   pl: 'pl',
   nl: 'nl',
   ar: 'ar',
   el: 'el',
+  sr: 'sr',
+  tr: 'tr',
 };
