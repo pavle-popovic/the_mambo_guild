@@ -41,8 +41,40 @@ import React, {
   useTransition,
   type ReactNode,
 } from 'react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { LOCALE_COOKIE, LOCALES, LOCALE_META, type Locale } from './config';
+import { isReadyVariant } from './seo-routing';
+
+const NON_DEFAULT_LOCALES: ReadonlySet<string> = new Set(
+  LOCALES.filter((l) => l !== 'en')
+);
+
+/**
+ * Strip a leading /<locale>/ segment if present, returning the unprefixed path.
+ * E.g. "/fr/blog/mambo-history" -> "/blog/mambo-history", "/blog" -> "/blog".
+ */
+function stripLocalePrefix(path: string): { unprefixed: string; hadPrefix: boolean } {
+  const segs = path.split('/').filter(Boolean);
+  if (segs.length >= 1 && NON_DEFAULT_LOCALES.has(segs[0])) {
+    return { unprefixed: '/' + segs.slice(1).join('/'), hadPrefix: true };
+  }
+  return { unprefixed: path || '/', hadPrefix: false };
+}
+
+/**
+ * Decide which URL the user should land on after switching to `next`.
+ * Three cases:
+ *  1. Current path is a SEO route AND `next` has a ready variant → /<next>/<path>
+ *  2. Current path is /<oldLocale>/<seo-path> AND `next` won't render localized
+ *     (either next === "en", or no ready variant) → strip prefix to /<seo-path>
+ *  3. Otherwise → stay on the same URL (cookie + refresh handles the chrome).
+ */
+function targetPathForLocale(currentPath: string, next: Locale): string {
+  const { unprefixed } = stripLocalePrefix(currentPath);
+  const hasReady = next !== 'en' && isReadyVariant(unprefixed, next);
+  if (hasReady) return `/${next}${unprefixed}`;
+  return unprefixed;
+}
 
 // ─── Context ─────────────────────────────────────────────────────────────────
 
@@ -65,6 +97,7 @@ export function LocaleProvider({
 }) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
+  const pathname = usePathname();
 
   const setLocale = useCallback(
     (next: Locale) => {
@@ -92,13 +125,23 @@ export function LocaleProvider({
       document.documentElement.lang = next;
       document.documentElement.dir = LOCALE_META[next].dir;
 
-      // Trigger a soft navigation so next-intl's server config re-runs
-      // and re-hydrates with the new messages
+      // SEO-aware navigation: if the new locale's URL variant is ready for
+      // this path, push to /<locale>/<path>. If we're on /<oldLocale>/<seo-path>
+      // and switching to a locale that doesn't have it (or to en), strip the
+      // prefix back to the canonical English URL. Otherwise stay put and let
+      // router.refresh() re-render the chrome from the cookie.
+      const current = pathname || '/';
+      const target = targetPathForLocale(current, next);
+
       startTransition(() => {
-        router.refresh();
+        if (target !== current) {
+          router.push(target);
+        } else {
+          router.refresh();
+        }
       });
     },
-    [router]
+    [router, pathname]
   );
 
   return (
