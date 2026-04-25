@@ -1,7 +1,11 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
+import { LOCALES, DEFAULT_LOCALE } from './i18n/config';
+import { isReadyVariant } from './i18n/seo-routing';
 
 const API_BASE_URL = process.env.API_DIRECT_URL ?? process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:8000';
+
+const NON_DEFAULT_LOCALES = new Set(LOCALES.filter((l) => l !== DEFAULT_LOCALE));
 
 /**
  * Resolve the current user's role by calling the backend's authenticated
@@ -36,6 +40,46 @@ const PUBLIC_WHEN_WAITLIST = [
 
 export async function middleware(request: NextRequest) {
     const path = request.nextUrl.pathname;
+
+    // --- URL-based locale routing for SEO pages ---------------------------
+    // Matches /<locale>/<rest>. If <locale> is one of our non-default locales:
+    //   * <rest> is a route that opts into URL locales (blog, pillar pages):
+    //     pass through so Next can render app/[locale]/<rest>/page.tsx.
+    //     Also set NEXT_LOCALE so the cookie-based <LocaleProvider> agrees.
+    //   * <rest> is anything else: redirect to /<rest> and set NEXT_LOCALE.
+    //     This is what makes /es/courses cleanly land on /courses in Spanish
+    //     for app-internal pages that are NOT URL-localized.
+    {
+        const segs = path.split('/').filter(Boolean);
+        if (segs.length >= 1 && NON_DEFAULT_LOCALES.has(segs[0] as any)) {
+            const locale = segs[0];
+            const rest = '/' + segs.slice(1).join('/');
+            if (isReadyVariant(rest, locale as any)) {
+                // The (path, locale) variant has a hand-translated body.
+                // Pass through so Next renders app/[locale]/<rest>/page.tsx.
+                const response = NextResponse.next();
+                response.cookies.set('NEXT_LOCALE', locale, {
+                    path: '/',
+                    maxAge: 60 * 60 * 24 * 365,
+                    sameSite: 'lax',
+                });
+                return response;
+            }
+            // Either the path doesn't opt into URL locales, or the locale
+            // doesn't have a translation yet. Redirect to the unprefixed
+            // path and pin the locale in a cookie so the cookie-based
+            // LocaleProvider still localises the chrome.
+            const url = request.nextUrl.clone();
+            url.pathname = rest === '/' ? '/' : rest;
+            const response = NextResponse.redirect(url);
+            response.cookies.set('NEXT_LOCALE', locale, {
+                path: '/',
+                maxAge: 60 * 60 * 24 * 365,
+                sameSite: 'lax',
+            });
+            return response;
+        }
+    }
 
     // --- Waitlist velvet rope with beta bypass ----------------------------
     const isWaitlistMode = process.env.NEXT_PUBLIC_WAITLIST_MODE === 'true';

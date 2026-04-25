@@ -3,6 +3,7 @@ import Link from "next/link";
 import NavBarAuth from "@/components/NavBarAuth";
 import Footer from "@/components/Footer";
 import { SITE_URL, SITE_NAME, FOUNDER } from "@/lib/site";
+import { hreflangAlternates } from "@/i18n/seo-routing";
 
 const PAGE_PATH = "/blog/the-85-percent-rule";
 const PAGE_URL = `${SITE_URL}${PAGE_PATH}`;
@@ -16,7 +17,7 @@ const DESCRIPTION =
 export const metadata: Metadata = {
     title: TITLE,
     description: DESCRIPTION,
-    alternates: { canonical: PAGE_PATH },
+    alternates: { canonical: PAGE_PATH, languages: hreflangAlternates(PAGE_PATH) },
     openGraph: {
         type: "article",
         url: PAGE_URL,
