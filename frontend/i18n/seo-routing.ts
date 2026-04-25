@@ -32,7 +32,7 @@ export const SEO_ROUTES: readonly SeoRoute[] = [
   { path: "/blog/mambo-history",       readyLocales: [] },
   { path: "/blog/the-85-percent-rule", readyLocales: [] },
   { path: "/what-is-salsa-on2",        readyLocales: [] },
-  { path: "/salsa-on1-vs-on2",         readyLocales: ["es", "pt", "fr", "de", "it"] },
+  { path: "/salsa-on1-vs-on2",         readyLocales: ALL_NON_EN },
 ] as const;
 
 const SEO_PATHS = new Set(SEO_ROUTES.map((r) => r.path));
