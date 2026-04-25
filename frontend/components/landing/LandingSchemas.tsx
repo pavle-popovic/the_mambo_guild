@@ -23,7 +23,7 @@ const courseSchema = {
         "Motor learning principles for dancers",
     ],
     inLanguage: "en",
-    availableLanguage: ["en", "fr", "it", "es", "pt", "de", "nl", "pl", "ru", "tr", "ja", "ko", "zh"],
+    availableLanguage: ["en", "fr", "it", "es", "pt", "de", "nl", "pl", "ru", "tr", "sr", "ar", "el", "ja", "ko", "zh"],
     courseMode: "online",
     hasCourseInstance: {
         "@type": "CourseInstance",

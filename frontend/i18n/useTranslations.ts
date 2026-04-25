@@ -34,9 +34,11 @@ import pl from '@/messages/pl.json';
 import nl from '@/messages/nl.json';
 import ar from '@/messages/ar.json';
 import el from '@/messages/el.json';
+import sr from '@/messages/sr.json';
+import tr from '@/messages/tr.json';
 
 const messages: Record<Locale, Record<string, any>> = {
-  en, es, pt, fr, de, it, ja, ko, zh, ru, pl, nl, ar, el,
+  en, es, pt, fr, de, it, ja, ko, zh, ru, pl, nl, ar, el, sr, tr,
 };
 
 function resolve(obj: any, path: string): string {
