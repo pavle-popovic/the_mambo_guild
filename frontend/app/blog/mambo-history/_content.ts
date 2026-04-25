@@ -1204,11 +1204,521 @@ const CONTENT: Record<Locale, MamboHistoryContent> = {
       },
     ],
   },
-  nl: {} as MamboHistoryContent,
-  ar: {} as MamboHistoryContent,
-  el: {} as MamboHistoryContent,
-  sr: {} as MamboHistoryContent,
-  tr: {} as MamboHistoryContent,
+  // ============================================================ NL
+  nl: {
+    metaTitle: "De geboorte van Mambo: van Havana tot het Palladium",
+    metaDescription:
+      "Hoe Mambo voortkwam uit de Cubaanse Danzón, Son en Afro-Cubaanse ritmes, werd getransformeerd door Arsenio Rodríguez en de dansers van het Palladium, en als moderne New York Style Salsa On2 werd gecodificeerd door Eddie Torres.",
+
+    breadcrumbHome: "Home",
+    breadcrumbBlog: "Blog",
+    breadcrumbCurrent: "Geschiedenis van Mambo",
+
+    badge: "Geschiedenis",
+    h1Pre: "De geboorte van Mambo: ",
+    h1Accent: "van Havana tot het Palladium",
+
+    shortAnswerRich:
+      "Mambo werd niet in één moment uitgevonden. Het is het hoogtepunt van een eeuwenlange synthese: Afro-Cubaanse percussietradities, Spaans-Europese dansvorm en Amerikaanse stedelijke theatraliteit die in drie opeenvolgende tijdperken botsten. De moderne vorm werd gekristalliseerd door **Arsenio Rodríguez** in het Havana van de jaren '40, getransformeerd door de **dansers van het Palladium** in het New York van de jaren '50, en gecodificeerd voor het lesgeven door **Eddie Torres** in de jaren '70.",
+
+    sec1Title: "Deel 1: de drie Cubaanse wortels",
+    sec1Paragraphs: [
+      "Voordat New York Mambo als zijn eigen claim opeiste, werden de ritmes en de lichaamstaal van de dans op Cuba gesmeed in een botsing tussen twee culturen met tegengestelde ideeën over hoe te bewegen.",
+      "Aan de ene kant de **Europese traditie**: Spaanse koloniale balzalen, de contradanza en uiteindelijk de Danzón (in 1879 in première gegaan door Miguel Failde). De dansen waren rechtop. De houding was strikt. De benen relatief gestrekt. De muziek werd gespeeld op violen, fluiten en piano's. Dansers stapten stevig op de telslag.",
+      "Aan de andere kant de **Afro-Cubaanse traditie**, bewaard in de *solares* (binnenplaatsen) en arbeidersbuurten: Rumba, met Guaguancó, Yambú en Columbia. De houding was laag, met gebogen knieën en een geaarde zwaartepunt. Beweging leefde in de schouders, de ribben, de heupen. De frasering benadrukte de tegentellen en de lege ruimtes ertussen.",
+      "Door de vroege twintigste eeuw werden deze tradities gescheiden gehouden door klasse en ras. De brug ertussen ontstond in de jaren '20 in de vorm van de **Son**. Afkomstig uit de oostelijke provincie Oriente, combineerde de Son Spaanse gitaar en lyrische structuur met Afro-Cubaanse percussie (bongo's, maraca's, clave). Het was de eerste muziek die zowel sociaal aanvaardbaar was in de clubs van de hogere klassen als authentiek werd aangedreven door de straatritmische tradities.",
+    ],
+
+    sec2Title: "Deel 2: Arsenio Rodríguez en de conga",
+    sec2Paragraphs: [
+      "In de jaren '30 en '40 besloot een blinde tres-gitarist genaamd **Arsenio Rodríguez** dat het Son-ensemble meer stuwkracht nodig had. Hij breidde het traditionele septeto uit tot een *conjunto*, voegde meerdere trompetten en de piano toe en (het meest controversieel) de conga. De conga was tot dan toe afgewezen als te \"straat\" voor formele ensembles. Arsenio plaatste hem in het hart van de sound.",
+      "Hij rekte ook het **montuno**-deel van het nummer op: de open, sterk gesyncopeerde, repetitieve eindvamp waarin zangers improviseerden en dansers eindelijk los konden gaan. De trage, stuwende, percussiegestuwde son montuno die daaruit voortkwam, is de directe ritmische voorouder van Mambo.",
+      "Wat Arsenio muzikaal afdwong, was een Afro-Cubaanse benadering van tijd. Het funderende patroon van de muziek is de **clave**, een skelet van vijf slagen dat de feel van elke volgende laag bepaalt. Goed gedanst, vraagt de muziek je lichaam om de knieën te verzachten, het zwaartepunt te verlagen en de gewichtsoverdracht te vertragen, zodat de stap zich in het ritme nestelt in plaats van eroverheen te marcheren. Die vertraging is wat de Cubaanse beweging (de acht van de heupen) op natuurlijke wijze laat ontstaan in plaats van mechanisch.",
+    ],
+
+    sec3Title: "Deel 3: het Palladium Ballroom (1948-1966)",
+    sec3IntroParagraphs: [
+      "In 1948 opende het Palladium Ballroom op de hoek van 53rd en Broadway zijn deuren voor raciaal geïntegreerde Latin-muzieknachten. Binnen enkele jaren was het het epicentrum van de **Mambo-rage**. Drie huisbandleiders (Tito Puente, Tito Rodríguez en Machito) dreven de muziek. Dansers uit de Bronx, Brooklyn en Spanish Harlem dreven de dans.",
+      "De Palladium-dansers waren niet academisch geschoold. Het waren Puerto Ricaanse, Italiaanse, joodse en Afro-Amerikaanse jongeren uit de arbeidersklasse, zonder formele sociale status, die hun identiteit in plaats daarvan op de dansvloer opbouwden. Ze stalen overal vandaan: tap uit de Cotton Club, Lindy Hop-acrobatiek uit het Savoy Ballroom, balzaal-frame uit de studio's van midtown Manhattan. Ze schroefden het allemaal op de Afro-Cubaanse clave.",
+    ],
+    sec3LegendsLeadIn: "De legendes uit die tijd:",
+    sec3LegendsBullets: [
+      "**Cuban Pete (Pedro Aguilar)**, een Puerto Ricaanse danser uit de Bronx met een tap- en Lindy Hop-achtergrond, smolt Afro-Cubaanse aarding samen met Amerikaanse jazz-styling en professionaliseerde de Mambo-exhibitiedans.",
+      "**Millie Donay**, Cuban Pete's Italiaans-Amerikaanse partner, hervormde de rol van de volger. Vóór Millie werd van volgers in de Latin-dans verwacht dat ze de leider passief volgden. Zij beantwoordde elke accent.",
+      "**Killer Joe Piro**, een Italiaans-Amerikaanse danser, werd de bekendste Mambo-instructeur van het land — de figuur die de chaos van de Palladium-vloer codificeerde tot stappen die aan middenklasse-Amerika konden worden verkocht.",
+      "**Augie en Margo Rodríguez** smolten Mambo samen met weidse balzaaltechnieken en brachten de dans naar nationale televisie in de Ed Sullivan Show.",
+    ],
+    sec3OutroParagraphs: [
+      "Uit deze botsing kwam de biomechanische signatuur die de New Yorkse Mambo nog steeds definieert: een geaard, in de knieën gebogen onderlichaam, gehuwd aan een agressief rechtopstaand, in de frame vergrendeld bovenlichaam. De buikkern fungeert als schokdemper tussen de twee. Wanneer je de voeten van een wereldklasse On2-danseres in oogverblindende snelheid ziet bewegen terwijl haar borst volkomen stil blijft, kijk je naar de directe erfenis van dit tijdperk.",
+    ],
+
+    sec4Title: "Deel 4: Eddie Torres en de codificatie van On2",
+    sec4Paragraphs: [
+      "Het Palladium sloot in 1966. Tegen de jaren '70 werd wat \"Mambo\" had geheten door de platenindustrie hernoemd tot \"Salsa\": dezelfde Afro-Cubaanse muzikale tradities onder een nieuw, marktvriendelijker label.",
+      "De danser die de brug sloeg tussen het Palladium-tijdperk en het moderne was **Eddie Torres**. Torres studeerde bij Tito Puente, die hem persoonlijk vertelde dat breken op de 2 trouwer was aan de clave en de conga dan breken op de 1. Torres nam dat muzikale principe en bouwde er een onderwijsbaar systeem omheen: een specifieke telstructuur, een specifieke basisstap, een didactiek die je les voor les kon leren in plaats van in jaren clubosmose op te nemen.",
+      "Elke moderne Salsa On2-leerlijn, ook deze, is uiteindelijk te herleiden tot het structurele werk van Eddie Torres. De uitdrukking \"New York Style\" werd synoniem met de lijn van Torres. Vandaag wordt \"On2\" overal van New York tot Tokio onderwezen, maar het systeem dat bijna al die docenten erven, was Torres' antwoord op één enkele vraag die Tito Puente hem stelde over de 2.",
+    ],
+
+    sec5Title: "Waarom deze geschiedenis op de dansvloer telt",
+    sec5Intro:
+      "Hier is de geschiedenis geen versiering. Drie dingen veranderen aan hoe je werkelijk beweegt zodra je begrijpt waar de dans vandaan komt:",
+    sec5Steps: [
+      "**Je stopt met vechten tegen de gebogen knieën.** Zachte knieën zijn geen stilistische keuze. Ze zijn biologisch vereist om de vertraagde gewichtsoverdracht uit te voeren die het ritme laat werken.",
+      "**Je stopt met stuiteren met de schouders.** Het stille bovenlichaam is geen esthetische affectatie. Het is de geërfde balzaaldiscipline die het voetenwerk leesbaar maakt en de leiding leesbaar via de frame.",
+      "**Je stopt met breken op de 1.** De slap van de conga valt op de 2. Je break-stap is geen willekeurige telkeuze; het is de ontmoetingsplek tussen jouw lichaam en de ritmesectie van de band.",
+    ],
+    sec5OutroRich:
+      "Dat is de stelling van [link]de On2-stijl[/link] en de kern van het Mambo Guild-curriculum.",
+
+    sec6Title: "Bronnen en verder lezen",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "Ga dieper",
+    ctaHeading: "The Mambo Guild heeft een complete geschiedeniscursus van 20 modules.",
+    ctaBody:
+      "Elke module volgt één draad uit het verhaal, van de Afrikaanse trommeltradities tot het Fania-tijdperk. Allemaal met bronvermelding, allemaal gegeven door gecertificeerde dansacademici. Inbegrepen bij elk Mambo Guild-lidmaatschap.",
+
+    faqs: [
+      {
+        q: "Wie heeft Mambo eigenlijk uitgevonden?",
+        a: "Er is geen enkele uitvinder. De Cubaanse bandleiders Arsenio Rodríguez (Havana, jaren '40) en Pérez Prado (Mexico-Stad, vanaf 1948) gaven de muziek haar funderende vorm; de dans werd gekristalliseerd door arbeidersklasse-New Yorkers in het Palladium Ballroom tussen 1948 en 1966.",
+      },
+      {
+        q: "Zijn Mambo en Salsa hetzelfde?",
+        a: "Muzikaal is moderne Salsa een commerciële herbranding van Mambo en aangrenzende Afro-Cubaanse genres, gemaakt door de New Yorkse platenindustrie aan het begin van de jaren '70. Als dans is wat tegenwoordig wordt onderwezen als Salsa On2 (New York Style) de directe afstammeling van de Mambo uit het Palladium-tijdperk.",
+      },
+      {
+        q: "Wat is de clave?",
+        a: "De clave is een ritmisch patroon van vijf slagen verspreid over twee maten (3-2 of 2-3) dat alle Afro-Cubaanse muziek verankert. Elk ander instrument wordt ten opzichte van haar gefraseerd; goed gedanst stemmen ook jouw gewichtsverplaatsingen zich op haar af.",
+      },
+      {
+        q: "Waarom eindigde het Palladium-tijdperk?",
+        a: "Het Palladium Ballroom verloor in 1966 zijn drankvergunning en sloot kort daarna. De Mambo-rage was bovendien in de bredere cultuur al verdrongen door rock-'n-roll en, binnen de Latin-muziek, door Boogaloo en het vroege \"Salsa\"-labeltijdperk.",
+      },
+      {
+        q: "Wie was Eddie Torres?",
+        a: "Eddie Torres is een New Yorkse danser en choreograaf die studeerde bij Tito Puente en codificeerde wat tegenwoordig wereldwijd wordt onderwezen als Salsa On2 / New York Style. Hij maakte van de vloerkennis van de Palladium-dansers een onderwijsbaar curriculum.",
+      },
+    ],
+  },
+  // ============================================================ AR
+  ar: {
+    metaTitle: "ميلاد المامبو: من هافانا إلى البلاديوم",
+    metaDescription:
+      "كيف نشأ المامبو من الدانزون الكوبي والـ«سون» والإيقاعات الأفروكوبية، وكيف حوّله أرسينيو رودريغيز وراقصو البلاديوم، ثم قنّنه إيدي توريس بصيغته الحديثة كسالسا أون 2 على الطريقة النيويوركية.",
+
+    breadcrumbHome: "الرئيسية",
+    breadcrumbBlog: "المدونة",
+    breadcrumbCurrent: "تاريخ المامبو",
+
+    badge: "تاريخ",
+    h1Pre: "ميلاد المامبو: ",
+    h1Accent: "من هافانا إلى البلاديوم",
+
+    shortAnswerRich:
+      "لم يُختَرع المامبو في لحظة واحدة. هو ذروة تركيبٍ امتد قرنًا من الزمن: تقاليد الإيقاع الأفروكوبية، والشكل الإسباني-الأوروبي للرقص، والمسرحية الحضرية الأمريكية، تتصادم في ثلاث حقب متعاقبة. صورته الحديثة بلورها **أرسينيو رودريغيز** في هافانا الأربعينيات، ثم حوّلها **راقصو البلاديوم** في نيويورك الخمسينيات، وقنّنها للتدريس **إيدي توريس** في السبعينيات.",
+
+    sec1Title: "الجزء 1: الجذور الكوبية الثلاثة",
+    sec1Paragraphs: [
+      "قبل أن تنسب نيويورك المامبو لنفسها، صُقلت إيقاعات هذا الرقص ولغة جسده في كوبا في تصادم ثقافتين تتعاكسان في فهم كيفية الحركة.",
+      "في جانب، **التقليد الأوروبي**: قاعات الرقص الكولونيالية الإسبانية، والكونترادانزا، ثم الدانزون (الذي قدّمه ميغيل فايلده لأول مرة عام 1879). كانت الرقصات منتصبة. كان القوام صارمًا. الساقان مستقيمتان نسبيًا. وكانت الموسيقى تُعزف على الكمان والفلوت والبيانو. وكان الراقصون يدوسون بثبات على النغمة القوية.",
+      "وفي الجانب الآخر، **التقليد الأفروكوبي**، المحفوظ في الـ*solares* (الأفنية) والأحياء العمالية: الرومبا، ومنها الغواغوانكو واليامبو والكولومبيا. كان الوضع منخفضًا، الركبتان مثنيتان، ومركز الثقل مزروع في الأرض. كانت الحركة تعيش في الأكتاف والأضلاع والأرداف. وكان البناء الإيقاعي يبرز ضربات الـ«off-beat» والفراغات بينها.",
+      "خلال أوائل القرن العشرين، ظلت هاتان التقليدتان منفصلتين بفعل الطبقة والعرق. ظهر الجسر بينهما في العشرينيات في صورة الـ**سون**. نشأ السون في إقليم أورينتي شرقي الجزيرة، وجمع الغيتار الإسباني والبنية الغنائية الإسبانية مع الإيقاع الأفروكوبي (البونغو والماراكاس والكلافي). كان أول موسيقى مقبولة اجتماعيًا في نوادي الطبقة العليا، ومدفوعة في الوقت ذاته بصدق من تقاليد إيقاع الشارع.",
+    ],
+
+    sec2Title: "الجزء 2: أرسينيو رودريغيز والكونغا",
+    sec2Paragraphs: [
+      "في الثلاثينيات والأربعينيات، قرر عازف التريس الكفيف **أرسينيو رودريغيز** أن أنسامبل الـ«سون» يحتاج إلى دفع أقوى. وسّع السبتيتو التقليدي إلى *كونخونتو*، فأضاف عدة أبواق، والبيانو، و(وهو الأكثر إثارة للجدل) الكونغا. كانت الكونغا مرفوضة قبل ذلك بوصفها «شارعية» أكثر من اللازم على الأنسامبلات الرسمية. وضعها أرسينيو في قلب الصوت.",
+      "كذلك مدّ مقطع الـ**مونتونو** في الأغنية: تلك الفقرة الختامية المفتوحة شديدة التضاد الإيقاعي والمتكررة، حيث يرتجل المغنون ويُطلق الراقصون أنفسهم أخيرًا. الـ«سون مونتونو» البطيء الدافع المتمحور حول الإيقاع الذي خرج من هناك هو السلف الإيقاعي المباشر للمامبو.",
+      "ما فرضه أرسينيو موسيقيًا كان مقاربة أفروكوبية للزمن. النمط المؤسس لهذه الموسيقى هو **الكلافي**، هيكل من خمس ضربات يحدد إحساس كل طبقة فوقه. عند الرقص الصحيح، تطلب الموسيقى من الجسد أن يلين الركبتين، ويخفض مركز الثقل، ويؤجّل نقل الوزن، حتى تستقرّ الخطوة في الإيقاع بدلاً من أن تسير فوقه. هذا التأخير هو ما يجعل الحركة الكوبية (شكل الرقم 8 بالأرداف) تحدث بشكل طبيعي بدلاً من ميكانيكي.",
+    ],
+
+    sec3Title: "الجزء 3: قاعة البلاديوم (1948-1966)",
+    sec3IntroParagraphs: [
+      "في عام 1948، فتحت قاعة البلاديوم على ناصية الشارع الـ53 وبرودواي أبوابها لأمسيات موسيقى لاتينية مختلطة عرقيًا. وفي غضون سنوات قليلة، صارت بؤرة **حُمّى المامبو**. ثلاثة قادة فرق مقيمين (تيتو بوينتي وتيتو رودريغيز وماتشيتو) كانوا يدفعون الموسيقى. وراقصون من برونكس وبروكلين وسبانيش هارلم كانوا يدفعون الرقص.",
+      "لم يكن راقصو البلاديوم متخرجين من معاهد. كانوا شبابًا من الطبقة العاملة من أصول بورتوريكية وإيطالية ويهودية وأمريكية أفريقية، بلا مكانة اجتماعية رسمية، فبنوا هويتهم على أرضية الرقص بدلاً من ذلك. سرقوا من كل شيء: التابدانس من الكوتون كلوب، وحركات الـ«ليندي هوب» الأكروباتية من قاعة الـ«سافوي»، وقوام قاعات الرقص من استوديوهات وسط مانهاتن. ثم ثبّتوا كل ذلك على الكلافي الأفروكوبي.",
+    ],
+    sec3LegendsLeadIn: "أساطير ذلك العصر:",
+    sec3LegendsBullets: [
+      "**كيوبان بيت (بيدرو أغيلار)**، راقص بورتوريكي من برونكس بخلفية تابدانس وليندي هوب، مزج الجذور الأفروكوبية بالأسلوب الأمريكي للجاز، وأكسب مامبو العرض طابعه المهني.",
+      "**ميلي دوناي**، شريكة كيوبان بيت من أصل إيطالي أمريكي، أحدثت ثورة في دور الراقصة المتابِعة. قبل ميلي، كان يُتوقع من المتابِعات في الرقص اللاتيني أن يتبعن القائد بشكل سلبي. لكنها كانت ترد عليه ضربةً بضربة.",
+      "**كيلر جو بيرو**، راقص إيطالي أمريكي، صار أشهر مدرّسي المامبو في البلاد، الشخصيةَ التي قنّنت فوضى أرضية البلاديوم في خطوات يمكن بيعها للطبقة الوسطى الأمريكية.",
+      "**أوغي ومارغو رودريغيز** مزجا المامبو بتقنيات قاعة الرقص الواسعة، وأخذا الرقص إلى التلفزيون الوطني في برنامج إد سوليفان شو.",
+    ],
+    sec3OutroParagraphs: [
+      "من ذلك التصادم خرجت البصمة البيوميكانيكية التي لا تزال تحدّد المامبو النيويوركي: نصف سفلي مزروع وركبتاه مثنيتان، متزوّج من نصف علوي منتصب بحدّة وقوام مقفل. وتعمل عضلات البطن مركزًا ماصًّا للصدمات بين الاثنين. حين ترى قدمَي راقصة أون 2 من الطراز العالمي تتحرّكان بسرعة مذهلة بينما يبقى صدرها ثابتًا تمامًا، فأنت تشاهد الإرث المباشر لذلك العصر.",
+    ],
+
+    sec4Title: "الجزء 4: إيدي توريس وتقنين أون 2",
+    sec4Paragraphs: [
+      "أُغلقت البلاديوم عام 1966. وبحلول السبعينيات، كانت صناعة الأسطوانات تعيد تسمية ما كان يُدعى «مامبو» بـ«السالسا»: نفس التقاليد الموسيقية الأفروكوبية تحت لافتة جديدة وأقرب إلى السوق.",
+      "الراقص الذي وصل بين عصر البلاديوم والعصر الحديث هو **إيدي توريس**. درس توريس على يد تيتو بوينتي، الذي قال له شخصيًا إن الكسر على الـ2 أصدق للكلافي والكونغا من الكسر على الـ1. أخذ توريس هذا المبدأ الموسيقي وبنى حوله نظامًا قابلاً للتدريس: بنية عدّ محددة، وخطوة أساسية محددة، ومنهجية يمكن تعلّمها درسًا بعد درس بدلاً من امتصاصها بسنوات من التشرّب في النوادي.",
+      "كل منهج حديث للسالسا أون 2، بما في ذلك هذا، يعود في النهاية إلى عمل إيدي توريس البنيوي. وصارت عبارة «الطريقة النيويوركية» مرادفة لخط توريس. اليوم يُدرَّس «أون 2» من نيويورك إلى طوكيو، لكن النظام الذي يرثه تقريبًا كل أولئك المعلمين كان جواب توريس على سؤال واحد طرحه عليه تيتو بوينتي عن الـ2.",
+    ],
+
+    sec5Title: "لماذا يهمّ هذا التاريخ على أرضية الرقص",
+    sec5Intro:
+      "التاريخ هنا ليس زينة. ثلاثة أمور تتغير في طريقة تحرّكك فعلًا حين تدرك من أين جاء هذا الرقص:",
+    sec5Steps: [
+      "**تتوقّف عن مقاومة الركبتين المثنيتين.** الركبتان الليّنتان ليستا اختيارًا أسلوبيًا. هما ضرورة بيولوجية لتنفيذ نقل الوزن المؤجَّل الذي يجعل الإيقاع يعمل.",
+      "**تتوقف عن نطّ الكتفين.** هدوء النصف العلوي ليس تصنّعًا جماليًا، بل انضباط قاعات الرقص الموروث، الذي يجعل عمل القدمين قابلاً للقراءة، ويجعل القيادة قابلة للقراءة عبر القوام.",
+      "**تتوقف عن الكسر على الـ1.** صفعة الكونغا تقع على الـ2. خطوة الكسر عندك ليست اختيار عدٍّ اعتباطيًا؛ بل نقطة لقاء بين جسدك والقسم الإيقاعي للفرقة.",
+    ],
+    sec5OutroRich:
+      "هذه هي أطروحة [link]أسلوب أون 2[/link] وجوهر منهج The Mambo Guild.",
+
+    sec6Title: "المصادر وقراءات إضافية",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "تعمّق أكثر",
+    ctaHeading: "تقدّم The Mambo Guild كورس تاريخ كاملًا من 20 وحدة.",
+    ctaBody:
+      "كل وحدة تتتبّع خيطًا من القصة، من تقاليد الطبل الأفريقية حتى عصر فانيا. كل شيء بمصادر موثّقة، وكلّه بإشراف باحثين معتمدين في الرقص. متاحة ضمن كل اشتراك في The Mambo Guild.",
+
+    faqs: [
+      {
+        q: "من اخترع المامبو فعلاً؟",
+        a: "لا يوجد مخترع واحد. قائدا الفِرق الكوبيان أرسينيو رودريغيز (هافانا، الأربعينيات) وبيريز برادو (مكسيكو سيتي، اعتبارًا من 1948) أعطيا الموسيقى شكلها التأسيسي؛ والرقص بلوره أبناء الطبقة العاملة في نيويورك في قاعة البلاديوم بين 1948 و1966.",
+      },
+      {
+        q: "هل المامبو والسالسا الشيء نفسه؟",
+        a: "موسيقيًا، السالسا الحديثة هي إعادة تغليف تسويقية للمامبو والأنواع الأفروكوبية المجاورة، أنجزتها صناعة الأسطوانات في نيويورك في مطلع السبعينيات. وكرقص، فإن ما يُدرَّس اليوم باسم سالسا أون 2 (الطريقة النيويوركية) هو السليل المباشر لمامبو حقبة البلاديوم.",
+      },
+      {
+        q: "ما هو الكلافي؟",
+        a: "الكلافي نمط إيقاعي من خمس ضربات يمتد على مازورتين (3-2 أو 2-3) ويرسي كل الموسيقى الأفروكوبية. كل آلة أخرى تُصاغ إيقاعيًا بالنسبة إليه؛ وعند الرقص الصحيح، تتوافق نقلات وزنك أنت أيضًا معه.",
+      },
+      {
+        q: "لماذا انتهت حقبة البلاديوم؟",
+        a: "خسرت قاعة البلاديوم رخصة بيع الكحول عام 1966 وأُغلقت بعد ذلك بقليل. كما كانت حُمّى المامبو قد أُزيحت بالفعل في الثقافة العامة على يد الروك أند رول، وداخل الموسيقى اللاتينية على يد البوغالو والمرحلة المبكرة من تسمية «السالسا».",
+      },
+      {
+        q: "من هو إيدي توريس؟",
+        a: "إيدي توريس راقص ومصمم رقص نيويوركي درس على يد تيتو بوينتي، وقنّن ما يُدرَّس اليوم في العالم باسم سالسا أون 2 / الطريقة النيويوركية. حوّل المعرفة الميدانية لراقصي حقبة البلاديوم إلى منهج قابل للتدريس.",
+      },
+    ],
+  },
+  // ============================================================ EL
+  el: {
+    metaTitle: "Η γέννηση του Mambo: από την Αβάνα στο Palladium",
+    metaDescription:
+      "Πώς το Mambo αναδύθηκε από το κουβανικό Danzón, τον Son και τον αφροκουβανικό ρυθμό, μεταμορφώθηκε από τον Arsenio Rodríguez και τους χορευτές του Palladium και κωδικοποιήθηκε ως σύγχρονη Salsa On2 New York Style από τον Eddie Torres.",
+
+    breadcrumbHome: "Αρχική",
+    breadcrumbBlog: "Blog",
+    breadcrumbCurrent: "Ιστορία του Mambo",
+
+    badge: "Ιστορία",
+    h1Pre: "Η γέννηση του Mambo: ",
+    h1Accent: "από την Αβάνα στο Palladium",
+
+    shortAnswerRich:
+      "Το Mambo δεν εφευρέθηκε σε μία στιγμή. Είναι η κορύφωση μιας σύνθεσης που κράτησε έναν αιώνα: αφροκουβανικές παραδόσεις κρουστών, ισπανο-ευρωπαϊκή χορευτική φόρμα και αμερικανική αστική θεατρικότητα να συγκρούονται σε τρεις διαδοχικές εποχές. Η σύγχρονη μορφή του κρυσταλλώθηκε από τον **Arsenio Rodríguez** στην Αβάνα της δεκαετίας του '40, μεταμορφώθηκε από τους **χορευτές του Palladium** στη Νέα Υόρκη της δεκαετίας του '50 και κωδικοποιήθηκε για διδασκαλία από τον **Eddie Torres** στη δεκαετία του '70.",
+
+    sec1Title: "Μέρος 1: οι τρεις κουβανικές ρίζες",
+    sec1Paragraphs: [
+      "Πριν η Νέα Υόρκη διεκδικήσει το Mambo ως δικό της, οι ρυθμοί και η σωματική γλώσσα του χορού σφυρηλατήθηκαν στην Κούβα μέσα από τη σύγκρουση δύο πολιτισμών με αντίθετες ιδέες για το πώς πρέπει να κινείται το σώμα.",
+      "Από τη μία, η **ευρωπαϊκή παράδοση**: ισπανικές αποικιοκρατικές αίθουσες χορού, η contradanza και τελικά το Danzón (πρεμιέρα το 1879 από τον Miguel Failde). Οι χοροί ήταν όρθιοι. Το πλαίσιο αυστηρό. Τα πόδια σχετικά τεντωμένα. Η μουσική παιζόταν με βιολιά, φλάουτα και πιάνα. Οι χορευτές πατούσαν αποφασιστικά στο ισχυρό μέρος του μέτρου.",
+      "Από την άλλη, η **αφροκουβανική παράδοση**, που διατηρήθηκε στα *solares* (αυλές) και στις γειτονιές της εργατικής τάξης: Rumba, και μέσα της Guaguancó, Yambú, Columbia. Η στάση ήταν χαμηλή, με λυγισμένα γόνατα και κέντρο βάρους ριζωμένο στο έδαφος. Η κίνηση ζούσε στους ώμους, στα πλευρά, στους γοφούς. Η φραστική έδινε έμφαση στα off-beats και στους κενούς χώρους ανάμεσά τους.",
+      "Στις πρώτες δεκαετίες του 20ού αιώνα, αυτές οι παραδόσεις παρέμειναν χωρισμένες από την τάξη και τη φυλή. Η γέφυρα ανάμεσά τους εμφανίστηκε στη δεκαετία του '20 με τη μορφή του **Son**. Με καταγωγή από την ανατολική επαρχία Oriente, ο Son συνδύασε την ισπανική κιθάρα και τη στιχουργική δομή με την αφροκουβανική κρουστή (μπόνγκος, μαράκες, clave). Ήταν η πρώτη μουσική που ήταν ταυτόχρονα κοινωνικά αποδεκτή στα κλαμπ των ανώτερων τάξεων και αυθεντικά οδηγημένη από τις ρυθμικές παραδόσεις του δρόμου.",
+    ],
+
+    sec2Title: "Μέρος 2: ο Arsenio Rodríguez και η conga",
+    sec2Paragraphs: [
+      "Στις δεκαετίες του '30 και του '40, ένας τυφλός παίκτης tres ονόματι **Arsenio Rodríguez** αποφάσισε ότι το ensemble του Son χρειαζόταν περισσότερη ώθηση. Επέκτεινε το παραδοσιακό septeto σε ένα *conjunto*, προσθέτοντας πολλά τρομπόνια και πιάνο, και (το πιο αμφιλεγόμενο) την conga. Η conga είχε απορριφθεί μέχρι τότε ως υπερβολικά «του δρόμου» για επίσημα ensembles. Ο Arsenio την έβαλε στην καρδιά του ήχου.",
+      "Επεξέτεινε επίσης το τμήμα **montuno** του τραγουδιού: εκείνο το ανοιχτό, έντονα συγκοπικό, επαναλαμβανόμενο vamp στο τέλος, όπου οι τραγουδιστές αυτοσχεδίαζαν και οι χορευτές μπορούσαν επιτέλους να ξεσπάσουν. Το αργό, πιεστικό, κρουστά-οδηγούμενο son montuno που προέκυψε είναι ο άμεσος ρυθμικός πρόγονος του Mambo.",
+      "Αυτό που ο Arsenio επέβαλε μουσικά ήταν μια αφροκουβανική προσέγγιση του χρόνου. Το θεμελιώδες μοτίβο της μουσικής είναι η **clave**, ένας σκελετός πέντε χτυπημάτων που καθορίζει την αίσθηση κάθε επόμενης στρώσης. Όταν χορεύεται σωστά, η μουσική ζητάει από το σώμα να χαλαρώσει τα γόνατα, να χαμηλώσει το κέντρο βάρους και να καθυστερήσει τη μεταφορά βάρους, ώστε το βήμα να κάθεται μέσα στον ρυθμό αντί να βαδίζει από πάνω του. Αυτή η καθυστέρηση είναι που κάνει την κουβανική κίνηση (το οχτάρι των γοφών) να συμβαίνει φυσικά αντί για μηχανικά.",
+    ],
+
+    sec3Title: "Μέρος 3: το Palladium Ballroom (1948-1966)",
+    sec3IntroParagraphs: [
+      "Το 1948, το Palladium Ballroom στη γωνία της 53ης Οδού και του Broadway άνοιξε τις πόρτες του σε φυλετικά μικτές βραδιές λάτιν μουσικής. Μέσα σε λίγα χρόνια ήταν το επίκεντρο της **Mambo Craze**. Τρεις σταθεροί αρχηγοί ορχήστρας (Tito Puente, Tito Rodríguez και Machito) τραβούσαν τη μουσική. Χορευτές από το Bronx, το Brooklyn και το Spanish Harlem τραβούσαν τον χορό.",
+      "Οι χορευτές του Palladium δεν είχαν ακαδημαϊκή εκπαίδευση. Ήταν πορτορικανά, ιταλικά, εβραϊκά και αφροαμερικανικά παιδιά της εργατικής τάξης χωρίς επίσημο κοινωνικό κύρος, που έχτιζαν την ταυτότητά τους πάνω στην πίστα του χορού. Έκλεβαν από τα πάντα: tap από το Cotton Club, ακροβατικά Lindy Hop από το Savoy Ballroom, στάση αίθουσας χορού από τα στούντιο του midtown Manhattan. Τα βίδωσαν όλα πάνω στην αφροκουβανική clave.",
+    ],
+    sec3LegendsLeadIn: "Οι θρύλοι της εποχής:",
+    sec3LegendsBullets: [
+      "**Cuban Pete (Pedro Aguilar)**, πορτορικάνος χορευτής από το Bronx με υπόβαθρο σε tap και Lindy Hop, συγχώνευσε την αφροκουβανική γείωση με το αμερικανικό jazz styling και επαγγελματοποίησε το Mambo επίδειξης.",
+      "**Millie Donay**, η ιταλοαμερικανίδα παρτενέρ του Cuban Pete, έκανε επανάσταση στον ρόλο της follower. Πριν από τη Millie, οι followers στους λατινοαμερικανικούς χορούς αναμενόταν να ακολουθούν παθητικά τον leader. Εκείνη του απαντούσε ξύλο με ξύλο.",
+      "**Killer Joe Piro**, ιταλοαμερικάνος χορευτής, έγινε ο πιο διάσημος δάσκαλος Mambo στη χώρα — η μορφή που κωδικοποίησε το χάος της πίστας του Palladium σε βήματα που μπορούσαν να πουληθούν στη μεσαία τάξη της Αμερικής.",
+      "**Augie και Margo Rodríguez** συγχώνευσαν το Mambo με σαρωτικές τεχνικές αίθουσας χορού και πήγαν τον χορό στην εθνική τηλεόραση στο Ed Sullivan Show.",
+    ],
+    sec3OutroParagraphs: [
+      "Από αυτή τη σύγκρουση βγήκε η βιομηχανική υπογραφή που ορίζει ακόμη το Mambo της Νέας Υόρκης: ένα γειωμένο, με λυγισμένα γόνατα κάτω σώμα, παντρεμένο με ένα επιθετικά όρθιο, κλειδωμένο στο πλαίσιο πάνω σώμα. Ο κορμός των κοιλιακών δουλεύει ως αμορτισέρ ανάμεσά τους. Όταν βλέπεις τα πόδια μιας χορεύτριας On2 παγκόσμιας κλάσης να κινούνται με εκτυφλωτική ταχύτητα ενώ ο θώρακάς της μένει εντελώς ακίνητος, βλέπεις την άμεση κληρονομιά αυτής της εποχής.",
+    ],
+
+    sec4Title: "Μέρος 4: ο Eddie Torres και η κωδικοποίηση του On2",
+    sec4Paragraphs: [
+      "Το Palladium έκλεισε το 1966. Μέχρι τη δεκαετία του '70, αυτό που λεγόταν «Mambo» μετονομαζόταν από τη βιομηχανία της δισκογραφίας σε «Salsa»: οι ίδιες αφροκουβανικές μουσικές παραδόσεις κάτω από μια νέα, εμπορικά πιο φιλική ετικέτα.",
+      "Ο χορευτής που γεφύρωσε την εποχή του Palladium και τη σύγχρονη ήταν ο **Eddie Torres**. Ο Torres σπούδασε με τον Tito Puente, ο οποίος του είπε προσωπικά ότι το να σπας στο 2 ήταν πιο πιστό στην clave και στην conga από το να σπας στο 1. Ο Torres πήρε αυτή τη μουσική αρχή και έχτισε γύρω της ένα διδάξιμο σύστημα: συγκεκριμένη δομή μετρήματος, συγκεκριμένο βασικό βήμα, μια παιδαγωγική που μπορούσε να μαθευτεί μάθημα μάθημα αντί να απορροφάται με χρόνια κλαμπικής όσμωσης.",
+      "Κάθε σύγχρονο πρόγραμμα Salsa On2, μαζί και αυτό εδώ, ανάγεται τελικά στη δομική δουλειά του Eddie Torres. Η έκφραση «New York Style» έγινε συνώνυμη με τη γενεαλογία του Torres. Σήμερα το «On2» διδάσκεται από τη Νέα Υόρκη μέχρι το Τόκιο, αλλά το σύστημα που σχεδόν όλοι αυτοί οι δάσκαλοι κληρονομούν ήταν η απάντηση του Torres σε μία και μόνη ερώτηση που του έθεσε ο Tito Puente για το 2.",
+    ],
+
+    sec5Title: "Γιατί αυτή η ιστορία μετράει στην πίστα",
+    sec5Intro:
+      "Εδώ η ιστορία δεν είναι διακόσμηση. Τρία πράγματα αλλάζουν στον τρόπο που πραγματικά κινείσαι, μόλις καταλάβεις από πού ήρθε ο χορός:",
+    sec5Steps: [
+      "**Σταματάς να παλεύεις τα λυγισμένα γόνατα.** Τα μαλακά γόνατα δεν είναι στιλιστική επιλογή. Είναι βιολογικά απαραίτητα για να εκτελέσεις την καθυστερημένη μεταφορά βάρους που κάνει τον ρυθμό να δουλεύει.",
+      "**Σταματάς να κουνάς τους ώμους.** Το ήσυχο πάνω σώμα δεν είναι αισθητική επιτήδευση. Είναι η κληρονομημένη πειθαρχία της αίθουσας χορού που κάνει το παιχνίδι των ποδιών αναγνώσιμο και την οδήγηση αναγνώσιμη μέσα από το πλαίσιο.",
+      "**Σταματάς να σπας στο 1.** Το slap της conga πέφτει στο 2. Το break-βήμα σου δεν είναι αυθαίρετη επιλογή μετρήματος, είναι ένα σημείο συνάντησης ανάμεσα στο σώμα σου και τη ρυθμική σεξιόν της μπάντας.",
+    ],
+    sec5OutroRich:
+      "Αυτή είναι η θέση του [link]στιλ On2[/link] και ο πυρήνας του προγράμματος του The Mambo Guild.",
+
+    sec6Title: "Πηγές και περαιτέρω ανάγνωση",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "Πήγαινε πιο βαθιά",
+    ctaHeading: "Το The Mambo Guild έχει πλήρες μάθημα ιστορίας 20 ενοτήτων.",
+    ctaBody:
+      "Κάθε ενότητα ακολουθεί ένα νήμα της ιστορίας, από τις αφρικανικές παραδόσεις των κρουστών μέχρι την εποχή της Fania. Όλα με πηγές, όλα διδαγμένα από πιστοποιημένους ακαδημαϊκούς του χορού. Περιλαμβάνεται σε κάθε συνδρομή του The Mambo Guild.",
+
+    faqs: [
+      {
+        q: "Ποιος εφηύρε στ' αλήθεια το Mambo;",
+        a: "Δεν υπάρχει μοναδικός εφευρέτης. Οι κουβανοί αρχηγοί ορχήστρας Arsenio Rodríguez (Αβάνα, δεκαετία '40) και Pérez Prado (Πόλη του Μεξικού, από το 1948 και μετά) έδωσαν στη μουσική τη θεμελιώδη μορφή της· ο χορός κρυσταλλώθηκε από νεοϋορκέζους της εργατικής τάξης στο Palladium Ballroom μεταξύ 1948 και 1966.",
+      },
+      {
+        q: "Είναι το Mambo και η Salsa το ίδιο πράγμα;",
+        a: "Μουσικά, η σύγχρονη Salsa είναι μια εμπορική αναβάπτιση του Mambo και των γειτονικών αφροκουβανικών ειδών, που έγινε από τη δισκογραφική βιομηχανία της Νέας Υόρκης στις αρχές της δεκαετίας του '70. Ως χορός, αυτό που σήμερα διδάσκεται ως Salsa On2 (New York Style) είναι ο άμεσος απόγονος του Mambo της εποχής του Palladium.",
+      },
+      {
+        q: "Τι είναι η clave;",
+        a: "Η clave είναι ένα ρυθμικό μοτίβο πέντε χτυπημάτων κατανεμημένο σε δύο μέτρα (3-2 ή 2-3) που αγκυροβολεί όλη την αφροκουβανική μουσική. Κάθε άλλο όργανο φράζεται σε σχέση με αυτήν· όταν χορεύεται σωστά, οι μεταφορές βάρους σου ευθυγραμμίζονται και αυτές με αυτήν.",
+      },
+      {
+        q: "Γιατί τελείωσε η εποχή του Palladium;",
+        a: "Το Palladium Ballroom έχασε την άδεια αλκοόλ το 1966 και έκλεισε λίγο αργότερα. Η Mambo Craze είχε εξάλλου ήδη εκτοπιστεί στην ευρύτερη κουλτούρα από το rock and roll και, εντός της λάτιν μουσικής, από το Boogaloo και την πρώιμη εποχή της ετικέτας «Salsa».",
+      },
+      {
+        q: "Ποιος ήταν ο Eddie Torres;",
+        a: "Ο Eddie Torres είναι νεοϋορκέζος χορευτής και χορογράφος που σπούδασε με τον Tito Puente και κωδικοποίησε αυτό που σήμερα διδάσκεται παγκοσμίως ως Salsa On2 / New York Style. Μετέτρεψε τη γνώση πίστας των χορευτών της εποχής του Palladium σε διδάξιμο πρόγραμμα.",
+      },
+    ],
+  },
+  // ============================================================ SR
+  sr: {
+    metaTitle: "Рођење мамба: од Хаване до Палладијума",
+    metaDescription:
+      "Како је мамбо настао из кубанског Дансона, Сона и афрокубанског ритма, како су га преобразили Арсенио Родригез и плесачи Палладијума и како га је Еди Торес кодификовао као модерну њујоршку салсу On2.",
+
+    breadcrumbHome: "Почетна",
+    breadcrumbBlog: "Блог",
+    breadcrumbCurrent: "Историја мамба",
+
+    badge: "Историја",
+    h1Pre: "Рођење мамба: ",
+    h1Accent: "од Хаване до Палладијума",
+
+    shortAnswerRich:
+      "Мамбо није измишљен у једном тренутку. То је врхунац вековне синтезе: афрокубанске традиције удараљки, шпанско-европске плесне форме и америчке урбане позоришности који се сударају у три узастопне епохе. Његову модерну форму искристалисао је **Арсенио Родригез** у Хавани четрдесетих, преобразили **плесачи Палладијума** у Њујорку педесетих, а кодификовао је за подучавање **Еди Торес** седамдесетих.",
+
+    sec1Title: "Део 1: три кубанска корена",
+    sec1Paragraphs: [
+      "Пре него што је Њујорк прогласио мамбо својим, ритмови и говор тела овог плеса искован је на Куби у судару две културе са супротним идејама о томе како се треба кретати.",
+      "С једне стране, **европска традиција**: шпанске колонијалне дворане, контраданца и на крају Дансон (премијерно изведен 1879. од стране Мигела Фаилдеа). Плесови су били усправни. Држање строго. Ноге релативно равне. Музика је свирана на виолинама, флаутама и клавирима. Плесачи су чврсто ступали на наглашену добу.",
+      "С друге стране, **афрокубанска традиција**, очувана у *солареима* (двориштима) и радничким крајевима: Румба, укључујући Гуагуанко, Јамбу, Колумбију. Држање је било ниско, са савијеним коленима и тежиштем укотвљеним у тлу. Кретање је живело у раменима, у ребрима, у куковима. Фразирање је наглашавало нагласке „ван добе” и празне просторе између њих.",
+      "Током раног двадесетог века ове традиције су биле раздвојене класом и расом. Мост између њих појавио се двадесетих година у виду **Сона**. Пореклом из источне провинције Оријенте, Сон је спојио шпанску гитару и текстуалну структуру са афрокубанском перкусијом (бонгои, мараке, клаве). Била је то прва музика која је била и друштвено прихватљива у клубовима виших класа и аутентично вођена уличним ритмичким традицијама.",
+    ],
+
+    sec2Title: "Део 2: Арсенио Родригез и конга",
+    sec2Paragraphs: [
+      "Тридесетих и четрдесетих година, слепи свирач трес-гитаре по имену **Арсенио Родригез** одлучио је да Сон-ансамблу треба више погона. Проширио је традиционални септето у *конхунто*, додавши више трубе, клавир и (најконтроверзније) конгу. Конга је дотад била одбацивана као превише „улична” за формалне ансамбле. Арсенио ју је ставио у само срце звука.",
+      "Такође је развукао **монтуно** одсек песме: онај отворени, снажно синкопирани, репетитивни вамп на крају у којем певачи импровизују и плесачи најзад могу да се распусте. Спори, потискујући, перкусионо-вођен сон монтуно који је одатле израстао директан је ритмички предак мамба.",
+      "Оно што је Арсенио музички наметнуо био је афрокубански однос према времену. Темељни образац ове музике је **клаве**, костур од пет удараца који одређује осећај сваког следећег слоја. Када се плеше исправно, музика од тела тражи да омекша колена, спусти тежиште и одложи пренос тежине, тако да се корак спусти у ритам уместо да маршира преко њега. Управо то одлагање чини да се кубанско кретање (осмица куковима) дешава природно, а не механички.",
+    ],
+
+    sec3Title: "Део 3: Палладијумова дворана (1948-1966)",
+    sec3IntroParagraphs: [
+      "Године 1948. Палладијумова дворана на углу 53. улице и Бродвеја отворила је врата расно интегрисаним вечерима латиноамеричке музике. За неколико година постала је епицентар **мамбо помаме**. Три кућна вођа оркестара (Тито Пуенте, Тито Родригез и Мачито) гурали су музику. Плесачи из Бронкса, Бруклина и Спанског Харлема гурали су плес.",
+      "Палладијумови плесачи нису имали академску обуку. Били су то порториканска, италијанска, јеврејска и афроамеричка деца радничке класе, без формалног друштвеног статуса, која су свој идентитет градила на плесном подијуму. Крали су из свега: степ из Котон Клаба, акробатику Линди Хопа из Савој дворане, држање плесних дворана из студија средњег Менхетна. Све то су зашрафили на афрокубанску клаве.",
+    ],
+    sec3LegendsLeadIn: "Легенде те епохе:",
+    sec3LegendsBullets: [
+      "**Куван Пит (Педро Агилар)**, порторикански плесач из Бронкса са степом и Линди Хопом у позадини, спојио је афрокубанску укотвљеност са америчким џез стилом и професионализовао изложбени мамбо.",
+      "**Мили Донеј**, италијанско-америчка партнерка Куван Пита, направила је револуцију у улози пратиоца. Пре Мили, од пратилаца у латиноамеричком плесу се очекивало да пасивно прате водитеља. Она му је одговарала ударац за ударац.",
+      "**Килер Џо Пиро**, италијанско-амерички плесач, постао је најпознатији инструктор мамба у земљи — фигура која је хаос Палладијумовог подијума кодификовала у кораке који су се могли продати америчкој средњој класи.",
+      "**Оџи и Марго Родригез** су спојили мамбо са замашним техникама плесних дворана и однели плес на националну телевизију у Ед Саливен Шоу.",
+    ],
+    sec3OutroParagraphs: [
+      "Из тог судара изашао је биомеханички потпис који и данас одређује њујоршки мамбо: укотвљен доњи део тела са савијеним коленима, ожењен агресивно усправним горњим делом тела закључаног држања. Стомачни кор делује као амортизер између њих. Када видите како стопала врхунске On2 плесачице језиво брзо лете, а њене груди остају потпуно мирне, гледате директно наслеђе те епохе.",
+    ],
+
+    sec4Title: "Део 4: Еди Торес и кодификација On2",
+    sec4Paragraphs: [
+      "Палладијум је затворен 1966. године. До седамдесетих, оно што се звало „мамбо” дискографска индустрија је пребрендирала у „салсу”: исте афрокубанске музичке традиције под новом, тржишно прихватљивијом етикетом.",
+      "Плесач који је премостио Палладијумову епоху и модерну био је **Еди Торес**. Торес је учио код Тита Пуентеа, који му је лично рекао да брејковати на 2 значи бити вернији клавеу и конги него брејковати на 1. Торес је узео тај музички принцип и око њега изградио систем који се може учити: одређену структуру бројања, одређени основни корак, педагогију коју је могуће усвајати час по час уместо упијањем кроз године клупске осмозе.",
+      "Сваки модерни наставни план за салсу On2, укључујући и овај, у крајњој линији сеже до структуралног рада Едија Тореса. Израз „њујоршки стил” постао је синоним за Торесову лозу. Данас се „On2” учи од Њујорка до Токија, али систем који скоро сви ти учитељи наслеђују био је Торесов одговор на једно једино питање које му је Тито Пуенте поставио о двојци.",
+    ],
+
+    sec5Title: "Зашто је ова историја важна на подијуму",
+    sec5Intro:
+      "Историја овде није украс. Када разумете одакле овај плес долази, мењају се три ствари у томе како се заиста крећете:",
+    sec5Steps: [
+      "**Престајете да се борите против савијених колена.** Мека колена нису стилски избор. Она су биолошки неопходна да би се извео одложен пренос тежине који чини да ритам функционише.",
+      "**Престајете да поскакујете раменима.** Тиха горња страна тела није естетска поза. То је наслеђена дисциплина плесних дворана која чита рад стопала и води преко држања.",
+      "**Престајете да брејковате на 1.** Слап конге пада на 2. Ваш брејк-корак није произвољан избор бројања; он је тачка сусрета између вашег тела и ритам секције бенда.",
+    ],
+    sec5OutroRich:
+      "То је теза [link]On2 стила[/link] и срж програма The Mambo Guild.",
+
+    sec6Title: "Извори и даље читање",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "Иди дубље",
+    ctaHeading: "The Mambo Guild има потпуни курс историје од 20 модула.",
+    ctaBody:
+      "Сваки модул прати по једну нит приче, од афричких традиција бубња до Фанијине ере. Све са изворима, све предају сертификовани истраживачи плеса. Укључено у сваку чланарину The Mambo Guild-а.",
+
+    faqs: [
+      {
+        q: "Ко је заиста изумео мамбо?",
+        a: "Не постоји један изумитељ. Кубански вође оркестара Арсенио Родригез (Хавана, четрдесете) и Перез Прадо (Мексико Сити, од 1948. па надаље) дали су музици њен темељни облик; плес су искристалисали радници Њујорка у Палладијумовој дворани између 1948. и 1966.",
+      },
+      {
+        q: "Да ли су мамбо и салса исто?",
+        a: "Музички, модерна салса је маркетиншко пребрендирање мамба и сродних афрокубанских жанрова, које је направила њујоршка дискографска индустрија почетком седамдесетих. Као плес, оно што се данас учи као салса On2 (њујоршки стил) директан је потомак мамба из Палладијумове епохе.",
+      },
+      {
+        q: "Шта је клаве?",
+        a: "Клаве је ритмички образац од пет удараца преко два такта (3-2 или 2-3) који утемељује сву афрокубанску музику. Сваки други инструмент се фразира у односу на њу; ако се плеше исправно, и ваше промене тежине се поравнавају са њом.",
+      },
+      {
+        q: "Зашто је завршила Палладијумова епоха?",
+        a: "Палладијумова дворана је 1966. изгубила лиценцу за алкохол и убрзо потом затворена. Мамбо помама је уз то већ била потиснута у широј култури рокенролом, а унутар латиноамеричке музике бугалоом и раним добом етикете „салса”.",
+      },
+      {
+        q: "Ко је био Еди Торес?",
+        a: "Еди Торес је њујоршки плесач и кореограф који је учио код Тита Пуентеа и кодификовао оно што се данас широм света учи као салса On2 / њујоршки стил. Знање са подијума плесача из Палладијумове епохе претворио је у наставни план који се може предавати.",
+      },
+    ],
+  },
+  // ============================================================ TR
+  tr: {
+    metaTitle: "Mambo'nun doğuşu: Havana'dan Palladium'a",
+    metaDescription:
+      "Mambo'nun Küba Danzón'undan, Son'dan ve Afro-Küba ritminden nasıl ortaya çıktığı, Arsenio Rodríguez ve Palladium dansçıları tarafından nasıl dönüştürüldüğü ve Eddie Torres tarafından modern New York Style Salsa On2 olarak nasıl kodlandığı.",
+
+    breadcrumbHome: "Ana Sayfa",
+    breadcrumbBlog: "Blog",
+    breadcrumbCurrent: "Mambo Tarihi",
+
+    badge: "Tarih",
+    h1Pre: "Mambo'nun doğuşu: ",
+    h1Accent: "Havana'dan Palladium'a",
+
+    shortAnswerRich:
+      "Mambo tek bir anda icat edilmedi. Bir asır süren bir sentezin doruk noktasıdır: Afro-Küba perküsyon gelenekleri, İspanyol-Avrupa dans formu ve Amerikan kentsel tiyatrallığının üç ardışık dönemde çarpışmasıdır. Modern biçimini 1940'ların Havana'sında **Arsenio Rodríguez** kristalleştirdi, 1950'lerin New York'unda **Palladium dansçıları** dönüştürdü ve 1970'lerde öğretilebilir hâle **Eddie Torres** kodladı.",
+
+    sec1Title: "1. Bölüm: üç Küba kökü",
+    sec1Paragraphs: [
+      "New York Mambo'yu kendi başarısı ilan etmeden önce, dansın ritimleri ve beden dili Küba'da, hareket etmeye dair birbirine zıt fikirleri olan iki kültürün çarpışmasında dövüldü.",
+      "Bir tarafta **Avrupa geleneği**: İspanyol sömürge balo salonları, contradanza ve nihayet Danzón (1879'da Miguel Failde tarafından sahnelendi). Danslar dik dururdu. Tutuş sertti. Bacaklar görece düzdü. Müzik kemanlar, flütler ve piyanolarla çalınırdı. Dansçılar güçlü vuruşa kararlı biçimde basardı.",
+      "Diğer tarafta **Afro-Küba geleneği**, *solares*'lerde (avlular) ve işçi mahallelerinde korundu: Rumba, içinde Guaguancó, Yambú, Columbia. Duruş alçaktı, dizler bükük, ağırlık merkezi yere kök salmıştı. Hareket omuzlarda, kaburgalarda, kalçalarda yaşıyordu. Cümleleme \"off-beat\"leri ve aralarındaki boş alanları öne çıkarıyordu.",
+      "20. yüzyılın başları boyunca bu iki gelenek sınıf ve ırk tarafından ayrı tutuldu. Aralarındaki köprü 1920'lerde **Son** biçiminde ortaya çıktı. Doğudaki Oriente eyaletinden çıkan Son, İspanyol gitarını ve sözel yapıyı Afro-Küba perküsyonuyla (bongolar, marakaslar, clave) birleştirdi. Üst sınıf kulüplerinde sosyal olarak kabul edilirken aynı zamanda sokağın ritim geleneklerinden gerçek anlamda beslenen ilk müzikti.",
+    ],
+
+    sec2Title: "2. Bölüm: Arsenio Rodríguez ve konga",
+    sec2Paragraphs: [
+      "1930'lar ve 40'larda, görme engelli bir tres çalgıcısı olan **Arsenio Rodríguez**, Son topluluğunun daha çok itki ihtiyacı olduğuna karar verdi. Geleneksel septeto'yu *conjunto*'ya genişletti, birden fazla trompet, piyano ve (en tartışmalı şekilde) konga ekledi. Konga, o güne dek resmi topluluklar için fazla \"sokak işi\" sayılıp dışlanıyordu. Arsenio onu sesin tam ortasına yerleştirdi.",
+      "Aynı zamanda parçanın **montuno** bölümünü uzattı: şarkıcıların doğaçlama yaptığı, dansçıların nihayet kendilerini bıraktığı; açık uçlu, ağır senkoplu, tekrara dayalı kapanış vamp'ı. Buradan çıkan yavaş, iten, perküsyon-ağırlıklı son montuno, Mambo'nun doğrudan ritmik atasıdır.",
+      "Arsenio'nun müzikal olarak dayattığı şey, zamanın Afro-Küba yorumuydu. Müziğin kurucu örüntüsü **clave**'dir; bunun üstüne yerleşen her katmanın hissini belirleyen, beş vuruşluk bir iskelettir. Doğru dans edildiğinde müzik bedenden dizleri yumuşatmasını, ağırlık merkezini düşürmesini ve ağırlık aktarımını geciktirmesini ister; böylece adım, ritmin üstünde yürümek yerine ritmin içine yerleşir. Küba hareketinin (kalçaların sekiz çizmesi) mekanik değil doğal biçimde gerçekleşmesini sağlayan tam da bu gecikmedir.",
+    ],
+
+    sec3Title: "3. Bölüm: Palladium Ballroom (1948-1966)",
+    sec3IntroParagraphs: [
+      "1948'de 53. Cadde ile Broadway köşesindeki Palladium Ballroom, ırklarüstü Latin müzik gecelerine kapılarını açtı. Birkaç yıl içinde **Mambo Çılgınlığı**'nın merkez üssü oldu. Üç ev orkestra şefi (Tito Puente, Tito Rodríguez ve Machito) müziği itiyordu. Bronx, Brooklyn ve Spanish Harlem'den dansçılar dansı itiyordu.",
+      "Palladium dansçıları akademik eğitim almamıştı. Resmi sosyal statüsü olmayan, kimliklerini bunun yerine dans pistinde inşa eden Porto Riko, İtalyan, Yahudi ve Afrika kökenli Amerikalı işçi sınıfı gençleriydi. Her yerden çalıyorlardı: Cotton Club'tan tap, Savoy Ballroom'dan Lindy Hop akrobasisi, midtown Manhattan'daki stüdyolardan balo salonu tutuşu. Hepsini Afro-Küba clave'ine cıvatadılar.",
+    ],
+    sec3LegendsLeadIn: "O dönemin efsaneleri:",
+    sec3LegendsBullets: [
+      "**Cuban Pete (Pedro Aguilar)**, tap ve Lindy Hop geçmişi olan, Bronx'tan Porto Rikolu bir dansçı; Afro-Küba'nın yere bağlı duruşunu Amerikan caz stiliyle birleştirdi ve gösteri Mambo'sunu profesyonelleştirdi.",
+      "**Millie Donay**, Cuban Pete'in İtalyan-Amerikalı partneri, takipçi rolünde devrim yaptı. Millie'den önce Latin danslarda takipçilerden lideri pasif biçimde takip etmeleri beklenirdi. O ise vuruşa vuruşla cevap verdi.",
+      "**Killer Joe Piro**, İtalyan-Amerikalı bir dansçı; ülkenin en ünlü Mambo eğitmeni oldu — Palladium pistinin kaosunu Amerikan orta sınıfına satılabilir adımlara kodlayan figürdür.",
+      "**Augie ve Margo Rodríguez** Mambo'yu geniş balo salonu teknikleriyle birleştirdi ve dansı Ed Sullivan Show'da ulusal televizyona taşıdı.",
+    ],
+    sec3OutroParagraphs: [
+      "Bu çarpışmadan New York Mambo'sunu hâlâ tanımlayan biyomekanik imza çıktı: yere bağlı, dizleri bükülü bir alt vücut ile agresif biçimde dik, tutuşu kilitli bir üst vücut. Karın çekirdeği bu ikisi arasında şok emici görevi görür. Dünya çapında bir On2 dansçısının ayakları göz kamaştırıcı hızda hareket ederken göğsünün tamamen sessiz kaldığını gördüğünüzde, bu çağın doğrudan mirasını seyrediyorsunuz demektir.",
+    ],
+
+    sec4Title: "4. Bölüm: Eddie Torres ve On2'nin kodlanması",
+    sec4Paragraphs: [
+      "Palladium 1966'da kapandı. 1970'lere gelindiğinde, plak endüstrisi \"Mambo\" denen şeyi \"Salsa\" olarak yeniden markalıyordu: aynı Afro-Küba müzik gelenekleri, daha pazarlanabilir yeni bir etiket altında.",
+      "Palladium çağıyla modern çağı bağlayan dansçı **Eddie Torres**'tir. Torres, kendisine 2'de break yapmanın 1'de break yapmaktan clave ve konga açısından daha sadık olduğunu bizzat söyleyen Tito Puente'nin yanında çalıştı. Torres bu müzikal ilkeyi alıp etrafına öğretilebilir bir sistem kurdu: belirli bir sayım yapısı, belirli bir temel adım, yıllarca kulüp emilimiyle özümsenmek yerine ders ders öğrenilebilen bir pedagoji.",
+      "Bu da dahil her modern Salsa On2 müfredatı, sonunda Eddie Torres'in yapısal çalışmasına dayanır. \"New York Style\" ifadesi Torres'in soyuyla eşanlamlı hâle geldi. Bugün \"On2\" New York'tan Tokyo'ya kadar her yerde öğretiliyor; ama o eğitmenlerin neredeyse tamamının devraldığı sistem, Tito Puente'nin Torres'e 2 hakkında sorduğu tek bir sorunun cevabıdır.",
+    ],
+
+    sec5Title: "Bu tarih dans pistinde neden önemli",
+    sec5Intro:
+      "Buradaki tarih dekoratif değil. Dansın nereden geldiğini anladığında, gerçekten nasıl hareket ettiğine dair üç şey değişir:",
+    sec5Steps: [
+      "**Bükük dizlerle savaşmayı bırakırsın.** Yumuşak dizler bir stil tercihi değildir. Ritmi işler kılan gecikmeli ağırlık aktarımını gerçekleştirmek için biyolojik olarak gereklidir.",
+      "**Omuzlarla zıplamayı bırakırsın.** Sessiz üst gövde estetik bir poz değil, miras alınmış balo salonu disiplinidir; ayak işini okunur kılan, tutuş üzerinden liderliği okunur kılan da odur.",
+      "**1'de break yapmayı bırakırsın.** Konganın slap'i 2'ye düşer. Senin break-adımın keyfi bir sayım tercihi değil, bedenin ile orkestranın ritim bölümünün buluşma noktasıdır.",
+    ],
+    sec5OutroRich:
+      "Bu, [link]On2 stilinin[/link] tezi ve The Mambo Guild müfredatının çekirdeğidir.",
+
+    sec6Title: "Kaynaklar ve daha fazla okuma",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "Daha derine in",
+    ctaHeading: "The Mambo Guild'de 20 modüllük tam bir tarih kursu var.",
+    ctaBody:
+      "Her modül hikâyenin bir ipliğini izler — Afrika davul geleneklerinden Fania dönemine kadar. Hepsi kaynaklı, hepsi sertifikalı dans akademisyenleri tarafından anlatılıyor. Her The Mambo Guild üyeliğinde dahildir.",
+
+    faqs: [
+      {
+        q: "Mambo'yu gerçekte kim icat etti?",
+        a: "Tek bir mucit yok. Kübalı orkestra şefleri Arsenio Rodríguez (Havana, 1940'lar) ve Pérez Prado (Mexico City, 1948'den itibaren) müziğe kurucu biçimini verdi; dans 1948-1966 arasında Palladium Ballroom'da işçi sınıfı New Yorklular tarafından kristalleştirildi.",
+      },
+      {
+        q: "Mambo ile Salsa aynı şey mi?",
+        a: "Müzikal olarak modern Salsa, 1970'lerin başında New York plak endüstrisinin yaptığı, Mambo ve komşu Afro-Küba türlerinin pazarlama amaçlı yeniden markalanmasıdır. Dans olarak bugün Salsa On2 (New York Style) adıyla öğretilen şey, Palladium dönemi Mambo'sunun doğrudan torunudur.",
+      },
+      {
+        q: "Clave nedir?",
+        a: "Clave, iki ölçüye yayılan beş vuruşluk bir ritim örüntüsüdür (3-2 ya da 2-3) ve tüm Afro-Küba müziğini sabitler. Diğer her enstrüman ona göre cümlelenir; doğru dans edildiğinde, senin ağırlık geçişlerin de ona hizalanır.",
+      },
+      {
+        q: "Palladium dönemi neden bitti?",
+        a: "Palladium Ballroom 1966'da içki ruhsatını kaybetti ve kısa süre sonra kapandı. Mambo çılgınlığı zaten geniş kültürde rock and roll tarafından, Latin müzik içinde ise Boogaloo ve erken \"Salsa\" etiket dönemi tarafından yerinden edilmişti.",
+      },
+      {
+        q: "Eddie Torres kimdi?",
+        a: "Eddie Torres, Tito Puente'nin yanında çalışan ve bugün dünya çapında Salsa On2 / New York Style olarak öğretilen şeyi kodlayan New Yorklu bir dansçı ve koreograftır. Palladium dönemi dansçılarının pist bilgisini öğretilebilir bir müfredata çevirdi.",
+      },
+    ],
+  },
 };
 
 export function getMamboHistoryContent(locale: Locale): MamboHistoryContent {
