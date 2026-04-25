@@ -30,7 +30,7 @@ const ALL_NON_EN: readonly Exclude<Locale, "en">[] = [
 export const SEO_ROUTES: readonly SeoRoute[] = [
   { path: "/blog",                     readyLocales: ALL_NON_EN },
   { path: "/blog/mambo-history",       readyLocales: ALL_NON_EN },
-  { path: "/blog/the-85-percent-rule", readyLocales: ["es", "pt", "fr", "de", "it", "ja", "ko", "zh", "ru", "pl"] },
+  { path: "/blog/the-85-percent-rule", readyLocales: ALL_NON_EN },
   { path: "/what-is-salsa-on2",        readyLocales: ALL_NON_EN },
   { path: "/salsa-on1-vs-on2",         readyLocales: ALL_NON_EN },
 ] as const;

@@ -1366,11 +1366,596 @@ const CONTENT: Record<Locale, EightyFiveContent> = {
       },
     ],
   },
-  nl: {} as EightyFiveContent,
-  ar: {} as EightyFiveContent,
-  el: {} as EightyFiveContent,
-  sr: {} as EightyFiveContent,
-  tr: {} as EightyFiveContent,
+  // ============================================================ NL
+  nl: {
+    metaTitle: "De 85 %-regel: hoe je brein écht leert dansen",
+    metaDescription:
+      "Een Nature-paper uit 2019 vond dat de wiskundig optimale foutkans bij leren 15,87 % is. Wat dat betekent voor salsa-oefening, hoe je je drills kalibreert en waarom \"schone\" oefening de vooruitgang stilzet.",
+
+    breadcrumbHome: "Home",
+    breadcrumbBlog: "Blog",
+    breadcrumbCurrent: "De 85 %-regel",
+
+    badge: "Trainingswetenschap",
+    h1Pre: "De 85 %-regel: ",
+    h1Accent: "hoe je brein écht leert dansen",
+
+    bylineCredential: "Gecertificeerd in Learning Experience Design",
+
+    shortAnswerRich:
+      "Een paper uit 2019 in *Nature Human Behaviour* van Wilson, Shenhav, Steine-Hanson en Cohen vond dat het wiskundig optimale foutpercentage voor het verwerven van een vaardigheid precies **15,87 % falen** is, ofwel ongeveer 85 % succes. Hoger dan dat kan je brein zich niet vastpinnen op een helder patroon. Lager dan dat archiveert je brein de vaardigheid als \"klaar\" en stopt het met upgraden. Dit is de wiskunde achter waarom schone oefening vooruitgang stilzet en waarom drills die net iets te moeilijk zijn de snelste route naar verbetering vormen.",
+
+    sec1Title: "Het onderzoek",
+    sec1Paragraphs: [
+      "In 2019 publiceerden Robert Wilson en collega's aan de Universiteit van Arizona *\"The Eighty Five Percent Rule for Optimal Learning\"* in *Nature Human Behaviour*. Ze stelden een precieze vraag: als je de moeilijkheidsknop van een oefensessie op elk getal kon zetten, op welk getal moet die knop staan om wiskundig zo snel mogelijk te leren?",
+      "Het antwoord komt voort uit de vorm van een standaard leercurve: een S-vormige sigmoïde. De curve stijgt langzaam wanneer de vaardigheid nieuw is, het snelst in het midden, en vlakt boven af zodra de vaardigheid is beheerst. Wilson vroeg: op welk punt van de curve is de helling (de mate van verbetering per herhaling) het steilst?",
+      "Dat punt, afgeleid uit de wiskunde, is **15,87 % falen**. Geen 10 %. Geen 25 %. 15,87 %. Het is een specifiek getal dat uit een specifieke curve valt, niet een ruwe schatting van iemand.",
+    ],
+
+    sec2Title: "Waarom je brein zo werkt",
+    sec2Paragraphs: [
+      "Bewegingsleren is een foutcorrectie-lus. Je probeert iets, je lichaam doet er een versie van, en je brein vergelijkt wat je *bedoelde* te doen met wat *werkelijk gebeurde*. Het verschil genereert een signaal in de kleine hersenen (het gebied achterin je hersenen dat beweging fijnregelt), en dat signaal vertelt je motorische cortex dat hij moet updaten.",
+      "Als elke herhaling perfect landt, is er geen verschil. Geen signaal. Je brein besluit dat de beweging is afgehandeld en stuurt de aandacht door naar wat nog kapot is. Daarom voelt schone oefening productief maar levert ze afnemend rendement op: je herhaalt wat je al weet in plaats van te trainen wat zich nog vormt.",
+      "Als te veel herhalingen mislukken, wordt het signaal ruisig. Je brein kan een echt patroon niet onderscheiden van willekeurige fouten. Onderzoekers noemen dit **gefrustreerd leren**: je werkt hard, maar het brein heeft niets stabiels om naar te updaten.",
+      "De 15 %-foutzone is waar het signaal schoon is. Je brein weet ongeveer wat er misging, heeft een stabiele referentie van hoe het goed gaan eruit ziet, en kan een kleine update per herhaling maken.",
+    ],
+
+    sec3Title: "Wenselijke moeilijkheid (Bjork)",
+    sec3Paragraphs: [
+      "De 85 %-regel heeft een gedragsmatige zus: Robert Bjorks concept van **wenselijke moeilijkheid** (desirable difficulty). Bjork heeft decennia laten zien dat oefencondities die *op het moment moeilijker aanvoelen* (herhalingen spreiden, verschillende vaardigheden afwisselen, feedback verminderen) een betere *langetermijn-retentie* opleveren. Geblokte oefening van één vaardigheid met constante feedback voelt prettiger tijdens het oefenen en levert merkbaar slechtere retentie op een week later.",
+      "Praktische implicatie voor dans: als je oefensessie moeiteloos en vlekkeloos voelt, leer je waarschijnlijk niet veel. Als ze net iets boven je huidige niveau voelt (oncomfortabel, een beetje chaotisch, veel eerlijke missers), leer je waarschijnlijk dichtbij het maximale tempo dat je brein toelaat.",
+    ],
+
+    sec4Title: "Hoe je de 85 %-regel toepast op salsa-oefening",
+    sec4Steps: [
+      "**Kies één geïsoleerde vaardigheid.** Oefen geen \"salsa\". Oefen iets concreets: een spinopzet, een cross-body lead op een specifieke tel, een shine-sequentie op een specifieke BPM. Je hebt een binair raak/mis-criterium nodig om een ratio te meten.",
+      "**Doe 10 herhalingen en scoor ze eerlijk.** Definieer vooraf wat als raak telt. Tel dan. 9 of 10 raak betekent dat de drill te makkelijk is. 5 of minder betekent dat hij te moeilijk is.",
+      "**Stel de moeilijkheidsknop bij.** Te makkelijk: verhoog de BPM met 10 %, voeg een laag arm-styling toe, doe het op de niet-dominante kant, voeg een partner toe, of neem de spiegelfeedback weg. Te moeilijk: vereenvoudig totdat je je stabiliseert op 8-9 raak van 10.",
+      "**Blijf in de 80-90 %-band.** Zodra je de band hebt gevonden, blijf er 15-20 ononderbroken minuten in. Dat is de zone waarin je kleine hersenen schone foutsignalen leveren en je motorische cortex de bewegingsrepresentatie herhaling per herhaling updatet.",
+    ],
+
+    sec5Title: "Waarom \"schone\" oefening lekker voelt maar minder leert",
+    sec5Paragraphs: [
+      "Als je ooit een sessie van 60 minuten hebt afgesloten waarin elke herhaling soepel voelde en je naar buiten liep met de gedachte \"dat ging top\", heb je jezelf waarschijnlijk minder geleerd dan in 20 minuten rommelig drillen aan de rand van je kunnen.",
+      "Het brein beloont geen inspanning. Het beloont voorspellingsfouten, en wel een hanteerbare hoeveelheid daarvan. Een uur herhalen wat je al weet houdt de dans veilig binnen je comfortzone en levert bijna geen update-signaal op. Twintig minuten drillen op 85 % succes, waarbij je twee van de tien herhalingen mist en die missers eerlijk voelt, is waar de neurologie van leren echt aan het werk gaat.",
+      "Dit is geen pleidooi voor zelfkastijding. Het is een pleidooi voor *kalibratie*. Je oefening moet eerlijk moeilijk voelen, niet verpletterend. 15 % falen, geen 50 %.",
+    ],
+
+    sec6Title: "Hoe dit eruitziet in een gestructureerd curriculum",
+    sec6Paragraphs: [
+      "Het curriculum van The Mambo Guild is rond dit principe gebouwd. Elke les opent de volgende op een expliciet beheersingscriterium. Elke drill heeft een moeilijkheidsslider. De Skill Tree ontgrendelt pas een nieuwe tak wanneer je de huidige tak consistent — niet onberispelijk, maar consistent — kunt uitvoeren. De hele bedoeling is om je in de 85 %-band te houden zonder dat je je eigen succespercentage met een klembord moet bijhouden.",
+      "Het alternatief (willekeurige lessen volgen, drillen wat de docent deze week toevallig behandelde) zet je vrijwel altijd of te laag (verveeld, je herhaalt wat je weet) of te hoog (verloren, je leert niets). Beide faalmodi zijn zichtbaar in de plateaus die zelflerende salsa-dansers raken rond zes tot negen maanden van casual leren.",
+    ],
+
+    sec7Title: "Bronnen",
+    sec7Sources: [
+      "Wilson, R.C., Shenhav, A., Steine-Hanson, M. & Cohen, J.D. (2019). *The Eighty Five Percent Rule for Optimal Learning*. Nature Human Behaviour, 3, 1316-1323.",
+      "Bjork, R.A. (1994). Memory and Metamemory Considerations in the Training of Human Beings. In J. Metcalfe & A. Shimamura (red.), *Metacognition*. MIT Press.",
+      "Schmidt, R.A. & Lee, T.D. (2011). *Motor Learning and Performance: From Principles to Application* (5e ed.). Human Kinetics.",
+    ],
+
+    faqs: [
+      {
+        q: "Wat is de 85 %-regel in eenvoudige taal?",
+        a: "Een paper uit 2019 in Nature Human Behaviour liet zien dat het menselijk brein nieuwe vaardigheden het snelst leert wanneer de oefenmoeilijkheid zo is gekalibreerd dat je ongeveer 85 % van de tijd slaagt en ongeveer 15 % mist. Het exacte optimum is 15,87 % falen. Oefenen bij veel hogere of veel lagere foutpercentages vertraagt het leren.",
+      },
+      {
+        q: "Waar komt het getal 15,87 % vandaan?",
+        a: "Het is wiskundig afgeleid uit de vorm van een standaard leercurve (een sigmoïde). De helling van de curve — hoe snel je per herhaling beter wordt — is op een specifiek punt het steilst, en dat punt komt overeen met een foutpercentage van 15,87 %. Geen empirische gok; dat getal valt rechtstreeks uit de wiskunde.",
+      },
+      {
+        q: "Geldt de 85 %-regel voor alle vaardigheden, ook dans?",
+        a: "Het paper van Wilson et al. ging over leren in neurale-netwerkmodellen en binaire classificatietaken, maar generaliseert sterk naar elke vaardigheid waarbij je brein een motorische output produceert en zich op basis van feedback updatet. Dans is een schoolvoorbeeld van motorisch leren.",
+      },
+      {
+        q: "En als ik een choreografie netjes wil uitvoeren, zonder fouten?",
+        a: "Oefenen en optreden zijn verschillende modi. Je moet drillen op 85 % succes en optreden op 100 %. De 15 %-foutzone is waar het leren gebeurt; de 100 %-zone is waar je verifieert dat het geleerde stabiel is.",
+      },
+      {
+        q: "Hoe past \"wenselijke moeilijkheid\" daarbij?",
+        a: "Het onderzoek van Robert Bjork naar wenselijke moeilijkheden laat zien dat oefencondities die het leren in het moment moeilijker laten voelen — gespreide herhaling, interleaving, minder feedback — een betere langetermijn-retentie opleveren. Het is de gedragsmatige zus van de 85 %-regel: hanteerbare worsteling verslaat moeiteloze herhaling voor alles wat je wilt vasthouden.",
+      },
+    ],
+
+    ctaEyebrow: "Slimmer oefenen",
+    ctaHeading: "Een curriculum gekalibreerd op de 85 %-zone.",
+    ctaBody:
+      "Elke drill, les en Skill Tree-tak in The Mambo Guild is afgesteld om je te houden in de moeilijkheidsband waar leren echt gebeurt. Gebouwd op leerwetenschappelijke principes door een gecertificeerde Learning Experience Designer.",
+
+    howToName: "Zo pas je de 85 %-regel toe in een salsa-oefensessie",
+    howToDescription:
+      "Een 4-stappenprotocol om de drillmoeilijkheid te kalibreren naar het wiskundig optimale foutpercentage van 15,87 %.",
+    howToSteps: [
+      {
+        name: "Kies per sessie één geïsoleerde vaardigheid",
+        text: "Drill geen 'salsa'. Drill één concreet ding: een spintechniek, de timing van een cross-body lead, een shine. Je hebt één definitie van succes/mislukking nodig om een succespercentage te kunnen meten.",
+      },
+      {
+        name: "Doe 10 herhalingen en scoor elk eerlijk",
+        text: "Beslis voor je begint wat als raak en wat als mis telt. Na 10 herhalingen tel je je rakers. Bij 9 of 10 is de drill te makkelijk. Bij 5 of minder is hij te moeilijk.",
+      },
+      {
+        name: "Stel de moeilijkheidsknop bij",
+        text: "Te makkelijk: verhoog de tempo met 10 %, voeg een arm-stylinglaag toe, voeg een partner toe, doe de niet-dominante versie of neem de visuele feedback weg. Te moeilijk: vereenvoudig tot je stabiliseert op 8 raak van 10.",
+      },
+      {
+        name: "Blijf 20 minuten in de 80-90 %-band",
+        text: "Zodra je 8-9 van 10 herhalingen raak slaat, blijf daar voor volgehouden oefening. Dat is de zone waarin je kleine hersenen heldere foutsignalen krijgen en je motorische cortex blijft updaten.",
+      },
+    ],
+  },
+  // ============================================================ AR
+  ar: {
+    metaTitle: "قاعدة 85 ٪: كيف يتعلّم دماغك الرقص فعلًا",
+    metaDescription:
+      "أظهرت دراسة عام 2019 في Nature أن النسبة الرياضية المثلى للأخطاء أثناء التعلم هي 15.87 ٪. ما يعنيه ذلك لتدريبك على السالسا، وكيف تعاير تمارينك، ولماذا توقف التدريبات «النظيفة» تقدّمك.",
+
+    breadcrumbHome: "الرئيسية",
+    breadcrumbBlog: "المدونة",
+    breadcrumbCurrent: "قاعدة 85 ٪",
+
+    badge: "علم التدريب",
+    h1Pre: "قاعدة 85 ٪: ",
+    h1Accent: "كيف يتعلّم دماغك الرقص فعلًا",
+
+    bylineCredential: "معتمد في تصميم تجربة التعلّم",
+
+    shortAnswerRich:
+      "وجدت ورقة بحثية نُشرت عام 2019 في *Nature Human Behaviour* للباحثين Wilson وShenhav وSteine-Hanson وCohen أن النسبة الرياضية المثلى للأخطاء عند اكتساب المهارة هي بالضبط **15.87 ٪ فشل**، أي نحو 85 ٪ نجاحًا. أعلى من ذلك، يعجز الدماغ عن التعلق بنمط واضح. أدنى من ذلك، يصنّف الدماغ المهارة بأنها «منتهية» ويتوقف عن ترقيتها. هذه هي الرياضيات التي تفسّر لماذا تجمّد التدريبات النظيفة تقدّمك، ولماذا التدريبات الأصعب قليلًا هي الطريق الأسرع للتحسّن.",
+
+    sec1Title: "الدراسة",
+    sec1Paragraphs: [
+      "في عام 2019، نشر Robert Wilson وزملاؤه في جامعة أريزونا ورقة *«The Eighty Five Percent Rule for Optimal Learning»* في *Nature Human Behaviour*. طرحوا سؤالًا دقيقًا: لو استطعت ضبط مقبض صعوبة جلسة التدريب على أيّ رقم، فعلى أيّ رقم يجب وضعه لتتعلّم بأسرع ما تسمح به الرياضيات؟",
+      "الجواب يخرج من شكل منحنى التعلّم القياسي: منحنى Sigmoid على شكل حرف S. يصعد المنحنى ببطء عندما تكون المهارة جديدة، ويصعد بأقصى سرعة في المنتصف، ثم ينبسط في الأعلى عند إتقانها. سأل Wilson: عند أي نقطة على المنحنى يكون الميل (سرعة التحسّن لكل تكرار) أكثر انحدارًا؟",
+      "تلك النقطة، المستخرجة من الرياضيات، هي **15.87 ٪ فشل**. ليس 10 ٪. ليس 25 ٪. 15.87 ٪. إنه رقم محدد يخرج من منحنى محدد، لا تخمين تقريبي اقترحه أحد.",
+    ],
+
+    sec2Title: "لماذا يعمل دماغك بهذه الطريقة",
+    sec2Paragraphs: [
+      "تعلّم الحركة حلقة لتصحيح الخطأ. تجرّب شيئًا، فينفّذه جسدك بنسخة ما، ويقارن دماغك بين ما *قصدت* فعله وما *حدث فعلًا*. هذه الفجوة تولّد إشارة في المخيخ (المنطقة الواقعة في الجزء الخلفي من الدماغ والتي تضبط الحركة بدقة)، وهذه الإشارة هي التي تخبر القشرة الحركية بأن تحدّث نفسها.",
+      "إذا نجحت كل تكرارة بشكل تامّ، فلا توجد فجوة. ولا توجد إشارة. يقرّر الدماغ أن الحركة قد ضُبطت ويعيد توجيه الانتباه إلى ما لم يُضبط بعد. لذلك يبدو التدريب النظيف منتجًا لكنه يقدّم عوائد متناقصة: أنت تعيد ما تعرفه أصلًا بدلًا من تدريب ما لا يزال يتشكّل.",
+      "وإذا فشل عدد كبير من التكرارات، تصبح الإشارة مشوّشة. لا يستطيع الدماغ التمييز بين النمط الحقيقي والخطأ العشوائي. يسمّي الباحثون هذه الحالة **التعلّم المُحبَط**: تعمل بجدّ، لكن ليس لدى الدماغ أي شيء مستقر يحدّث نفسه باتجاهه.",
+      "منطقة 15 ٪ فشل هي المكان الذي تكون فيه الإشارة نظيفة. يعرف دماغك تقريبًا ما الذي حدث خطأ، ولديه مرجع ثابت لشكل النجاح، ويستطيع إجراء تحديث صغير في كل تكرارة.",
+    ],
+
+    sec3Title: "الصعوبة المرغوبة (Bjork)",
+    sec3Paragraphs: [
+      "لقاعدة 85 ٪ شقيقة سلوكية: مفهوم **الصعوبة المرغوبة** عند Robert Bjork. أمضى Bjork عقودًا يبيّن أن ظروف التدريب التي تبدو *أصعب في اللحظة* (تباعد التكرارات، وتشابك المهارات المختلفة، وتقليل التغذية الراجعة) تنتج احتفاظًا *أفضل على المدى الطويل*. أما التدريب المكثّف لمهارة واحدة مع تغذية راجعة مستمرة فيشعر بأنه أفضل أثناء أدائه، ويُنتج احتفاظًا أسوأ بشكل ملحوظ بعد أسبوع.",
+      "المغزى العملي للرقص: إذا بدت جلسة تدريبك بلا جهد ومن دون أيّ احتكاك، فالأرجح أنك لا تتعلّم كثيرًا. وإذا بدت أعلى قليلًا من مستواك الحالي (غير مريحة، فيها بعض الفوضى، فيها كثير من الإخفاقات الصادقة)، فالأرجح أنك تتعلّم بمعدّل قريب من الحدّ الأقصى الذي يسمح به الدماغ.",
+    ],
+
+    sec4Title: "كيف تطبّق قاعدة 85 ٪ على تدريب السالسا",
+    sec4Steps: [
+      "**اختر مهارة معزولة واحدة.** لا تتدرّب على «السالسا». تدرّب على شيء محدد: استعداد لدورة، Cross-body lead على عدّة معيّنة، تتابع shines على BPM محدد. تحتاج إلى معيار ثنائي نجاح/فشل لقياس النسبة.",
+      "**نفّذ 10 تكرارات وقيّمها بصدق.** حدّد سلفًا ما الذي يُعدّ نجاحًا. ثم احسب. 9 أو 10 نجاحات تعني أن التمرين سهل جدًا. 5 أو أقل تعني أنه صعب جدًا.",
+      "**اضبط مقبض الصعوبة.** سهل جدًا: ارفع الـBPM بنسبة 10 ٪، أضف طبقة تنميق للذراعين، نفّذه بالجهة غير المهيمنة، أضف شريكًا، أو ألغِ التغذية البصرية للمرآة. صعب جدًا: بسّطه حتى تستقرّ على 8-9 نجاحات من أصل 10.",
+      "**ابقَ في شريط 80-90 ٪.** بمجرد أن تجد الشريط، استمر داخله 15-20 دقيقة متواصلة. هذه هي المنطقة التي يصدر فيها مخيّخك إشارات خطأ نظيفة، وتحدّث فيها قشرتك الحركية تمثيل الحركة تكرارة بعد تكرارة.",
+    ],
+
+    sec5Title: "لماذا يبدو التدريب «النظيف» جيدًا لكنه يعلّم أقل",
+    sec5Paragraphs: [
+      "إذا أنهيت يومًا جلسة تدريب من 60 دقيقة بدت فيها كل تكرارة سلسة، وخرجت تفكّر «كان هذا رائعًا»، فالأرجح أنك علّمت نفسك أقل مما كنت ستعلّمها في 20 دقيقة من التدريب الفوضوي على حافّة قدرتك.",
+      "الدماغ لا يكافئ بذل الجهد. هو يكافئ خطأ التنبؤ، وتحديدًا قدرًا منه يمكن إدارته. ساعة من إعادة ما تعرفه تُبقي الرقصة آمنة داخل منطقة الراحة، ولا تكاد تولّد إشارة تحديث. أما عشرون دقيقة من التدريب على نسبة نجاح 85 ٪، حيث تخفق في تكرارتين من كل عشر وتشعر بهما بصدق، فهي المكان الذي يعمل فيه فعليًا علم أعصاب التعلّم.",
+      "هذه ليست دعوة لمعاقبة نفسك. إنها دعوة للـ*معايرة*. ينبغي أن يبدو تدريبك صعبًا بصدق، لا ساحقًا. 15 ٪ فشل، لا 50 ٪.",
+    ],
+
+    sec6Title: "كيف يبدو هذا في منهج منظّم",
+    sec6Paragraphs: [
+      "بُني منهج The Mambo Guild حول هذا المبدأ. كل درس يفتح الذي يليه عند معيار إتقان واضح. كل تمرين له شريط لتعديل الصعوبة. ولا تفتح Skill Tree فرعًا جديدًا إلا حين تتمكن من تنفيذ الفرع الحالي بثبات، لا بكمال، بل بثبات. الفكرة كلها هي إبقاؤك في شريط 85 ٪ من دون أن تضطر إلى قياس معدّل نجاحك بنفسك بورقة وقلم.",
+      "أما البديل (حضور حصص عشوائية، والتدريب على أيّ شيء غطّاه المعلم هذا الأسبوع) فيضعك في الغالب إما في مستوى أدنى من اللازم (شعور بالملل، تكرار لما تعرفه أصلًا) أو أعلى من اللازم (ضائع، لا تتعلم شيئًا). كلا نمطي الفشل ظاهر في حالات الجمود التي يصطدم بها متعلّمو السالسا الذاتيون بعد ستة إلى تسعة أشهر من التعلّم العفوي.",
+    ],
+
+    sec7Title: "المصادر",
+    sec7Sources: [
+      "Wilson, R.C., Shenhav, A., Steine-Hanson, M. & Cohen, J.D. (2019). *The Eighty Five Percent Rule for Optimal Learning*. Nature Human Behaviour, 3, 1316-1323.",
+      "Bjork, R.A. (1994). Memory and Metamemory Considerations in the Training of Human Beings. في J. Metcalfe و A. Shimamura (تحرير)، *Metacognition*. MIT Press.",
+      "Schmidt, R.A. & Lee, T.D. (2011). *Motor Learning and Performance: From Principles to Application* (الطبعة الخامسة). Human Kinetics.",
+    ],
+
+    faqs: [
+      {
+        q: "ما قاعدة 85 ٪ بكلمات بسيطة؟",
+        a: "أظهرت ورقة بحثية في Nature Human Behaviour عام 2019 أن الدماغ البشري يتعلّم المهارات الجديدة بأسرع وتيرة عندما تكون صعوبة التدريب معيّرة بحيث تنجح نحو 85 ٪ من المرات وتخفق نحو 15 ٪. القيمة المثلى الدقيقة هي 15.87 ٪ فشلًا. التدريب بنسب فشل أعلى أو أدنى بكثير يبطئ التعلم.",
+      },
+      {
+        q: "من أين جاء الرقم 15.87 ٪؟",
+        a: "إنه مستخرج رياضيًا من شكل منحنى التعلم القياسي (Sigmoid). يكون ميل المنحنى — أي مقدار التحسن لكل تكرارة — في أقصاه عند نقطة معيّنة، وتلك النقطة تطابق نسبة فشل قدرها 15.87 ٪. ليس تخمينًا تجريبيًا؛ بل ينبثق من الرياضيات نفسها.",
+      },
+      {
+        q: "هل تنطبق قاعدة 85 ٪ على كل المهارات، بما فيها الرقص؟",
+        a: "كانت ورقة Wilson وزملائه عن التعلم في نماذج الشبكات العصبية ومهام التصنيف الثنائي، لكنها تُعمَّم بقوة على أيّ مهارة يُنتج فيها الدماغ مخرجًا حركيًا ويحدّث نفسه استنادًا إلى التغذية الراجعة. الرقص مثال نموذجي على التعلّم الحركي.",
+      },
+      {
+        q: "وماذا لو أردتُ أداء روتين بشكل نظيف بلا أيّ خطأ؟",
+        a: "الأداء والتدريب نمطان مختلفان. يجب أن تتدرّب على نسبة نجاح 85 ٪ وتؤدّي على 100 ٪. منطقة 15 ٪ فشل هي حيث يحدث التعلّم، ومنطقة 100 ٪ هي حيث تتأكد أن ما تعلّمته مستقرّ.",
+      },
+      {
+        q: "كيف تتلاءم «الصعوبة المرغوبة» مع كل ذلك؟",
+        a: "تظهر أبحاث Robert Bjork حول الصعوبات المرغوبة أن ظروف التدريب التي تجعل التعلم يبدو أصعب في اللحظة — التكرار المتباعد، والتشابك بين المهارات، وتقليل التغذية الراجعة — تنتج احتفاظًا أفضل على المدى الطويل. هي الشقيقة السلوكية لقاعدة 85 ٪: الكفاح القابل للإدارة يتفوّق على التكرار اليسير في كل ما تريد الاحتفاظ به.",
+      },
+    ],
+
+    ctaEyebrow: "تدرّب بذكاء أكبر",
+    ctaHeading: "منهج معاير على منطقة 85 ٪.",
+    ctaBody:
+      "كل تمرين ودرس وفرع في Skill Tree داخل The Mambo Guild مضبوط ليبقيك في شريط الصعوبة الذي يحدث فيه التعلم فعلًا. مبني على مبادئ علم التعلم على يد مصمّم تجربة تعلّم معتمد.",
+
+    howToName: "كيف تطبّق قاعدة 85 ٪ في جلسة تدريب على السالسا",
+    howToDescription:
+      "بروتوكول من 4 خطوات لمعايرة صعوبة التدريب على نسبة الخطأ المثلى رياضيًا 15.87 ٪.",
+    howToSteps: [
+      {
+        name: "اختر مهارة معزولة واحدة في كل جلسة",
+        text: "لا تتدرّب على «السالسا». تدرّب على شيء محدّد: تقنية دوران، توقيت Cross-body lead، أو شاين. تحتاج إلى تعريف واحد للنجاح/الفشل لقياس معدّل النجاح.",
+      },
+      {
+        name: "نفّذ 10 تكرارات وقيّم كلًا منها بصدق",
+        text: "قبل أن تبدأ، حدّد ما الذي يُعدّ نجاحًا وما الذي يُعدّ فشلًا. بعد 10 تكرارات، احسب نجاحاتك. 9 أو 10 يعني أن التمرين سهل جدًا. 5 أو أقل يعني أنه صعب جدًا.",
+      },
+      {
+        name: "اضبط مقبض الصعوبة",
+        text: "سهل جدًا: ارفع الإيقاع 10 ٪، وأضف طبقة تنميق للذراعين، أو شريكًا، أو نفّذه بالجهة غير المهيمنة، أو ألغِ التغذية البصرية. صعب جدًا: بسّطه حتى تستقرّ على 8 نجاحات من 10.",
+      },
+      {
+        name: "ابقَ في شريط 80-90 ٪ لمدة 20 دقيقة",
+        text: "بمجرد أن تنجح في 8-9 من 10 تكرارات، استمر هناك في تدريب متواصل. هذه هي المنطقة التي يستلم فيها مخيخك إشارات خطأ واضحة وتستمر فيها قشرتك الحركية في التحديث.",
+      },
+    ],
+  },
+  // ============================================================ EL
+  el: {
+    metaTitle: "Ο κανόνας του 85 %: πώς ο εγκέφαλός σου μαθαίνει στ' αλήθεια να χορεύει",
+    metaDescription:
+      "Μια εργασία του 2019 στο Nature βρήκε ότι ο μαθηματικά βέλτιστος ρυθμός σφάλματος για τη μάθηση είναι 15,87 %. Τι σημαίνει αυτό για την εξάσκηση στη σάλσα, πώς να καλιμπράρεις τα drills σου και γιατί η «καθαρή» εξάσκηση σταματά την πρόοδο.",
+
+    breadcrumbHome: "Αρχική",
+    breadcrumbBlog: "Blog",
+    breadcrumbCurrent: "Ο κανόνας του 85 %",
+
+    badge: "Επιστήμη της προπόνησης",
+    h1Pre: "Ο κανόνας του 85 %: ",
+    h1Accent: "πώς ο εγκέφαλός σου μαθαίνει στ' αλήθεια να χορεύει",
+
+    bylineCredential: "Πιστοποιημένος στον σχεδιασμό εμπειρίας μάθησης",
+
+    shortAnswerRich:
+      "Μια εργασία του 2019 στο *Nature Human Behaviour* από τους Wilson, Shenhav, Steine-Hanson και Cohen βρήκε ότι ο μαθηματικά βέλτιστος ρυθμός σφάλματος για την απόκτηση δεξιότητας είναι ακριβώς **15,87 % αποτυχία**, δηλαδή περίπου 85 % επιτυχία. Πάνω από αυτό, ο εγκέφαλος δεν μπορεί να κλειδώσει σε ένα καθαρό πρότυπο. Κάτω από αυτό, ο εγκέφαλος αρχειοθετεί τη δεξιότητα ως «τελειωμένη» και σταματά να την αναβαθμίζει. Αυτή είναι η μαθηματική λογική πίσω από το γιατί η καθαρή εξάσκηση παγώνει την πρόοδο και γιατί τα ελαφρώς υπερβολικά δύσκολα drills είναι ο γρηγορότερος δρόμος για βελτίωση.",
+
+    sec1Title: "Η μελέτη",
+    sec1Paragraphs: [
+      "Το 2019, ο Robert Wilson και συνεργάτες του στο Πανεπιστήμιο της Αριζόνα δημοσίευσαν *«The Eighty Five Percent Rule for Optimal Learning»* στο *Nature Human Behaviour*. Έθεσαν ένα ακριβές ερώτημα: αν μπορούσες να ορίσεις τον ρυθμιστή δυσκολίας μιας προπόνησης σε οποιονδήποτε αριθμό, σε ποιον αριθμό θα τον έβαζες ώστε να μάθεις όσο πιο γρήγορα είναι μαθηματικά δυνατόν;",
+      "Η απάντηση βγαίνει από το σχήμα μιας τυπικής καμπύλης μάθησης: μιας σιγμοειδούς σε σχήμα S. Η καμπύλη ανεβαίνει αργά όταν η δεξιότητα είναι καινούρια, ανεβαίνει πιο γρήγορα στη μέση, και ισιώνει στην κορυφή όταν η δεξιότητα έχει κατακτηθεί. Ο Wilson ρώτησε: σε ποιο σημείο της καμπύλης η κλίση (ο ρυθμός βελτίωσης ανά επανάληψη) είναι πιο απότομη;",
+      "Αυτό το σημείο, παραγόμενο μαθηματικά, είναι το **15,87 % αποτυχίας**. Όχι 10 %. Όχι 25 %. 15,87 %. Είναι ένας συγκεκριμένος αριθμός που πέφτει από μια συγκεκριμένη καμπύλη, όχι μια πρόχειρη εκτίμηση που πρότεινε κάποιος.",
+    ],
+
+    sec2Title: "Γιατί ο εγκέφαλός σου δουλεύει έτσι",
+    sec2Paragraphs: [
+      "Η κινητική μάθηση είναι ένας βρόχος διόρθωσης σφάλματος. Δοκιμάζεις κάτι, το σώμα σου κάνει μια εκδοχή του, και ο εγκέφαλος συγκρίνει αυτό που *σκόπευες* να κάνεις με αυτό που *πραγματικά συνέβη*. Η ασυμφωνία παράγει ένα σήμα στην παρεγκεφαλίδα (την περιοχή στο πίσω μέρος του εγκεφάλου που ρυθμίζει με ακρίβεια την κίνηση), και αυτό το σήμα είναι που λέει στον κινητικό σου φλοιό να ενημερωθεί.",
+      "Αν κάθε επανάληψη πέφτει τέλεια, δεν υπάρχει ασυμφωνία. Δεν υπάρχει σήμα. Ο εγκέφαλος αποφασίζει ότι η κίνηση τακτοποιήθηκε και ανακατευθύνει την προσοχή σε ό,τι παραμένει σπασμένο. Γι' αυτό η καθαρή εξάσκηση φαίνεται παραγωγική αλλά δίνει φθίνουσες αποδόσεις: επαναλαμβάνεις αυτό που ήδη ξέρεις αντί να εκπαιδεύεις αυτό που ακόμη σχηματίζεται.",
+      "Αν αποτύχουν πολλές επαναλήψεις, το σήμα γίνεται θορυβώδες. Ο εγκέφαλος δεν μπορεί να ξεχωρίσει ένα πραγματικό πρότυπο από τυχαίο σφάλμα. Οι ερευνητές αυτό το λένε **απογοητευμένη μάθηση**: δουλεύεις σκληρά, αλλά ο εγκέφαλος δεν έχει τίποτα σταθερό προς το οποίο να ενημερωθεί.",
+      "Η ζώνη του 15 % αποτυχίας είναι εκεί όπου το σήμα είναι καθαρό. Ο εγκέφαλος ξέρει χονδρικά τι πήγε στραβά, έχει μια σταθερή αναφορά για το πώς δείχνει το σωστό, και μπορεί να κάνει μικρή ενημέρωση ανά επανάληψη.",
+    ],
+
+    sec3Title: "Επιθυμητή δυσκολία (Bjork)",
+    sec3Paragraphs: [
+      "Ο κανόνας του 85 % έχει μια συμπεριφορική αδελφή: την έννοια της **επιθυμητής δυσκολίας** (desirable difficulty) του Robert Bjork. Ο Bjork αφιέρωσε δεκαετίες δείχνοντας ότι συνθήκες εξάσκησης που μοιάζουν *πιο δύσκολες στη στιγμή* (διασπορά επαναλήψεων, εναλλαγή διαφορετικών δεξιοτήτων, μειωμένη ανατροφοδότηση) παράγουν καλύτερη *μακροπρόθεσμη* συγκράτηση. Η συσσωρευμένη εξάσκηση μιας μόνο δεξιότητας με συνεχή ανατροφοδότηση δίνει καλύτερη αίσθηση όσο τη κάνεις και αισθητά χειρότερη συγκράτηση μια εβδομάδα μετά.",
+      "Η πρακτική σημασία για τον χορό: αν η προπόνησή σου μοιάζει χωρίς προσπάθεια και ομαλή, μάλλον δεν μαθαίνεις πολλά. Αν μοιάζει ελαφρώς πάνω από το τρέχον επίπεδό σου (άβολη, λίγο χαοτική, με αρκετές ειλικρινείς αστοχίες), μάλλον μαθαίνεις κοντά στον μέγιστο ρυθμό που επιτρέπει ο εγκέφαλος.",
+    ],
+
+    sec4Title: "Πώς εφαρμόζεις τον κανόνα του 85 % στην εξάσκηση σάλσα",
+    sec4Steps: [
+      "**Διάλεξε μία απομονωμένη δεξιότητα.** Μην εξασκείσαι σε «σάλσα». Εξασκήσου σε κάτι συγκεκριμένο: μια προετοιμασία στροφής, ένα cross-body lead σε συγκεκριμένο μέτρημα, μια ακολουθία shines σε συγκεκριμένο BPM. Χρειάζεσαι ένα δυαδικό κριτήριο επιτυχίας/αποτυχίας για να μετράς ποσοστό.",
+      "**Κάνε 10 επαναλήψεις και βαθμολόγησέ τες ειλικρινά.** Όρισε εκ των προτέρων τι μετρά ως επιτυχία. Έπειτα μέτρα. 9 ή 10 επιτυχίες σημαίνει ότι το drill είναι πολύ εύκολο. 5 ή λιγότερες σημαίνει πολύ δύσκολο.",
+      "**Ρύθμισε τον ρυθμιστή δυσκολίας.** Πολύ εύκολο: ανέβασε το BPM κατά 10 %, πρόσθεσε ένα στρώμα styling χεριών, κάν' το με τη μη κυρίαρχη πλευρά, πρόσθεσε σύντροφο ή αφαίρεσε την οπτική επιστροφή του καθρέφτη. Πολύ δύσκολο: απλοποίησε μέχρι να σταθεροποιηθείς σε 8-9 επιτυχίες στις 10.",
+      "**Μείνε στη ζώνη 80-90 %.** Όταν τη βρεις, μείνε εκεί 15-20 αδιάλειπτα λεπτά. Αυτή είναι η ζώνη όπου η παρεγκεφαλίδα παράγει καθαρά σήματα σφάλματος και ο κινητικός φλοιός ενημερώνει την αναπαράσταση της κίνησης ανά επανάληψη.",
+    ],
+
+    sec5Title: "Γιατί η «καθαρή» εξάσκηση είναι ευχάριστη αλλά διδάσκει λιγότερο",
+    sec5Paragraphs: [
+      "Αν έχεις τελειώσει ποτέ μια προπόνηση 60 λεπτών όπου κάθε επανάληψη πήγαινε ομαλά και έφυγες σκεπτόμενος «ήταν τέλεια», πιθανότατα δίδαξες λιγότερα στον εαυτό σου από όσα θα δίδασκες σε 20 λεπτά βρώμικου drilling στο όριο των δυνατοτήτων σου.",
+      "Ο εγκέφαλος δεν ανταμείβει τον κόπο. Ανταμείβει το σφάλμα πρόβλεψης, και πιο συγκεκριμένα μια διαχειρίσιμη ποσότητά του. Μια ώρα επανάληψης όσων ήδη ξέρεις κρατάει τον χορό ασφαλισμένο μέσα στη ζώνη άνεσης και παράγει σχεδόν κανένα σήμα ενημέρωσης. Είκοσι λεπτά drilling στο 85 % επιτυχίας, όπου χάνεις δύο επαναλήψεις στις δέκα και τις νιώθεις ειλικρινά, είναι εκεί όπου η νευρολογία της μάθησης λειτουργεί στ' αλήθεια.",
+      "Αυτό δεν είναι επιχείρημα να τιμωρείς τον εαυτό σου. Είναι επιχείρημα για *καλιμπράρισμα*. Η εξάσκησή σου πρέπει να μοιάζει ειλικρινά δύσκολη, όχι συντριπτική. 15 % αποτυχία, όχι 50 %.",
+    ],
+
+    sec6Title: "Πώς δείχνει αυτό μέσα σε ένα δομημένο πρόγραμμα",
+    sec6Paragraphs: [
+      "Το πρόγραμμα του The Mambo Guild έχει χτιστεί γύρω από αυτή την αρχή. Κάθε μάθημα ανοίγει το επόμενο σε ένα ρητό κριτήριο κατάκτησης. Κάθε drill έχει ρυθμιστικό δυσκολίας. Το Skill Tree ξεκλειδώνει νέο κλαδί μόνο όταν μπορείς να εκτελέσεις το τρέχον σταθερά — όχι άψογα, αλλά σταθερά. Όλο το νόημα είναι να σε κρατάει στη ζώνη του 85 % χωρίς να χρειάζεται να μετράς εσύ τον ρυθμό επιτυχίας σου με σημειωματάριο.",
+      "Η εναλλακτική (να παίρνεις τυχαία μαθήματα, να εξασκείσαι σε ό,τι έτυχε να καλύψει ο δάσκαλος αυτή την εβδομάδα) σε βάζει σχεδόν πάντα ή πολύ χαμηλά (βαριέσαι, επαναλαμβάνεις όσα ξέρεις) ή πολύ ψηλά (χαμένος, δεν μαθαίνεις τίποτα). Και τα δύο είδη αποτυχίας φαίνονται στα plateau που χτυπούν οι αυτοδίδακτοι σαλσέροι γύρω στους έξι έως εννέα μήνες χαλαρής μάθησης.",
+    ],
+
+    sec7Title: "Πηγές",
+    sec7Sources: [
+      "Wilson, R.C., Shenhav, A., Steine-Hanson, M. & Cohen, J.D. (2019). *The Eighty Five Percent Rule for Optimal Learning*. Nature Human Behaviour, 3, 1316-1323.",
+      "Bjork, R.A. (1994). Memory and Metamemory Considerations in the Training of Human Beings. Στο J. Metcalfe & A. Shimamura (επιμ.), *Metacognition*. MIT Press.",
+      "Schmidt, R.A. & Lee, T.D. (2011). *Motor Learning and Performance: From Principles to Application* (5η έκδ.). Human Kinetics.",
+    ],
+
+    faqs: [
+      {
+        q: "Τι είναι ο κανόνας του 85 % με απλά λόγια;",
+        a: "Μια εργασία του 2019 στο Nature Human Behaviour έδειξε ότι ο ανθρώπινος εγκέφαλος μαθαίνει νέες δεξιότητες ταχύτερα όταν η δυσκολία της εξάσκησης είναι καλιμπραρισμένη ώστε να επιτυγχάνεις περίπου στο 85 % των φορών και να αποτυγχάνεις περίπου στο 15 %. Το ακριβές βέλτιστο είναι 15,87 % αποτυχία. Εξάσκηση με πολύ υψηλότερα ή πολύ χαμηλότερα ποσοστά αποτυχίας επιβραδύνει τη μάθηση.",
+      },
+      {
+        q: "Από πού προέρχεται ο αριθμός 15,87 %;",
+        a: "Παράγεται μαθηματικά από το σχήμα μιας τυπικής καμπύλης μάθησης (μιας σιγμοειδούς). Η κλίση της καμπύλης — πόσο γρήγορα βελτιώνεσαι ανά επανάληψη — είναι μέγιστη σε ένα συγκεκριμένο σημείο, και εκείνο το σημείο αντιστοιχεί σε ποσοστό αποτυχίας 15,87 %. Δεν είναι εμπειρική εικασία· πέφτει κατευθείαν από τα μαθηματικά.",
+      },
+      {
+        q: "Ισχύει ο κανόνας του 85 % για όλες τις δεξιότητες, και για τον χορό;",
+        a: "Η εργασία των Wilson κ.ά. αφορούσε τη μάθηση σε μοντέλα νευρωνικών δικτύων και έργα δυαδικής ταξινόμησης, αλλά γενικεύεται έντονα σε κάθε δεξιότητα όπου ο εγκέφαλος παράγει κινητική έξοδο και ενημερώνεται με βάση ανατροφοδότηση. Ο χορός είναι σχολικό παράδειγμα κινητικής μάθησης.",
+      },
+      {
+        q: "Τι γίνεται αν θέλω να εκτελέσω μια ρουτίνα καθαρά, χωρίς λάθη;",
+        a: "Η εξάσκηση και η εκτέλεση είναι διαφορετικοί τρόποι λειτουργίας. Πρέπει να εξασκείσαι στο 85 % επιτυχίας και να εκτελείς στο 100 %. Η ζώνη του 15 % αποτυχίας είναι εκεί όπου συμβαίνει η μάθηση· η ζώνη του 100 % είναι εκεί όπου επαληθεύεις ότι η μάθηση είναι σταθερή.",
+      },
+      {
+        q: "Πώς συνδέεται με την «επιθυμητή δυσκολία»;",
+        a: "Η έρευνα του Robert Bjork για τις επιθυμητές δυσκολίες δείχνει ότι συνθήκες εξάσκησης που κάνουν τη μάθηση να μοιάζει πιο δύσκολη στη στιγμή — διασπορά επαναλήψεων, interleaving, μειωμένη ανατροφοδότηση — παράγουν καλύτερη μακροπρόθεσμη συγκράτηση. Είναι η συμπεριφορική αδελφή του κανόνα του 85 %: η διαχειρίσιμη πάλη νικά την άκοπη επανάληψη για ό,τι θες να κρατήσεις.",
+      },
+    ],
+
+    ctaEyebrow: "Εξασκήσου πιο έξυπνα",
+    ctaHeading: "Ένα πρόγραμμα καλιμπραρισμένο στη ζώνη του 85 %.",
+    ctaBody:
+      "Κάθε drill, μάθημα και κλαδί του Skill Tree στο The Mambo Guild είναι ρυθμισμένο ώστε να σε κρατάει στη ζώνη δυσκολίας όπου η μάθηση συμβαίνει στ' αλήθεια. Χτισμένο σε αρχές της επιστήμης της μάθησης από έναν πιστοποιημένο σχεδιαστή εμπειρίας μάθησης.",
+
+    howToName: "Πώς να εφαρμόσεις τον κανόνα του 85 % σε μια προπόνηση σάλσα",
+    howToDescription:
+      "Πρωτόκολλο 4 βημάτων για να καλιμπράρεις τη δυσκολία του drill στον μαθηματικά βέλτιστο ρυθμό σφάλματος του 15,87 %.",
+    howToSteps: [
+      {
+        name: "Διάλεξε ανά συνεδρία μία απομονωμένη δεξιότητα",
+        text: "Μην εξασκείσαι σε «σάλσα». Εξασκήσου σε ένα συγκεκριμένο πράγμα: μια τεχνική στροφής, το timing ενός cross-body lead, ένα shine. Χρειάζεται μία ενιαία ορισμός επιτυχίας/αποτυχίας για να μετριέται ποσοστό επιτυχίας.",
+      },
+      {
+        name: "Κάνε 10 επαναλήψεις και βαθμολόγησε καθεμία ειλικρινά",
+        text: "Πριν ξεκινήσεις, αποφάσισε τι μετρά ως επιτυχία και τι ως αποτυχία. Μετά από 10 επαναλήψεις, μέτρα τις επιτυχίες σου. Αν είναι 9 ή 10, το drill είναι πολύ εύκολο. Αν είναι 5 ή λιγότερες, είναι πολύ δύσκολο.",
+      },
+      {
+        name: "Ρύθμισε τον ρυθμιστή δυσκολίας",
+        text: "Πολύ εύκολο: αύξησε το tempo κατά 10 %, πρόσθεσε ένα στρώμα styling χεριών, σύντροφο, εκδοχή με τη μη κυρίαρχη πλευρά ή αφαίρεσε την οπτική ανατροφοδότηση. Πολύ δύσκολο: απλοποίησε μέχρι να σταθεροποιηθείς σε 8 επιτυχίες στις 10.",
+      },
+      {
+        name: "Μείνε στη ζώνη 80-90 % για 20 λεπτά",
+        text: "Όταν πετυχαίνεις 8-9 από τις 10 επαναλήψεις, μείνε εκεί για παρατεταμένη εξάσκηση. Είναι η ζώνη όπου η παρεγκεφαλίδα λαμβάνει σαφή σήματα σφάλματος και ο κινητικός φλοιός συνεχίζει να ενημερώνεται.",
+      },
+    ],
+  },
+  // ============================================================ SR
+  sr: {
+    metaTitle: "Правило 85 %: како твој мозак заиста учи да плеше",
+    metaDescription:
+      "Рад из 2019. у часопису Nature утврдио је да је математички оптимална стопа грешке за учење 15,87 %. Ево шта то значи за вежбу салсе, како да калибрирати дрилове и зашто „чиста\" вежба зауставља напредак.",
+
+    breadcrumbHome: "Почетна",
+    breadcrumbBlog: "Блог",
+    breadcrumbCurrent: "Правило 85 %",
+
+    badge: "Наука тренинга",
+    h1Pre: "Правило 85 %: ",
+    h1Accent: "како твој мозак заиста учи да плеше",
+
+    bylineCredential: "Сертификован у дизајну искуства учења",
+
+    shortAnswerRich:
+      "Рад из 2019. у часопису *Nature Human Behaviour* (Wilson, Shenhav, Steine-Hanson и Cohen) утврдио је да је математички оптимална стопа грешке за усвајање вештине тачно **15,87 % промашаја**, односно око 85 % успеха. Изнад тога, мозак не може да се закључа за јасан образац. Испод тога, мозак заводи вештину као „завршену\" и престаје да је унапређује. То је математика иза тога зашто чиста вежба зауставља напредак и зашто су дрилови мало претешки најбржи пут до напретка.",
+
+    sec1Title: "Студија",
+    sec1Paragraphs: [
+      "Године 2019. Robert Wilson и његове колеге са Универзитета Аризона објавили су *„The Eighty Five Percent Rule for Optimal Learning\"* у часопису *Nature Human Behaviour*. Поставили су прецизно питање: када бисте могли да поставите ручицу тежине вежбе на било који број, на који би број требало да буде да бисте учили математички најбрже могуће?",
+      "Одговор излази из облика стандардне криве учења: сигмоидне криве у облику слова S. Крива се споро успиње док је вештина нова, успиње се најбрже у средини и заравњује се на врху када је вештина савладана. Wilson је питао: у којој тачки криве је нагиб (стопа напретка по понављању) најстрмији?",
+      "Та тачка, изведена из математике, је **15,87 % промашаја**. Не 10 %. Не 25 %. 15,87 %. То је конкретан број који излази из конкретне криве, а не груба претпоставка коју је неко предложио.",
+    ],
+
+    sec2Title: "Зашто твој мозак тако функционише",
+    sec2Paragraphs: [
+      "Учење покрета је петља корекције грешке. Покушаваш нешто, тело изведе своју верзију, а мозак упоређује оно што си *намеравао* да урадиш са оним што се *заиста десило*. Тај раскорак ствара сигнал у малом мозгу (региону на задњем делу мозга који фино подешава покрет), и тај сигнал говори моторичком кортексу да се освежи.",
+      "Ако свако понављање падне савршено, нема раскорака. Нема сигнала. Мозак закључује да је покрет решен и преусмерава пажњу на оно што још не штима. Зато чиста вежба делује продуктивно, али даје опадајуће приносе: понављаш оно што већ знаш уместо да тренираш оно што се још формира.",
+      "Ако превише понављања пропадне, сигнал постаје бучан. Мозак не може да разликује стваран образац од случајне грешке. Истраживачи то зову **фрустрираним учењем**: радиш напорно, али мозак нема ништа стабилно ка чему да се освежи.",
+      "Зона од 15 % промашаја је тамо где је сигнал чист. Мозак отприлике зна шта је пошло наопако, има стабилну референцу како изгледа кад иде како треба, и може да направи мали update по понављању.",
+    ],
+
+    sec3Title: "Пожељна тежина (Bjork)",
+    sec3Paragraphs: [
+      "Правило 85 % има понашајну сестру: концепт **пожељне тежине** (desirable difficulty) Robert-а Bjork-а. Bjork је деценијама показивао да услови вежбе који *у моменту делују теже* (размазивање понављања, преплитање различитих вештина, смањење повратне информације) дају бољу *дугорочну* ретенцију. Концентрисано вежбање једне вештине са константном повратном информацијом изгледа боље док је радиш и даје приметно слабију ретенцију недељу дана касније.",
+      "Практична импликација за плес: ако ти вежба делује без напора и без отпора, вероватно не учиш много. Ако делује нешто изнад твог тренутног нивоа (непријатно, помало хаотично, са доста искрених промашаја), вероватно учиш близу максималне стопе коју мозак дозвољава.",
+    ],
+
+    sec4Title: "Како применити правило 85 % на вежбу салсе",
+    sec4Steps: [
+      "**Изабери једну изоловану вештину.** Не вежбај „салсу\". Вежбај нешто конкретно: припрему за окрет, cross-body lead на одређеној доби, секвенцу shines на одређеним BPM-овима. Треба ти бинарни критеријум погодак/промашај да би мерио однос.",
+      "**Уради 10 понављања и поштено их оцени.** Унапред дефиниши шта се рачуна као погодак. Затим броји. 9 или 10 погодака значи да је дрил прелак. 5 или мање значи да је претежак.",
+      "**Подеси ручицу тежине.** Прелако: подигни BPM за 10 %, додај слој стилизације руку, ради на недоминантној страни, додај партнера или склони огледало. Претешко: поједностави док се не стабилизујеш на 8-9 погодака од 10.",
+      "**Остани у траци 80-90 %.** Када је нађеш, остани у њој 15-20 непрекидних минута. То је зона у којој мали мозак производи чисте сигнале грешке, а моторички кортекс ажурира представу покрета понављање за понављањем.",
+    ],
+
+    sec5Title: "Зашто „чиста\" вежба прија али мање учи",
+    sec5Paragraphs: [
+      "Ако си икад завршио вежбу од 60 минута у којој је свако понављање деловало глатко и изашао са мишљу „било је сјајно\", вероватно си себе мање научио него у 20 минута прљавог дриловања на ивици својих способности.",
+      "Мозак не награђује напор. Награђује грешку предвиђања, и то у мерљивој, подношљивој количини. Сат понављања онога што већ знаш држи плес безбедно унутар твоје зоне комфора и једва да производи сигнал ажурирања. Двадесет минута дриловања на 85 % успеха, где промашујеш две од десет и поштено их осећаш, ту је место где неурологија учења заиста ради.",
+      "Ово није аргумент за самокажњавање. То је аргумент за *калибрирање*. Твоја вежба треба да делује поштено тешко, не сламајуће. 15 % промашаја, не 50 %.",
+    ],
+
+    sec6Title: "Како то изгледа у структурираном програму",
+    sec6Paragraphs: [
+      "Програм The Mambo Guild-а изграђен је око овог принципа. Свака лекција отвара следећу на јасном критеријуму савладаности. Сваки дрил има клизач тежине. Skill Tree откључава нову грану тек када можеш да доследно — не беспрекорно, већ доследно — изводиш тренутну. Цела поента је да те држи у траци 85 % без потребе да сам мериш своје погодке листићем у руци.",
+      "Алтернатива (узимање насумичних часова, дриловање онога што је предавач случајно ове недеље покрио) скоро увек те ставља или прениско (досадно, понављаш оно што знаш) или превисоко (изгубљен, не учиш ништа). Оба режима неуспеха видљива су у платоима на које самоуки плесачи салсе ударају око шест до девет месеци опуштеног учења.",
+    ],
+
+    sec7Title: "Извори",
+    sec7Sources: [
+      "Wilson, R.C., Shenhav, A., Steine-Hanson, M. & Cohen, J.D. (2019). *The Eighty Five Percent Rule for Optimal Learning*. Nature Human Behaviour, 3, 1316-1323.",
+      "Bjork, R.A. (1994). Memory and Metamemory Considerations in the Training of Human Beings. У J. Metcalfe и A. Shimamura (ур.), *Metacognition*. MIT Press.",
+      "Schmidt, R.A. & Lee, T.D. (2011). *Motor Learning and Performance: From Principles to Application* (5. изд.). Human Kinetics.",
+    ],
+
+    faqs: [
+      {
+        q: "Шта је правило 85 % једноставним речима?",
+        a: "Рад из 2019. у часопису Nature Human Behaviour показао је да људски мозак најбрже учи нове вештине када је тежина вежбе калибрирана тако да успеш око 85 % пута и промашиш око 15 %. Тачан оптимум је 15,87 % промашаја. Вежбање са много вишим или много нижим стопама грешке успорава учење.",
+      },
+      {
+        q: "Одакле долази број 15,87 %?",
+        a: "Изведен је математички из облика стандардне криве учења (сигмоиде). Нагиб криве — колико брзо напредујеш по понављању — је највећи у одређеној тачки, а та тачка одговара стопи промашаја од 15,87 %. Није емпиријска претпоставка; излази директно из математике.",
+      },
+      {
+        q: "Да ли правило 85 % важи за све вештине, укључујући плес?",
+        a: "Рад Wilson-а и сарадника био је о учењу у моделима неуронских мрежа и задацима бинарне класификације, али се снажно генерализује на сваку вештину у којој мозак производи моторички излаз и ажурира се на основу повратне информације. Плес је школски пример моторичког учења.",
+      },
+      {
+        q: "Шта ако желим да изведем рутину чисто, без иједне грешке?",
+        a: "Вежба и наступ су различити модуси. Треба да дрилујеш на 85 % успеха, а да наступаш на 100 %. Зона од 15 % промашаја је тамо где се одвија учење; зона од 100 % је тамо где потврђујеш да је учено стабилно.",
+      },
+      {
+        q: "Како се „пожељна тежина\" уклапа у све ово?",
+        a: "Истраживања Robert-а Bjork-а о пожељним тежинама показују да услови вежбе који чине да учење у моменту делује теже — размакнуто понављање, преплитање, мање повратне информације — производе бољу дугорочну ретенцију. То је понашајна сестра правила 85 %: подношљива борба побеђује лако понављање за све што желиш да задржиш.",
+      },
+    ],
+
+    ctaEyebrow: "Вежбај паметније",
+    ctaHeading: "Програм калибриран на зону од 85 %.",
+    ctaBody:
+      "Сваки дрил, лекција и грана Skill Tree-а у The Mambo Guild-у штимован је тако да те држи у тракци тежине у којој се учење заиста дешава. Изграђен на принципима науке о учењу, од стране сертификованог дизајнера искуства учења.",
+
+    howToName: "Како применити правило 85 % у једној сесији вежбе салсе",
+    howToDescription:
+      "Протокол од 4 корака за калибрирање тежине дрила на математички оптималну стопу грешке од 15,87 %.",
+    howToSteps: [
+      {
+        name: "По сесији изабери једну изоловану вештину",
+        text: "Немој да дрилујеш „салсу\". Дрилуј нешто конкретно: технику окрета, тајминг cross-body lead-а, shine. Треба ти једна дефиниција успеха/неуспеха да би мерио стопу погодака.",
+      },
+      {
+        name: "Уради 10 понављања и поштено оцени свако",
+        text: "Пре него што почнеш, одлучи шта се рачуна као погодак, а шта као промашај. После 10 понављања, изброј погодке. Ако је 9 или 10, дрил је прелак. Ако је 5 или мање, претежак је.",
+      },
+      {
+        name: "Подеси ручицу тежине",
+        text: "Прелако: подигни темпо за 10 %, додај слој стилизације руку, додај партнера, изведи верзију на недоминантној страни или склони визуелну повратну информацију. Претешко: поједностави док се не стабилизујеш на 8 погодака од 10.",
+      },
+      {
+        name: "Остани у траци 80-90 % 20 минута",
+        text: "Када остваруј 8-9 од 10 понављања, остани ту за издржану вежбу. То је зона где мали мозак добија јасне сигнале грешке, а моторички кортекс наставља да ажурира.",
+      },
+    ],
+  },
+  // ============================================================ TR
+  tr: {
+    metaTitle: "%85 kuralı: beynin aslında dans etmeyi nasıl öğrenir",
+    metaDescription:
+      "Nature'da yayımlanan 2019 tarihli bir makale, öğrenme için matematiksel olarak optimum hata oranının %15,87 olduğunu buldu. Bunun salsa pratiğine ne anlama geldiği, drill'lerini nasıl kalibre edeceğin ve neden \"temiz\" pratik ilerlemeyi durdurur.",
+
+    breadcrumbHome: "Ana Sayfa",
+    breadcrumbBlog: "Blog",
+    breadcrumbCurrent: "%85 kuralı",
+
+    badge: "Antrenman Bilimi",
+    h1Pre: "%85 kuralı: ",
+    h1Accent: "beynin aslında dans etmeyi nasıl öğrenir",
+
+    bylineCredential: "Learning Experience Design sertifikalı",
+
+    shortAnswerRich:
+      "2019'da *Nature Human Behaviour*'da Wilson, Shenhav, Steine-Hanson ve Cohen tarafından yayımlanan makale, bir beceriyi kazanmak için matematiksel olarak optimum hata oranının tam olarak **%15,87 başarısızlık** olduğunu, yani yaklaşık %85 başarı oranı olduğunu buldu. Bunun üzerinde beyin net bir örüntüye kilitlenemez. Bunun altında ise beyin beceriyi \"halledildi\" olarak dosyalar ve onu yükseltmeyi bırakır. Temiz pratiğin ilerlemeyi durdurmasının ve biraz fazla zor drill'lerin gelişmenin en hızlı yolu olmasının arkasındaki matematik budur.",
+
+    sec1Title: "Çalışma",
+    sec1Paragraphs: [
+      "2019'da Arizona Üniversitesi'nden Robert Wilson ve meslektaşları *Nature Human Behaviour*'da *\"The Eighty Five Percent Rule for Optimal Learning\"*ı yayımladı. Kesin bir soru sordular: bir antrenman seansının zorluk düğmesini herhangi bir sayıya ayarlayabilseydin, matematiksel olarak mümkün olduğunca hızlı öğrenmek için bu düğmeyi hangi sayıya ayarlardın?",
+      "Cevap, standart bir öğrenme eğrisinin biçiminden çıkar: S şeklinde bir sigmoid. Beceri yeniyken eğri yavaş yükselir, ortada en hızlı yükselir ve beceri ustalaşıldığında üst kısımda yataylaşır. Wilson şunu sordu: eğrinin hangi noktasında eğim (tekrar başına gelişme hızı) en diktir?",
+      "Matematikten türetilen bu nokta **%15,87 başarısızlıktır**. %10 değil. %25 değil. %15,87. Birinin önerdiği kaba bir tahmin değil, belirli bir eğriden çıkan belirli bir sayıdır.",
+    ],
+
+    sec2Title: "Beynin neden böyle çalışıyor",
+    sec2Paragraphs: [
+      "Hareket öğrenimi bir hata düzeltme döngüsüdür. Bir şey denersin, bedenin bunun bir versiyonunu yapar ve beynin *yapmayı amaçladığın* şeyi *gerçekte olanla* karşılaştırır. Bu uyumsuzluk, beyincikte (beynin arka kısmındaki, hareketi ince ayarlayan bölge) bir sinyal üretir ve bu sinyal motor korteksine güncellenmesini söyler.",
+      "Her tekrar mükemmel inerse, uyumsuzluk yoktur. Sinyal de yoktur. Beyin, hareketin halledildiğine karar verir ve dikkati hâlâ bozuk olan başka bir şeye yönlendirir. Bu yüzden temiz pratik üretken hissettirir ama azalan getiriler verir: hâlâ oluşmakta olanı eğitmek yerine zaten bildiğini tekrar ediyorsundur.",
+      "Çok fazla tekrar başarısız olursa, sinyal gürültülü olur. Beyin, gerçek bir örüntüyü rastgele hatadan ayırt edemez. Araştırmacılar buna **engellenmiş öğrenme** der: çok çalışıyorsundur ama beynin güncellenmek için sabit bir hedefi yoktur.",
+      "%15 başarısızlık bölgesi, sinyalin temiz olduğu yerdir. Beyin yaklaşık olarak neyin yanlış gittiğini bilir, doğru yapmanın nasıl göründüğüne dair sabit bir referansa sahiptir ve her tekrar başına küçük bir güncelleme yapabilir.",
+    ],
+
+    sec3Title: "Arzu edilebilir zorluk (Bjork)",
+    sec3Paragraphs: [
+      "%85 kuralının davranışsal bir kız kardeşi var: Robert Bjork'un **arzu edilebilir zorluk** (desirable difficulty) kavramı. Bjork onlarca yıl boyunca *o anda daha zor hissettiren* pratik koşullarının (tekrarları zamana yayma, farklı becerileri arada birbirine geçirme, geri bildirimi azaltma) daha iyi *uzun vadeli* tutmaya yol açtığını gösterdi. Sürekli geri bildirim altında tek bir beceriyi yığma şeklinde yapmak, yapılırken daha iyi hissettirir ve bir hafta sonra gözle görülür biçimde daha kötü tutma üretir.",
+      "Dans için pratik çıkarım: pratiğin çabasız ve sürtünmesiz hissediyorsa, muhtemelen pek bir şey öğrenmiyorsundur. Mevcut seviyenin biraz üzerindeymiş gibi hissettiriyorsa (rahatsız, biraz kaotik, bolca dürüst kaçırış varsa), muhtemelen beynin izin verdiği maksimum hıza yakın öğreniyorsundur.",
+    ],
+
+    sec4Title: "%85 kuralını salsa pratiğine nasıl uygularsın",
+    sec4Steps: [
+      "**İzole tek bir beceri seç.** \"Salsa\"yı çalışma. Belirli bir şeyi çalış: bir dönüş hazırlığı, belirli bir sayıdaki cross-body lead, belirli bir BPM'de bir shine dizisi. Bir oran ölçmek için ikili bir isabet/kaçırış kriteri lazım.",
+      "**10 tekrar yap ve dürüstçe puanla.** Başlamadan önce neyin isabet sayıldığını tanımla. Sonra say. 9 veya 10 isabet, drill'in çok kolay olduğu anlamına gelir. 5 veya daha az, çok zor olduğu anlamına gelir.",
+      "**Zorluk düğmesini ayarla.** Çok kolaysa: BPM'i %10 artır, kollar için bir styling katmanı ekle, baskın olmayan tarafta yap, partner ekle veya aynanın görsel geri bildirimini kaldır. Çok zorsa: 10'da 8-9'a sabitleninceye kadar basitleştir.",
+      "**%80-90 bandında kal.** Bandı bulunca, 15-20 sürekli dakika orada kal. Beyinciğinin temiz hata sinyalleri ürettiği ve motor korteksinin tekrar tekrar hareket temsilini güncellediği bölge burasıdır.",
+    ],
+
+    sec5Title: "\"Temiz\" pratiğin neden iyi hissettiriyor ama daha az öğretiyor",
+    sec5Paragraphs: [
+      "Eğer 60 dakikalık bir antrenmanı her tekrar pürüzsüz hissederek bitirip \"harikaydı\" diyerek çıktıysan, muhtemelen kendine, yeteneklerinin sınırında 20 dakika dağınık dril yapsaydın öğretebileceğinden daha azını öğrettin.",
+      "Beyin çabayı ödüllendirmez. Beyin tahmin hatasını ödüllendirir, üstelik yönetilebilir miktarda olanı. Zaten bildiğini bir saat tekrar etmek, dansı güvenle konfor bölgesinin içinde tutar ve neredeyse hiç güncelleme sinyali üretmez. %85 başarı oranıyla 20 dakika dril, on tekrarın ikisini kaçırdığın ve o kaçırışları dürüstçe hissettiğin yer, öğrenmenin nörolojisinin gerçekten çalıştığı yerdir.",
+      "Bu, kendini cezalandırmanı savunmak değil, *kalibre etmeni* savunmaktır. Pratiğin dürüstçe zor hissetmeli, ezici değil. %50 değil, %15 başarısızlık.",
+    ],
+
+    sec6Title: "Bu, yapılandırılmış bir müfredatta nasıl görünür",
+    sec6Paragraphs: [
+      "The Mambo Guild müfredatı bu ilke etrafında inşa edilmiştir. Her ders, bir sonrakine açıkça tanımlanmış bir ustalık kriteriyle açılır. Her drill'in bir zorluk kaydırıcısı vardır. Skill Tree, mevcut dalı kusursuz değil ama tutarlı şekilde yürütebildiğin zaman yeni bir dalı açar. Bütün amaç, kendi başarı oranını bir not defteriyle ölçmen gerekmeden seni %85 bandında tutmaktır.",
+      "Alternatif (rastgele dersler almak, hocanın o hafta denk gelip işlediği şeyi çalışmak) seni neredeyse her zaman ya çok aşağıda (sıkkın, bildiğini tekrar ediyorsun) ya da çok yukarıda (kayıp, hiçbir şey öğrenmiyorsun) bırakır. Her iki başarısızlık biçimi de, salsayı kendi kendine öğrenenlerin yaklaşık altı ila dokuz aylık gevşek öğrenmeden sonra çarptığı plato'larda görülür.",
+    ],
+
+    sec7Title: "Kaynaklar",
+    sec7Sources: [
+      "Wilson, R.C., Shenhav, A., Steine-Hanson, M. & Cohen, J.D. (2019). *The Eighty Five Percent Rule for Optimal Learning*. Nature Human Behaviour, 3, 1316-1323.",
+      "Bjork, R.A. (1994). Memory and Metamemory Considerations in the Training of Human Beings. J. Metcalfe & A. Shimamura (Ed.) içinde, *Metacognition*. MIT Press.",
+      "Schmidt, R.A. & Lee, T.D. (2011). *Motor Learning and Performance: From Principles to Application* (5. baskı). Human Kinetics.",
+    ],
+
+    faqs: [
+      {
+        q: "%85 kuralı sade bir dille ne demek?",
+        a: "2019'da Nature Human Behaviour'da yayımlanan makale, insan beyninin pratik zorluğu yaklaşık %85 başarı ve %15 başarısızlığa kalibre edildiğinde yeni becerileri en hızlı şekilde öğrendiğini gösterdi. Tam optimum %15,87 başarısızlıktır. Çok daha yüksek veya çok daha düşük başarısızlık oranlarında pratik yapmak öğrenmeyi yavaşlatır.",
+      },
+      {
+        q: "%15,87 sayısı nereden geliyor?",
+        a: "Standart bir öğrenme eğrisinin (sigmoid) biçiminden matematiksel olarak türetilir. Eğrinin eğimi — tekrar başına ne kadar geliştiğin — belirli bir noktada en yüksektir ve o nokta %15,87 başarısızlık oranına karşılık gelir. Ampirik bir tahmin değil; doğrudan matematikten çıkar.",
+      },
+      {
+        q: "%85 kuralı dans dahil tüm becerilere uygulanır mı?",
+        a: "Wilson ve arkadaşlarının makalesi sinir ağı modellerinde ve ikili sınıflandırma görevlerinde öğrenmeyi konu aldı, ancak beynin bir motor çıktı ürettiği ve geri bildirime göre güncellendiği herhangi bir beceriye güçlü biçimde genelleşir. Dans, ders kitabı niteliğinde bir motor öğrenmedir.",
+      },
+      {
+        q: "Bir koreografiyi temiz, hatasız sergilemek istersem ne yapmalıyım?",
+        a: "Pratik ve sahne farklı modlardır. %85 başarıyla drill yapıp %100'de sergilemelisin. %15 başarısızlık bölgesi öğrenmenin gerçekleştiği yerdir; %100 bölgesi öğrenmenin sabitlendiğini doğruladığın yerdir.",
+      },
+      {
+        q: "\"Arzu edilebilir zorluk\" buraya nasıl oturuyor?",
+        a: "Robert Bjork'un arzu edilebilir zorluk araştırması, öğrenmeyi o anda daha zor hissettiren pratik koşullarının — aralıklı tekrar, interleaving, azaltılmış geri bildirim — daha iyi uzun vadeli tutuş ürettiğini gösterir. %85 kuralının davranışsal kız kardeşidir: tutmak istediğin her şey için yönetilebilir mücadele, çabasız tekrarı yener.",
+      },
+    ],
+
+    ctaEyebrow: "Daha akıllı çalış",
+    ctaHeading: "%85 bölgesine kalibre edilmiş bir müfredat.",
+    ctaBody:
+      "The Mambo Guild'deki her drill, ders ve Skill Tree dalı, seni öğrenmenin gerçekten gerçekleştiği zorluk bandında tutmak için ayarlanmıştır. Sertifikalı bir Learning Experience Designer tarafından öğrenme bilimi ilkeleri üzerine inşa edilmiştir.",
+
+    howToName: "Bir salsa antrenman seansında %85 kuralını nasıl uygularsın",
+    howToDescription:
+      "Drill zorluğunu matematiksel olarak optimum %15,87 hata oranına kalibre etmek için 4 adımlı bir protokol.",
+    howToSteps: [
+      {
+        name: "Seans başına izole tek bir beceri seç",
+        text: "'Salsa'yı çalışma. Belirli tek bir şeyi çalış: bir dönüş tekniği, bir cross-body lead'in zamanlaması, bir shine. Başarı oranı ölçmek için tek bir başarı/başarısızlık tanımına ihtiyacın var.",
+      },
+      {
+        name: "10 tekrar yap ve her birini dürüstçe puanla",
+        text: "Başlamadan önce neyin isabet, neyin kaçırış sayılacağına karar ver. 10 tekrar sonunda isabetlerini say. 9 veya 10 ise drill çok kolaydır. 5 veya daha az ise çok zordur.",
+      },
+      {
+        name: "Zorluk düğmesini ayarla",
+        text: "Çok kolaysa: tempoyu %10 artır, kollar için styling katmanı ekle, partner ekle, baskın olmayan taraf versiyonunu yap veya görsel geri bildirimi kaldır. Çok zorsa: 10'da 8 isabete sabitleninceye kadar basitleştir.",
+      },
+      {
+        name: "%80-90 bandında 20 dakika kal",
+        text: "10 tekrarın 8-9'unu isabetli yapmaya başlayınca sürekli pratik için orada kal. Beyinciğinin net hata sinyalleri aldığı ve motor korteksinin güncellenmeyi sürdürdüğü bölge orasıdır.",
+      },
+    ],
+  },
 };
 
 export function getEightyFiveContent(locale: Locale): EightyFiveContent {
