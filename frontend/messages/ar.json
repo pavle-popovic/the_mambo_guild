@@ -20,7 +20,20 @@
     "signup": "إنشاء حساب",
     "dashboard": "لوحة التحكم",
     "pricing": "الأسعار",
-    "studio": "الاستوديو"
+    "studio": "الاستوديو",
+    "instructors": "المدربون",
+    "blog": "المدونة",
+    "admin": "إدارة",
+    "guildMasterAccess": "وصول Guild Master",
+    "unlockAllFeatures": "افتح كل الميزات",
+    "upgrade": "ترقية",
+    "coachingShort": "زاوية التدريب",
+    "coachingSubtitle": "ملاحظات فيديو 1 إلى 1",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "مكالمات مباشرة وأرشيف",
+    "lockedTag": "مقفل",
+    "toggleMenu": "تبديل القائمة",
+    "toggleNavMenu": "تبديل قائمة التنقل"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "قريباً",
     "typeLabel": "النوع",
     "levelLabel": "المستوى",
-    "whatYoullLearn": "ما الذي ستتعلمه"
+    "whatYoullLearn": "ما الذي ستتعلمه",
+    "modules": "وحدات",
+    "clearFilters": "مسح كل المرشحات",
+    "typeCourse": "دورة",
+    "typeChoreo": "كوريو",
+    "typeTopic": "موضوع",
+    "noResultsHint": "جرب مرشحًا آخر أو امسحها جميعًا."
   },
   "lesson": {
     "title": "الدرس",

@@ -20,7 +20,20 @@
     "signup": "Sign Up",
     "dashboard": "Dashboard",
     "pricing": "Pricing",
-    "studio": "Studio"
+    "studio": "Studio",
+    "instructors": "Εκπαιδευτές",
+    "blog": "Blog",
+    "admin": "Διαχείριση",
+    "guildMasterAccess": "Πρόσβαση Guild Master",
+    "unlockAllFeatures": "Ξεκλείδωσε όλες τις λειτουργίες",
+    "upgrade": "Αναβάθμιση",
+    "coachingShort": "Γωνιά Coaching",
+    "coachingSubtitle": "Video feedback 1 προς 1",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "Live κλήσεις και αρχεία",
+    "lockedTag": "ΚΛΕΙΔΩΜΕΝΟ",
+    "toggleMenu": "Εναλλαγή μενού",
+    "toggleNavMenu": "Εναλλαγή μενού πλοήγησης"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "Coming Soon",
     "typeLabel": "Τύπος",
     "levelLabel": "Επίπεδο",
-    "whatYoullLearn": "Τι θα μάθεις"
+    "whatYoullLearn": "Τι θα μάθεις",
+    "modules": "Ενότητες",
+    "clearFilters": "Καθαρισμός όλων των φίλτρων",
+    "typeCourse": "Μάθημα",
+    "typeChoreo": "Χορογραφία",
+    "typeTopic": "Θέμα",
+    "noResultsHint": "Δοκίμασε άλλο φίλτρο ή καθάρισέ τα όλα."
   },
   "lesson": {
     "title": "Lesson",

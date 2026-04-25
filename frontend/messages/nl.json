@@ -20,7 +20,20 @@
     "signup": "Registreren",
     "dashboard": "Dashboard",
     "pricing": "Prijzen",
-    "studio": "Studio"
+    "studio": "Studio",
+    "instructors": "Instructeurs",
+    "blog": "Blog",
+    "admin": "Admin",
+    "guildMasterAccess": "Guild Master toegang",
+    "unlockAllFeatures": "Ontgrendel alle functies",
+    "upgrade": "Upgrade",
+    "coachingShort": "Coaching-hoek",
+    "coachingSubtitle": "1-op-1 video-feedback",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "Live gesprekken en archieven",
+    "lockedTag": "VERGRENDELD",
+    "toggleMenu": "Menu omschakelen",
+    "toggleNavMenu": "Navigatiemenu omschakelen"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "Binnenkort",
     "typeLabel": "Type",
     "levelLabel": "Niveau",
-    "whatYoullLearn": "Wat je gaat leren"
+    "whatYoullLearn": "Wat je gaat leren",
+    "modules": "Modules",
+    "clearFilters": "Alle filters wissen",
+    "typeCourse": "Cursus",
+    "typeChoreo": "Choreo",
+    "typeTopic": "Onderwerp",
+    "noResultsHint": "Probeer een ander filter of wis ze allemaal."
   },
   "lesson": {
     "title": "Les",

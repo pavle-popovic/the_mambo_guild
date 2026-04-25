@@ -20,7 +20,20 @@
     "signup": "Регистрация",
     "dashboard": "Панель",
     "pricing": "Цены",
-    "studio": "Студия"
+    "studio": "Студия",
+    "instructors": "Инструкторы",
+    "blog": "Блог",
+    "admin": "Админ",
+    "guildMasterAccess": "Доступ Guild Master",
+    "unlockAllFeatures": "Разблокируй все функции",
+    "upgrade": "Улучшить",
+    "coachingShort": "Уголок коучинга",
+    "coachingSubtitle": "Видео-фидбек 1 на 1",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "Прямые эфиры и архивы",
+    "lockedTag": "ЗАБЛОКИРОВАНО",
+    "toggleMenu": "Меню",
+    "toggleNavMenu": "Меню навигации"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "Скоро",
     "typeLabel": "Тип",
     "levelLabel": "Уровень",
-    "whatYoullLearn": "Чему ты научишься"
+    "whatYoullLearn": "Чему ты научишься",
+    "modules": "Модули",
+    "clearFilters": "Сбросить все фильтры",
+    "typeCourse": "Курс",
+    "typeChoreo": "Хорео",
+    "typeTopic": "Тема",
+    "noResultsHint": "Попробуй другой фильтр или сбрось все."
   },
   "lesson": {
     "title": "Урок",

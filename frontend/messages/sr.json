@@ -20,7 +20,20 @@
     "signup": "Региструј се",
     "dashboard": "Контролна табла",
     "pricing": "Цене",
-    "studio": "Студио"
+    "studio": "Студио",
+    "instructors": "Инструктори",
+    "blog": "Блог",
+    "admin": "Админ",
+    "guildMasterAccess": "Guild Master приступ",
+    "unlockAllFeatures": "Откључај све функције",
+    "upgrade": "Унапреди",
+    "coachingShort": "Кочинг кутак",
+    "coachingSubtitle": "1 на 1 видео фидбек",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "Позиви уживо и архиве",
+    "lockedTag": "ЗАКЉУЧАНО",
+    "toggleMenu": "Отвори мени",
+    "toggleNavMenu": "Отвори навигациони мени"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "Ускоро",
     "typeLabel": "Тип",
     "levelLabel": "Ниво",
-    "whatYoullLearn": "Шта ћеш научити"
+    "whatYoullLearn": "Шта ћеш научити",
+    "modules": "Модули",
+    "clearFilters": "Очисти све филтере",
+    "typeCourse": "Курс",
+    "typeChoreo": "Корео",
+    "typeTopic": "Тема",
+    "noResultsHint": "Покушај други филтер или очисти све."
   },
   "lesson": {
     "title": "Лекција",

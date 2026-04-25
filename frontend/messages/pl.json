@@ -20,7 +20,20 @@
     "signup": "Rejestracja",
     "dashboard": "Panel",
     "pricing": "Cennik",
-    "studio": "Studio"
+    "studio": "Studio",
+    "instructors": "Instruktorzy",
+    "blog": "Blog",
+    "admin": "Admin",
+    "guildMasterAccess": "Dostęp Guild Master",
+    "unlockAllFeatures": "Odblokuj wszystkie funkcje",
+    "upgrade": "Ulepsz",
+    "coachingShort": "Kącik Coachingowy",
+    "coachingSubtitle": "Wideo feedback 1 na 1",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "Rozmowy na żywo i archiwa",
+    "lockedTag": "ZABLOKOWANE",
+    "toggleMenu": "Przełącz menu",
+    "toggleNavMenu": "Przełącz menu nawigacji"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "Wkrótce",
     "typeLabel": "Typ",
     "levelLabel": "Poziom",
-    "whatYoullLearn": "Czego się nauczysz"
+    "whatYoullLearn": "Czego się nauczysz",
+    "modules": "Moduły",
+    "clearFilters": "Wyczyść wszystkie filtry",
+    "typeCourse": "Kurs",
+    "typeChoreo": "Choreo",
+    "typeTopic": "Temat",
+    "noResultsHint": "Spróbuj innego filtra lub wyczyść wszystkie."
   },
   "lesson": {
     "title": "Lekcja",

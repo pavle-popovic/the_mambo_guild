@@ -18,10 +18,26 @@ function resolveCourseType(raw?: string): CourseTypeKey {
   return "course";
 }
 
+// Translation key for the on-card type badge — resolved via t('courses.<key>').
+const COURSE_TYPE_LABEL_KEY: Record<CourseTypeKey, string> = {
+  course: "typeCourse",
+  choreo: "typeChoreo",
+  topic: "typeTopic",
+};
+
+// Translation key for the on-card difficulty pill — DB value is one of
+// "Beginner" | "Intermediate" | "Advanced" | null/empty.
+function difficultyKey(raw?: string): string {
+  const d = (raw || "").toLowerCase().trim();
+  if (d === "beginner") return "difficultyBeginner";
+  if (d === "intermediate") return "difficultyIntermediate";
+  if (d === "advanced") return "difficultyAdvanced";
+  return "difficultyAll"; // shown as "All Levels" in en, localized elsewhere
+}
+
 const COURSE_TYPE_STYLES: Record<
   CourseTypeKey,
   {
-    label: string;
     labelText: string;
     border: string;
     hoverBorder: string;
@@ -30,7 +46,6 @@ const COURSE_TYPE_STYLES: Record<
   }
 > = {
   course: {
-    label: "Course",
     labelText: "text-emerald-300",
     border: "border-emerald-500/20",
     hoverBorder: "hover:border-emerald-400/60",
@@ -38,7 +53,6 @@ const COURSE_TYPE_STYLES: Record<
     accentBar: "bg-gradient-to-r from-emerald-500 via-green-400 to-emerald-500",
   },
   choreo: {
-    label: "Choreo",
     labelText: "text-rose-300",
     border: "border-rose-500/20",
     hoverBorder: "hover:border-rose-400/60",
@@ -46,7 +60,6 @@ const COURSE_TYPE_STYLES: Record<
     accentBar: "bg-gradient-to-r from-rose-500 via-red-400 to-rose-500",
   },
   topic: {
-    label: "Topic",
     labelText: "text-sky-300",
     border: "border-sky-500/20",
     hoverBorder: "hover:border-sky-400/60",
@@ -203,13 +216,13 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
                 {moduleCount > 0 && (
                   <div className="bg-black/70 backdrop-blur-sm rounded-lg px-1.5 sm:px-2.5 py-0.5 sm:py-1 border border-white/10">
                     <span className="text-xs sm:text-sm font-bold text-mambo-gold">{moduleCount}</span>
-                    <span className="text-[9px] sm:text-[10px] text-gray-400 ml-0.5 sm:ml-1 uppercase">Modules</span>
+                    <span className="text-[9px] sm:text-[10px] text-gray-400 ml-0.5 sm:ml-1 uppercase">{tCourses('modules')}</span>
                   </div>
                 )}
                 {lessonCount > 0 && (
                   <div className="bg-black/70 backdrop-blur-sm rounded-lg px-1.5 sm:px-2.5 py-0.5 sm:py-1 border border-white/10">
                     <span className="text-xs sm:text-sm font-bold text-cyan-400">{lessonCount}</span>
-                    <span className="text-[9px] sm:text-[10px] text-gray-400 ml-0.5 sm:ml-1 uppercase">Lessons</span>
+                    <span className="text-[9px] sm:text-[10px] text-gray-400 ml-0.5 sm:ml-1 uppercase">{tCourses('lessons')}</span>
                   </div>
                 )}
                 {duration && (
@@ -245,10 +258,10 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
                 <h3 className="gold-shimmer-text font-bold text-base sm:text-xl tracking-wide drop-shadow-md line-clamp-2">{course.title}</h3>
                 <div className="flex items-center gap-2 text-[10px] uppercase tracking-wider font-semibold">
                   <span className={`${course.difficulty === 'Beginner' ? 'text-green-400' : course.difficulty === 'Intermediate' ? 'text-yellow-400' : course.difficulty === 'Advanced' ? 'text-red-400' : 'text-purple-400'}`}>
-                    {course.difficulty || "All Levels"}
+                    {tCourses(difficultyKey(course.difficulty))}
                   </span>
                   <span className="text-gray-500">•</span>
-                  <span className={typeStyle.labelText}>{typeStyle.label}</span>
+                  <span className={typeStyle.labelText}>{tCourses(COURSE_TYPE_LABEL_KEY[typeKey])}</span>
                 </div>
               </div>
 

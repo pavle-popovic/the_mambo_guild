@@ -304,9 +304,9 @@ export default function CoursesPage() {
           ) : filteredCourses.length === 0 ? (
             <div className="text-center py-20 bg-white/5 rounded-2xl border border-white/10">
               <p className="text-xl text-gray-300 font-serif mb-2">{tCourses('noResults')}</p>
-              <p className="text-gray-500 text-sm">{tCourses('noResults')}</p>
+              <p className="text-gray-500 text-sm">{tCourses('noResultsHint')}</p>
               <button onClick={() => { setSearchQuery(''); setTypeFilter('all'); setDifficultyFilter('all'); }} className="mt-6 px-6 py-2 bg-white/10 hover:bg-white/20 text-white rounded-full text-sm font-bold transition-colors">
-                Clear All Filters
+                {tCourses('clearFilters')}
               </button>
             </div>
           ) : (

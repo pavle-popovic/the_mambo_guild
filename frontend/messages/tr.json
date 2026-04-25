@@ -20,7 +20,20 @@
     "signup": "Kayıt Ol",
     "dashboard": "Panel",
     "pricing": "Fiyatlar",
-    "studio": "Stüdyo"
+    "studio": "Stüdyo",
+    "instructors": "Eğitmenler",
+    "blog": "Blog",
+    "admin": "Admin",
+    "guildMasterAccess": "Guild Master Erişimi",
+    "unlockAllFeatures": "Tüm özellikleri aç",
+    "upgrade": "Yükselt",
+    "coachingShort": "Koçluk Köşesi",
+    "coachingSubtitle": "1-on-1 video geri bildirim",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "Canlı görüşmeler ve arşivler",
+    "lockedTag": "KİLİTLİ",
+    "toggleMenu": "Menüyü aç/kapat",
+    "toggleNavMenu": "Gezinme menüsünü aç/kapat"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "Yakında",
     "typeLabel": "Tür",
     "levelLabel": "Seviye",
-    "whatYoullLearn": "Ne Öğreneceksin"
+    "whatYoullLearn": "Ne Öğreneceksin",
+    "modules": "Modüller",
+    "clearFilters": "Tüm Filtreleri Temizle",
+    "typeCourse": "Ders",
+    "typeChoreo": "Koreografi",
+    "typeTopic": "Konu",
+    "noResultsHint": "Farklı bir filtre dene veya tümünü temizle."
   },
   "lesson": {
     "title": "Ders",

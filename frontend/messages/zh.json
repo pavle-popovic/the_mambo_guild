@@ -20,7 +20,20 @@
     "signup": "注册",
     "dashboard": "控制台",
     "pricing": "价格",
-    "studio": "工作室"
+    "studio": "工作室",
+    "instructors": "讲师",
+    "blog": "博客",
+    "admin": "管理",
+    "guildMasterAccess": "Guild Master 访问权限",
+    "unlockAllFeatures": "解锁所有功能",
+    "upgrade": "升级",
+    "coachingShort": "教练角",
+    "coachingSubtitle": "1对1 视频反馈",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "实时通话与归档",
+    "lockedTag": "锁定",
+    "toggleMenu": "切换菜单",
+    "toggleNavMenu": "切换导航菜单"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "即将推出",
     "typeLabel": "类型",
     "levelLabel": "等级",
-    "whatYoullLearn": "你将学到什么"
+    "whatYoullLearn": "你将学到什么",
+    "modules": "模块",
+    "clearFilters": "清除所有筛选",
+    "typeCourse": "课程",
+    "typeChoreo": "编舞",
+    "typeTopic": "主题",
+    "noResultsHint": "尝试不同的筛选条件或清除所有筛选。"
   },
   "lesson": {
     "title": "课时",

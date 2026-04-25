@@ -20,7 +20,20 @@
     "signup": "登録",
     "dashboard": "ダッシュボード",
     "pricing": "料金",
-    "studio": "スタジオ"
+    "studio": "スタジオ",
+    "instructors": "インストラクター",
+    "blog": "ブログ",
+    "admin": "管理",
+    "guildMasterAccess": "Guild Master アクセス",
+    "unlockAllFeatures": "すべての機能を解除",
+    "upgrade": "アップグレード",
+    "coachingShort": "コーチングコーナー",
+    "coachingSubtitle": "1対1 ビデオフィードバック",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "ライブ通話とアーカイブ",
+    "lockedTag": "ロック中",
+    "toggleMenu": "メニュー切替",
+    "toggleNavMenu": "ナビゲーションメニュー切替"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "近日公開",
     "typeLabel": "タイプ",
     "levelLabel": "レベル",
-    "whatYoullLearn": "学べること"
+    "whatYoullLearn": "学べること",
+    "modules": "モジュール",
+    "clearFilters": "すべてのフィルターをクリア",
+    "typeCourse": "コース",
+    "typeChoreo": "振付",
+    "typeTopic": "トピック",
+    "noResultsHint": "別のフィルターを試すか、すべてクリアしてください。"
   },
   "lesson": {
     "title": "レッスン",

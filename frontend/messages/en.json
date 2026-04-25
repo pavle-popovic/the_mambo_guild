@@ -20,7 +20,20 @@
     "signup": "Sign Up",
     "dashboard": "Dashboard",
     "pricing": "Pricing",
-    "studio": "Studio"
+    "studio": "Studio",
+    "instructors": "Instructors",
+    "blog": "Blog",
+    "admin": "Admin",
+    "guildMasterAccess": "Guild Master Access",
+    "unlockAllFeatures": "Unlock all features",
+    "upgrade": "Upgrade",
+    "coachingShort": "Coaching Corner",
+    "coachingSubtitle": "1-on-1 video feedback",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "Live calls & archives",
+    "lockedTag": "LOCKED",
+    "toggleMenu": "Toggle menu",
+    "toggleNavMenu": "Toggle navigation menu"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "Coming Soon",
     "typeLabel": "Type",
     "levelLabel": "Level",
-    "whatYoullLearn": "What You'll Learn"
+    "whatYoullLearn": "What You'll Learn",
+    "modules": "Modules",
+    "clearFilters": "Clear All Filters",
+    "typeCourse": "Course",
+    "typeChoreo": "Choreo",
+    "typeTopic": "Topic",
+    "noResultsHint": "Try a different filter or clear all filters."
   },
   "lesson": {
     "title": "Lesson",

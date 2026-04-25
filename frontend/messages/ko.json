@@ -20,7 +20,20 @@
     "signup": "회원가입",
     "dashboard": "대시보드",
     "pricing": "요금제",
-    "studio": "스튜디오"
+    "studio": "스튜디오",
+    "instructors": "강사",
+    "blog": "블로그",
+    "admin": "관리",
+    "guildMasterAccess": "Guild Master 접근",
+    "unlockAllFeatures": "모든 기능 잠금 해제",
+    "upgrade": "업그레이드",
+    "coachingShort": "코칭 코너",
+    "coachingSubtitle": "1:1 비디오 피드백",
+    "roundtableShort": "The Roundtable",
+    "roundtableSubtitle": "라이브 통화와 아카이브",
+    "lockedTag": "잠김",
+    "toggleMenu": "메뉴 전환",
+    "toggleNavMenu": "내비게이션 메뉴 전환"
   },
   "auth": {
     "login": {
@@ -247,7 +260,13 @@
     "comingSoon": "곧 출시",
     "typeLabel": "유형",
     "levelLabel": "레벨",
-    "whatYoullLearn": "배우게 될 내용"
+    "whatYoullLearn": "배우게 될 내용",
+    "modules": "모듈",
+    "clearFilters": "모든 필터 지우기",
+    "typeCourse": "코스",
+    "typeChoreo": "안무",
+    "typeTopic": "주제",
+    "noResultsHint": "다른 필터를 시도하거나 모두 지워보세요."
   },
   "lesson": {
     "title": "레슨",

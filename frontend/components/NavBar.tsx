@@ -163,8 +163,8 @@ export default function NavBar({ user }: NavBarProps) {
             <NavLink href="/courses" activePaths={["/courses"]}>{t('courses')}</NavLink>
             <NavLink href="/community" activePaths={["/community"]}>{t('community')}</NavLink>
             <NavLink href="/pricing">{t('pricing')}</NavLink>
-            <NavLink href="/instructors">Instructors</NavLink>
-            <NavLink href="/blog" activePaths={["/blog", "/what-is-salsa-on2", "/salsa-on1-vs-on2"]}>Blog</NavLink>
+            <NavLink href="/instructors">{t('instructors')}</NavLink>
+            <NavLink href="/blog" activePaths={["/blog", "/what-is-salsa-on2", "/salsa-on1-vs-on2"]}>{t('blog')}</NavLink>
           </div>
 
           {/* Mobile: Hamburger + minimal icons */}
@@ -199,7 +199,7 @@ export default function NavBar({ user }: NavBarProps) {
             <button
               className="p-2 text-gray-300 hover:text-white transition-colors"
               onClick={() => { setIsMobileMenuOpen(!isMobileMenuOpen); UISound.click(); }}
-              aria-label="Toggle menu"
+              aria-label={t('toggleMenu')}
             >
               {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
             </button>
@@ -210,7 +210,7 @@ export default function NavBar({ user }: NavBarProps) {
           <button
             className="hidden md:flex xl:hidden p-2 text-gray-300 hover:text-white transition-colors mr-1"
             onClick={() => { setIsMobileMenuOpen(!isMobileMenuOpen); UISound.click(); }}
-            aria-label="Toggle navigation menu"
+            aria-label={t('toggleNavMenu')}
           >
             {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
@@ -291,12 +291,12 @@ export default function NavBar({ user }: NavBarProps) {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-white">Coaching Corner</span>
+                                <span className="text-sm font-semibold text-white">{t('coachingShort')}</span>
                                 {!isGuildMaster && (
-                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">{t('lockedTag')}</span>
                                 )}
                               </div>
-                              <p className="text-xs text-gray-400">1-on-1 video feedback</p>
+                              <p className="text-xs text-gray-400">{t('coachingSubtitle')}</p>
                             </div>
                           </Link>
 
@@ -316,12 +316,12 @@ export default function NavBar({ user }: NavBarProps) {
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
-                                <span className="text-sm font-semibold text-white">The Roundtable</span>
+                                <span className="text-sm font-semibold text-white">{t('roundtableShort')}</span>
                                 {!isGuildMaster && (
-                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>
+                                  <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">{t('lockedTag')}</span>
                                 )}
                               </div>
-                              <p className="text-xs text-gray-400">Live calls & archives</p>
+                              <p className="text-xs text-gray-400">{t('roundtableSubtitle')}</p>
                             </div>
                           </Link>
                         </div>
@@ -336,17 +336,17 @@ export default function NavBar({ user }: NavBarProps) {
                           {isGuildMaster ? (
                             <div className="flex items-center gap-2">
                               <Crown size={14} className="text-amber-400" />
-                              <span className="text-xs font-semibold text-amber-300">Guild Master Access</span>
+                              <span className="text-xs font-semibold text-amber-300">{t('guildMasterAccess')}</span>
                             </div>
                           ) : (
-                            <Link 
+                            <Link
                               href="/pricing"
                               onClick={() => setIsStudioOpen(false)}
                               className="flex items-center justify-between group"
                             >
-                              <span className="text-xs text-gray-400">Unlock all features</span>
+                              <span className="text-xs text-gray-400">{t('unlockAllFeatures')}</span>
                               <span className="text-xs font-bold text-amber-400 group-hover:text-amber-300 transition-colors">
-                                Upgrade →
+                                {t('upgrade')} →
                               </span>
                             </Link>
                           )}
@@ -363,7 +363,7 @@ export default function NavBar({ user }: NavBarProps) {
                     className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/20 border border-red-400/30 hover:bg-red-500/30 transition-all"
                     onMouseEnter={handleNavHover}
                   >
-                    <span className="text-xs font-bold text-red-300">Admin</span>
+                    <span className="text-xs font-bold text-red-300">{t('admin')}</span>
                   </Link>
                 )}
 
