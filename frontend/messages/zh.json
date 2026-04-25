@@ -292,7 +292,11 @@
     "saveNote": "保存笔记",
     "notePlaceholder": "在此添加练习笔记...",
     "xpEarned": "获得经验值",
-    "upgradeForControls": "升级以解锁专业控制"
+    "upgradeForControls": "升级以解锁专业控制",
+    "proveKnowledge": "证明你的知识",
+    "noQuizYet": "暂无测验题目。",
+    "noContentYet": "暂无内容。",
+    "rotateForFullscreen": "旋转以全屏"
   },
   "skillTree": {
     "title": "技能树",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "抢先体验",
-    "copyright": "© 2024 The Mambo Guild. 继续跳舞。"
+    "copyright": "© 2024 The Mambo Guild. 继续跳舞。",
+    "learnBlog": "博客"
   },
   "pricingPage": {
     "rookieName": "Rookie",

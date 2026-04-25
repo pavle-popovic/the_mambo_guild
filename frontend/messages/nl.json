@@ -292,7 +292,11 @@
     "saveNote": "Notitie opslaan",
     "notePlaceholder": "Voeg hier je oefennotities toe...",
     "xpEarned": "XP verdiend",
-    "upgradeForControls": "Upgrade voor Pro-besturing"
+    "upgradeForControls": "Upgrade voor Pro-besturing",
+    "proveKnowledge": "Bewijs je kennis",
+    "noQuizYet": "Nog geen quizvragen beschikbaar.",
+    "noContentYet": "Nog geen content beschikbaar.",
+    "rotateForFullscreen": "Draai voor volledig scherm"
   },
   "skillTree": {
     "title": "Vaardighedenboom",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Early Access",
-    "copyright": "© 2024 The Mambo Guild. Keep dancing."
+    "copyright": "© 2024 The Mambo Guild. Keep dancing.",
+    "learnBlog": "Blog"
   },
   "pricingPage": {
     "rookieName": "Rookie",

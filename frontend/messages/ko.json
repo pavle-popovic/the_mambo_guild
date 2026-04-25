@@ -292,7 +292,11 @@
     "saveNote": "노트 저장",
     "notePlaceholder": "연습 노트를 여기에 추가하세요...",
     "xpEarned": "획득 XP",
-    "upgradeForControls": "프로 컨트롤을 잠금 해제하려면 업그레이드하세요"
+    "upgradeForControls": "프로 컨트롤을 잠금 해제하려면 업그레이드하세요",
+    "proveKnowledge": "지식을 증명하라",
+    "noQuizYet": "아직 퀴즈 문제가 없습니다.",
+    "noContentYet": "아직 콘텐츠가 없습니다.",
+    "rotateForFullscreen": "전체화면을 위해 회전하세요"
   },
   "skillTree": {
     "title": "스킬 트리",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "인스타그램",
     "connectYoutube": "유튜브",
     "connectEarlyAccess": "얼리 액세스",
-    "copyright": "© 2024 The Mambo Guild. 계속 춤춰요."
+    "copyright": "© 2024 The Mambo Guild. 계속 춤춰요.",
+    "learnBlog": "블로그"
   },
   "pricingPage": {
     "rookieName": "Rookie",

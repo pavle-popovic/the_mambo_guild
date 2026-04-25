@@ -292,7 +292,11 @@
     "saveNote": "ノートを保存",
     "notePlaceholder": "練習メモをここに追加...",
     "xpEarned": "獲得XP",
-    "upgradeForControls": "プロコントロールのアップグレード"
+    "upgradeForControls": "プロコントロールのアップグレード",
+    "proveKnowledge": "知識を試そう",
+    "noQuizYet": "クイズの問題はまだありません。",
+    "noContentYet": "コンテンツはまだありません。",
+    "rotateForFullscreen": "回転してフルスクリーン"
   },
   "skillTree": {
     "title": "スキルツリー",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "先行アクセス",
-    "copyright": "© 2024 The Mambo Guild. 踊り続けよう。"
+    "copyright": "© 2024 The Mambo Guild. 踊り続けよう。",
+    "learnBlog": "ブログ"
   },
   "pricingPage": {
     "rookieName": "Rookie",

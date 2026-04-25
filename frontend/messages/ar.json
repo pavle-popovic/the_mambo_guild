@@ -292,7 +292,11 @@
     "saveNote": "حفظ الملاحظة",
     "notePlaceholder": "أضف ملاحظات التدريب هنا...",
     "xpEarned": "نقاط XP المكتسبة",
-    "upgradeForControls": "قم بالترقية لفتح أدوات التحكم الاحترافية"
+    "upgradeForControls": "قم بالترقية لفتح أدوات التحكم الاحترافية",
+    "proveKnowledge": "أثبت معرفتك",
+    "noQuizYet": "لا توجد أسئلة اختبار بعد.",
+    "noContentYet": "لا يوجد محتوى بعد.",
+    "rotateForFullscreen": "استدر لملء الشاشة"
   },
   "skillTree": {
     "title": "شجرة المهارات",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "وصول مبكر",
-    "copyright": "© 2024 The Mambo Guild. استمر في الرقص."
+    "copyright": "© 2024 The Mambo Guild. استمر في الرقص.",
+    "learnBlog": "المدونة"
   },
   "pricingPage": {
     "rookieName": "Rookie",

@@ -292,7 +292,11 @@
     "saveNote": "Save Note",
     "notePlaceholder": "Add your practice notes here...",
     "xpEarned": "XP Earned",
-    "upgradeForControls": "Upgrade to unlock Pro Controls"
+    "upgradeForControls": "Upgrade to unlock Pro Controls",
+    "proveKnowledge": "Prove Your Knowledge",
+    "noQuizYet": "No quiz questions available yet.",
+    "noContentYet": "No content available yet.",
+    "rotateForFullscreen": "Rotate for full screen"
   },
   "skillTree": {
     "title": "Skill Tree",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Early Access",
-    "copyright": "© 2024 The Mambo Guild. Keep dancing."
+    "copyright": "© 2024 The Mambo Guild. Keep dancing.",
+    "learnBlog": "Blog"
   },
   "pricingPage": {
     "rookieName": "Rookie",

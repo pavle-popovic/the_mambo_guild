@@ -1185,8 +1185,8 @@ export default function LessonPage() {
                 )}
                 {isQuizLesson && !hasQuiz && (
                   <div className="bg-mambo-panel border border-gray-800 rounded-xl p-8 text-center max-w-2xl mx-auto">
-                    <h3 className="text-xl font-bold text-white mb-2">Prove Your Knowledge</h3>
-                    <p className="text-gray-400">No quiz questions available yet.</p>
+                    <h3 className="text-xl font-bold text-white mb-2">{tLesson('proveKnowledge')}</h3>
+                    <p className="text-gray-400">{tLesson('noQuizYet')}</p>
                   </div>
                 )}
                 {isHistoryLesson && (
@@ -1203,7 +1203,7 @@ export default function LessonPage() {
                       </div>
                     ) : (
                       <div className="bg-mambo-panel border border-gray-800 rounded-xl p-8 text-center">
-                        <p className="text-gray-400">No content available yet.</p>
+                        <p className="text-gray-400">{tLesson('noContentYet')}</p>
                       </div>
                     )}
                   </div>
@@ -1256,7 +1256,7 @@ export default function LessonPage() {
             {/* Rotate prompt */}
             <div className="flex items-center justify-center gap-1.5 py-1.5 text-[10px] text-white/30">
               <MdScreenRotation className="text-xs" />
-              <span>Rotate for full screen</span>
+              <span>{tLesson('rotateForFullscreen')}</span>
             </div>
             <VideoControls
               playerRef={videoPlayerRef}

@@ -292,7 +292,11 @@
     "saveNote": "Zapisz notatkę",
     "notePlaceholder": "Dodaj tutaj swoje notatki z ćwiczeń...",
     "xpEarned": "Zdobyte XP",
-    "upgradeForControls": "Ulepsz plan, aby odblokować kontrolki Pro"
+    "upgradeForControls": "Ulepsz plan, aby odblokować kontrolki Pro",
+    "proveKnowledge": "Sprawdź swoją wiedzę",
+    "noQuizYet": "Brak pytań quizu.",
+    "noContentYet": "Brak dostępnej treści.",
+    "rotateForFullscreen": "Obróć, aby wyświetlić na pełnym ekranie"
   },
   "skillTree": {
     "title": "Drzewo Umiejętności",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Wczesny dostęp",
-    "copyright": "© 2024 The Mambo Guild. Tańcz dalej."
+    "copyright": "© 2024 The Mambo Guild. Tańcz dalej.",
+    "learnBlog": "Blog"
   },
   "pricingPage": {
     "rookieName": "Rookie",

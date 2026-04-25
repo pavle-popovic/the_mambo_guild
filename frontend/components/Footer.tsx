@@ -58,7 +58,7 @@ export default function Footer({ className = "" }: FooterProps) {
             </li>
             <li>
               <Link href="/blog" className="hover:text-mambo-blue transition">
-                Blog
+                {t("learnBlog")}
               </Link>
             </li>
           </ul>

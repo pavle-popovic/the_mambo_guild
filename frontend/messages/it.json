@@ -292,7 +292,11 @@
     "saveNote": "Salva Nota",
     "notePlaceholder": "Aggiungi qui le tue note di pratica...",
     "xpEarned": "XP Guadagnati",
-    "upgradeForControls": "Aggiorna per sbloccare i Controlli Pro"
+    "upgradeForControls": "Aggiorna per sbloccare i Controlli Pro",
+    "proveKnowledge": "Dimostra quello che sai",
+    "noQuizYet": "Non ci sono ancora domande nel quiz.",
+    "noContentYet": "Non c’è ancora contenuto.",
+    "rotateForFullscreen": "Ruota per schermo intero"
   },
   "skillTree": {
     "title": "Albero delle Abilità",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Accesso Anticipato",
-    "copyright": "© 2024 The Mambo Guild. Continua a ballare."
+    "copyright": "© 2024 The Mambo Guild. Continua a ballare.",
+    "learnBlog": "Blog"
   },
   "pricingPage": {
     "rookieName": "Rookie",

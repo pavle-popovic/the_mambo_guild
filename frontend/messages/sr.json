@@ -292,7 +292,11 @@
     "saveNote": "Сачувај белешку",
     "notePlaceholder": "Додај своје белешке за вежбање овде...",
     "xpEarned": "XP зарађен",
-    "upgradeForControls": "Унапреди да откључаш Pro контроле"
+    "upgradeForControls": "Унапреди да откључаш Pro контроле",
+    "proveKnowledge": "Докажи своје знање",
+    "noQuizYet": "Још нема питања за квиз.",
+    "noContentYet": "Још нема доступног садржаја.",
+    "rotateForFullscreen": "Окрени за пун екран"
   },
   "skillTree": {
     "title": "Дрво вештина",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Рани приступ",
-    "copyright": "© 2024 The Mambo Guild. Настави да плешеш."
+    "copyright": "© 2024 The Mambo Guild. Настави да плешеш.",
+    "learnBlog": "Блог"
   },
   "pricingPage": {
     "rookieName": "Rookie",

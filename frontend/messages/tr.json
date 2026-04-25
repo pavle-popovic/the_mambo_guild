@@ -292,7 +292,11 @@
     "saveNote": "Notu Kaydet",
     "notePlaceholder": "Çalışma notlarını buraya ekle...",
     "xpEarned": "Kazanılan XP",
-    "upgradeForControls": "Pro Kontrolleri açmak için yükselt"
+    "upgradeForControls": "Pro Kontrolleri açmak için yükselt",
+    "proveKnowledge": "Bildiğini kanıtla",
+    "noQuizYet": "Henüz quiz sorusu yok.",
+    "noContentYet": "Henüz içerik yok.",
+    "rotateForFullscreen": "Tam ekran için döndür"
   },
   "skillTree": {
     "title": "Yetenek Ağacı",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Erken Erişim",
-    "copyright": "© 2024 The Mambo Guild. Dans etmeye devam et."
+    "copyright": "© 2024 The Mambo Guild. Dans etmeye devam et.",
+    "learnBlog": "Blog"
   },
   "pricingPage": {
     "rookieName": "Rookie",

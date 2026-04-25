@@ -292,7 +292,11 @@
     "saveNote": "Сохранить заметку",
     "notePlaceholder": "Добавьте заметки о практике здесь...",
     "xpEarned": "Получено XP",
-    "upgradeForControls": "Улучшите план для доступа к Pro-управлению"
+    "upgradeForControls": "Улучшите план для доступа к Pro-управлению",
+    "proveKnowledge": "Покажи свои знания",
+    "noQuizYet": "Вопросов квиза пока нет.",
+    "noContentYet": "Контента пока нет.",
+    "rotateForFullscreen": "Поверни для полноэкранного режима"
   },
   "skillTree": {
     "title": "Дерево Навыков",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Ранний доступ",
-    "copyright": "© 2024 The Mambo Guild. Продолжайте танцевать."
+    "copyright": "© 2024 The Mambo Guild. Продолжайте танцевать.",
+    "learnBlog": "Блог"
   },
   "pricingPage": {
     "rookieName": "Rookie",

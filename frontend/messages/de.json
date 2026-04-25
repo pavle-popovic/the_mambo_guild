@@ -292,7 +292,11 @@
     "saveNote": "Notiz speichern",
     "notePlaceholder": "Füge hier deine Übungsnotizen hinzu...",
     "xpEarned": "XP verdient",
-    "upgradeForControls": "Upgrade für Pro-Steuerung"
+    "upgradeForControls": "Upgrade für Pro-Steuerung",
+    "proveKnowledge": "Zeig was du weißt",
+    "noQuizYet": "Noch keine Quizfragen verfügbar.",
+    "noContentYet": "Noch kein Inhalt verfügbar.",
+    "rotateForFullscreen": "Drehen für Vollbild"
   },
   "skillTree": {
     "title": "Fähigkeitsbaum",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Early Access",
-    "copyright": "© 2024 The Mambo Guild. Keep dancing."
+    "copyright": "© 2024 The Mambo Guild. Keep dancing.",
+    "learnBlog": "Blog"
   },
   "pricingPage": {
     "rookieName": "Rookie",

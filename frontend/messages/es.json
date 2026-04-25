@@ -292,7 +292,11 @@
     "saveNote": "Guardar Nota",
     "notePlaceholder": "Añade tus notas de práctica aquí...",
     "xpEarned": "XP Ganados",
-    "upgradeForControls": "Mejora para desbloquear los Controles Pro"
+    "upgradeForControls": "Mejora para desbloquear los Controles Pro",
+    "proveKnowledge": "Demuestra lo que sabes",
+    "noQuizYet": "Aún no hay preguntas del quiz.",
+    "noContentYet": "Aún no hay contenido disponible.",
+    "rotateForFullscreen": "Rota para pantalla completa"
   },
   "skillTree": {
     "title": "Árbol de Habilidades",
@@ -1159,7 +1163,8 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Acceso anticipado",
-    "copyright": "© 2024 The Mambo Guild. Sigue bailando."
+    "copyright": "© 2024 The Mambo Guild. Sigue bailando.",
+    "learnBlog": "Blog"
   },
   "pricingPage": {
     "rookieName": "Rookie",
