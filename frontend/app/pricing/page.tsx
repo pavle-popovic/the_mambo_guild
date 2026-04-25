@@ -11,12 +11,13 @@ import { FaCheck, FaTimes, FaCrown } from "react-icons/fa";
 import { FadeIn, StaggerContainer, StaggerItem, HoverCard, Clickable } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
 import { toast } from "sonner";
-import { CONTACT_EMAIL, daysUntilProGrandfatherEnd } from "@/lib/site";
+import {
+  CONTACT_EMAIL,
+  daysUntilProGrandfatherEnd,
+  ADVANCED_PRICE_ID,
+  PERFORMER_PRICE_ID,
+} from "@/lib/site";
 import { useTranslations } from "@/i18n/useTranslations";
-
-// Stripe Price IDs
-const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
-const PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml";
 
 function PricingPageContent() {
   const t = useTranslations("pricingPage");
@@ -26,7 +27,6 @@ function PricingPageContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  const [showDowngradeModal, setShowDowngradeModal] = useState(false);
   const [guildMasterSeats, setGuildMasterSeats] = useState<{
     total: number;
     taken: number;
@@ -204,37 +204,47 @@ function PricingPageContent() {
     }
   };
 
-  const performDowngrade = async () => {
-    try {
-      setLoading("downgrade");
-      setShowDowngradeModal(false);
-      await apiClient.updateSubscription(ADVANCED_PRICE_ID);
-      await Promise.all([refreshUser(), refreshSeats()]);
-      setRefreshKey((k) => k + 1);
-      toast.success(t("toastDowngraded"), {
-        description: t("toastDowngradedDesc"),
-        duration: 4500,
-      });
-    } catch (error: any) {
-      console.error("Failed to downgrade:", error);
-      toast.error(t("toastDowngradeFailed"), {
-        description: error.message || t("toastDowngradeFailedDesc"),
-      });
-    } finally {
-      setLoading(null);
-    }
-  };
-
-  const handleDowngrade = () => {
-    if (!user) return;
-    setShowDowngradeModal(true);
-  };
-
   // Get current user tier (default to "rookie" if not logged in or no tier)
   const currentTier = user?.tier?.toLowerCase() || "rookie";
   const isRookie = currentTier === "rookie";
   const isAdvanced = currentTier === "advanced";
   const isPerformer = currentTier === "performer";
+
+  // Subscription billing state (active sub only). cancel_at_period_end flips
+  // to true the moment the user clicks "cancel" — they keep access until
+  // periodEnd and we show a warning banner during that window.
+  const cancelAtPeriodEnd = !!user?.subscription_cancel_at_period_end;
+  const periodEnd = user?.subscription_period_end || null;
+  const periodEndLabel = periodEnd
+    ? new Date(periodEnd).toLocaleDateString(undefined, {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      })
+    : null;
+
+  // Reusable footer for an "active plan" card. The pricing page is now purely
+  // an upgrade surface — full subscription management (Stripe portal, cancel,
+  // resume, downgrade) lives on /profile so there is one canonical place to do
+  // it. Here we only show the renewal/cancellation date and a deep-link to
+  // /profile, mirroring how Spotify/Notion/Linear treat their pricing pages.
+  const ActivePlanFooter = () => (
+    <div className="mt-3 space-y-2 text-center">
+      {cancelAtPeriodEnd && periodEndLabel ? (
+        <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
+          Access ends on <span className="font-semibold">{periodEndLabel}</span>.
+        </div>
+      ) : periodEndLabel ? (
+        <div className="text-[11px] text-gray-500">Renews on {periodEndLabel}</div>
+      ) : null}
+      <Link
+        href="/profile"
+        className="text-xs text-gray-500 hover:text-gray-300 underline underline-offset-4 decoration-gray-700 hover:decoration-gray-500 transition"
+      >
+        Manage subscription
+      </Link>
+    </div>
+  );
 
   // Logic mimics LandingPricingSection.tsx
   // Highlight "Most Popular" (Advanced) only if user is NOT logged in.
@@ -285,10 +295,6 @@ function PricingPageContent() {
                         >
                           {tp("currentPlan")}
                         </Link>
-                      ) : (isAdvanced || isPerformer) ? (
-                        <p className="block w-full py-3 text-center text-gray-500 text-sm">
-                          {t("rookieCancelHint")}
-                        </p>
                       ) : null}
                     </Clickable>
                   </div>
@@ -369,22 +375,15 @@ function PricingPageContent() {
                           {loading === ADVANCED_PRICE_ID ? tp("loading") : t("proStartTrial")}
                         </button>
                       ) : isAdvanced ? (
-                        <button
-                          disabled
-                          className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 cursor-default"
-                        >
-                          {tp("currentPlan")}
-                        </button>
-                      ) : isPerformer ? (
-                        <div className="pt-1 text-center">
+                        <>
                           <button
-                            onClick={handleDowngrade}
-                            disabled={loading === "downgrade"}
-                            className="text-xs text-gray-500 hover:text-gray-300 underline underline-offset-4 decoration-gray-700 hover:decoration-gray-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                            disabled
+                            className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 cursor-default"
                           >
-                            {loading === "downgrade" ? t("proSwitching") : t("proSwitchTo")}
+                            {tp("currentPlan")}
                           </button>
-                        </div>
+                          <ActivePlanFooter />
+                        </>
                       ) : null}
                     </Clickable>
                   </div>
@@ -466,12 +465,15 @@ function PricingPageContent() {
                         // Already Guild Master — always show Current Plan.
                         if (isPerformer) {
                           return (
-                            <button
-                              disabled
-                              className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 cursor-default"
-                            >
-                              {tp("currentPlan")}
-                            </button>
+                            <>
+                              <button
+                                disabled
+                                className="block w-full py-4 bg-gradient-to-r from-mambo-blue to-blue-600 hover:from-blue-500 hover:to-blue-600 text-white rounded-lg font-bold transition-all duration-300 shadow-lg shadow-blue-500/25 cursor-default"
+                              >
+                                {tp("currentPlan")}
+                              </button>
+                              <ActivePlanFooter />
+                            </>
                           );
                         }
                         // Seat cap hit — lock the button with a waitlist CTA.
@@ -551,71 +553,6 @@ function PricingPageContent() {
         onClose={() => setShowAuthModal(false)}
         type="login"
       />
-
-      {/* Downgrade Confirmation Modal */}
-      {showDowngradeModal && (
-        <div
-          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
-          onClick={() => setShowDowngradeModal(false)}
-        >
-          <div
-            className="relative w-full max-w-md rounded-2xl bg-mambo-panel border border-gray-800 p-6 sm:p-8 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              onClick={() => setShowDowngradeModal(false)}
-              className="absolute top-3 right-3 text-gray-600 hover:text-gray-300 text-xl leading-none"
-              aria-label="Close"
-            >
-              ×
-            </button>
-            <h2 className="text-2xl font-extrabold text-mambo-text mb-2 tracking-tight">
-              {t("downgradeTitlePre")} <span className="text-amber-300">{t("downgradeTitleAccent")}</span>{t("downgradeTitleSuffix")}
-            </h2>
-            <p className="text-gray-400 mb-5">
-              {t("downgradeBody")}
-            </p>
-            <ul className="space-y-3 mb-6">
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <span className="text-red-400 mt-0.5">✕</span>
-                <span>{t("downgradePerk1")}</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <span className="text-red-400 mt-0.5">✕</span>
-                <span>{t("downgradePerk2")}</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <span className="text-red-400 mt-0.5">✕</span>
-                <span>{t("downgradePerk3")}</span>
-              </li>
-              <li className="flex items-start gap-3 text-sm text-gray-300">
-                <span className="text-red-400 mt-0.5">✕</span>
-                <span>{t("downgradePerk4")}</span>
-              </li>
-            </ul>
-            <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-4 mb-6">
-              <p className="text-sm text-amber-100/80 leading-relaxed">
-                {t("downgradeWarning")}
-              </p>
-            </div>
-            <div className="flex flex-col gap-3">
-              <button
-                onClick={() => setShowDowngradeModal(false)}
-                className="w-full py-3 rounded-xl bg-gradient-to-r from-amber-500 to-yellow-500 text-black font-bold shadow-lg shadow-amber-500/20 hover:scale-[1.02] transition"
-              >
-                {t("downgradeKeep")}
-              </button>
-              <button
-                onClick={performDowngrade}
-                disabled={loading === "downgrade"}
-                className="w-full py-2 text-xs text-gray-600 hover:text-gray-400 underline underline-offset-4 transition disabled:opacity-30 disabled:cursor-not-allowed"
-              >
-                {loading === "downgrade" ? t("downgradeProcessing") : t("downgradeConfirm")}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       <Footer />
     </div>

@@ -744,6 +744,10 @@ export default function ProfilePage() {
           </div>
 
           <div className="mt-5 sm:mt-8 order-4">
+            <SubscriptionManager />
+          </div>
+
+          <div className="mt-5 sm:mt-8 order-5">
             <h2 className="text-xl font-bold mb-6 text-mambo-text">{t("continueLearning")}</h2>
 
             {loadingCourses ? (
@@ -839,7 +843,6 @@ export default function ProfilePage() {
           </div>
         </div>
 
-        <SubscriptionManager />
       </div>
 
       <Footer />

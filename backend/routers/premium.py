@@ -4,8 +4,8 @@ Handles Live Calls, Coaching Submissions, and DJ Booth tracks.
 All endpoints require Guild Master (PERFORMER) tier unless noted.
 """
 import logging
-from datetime import datetime, timezone
-from typing import List, Optional
+from datetime import datetime, timedelta, timezone
+from typing import List, Optional, Tuple
 import uuid
 
 logger = logging.getLogger(__name__)
@@ -94,6 +94,83 @@ def require_guild_master(user: User):
             status_code=status.HTTP_403_FORBIDDEN,
             detail="This feature requires Guild Master (Performer) subscription."
         )
+
+
+# Minimum days between two subscription-source coaching submissions. The
+# calendar-month uniqueness DB constraint already blocks two submissions in
+# the same month, but a user can otherwise churn Pro→Performer→Pro across
+# month boundaries (e.g. submit on day 28, re-upgrade on day 32) and harvest
+# extra credits while paying only Stripe proration fees. A 25-day floor
+# closes that window: legit monthly users have ~30-day gaps and pass; the
+# churn pattern requires gaps under 28 days and is rejected.
+COACHING_SUBSCRIPTION_COOLDOWN_DAYS = 25
+
+
+def _ensure_utc(dt: Optional[datetime]) -> Optional[datetime]:
+    """Coerce a naive UTC timestamp to tz-aware. Some legacy rows were stored
+    naive; comparing them against datetime.now(tz=UTC) crashes on tz mismatch."""
+    if dt is None:
+        return None
+    if dt.tzinfo is None:
+        return dt.replace(tzinfo=timezone.utc)
+    return dt
+
+
+def _subscription_coaching_eligibility(
+    db: Session, user_id: uuid.UUID, now: datetime
+) -> Tuple[bool, Optional["CoachingSubmission"], Optional[datetime]]:
+    """
+    Decide whether `user_id` can claim their subscription-tier coaching slot.
+
+    Returns ``(can_submit, blocking_submission, next_credit_at)``:
+    - ``can_submit`` is True when nothing blocks a new submission.
+    - ``blocking_submission`` is the most recent subscription-source row that
+      forces the cooldown (None when the user is eligible).
+    - ``next_credit_at`` is when the cooldown lifts, or the 1st of next
+      calendar month if the calendar-uniqueness rule is the binding gate.
+
+    Combines two checks:
+      1. ``COACHING_SUBSCRIPTION_COOLDOWN_DAYS`` since the last subscription
+         submission — defeats Pro→Performer→Pro churn across month boundaries.
+      2. The pre-existing calendar-month uniqueness — a legacy belt-and-braces
+         check that is also enforced at DB level by a UniqueConstraint.
+    """
+    last_sub_submission = (
+        db.query(CoachingSubmission)
+        .filter(
+            CoachingSubmission.user_id == user_id,
+            CoachingSubmission.source == "subscription",
+        )
+        .order_by(desc(CoachingSubmission.submitted_at))
+        .first()
+    )
+
+    # (1) Cooldown gate.
+    if last_sub_submission is not None:
+        last_at = _ensure_utc(last_sub_submission.submitted_at) or now
+        cooldown_lifts_at = last_at + timedelta(days=COACHING_SUBSCRIPTION_COOLDOWN_DAYS)
+        if now < cooldown_lifts_at:
+            return False, last_sub_submission, cooldown_lifts_at
+
+    # (2) Calendar-month gate (kept for parity with the DB unique constraint).
+    current_month_existing = (
+        db.query(CoachingSubmission)
+        .filter(
+            CoachingSubmission.user_id == user_id,
+            CoachingSubmission.submission_month == now.month,
+            CoachingSubmission.submission_year == now.year,
+            CoachingSubmission.source == "subscription",
+        )
+        .first()
+    )
+    if current_month_existing is not None:
+        if now.month == 12:
+            next_credit = datetime(now.year + 1, 1, 1, tzinfo=timezone.utc)
+        else:
+            next_credit = datetime(now.year, now.month + 1, 1, tzinfo=timezone.utc)
+        return False, current_month_existing, next_credit
+
+    return True, None, None
 
 
 def require_admin(user: User):
@@ -332,37 +409,28 @@ def get_coaching_status(
     require_guild_master(current_user)
 
     now = datetime.now(timezone.utc)
-    current_month = now.month
-    current_year = now.year
 
-    # Only the subscription-slot submission consumes the monthly credit. A
-    # Golden Ticket submission from the shop doesn't count against it.
-    existing = db.query(CoachingSubmission).filter(
-        CoachingSubmission.user_id == current_user.id,
-        CoachingSubmission.submission_month == current_month,
-        CoachingSubmission.submission_year == current_year,
-        CoachingSubmission.source == "subscription",
-    ).first()
+    can_submit, blocking, next_credit_at = _subscription_coaching_eligibility(
+        db, current_user.id, now
+    )
 
-    if existing:
-        # Calculate next month's first day
-        if current_month == 12:
-            next_credit = datetime(current_year + 1, 1, 1, tzinfo=timezone.utc)
-        else:
-            next_credit = datetime(current_year, current_month + 1, 1, tzinfo=timezone.utc)
-        
+    if not can_submit and blocking is not None:
+        when = next_credit_at or now
+        # %B %d works on both Windows (%#d) and POSIX (%-d) — accept the
+        # leading zero ("April 05") as a tiny cosmetic compromise for portability.
+        when_label = when.strftime("%B %d, %Y")
         return CoachingStatusResponse(
             can_submit=False,
-            current_submission=_format_submission_response(existing),
-            next_credit_date=next_credit,
-            message=f"Credit used. Resets on {next_credit.strftime('%B 1, %Y')}"
+            current_submission=_format_submission_response(blocking),
+            next_credit_date=when,
+            message=f"Credit used. Next credit available on {when_label}",
         )
-    
+
     return CoachingStatusResponse(
         can_submit=True,
         current_submission=None,
         next_credit_date=None,
-        message="You have 1 coaching credit available this month!"
+        message="You have 1 coaching credit available!"
     )
 
 
@@ -377,24 +445,48 @@ def submit_coaching_video(
     Limited to 1 per month. Guild Master only.
     """
     require_guild_master(current_user)
-    
+
+    # Defense-in-depth re-check against a freshly-loaded subscription row.
+    # `current_user.subscription` is a relationship hydrated when the request
+    # started; a tier change that landed in the meantime (downgrade webhook,
+    # dispute, refund) would not show up there. Re-querying closes the
+    # ~25-min frontend-cache window and webhook-lag races where a downgraded
+    # member could still slip a submission through.
+    fresh_sub = (
+        db.query(Subscription)
+        .filter(Subscription.user_id == current_user.id)
+        .first()
+    )
+    if (
+        fresh_sub is None
+        or fresh_sub.tier != SubscriptionTier.PERFORMER
+        or fresh_sub.status != SubscriptionStatus.ACTIVE
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Your Guild Master access is no longer active. Refresh and try again.",
+        )
+
     now = datetime.now(timezone.utc)
     current_month = now.month
     current_year = now.year
-    
-    # Only the subscription-slot submission is gated here. Golden Ticket
-    # submissions go through /coaching/submit-ticket and don't conflict.
-    existing = db.query(CoachingSubmission).filter(
-        CoachingSubmission.user_id == current_user.id,
-        CoachingSubmission.submission_month == current_month,
-        CoachingSubmission.submission_year == current_year,
-        CoachingSubmission.source == "subscription",
-    ).first()
 
-    if existing:
+    can_submit, blocking, next_credit_at = _subscription_coaching_eligibility(
+        db, current_user.id, now
+    )
+    if not can_submit:
+        when_label = (
+            next_credit_at.strftime("%B %d, %Y")
+            if next_credit_at is not None
+            else None
+        )
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="You have already submitted a coaching video this month."
+            detail=(
+                f"You've already used a coaching credit recently. Next credit available on {when_label}."
+                if when_label
+                else "You have already submitted a coaching video this month."
+            ),
         )
 
     # Validate video duration (max 100 seconds)

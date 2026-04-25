@@ -119,9 +119,15 @@ class Settings:
     STRIPE_SECRET_KEY: Optional[str] = os.getenv("STRIPE_SECRET_KEY")
     STRIPE_WEBHOOK_SECRET: Optional[str] = os.getenv("STRIPE_WEBHOOK_SECRET")
 
-    # Stripe Price IDs (TEST-mode; swap to live IDs at activation)
-    ADVANCED_PRICE_ID: str = "price_1TKKp51a6FlufVwfYgvr192X"
-    PERFORMER_PRICE_ID: str = "price_1TKKwC1a6FlufVwfVmE6uHml"
+    # Stripe Price IDs. The defaults are TEST-mode; set
+    # STRIPE_ADVANCED_PRICE_ID / STRIPE_PERFORMER_PRICE_ID in the live env to
+    # switch to the production prices without a code change.
+    ADVANCED_PRICE_ID: str = os.getenv(
+        "STRIPE_ADVANCED_PRICE_ID", "price_1TKKp51a6FlufVwfYgvr192X"
+    )
+    PERFORMER_PRICE_ID: str = os.getenv(
+        "STRIPE_PERFORMER_PRICE_ID", "price_1TKKwC1a6FlufVwfVmE6uHml"
+    )
 
     # Anthropic (Claude) API - used by moderation_service and ai_chat
     ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")

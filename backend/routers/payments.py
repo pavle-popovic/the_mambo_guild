@@ -3,7 +3,7 @@ from urllib.parse import urlparse
 import uuid
 import logging
 import stripe
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, status, Request
 from sqlalchemy import text
@@ -16,10 +16,15 @@ logger = logging.getLogger(__name__)
 from dependencies import get_db, get_current_user
 from models.user import User, UserProfile, Subscription, SubscriptionStatus, SubscriptionTier
 from models.payment import StripeWebhookEvent
+from models.premium import CoachingSubmission, CoachingSubmissionStatus
 from services import stripe_service
 from services.clave_service import award_subscription_bonus
 from services.badge_service import award_subscription_badge, revoke_subscription_badges
 from services.analytics_service import track_event
+from services.email_service import (
+    send_payment_failed_email,
+    send_subscription_canceled_email,
+)
 from config import settings
 
 from schemas.course import (
@@ -32,11 +37,11 @@ from schemas.course import (
 router = APIRouter(prefix="/payments", tags=["payments"])
 
 # Stripe Price IDs - Advanced and Performer (a.k.a. "VIP") tiers.
-# These are TEST-mode Price IDs. Swap to live IDs when activating payments.
+# Sourced from settings so live IDs can be set via env without a code change.
 # The display name on Stripe is "VIP" ($59/mo) but the internal enum stays
 # SubscriptionTier.PERFORMER to avoid a DB migration.
-ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X"
-PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml"
+ADVANCED_PRICE_ID = settings.ADVANCED_PRICE_ID
+PERFORMER_PRICE_ID = settings.PERFORMER_PRICE_ID
 
 def _fire_subscribe_and_purchase(
     *,
@@ -161,6 +166,39 @@ def _validate_return_url(url: str, field_name: str) -> str:
             detail=f"{field_name} must point to this site.",
         )
     return url
+
+
+def _expire_pending_subscription_coaching(db: Session, user_id) -> int:
+    """
+    On a full refund or chargeback, mark this user's PENDING subscription-source
+    coaching submissions as EXPIRED so a refunder can't keep their coach review.
+
+    Scope:
+      - status=PENDING only — IN_REVIEW or COMPLETED means the coach has
+        already done the work; we don't retroactively undo that.
+      - source='subscription' only — Golden Tickets are a separate paid
+        product and are not affected by a subscription refund.
+      - submitted_at within the last 60 days — bounds the operation to the
+        recent billing window so an unrelated old PENDING row (shouldn't
+        exist, but be defensive) isn't swept up.
+
+    Returns the number of rows expired so the caller can log it.
+    """
+    cutoff = datetime.now(timezone.utc) - timedelta(days=60)
+    expired_count = (
+        db.query(CoachingSubmission)
+        .filter(
+            CoachingSubmission.user_id == user_id,
+            CoachingSubmission.status == CoachingSubmissionStatus.PENDING,
+            CoachingSubmission.source == "subscription",
+            CoachingSubmission.submitted_at >= cutoff,
+        )
+        .update(
+            {CoachingSubmission.status: CoachingSubmissionStatus.EXPIRED},
+            synchronize_session=False,
+        )
+    )
+    return expired_count
 
 
 def _email_has_prior_stripe_subscription(email: str) -> bool:
@@ -472,13 +510,17 @@ async def stripe_webhook(
             # "ACTIVE" rows after a failed renewal.
             db_subscription.stripe_subscription_id = stripe_sub_id
             db_subscription.status = db_status
-            # Only promote tier when the sub is good-standing; on past_due /
-            # canceled the user is effectively losing access, but keep the tier
-            # so we can show "your Pro access is expiring" UX until the final
-            # customer.subscription.deleted lands.
+            # Promote tier on good-standing states. On past_due we revoke
+            # premium access immediately by dropping to ROOKIE — Stripe Smart
+            # Retries can run for ~14 days otherwise, during which a delinquent
+            # member would keep Guild Master perks for free. If a retry
+            # succeeds, invoice.payment_succeeded restores the tier from
+            # price.id automatically.
             if db_status in (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE):
                 db_subscription.tier = tier
                 db_subscription.current_period_end = period_end_dt
+            elif db_status == SubscriptionStatus.PAST_DUE:
+                db_subscription.tier = SubscriptionTier.ROOKIE
             db_subscription.cancel_at_period_end = bool(sub_obj.get("cancel_at_period_end"))
             if db_status == SubscriptionStatus.CANCELED:
                 db_subscription.tier = SubscriptionTier.ROOKIE
@@ -713,13 +755,249 @@ async def stripe_webhook(
                 )
             except Exception:
                 logger.exception("webhook: SubscriptionCanceled tracking failed (non-fatal)")
+
+            # Confirmation email so the user knows access has ended and has a
+            # one-click path back. Sent in background so a Resend hiccup never
+            # blocks the webhook ack.
+            try:
+                cancelled_user = db.query(User).filter(User.id == cancelled_user_id).first()
+                cancelled_profile = db.query(UserProfile).filter(
+                    UserProfile.user_id == cancelled_user_id
+                ).first()
+                if cancelled_user and cancelled_user.email:
+                    reactivate_url = f"{settings.FRONTEND_URL}/pricing"
+                    background_tasks.add_task(
+                        send_subscription_canceled_email,
+                        cancelled_user.email,
+                        cancelled_profile.first_name if cancelled_profile else "",
+                        (cancelled_tier or "premium").capitalize(),
+                        reactivate_url,
+                    )
+            except Exception:
+                logger.exception("webhook: queue cancellation email failed (non-fatal)")
         else:
             logger.warning(
                 f"Subscription {stripe_subscription_id} (customer {stripe_customer_id}) "
                 f"not found in DB for deletion event — ignoring."
             )
 
-    # Other event types can be handled here as needed
+    elif event["type"] == "invoice.payment_failed":
+        # A renewal charge (or the final trial-end charge) failed. The
+        # `customer.subscription.updated` handler above has already flipped
+        # the subscription to past_due and dropped tier to ROOKIE — here we
+        # just notify the user so they can fix their card. Sending only on
+        # the FIRST attempt prevents inbox spam during Stripe Smart Retries.
+        invoice = event["data"]["object"]
+        attempt_count = invoice.get("attempt_count", 0) or 0
+        customer_id = invoice.get("customer")
+        if not customer_id:
+            return {"status": "success"}
+
+        db_subscription = db.query(Subscription).filter(
+            Subscription.stripe_customer_id == customer_id
+        ).first()
+        if not db_subscription:
+            logger.info(
+                f"invoice.payment_failed for unknown customer {customer_id} — ignoring."
+            )
+            return {"status": "success"}
+
+        # Notify on first failure only. Subsequent retries by Stripe Smart
+        # Retries should not re-spam the user.
+        if attempt_count <= 1:
+            try:
+                failed_user = db.query(User).filter(
+                    User.id == db_subscription.user_id
+                ).first()
+                failed_profile = db.query(UserProfile).filter(
+                    UserProfile.user_id == db_subscription.user_id
+                ).first()
+                if failed_user and failed_user.email:
+                    portal_url = f"{settings.FRONTEND_URL}/pricing"
+                    tier_label = (
+                        "Guild Master"
+                        if db_subscription.tier == SubscriptionTier.PERFORMER
+                        else "Pro"
+                    )
+                    background_tasks.add_task(
+                        send_payment_failed_email,
+                        failed_user.email,
+                        failed_profile.first_name if failed_profile else "",
+                        portal_url,
+                        tier_label,
+                    )
+            except Exception:
+                logger.exception("webhook: queue payment_failed email failed (non-fatal)")
+
+        try:
+            track_event(
+                db=db,
+                event_name="SubscriptionPaymentFailed",
+                user_id=db_subscription.user_id,
+                properties={
+                    "attempt_count": attempt_count,
+                    "stripe_invoice_id": invoice.get("id"),
+                    "amount_due": (invoice.get("amount_due", 0) or 0) / 100.0,
+                },
+                request=request,
+            )
+        except Exception:
+            logger.exception("webhook: SubscriptionPaymentFailed tracking failed (non-fatal)")
+
+    elif event["type"] == "charge.refunded":
+        # Stripe fires this on every refund (full or partial). Only treat a
+        # FULL refund of a subscription charge as a cancellation — partial
+        # refunds (e.g., goodwill credits) should not revoke access. For full
+        # refunds we proactively cancel the active sub in Stripe; that emits
+        # customer.subscription.deleted, which is where the tier downgrade
+        # and confirmation email actually happen.
+        charge = event["data"]["object"]
+        amount = charge.get("amount", 0) or 0
+        amount_refunded = charge.get("amount_refunded", 0) or 0
+        is_full_refund = bool(charge.get("refunded")) or (
+            amount > 0 and amount_refunded >= amount
+        )
+        customer_id = charge.get("customer")
+
+        if not is_full_refund:
+            logger.info(
+                f"charge.refunded partial refund on charge {charge.get('id')} — no tier change."
+            )
+        elif customer_id:
+            db_subscription = db.query(Subscription).filter(
+                Subscription.stripe_customer_id == customer_id
+            ).first()
+            if db_subscription and db_subscription.stripe_subscription_id and db_subscription.status in (
+                SubscriptionStatus.ACTIVE,
+                SubscriptionStatus.TRIALING,
+                SubscriptionStatus.PAST_DUE,
+            ):
+                try:
+                    stripe.Subscription.delete(db_subscription.stripe_subscription_id)
+                    logger.info(
+                        f"charge.refunded: cancelled Stripe sub {db_subscription.stripe_subscription_id} "
+                        f"after full refund of charge {charge.get('id')}"
+                    )
+                except stripe.error.InvalidRequestError as e:
+                    # Already cancelled — fine, the deleted webhook will land.
+                    logger.info(
+                        f"charge.refunded: Stripe sub already cancelled or missing: {e}"
+                    )
+                except stripe.error.StripeError:
+                    # Belt-and-braces — if we can't reach Stripe, still revoke
+                    # access locally so the refund actually takes effect.
+                    logger.exception(
+                        f"charge.refunded: could not cancel Stripe sub, downgrading locally"
+                    )
+                    db_subscription.status = SubscriptionStatus.CANCELED
+                    db_subscription.tier = SubscriptionTier.ROOKIE
+                    db_subscription.cancel_at_period_end = False
+                    db.commit()
+
+                # Revoke any pending coaching submission from this billing
+                # period — refunders shouldn't get a free coach review on top
+                # of their refund. Run regardless of which Stripe path above
+                # ran; idempotent if there are no PENDING rows.
+                try:
+                    expired = _expire_pending_subscription_coaching(
+                        db, db_subscription.user_id
+                    )
+                    if expired:
+                        db.commit()
+                        logger.info(
+                            f"charge.refunded: expired {expired} pending coaching "
+                            f"submission(s) for user {db_subscription.user_id}"
+                        )
+                except Exception:
+                    logger.exception(
+                        "webhook: expire pending coaching on refund failed (non-fatal)"
+                    )
+                    db.rollback()
+
+    elif event["type"] == "charge.dispute.created":
+        # Chargeback opened. Industry standard: cancel immediately, don't
+        # wait for the dispute outcome (which can take 30-90 days). Cancelling
+        # in Stripe also unblocks the dispute response on Stripe's side.
+        dispute = event["data"]["object"]
+        charge_id = dispute.get("charge")
+        if not charge_id:
+            return {"status": "success"}
+
+        try:
+            charge = stripe.Charge.retrieve(charge_id)
+        except stripe.error.StripeError:
+            logger.exception(f"charge.dispute.created: failed to retrieve charge {charge_id}")
+            return {"status": "success"}
+
+        customer_id = charge.get("customer")
+        if not customer_id:
+            return {"status": "success"}
+
+        db_subscription = db.query(Subscription).filter(
+            Subscription.stripe_customer_id == customer_id
+        ).first()
+        if not db_subscription:
+            logger.warning(
+                f"charge.dispute.created for unknown customer {customer_id} — ignoring."
+            )
+            return {"status": "success"}
+
+        # Cancel in Stripe (idempotent: already-cancelled raises InvalidRequest)
+        if db_subscription.stripe_subscription_id:
+            try:
+                stripe.Subscription.delete(db_subscription.stripe_subscription_id)
+            except stripe.error.InvalidRequestError:
+                pass
+            except stripe.error.StripeError:
+                logger.exception("charge.dispute.created: Stripe cancel failed; downgrading locally")
+
+        # Always revoke locally as well, so a Stripe-side failure doesn't leave
+        # a fraudster on premium.
+        db_subscription.status = SubscriptionStatus.CANCELED
+        db_subscription.tier = SubscriptionTier.ROOKIE
+        db_subscription.cancel_at_period_end = False
+        db.commit()
+        db.refresh(db_subscription)
+
+        try:
+            revoke_subscription_badges(str(db_subscription.user_id), "rookie", db)
+            db.commit()
+        except Exception:
+            logger.exception("webhook: revoke_subscription_badges failed on dispute (non-fatal)")
+            db.rollback()
+
+        # Same revocation as on a full refund — a chargeback is effectively
+        # a forced refund, the user shouldn't retain a pending coach review.
+        try:
+            expired = _expire_pending_subscription_coaching(
+                db, db_subscription.user_id
+            )
+            if expired:
+                db.commit()
+                logger.info(
+                    f"charge.dispute.created: expired {expired} pending coaching "
+                    f"submission(s) for user {db_subscription.user_id}"
+                )
+        except Exception:
+            logger.exception(
+                "webhook: expire pending coaching on dispute failed (non-fatal)"
+            )
+            db.rollback()
+
+        try:
+            track_event(
+                db=db,
+                event_name="SubscriptionDisputed",
+                user_id=db_subscription.user_id,
+                properties={
+                    "stripe_charge_id": charge_id,
+                    "stripe_dispute_id": dispute.get("id"),
+                    "reason": dispute.get("reason"),
+                },
+                request=request,
+            )
+        except Exception:
+            logger.exception("webhook: SubscriptionDisputed tracking failed (non-fatal)")
 
     return {"status": "success"}
 
@@ -1009,3 +1287,60 @@ def resume_subscription(
     except Exception as e:
         logger.error(f"Unexpected error resuming subscription for user {current_user.id}: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+
+
+class PortalSessionRequest(BaseModel):
+    return_url: str
+
+
+class PortalSessionResponse(BaseModel):
+    url: str
+
+
+@router.post("/create-portal-session", response_model=PortalSessionResponse)
+def create_portal_session(
+    request_data: PortalSessionRequest,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Stripe Customer Portal session. The user lands on a Stripe-hosted page
+    where they can update card details, view invoices, change billing address,
+    and (depending on portal config) cancel the subscription. We do not need
+    to mirror any of that UI ourselves — Stripe handles it, and the resulting
+    state changes flow back through the existing webhook handlers.
+
+    Auth-only. The portal session is scoped to this user's Stripe customer,
+    so an authenticated request can never reach a different user's billing.
+    """
+    try:
+        safe_return_url = _validate_return_url(request_data.return_url, "return_url")
+
+        subscription = db.query(Subscription).filter(
+            Subscription.user_id == current_user.id
+        ).first()
+        if not subscription or not subscription.stripe_customer_id:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="No billing account found. Subscribe first to manage billing.",
+            )
+
+        portal_session = stripe.billing_portal.Session.create(
+            customer=subscription.stripe_customer_id,
+            return_url=safe_return_url,
+        )
+        return PortalSessionResponse(url=portal_session.url)
+    except HTTPException:
+        raise
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error creating portal session for user {current_user.id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Could not open the billing portal. Please try again.",
+        )
+    except Exception as e:
+        logger.error(f"Unexpected error creating portal session for user {current_user.id}: {e}")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="An unexpected error occurred. Please try again.",
+        )

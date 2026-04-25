@@ -479,6 +479,9 @@ class ApiClient {
       role: string;
       avatar_url: string | null;
       instagram_url: string | null;
+      subscription_cancel_at_period_end?: boolean;
+      subscription_period_end?: string | null;
+      subscription_status?: string | null;
       reputation: number;
       current_claves: number;
       badges: Array<{
@@ -1063,6 +1066,13 @@ class ApiClient {
       remaining: number;
       is_full: boolean;
     }>("/api/payments/guild-master-seats");
+  }
+
+  async createPortalSession(returnUrl: string) {
+    return this.request<{ url: string }>("/api/payments/create-portal-session", {
+      method: "POST",
+      body: JSON.stringify({ return_url: returnUrl }),
+    });
   }
 
   // ============================================

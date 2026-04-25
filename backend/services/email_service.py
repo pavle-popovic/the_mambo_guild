@@ -458,6 +458,136 @@ def send_ambassador_application_email(
         return False
 
 
+def send_payment_failed_email(
+    email: str,
+    name: str,
+    manage_billing_url: str,
+    tier_label: str,
+) -> bool:
+    """
+    Notify a member that their renewal payment failed and access has been
+    paused until they update their card. Linked to the Stripe Customer Portal
+    so they can fix it themselves without contacting support.
+    """
+    if not resend or not settings.RESEND_API_KEY:
+        logger.error("Resend client not configured. Cannot send payment failed email.")
+        return False
+
+    try:
+        from_email = settings.FROM_EMAIL
+        from html import escape
+        safe_name = escape(name or "there")
+        safe_tier = escape(tier_label)
+        safe_url = escape(manage_billing_url)
+
+        result = resend.Emails.send({
+            "from": f"The Mambo Guild <{from_email}>",
+            "to": [email],
+            "subject": "Action needed: your Mambo Guild payment did not go through",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {{ font-family: Georgia, 'Times New Roman', Times, serif; background-color: #F9F7F1; color: #333333; margin: 0; padding: 0; line-height: 1.8; }}
+                    .container {{ max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #F9F7F1; }}
+                    .badge {{ display: inline-block; background-color: #D4AF37; color: #000; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; margin-bottom: 24px; font-family: Arial, sans-serif; }}
+                    h1 {{ font-family: Georgia, serif; font-size: 26px; color: #111; margin-bottom: 8px; }}
+                    p {{ font-size: 16px; margin-bottom: 18px; }}
+                    .cta-button {{ display: inline-block; padding: 14px 32px; background-color: #D4AF37; color: #000000; text-decoration: none; font-family: Arial, sans-serif; font-weight: bold; font-size: 15px; border-radius: 4px; margin: 20px 0; }}
+                    .divider {{ border: none; border-top: 1px solid #e0e0e0; margin: 32px 0; }}
+                    .footer {{ font-size: 13px; color: #888; font-style: italic; font-family: Arial, sans-serif; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="badge">Billing</div>
+                    <h1>We could not charge your card, {safe_name}.</h1>
+                    <p>Your latest <strong>{safe_tier}</strong> renewal was declined by your bank. Your premium access has been paused while we sort this out.</p>
+                    <p>The fix is fast: open the billing portal and update your card. Once we collect a successful payment, your tier comes back automatically.</p>
+                    <a href="{safe_url}" class="cta-button">Update payment method</a>
+                    <p>Stripe will retry the charge a few more times over the next several days. If none succeed, the subscription will be cancelled and you can re-subscribe whenever you are ready.</p>
+                    <hr class="divider">
+                    <p class="footer">Need help? Reply to this email and I will personally take a look.<br>Pavle &amp; The Mambo Guild Team</p>
+                </div>
+            </body>
+            </html>
+            """,
+        })
+
+        logger.info(f"Payment failed email sent to {email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send payment failed email to {email}: {str(e)}")
+        return False
+
+
+def send_subscription_canceled_email(
+    email: str,
+    name: str,
+    tier_label: str,
+    reactivate_url: str,
+) -> bool:
+    """
+    Confirm a cancellation has gone through. Sent on the final
+    customer.subscription.deleted event (after period end), not on the
+    user's "cancel at period end" click — that one keeps full access.
+    """
+    if not resend or not settings.RESEND_API_KEY:
+        logger.error("Resend client not configured. Cannot send cancellation email.")
+        return False
+
+    try:
+        from_email = settings.FROM_EMAIL
+        from html import escape
+        safe_name = escape(name or "there")
+        safe_tier = escape(tier_label)
+        safe_url = escape(reactivate_url)
+
+        result = resend.Emails.send({
+            "from": f"The Mambo Guild <{from_email}>",
+            "to": [email],
+            "subject": "Your Mambo Guild subscription has ended",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    body {{ font-family: Georgia, 'Times New Roman', Times, serif; background-color: #F9F7F1; color: #333333; margin: 0; padding: 0; line-height: 1.8; }}
+                    .container {{ max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #F9F7F1; }}
+                    .badge {{ display: inline-block; background-color: #D4AF37; color: #000; font-size: 12px; font-weight: bold; letter-spacing: 1px; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; margin-bottom: 24px; font-family: Arial, sans-serif; }}
+                    h1 {{ font-family: Georgia, serif; font-size: 26px; color: #111; margin-bottom: 8px; }}
+                    p {{ font-size: 16px; margin-bottom: 18px; }}
+                    .cta-button {{ display: inline-block; padding: 14px 32px; background-color: #D4AF37; color: #000000; text-decoration: none; font-family: Arial, sans-serif; font-weight: bold; font-size: 15px; border-radius: 4px; margin: 20px 0; }}
+                    .divider {{ border: none; border-top: 1px solid #e0e0e0; margin: 32px 0; }}
+                    .footer {{ font-size: 13px; color: #888; font-style: italic; font-family: Arial, sans-serif; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="badge">Subscription</div>
+                    <h1>Your {safe_tier} subscription has ended, {safe_name}.</h1>
+                    <p>You still have a free Rookie account, so all your XP, badges, streaks and progress are safe and waiting for you whenever you decide to come back.</p>
+                    <p>If this was a mistake, or if you change your mind, you can re-activate in one click and pick up exactly where you left off.</p>
+                    <a href="{safe_url}" class="cta-button">Re-activate my plan</a>
+                    <p>Thank you for the time you spent training with us. Whatever comes next, keep dancing.</p>
+                    <hr class="divider">
+                    <p class="footer">Pavle &amp; The Mambo Guild Team</p>
+                </div>
+            </body>
+            </html>
+            """,
+        })
+
+        logger.info(f"Subscription cancellation email sent to {email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send cancellation email to {email}: {str(e)}")
+        return False
+
+
 def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -> bool:
     """
     Send welcome email to new waitlist members.

@@ -18,6 +18,7 @@ interface User {
   is_pro?: boolean;
   subscription_cancel_at_period_end?: boolean;
   subscription_period_end?: string | null;
+  subscription_status?: string | null;
   reputation: number;
   current_claves: number;
   badges: Array<{

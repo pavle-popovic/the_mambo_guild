@@ -27,3 +27,14 @@ export function daysUntilProGrandfatherEnd(now: number = Date.now()): number {
     const diff = end - now;
     return Math.max(0, Math.ceil(diff / 86_400_000));
 }
+
+// Stripe Price IDs. Defaults are the TEST-mode prices used in sandbox; set
+// NEXT_PUBLIC_STRIPE_ADVANCED_PRICE_ID / NEXT_PUBLIC_STRIPE_PERFORMER_PRICE_ID
+// in the live Vercel env (and the matching STRIPE_*_PRICE_ID in Railway) to
+// flip to production without a code change.
+export const ADVANCED_PRICE_ID =
+    process.env.NEXT_PUBLIC_STRIPE_ADVANCED_PRICE_ID ||
+    "price_1TKKp51a6FlufVwfYgvr192X";
+export const PERFORMER_PRICE_ID =
+    process.env.NEXT_PUBLIC_STRIPE_PERFORMER_PRICE_ID ||
+    "price_1TKKwC1a6FlufVwfVmE6uHml";

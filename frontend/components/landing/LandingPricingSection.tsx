@@ -9,11 +9,12 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { HoverCard, Clickable, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
-import { daysUntilProGrandfatherEnd } from "@/lib/site";
+import {
+  daysUntilProGrandfatherEnd,
+  ADVANCED_PRICE_ID,
+  PERFORMER_PRICE_ID,
+} from "@/lib/site";
 import { useTranslations } from "@/i18n/useTranslations";
-
-const ADVANCED_PRICE_ID = "price_1TKKp51a6FlufVwfYgvr192X";
-const PERFORMER_PRICE_ID = "price_1TKKwC1a6FlufVwfVmE6uHml";
 
 type Plan = {
   id: string;
