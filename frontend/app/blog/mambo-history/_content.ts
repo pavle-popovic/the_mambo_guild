@@ -689,11 +689,521 @@ const CONTENT: Record<Locale, MamboHistoryContent> = {
       },
     ],
   },
-  ja: {} as MamboHistoryContent,
-  ko: {} as MamboHistoryContent,
-  zh: {} as MamboHistoryContent,
-  ru: {} as MamboHistoryContent,
-  pl: {} as MamboHistoryContent,
+  // ============================================================ JA
+  ja: {
+    metaTitle: "マンボの誕生:ハバナからパラディアムへ",
+    metaDescription:
+      "マンボがいかにキューバのダンソン、ソン、アフロキューバンのリズムから生まれ、アルセニオ・ロドリゲスとパラディアムのダンサーたちによって変容し、エディ・トーレスによって現代のニューヨーク・スタイルのサルサ On2 として体系化されたか。",
+
+    breadcrumbHome: "ホーム",
+    breadcrumbBlog: "ブログ",
+    breadcrumbCurrent: "マンボの歴史",
+
+    badge: "歴史",
+    h1Pre: "マンボの誕生:",
+    h1Accent: "ハバナからパラディアムへ",
+
+    shortAnswerRich:
+      "マンボはひとつの瞬間に発明されたものではない。それは1世紀にわたる総合の到達点だ。アフロキューバンの打楽器の伝統、スペイン・ヨーロッパ系の社交ダンスの形式、アメリカ都市の劇場性が、3つの連続する時代に衝突して生まれた。その現代的な形は、1940年代のハバナで **アルセニオ・ロドリゲス** が結晶化させ、1950年代のニューヨークで **パラディアムのダンサーたち** が変貌させ、1970年代に **エディ・トーレス** が指導用に体系化した。",
+
+    sec1Title: "第1部:キューバの3つのルーツ",
+    sec1Paragraphs: [
+      "ニューヨークがマンボを自分のものとして主張する前に、ダンスのリズムと身体言語は、動き方について正反対の考えを持つ2つの文化が衝突するなかでキューバで鍛えられた。",
+      "一方は **ヨーロッパの伝統** だ。スペイン植民地の舞踏会、コントラダンサ、そして最終的にダンソン(1879年にミゲル・ファイルデが初演)。ダンスは直立していた。フレームは厳格だった。脚は比較的伸ばされていた。音楽はバイオリン、フルート、ピアノで奏でられた。ダンサーは表拍をしっかりと踏んだ。",
+      "もう一方は **アフロキューバンの伝統** だ。*ソラレス*(中庭)や労働者階級の地区で守られていた:ルンバ、なかでもグアグアンコ、ヤンブ、コロンビア。姿勢は低く、膝は曲げられ、重心は地面にしっかりと根を張っていた。動きは肩、肋骨、腰に宿った。フレーズはオフビートと、その間にある空白を強調した。",
+      "20世紀前半を通じて、これらの伝統は階級と人種によって分け隔てられていた。両者をつなぐ橋は1920年代に **ソン** という形で現れた。東部のオリエンテ州を発祥とするソンは、スペインのギターと歌詞構造をアフロキューバンの打楽器(ボンゴ、マラカス、クラーベ)と結びつけた。それは上流階級のクラブで社会的に許容され、同時に街の本物のリズムの伝統に駆動された最初の音楽だった。",
+    ],
+
+    sec2Title: "第2部:アルセニオ・ロドリゲスとコンガ",
+    sec2Paragraphs: [
+      "1930〜40年代、盲目のトレス奏者 **アルセニオ・ロドリゲス** は、ソンのアンサンブルにはもっと推進力が必要だと判断した。彼は伝統的なセプテートを *コンフント* に拡張し、複数のトランペット、ピアノ、そして(最も論争を呼んだ)コンガを加えた。コンガはそれまで、フォーマルなアンサンブルには「ストリート的すぎる」として退けられていた。アルセニオはそれをサウンドの中心に据えた。",
+      "彼はまた、曲の **モントゥーノ** 部分を引き伸ばした。あの開かれた、強くシンコペーションされた、繰り返しの終結ヴァンプ。歌い手が即興し、ダンサーがついに解放される場所だ。そこから生まれた、遅く、突き進み、打楽器が前面に出るソン・モントゥーノは、マンボの直接のリズム的祖先だ。",
+      "アルセニオが音楽的に押し通したのは、アフロキューバン的な時間の捉え方だった。音楽の根幹のパターンは **クラーベ** で、5つの打点からなる骨格が、その上に積まれるすべての層の感覚を決める。正しく踊られると、音楽は身体に対して、膝を緩め、重心を下げ、体重移動を遅らせて、ステップがリズムを踏みつけるのではなくリズムに沈み込むことを要求する。その遅れこそが、キューバ的な動き(腰の8の字)を機械的にではなく自然に生じさせるものだ。",
+    ],
+
+    sec3Title: "第3部:パラディアム・ボールルーム(1948-1966)",
+    sec3IntroParagraphs: [
+      "1948年、53丁目とブロードウェイの角にあるパラディアム・ボールルームは、人種統合のラテン音楽ナイトに門戸を開いた。数年のうちに、そこは **マンボ・クレイズ** の震源地となった。3人のハウス・バンドリーダー(ティト・プエンテ、ティト・ロドリゲス、マチート)が音楽を引っ張った。ブロンクス、ブルックリン、スパニッシュ・ハーレムのダンサーたちがダンスを引っ張った。",
+      "パラディアムのダンサーたちは学術的な訓練を受けていなかった。彼らは公的な社会的地位を持たず、代わりにダンスフロアの上で自分のアイデンティティを築いていた、労働者階級のプエルトリコ系、イタリア系、ユダヤ系、アフリカ系アメリカ人の若者たちだった。彼らはあらゆるところから盗んだ。コットン・クラブからはタップ、サヴォイ・ボールルームからはリンディ・ホップのアクロバット、ミッドタウン・マンハッタンのスタジオからは社交ダンスのフレーム。それらすべてをアフロキューバンのクラーベの上にボルトで留めた。",
+    ],
+    sec3LegendsLeadIn: "この時代の伝説たち:",
+    sec3LegendsBullets: [
+      "**キューバン・ピート(ペドロ・アギラール)**、ブロンクス出身のプエルトリコ系ダンサーで、タップとリンディ・ホップのバックグラウンドを持ち、アフロキューバンの地に足のついた感覚をアメリカン・ジャズのスタイリングと融合させ、エキシビションのマンボを職業として確立した。",
+      "**ミリー・ドネイ**、キューバン・ピートのイタリア系アメリカ人パートナー。フォロワーの役割を革命的に変えた。ミリー以前、ラテン・ダンスのフォロワーはリーダーに受動的に従うことが期待されていた。彼女は一打一打、彼に応酬した。",
+      "**キラー・ジョー・ピロ**、イタリア系アメリカ人ダンサー。国でもっとも有名なマンボ講師となり、パラディアムのフロアの混沌を、アメリカの中産階級に売れるステップへと体系化した人物。",
+      "**オーギー&マーゴ・ロドリゲス** はマンボを大きな社交ダンスのテクニックと融合させ、エド・サリヴァン・ショーを通じてダンスを全米テレビに送り込んだ。",
+    ],
+    sec3OutroParagraphs: [
+      "この衝突から、いまもニューヨーク・マンボを定義する生体力学的な署名が生まれた。地に根ざした膝を曲げた下半身と、攻撃的に直立し、フレームをロックした上半身。腹筋のコアが両者の間のショックアブソーバーとして働く。世界レベルの On2 ダンサーの足が目にもとまらぬ速さで動く一方で、胸が完全に静止しているのを見るとき、あなたが見ているのはこの時代の直接の遺産だ。",
+    ],
+
+    sec4Title: "第4部:エディ・トーレスと On2 の体系化",
+    sec4Paragraphs: [
+      "パラディアムは1966年に閉鎖された。1970年代までに、「マンボ」と呼ばれていたものは、レコード業界によって「サルサ」として再ブランド化されていた。同じアフロキューバンの音楽的伝統が、市場に受けやすい新しいラベルの下に置かれたのだ。",
+      "パラディアムの時代と現代の橋渡しをしたダンサーが **エディ・トーレス** だ。トーレスはティト・プエンテに学び、プエンテ自身から、2でブレイクすることが1でブレイクするよりもクラーベとコンガに忠実だと直接告げられた。トーレスはその音楽的原理を、教えられるシステムへと組み立てた。具体的なカウント構造、具体的なベーシック・ステップ、何年ものクラブ漬けで吸収するのではなく、レッスンごとに学べる教育法だ。",
+      "現代のサルサ On2 のあらゆるカリキュラム、これも例外ではないが、最終的にはエディ・トーレスの構造的な仕事に行き着く。「ニューヨーク・スタイル」という言葉はトーレスの系譜の同義語となった。今日、ニューヨークから東京まで「On2」が教えられているが、ほぼすべての教師が受け継ぐシステムは、ティト・プエンテが2について彼に投げかけたひとつの問いに対するトーレスの答えだった。",
+    ],
+
+    sec5Title: "なぜこの歴史がフロアで重要なのか",
+    sec5Intro:
+      "ここでの歴史は飾りではない。ダンスがどこから来たのかを理解すると、実際の動き方において3つのことが変わる:",
+    sec5Steps: [
+      "**膝を曲げることに抗うのをやめる。** 柔らかい膝はスタイルの選択ではない。リズムを成立させる遅延した体重移動を実行するために、生物学的に必要なものだ。",
+      "**肩を弾ませるのをやめる。** 静かな上半身は美学的なポーズではない。フットワークを読み取れるようにし、フレームを通じてリードを読み取れるようにする、受け継がれた社交ダンスの規律だ。",
+      "**1でブレイクするのをやめる。** コンガのスラップは2に落ちる。あなたのブレイク・ステップは恣意的なカウントの選択ではなく、あなたの身体とバンドのリズムセクションの出会う場所だ。",
+    ],
+    sec5OutroRich:
+      "これが [link]On2 スタイル[/link] の主張であり、The Mambo Guild のカリキュラムの中核だ。",
+
+    sec6Title: "出典とさらなる読書",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "もっと深く",
+    ctaHeading: "The Mambo Guild には全20モジュールの歴史コースがあります。",
+    ctaBody:
+      "各モジュールが物語のひとつの糸をたどります。アフリカの太鼓の伝統からファニア時代まで。すべてに出典があり、すべて認定されたダンス研究者が教えます。The Mambo Guild のすべての会員プランに含まれます。",
+
+    faqs: [
+      {
+        q: "実際にマンボを発明したのは誰ですか?",
+        a: "唯一の発明者はいません。キューバのバンドリーダー、アルセニオ・ロドリゲス(1940年代ハバナ)とペレス・プラード(1948年以降のメキシコシティ)が音楽の基礎的な形を与えました。ダンスは1948〜1966年のパラディアム・ボールルームで、労働者階級のニューヨーカーたちによって結晶化されました。",
+      },
+      {
+        q: "マンボとサルサは同じものですか?",
+        a: "音楽的には、現代のサルサは1970年代初頭にニューヨークのレコード業界が行った、マンボと隣接するアフロキューバンのジャンルのマーケティング上の再ブランド化です。ダンスとして今日サルサ On2(ニューヨーク・スタイル)として教えられているものは、パラディアム時代のマンボの直接の子孫です。",
+      },
+      {
+        q: "クラーベとは何ですか?",
+        a: "クラーベは2小節にわたる5打点のリズム・パターン(3-2 または 2-3)で、すべてのアフロキューバン音楽を支えています。他のすべての楽器はそれに対してフレージングされます。正しく踊れば、あなたの体重移動もそれに揃います。",
+      },
+      {
+        q: "なぜパラディアム時代は終わったのですか?",
+        a: "パラディアム・ボールルームは1966年に酒類販売免許を失い、その後まもなく閉鎖されました。マンボ・ブームはまた、より広い文化のなかではロックンロールに、ラテン音楽の内部ではブーガルーと初期サルサ・レーベル時代によって、すでに置き換えられていました。",
+      },
+      {
+        q: "エディ・トーレスとは誰ですか?",
+        a: "エディ・トーレスはニューヨークのダンサー兼振付家で、ティト・プエンテに師事し、現在世界中でサルサ On2 / ニューヨーク・スタイルとして教えられているものを体系化しました。彼はパラディアム時代のダンサーたちのフロアの知を、教えられるカリキュラムへと変えたのです。",
+      },
+    ],
+  },
+  // ============================================================ KO
+  ko: {
+    metaTitle: "맘보의 탄생: 아바나에서 팔라디움까지",
+    metaDescription:
+      "맘보가 어떻게 쿠바의 단존, 손, 아프로쿠반 리듬에서 출현했고, 아르세니오 로드리게스와 팔라디움 댄서들에 의해 변형되었으며, 에디 토레스에 의해 현대 뉴욕 스타일 살사 On2로 체계화되었는지.",
+
+    breadcrumbHome: "홈",
+    breadcrumbBlog: "블로그",
+    breadcrumbCurrent: "맘보의 역사",
+
+    badge: "역사",
+    h1Pre: "맘보의 탄생: ",
+    h1Accent: "아바나에서 팔라디움까지",
+
+    shortAnswerRich:
+      "맘보는 어느 한 순간에 발명된 것이 아니다. 한 세기에 걸친 종합의 정점이다. 아프로쿠반 타악 전통, 스페인-유럽계 사교 무용 형식, 미국 도시의 연극성이 세 시대에 걸쳐 충돌하면서 만들어졌다. 그 현대적 형태는 1940년대 아바나에서 **아르세니오 로드리게스** 가 결정화시켰고, 1950년대 뉴욕에서 **팔라디움 댄서들** 이 변모시켰으며, 1970년대에 **에디 토레스** 가 가르치기 위한 형태로 체계화했다.",
+
+    sec1Title: "1부: 쿠바의 세 가지 뿌리",
+    sec1Paragraphs: [
+      "뉴욕이 맘보를 자기 것이라 주장하기 전, 이 춤의 리듬과 신체 언어는 움직임에 대해 정반대의 생각을 가진 두 문화의 충돌 속에서 쿠바에서 벼려졌다.",
+      "한쪽은 **유럽의 전통** 이었다. 스페인 식민지 시대의 무도장, 콘트라단사, 그리고 마침내 단존(1879년 미겔 파일데가 초연). 춤은 곧추서 있었다. 자세는 엄격했다. 다리는 비교적 곧게 뻗어 있었다. 음악은 바이올린, 플루트, 피아노로 연주되었다. 댄서들은 박자의 강박을 단단히 디뎠다.",
+      "다른 한쪽은 **아프로쿠반 전통** 이었다. *솔라레스*(안뜰)와 노동계급 동네에 보존되어 있었다. 룸바, 그 안에 과과앙코, 얌부, 콜룸비아. 자세는 낮고 무릎은 굽혀져 있으며 무게중심은 땅에 단단히 박혀 있었다. 움직임은 어깨, 갈비뼈, 엉덩이에 살았다. 프레이징은 오프비트와 그 사이의 빈 공간을 강조했다.",
+      "20세기 초까지 이 두 전통은 계급과 인종에 의해 분리되어 있었다. 둘 사이의 다리는 1920년대에 **손(Son)** 의 형태로 등장했다. 동부 오리엔테주에서 기원한 손은 스페인의 기타와 가사 구조를 아프로쿠반 타악(봉고, 마라카스, 클라베)과 결합시켰다. 그것은 상류층 클럽에서 사회적으로 받아들여지면서도, 거리의 리듬 전통에 의해 진정으로 추동된 최초의 음악이었다.",
+    ],
+
+    sec2Title: "2부: 아르세니오 로드리게스와 콩가",
+    sec2Paragraphs: [
+      "1930~40년대, 시각장애인 트레스 연주자 **아르세니오 로드리게스** 는 손 앙상블에 더 많은 추진력이 필요하다고 결정했다. 그는 전통적인 셉테토를 *콘훈토* 로 확장해 여러 트럼펫과 피아노를 더했고, (가장 논란이 된) 콩가도 추가했다. 콩가는 그때까지 정식 앙상블에는 너무 \"거리적\"이라며 배제되어 왔다. 아르세니오는 그것을 사운드의 중심에 놓았다.",
+      "그는 또 곡의 **몬투노** 부분을 길게 늘였다. 끝에 위치한, 열려 있고 강하게 싱코페이션된 반복적인 뱀프 구간. 가수가 즉흥을 펼치고 댄서들이 마침내 풀려날 수 있는 곳. 거기서 나온 느리고 밀어붙이며 타악기가 전면에 나선 손 몬투노가 맘보의 직계 리듬 조상이다.",
+      "아르세니오가 음악적으로 관철시킨 것은 시간을 다루는 아프로쿠반적 방식이었다. 음악의 기초 패턴은 **클라베** 다. 다섯 타격으로 이루어진 골격이 그 위에 쌓이는 모든 층의 감각을 결정한다. 제대로 춤을 추면 음악은 몸에게 무릎을 부드럽게 하고 무게중심을 낮추며 체중 이동을 지연시키도록 요구한다. 그래야 스텝이 리듬 위를 행진하는 것이 아니라 리듬 속으로 가라앉는다. 그 지연이 바로 쿠바적 움직임(엉덩이의 8자 모양)을 기계적이지 않고 자연스럽게 일어나게 만든다.",
+    ],
+
+    sec3Title: "3부: 팔라디움 볼룸 (1948-1966)",
+    sec3IntroParagraphs: [
+      "1948년, 53번가와 브로드웨이 모퉁이의 팔라디움 볼룸이 인종 통합 라틴 음악의 밤들을 위해 문을 열었다. 몇 년 만에 그곳은 **맘보 열풍** 의 진원지가 되었다. 세 명의 하우스 밴드 리더(티토 푸엔테, 티토 로드리게스, 마치토)가 음악을 이끌었다. 브롱크스, 브루클린, 스패니시 할렘의 댄서들이 춤을 이끌었다.",
+      "팔라디움 댄서들은 학문적 훈련을 받은 사람들이 아니었다. 공식적인 사회적 지위가 없었기에 댄스 플로어 위에서 자신의 정체성을 만들어가던 노동계급의 푸에르토리코계, 이탈리아계, 유대계, 아프리카계 미국인 청소년들이었다. 그들은 모든 것에서 훔쳐왔다. 코튼 클럽의 탭, 사보이 볼룸의 린디 합 곡예, 미드타운 맨해튼 스튜디오의 사교 무용 프레임. 그들은 이 모든 것을 아프로쿠반의 클라베 위에 볼트로 고정시켰다.",
+    ],
+    sec3LegendsLeadIn: "이 시대의 전설들:",
+    sec3LegendsBullets: [
+      "**쿠반 피트(페드로 아길라르)**, 브롱크스 출신의 푸에르토리코계 댄서로 탭과 린디 합 배경을 가지고 있으며, 아프로쿠반의 묵직한 그라운딩과 미국 재즈의 스타일링을 융합해 전시용 맘보를 직업화했다.",
+      "**밀리 도네이**, 쿠반 피트의 이탈리아계 미국인 파트너. 팔로워의 역할을 혁명적으로 바꿨다. 밀리 이전에는 라틴 댄스에서 팔로워는 리더를 수동적으로 따르도록 기대받았다. 그녀는 한 박자 한 박자 그에게 맞받아쳤다.",
+      "**킬러 조 피로**, 이탈리아계 미국인 댄서. 미국에서 가장 유명한 맘보 강사가 되었으며, 팔라디움 플로어의 혼돈을 미국 중산층에게 팔 수 있는 스텝으로 체계화한 인물.",
+      "**오기 & 마고 로드리게스** 는 맘보를 시원시원한 사교 무용 기법과 융합시키고, 에드 설리번 쇼를 통해 이 춤을 전국 텔레비전에 올렸다.",
+    ],
+    sec3OutroParagraphs: [
+      "이 충돌에서 지금도 뉴욕 맘보를 정의하는 생체역학적 서명이 나왔다. 단단히 자리잡고 무릎이 굽혀진 하체에, 공격적으로 곧추서고 프레임이 잠긴 상체가 결합된다. 복부 코어가 둘 사이의 충격 흡수 장치 역할을 한다. 세계 정상급 On2 댄서의 발이 눈으로 좇기 어려운 속도로 움직이는 동안 가슴은 완전히 고요하게 머물러 있는 것을 본다면, 당신은 이 시대의 직접적인 유산을 보고 있는 것이다.",
+    ],
+
+    sec4Title: "4부: 에디 토레스와 On2의 체계화",
+    sec4Paragraphs: [
+      "팔라디움은 1966년에 문을 닫았다. 1970년대까지 \"맘보\"라 불리던 것은 음반 산업에 의해 \"살사\"로 리브랜딩되고 있었다. 같은 아프로쿠반 음악 전통이 시장친화적인 새 라벨 아래에 놓인 것이다.",
+      "팔라디움 시대와 현대를 연결한 댄서가 **에디 토레스** 다. 토레스는 티토 푸엔테에게 사사했는데, 푸엔테는 직접 그에게 2박에서 브레이크하는 것이 1박에서 브레이크하는 것보다 클라베와 콩가에 더 충실하다고 말했다. 토레스는 그 음악적 원리를 가르칠 수 있는 시스템으로 쌓아올렸다. 구체적인 카운트 구조, 구체적인 베이직 스텝, 클럽 삼투작용으로 수년에 걸쳐 흡수하는 것이 아니라 수업 단위로 배울 수 있는 교육 방식.",
+      "이 커리큘럼을 포함한 모든 현대 살사 On2 커리큘럼은 결국 에디 토레스의 구조적 작업으로 거슬러 올라간다. \"뉴욕 스타일\"이라는 표현은 토레스의 계보와 동의어가 되었다. 오늘날 \"On2\"는 뉴욕에서 도쿄까지 어디서든 가르쳐지지만, 거의 모든 그 강사들이 물려받는 시스템은 티토 푸엔테가 2박에 대해 던진 단 하나의 질문에 대한 토레스의 답이었다.",
+    ],
+
+    sec5Title: "이 역사가 플로어에서 중요한 이유",
+    sec5Intro:
+      "여기서 역사는 장식이 아니다. 춤이 어디에서 왔는지를 이해하면, 실제로 움직이는 방식에서 세 가지가 바뀐다:",
+    sec5Steps: [
+      "**굽힌 무릎과 싸우기를 멈춘다.** 부드러운 무릎은 스타일의 선택이 아니다. 리듬을 성립시키는 지연된 체중 이동을 실행하기 위해 생물학적으로 요구되는 것이다.",
+      "**어깨를 들썩이는 것을 멈춘다.** 고요한 상체는 미적 가식이 아니다. 풋워크를 읽힐 수 있게 만들고, 프레임을 통해 리드를 읽힐 수 있게 만드는 물려받은 사교 무용의 규율이다.",
+      "**1박에서 브레이크하는 것을 멈춘다.** 콩가의 슬랩은 2박에 떨어진다. 당신의 브레이크 스텝은 임의의 카운트 선택이 아니라, 당신의 몸과 밴드의 리듬 섹션이 만나는 지점이다.",
+    ],
+    sec5OutroRich:
+      "이것이 [link]On2 스타일[/link]의 명제이며 The Mambo Guild 커리큘럼의 핵심이다.",
+
+    sec6Title: "출처 및 더 읽을거리",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "더 깊이",
+    ctaHeading: "The Mambo Guild에는 20개 모듈로 구성된 전체 역사 강좌가 있습니다.",
+    ctaBody:
+      "각 모듈은 이야기의 한 가닥을 따라갑니다. 아프리카 드럼 전통에서 파니아 시대까지. 모두 출처가 있고, 모두 공인 무용 학자들이 가르칩니다. 모든 The Mambo Guild 멤버십에 포함되어 있습니다.",
+
+    faqs: [
+      {
+        q: "실제로 맘보를 발명한 사람은 누구입니까?",
+        a: "단일한 발명자는 없습니다. 쿠바의 밴드 리더 아르세니오 로드리게스(1940년대 아바나)와 페레스 프라도(1948년 이후 멕시코시티)가 음악에 기초적 형태를 부여했고, 춤은 1948-1966년 팔라디움 볼룸에서 노동계급 뉴요커들에 의해 결정화되었습니다.",
+      },
+      {
+        q: "맘보와 살사는 같은 것입니까?",
+        a: "음악적으로 현대의 살사는 1970년대 초 뉴욕 음반 산업이 만든, 맘보와 인접한 아프로쿠반 장르의 마케팅 리브랜딩입니다. 춤으로서, 오늘날 살사 On2(뉴욕 스타일)로 가르쳐지는 것은 팔라디움 시대 맘보의 직접 후손입니다.",
+      },
+      {
+        q: "클라베란 무엇입니까?",
+        a: "클라베는 두 마디에 걸친 5타격 리듬 패턴(3-2 또는 2-3)으로, 모든 아프로쿠반 음악을 떠받칩니다. 다른 모든 악기는 그에 맞추어 프레이징되며, 제대로 춤을 추면 당신의 체중 이동도 그것에 정렬됩니다.",
+      },
+      {
+        q: "팔라디움 시대는 왜 끝났습니까?",
+        a: "팔라디움 볼룸은 1966년에 주류 판매 면허를 잃고 곧 폐쇄되었습니다. 맘보 열풍은 또한 더 넓은 문화 안에서는 로큰롤에 의해, 라틴 음악 안에서는 부갈루와 초기 살사 레이블 시대에 의해 이미 자리를 내준 상태였습니다.",
+      },
+      {
+        q: "에디 토레스는 누구입니까?",
+        a: "에디 토레스는 티토 푸엔테에게 사사하고, 현재 전 세계에서 살사 On2 / 뉴욕 스타일로 가르쳐지는 것을 체계화한 뉴욕의 댄서이자 안무가입니다. 그는 팔라디움 시대 댄서들의 플로어 지식을 가르칠 수 있는 커리큘럼으로 만들었습니다.",
+      },
+    ],
+  },
+  // ============================================================ ZH
+  zh: {
+    metaTitle: "曼波的诞生:从哈瓦那到帕拉迪姆",
+    metaDescription:
+      "曼波如何从古巴的丹松、Son 和非洲-古巴节奏中诞生,如何被阿森尼奥·罗德里格斯和帕拉迪姆舞者们改造,又如何被埃迪·托雷斯整理成现代的纽约风格萨尔萨 On2。",
+
+    breadcrumbHome: "首页",
+    breadcrumbBlog: "博客",
+    breadcrumbCurrent: "曼波的历史",
+
+    badge: "历史",
+    h1Pre: "曼波的诞生:",
+    h1Accent: "从哈瓦那到帕拉迪姆",
+
+    shortAnswerRich:
+      "曼波并非在某一个瞬间被发明出来。它是一场长达一个世纪的综合的高潮:非洲-古巴打击乐传统、西班牙-欧洲舞蹈形式与美国都市剧场性,在三个相继的时代里相互碰撞。它的现代形态由 1940 年代哈瓦那的 **阿森尼奥·罗德里格斯** 凝结成形,在 1950 年代纽约由 **帕拉迪姆舞者们** 加以改造,并由 **埃迪·托雷斯** 在 1970 年代整理成可教学的体系。",
+
+    sec1Title: "第一部分:三条古巴根源",
+    sec1Paragraphs: [
+      "在纽约把曼波宣告为自己的之前,这种舞蹈的节奏与身体语言已经在古巴的两个文化的撞击中被锻造出来,这两个文化对于「该如何动」有着完全相反的想法。",
+      "一边是 **欧洲传统**:西班牙殖民时代的舞厅、Contradanza,最终是丹松(Miguel Failde 于 1879 年首演)。舞蹈是直立的。架子很严格。腿相对伸直。音乐由小提琴、长笛和钢琴演奏。舞者牢牢地踩在正拍上。",
+      "另一边是 **非洲-古巴传统**,保留在 *solares*(院落)和工人阶级社区中:Rumba,包括 Guaguancó、Yambú、Columbia。姿态偏低,膝盖弯曲,重心扎在地上。动作活在肩膀、肋骨和胯部。乐句强调反拍以及反拍之间的留白。",
+      "整个 20 世纪上半叶,这两种传统因阶级与种族而被分隔。它们之间的桥梁出现在 1920 年代,以 **Son** 的形式。Son 起源于古巴东部的 Oriente 省,把西班牙吉他与歌词结构和非洲-古巴打击乐(邦戈、马拉卡斯、Clave)结合在一起。它是第一种既能在上层俱乐部被社会接受、又被街头节奏传统真正驱动的音乐。",
+    ],
+
+    sec2Title: "第二部分:阿森尼奥·罗德里格斯与康加鼓",
+    sec2Paragraphs: [
+      "在 1930 至 40 年代,一位失明的 tres 吉他演奏者 **阿森尼奥·罗德里格斯** 决定:Son 乐团需要更强的推动力。他把传统的 septeto 扩展为 *conjunto*,加入多支小号、钢琴,以及(最具争议的)康加鼓。康加鼓在此之前一直被认为太「街头」,不适合正式乐团。阿森尼奥把它放在了声音的中心。",
+      "他还把曲子的 **montuno** 部分拉长:那段开放的、强烈切分的、重复的结尾 vamp,在那里歌手即兴,舞者也终于可以真正放开。由此产生的、缓慢、推进、以打击乐为主导的 son montuno,正是曼波的直接节奏祖先。",
+      "阿森尼奥在音乐上贯彻的,是一种非洲-古巴式的对待时间的方式。这门音乐的根本图式是 **Clave**,一个由 5 个击点构成的骨架,决定了之上每一层的感觉。正确地舞动时,音乐要求身体放软膝盖、降低重心、并延后重心转移,让步子沉入节奏,而不是从节奏上踏过。正是这种延后,让古巴式的动作(胯部的 8 字)自然发生,而非机械执行。",
+    ],
+
+    sec3Title: "第三部分:帕拉迪姆舞厅(1948-1966)",
+    sec3IntroParagraphs: [
+      "1948 年,位于第 53 街与百老汇交口的帕拉迪姆舞厅,向种族融合的拉丁音乐之夜敞开了大门。在几年之内,它就成了 **曼波热潮** 的震中。三位驻场乐队领队(Tito Puente、Tito Rodríguez 和 Machito)推动了音乐。来自布朗克斯、布鲁克林和西班牙哈林区的舞者们推动了舞蹈。",
+      "帕拉迪姆的舞者们没有受过学院训练。他们是工人阶级的波多黎各裔、意大利裔、犹太裔和非裔美国孩子,没有任何正式的社会地位,转而在舞池上建构自己的身份。他们到处偷招:从 Cotton Club 偷来踢踏,从 Savoy 舞厅偷来 Lindy Hop 的杂技,从中城曼哈顿的舞蹈工作室偷来交谊舞的架子。他们把这一切都拧到了非洲-古巴的 Clave 之上。",
+    ],
+    sec3LegendsLeadIn: "那个时代的传奇:",
+    sec3LegendsBullets: [
+      "**Cuban Pete(Pedro Aguilar)**,布朗克斯的波多黎各裔舞者,有踢踏与 Lindy Hop 背景,把非洲-古巴式的扎实接地与美国爵士风格融合,把表演性曼波专业化。",
+      "**Millie Donay**,Cuban Pete 的意大利裔美国女搭档,彻底改变了 follower 的角色。在 Millie 之前,拉丁舞中的 follower 被期待被动地跟随 leader。她则是一拍一拍地与他对答如流。",
+      "**Killer Joe Piro**,意大利裔美国舞者,成为全美最著名的曼波教师,正是他把帕拉迪姆舞池的混乱整理成可以卖给中产美国的舞步。",
+      "**Augie & Margo Rodríguez** 把曼波与大开大合的交谊舞技术融合,通过 Ed Sullivan Show 把这门舞带上全国电视。",
+    ],
+    sec3OutroParagraphs: [
+      "正是这种碰撞,塑造了至今仍定义纽约曼波的生物力学签名:扎实、屈膝的下半身,与极度直立、架子锁住的上半身相结合。腹部核心则是两者之间的减震器。当你看到一位世界级 On2 女舞者的脚以惊人速度移动,而胸口却几乎完全静止,你看到的就是这个时代的直接遗产。",
+    ],
+
+    sec4Title: "第四部分:埃迪·托雷斯与 On2 的体系化",
+    sec4Paragraphs: [
+      "帕拉迪姆于 1966 年关闭。到了 1970 年代,过去被称为「曼波」的东西,被唱片业重新包装为「萨尔萨」——同一套非洲-古巴音乐传统,换上了一个更易于市场接受的新标签。",
+      "在帕拉迪姆时代和现代之间架起桥梁的舞者是 **埃迪·托雷斯**。托雷斯在 Tito Puente 门下学习,Puente 亲口告诉他:在 2 拍 break 比在 1 拍 break 更忠于 Clave 与康加鼓。托雷斯把这条音乐原则,搭建成了一套可以传授的体系:具体的拍数结构、具体的基本步、可以一节课一节课学的教学法,而不是靠多年泡夜场慢慢渗透。",
+      "包括本课程在内的每一套现代萨尔萨 On2 教学体系,最终都可以追溯到埃迪·托雷斯的结构性工作。「纽约风格」一词就此与托雷斯的师承同义。今天,从纽约到东京,「On2」无处不教,但几乎所有这些老师所继承的体系,都是托雷斯对 Tito Puente 关于 2 拍那一个问题的回答。",
+    ],
+
+    sec5Title: "为什么这段历史在舞池里很重要",
+    sec5Intro:
+      "这里的历史不是装饰。一旦你理解这门舞从哪里来,你实际的动作方式会有三件事发生改变:",
+    sec5Steps: [
+      "**你不再与屈膝对抗。** 软膝并不是一种风格选择。它在生物学上是必须的,只有这样才能完成让节奏成立的「延后重心转移」。",
+      "**你不再用肩膀上下弹跳。** 上半身的安静并不是审美上的做作,而是继承自交谊舞的纪律——它让脚下的工作可读,也让通过架子传递的引导可读。",
+      "**你不再在 1 拍上 break。** 康加鼓的 slap 落在 2 拍上。你的 break step 不是一个随意的拍数选择,而是你的身体与乐队节奏组的相遇之处。",
+    ],
+    sec5OutroRich:
+      "这就是 [link]On2 风格[/link] 的核心论点,也是 The Mambo Guild 教学体系的核心。",
+
+    sec6Title: "参考资料与延伸阅读",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "深入了解",
+    ctaHeading: "The Mambo Guild 拥有完整的 20 个模块的历史课程。",
+    ctaBody:
+      "每个模块追踪故事中的一条线索,从非洲鼓的传统一直到 Fania 时代。全部有出处,全部由获得认证的舞蹈学者教授。包含在每一份 The Mambo Guild 会籍中。",
+
+    faqs: [
+      {
+        q: "曼波到底是谁发明的?",
+        a: "没有单一的发明者。古巴乐队领队阿森尼奥·罗德里格斯(1940 年代哈瓦那)和 Pérez Prado(1948 年之后的墨西哥城)赋予了这门音乐基础形态;舞蹈则在 1948-1966 年的帕拉迪姆舞厅,由纽约工人阶级的年轻人们结晶成型。",
+      },
+      {
+        q: "曼波和萨尔萨是同一个东西吗?",
+        a: "在音乐上,现代萨尔萨是 1970 年代初纽约唱片业对曼波及邻近的非洲-古巴流派进行的市场化改包装。作为舞蹈,今天被作为萨尔萨 On2(纽约风格)教授的内容,正是帕拉迪姆时代曼波的直接后裔。",
+      },
+      {
+        q: "什么是 Clave?",
+        a: "Clave 是横跨两个小节的 5 击节奏型(3-2 或 2-3),所有非洲-古巴音乐都以它为锚点。其他每一件乐器都是相对于它来分句的;正确舞动时,你的重心切换也会与之对齐。",
+      },
+      {
+        q: "帕拉迪姆时代为什么会结束?",
+        a: "帕拉迪姆舞厅在 1966 年失去了酒类经营许可,不久后关门。在更宽广的文化中,曼波热潮也已被摇滚乐所取代;在拉丁音乐内部,则被 Boogaloo 和早期「萨尔萨」标签时代所取代。",
+      },
+      {
+        q: "埃迪·托雷斯是谁?",
+        a: "埃迪·托雷斯是一位在 Tito Puente 门下学习的纽约舞者与编舞家,他整理出了如今全世界以萨尔萨 On2 / 纽约风格教授的体系。他把帕拉迪姆时代舞者们的舞池经验,变成了一套可以教学的课程。",
+      },
+    ],
+  },
+  // ============================================================ RU
+  ru: {
+    metaTitle: "Рождение мамбо: от Гаваны до «Палладиума»",
+    metaDescription:
+      "Как мамбо вырос из кубинского данзона, сона и афрокубинских ритмов, был преображён Арсенио Родригесом и танцорами «Палладиума» и был кодифицирован Эдди Торресом как современный нью-йоркский стиль сальсы On2.",
+
+    breadcrumbHome: "Главная",
+    breadcrumbBlog: "Блог",
+    breadcrumbCurrent: "История мамбо",
+
+    badge: "История",
+    h1Pre: "Рождение мамбо: ",
+    h1Accent: "от Гаваны до «Палладиума»",
+
+    shortAnswerRich:
+      "Мамбо не был изобретён в одну минуту. Это кульминация почти столетнего синтеза: афрокубинские традиции перкуссии, испано-европейская танцевальная форма и американская городская театральность сталкиваются в трёх последовательных эпохах. Его современная форма была кристаллизована **Арсенио Родригесом** в Гаване 1940-х, преображена **танцорами «Палладиума»** в Нью-Йорке 1950-х и кодифицирована для преподавания **Эдди Торресом** в 1970-х.",
+
+    sec1Title: "Часть 1: три кубинских корня",
+    sec1Paragraphs: [
+      "До того как Нью-Йорк объявил мамбо своим, ритмы и язык тела этого танца были выкованы на Кубе в столкновении двух культур, у которых были противоположные представления о том, как двигаться.",
+      "С одной стороны — **европейская традиция**: испанские колониальные бальные залы, контрданса и, в конце концов, данзон (премьера в 1879 году у Мигеля Файлде). Танцы были вертикальными. Рамка — строгой. Ноги — относительно прямыми. Музыку играли на скрипках, флейтах и фортепиано. Танцоры твёрдо ставили ногу на сильную долю.",
+      "С другой стороны — **афрокубинская традиция**, сохранявшаяся в *соларес* (внутренних дворах) и рабочих кварталах: румба, в том числе гуагуанко, ямбу, колумбия. Положение было низким, колени согнуты, центр тяжести укоренён в земле. Движение жило в плечах, рёбрах, бёдрах. Фразировка подчёркивала слабые доли и пустоты между ними.",
+      "На протяжении начала XX века эти традиции были разделены классом и расой. Мост между ними появился в 1920-х в виде **сона**. Возникнув в восточной провинции Орьенте, сон соединил испанскую гитару и лирическую структуру с афрокубинской перкуссией (бонго, маракасы, клаве). Это была первая музыка, одновременно социально приемлемая в клубах высшего класса и подлинно движимая уличными ритмическими традициями.",
+    ],
+
+    sec2Title: "Часть 2: Арсенио Родригес и конга",
+    sec2Paragraphs: [
+      "В 1930–40-х слепой исполнитель на тресе по имени **Арсенио Родригес** решил, что ансамблю сона нужно больше драйва. Он расширил традиционный септето до *конхунто*, добавив несколько труб, фортепиано и (самое спорное) конгу. До этого конгу отвергали как слишком «уличную» для официальных ансамблей. Арсенио поставил её в самое сердце звука.",
+      "Он также растянул раздел **монтуно** в композиции — открытую, сильно синкопированную, повторяющуюся вампу в конце, где певцы импровизировали, а танцоры наконец могли отпустить себя. Возникший там медленный, давящий, перкуссионно-ориентированный сон-монтуно — прямой ритмический предок мамбо.",
+      "Музыкально Арсенио утвердил афрокубинский подход ко времени. Основополагающая фигура этой музыки — **клаве**, скелет из пяти ударов, который задаёт ощущение каждого следующего слоя. Если танцевать правильно, музыка просит тело смягчить колени, опустить центр тяжести и задержать перенос веса так, чтобы шаг садился в ритм, а не маршировал поверх него. Именно эта задержка делает кубинское движение (восьмёрка бёдер) естественным, а не механическим.",
+    ],
+
+    sec3Title: "Часть 3: бальный зал «Палладиум» (1948–1966)",
+    sec3IntroParagraphs: [
+      "В 1948 году бальный зал «Палладиум» на углу 53-й улицы и Бродвея открыл двери для расово смешанных вечеров латиноамериканской музыки. Через несколько лет он стал эпицентром **мамбо-лихорадки**. Музыку двигали три домашних бэндлидера (Тито Пуэнте, Тито Родригес и Мачито). Танцоры из Бронкса, Бруклина и Спэниш-Гарлема двигали танец.",
+      "Танцоры «Палладиума» не имели академического образования. Это были рабочие пуэрториканские, итальянские, еврейские и афроамериканские подростки без формального социального статуса, которые строили свою идентичность на танцполе. Они тащили отовсюду: чечётку из «Cotton Club», акробатику Линди-Хопа из «Savoy», бальную рамку из студий мидтауна. Всё это они привинтили к афрокубинской клаве.",
+    ],
+    sec3LegendsLeadIn: "Легенды эпохи:",
+    sec3LegendsBullets: [
+      "**Cuban Pete (Педро Агилар)** — пуэрториканский танцор из Бронкса с фоном чечётки и Линди-Хопа, соединил афрокубинскую заземлённость с американской джазовой стилистикой и сделал выставочное мамбо профессиональной дисциплиной.",
+      "**Милли Донэй**, итало-американская партнёрша Cuban Pete, революционизировала роль follower. До Милли в латинских танцах от партнёрши ожидали пассивно следовать за ведущим. Она отвечала ему удар на удар.",
+      "**Killer Joe Piro**, итало-американский танцор, стал самым известным преподавателем мамбо в стране — фигурой, которая упорядочила хаос «Палладиума» в шаги, которые можно было продать среднему классу Америки.",
+      "**Оги и Марго Родригес** соединили мамбо с широкими бальными техниками и вывели танец на национальное телевидение в шоу Эда Салливана.",
+    ],
+    sec3OutroParagraphs: [
+      "Из этого столкновения родилась биомеханическая подпись, которая до сих пор определяет нью-йоркское мамбо: заземлённый низ корпуса с согнутыми коленями, женатый на агрессивно прямом, заблокированном по рамке верхе. Брюшной кор служит амортизатором между ними. Когда вы видите, как у топ-танцовщицы On2 ноги мелькают со слепящей скоростью, а грудная клетка остаётся совершенно неподвижной, вы смотрите на прямое наследство этой эпохи.",
+    ],
+
+    sec4Title: "Часть 4: Эдди Торрес и кодификация On2",
+    sec4Paragraphs: [
+      "«Палладиум» закрылся в 1966 году. К 1970-м то, что называлось «мамбо», звукозаписывающая индустрия стала переименовывать в «сальсу» — те же афрокубинские музыкальные традиции под новой, более маркетинговой этикеткой.",
+      "Танцором, перекинувшим мост между эпохой «Палладиума» и современной, стал **Эдди Торрес**. Торрес учился у Тито Пуэнте, который лично сказал ему, что брейк на 2 точнее соответствует клаве и конге, чем брейк на 1. Торрес взял этот музыкальный принцип и построил вокруг него систему, которой можно учить: конкретную структуру счёта, конкретный базовый шаг, педагогику, которую можно осваивать урок за уроком, а не впитывать годами клубного осмоса.",
+      "Любая современная программа сальсы On2, включая эту, в конечном счёте восходит к структурной работе Эдди Торреса. Выражение «нью-йоркский стиль» стало синонимом линии Торреса. Сегодня «On2» преподают повсюду — от Нью-Йорка до Токио, — но систему, которую наследует почти каждый из этих учителей, Торрес выстроил как ответ на единственный вопрос, заданный ему Тито Пуэнте о двойке.",
+    ],
+
+    sec5Title: "Почему эта история важна на танцполе",
+    sec5Intro:
+      "История здесь не декоративна. Когда вы понимаете, откуда пришёл танец, в том, как вы реально двигаетесь, меняются три вещи:",
+    sec5Steps: [
+      "**Вы перестаёте бороться с согнутыми коленями.** Мягкие колени — это не стилистический выбор. Они биологически необходимы, чтобы выполнить тот самый отложенный перенос веса, который заставляет ритм работать.",
+      "**Вы перестаёте подпрыгивать плечами.** Тихий верх — не эстетический жест, а унаследованная бальная дисциплина: только она делает работу стоп читаемой и делает ведение читаемым через рамку.",
+      "**Вы перестаёте брейкать на 1.** Слэп конги падает на 2. Ваш брейк-шаг — не произвольный выбор счёта, а точка встречи вашего тела с ритм-секцией оркестра.",
+    ],
+    sec5OutroRich:
+      "В этом тезис [link]стиля On2[/link] и сердцевина программы The Mambo Guild.",
+
+    sec6Title: "Источники и дополнительное чтение",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "Глубже",
+    ctaHeading: "В The Mambo Guild есть полный 20-модульный курс по истории.",
+    ctaBody:
+      "Каждый модуль ведёт по одной нити сюжета — от африканских барабанных традиций до эпохи Fania. Всё с источниками, всё преподают сертифицированные исследователи танца. Включено в любую подписку The Mambo Guild.",
+
+    faqs: [
+      {
+        q: "Кто на самом деле изобрёл мамбо?",
+        a: "Единственного изобретателя нет. Кубинские бэндлидеры Арсенио Родригес (Гавана, 1940-е) и Перес Прадо (Мехико, с 1948 года) задали музыке её базовую форму; танец был кристаллизован рабочими нью-йоркцами в бальном зале «Палладиум» в 1948–1966 годах.",
+      },
+      {
+        q: "Мамбо и сальса — это одно и то же?",
+        a: "Музыкально современная сальса — это маркетинговый ребрендинг мамбо и соседних афрокубинских жанров, проведённый нью-йоркской звукозаписывающей индустрией в начале 1970-х. Как танец то, что сегодня преподают как сальсу On2 (нью-йоркский стиль), — прямой потомок мамбо эпохи «Палладиума».",
+      },
+      {
+        q: "Что такое клаве?",
+        a: "Клаве — это пятиударная ритмическая фигура, растянутая на два такта (3-2 или 2-3), которая закрепляет всю афрокубинскую музыку. Все остальные инструменты фразируются относительно неё; если танцевать правильно, ваши переносы веса тоже выстраиваются по ней.",
+      },
+      {
+        q: "Почему закончилась эпоха «Палладиума»?",
+        a: "Бальный зал «Палладиум» в 1966 году лишился алкогольной лицензии и вскоре закрылся. Мамбо-лихорадка к тому моменту уже была вытеснена в широкой культуре рок-н-роллом, а внутри латиноамериканской музыки — бугалу и ранней эпохой ярлыка «сальса».",
+      },
+      {
+        q: "Кто такой Эдди Торрес?",
+        a: "Эдди Торрес — нью-йоркский танцор и хореограф, ученик Тито Пуэнте, кодифицировавший то, что сегодня по всему миру преподают как сальсу On2 / нью-йоркский стиль. Он превратил танцпольное знание танцоров эпохи «Палладиума» в обучаемую программу.",
+      },
+    ],
+  },
+  // ============================================================ PL
+  pl: {
+    metaTitle: "Narodziny mambo: od Hawany po Palladium",
+    metaDescription:
+      "Jak mambo wyłoniło się z kubańskiego danzónu, sonu i afrokubańskiego rytmu, jak zostało przekształcone przez Arsenia Rodrígueza i tancerzy z Palladium oraz jak Eddie Torres skodyfikował je jako współczesną nowojorską salsę On2.",
+
+    breadcrumbHome: "Strona główna",
+    breadcrumbBlog: "Blog",
+    breadcrumbCurrent: "Historia mambo",
+
+    badge: "Historia",
+    h1Pre: "Narodziny mambo: ",
+    h1Accent: "od Hawany po Palladium",
+
+    shortAnswerRich:
+      "Mambo nie zostało wynalezione w jednym momencie. Jest kulminacją trwającej stulecie syntezy: afrokubańskich tradycji perkusji, hiszpańsko-europejskiej formy tanecznej i amerykańskiej miejskiej teatralności, które zderzają się w trzech kolejnych epokach. Jego współczesną formę skrystalizował **Arsenio Rodríguez** w Hawanie lat 40., **tancerze z Palladium** przekształcili ją w Nowym Jorku lat 50., a **Eddie Torres** skodyfikował ją do nauczania w latach 70.",
+
+    sec1Title: "Część 1: trzy kubańskie korzenie",
+    sec1Paragraphs: [
+      "Zanim Nowy Jork uznał mambo za swoje, rytmy i język ciała tego tańca zostały wykute na Kubie w starciu dwóch kultur o przeciwstawnych pomysłach na to, jak ma się ruszać.",
+      "Z jednej strony była **tradycja europejska**: hiszpańskie kolonialne sale balowe, contradanza i wreszcie danzón (debiut w 1879 roku w wykonaniu Miguela Failde'a). Tańce były wyprostowane. Postawa była rygorystyczna. Nogi były względnie wyprostowane. Muzyka grała na skrzypcach, fletach i fortepianach. Tancerze stawiali stopę zdecydowanie na mocnej części taktu.",
+      "Z drugiej strony była **tradycja afrokubańska**, zachowywana w *solares* (podwórkach) i robotniczych dzielnicach: rumba, w tym Guaguancó, Yambú, Columbia. Postawa była niska, kolana ugięte, środek ciężkości zakorzeniony w ziemi. Ruch żył w barkach, żebrach, biodrach. Frazowanie podkreślało pauzy między mocnymi częściami taktu i puste przestrzenie między nimi.",
+      "Przez początek XX wieku te tradycje były rozdzielone klasą i rasą. Most między nimi pojawił się w latach 20. w postaci **sonu**. Pochodzący ze wschodniej prowincji Oriente, son łączył hiszpańską gitarę i lirykę z afrokubańską perkusją (bongosy, marakasy, klawes). Była to pierwsza muzyka, która jednocześnie była społecznie akceptowalna w klubach klas wyższych i autentycznie napędzana przez uliczne tradycje rytmiczne.",
+    ],
+
+    sec2Title: "Część 2: Arsenio Rodríguez i konga",
+    sec2Paragraphs: [
+      "W latach 30. i 40. niewidomy gitarzysta tres o nazwisku **Arsenio Rodríguez** uznał, że zespół sonu potrzebuje większej siły napędowej. Rozszerzył tradycyjne septeto do *conjunto*, dodając kilka trąbek, fortepian i (najbardziej kontrowersyjnie) kongę. Konga wcześniej była odrzucana jako zbyt „uliczna\" do formalnych zespołów. Arsenio postawił ją w samym sercu brzmienia.",
+      "Rozciągnął również część **montuno** utworu — otwarty, mocno synkopowany, repetytywny vamp na końcu, w którym śpiewacy improwizowali, a tancerze mogli wreszcie się rozluźnić. Powstały tam wolny, napierający, prowadzony przez perkusję son montuno jest bezpośrednim rytmicznym przodkiem mambo.",
+      "Muzycznie Arsenio narzucił afrokubańskie podejście do czasu. Fundamentalnym wzorcem tej muzyki jest **klawes**, pięciouderzeniowy szkielet, który definiuje wrażenie każdej kolejnej warstwy. Tańczona prawidłowo, muzyka prosi ciało, by zmiękczyło kolana, obniżyło środek ciężkości i opóźniło przeniesienie ciężaru tak, by krok osiadał w rytmie zamiast po nim maszerować. To właśnie to opóźnienie sprawia, że kubański ruch (ósemka bioder) dzieje się naturalnie, a nie mechanicznie.",
+    ],
+
+    sec3Title: "Część 3: Palladium Ballroom (1948-1966)",
+    sec3IntroParagraphs: [
+      "W 1948 roku Palladium Ballroom przy 53. ulicy i Broadwayu otworzył drzwi dla rasowo zintegrowanych wieczorów muzyki latynoskiej. W ciągu kilku lat stał się epicentrum **mambo-szaleństwa**. Trzech rezydentów-bandleaderów (Tito Puente, Tito Rodríguez i Machito) napędzało muzykę. Tancerze z Bronxu, Brooklynu i Spanish Harlem napędzali taniec.",
+      "Tancerze z Palladium nie mieli akademickiego wykształcenia. Byli to portorykańscy, włoscy, żydowscy i afroamerykańscy chłopcy i dziewczęta z klasy robotniczej, bez formalnego statusu społecznego, którzy zamiast tego budowali swoją tożsamość na parkiecie. Kradli ze wszystkiego: stepowanie z Cotton Clubu, akrobatykę Lindy Hopa z Savoy Ballroom, bal-room frame ze studiów midtown Manhattanu. Wszystko to przykręcili do afrokubańskiego klawesa.",
+    ],
+    sec3LegendsLeadIn: "Legendy tej epoki:",
+    sec3LegendsBullets: [
+      "**Cuban Pete (Pedro Aguilar)**, portorykański tancerz z Bronxu z bagażem stepu i Lindy Hopa, połączył afrokubańskie zakorzenienie z amerykańskim stylem jazzowym i sprofesjonalizował mambo wystawowe.",
+      "**Millie Donay**, włosko-amerykańska partnerka Cuban Pete'a, zrewolucjonizowała rolę partnerki podążającej. Przed Millie oczekiwano, że partnerki w tańcu latynoskim będą biernie podążać za prowadzącym. Ona odpowiadała mu uderzenie na uderzenie.",
+      "**Killer Joe Piro**, włosko-amerykański tancerz, stał się najbardziej znanym instruktorem mambo w kraju, postacią, która ujęła chaos parkietu Palladium w kroki, które dało się sprzedać amerykańskiej klasie średniej.",
+      "**Augie i Margo Rodríguez** połączyli mambo z szerokimi technikami sali balowej i przenieśli ten taniec do telewizji ogólnokrajowej w Ed Sullivan Show.",
+    ],
+    sec3OutroParagraphs: [
+      "Z tego zderzenia wyszedł biomechaniczny podpis, który do dziś definiuje nowojorskie mambo: zakorzeniony, ugięty w kolanach dół ciała ożeniony z agresywnie wyprostowaną, zablokowaną w postawie górą. Mięśnie brzucha działają jako amortyzator między nimi. Kiedy widzisz, jak stopy światowej klasy tancerki On2 poruszają się z oślepiającą prędkością, podczas gdy jej klatka piersiowa pozostaje zupełnie nieruchoma, patrzysz na bezpośrednie dziedzictwo tej epoki.",
+    ],
+
+    sec4Title: "Część 4: Eddie Torres i kodyfikacja On2",
+    sec4Paragraphs: [
+      "Palladium zamknięto w 1966 roku. Do lat 70. to, co nazywano „mambo\", było rebrandowane przez przemysł płytowy jako „salsa\" — te same afrokubańskie tradycje muzyczne pod nową, marketingową etykietą.",
+      "Tancerzem, który zbudował most między epoką Palladium a współczesnością, był **Eddie Torres**. Torres uczył się u Tita Puente, który osobiście powiedział mu, że łamanie na 2 jest wierniejsze klawesowi i kondze niż łamanie na 1. Torres wziął tę zasadę muzyczną i zbudował wokół niej system, którego dało się nauczać: konkretną strukturę liczenia, konkretny krok podstawowy, dydaktykę, której można się uczyć lekcja po lekcji, zamiast wchłaniać przez lata klubowej osmozy.",
+      "Każdy współczesny program nauczania salsy On2, łącznie z tym, ostatecznie wywodzi się ze strukturalnej pracy Eddiego Torresa. Wyrażenie „styl nowojorski\" stało się synonimem linii Torresa. Dziś „On2\" naucza się od Nowego Jorku po Tokio, ale system, który niemal wszyscy ci nauczyciele dziedziczą, był odpowiedzią Torresa na jedno pytanie, które Tito Puente zadał mu o dwójce.",
+    ],
+
+    sec5Title: "Dlaczego ta historia ma znaczenie na parkiecie",
+    sec5Intro:
+      "Historia nie jest tu dekoracją. Gdy zrozumiesz, skąd przyszedł ten taniec, w sposobie, w jaki naprawdę się ruszasz, zmienią się trzy rzeczy:",
+    sec5Steps: [
+      "**Przestajesz walczyć z ugiętymi kolanami.** Miękkie kolana to nie wybór stylistyczny. Są biologicznie wymagane, by wykonać opóźnione przeniesienie ciężaru, które sprawia, że rytm w ogóle działa.",
+      "**Przestajesz odbijać barkami.** Cicha góra ciała to nie estetyczna pretensja. To odziedziczona dyscyplina sali balowej, która sprawia, że praca stóp jest czytelna, a prowadzenie czytelne przez postawę.",
+      "**Przestajesz łamać na 1.** Slap kongi spada na 2. Twój break step nie jest arbitralnym wyborem liczenia; to punkt spotkania twojego ciała z sekcją rytmiczną zespołu.",
+    ],
+    sec5OutroRich:
+      "Taka jest teza [link]stylu On2[/link] i rdzeń programu nauczania The Mambo Guild.",
+
+    sec6Title: "Źródła i dalsza lektura",
+    sec6Sources: [
+      "McMains, Juliet. *Spinning Mambo into Salsa: Caribbean Dance in Global Commerce*. Oxford University Press, 2015.",
+      "Roberts, John Storm. *The Latin Tinge: The Impact of Latin American Music on the United States*. Oxford University Press, 1999.",
+      "Fernandez, Raul A. *From Afro-Cuban Rhythms to Latin Jazz*. University of California Press, 2006.",
+      "Manuel, Peter. *Caribbean Currents: Caribbean Music from Rumba to Reggae*. Temple University Press, 2009.",
+      "Gottschild, Brenda Dixon. *Digging the Africanist Presence in American Performance*. Greenwood Press, 1996.",
+    ],
+
+    ctaEyebrow: "Głębiej",
+    ctaHeading: "The Mambo Guild ma pełny 20-modułowy kurs historii.",
+    ctaBody:
+      "Każdy moduł śledzi jedną nić tej historii — od afrykańskich tradycji bębnowych po erę Fanii. Wszystko ze źródłami, wszystko prowadzone przez certyfikowanych badaczy tańca. Wliczone w każdą subskrypcję The Mambo Guild.",
+
+    faqs: [
+      {
+        q: "Kto naprawdę wynalazł mambo?",
+        a: "Nie ma jednego wynalazcy. Kubańscy bandleaderzy Arsenio Rodríguez (Hawana, lata 40.) i Pérez Prado (Meksyk, od 1948 roku) nadali tej muzyce jej fundamentalny kształt; taniec został skrystalizowany przez nowojorczyków z klasy robotniczej w Palladium Ballroom w latach 1948-1966.",
+      },
+      {
+        q: "Czy mambo i salsa to to samo?",
+        a: "Muzycznie współczesna salsa to marketingowy rebranding mambo i sąsiednich gatunków afrokubańskich, dokonany przez nowojorski przemysł płytowy na początku lat 70. Jako taniec to, co dziś naucza się jako salsę On2 (styl nowojorski), jest bezpośrednim potomkiem mambo z epoki Palladium.",
+      },
+      {
+        q: "Co to jest klawes?",
+        a: "Klawes to pięciouderzeniowy wzorzec rytmiczny rozłożony na dwóch taktach (3-2 lub 2-3), który zakotwicza całą muzykę afrokubańską. Każdy inny instrument frazuje się w stosunku do niego; jeśli tańczysz prawidłowo, twoje zmiany ciężaru również się z nim zgrywają.",
+      },
+      {
+        q: "Dlaczego skończyła się epoka Palladium?",
+        a: "Palladium Ballroom stracił koncesję na alkohol w 1966 roku i wkrótce został zamknięty. Mambo-szaleństwo zostało już zresztą wyparte w szerszej kulturze przez rock and rolla, a wewnątrz muzyki latynoskiej — przez boogaloo i wczesną erę etykiety „salsa\".",
+      },
+      {
+        q: "Kim był Eddie Torres?",
+        a: "Eddie Torres to nowojorski tancerz i choreograf, który uczył się u Tita Puente i skodyfikował to, co dziś naucza się na całym świecie jako salsa On2 / styl nowojorski. Zamienił parkietową wiedzę tancerzy z epoki Palladium w nadający się do nauczania program.",
+      },
+    ],
+  },
   nl: {} as MamboHistoryContent,
   ar: {} as MamboHistoryContent,
   el: {} as MamboHistoryContent,
