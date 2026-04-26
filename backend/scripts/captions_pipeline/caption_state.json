@@ -5083,14 +5083,16 @@
     "Mambo101Edited__IntroMambo101": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777226173.6997786
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.8385658
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777226189.468062
         },
         "es": {
           "status": "translated",
@@ -5767,14 +5769,16 @@
     "Mambo101Edited__SuzyQ_1_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777226200.3477063
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.174033
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777226204.855659
         },
         "es": {
           "status": "translated",
@@ -6015,14 +6019,16 @@
     "Mambo101Edited__SuzyQ_2_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777226213.8650055
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.2837899
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777226218.2562268
         },
         "es": {
           "status": "translated",
