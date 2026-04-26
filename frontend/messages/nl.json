@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ Nieuwe like",
-        "message": "{name} vond je bericht \"{postTitle}\" leuk"
+        "message": "{name} vond je bericht \"{postTitle}\" leuk",
+        "action": "vond je bericht \"{postTitle}\" leuk"
       },
       "reply_received": {
         "title": "💬 Nieuwe reactie",
-        "message": "{name} reageerde op je bericht \"{postTitle}\""
+        "message": "{name} reageerde op je bericht \"{postTitle}\"",
+        "action": "reageerde op je bericht \"{postTitle}\""
       },
       "answer_accepted": {
         "title": "✅ Antwoord geaccepteerd!",

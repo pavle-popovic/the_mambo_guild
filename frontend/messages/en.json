@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ New Like",
-        "message": "{name} liked your post \"{postTitle}\""
+        "message": "{name} liked your post \"{postTitle}\"",
+        "action": "liked your post \"{postTitle}\""
       },
       "reply_received": {
         "title": "💬 New Reply",
-        "message": "{name} replied to your post \"{postTitle}\""
+        "message": "{name} replied to your post \"{postTitle}\"",
+        "action": "replied to your post \"{postTitle}\""
       },
       "answer_accepted": {
         "title": "✅ Answer Accepted!",

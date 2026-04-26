@@ -16,6 +16,11 @@ class Notification(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
+    # Acting user (the one who liked / replied / etc). Nullable because system
+    # notifications (badge_earned, weekly_meeting_scheduled, ...) have no actor.
+    # No FK so deleting an actor's user row leaves their notifications intact
+    # rather than CASCADE-deleting the recipient's history.
+    actor_id = Column(UUID(as_uuid=True), nullable=True, index=True)
 
     type = Column(String(50), nullable=False)  # 'badge_earned', 'reaction_received', 'reply_received', 'answer_accepted'
     title = Column(String(200), nullable=False)

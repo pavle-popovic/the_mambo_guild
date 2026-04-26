@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ Nova curtida",
-        "message": "{name} curtiu sua publicação \"{postTitle}\""
+        "message": "{name} curtiu sua publicação \"{postTitle}\"",
+        "action": "curtiu sua publicação \"{postTitle}\""
       },
       "reply_received": {
         "title": "💬 Nova resposta",
-        "message": "{name} respondeu à sua publicação \"{postTitle}\""
+        "message": "{name} respondeu à sua publicação \"{postTitle}\"",
+        "action": "respondeu à sua publicação \"{postTitle}\""
       },
       "answer_accepted": {
         "title": "✅ Resposta aceita!",

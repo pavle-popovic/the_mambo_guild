@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef, useCallback } from "react";
 import { Bell } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 import { apiClient } from "@/lib/api";
 import { useTranslations } from "@/i18n/useTranslations";
 
@@ -15,6 +16,9 @@ interface Notification {
   reference_id: string | null;
   is_read: boolean;
   created_at: string;
+  actor_id?: string | null;
+  actor_username?: string | null;
+  actor_avatar_url?: string | null;
 }
 
 const KNOWN_TYPES = new Set([
@@ -26,11 +30,31 @@ const KNOWN_TYPES = new Set([
   "badge_earned",
 ]);
 
-const MESSAGE_PATTERNS: Record<string, RegExp> = {
-  reaction_received: /^(.+?) liked your post "(.+)"$/,
-  reply_received: /^(.+?) replied to your post "(.+)"$/,
-  badge_earned: /^You earned the (.+) badge!$/,
+// New (post-migration) backend stores action-only messages like
+// `liked your post "X"`. Legacy rows still have the actor name baked in
+// (`Founder liked your post "X"`). Both regexes are tried in order so the
+// dropdown keeps rendering correctly across the rolling deploy.
+const MESSAGE_PATTERNS: Record<string, RegExp[]> = {
+  reaction_received: [
+    /^liked your post "(.+)"$/,
+    /^(?:.+?) liked your post "(.+)"$/,
+  ],
+  reply_received: [
+    /^replied to your post "(.+)"$/,
+    /^(?:.+?) replied to your post "(.+)"$/,
+  ],
+  badge_earned: [/^You earned the (.+) badge!$/],
 };
+
+function extractPostTitle(type: string, message: string): string | null {
+  const patterns = MESSAGE_PATTERNS[type];
+  if (!patterns) return null;
+  for (const pattern of patterns) {
+    const match = message.match(pattern);
+    if (match) return match[1] ?? null;
+  }
+  return null;
+}
 
 export default function NotificationBell() {
   const [isOpen, setIsOpen] = useState(false);
@@ -153,26 +177,29 @@ export default function NotificationBell() {
 
   const translateMessage = (n: Notification): string => {
     if (!KNOWN_TYPES.has(n.type)) return n.message;
-    const pattern = MESSAGE_PATTERNS[n.type];
-    if (pattern) {
-      const match = n.message.match(pattern);
+
+    if (n.type === "reaction_received" || n.type === "reply_received") {
+      const postTitle = extractPostTitle(n.type, n.message);
+      if (postTitle === null) return n.message;
+      // Action-only translation key — the actor avatar+username render
+      // separately. Falls back to the legacy `{name} ...` template (with
+      // name stripped) for any locale that hasn't shipped the new key.
+      const action = t(`types.${n.type}.action`, { postTitle });
+      if (action && !action.startsWith("types.")) return action;
+      const legacy = t(`types.${n.type}.message`, { name: "", postTitle });
+      if (legacy && !legacy.startsWith("types.")) return legacy.trim();
+      return n.message;
+    }
+
+    if (n.type === "badge_earned") {
+      const match = n.message.match(MESSAGE_PATTERNS.badge_earned[0]);
       if (match) {
-        if (n.type === "reaction_received" || n.type === "reply_received") {
-          const translated = t(`types.${n.type}.message`, {
-            name: match[1],
-            postTitle: match[2],
-          });
-          if (translated && !translated.startsWith("types.")) return translated;
-        }
-        if (n.type === "badge_earned") {
-          const translated = t(`types.${n.type}.message`, {
-            badgeName: match[1],
-          });
-          if (translated && !translated.startsWith("types.")) return translated;
-        }
+        const translated = t(`types.${n.type}.message`, { badgeName: match[1] });
+        if (translated && !translated.startsWith("types.")) return translated;
       }
       return n.message;
     }
+
     const translated = t(`types.${n.type}.message`);
     if (translated && !translated.startsWith("types.")) return translated;
     return n.message;
@@ -235,28 +262,68 @@ export default function NotificationBell() {
               </div>
             ) : (
               <div className="divide-y divide-white/5">
-                {notifications.map((notification) => (
-                  <motion.div
-                    key={notification.id}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    onClick={() => handleNotificationClick(notification)}
-                    className={`p-3 cursor-pointer hover:bg-white/5 transition-colors ${
-                      !notification.is_read ? "bg-white/[0.03]" : ""
-                    }`}
-                  >
-                    <div className="flex items-start gap-2">
-                      {!notification.is_read && (
-                        <div className="w-2 h-2 rounded-full bg-[#D4AF37] mt-1.5 flex-shrink-0" />
-                      )}
-                      <div className={!notification.is_read ? "" : "ml-4"}>
-                        <p className="text-sm font-medium text-white/90">{translateTitle(notification)}</p>
-                        <p className="text-xs text-white/50 mt-0.5">{translateMessage(notification)}</p>
-                        <p className="text-[10px] text-white/30 mt-1">{formatTime(notification.created_at)}</p>
+                {notifications.map((notification) => {
+                  const actorUsername = notification.actor_username;
+                  const actorAvatar = notification.actor_avatar_url;
+                  const profileHref = actorUsername ? `/u/${encodeURIComponent(actorUsername)}` : null;
+                  return (
+                    <motion.div
+                      key={notification.id}
+                      initial={{ opacity: 0 }}
+                      animate={{ opacity: 1 }}
+                      onClick={() => handleNotificationClick(notification)}
+                      className={`p-3 cursor-pointer hover:bg-white/5 transition-colors ${
+                        !notification.is_read ? "bg-white/[0.03]" : ""
+                      }`}
+                    >
+                      <div className="flex items-start gap-2">
+                        {!notification.is_read && (
+                          <div className="w-2 h-2 rounded-full bg-[#D4AF37] mt-1.5 flex-shrink-0" />
+                        )}
+                        {/* Avatar — only when the notification has an actor.
+                            Stops propagation so clicking the avatar opens the
+                            profile instead of navigating to the referenced post. */}
+                        {profileHref && (
+                          <Link
+                            href={profileHref}
+                            onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+                            className="flex-shrink-0 mt-0.5"
+                          >
+                            {actorAvatar ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={actorAvatar}
+                                alt={actorUsername || ""}
+                                className="w-8 h-8 rounded-full object-cover ring-1 ring-white/10 hover:ring-[#D4AF37]/60 transition"
+                              />
+                            ) : (
+                              <div className="w-8 h-8 rounded-full bg-white/10 ring-1 ring-white/10 hover:ring-[#D4AF37]/60 transition flex items-center justify-center text-[11px] font-semibold text-white/70">
+                                {(actorUsername?.[0] || "U").toUpperCase()}
+                              </div>
+                            )}
+                          </Link>
+                        )}
+                        <div className={`min-w-0 flex-1 ${!notification.is_read || profileHref ? "" : "ml-4"}`}>
+                          <p className="text-sm font-medium text-white/90">{translateTitle(notification)}</p>
+                          <p className="text-xs text-white/50 mt-0.5">
+                            {profileHref && (
+                              <Link
+                                href={profileHref}
+                                onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+                                className="font-semibold text-white/80 hover:text-[#D4AF37] transition-colors"
+                              >
+                                @{actorUsername}
+                              </Link>
+                            )}
+                            {profileHref && " "}
+                            {translateMessage(notification)}
+                          </p>
+                          <p className="text-[10px] text-white/30 mt-1">{formatTime(notification.created_at)}</p>
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ))}
+                    </motion.div>
+                  );
+                })}
               </div>
             )}
           </motion.div>

@@ -125,6 +125,17 @@ def _ensure_tables() -> None:
         )
         return
 
+    # Apply additive column migrations that create_all can't do (it only
+    # adds missing tables, never columns). Each migration is idempotent
+    # via IF NOT EXISTS so re-runs across rolling deploys are safe.
+    try:
+        from migrations.add_notification_actor import run as _add_notification_actor
+        _add_notification_actor()
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning(
+            "notifications.actor_id migration skipped: %s", exc
+        )
+
     # Seed release_schedule_items with the launch lineup so the admin
     # editor and the landing page agree on day one. Only inserts when
     # the table is empty — never overwrites later edits.

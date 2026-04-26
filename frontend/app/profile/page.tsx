@@ -275,17 +275,13 @@ export default function ProfilePage() {
                   </button>
                 </div>
               ) : (
-                <>
-                  <div className="text-base font-bold text-mambo-text truncate">
-                    {user.first_name} {user.last_name}
-                  </div>
-                  <button
-                    onClick={() => { setNewUsername(user.username || ""); setIsEditingUsername(true); }}
-                    className="text-xs text-gray-500 truncate block"
-                  >
-                    @{user.username || `${user.first_name}${user.last_name}`}
-                  </button>
-                </>
+                <button
+                  onClick={() => { setNewUsername(user.username || ""); setIsEditingUsername(true); }}
+                  className="text-base font-bold text-mambo-text truncate hover:text-mambo-gold transition-colors text-left"
+                  title={t("editUsername")}
+                >
+                  @{user.username || `${user.first_name}${user.last_name}`}
+                </button>
               )}
               {usernameError && <div className="text-red-500 text-[10px] mt-0.5">{usernameError}</div>}
               {(() => {

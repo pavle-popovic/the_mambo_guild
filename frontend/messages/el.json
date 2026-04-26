@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ Νέο Like",
-        "message": "Στον/στην {name} άρεσε η ανάρτησή σου \"{postTitle}\""
+        "message": "Στον/στην {name} άρεσε η ανάρτησή σου \"{postTitle}\"",
+        "action": "άρεσε η ανάρτησή σου \"{postTitle}\""
       },
       "reply_received": {
         "title": "💬 Νέα απάντηση",
-        "message": "Ο/Η {name} απάντησε στην ανάρτησή σου \"{postTitle}\""
+        "message": "Ο/Η {name} απάντησε στην ανάρτησή σου \"{postTitle}\"",
+        "action": "απάντησε στην ανάρτησή σου \"{postTitle}\""
       },
       "answer_accepted": {
         "title": "✅ Η απάντηση έγινε αποδεκτή!",

@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ Новый лайк",
-        "message": "{name} лайкнул(а) вашу запись \"{postTitle}\""
+        "message": "{name} лайкнул(а) вашу запись \"{postTitle}\"",
+        "action": "лайкнул(а) вашу запись \"{postTitle}\""
       },
       "reply_received": {
         "title": "💬 Новый ответ",
-        "message": "{name} ответил(а) на вашу запись \"{postTitle}\""
+        "message": "{name} ответил(а) на вашу запись \"{postTitle}\"",
+        "action": "ответил(а) на вашу запись \"{postTitle}\""
       },
       "answer_accepted": {
         "title": "✅ Ответ принят!",

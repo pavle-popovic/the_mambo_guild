@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ 새로운 좋아요",
-        "message": "{name}님이 회원님의 게시물 \"{postTitle}\"을(를) 좋아합니다"
+        "message": "{name}님이 회원님의 게시물 \"{postTitle}\"을(를) 좋아합니다",
+        "action": "님이 회원님의 게시물 \"{postTitle}\"을(를) 좋아합니다"
       },
       "reply_received": {
         "title": "💬 새 답글",
-        "message": "{name}님이 회원님의 게시물 \"{postTitle}\"에 답글을 남겼습니다"
+        "message": "{name}님이 회원님의 게시물 \"{postTitle}\"에 답글을 남겼습니다",
+        "action": "님이 회원님의 게시물 \"{postTitle}\"에 답글을 남겼습니다"
       },
       "answer_accepted": {
         "title": "✅ 답변이 채택되었습니다!",

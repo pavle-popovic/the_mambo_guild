@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ 新的点赞",
-        "message": "{name}点赞了你的帖子\"{postTitle}\""
+        "message": "{name}点赞了你的帖子\"{postTitle}\"",
+        "action": "点赞了你的帖子\"{postTitle}\""
       },
       "reply_received": {
         "title": "💬 新的回复",
-        "message": "{name}回复了你的帖子\"{postTitle}\""
+        "message": "{name}回复了你的帖子\"{postTitle}\"",
+        "action": "回复了你的帖子\"{postTitle}\""
       },
       "answer_accepted": {
         "title": "✅ 回答已采纳！",

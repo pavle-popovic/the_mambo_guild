@@ -8,6 +8,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, desc
 
 from models.notification import Notification
+from models.user import UserProfile
 
 logger = logging.getLogger(__name__)
 
@@ -19,12 +20,19 @@ def create_notification(
     message: str,
     reference_type: str = None,
     reference_id: str = None,
+    actor_id: str = None,
     db: Session = None
 ) -> Notification:
-    """Create a new notification for a user."""
+    """Create a new notification for a user.
+
+    `actor_id` should be set for events triggered by another user (reactions,
+    replies, etc.) so the dropdown can render their avatar + clickable handle.
+    Leave None for system events (badges, scheduled meetings).
+    """
     notification = Notification(
         id=uuid.uuid4(),
         user_id=user_id,
+        actor_id=actor_id,
         type=type,
         title=title,
         message=message,
@@ -50,7 +58,7 @@ def get_notifications(
         desc(Notification.created_at)
     ).offset(skip).limit(limit).all()
 
-    return [_format_notification(n) for n in notifications]
+    return _format_notifications(notifications, db)
 
 
 def get_unread_notifications(
@@ -66,7 +74,7 @@ def get_unread_notifications(
         desc(Notification.created_at)
     ).limit(limit).all()
 
-    return [_format_notification(n) for n in notifications]
+    return _format_notifications(notifications, db)
 
 
 def get_unread_count(user_id: str, db: Session) -> int:
@@ -100,7 +108,23 @@ def mark_all_read(user_id: str, db: Session) -> int:
     return count
 
 
-def _format_notification(n: Notification) -> dict:
+def _format_notifications(rows: List[Notification], db: Session) -> List[dict]:
+    """Format a list of notifications, batch-loading actor profiles in one query.
+
+    Notifications without an actor_id (legacy rows + system events) just get
+    None for the actor fields, and the frontend falls back to the embedded
+    message text.
+    """
+    actor_ids = {n.actor_id for n in rows if n.actor_id is not None}
+    actors: dict = {}
+    if actor_ids:
+        profiles = db.query(UserProfile).filter(UserProfile.user_id.in_(actor_ids)).all()
+        actors = {str(p.user_id): p for p in profiles}
+
+    return [_format_notification(n, actors.get(str(n.actor_id)) if n.actor_id else None) for n in rows]
+
+
+def _format_notification(n: Notification, actor: Optional[UserProfile] = None) -> dict:
     """Format a notification for API response."""
     return {
         "id": str(n.id),
@@ -110,5 +134,8 @@ def _format_notification(n: Notification) -> dict:
         "reference_type": n.reference_type,
         "reference_id": n.reference_id,
         "is_read": n.is_read,
-        "created_at": n.created_at
+        "created_at": n.created_at,
+        "actor_id": str(n.actor_id) if n.actor_id else None,
+        "actor_username": actor.username if actor else None,
+        "actor_avatar_url": actor.avatar_url if actor else None,
     }

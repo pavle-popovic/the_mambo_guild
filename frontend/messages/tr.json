@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ Yeni Beğeni",
-        "message": "{name}, \"{postTitle}\" gönderini beğendi"
+        "message": "{name}, \"{postTitle}\" gönderini beğendi",
+        "action": "\"{postTitle}\" gönderini beğendi"
       },
       "reply_received": {
         "title": "💬 Yeni Yanıt",
-        "message": "{name}, \"{postTitle}\" gönderine yanıt verdi"
+        "message": "{name}, \"{postTitle}\" gönderine yanıt verdi",
+        "action": "\"{postTitle}\" gönderine yanıt verdi"
       },
       "answer_accepted": {
         "title": "✅ Cevap Kabul Edildi!",

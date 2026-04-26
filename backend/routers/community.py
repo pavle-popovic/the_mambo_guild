@@ -296,16 +296,16 @@ def add_reaction(
         badge_service.increment_reaction_received(str(post.user_id), db, video_type=post.video_type)
 
         if str(post.user_id) != str(current_user.id):
-            from models.user import UserProfile
-            profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
-            reactor_name = profile.first_name if profile else "Someone"
+            # Action-only message; the dropdown joins the actor profile and
+            # renders the avatar + clickable @username on the client side.
             notification_service.create_notification(
                 user_id=str(post.user_id),
                 type="reaction_received",
                 title="❤️ New Like",
-                message=f"{reactor_name} liked your post \"{post.title[:50]}\"",
+                message=f"liked your post \"{post.title[:50]}\"",
                 reference_type="post",
                 reference_id=str(post.id),
+                actor_id=str(current_user.id),
                 db=db
             )
 
@@ -391,16 +391,14 @@ def add_reply(
         # Notify post owner about the reply (don't notify self)
         post = db.query(Post).filter(Post.id == post_id).first()
         if post and str(post.user_id) != str(current_user.id):
-            from models.user import UserProfile
-            profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
-            replier_name = profile.first_name if profile else "Someone"
             notification_service.create_notification(
                 user_id=str(post.user_id),
                 type="reply_received",
                 title="💬 New Reply",
-                message=f"{replier_name} replied to your post \"{post.title[:50]}\"",
+                message=f"replied to your post \"{post.title[:50]}\"",
                 reference_type="post",
                 reference_id=str(post.id),
+                actor_id=str(current_user.id),
                 db=db
             )
 

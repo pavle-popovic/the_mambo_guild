@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ Nowe polubienie",
-        "message": "{name} polubił(a) Twój post \"{postTitle}\""
+        "message": "{name} polubił(a) Twój post \"{postTitle}\"",
+        "action": "polubił(a) Twój post \"{postTitle}\""
       },
       "reply_received": {
         "title": "💬 Nowa odpowiedź",
-        "message": "{name} odpowiedział(a) na Twój post \"{postTitle}\""
+        "message": "{name} odpowiedział(a) na Twój post \"{postTitle}\"",
+        "action": "odpowiedział(a) na Twój post \"{postTitle}\""
       },
       "answer_accepted": {
         "title": "✅ Odpowiedź zaakceptowana!",

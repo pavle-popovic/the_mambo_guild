@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ إعجاب جديد",
-        "message": "أعجب {name} بمنشورك \"{postTitle}\""
+        "message": "أعجب {name} بمنشورك \"{postTitle}\"",
+        "action": "أعجب بمنشورك \"{postTitle}\""
       },
       "reply_received": {
         "title": "💬 رد جديد",
-        "message": "رد {name} على منشورك \"{postTitle}\""
+        "message": "رد {name} على منشورك \"{postTitle}\"",
+        "action": "رد على منشورك \"{postTitle}\""
       },
       "answer_accepted": {
         "title": "✅ تم قبول الإجابة!",

@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ Нови лајк",
-        "message": "{name} је лајковао твоју објаву „{postTitle}”"
+        "message": "{name} је лајковао твоју објаву „{postTitle}”",
+        "action": "је лајковао твоју објаву „{postTitle}”"
       },
       "reply_received": {
         "title": "💬 Нови одговор",
-        "message": "{name} је одговорио на твоју објаву „{postTitle}”"
+        "message": "{name} је одговорио на твоју објаву „{postTitle}”",
+        "action": "је одговорио на твоју објаву „{postTitle}”"
       },
       "answer_accepted": {
         "title": "✅ Одговор прихваћен!",

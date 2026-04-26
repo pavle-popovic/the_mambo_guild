@@ -1722,11 +1722,13 @@
     "types": {
       "reaction_received": {
         "title": "❤️ 新しい いいね",
-        "message": "{name}さんがあなたの投稿「{postTitle}」にいいねしました"
+        "message": "{name}さんがあなたの投稿「{postTitle}」にいいねしました",
+        "action": "さんがあなたの投稿「{postTitle}」にいいねしました"
       },
       "reply_received": {
         "title": "💬 新しい返信",
-        "message": "{name}さんがあなたの投稿「{postTitle}」に返信しました"
+        "message": "{name}さんがあなたの投稿「{postTitle}」に返信しました",
+        "action": "さんがあなたの投稿「{postTitle}」に返信しました"
       },
       "answer_accepted": {
         "title": "✅ 回答が採用されました！",
