@@ -3707,14 +3707,16 @@
     "Mambo101Edited__Basic_Step_3_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224617.237965
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.30821
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224617.241393
         },
         "es": {
           "status": "translated",
@@ -3831,14 +3833,16 @@
     "Mambo101Edited__Basic_Step_3_Lesson_2": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224702.7655375
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.3427086
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224706.583828
         },
         "es": {
           "status": "translated",
@@ -3893,14 +3897,16 @@
     "Mambo101Edited__Basic_Step_3_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224613.3794756
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.358117
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224616.8921013
         },
         "es": {
           "status": "translated",
