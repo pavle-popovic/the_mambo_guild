@@ -5175,14 +5175,16 @@
     "Mambo101Edited__Parttern_1_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777243763.8999517
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.8561904
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777243763.9318273
         },
         "es": {
           "status": "translated",
