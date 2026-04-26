@@ -237,6 +237,18 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                     if (status.status === "ready" && status.playback_id) {
                       clearInterval(pollInterval);
                       window.dispatchEvent(new Event("post-video-ready"));
+                      // Stage-post claves are awarded here, not at create-time,
+                      // because mux_asset_id is null until the upload finishes.
+                      // Push the new balance straight into the wallet for an
+                      // immediate "+40 🥢" flash; a missing reward field just
+                      // means it was already credited or hit a guardrail.
+                      if (status.reward?.new_balance !== undefined) {
+                        window.dispatchEvent(new CustomEvent("wallet-updated", {
+                          detail: { balance: status.reward.new_balance },
+                        }));
+                      } else {
+                        window.dispatchEvent(new Event("wallet-updated"));
+                      }
                     } else if (pollCount >= maxPolls) {
                       clearInterval(pollInterval);
                     }
@@ -278,7 +290,15 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
       }
 
       UISound.click();
-      window.dispatchEvent(new Event("wallet-updated"));
+      // Lab posts (and stage posts that re-use a pre-uploaded asset) get the
+      // reward at create-time; surface it instantly when present.
+      if (result.reward?.new_balance !== undefined) {
+        window.dispatchEvent(new CustomEvent("wallet-updated", {
+          detail: { balance: result.reward.new_balance },
+        }));
+      } else {
+        window.dispatchEvent(new Event("wallet-updated"));
+      }
 
       onPostCreated(
         result.post || {
@@ -607,7 +627,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 : `${t("labCost")}${questionSlots ? t("questionSlotsRemaining", { remaining: questionSlots.max_slots - questionSlots.current_slots }) : ""}`}
             </p>
             <p className="text-[11px] text-amber-300/80 mt-1 text-center">
-              {mode === "stage" ? "Earn +10 🥢 on post" : "Earn +3 🥢 on post"}
+              {mode === "stage" ? "Earn +40 🥢 on post" : "Earn +12 🥢 on post"}
             </p>
           </GlassCard>
 

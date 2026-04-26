@@ -608,6 +608,7 @@ class ApiClient {
       playback_id?: string;
       asset_id?: string;
       message: string;
+      reward?: { amount: number; reason: string; new_balance: number };
     }>(`/api/mux/check-upload-status?${params.toString()}`, {
       method: "POST",
     });
@@ -1271,6 +1272,7 @@ class ApiClient {
       success: boolean;
       post?: any;
       message: string;
+      reward?: { amount: number; reason: string; new_balance: number };
     }>("/api/community/posts", {
       method: "POST",
       body: JSON.stringify(data),

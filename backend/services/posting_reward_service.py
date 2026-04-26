@@ -37,11 +37,11 @@ logger = logging.getLogger(__name__)
 # Tunables
 # ---------------------------------------------------------------------------
 
-REWARD_STAGE_POST = 10
-REWARD_LAB_QUESTION = 3
+REWARD_STAGE_POST = 40         # 4x boost
+REWARD_LAB_QUESTION = 12       # 4x boost
 
-DAILY_REWARD_CAP = 30          # across all post_reward:* txns
-COOLDOWN_SECONDS = 10 * 60     # 10 min between reward-earning posts
+DAILY_REWARD_CAP = 120         # scaled 4x with per-post amounts; daily cap is the real anti-farming gate
+COOLDOWN_SECONDS = 60          # 60s blocks bot bursts but allows back-to-back legitimate posts
 LAB_BODY_MIN_CHARS = 40        # prevent "a?" farming
 CLAWBACK_WINDOW_HOURS = 72
 

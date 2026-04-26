@@ -30,10 +30,10 @@ COST_POST_VIDEO = 0
 # ============================================
 # Earning Constants (from PRD)
 # ============================================
-EARN_DAILY_BASE = (1, 3)      # RNG range for base users
-EARN_DAILY_PRO = (4, 8)       # RNG range for pro users
-EARN_STREAK_BONUS_BASE = 10
-EARN_STREAK_BONUS_PRO = 20
+EARN_DAILY_BASE = (2, 6)      # RNG range for base users (2x boost)
+EARN_DAILY_PRO = (8, 16)      # RNG range for pro users (2x boost)
+EARN_STREAK_BONUS_BASE = 20
+EARN_STREAK_BONUS_PRO = 40
 EARN_STREAK_INTERVAL = 5      # Every 5 consecutive days
 EARN_ACCEPTED_ANSWER = 15
 EARN_REFERRAL_BONUS = 50

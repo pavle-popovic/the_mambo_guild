@@ -822,12 +822,36 @@ def check_upload_status(
                     post.mux_playback_id = playback_id
                     post.mux_asset_id = found_asset.id
                     db.commit()
-                    return {
+
+                    # Stage posts are created BEFORE the Mux upload completes,
+                    # so award_post_reward() at create-time sees mux_asset_id=None
+                    # and skips ("ineligible"). Re-run the reward here, now that
+                    # the asset is attached. Idempotent — _already_rewarded()
+                    # guards against double-credit if this path fires twice.
+                    reward_payload = None
+                    try:
+                        from services import posting_reward_service
+                        outcome = posting_reward_service.award_post_reward(str(post.id), db)
+                        if outcome.get("awarded"):
+                            db.commit()
+                            reward_payload = {
+                                "amount": outcome["amount"],
+                                "reason": outcome["reason"],
+                                "new_balance": outcome["new_balance"],
+                            }
+                    except Exception:
+                        logger.exception("check_upload_status: posting reward failed (non-fatal)")
+                        db.rollback()
+
+                    response = {
                         "status": "ready",
                         "playback_id": playback_id,
                         "asset_id": found_asset.id,
                         "message": "Video found and post updated",
                     }
+                    if reward_payload is not None:
+                        response["reward"] = reward_payload
+                    return response
                 else:
                     return {"status": "processing", "message": "Video is still processing or not found"}
             except Exception as e:
@@ -1061,6 +1085,20 @@ async def mux_webhook_handler(
                                 post.mux_playback_id = playback_id
                                 db.commit()
                                 logger.info(f"Updated post {post_id} with video")
+
+                                # Award the stage-post claves now that the asset is
+                                # attached (the create-time call skipped because
+                                # mux_asset_id was None). Idempotent via
+                                # _already_rewarded(); the polling endpoint may
+                                # have beaten the webhook to it and that's fine.
+                                try:
+                                    from services import posting_reward_service
+                                    outcome = posting_reward_service.award_post_reward(post_id, db)
+                                    if outcome.get("awarded"):
+                                        db.commit()
+                                except Exception:
+                                    logger.exception("mux_webhook: posting reward failed (non-fatal)")
+                                    db.rollback()
 
                                 # ML feature: community video creation signals high-intent engagement.
                                 try:
