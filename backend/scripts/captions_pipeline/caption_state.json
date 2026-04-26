@@ -2051,14 +2051,16 @@
     "BodymovementsEdited__Ribcage_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777214313.09013
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.5447042
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777214316.9174764
         },
         "es": {
           "status": "translated",
