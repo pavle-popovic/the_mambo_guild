@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { FaFire, FaBolt } from "react-icons/fa";
-import { Star, Crown, Headphones, Video, Radio, ChevronDown, Menu, X, User as UserIcon, CreditCard, LogOut } from "lucide-react";
+import { Star, Crown, Headphones, Video, Radio, ChevronDown, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -15,7 +15,6 @@ import LocaleSwitcher from "./LocaleSwitcher";
 import { BorderFrame } from "./cosmetics/BorderFrame";
 import { BORDER_FRAME_SPECS } from "@/lib/borderFrames";
 import { useTranslations } from "@/i18n/useTranslations";
-import { useAuth } from "@/contexts/AuthContext";
 import { UISound } from "@/hooks/useUISound";
 
 interface NavBarProps {
@@ -37,26 +36,14 @@ interface NavBarProps {
 
 export default function NavBar({ user }: NavBarProps) {
   const pathname = usePathname();
-  const router = useRouter();
-  const { logout } = useAuth();
   const t = useTranslations('nav');
   const [mounted, setMounted] = useState(false);
   const [isWalletOpen, setIsWalletOpen] = useState(false);
   const [isStudioOpen, setIsStudioOpen] = useState(false);
-  const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const studioDropdownRef = useRef<HTMLDivElement>(null);
-  const profileDropdownRef = useRef<HTMLDivElement>(null);
   const isAuthenticated = !!user;
   const isGuildMaster = user?.tier?.toLowerCase() === "performer";
-
-  // Tier/status flags drive whether the avatar dropdown surfaces a
-  // "Subscription" entry. Free Rookies with no Stripe history don't see it,
-  // so the dropdown never points at an empty section on /profile.
-  const subTier = user?.tier?.toLowerCase();
-  const subStatus = user?.subscription_status?.toLowerCase();
-  const showSubscriptionLink =
-    subTier === "advanced" || subTier === "performer" || subStatus === "past_due";
 
   useEffect(() => {
     setMounted(true);
@@ -67,9 +54,6 @@ export default function NavBar({ user }: NavBarProps) {
     const handleClickOutside = (event: MouseEvent) => {
       if (studioDropdownRef.current && !studioDropdownRef.current.contains(event.target as Node)) {
         setIsStudioOpen(false);
-      }
-      if (profileDropdownRef.current && !profileDropdownRef.current.contains(event.target as Node)) {
-        setIsProfileMenuOpen(false);
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
@@ -387,107 +371,45 @@ export default function NavBar({ user }: NavBarProps) {
                 {/* Notification Bell */}
                 <NotificationBell />
 
-                {/* Profile Avatar Dropdown — click opens an account menu so
-                    Subscription is reachable from any page (one click), not
-                    just by landing on /profile and scrolling. The dropdown
-                    panel mirrors the Studio dropdown's styling for parity. */}
-                <div className="relative" ref={profileDropdownRef}>
-                  <MotionDiv
-                    {...(mounted ? {
-                      whileHover: { scale: 1.1 },
-                      whileTap: { scale: 0.95 },
-                      transition: { type: "spring", stiffness: 400, damping: 17 }
-                    } : {})}
-                    onMouseEnter={handleNavHover}
-                    className="relative w-10 h-10"
+                {/* Profile Avatar */}
+                <MotionDiv
+                  {...(mounted ? {
+                    whileHover: { scale: 1.1 },
+                    whileTap: { scale: 0.95 },
+                    transition: { type: "spring", stiffness: 400, damping: 17 }
+                  } : {})}
+                  onMouseEnter={handleNavHover}
+                  className="relative w-10 h-10"
+                >
+                  <Link
+                    href="/profile"
+                    className={cn(
+                      "w-10 h-10 rounded-full bg-gray-700 overflow-hidden transition-all flex items-center justify-center",
+                      user.tier?.toLowerCase() === "performer"
+                        ? "ring-2 ring-amber-400/50 hover:ring-amber-400"
+                        : user.tier?.toLowerCase() === "advanced"
+                        ? "ring-2 ring-blue-400/50 hover:ring-blue-400"
+                        : "ring-2 ring-transparent hover:ring-[rgba(212,175,55,0.5)]"
+                    )}
                   >
-                    <button
-                      type="button"
-                      onClick={() => { setIsProfileMenuOpen(!isProfileMenuOpen); UISound.click(); }}
-                      aria-haspopup="menu"
-                      aria-expanded={isProfileMenuOpen}
-                      className={cn(
-                        "w-10 h-10 rounded-full bg-gray-700 overflow-hidden transition-all flex items-center justify-center",
-                        user.tier?.toLowerCase() === "performer"
-                          ? "ring-2 ring-amber-400/50 hover:ring-amber-400"
-                          : user.tier?.toLowerCase() === "advanced"
-                          ? "ring-2 ring-blue-400/50 hover:ring-blue-400"
-                          : "ring-2 ring-transparent hover:ring-[rgba(212,175,55,0.5)]"
-                      )}
-                    >
-                      {user.avatar_url ? (
-                        <Image
-                          src={user.avatar_url}
-                          alt={user.username || `${user.first_name} ${user.last_name}`}
-                          width={40}
-                          height={40}
-                          className="w-full h-full object-cover rounded-full"
-                        />
-                      ) : (
-                        <div className="w-full h-full rounded-full bg-gradient-to-br from-[#FCE205] to-[#D4AF37] flex items-center justify-center text-black text-xs font-bold">
-                          {(user.username?.[0] || user.first_name?.[0] || "U").toUpperCase()}
-                        </div>
-                      )}
-                    </button>
-                    {user.equipped_border_sku && BORDER_FRAME_SPECS[user.equipped_border_sku] && (
-                      <BorderFrame sku={user.equipped_border_sku} />
+                    {user.avatar_url ? (
+                      <Image
+                        src={user.avatar_url}
+                        alt={user.username || `${user.first_name} ${user.last_name}`}
+                        width={40}
+                        height={40}
+                        className="w-full h-full object-cover rounded-full"
+                      />
+                    ) : (
+                      <div className="w-full h-full rounded-full bg-gradient-to-br from-[#FCE205] to-[#D4AF37] flex items-center justify-center text-black text-xs font-bold">
+                        {(user.username?.[0] || user.first_name?.[0] || "U").toUpperCase()}
+                      </div>
                     )}
-                  </MotionDiv>
-
-                  <AnimatePresence>
-                    {isProfileMenuOpen && (
-                      <motion.div
-                        initial={{ opacity: 0, y: -10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                        transition={{ duration: 0.15, ease: "easeOut" }}
-                        className="absolute right-0 mt-2 w-56 max-w-[calc(100vw-2rem)] rounded-xl bg-gray-900/95 backdrop-blur-xl border border-gray-700/50 shadow-2xl shadow-black/50 overflow-hidden z-50"
-                        role="menu"
-                      >
-                        <div className="p-2">
-                          <Link
-                            href="/profile"
-                            onClick={() => setIsProfileMenuOpen(false)}
-                            className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors"
-                            role="menuitem"
-                          >
-                            <UserIcon size={16} className="text-gray-400" />
-                            <span className="text-sm font-semibold text-white">{t('profile')}</span>
-                          </Link>
-                          {showSubscriptionLink && (
-                            <Link
-                              href="/profile#subscription"
-                              onClick={() => setIsProfileMenuOpen(false)}
-                              className="flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors"
-                              role="menuitem"
-                            >
-                              <CreditCard size={16} className="text-gray-400" />
-                              <span className="text-sm font-semibold text-white">{t('subscription')}</span>
-                              {subStatus === "past_due" && (
-                                <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">!</span>
-                              )}
-                            </Link>
-                          )}
-                        </div>
-                        <div className="border-t border-gray-700/50 p-2">
-                          <button
-                            type="button"
-                            onClick={() => {
-                              setIsProfileMenuOpen(false);
-                              logout();
-                              router.push("/");
-                            }}
-                            className="w-full flex items-center gap-3 p-3 rounded-lg hover:bg-white/5 transition-colors"
-                            role="menuitem"
-                          >
-                            <LogOut size={16} className="text-gray-400" />
-                            <span className="text-sm font-semibold text-gray-300">{t('logout')}</span>
-                          </button>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
-                </div>
+                  </Link>
+                  {user.equipped_border_sku && BORDER_FRAME_SPECS[user.equipped_border_sku] && (
+                    <BorderFrame sku={user.equipped_border_sku} />
+                  )}
+                </MotionDiv>
 
                 {/* Language Switcher - far right */}
                 <LocaleSwitcher compact />
@@ -576,19 +498,6 @@ export default function NavBar({ user }: NavBarProps) {
                       <Radio size={16} /> The Roundtable
                       {!isGuildMaster && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>}
                     </Link>
-
-                    {showSubscriptionLink && (
-                      <Link
-                        href="/profile#subscription"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                        className="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 font-semibold flex items-center gap-2"
-                      >
-                        <CreditCard size={16} /> {t('subscription')}
-                        {subStatus === "past_due" && (
-                          <span className="ml-auto text-[10px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-300 font-bold">!</span>
-                        )}
-                      </Link>
-                    )}
 
                     {user?.role?.toLowerCase() === "admin" && (
                       <Link href="/admin" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-lg text-red-300 hover:text-red-200 hover:bg-red-500/10 font-bold">

@@ -13,7 +13,7 @@ import { BadgeTrophyCase } from "@/components/BadgeTrophyCase";
 import { ReferralSection } from "@/components/ReferralSection";
 import SubscriptionManager from "@/components/SubscriptionManager";
 import { useTranslations } from "@/i18n/useTranslations";
-import { ShoppingBag, Package } from "lucide-react";
+import { ShoppingBag, Package, CreditCard } from "lucide-react";
 import { BorderFrame } from "@/components/cosmetics/BorderFrame";
 import { BORDER_FRAME_SPECS } from "@/lib/borderFrames";
 import { TitleChip } from "@/components/ui/GuildMasterAvatar";
@@ -301,6 +301,37 @@ export default function ProfilePage() {
                 <span className="capitalize">{user.tier}</span>
               </div>
             </div>
+
+            {/* Subscription anchor + Logout — icon-only on mobile to fit the
+                tight character-sheet header. The Subscription icon only
+                renders for users with Stripe state worth managing so free
+                Rookies don't see a dead link. The past-due red dot makes a
+                broken renewal obvious from the moment they open profile. */}
+            {(() => {
+              const subTier = (user.tier || "").toLowerCase();
+              const subStatus = (user.subscription_status || "").toLowerCase();
+              const showSubLink =
+                subTier === "advanced" ||
+                subTier === "performer" ||
+                subStatus === "past_due";
+              if (!showSubLink) return null;
+              return (
+                <a
+                  href="#subscription"
+                  className="relative w-8 h-8 flex items-center justify-center text-gray-500 hover:text-mambo-gold transition shrink-0"
+                  title="Subscription"
+                  aria-label="Subscription"
+                >
+                  <CreditCard size={16} />
+                  {subStatus === "past_due" && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-red-500 ring-2 ring-mambo-dark"
+                    />
+                  )}
+                </a>
+              );
+            })()}
 
             {/* Logout button */}
             <button
