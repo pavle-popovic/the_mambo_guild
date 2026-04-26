@@ -4845,14 +4845,16 @@
     "Mambo101Edited__Flares_1_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231727.007071
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.7384965
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231727.0116534
         },
         "es": {
           "status": "translated",
@@ -5221,14 +5223,16 @@
     "Mambo101Edited__Pattern_1_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231726.7752943
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.8708527
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231726.7773488
         },
         "es": {
           "status": "translated",
