@@ -5491,14 +5491,16 @@
     "Mambo101Edited__Styling_1_Lesson_2": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777242656.3498826
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.9737093
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777242656.4047742
         },
         "es": {
           "status": "translated",
