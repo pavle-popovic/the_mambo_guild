@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { apiClient } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
+import { useTranslations } from "@/i18n/useTranslations";
 import { ADVANCED_PRICE_ID } from "@/lib/site";
 
 // State-of-the-art subscription management.
@@ -18,12 +19,10 @@ import { ADVANCED_PRICE_ID } from "@/lib/site";
 
 type Modal = null | "cancel" | "downgrade";
 
-const PERFORMER_LABEL = "Guild Master";
-const ADVANCED_LABEL = "Pro";
-
 export default function SubscriptionManager() {
   const router = useRouter();
   const { user, refreshUser } = useAuth();
+  const t = useTranslations("profile.subscription");
   const [modal, setModal] = useState<Modal>(null);
   const [submitting, setSubmitting] = useState<null | string>(null);
 
@@ -55,7 +54,9 @@ export default function SubscriptionManager() {
       })
     : null;
 
-  const planLabel = isPerformer ? PERFORMER_LABEL : ADVANCED_LABEL;
+  // Plan label is translated via the brand-name keys; price stays a literal
+  // because Stripe-billed amounts shouldn't drift between locales.
+  const planLabel = isPerformer ? t("planPerformer") : t("planAdvanced");
   const planPrice = isPerformer ? "$59" : "$39";
 
   const close = () => setModal(null);
@@ -68,7 +69,7 @@ export default function SubscriptionManager() {
       window.location.href = url;
     } catch (err: any) {
       console.error("Portal session failed:", err);
-      toast.error(err?.message || "Could not open the billing portal.");
+      toast.error(err?.message || t("toastPortalError"));
       setSubmitting(null);
     }
   };
@@ -78,14 +79,14 @@ export default function SubscriptionManager() {
     try {
       const res = await apiClient.cancelSubscription();
       if (res.success) {
-        toast.success(res.message || "Subscription scheduled to end.");
+        toast.success(res.message || t("toastCancelSuccess"));
         await refreshUser();
         close();
       } else {
-        toast.error("Could not cancel. Try again.");
+        toast.error(t("toastCancelError"));
       }
     } catch (err: any) {
-      toast.error(err?.message || "Could not cancel. Try again.");
+      toast.error(err?.message || t("toastCancelError"));
     } finally {
       setSubmitting(null);
     }
@@ -96,13 +97,13 @@ export default function SubscriptionManager() {
     try {
       const res = await apiClient.resumeSubscription();
       if (res.success) {
-        toast.success(res.message || "Subscription resumed.");
+        toast.success(res.message || t("toastResumeSuccess"));
         await refreshUser();
       } else {
-        toast.error("Could not resume.");
+        toast.error(t("toastResumeError"));
       }
     } catch (err: any) {
-      toast.error(err?.message || "Could not resume.");
+      toast.error(err?.message || t("toastResumeError"));
     } finally {
       setSubmitting(null);
     }
@@ -113,11 +114,11 @@ export default function SubscriptionManager() {
     try {
       await apiClient.updateSubscription(ADVANCED_PRICE_ID);
       await refreshUser();
-      toast.success("Switched to Pro.");
+      toast.success(t("toastDowngradeSuccess"));
       close();
     } catch (err: any) {
       console.error("Downgrade failed:", err);
-      toast.error(err?.message || "Could not switch plans.");
+      toast.error(err?.message || t("toastDowngradeError"));
     } finally {
       setSubmitting(null);
     }
@@ -128,23 +129,26 @@ export default function SubscriptionManager() {
   // makes sense here.
   if (isPastDue) {
     return (
-      <section id="subscription" aria-labelledby="subscription-heading" className="scroll-mt-24">
+      <section
+        id="subscription"
+        aria-labelledby="subscription-heading"
+        className="scroll-mt-24"
+      >
         <h2
           id="subscription-heading"
           className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3"
         >
-          Subscription
+          {t("heading")}
         </h2>
         <div className="rounded-2xl border border-red-500/40 bg-red-500/5 p-5 sm:p-6">
           <div className="flex items-start gap-3 mb-3">
             <span className="text-red-300 text-xl leading-none">⚠</span>
             <div>
               <p className="text-base font-semibold text-red-100">
-                Your last renewal payment failed.
+                {t("pastDueTitle")}
               </p>
               <p className="text-sm text-red-200/80 mt-1">
-                Premium access has been paused. Update your card and the
-                subscription will resume automatically.
+                {t("pastDueBody")}
               </p>
             </div>
           </div>
@@ -153,7 +157,7 @@ export default function SubscriptionManager() {
             disabled={submitting === "portal"}
             className="px-4 py-2.5 rounded-lg bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black font-bold text-sm shadow-lg shadow-amber-500/20 transition disabled:opacity-50"
           >
-            {submitting === "portal" ? "Opening..." : "Update payment method"}
+            {submitting === "portal" ? t("opening") : t("updatePayment")}
           </button>
         </div>
       </section>
@@ -163,12 +167,16 @@ export default function SubscriptionManager() {
   // ---- Active / trialing / scheduled-to-cancel
   return (
     <>
-      <section id="subscription" aria-labelledby="subscription-heading" className="scroll-mt-24">
+      <section
+        id="subscription"
+        aria-labelledby="subscription-heading"
+        className="scroll-mt-24"
+      >
         <h2
           id="subscription-heading"
           className="text-xs font-bold uppercase tracking-widest text-gray-500 mb-3"
         >
-          Subscription
+          {t("heading")}
         </h2>
 
         <div className="rounded-2xl border border-gray-800 bg-mambo-panel p-5 sm:p-6">
@@ -185,7 +193,7 @@ export default function SubscriptionManager() {
             </span>
             <span className="text-2xl font-bold text-mambo-text leading-none">
               {planPrice}
-              <span className="text-sm font-normal text-gray-500">/mo</span>
+              <span className="text-sm font-normal text-gray-500">{t("pricePerMonth")}</span>
             </span>
           </div>
 
@@ -193,34 +201,20 @@ export default function SubscriptionManager() {
           {isScheduledToCancel && periodEndLabel && (
             <div className="mb-4 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2.5">
               <p className="text-sm text-amber-100">
-                Your subscription ends on{" "}
-                <span className="font-semibold text-amber-50">
-                  {periodEndLabel}
-                </span>
-                . You'll keep full access until then.
+                {t("endsOn", { date: periodEndLabel })}
               </p>
             </div>
           )}
           {!isScheduledToCancel && isTrialing && periodEndLabel && (
             <div className="mb-4 rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-2.5">
               <p className="text-sm text-blue-100">
-                Free trial active. First charge of{" "}
-                <span className="font-semibold text-blue-50">{planPrice}</span>{" "}
-                on{" "}
-                <span className="font-semibold text-blue-50">
-                  {periodEndLabel}
-                </span>
-                .
+                {t("trialingBanner", { price: planPrice, date: periodEndLabel })}
               </p>
             </div>
           )}
           {!isScheduledToCancel && !isTrialing && periodEndLabel && (
             <p className="text-sm text-gray-400 mb-4">
-              Renews on{" "}
-              <span className="text-gray-200 font-semibold">
-                {periodEndLabel}
-              </span>
-              .
+              {t("renewsOn", { date: periodEndLabel })}
             </p>
           )}
 
@@ -231,7 +225,7 @@ export default function SubscriptionManager() {
               disabled={submitting === "portal"}
               className="px-4 py-2 rounded-lg bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black font-bold text-sm shadow-lg shadow-amber-500/20 transition disabled:opacity-50"
             >
-              {submitting === "portal" ? "Opening..." : "Manage billing"}
+              {submitting === "portal" ? t("opening") : t("manageBilling")}
             </button>
 
             {isAdvanced && !isScheduledToCancel && (
@@ -239,7 +233,7 @@ export default function SubscriptionManager() {
                 onClick={() => router.push("/pricing")}
                 className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-900/60 text-mambo-text font-semibold text-sm hover:bg-gray-800 transition"
               >
-                Upgrade to Guild Master
+                {t("upgradeToGuildMaster")}
               </button>
             )}
 
@@ -248,7 +242,7 @@ export default function SubscriptionManager() {
                 onClick={() => setModal("downgrade")}
                 className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-900/60 text-mambo-text font-semibold text-sm hover:bg-gray-800 transition"
               >
-                Switch to Pro
+                {t("switchToPro")}
               </button>
             )}
 
@@ -258,14 +252,14 @@ export default function SubscriptionManager() {
                 disabled={submitting === "resume"}
                 className="px-4 py-2 rounded-lg border border-amber-500/40 bg-amber-500/10 text-amber-200 font-semibold text-sm hover:bg-amber-500/20 transition disabled:opacity-50"
               >
-                {submitting === "resume" ? "Resuming..." : "Resume subscription"}
+                {submitting === "resume" ? t("resuming") : t("resumeSubscription")}
               </button>
             ) : (
               <button
                 onClick={() => setModal("cancel")}
                 className="px-4 py-2 rounded-lg border border-gray-700 text-gray-300 font-semibold text-sm hover:bg-gray-800/60 hover:text-mambo-text transition"
               >
-                Cancel subscription
+                {t("cancelSubscription")}
               </button>
             )}
           </div>
@@ -274,42 +268,29 @@ export default function SubscriptionManager() {
 
       {/* Cancel modal — single step, equal-weight buttons. */}
       {modal === "cancel" && (
-        <ModalShell onClose={close}>
+        <ModalShell onClose={close} closeAria={t("modalClose")}>
           <h2 className="text-xl font-serif font-bold text-mambo-text mb-2">
-            Cancel your {planLabel} subscription?
+            {t("cancelTitle", { plan: planLabel })}
           </h2>
           <p className="text-sm text-gray-400 mb-3">
-            {periodEndLabel ? (
-              <>
-                You'll keep full access until{" "}
-                <span className="text-mambo-text font-semibold">
-                  {periodEndLabel}
-                </span>
-                , then drop to the free Rookie tier.
-              </>
-            ) : (
-              "You'll lose premium access at the end of your current billing period."
-            )}
+            {periodEndLabel
+              ? t("cancelBodyWithDate", { date: periodEndLabel })
+              : t("cancelBodyNoDate")}
           </p>
-          <p className="text-xs text-gray-500 mb-5">
-            Your XP, badges, streaks and progress stay with you. You can
-            resubscribe any time.
-          </p>
+          <p className="text-xs text-gray-500 mb-5">{t("cancelKeepPromise")}</p>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               onClick={close}
-              className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-mambo-gold to-orange-500 text-black font-bold text-sm hover:scale-[1.02] transition"
+              className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black font-bold text-sm shadow-lg shadow-amber-500/20 transition"
             >
-              Keep my subscription
+              {t("keepSubscription")}
             </button>
             <button
               onClick={handleCancel}
               disabled={submitting === "cancel"}
               className="flex-1 py-2.5 rounded-lg border border-gray-700 bg-gray-900/60 text-gray-200 font-semibold text-sm hover:bg-gray-800 hover:text-mambo-text transition disabled:opacity-50"
             >
-              {submitting === "cancel"
-                ? "Cancelling..."
-                : "Cancel subscription"}
+              {submitting === "cancel" ? t("cancelling") : t("cancelSubscription")}
             </button>
           </div>
         </ModalShell>
@@ -317,45 +298,42 @@ export default function SubscriptionManager() {
 
       {/* Downgrade modal — Performer → Pro. */}
       {modal === "downgrade" && (
-        <ModalShell onClose={close}>
+        <ModalShell onClose={close} closeAria={t("modalClose")}>
           <h2 className="text-xl font-serif font-bold text-mambo-text mb-2">
-            Switch from Guild Master to Pro?
+            {t("downgradeTitle")}
           </h2>
-          <p className="text-sm text-gray-400 mb-4">
-            You'll keep full Guild Master access for the rest of this billing
-            cycle, then move to Pro at $39/mo.
-          </p>
+          <p className="text-sm text-gray-400 mb-4">{t("downgradeBody")}</p>
           <ul className="space-y-2 mb-5 text-sm">
             <li className="flex items-start gap-2 text-gray-300">
               <span className="text-red-400 mt-0.5 leading-none">−</span>
-              <span>Lose 1-on-1 video coaching</span>
+              <span>{t("downgradeLose1")}</span>
             </li>
             <li className="flex items-start gap-2 text-gray-300">
               <span className="text-red-400 mt-0.5 leading-none">−</span>
-              <span>Lose Roundtable Zoom calls</span>
+              <span>{t("downgradeLose2")}</span>
             </li>
             <li className="flex items-start gap-2 text-gray-300">
               <span className="text-red-400 mt-0.5 leading-none">−</span>
-              <span>Free up your Guild Master seat (capped at 30)</span>
+              <span>{t("downgradeLose3")}</span>
             </li>
             <li className="flex items-start gap-2 text-gray-300">
               <span className="text-mambo-gold mt-0.5 leading-none">+</span>
-              <span>Keep all Pro features and full course access</span>
+              <span>{t("downgradeKeep1")}</span>
             </li>
           </ul>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               onClick={close}
-              className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-mambo-gold to-orange-500 text-black font-bold text-sm hover:scale-[1.02] transition"
+              className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black font-bold text-sm shadow-lg shadow-amber-500/20 transition"
             >
-              Stay on Guild Master
+              {t("stayOnGuildMaster")}
             </button>
             <button
               onClick={handleDowngrade}
               disabled={submitting === "downgrade"}
               className="flex-1 py-2.5 rounded-lg border border-gray-700 bg-gray-900/60 text-gray-200 font-semibold text-sm hover:bg-gray-800 hover:text-mambo-text transition disabled:opacity-50"
             >
-              {submitting === "downgrade" ? "Switching..." : "Switch to Pro"}
+              {submitting === "downgrade" ? t("switching") : t("switchToPro")}
             </button>
           </div>
         </ModalShell>
@@ -367,9 +345,11 @@ export default function SubscriptionManager() {
 function ModalShell({
   children,
   onClose,
+  closeAria,
 }: {
   children: React.ReactNode;
   onClose: () => void;
+  closeAria: string;
 }) {
   return (
     <div
@@ -383,7 +363,7 @@ function ModalShell({
         <button
           onClick={onClose}
           className="absolute top-3 right-3 text-gray-600 hover:text-gray-300 text-xl leading-none"
-          aria-label="Close"
+          aria-label={closeAria}
         >
           ×
         </button>

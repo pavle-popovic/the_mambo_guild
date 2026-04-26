@@ -59,15 +59,27 @@ export function useTranslations(namespace?: string) {
   const locale = useLocale();
 
   return useMemo(() => {
-    const msgs = messages[locale] || messages.en;
-    const scoped = namespace ? resolve(msgs, namespace) : msgs;
-
     return (key: string, params?: Record<string, string | number>): string => {
-      const base = typeof scoped === 'object' ? resolve(scoped, key) : resolve(msgs, namespace ? `${namespace}.${key}` : key);
+      const fullKey = namespace ? `${namespace}.${key}` : key;
+      const localeMsgs = messages[locale] || messages.en;
+
+      // Resolve in the current locale first. `resolve()` returns the
+      // unmodified path when no value matches, which we use as the
+      // "missing" signal to fall back to English. Without this fallback,
+      // a half-translated locale would surface raw keys like
+      // "profile.subscription.cancelTitle" to the user.
+      let base = resolve(localeMsgs, fullKey);
+      if (base === fullKey && locale !== 'en') {
+        base = resolve(messages.en, fullKey);
+      }
+
       if (!params) return base;
       // Simple parameter substitution: {name} or $1, $2
-      return base.replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? `{${k}}`))
-                 .replace(/\$(\d+)/g, (_, n) => String(params[`$${n}`] ?? params[Object.keys(params)[parseInt(n) - 1]] ?? `$${n}`));
+      return base
+        .replace(/\{(\w+)\}/g, (_, k) => String(params[k] ?? `{${k}}`))
+        .replace(/\$(\d+)/g, (_, n) =>
+          String(params[`$${n}`] ?? params[Object.keys(params)[parseInt(n) - 1]] ?? `$${n}`)
+        );
     };
   }, [locale, namespace]);
 }
