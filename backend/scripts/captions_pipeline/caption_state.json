@@ -2563,14 +2563,16 @@
     "BodymovementsEdited__Shoulder_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216018.2321978
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.7503333
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216018.2357082
         },
         "es": {
           "status": "translated",
@@ -2753,14 +2755,16 @@
     "BodymovementsEdited__Sidewave_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216013.7118647
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.8422449
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216017.964188
         },
         "es": {
           "status": "translated",
