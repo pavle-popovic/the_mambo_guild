@@ -25,6 +25,7 @@ from services.email_service import (
     send_payment_failed_email,
     send_subscription_canceled_email,
 )
+from services.email_validation import is_disposable_email, normalize_email_for_dedup
 from config import settings
 
 from schemas.course import (
@@ -205,16 +206,41 @@ def _email_has_prior_stripe_subscription(email: str) -> bool:
     """
     Trial-abuse guard. Even if this UserProfile has has_used_trial=False (new
     account), we should refuse to grant another 7-day trial if Stripe already
-    knows this email from a previous subscription. Catches the 'sign up again
-    with the same email' loophole. Does NOT catch different-email-same-card —
-    that requires a fingerprint column + migration.
+    knows this email from a previous subscription. Two queries stack:
+
+    1. Exact email lookup via stripe.Customer.list — catches the simple
+       'sign up again with same email' loophole.
+    2. Normalized-email lookup via stripe.Customer.search on metadata —
+       catches Gmail-alias siblings ('foo+a@gmail.com' / 'foo+b@gmail.com'
+       both normalize to 'foo@gmail.com'). For this to work, NEW customers
+       must be created with metadata['normalized_email'] populated; see the
+       customer-create branch in create_checkout_session below.
+
+    Does NOT catch same-card-different-email or burner-card patterns — that
+    requires a card-fingerprint column + migration. Acceptable trade-off
+    given the trial value ($39 of Pro access) and the friction those
+    patterns require from the attacker.
     """
+    normalized = normalize_email_for_dedup(email)
     try:
+        # (1) Exact email lookup
         customers = stripe.Customer.list(email=email, limit=10)
         for cust in customers.auto_paging_iter():
             subs = stripe.Subscription.list(customer=cust.id, status="all", limit=1)
             if subs.data:
                 return True
+        # (2) Normalized-email lookup via metadata. Skip when normalized ==
+        # the as-typed form (no Gmail-alias collapsing happened) so we don't
+        # fire a redundant query.
+        if normalized and normalized != email.strip().lower():
+            search_results = stripe.Customer.search(
+                query=f"metadata['normalized_email']:'{normalized}'",
+                limit=10,
+            )
+            for cust in search_results.auto_paging_iter():
+                subs = stripe.Subscription.list(customer=cust.id, status="all", limit=1)
+                if subs.data:
+                    return True
     except stripe.error.StripeError as e:
         logger.warning(f"Stripe lookup failed for trial eligibility on {email}: {e}")
         # Fail closed on trial eligibility — if we can't verify, deny the trial.
@@ -300,19 +326,30 @@ def create_checkout_session(
         # trial-abuse lookup reliable.
         stripe_customer_id = current_user.subscription.stripe_customer_id if current_user.subscription else None
         if not stripe_customer_id:
+            # We populate two metadata fields on every Stripe customer:
+            # - user_id: links Stripe → our DB so webhooks know who to update
+            # - normalized_email: enables the alias-aware trial-abuse guard
+            #   in _email_has_prior_stripe_subscription. Catches Gmail-alias
+            #   siblings (foo+a@ / foo+b@ map to foo@) on later signups.
+            customer_metadata = {
+                "user_id": str(current_user.id),
+                "normalized_email": normalize_email_for_dedup(current_user.email),
+            }
             existing_customers = stripe.Customer.list(email=current_user.email, limit=1)
             if existing_customers.data:
                 customer = existing_customers.data[0]
-                # Ensure our user_id metadata is attached for webhook routing.
-                if (customer.metadata or {}).get("user_id") != str(current_user.id):
-                    stripe.Customer.modify(
-                        customer.id,
-                        metadata={"user_id": str(current_user.id)},
-                    )
+                # Ensure both metadata fields are attached. We compare each
+                # key individually because Stripe.modify replaces metadata
+                # wholesale only if we pass it; an existing customer could
+                # have user_id set but be missing normalized_email (older
+                # Stripe customer pre-dating this guard).
+                existing_md = customer.metadata or {}
+                if any(existing_md.get(k) != v for k, v in customer_metadata.items()):
+                    stripe.Customer.modify(customer.id, metadata=customer_metadata)
             else:
                 customer = stripe.Customer.create(
                     email=current_user.email,
-                    metadata={"user_id": str(current_user.id)}
+                    metadata=customer_metadata,
                 )
             stripe_customer_id = customer.id
             
@@ -340,11 +377,16 @@ def create_checkout_session(
         # upgrades, etc.) they pay from day 0.
         profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
         # Free trial is ADVANCED-tier only. Guild Master (PERFORMER) is a
-        # separate product with no trial. Also refuse a trial if Stripe has
-        # ever seen a subscription on this email (same-email re-signup loop).
+        # separate product with no trial. Defense-in-depth disposable-email
+        # check (registration also blocks these — this is the second layer
+        # in case a user changed their email post-registration to a
+        # throwaway domain). And we refuse a trial if Stripe has ever seen
+        # a subscription on this email or any of its alias siblings (the
+        # latter via the normalized_email metadata search).
         trial_eligible = (
             bool(profile and not profile.has_used_trial)
             and request_data.price_id == ADVANCED_PRICE_ID
+            and not is_disposable_email(current_user.email)
             and not _email_has_prior_stripe_subscription(current_user.email)
         )
         trial_period_days = 7 if trial_eligible else None

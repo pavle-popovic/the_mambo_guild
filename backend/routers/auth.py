@@ -15,6 +15,7 @@ from services.email_service import send_password_reset_email, send_waitlist_welc
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
 from services.clave_service import process_daily_login, award_new_user_bonus, award_referral_bonus
 from services.analytics_service import track_event, capture_first_touch
+from services.email_validation import is_disposable_email, normalize_email_for_dedup
 from utils.request import client_ip as get_client_ip
 from dependencies import get_current_user
 from config import settings
@@ -49,6 +50,15 @@ def _is_admin_test_account(username: str) -> bool:
     return bool(re.match(r"^test\d+$", username.lower().strip()))
 
 def _is_blocked_domain(email: str) -> bool:
+    """
+    True when the email's domain is unacceptable for new accounts. Two
+    sources stack: (1) the comprehensive disposable-services list in
+    services.email_validation (~200 well-known throwaway domains), and
+    (2) the local BLOCKED_EMAIL_DOMAINS above for one-off bad actors
+    we've observed locally that aren't in the public lists yet.
+    """
+    if is_disposable_email(email):
+        return True
     domain = email.split("@")[-1].lower()
     return domain in BLOCKED_EMAIL_DOMAINS
 
@@ -113,16 +123,49 @@ def register(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid email format"
             )
-        
+
+        # Trial-abuse defense layer 1: reject known disposable / throwaway
+        # email services. These are the prime tool for trial-abuse loops
+        # (sign up, use trial, throw away email, repeat). Admin test
+        # accounts (username pattern test{N}) bypass for QA convenience.
+        if not _is_admin_test_account(user_data.username) and _is_blocked_domain(user_data.email):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Please use a permanent email address. Disposable or temporary email services are not accepted."
+            )
+
         # Password validation is handled by Pydantic schema (confirm_password and strength check)
-        
-        # Check if user already exists
+
+        # Check if user already exists (exact-case match on the as-typed
+        # email; the column is case-insensitively stored thanks to the
+        # .lower().strip() at insert time).
         existing_user = db.query(User).filter(User.email == user_data.email.lower().strip()).first()
         if existing_user:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Email already registered"
             )
+
+        # Trial-abuse defense layer 2: reject if any existing user has an
+        # email that normalizes to the same canonical form. Catches Gmail-
+        # alias attacks (foo+a@, foo+b@, fo.o@ all map to foo@gmail.com)
+        # and similar +alias schemes on other providers. The first user
+        # with that canonical form keeps the account; later attempts get
+        # the same "already registered" message so attackers can't
+        # enumerate the existing user. We narrow the scan to candidates
+        # on the same domain to keep the query cheap.
+        target_normalized = normalize_email_for_dedup(user_data.email)
+        if "@" in target_normalized:
+            target_domain = target_normalized.rsplit("@", 1)[1]
+            same_domain_emails = db.query(User.email).filter(
+                func.lower(User.email).like(f"%@{target_domain}")
+            ).all()
+            for (candidate_email,) in same_domain_emails:
+                if normalize_email_for_dedup(candidate_email) == target_normalized:
+                    raise HTTPException(
+                        status_code=status.HTTP_400_BAD_REQUEST,
+                        detail="Email already registered"
+                    )
 
         # Check if username is taken (case-insensitive)
         existing_username = db.query(UserProfile).filter(
