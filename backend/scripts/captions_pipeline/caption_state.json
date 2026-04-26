@@ -1091,14 +1091,16 @@
     "BodymovementsEdited__Despelote_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777211263.4800377
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.9877446
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777211263.5232346
         },
         "es": {
           "status": "translated",
