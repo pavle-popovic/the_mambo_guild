@@ -2369,14 +2369,16 @@
     "BodymovementsEdited__Shimmy_Lesson_2": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777214512.0308456
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.6669652
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777214515.559808
         },
         "es": {
           "status": "translated",
