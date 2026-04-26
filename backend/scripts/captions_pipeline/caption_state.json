@@ -643,14 +643,16 @@
     "BodymovementsEdited__Bodyroll_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210662.1263778
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.678401
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210665.6540835
         },
         "es": {
           "status": "translated",
@@ -767,14 +769,16 @@
     "BodymovementsEdited__Bodyroll_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210679.275367
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.7323904
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210679.3920898
         },
         "es": {
           "status": "translated",
@@ -829,14 +833,16 @@
     "BodymovementsEdited__Bounce_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210732.739472
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.8107107
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210736.5830622
         },
         "es": {
           "status": "translated",
