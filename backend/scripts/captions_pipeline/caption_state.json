@@ -707,14 +707,16 @@
     "BodymovementsEdited__Bodyroll_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210871.1537454
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.71593
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210871.250983
         },
         "es": {
           "status": "translated",
@@ -897,14 +899,16 @@
     "BodymovementsEdited__Bounce_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210964.8605363
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.8600073
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210968.4001958
         },
         "es": {
           "status": "translated",
