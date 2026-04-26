@@ -2307,14 +2307,16 @@
     "BodymovementsEdited__Shimmy_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777214714.8485527
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.6487122
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777214718.3733644
         },
         "es": {
           "status": "translated",
