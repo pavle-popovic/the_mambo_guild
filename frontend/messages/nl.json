@@ -884,7 +884,8 @@
   "landing": {
     "subscribed": {
       "continueLearning": "Doorgaan met leren",
-      "visitCommunity": "Bezoek de community"
+      "visitCommunity": "Bezoek de community",
+      "shareProgress": "Voortgang delen"
     },
     "hero": {
       "credentialBadge": "Gebouwd op Learning Experience Design",

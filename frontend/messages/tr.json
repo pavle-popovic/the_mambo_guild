@@ -884,7 +884,8 @@
   "landing": {
     "subscribed": {
       "continueLearning": "Öğrenmeye Devam Et",
-      "visitCommunity": "Topluluğu Ziyaret Et"
+      "visitCommunity": "Topluluğu Ziyaret Et",
+      "shareProgress": "İlerlemeyi Paylaş"
     },
     "hero": {
       "credentialBadge": "Learning Experience Design üzerine kurulu",

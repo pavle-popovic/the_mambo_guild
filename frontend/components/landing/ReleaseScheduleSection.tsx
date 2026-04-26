@@ -439,6 +439,7 @@ export default function ReleaseScheduleSection() {
     const t = useTranslations("landing.releases");
     const tSubscribed = useTranslations("landing.subscribed");
     const { user } = useAuth();
+    const isSubscribed = user?.tier === "advanced" || user?.tier === "performer";
     const items = useReleaseSchedule();
     const next = useNextRelease(items);
     return (
@@ -474,12 +475,29 @@ export default function ReleaseScheduleSection() {
                     transition={{ delay: 0.3 }}
                     className="mt-10 text-center md:mt-14"
                 >
-                    <Link
-                        href={user ? "/courses" : "/register"}
-                        className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-mambo-gold to-amber-500 px-6 py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all hover:from-amber-500 hover:to-mambo-gold hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] md:px-8 md:py-4 md:text-base"
-                    >
-                        <FaCalendarAlt /> {user ? tSubscribed("continueLearning") : t("cta")}
-                    </Link>
+                    {isSubscribed ? (
+                        <div className="inline-flex flex-row gap-2 sm:gap-3 w-full sm:w-auto justify-center">
+                            <Link
+                                href="/courses"
+                                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-mambo-gold to-amber-500 px-4 sm:px-6 py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all hover:brightness-110 hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] md:px-7 md:py-4 md:text-base whitespace-nowrap"
+                            >
+                                <FaCalendarAlt /> {tSubscribed("continueLearning")}
+                            </Link>
+                            <Link
+                                href="/community"
+                                className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 rounded-full bg-gradient-to-r from-blue-500 to-blue-700 px-4 sm:px-6 py-3 text-sm font-bold text-white shadow-[0_0_20px_rgba(59,130,246,0.3)] transition-all hover:brightness-110 hover:shadow-[0_0_30px_rgba(59,130,246,0.5)] md:px-7 md:py-4 md:text-base whitespace-nowrap"
+                            >
+                                {tSubscribed("shareProgress")}
+                            </Link>
+                        </div>
+                    ) : (
+                        <Link
+                            href="/register"
+                            className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-mambo-gold to-amber-500 px-6 py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all hover:from-amber-500 hover:to-mambo-gold hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] md:px-8 md:py-4 md:text-base"
+                        >
+                            <FaCalendarAlt /> {t("cta")}
+                        </Link>
+                    )}
                     <p className="mt-3 text-xs text-gray-500">{t("ctaHint")}</p>
                 </motion.div>
             </div>

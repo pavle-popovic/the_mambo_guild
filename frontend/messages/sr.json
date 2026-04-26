@@ -884,7 +884,8 @@
   "landing": {
     "subscribed": {
       "continueLearning": "Nastavi učenje",
-      "visitCommunity": "Poseti zajednicu"
+      "visitCommunity": "Poseti zajednicu",
+      "shareProgress": "Podeli napredak"
     },
     "hero": {
       "credentialBadge": "Засновано на Learning Experience Design-у",

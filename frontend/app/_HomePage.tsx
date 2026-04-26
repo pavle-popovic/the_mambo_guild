@@ -24,6 +24,7 @@ export default function HomePage() {
     const { user } = useAuth();
     const t = useTranslations("landing");
     const tSubscribed = useTranslations("landing.subscribed");
+    const isSubscribed = user?.tier === "advanced" || user?.tier === "performer";
     const [showStickyCta, setShowStickyCta] = useState(false);
 
     // Show sticky CTA after scrolling past the hero
@@ -102,12 +103,29 @@ export default function HomePage() {
                 }`}
             >
                 <div className="bg-black/60 backdrop-blur-xl border-t border-white/15 px-4 py-3 sm:py-4 flex items-center justify-center shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
-                    <Link
-                        href={user ? "/courses" : "/register"}
-                        className="w-full max-w-md bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] hover:bg-[linear-gradient(135deg,#FCE205_20%,#D4AF37_100%)] text-black font-extrabold py-3.5 sm:py-4 px-8 rounded-full text-base sm:text-lg active:scale-[0.97] transition-all text-center shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 tracking-wide"
-                    >
-                        {user ? tSubscribed("continueLearning") : t("stickyCta")}
-                    </Link>
+                    {isSubscribed ? (
+                        <div className="flex flex-row gap-2 sm:gap-3 w-full max-w-md">
+                            <Link
+                                href="/courses"
+                                className="flex-1 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] hover:brightness-110 text-black font-extrabold py-3.5 sm:py-4 px-3 sm:px-5 rounded-full text-sm sm:text-base active:scale-[0.97] transition-all text-center shadow-[0_0_20px_rgba(252,226,5,0.35)] ring-2 ring-amber-400/50 tracking-wide whitespace-nowrap"
+                            >
+                                {tSubscribed("continueLearning")}
+                            </Link>
+                            <Link
+                                href="/community"
+                                className="flex-1 bg-[linear-gradient(135deg,#3B82F6_0%,#1D4ED8_100%)] hover:brightness-110 text-white font-extrabold py-3.5 sm:py-4 px-3 sm:px-5 rounded-full text-sm sm:text-base active:scale-[0.97] transition-all text-center shadow-[0_0_20px_rgba(59,130,246,0.35)] ring-2 ring-blue-400/50 tracking-wide whitespace-nowrap"
+                            >
+                                {tSubscribed("shareProgress")}
+                            </Link>
+                        </div>
+                    ) : (
+                        <Link
+                            href="/register"
+                            className="w-full max-w-md bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] hover:bg-[linear-gradient(135deg,#FCE205_20%,#D4AF37_100%)] text-black font-extrabold py-3.5 sm:py-4 px-8 rounded-full text-base sm:text-lg active:scale-[0.97] transition-all text-center shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 tracking-wide"
+                        >
+                            {t("stickyCta")}
+                        </Link>
+                    )}
                 </div>
             </div>
         </>

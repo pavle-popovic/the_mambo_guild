@@ -884,7 +884,8 @@
   "landing": {
     "subscribed": {
       "continueLearning": "学習を続ける",
-      "visitCommunity": "コミュニティを訪問"
+      "visitCommunity": "コミュニティを訪問",
+      "shareProgress": "進捗をシェア"
     },
     "hero": {
       "credentialBadge": "ラーニング・エクスペリエンス・デザインに基づいて設計",

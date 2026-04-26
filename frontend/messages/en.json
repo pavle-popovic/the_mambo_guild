@@ -884,7 +884,8 @@
   "landing": {
     "subscribed": {
       "continueLearning": "Continue Learning",
-      "visitCommunity": "Visit Community"
+      "visitCommunity": "Visit Community",
+      "shareProgress": "Share Progress"
     },
     "hero": {
       "credentialBadge": "Built on Learning Experience Design",

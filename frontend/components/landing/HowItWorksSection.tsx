@@ -144,6 +144,7 @@ export default function HowItWorksSection() {
   const t = useTranslations("landing.howItWorks");
   const tSubscribed = useTranslations("landing.subscribed");
   const { user } = useAuth();
+  const isSubscribed = user?.tier === "advanced" || user?.tier === "performer";
 
   const pillars: Pillar[] = [
     {
@@ -396,12 +397,29 @@ export default function HowItWorksSection() {
                 {t("closingBody")}
               </p>
               <div className="mt-8 flex items-center justify-center landscape-phone:mt-5">
-                <Link
-                  href={user ? "/courses" : "/register"}
-                  className="w-full sm:w-auto bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-8 rounded-full text-base sm:text-lg tracking-wide shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm"
-                >
-                  {user ? tSubscribed("continueLearning") : t("closingCta")}
-                </Link>
+                {isSubscribed ? (
+                  <div className="flex flex-row gap-2 sm:gap-3 w-full sm:w-auto">
+                    <Link
+                      href="/courses"
+                      className="flex-1 sm:flex-initial bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-4 sm:px-7 rounded-full text-sm sm:text-base tracking-wide shadow-[0_0_20px_rgba(252,226,5,0.35)] ring-2 ring-amber-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm text-center whitespace-nowrap"
+                    >
+                      {tSubscribed("continueLearning")}
+                    </Link>
+                    <Link
+                      href="/community"
+                      className="flex-1 sm:flex-initial bg-[linear-gradient(135deg,#3B82F6_0%,#1D4ED8_100%)] text-white font-extrabold py-3.5 px-4 sm:px-7 rounded-full text-sm sm:text-base tracking-wide shadow-[0_0_20px_rgba(59,130,246,0.35)] ring-2 ring-blue-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm text-center whitespace-nowrap"
+                    >
+                      {tSubscribed("shareProgress")}
+                    </Link>
+                  </div>
+                ) : (
+                  <Link
+                    href="/register"
+                    className="w-full sm:w-auto bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-8 rounded-full text-base sm:text-lg tracking-wide shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm text-center"
+                  >
+                    {t("closingCta")}
+                  </Link>
+                )}
               </div>
             </div>
           </div>

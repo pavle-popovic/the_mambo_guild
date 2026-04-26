@@ -884,7 +884,8 @@
   "landing": {
     "subscribed": {
       "continueLearning": "继续学习",
-      "visitCommunity": "访问社区"
+      "visitCommunity": "访问社区",
+      "shareProgress": "分享进度"
     },
     "hero": {
       "credentialBadge": "基于学习体验设计打造",

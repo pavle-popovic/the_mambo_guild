@@ -884,7 +884,8 @@
   "landing": {
     "subscribed": {
       "continueLearning": "Συνέχεια μάθησης",
-      "visitCommunity": "Επίσκεψη στην Κοινότητα"
+      "visitCommunity": "Επίσκεψη στην Κοινότητα",
+      "shareProgress": "Μοιραστείτε την πρόοδο"
     },
     "hero": {
       "credentialBadge": "Βασισμένο στο Learning Experience Design",
