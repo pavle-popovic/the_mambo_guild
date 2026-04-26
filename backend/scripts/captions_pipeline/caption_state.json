@@ -2499,14 +2499,16 @@
     "BodymovementsEdited__Shoulder_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777215816.9621184
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.733999
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777215816.9642966
         },
         "es": {
           "status": "translated",
@@ -2623,14 +2625,16 @@
     "BodymovementsEdited__Shoulder_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777215812.8640041
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.7641354
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777215816.3657362
         },
         "es": {
           "status": "translated",
@@ -2685,14 +2689,16 @@
     "BodymovementsEdited__Sidewave_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777215817.2251372
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.8263268
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777215817.2314136
         },
         "es": {
           "status": "translated",
@@ -2809,14 +2815,16 @@
     "BodymovementsEdited__Sidewave_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777215816.69378
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.852853
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777215816.7178674
         },
         "es": {
           "status": "translated",
