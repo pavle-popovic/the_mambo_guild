@@ -27,6 +27,13 @@ function PricingPageContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  // Trial-Advanced users upgrading to Performer trigger an immediate $59
+  // charge AND end their free trial NOW (see backend update_subscription
+  // path that sets trial_end="now"). Without a confirmation step, users
+  // who click "Upgrade to Guild Master" expecting "this will start when my
+  // trial ends" instead see a $59 charge same instant. The modal below
+  // surfaces both consequences before firing the API call.
+  const [showTrialUpgradeModal, setShowTrialUpgradeModal] = useState(false);
   const [guildMasterSeats, setGuildMasterSeats] = useState<{
     total: number;
     taken: number;
@@ -202,6 +209,29 @@ function PricingPageContent() {
     } finally {
       setLoading(null);
     }
+  };
+
+  // Click gate: trial-Advanced users see a confirmation step that names the
+  // immediate-charge consequence; everyone else upgrades straight through
+  // (paid Pro users are already used to monthly billing).
+  const handleUpgradeClick = () => {
+    if (!user) {
+      setShowAuthModal(true);
+      return;
+    }
+    const isTrialingAdvanced =
+      (user.subscription_status || "").toLowerCase() === "trialing"
+      && (user.tier || "").toLowerCase() === "advanced";
+    if (isTrialingAdvanced) {
+      setShowTrialUpgradeModal(true);
+      return;
+    }
+    handleUpgrade();
+  };
+
+  const handleConfirmTrialUpgrade = async () => {
+    setShowTrialUpgradeModal(false);
+    await handleUpgrade();
   };
 
   // Get current user tier (default to "rookie" if not logged in or no tier)
@@ -491,7 +521,7 @@ function PricingPageContent() {
                         if (isAdvanced) {
                           return (
                             <button
-                              onClick={handleUpgrade}
+                              onClick={handleUpgradeClick}
                               disabled={loading === "upgrade"}
                               className="block w-full py-4 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black rounded-lg font-bold transition-all duration-300 shadow-lg shadow-yellow-500/25 hover:shadow-xl hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                             >
@@ -553,6 +583,52 @@ function PricingPageContent() {
         onClose={() => setShowAuthModal(false)}
         type="login"
       />
+
+      {/* Trial-to-Performer upgrade confirmation. Only fires for users in
+          status=trialing on the Advanced tier. Stops the surprise-billing
+          complaint vector — clicking "Upgrade" otherwise charges $59 and
+          ends the trial in the same instant with no warning. */}
+      {showTrialUpgradeModal && (
+        <div
+          className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+          onClick={() => setShowTrialUpgradeModal(false)}
+        >
+          <div
+            className="relative w-full max-w-md rounded-2xl bg-mambo-panel border border-gray-800 p-6 sm:p-7 shadow-2xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <button
+              onClick={() => setShowTrialUpgradeModal(false)}
+              className="absolute top-3 right-3 text-gray-600 hover:text-gray-300 text-xl leading-none"
+              aria-label={t("trialUpgradeCancel")}
+            >
+              ×
+            </button>
+            <h2 className="text-xl font-serif font-bold text-mambo-text mb-3">
+              {t("trialUpgradeTitle")}
+            </h2>
+            <p className="text-sm text-gray-300 mb-6">
+              {t("trialUpgradeBody")}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+              <button
+                onClick={handleConfirmTrialUpgrade}
+                disabled={loading === "upgrade"}
+                className="flex-1 py-2.5 rounded-lg bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black font-bold text-sm shadow-lg shadow-amber-500/20 transition disabled:opacity-50"
+              >
+                {loading === "upgrade" ? tp("loading") : t("trialUpgradeConfirm")}
+              </button>
+              <button
+                onClick={() => setShowTrialUpgradeModal(false)}
+                disabled={loading === "upgrade"}
+                className="flex-1 py-2.5 rounded-lg border border-gray-700 bg-gray-900/60 text-gray-200 font-semibold text-sm hover:bg-gray-800 hover:text-mambo-text transition disabled:opacity-50"
+              >
+                {t("trialUpgradeCancel")}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       <Footer />
     </div>
