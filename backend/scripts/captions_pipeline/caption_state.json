@@ -4031,14 +4031,16 @@
     "Mambo101Edited__Combo_1_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777234040.7775338
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.428859
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777234040.7984262
         },
         "es": {
           "status": "translated",
