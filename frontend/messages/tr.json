@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Düşer, kalkar, dans etmeye devam eder."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Video Kontrolleri",
+    "minimize": "Kontrolleri Küçült",
+    "speed": "Hız",
+    "frames": "Kareler",
+    "abLoop": "A/B Döngü",
+    "playbackSpeed": "Oynatma Hızı",
+    "framePrecision": "Kare Hassasiyeti",
+    "close": "Kapat",
+    "frameByFrame": "Kare Kare",
+    "stepBackward": "Önceki Kare",
+    "stepForward": "Sonraki Kare",
+    "pauseFirst": "Önce videoyu duraklat",
+    "pauseToStep": "Kare ilerletmek için duraklat",
+    "back": "geri",
+    "forward": "ileri",
+    "enableAbLoop": "A/B Döngüyü Aç",
+    "turnOffAbLoop": "A/B Döngüyü Kapat",
+    "abLoopHint": "Döngü için video üzerindeki A ve B işaretlerini sürükle.",
+    "slowSpeedWarning": "Yavaş hızlar ses kalitesini etkileyebilir"
+  },
+  "questLog": {
+    "currentWorld": "Mevcut Dünya",
+    "progress": "İlerleme",
+    "week": "Hafta",
+    "day": "Gün",
+    "nowPlaying": "Şimdi Oynatılıyor",
+    "min": "dk"
   }
 }

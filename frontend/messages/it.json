@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Cade, si rialza, continua a ballare."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Controlli video",
+    "minimize": "Minimizza controlli",
+    "speed": "Velocità",
+    "frames": "Fotogrammi",
+    "abLoop": "Loop A/B",
+    "playbackSpeed": "Velocità di riproduzione",
+    "framePrecision": "Precisione fotogramma",
+    "close": "Chiudi",
+    "frameByFrame": "Fotogramma per fotogramma",
+    "stepBackward": "Fotogramma precedente",
+    "stepForward": "Fotogramma successivo",
+    "pauseFirst": "Metti prima in pausa il video",
+    "pauseToStep": "Metti in pausa per avanzare",
+    "back": "indietro",
+    "forward": "avanti",
+    "enableAbLoop": "Attiva loop A/B",
+    "turnOffAbLoop": "Disattiva loop A/B",
+    "abLoopHint": "Trascina i marker A e B sul video per impostare il loop.",
+    "slowSpeedWarning": "Velocità più basse possono compromettere la qualità audio"
+  },
+  "questLog": {
+    "currentWorld": "Mondo corrente",
+    "progress": "Progresso",
+    "week": "Settimana",
+    "day": "Giorno",
+    "nowPlaying": "In riproduzione",
+    "min": "min"
   }
 }

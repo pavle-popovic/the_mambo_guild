@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Πέφτει, σηκώνεται, συνεχίζει να χορεύει."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Χειριστήρια βίντεο",
+    "minimize": "Σμίκρυνση χειριστηρίων",
+    "speed": "Ταχύτητα",
+    "frames": "Καρέ",
+    "abLoop": "Βρόχος A/B",
+    "playbackSpeed": "Ταχύτητα αναπαραγωγής",
+    "framePrecision": "Ακρίβεια καρέ",
+    "close": "Κλείσιμο",
+    "frameByFrame": "Καρέ προς καρέ",
+    "stepBackward": "Καρέ πίσω",
+    "stepForward": "Καρέ μπροστά",
+    "pauseFirst": "Παύσε πρώτα το βίντεο",
+    "pauseToStep": "Παύση για κίνηση καρέ προς καρέ",
+    "back": "πίσω",
+    "forward": "μπροστά",
+    "enableAbLoop": "Ενεργοποίηση βρόχου A/B",
+    "turnOffAbLoop": "Απενεργοποίηση βρόχου A/B",
+    "abLoopHint": "Σύρε τους δείκτες A και B στο βίντεο για να ορίσεις τον βρόχο.",
+    "slowSpeedWarning": "Οι χαμηλές ταχύτητες μπορεί να επηρεάσουν την ποιότητα ήχου"
+  },
+  "questLog": {
+    "currentWorld": "Τρέχων κόσμος",
+    "progress": "Πρόοδος",
+    "week": "Εβδομάδα",
+    "day": "Ημέρα",
+    "nowPlaying": "Αναπαράγεται τώρα",
+    "min": "λεπτά"
   }
 }

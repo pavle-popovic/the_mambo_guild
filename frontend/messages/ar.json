@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "يسقط، ينهض، يستمر في الرقص."
+  },
+  "videoPlayerControls": {
+    "videoControls": "أدوات التحكم بالفيديو",
+    "minimize": "تصغير عناصر التحكم",
+    "speed": "السرعة",
+    "frames": "إطارات",
+    "abLoop": "حلقة A/B",
+    "playbackSpeed": "سرعة التشغيل",
+    "framePrecision": "دقة إطار بإطار",
+    "close": "إغلاق",
+    "frameByFrame": "إطار بإطار",
+    "stepBackward": "الإطار السابق",
+    "stepForward": "الإطار التالي",
+    "pauseFirst": "أوقف الفيديو مؤقتًا أولًا",
+    "pauseToStep": "أوقف مؤقتًا للتنقل بالإطارات",
+    "back": "للخلف",
+    "forward": "للأمام",
+    "enableAbLoop": "تفعيل حلقة A/B",
+    "turnOffAbLoop": "إيقاف حلقة A/B",
+    "abLoopHint": "اسحب علامتي A و B على الفيديو لتحديد الحلقة.",
+    "slowSpeedWarning": "السرعات البطيئة قد تؤثر على جودة الصوت"
+  },
+  "questLog": {
+    "currentWorld": "العالم الحالي",
+    "progress": "التقدم",
+    "week": "الأسبوع",
+    "day": "اليوم",
+    "nowPlaying": "قيد التشغيل",
+    "min": "دقيقة"
   }
 }

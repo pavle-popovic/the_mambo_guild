@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Falls, rises, keeps dancing."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Video Controls",
+    "minimize": "Minimize Controls",
+    "speed": "Speed",
+    "frames": "Frames",
+    "abLoop": "A/B Loop",
+    "playbackSpeed": "Playback Speed",
+    "framePrecision": "Frame Precision",
+    "close": "Close",
+    "frameByFrame": "Frame-by-Frame",
+    "stepBackward": "Step backward",
+    "stepForward": "Step forward",
+    "pauseFirst": "Pause video first",
+    "pauseToStep": "Pause to step",
+    "back": "back",
+    "forward": "forward",
+    "enableAbLoop": "Enable A/B Loop",
+    "turnOffAbLoop": "Turn OFF A/B Loop",
+    "abLoopHint": "Drag the A and B markers on the video to set the loop.",
+    "slowSpeedWarning": "Slower speeds may affect audio quality"
+  },
+  "questLog": {
+    "currentWorld": "Current World",
+    "progress": "Progress",
+    "week": "Week",
+    "day": "Day",
+    "nowPlaying": "Now Playing",
+    "min": "min"
   }
 }

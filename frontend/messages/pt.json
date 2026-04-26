@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Cai, levanta, continua dançando."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Controlos de vídeo",
+    "minimize": "Minimizar controlos",
+    "speed": "Velocidade",
+    "frames": "Frames",
+    "abLoop": "Loop A/B",
+    "playbackSpeed": "Velocidade de reprodução",
+    "framePrecision": "Precisão por frame",
+    "close": "Fechar",
+    "frameByFrame": "Frame a frame",
+    "stepBackward": "Frame anterior",
+    "stepForward": "Frame seguinte",
+    "pauseFirst": "Põe o vídeo em pausa primeiro",
+    "pauseToStep": "Põe em pausa para avançar",
+    "back": "trás",
+    "forward": "frente",
+    "enableAbLoop": "Ativar loop A/B",
+    "turnOffAbLoop": "Desativar loop A/B",
+    "abLoopHint": "Arrasta os marcadores A e B no vídeo para definir o loop.",
+    "slowSpeedWarning": "Velocidades mais lentas podem afetar a qualidade do áudio"
+  },
+  "questLog": {
+    "currentWorld": "Mundo atual",
+    "progress": "Progresso",
+    "week": "Semana",
+    "day": "Dia",
+    "nowPlaying": "A reproduzir",
+    "min": "min"
   }
 }

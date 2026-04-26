@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Пада, диже се, наставља да плеше."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Контроле видеа",
+    "minimize": "Смањи контроле",
+    "speed": "Брзина",
+    "frames": "Фрејмови",
+    "abLoop": "A/B петља",
+    "playbackSpeed": "Брзина репродукције",
+    "framePrecision": "Прецизност по фрејму",
+    "close": "Затвори",
+    "frameByFrame": "Фрејм по фрејм",
+    "stepBackward": "Претходни фрејм",
+    "stepForward": "Следећи фрејм",
+    "pauseFirst": "Прво паузирај видео",
+    "pauseToStep": "Паузирај за кретање по фрејмовима",
+    "back": "назад",
+    "forward": "напред",
+    "enableAbLoop": "Укључи A/B петљу",
+    "turnOffAbLoop": "Искључи A/B петљу",
+    "abLoopHint": "Превуци ознаке A и B на видеу да поставиш петљу.",
+    "slowSpeedWarning": "Споре брзине могу да утичу на квалитет звука"
+  },
+  "questLog": {
+    "currentWorld": "Тренутни свет",
+    "progress": "Напредак",
+    "week": "Недеља",
+    "day": "Дан",
+    "nowPlaying": "Тренутно се репродукује",
+    "min": "мин"
   }
 }

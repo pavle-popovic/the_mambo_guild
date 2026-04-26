@@ -3,6 +3,8 @@
 import MuxPlayer from "@mux/mux-player-react";
 import type MuxPlayerElement from "@mux/mux-player";
 import { forwardRef, useImperativeHandle, useRef, useCallback, useState, useEffect } from "react";
+import { useLocale } from "@/i18n/client";
+import { LOCALE_TO_MUX_LANG } from "@/i18n/config";
 
 interface MuxVideoPlayerProps {
   playbackId: string;
@@ -65,6 +67,10 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
     const wrapperRef = useRef<HTMLDivElement>(null);
     const [captionText, setCaptionText] = useState<string>("");
     const [nativeCaptionsActive, setNativeCaptionsActive] = useState<boolean>(false);
+    const locale = useLocale();
+    // BCP-47 language code Mux uses on its text tracks. Falls back to the raw
+    // locale string for any locale that doesn't have an explicit mapping.
+    const muxLang = LOCALE_TO_MUX_LANG[locale] ?? locale;
 
     // Get the underlying video element from Mux Player
     const getVideoElement = useCallback((): HTMLVideoElement | null => {
@@ -72,6 +78,67 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       if (!player) return null;
       return (player as any).media?.nativeEl || null;
     }, []);
+
+    // Sync the active caption track to the page locale. Whenever `locale`
+    // changes (LocaleSwitcher click, URL-prefix navigation, or initial cookie
+    // resolution), find the Mux text track whose `language` matches `muxLang`
+    // and set it to "showing"; hide all other subtitle/caption tracks. If the
+    // requested language has no track on this asset, fall back to English so
+    // captions stay visible.
+    useEffect(() => {
+      const apply = () => {
+        const video = getVideoElement();
+        if (!video) return;
+        const tracks = video.textTracks;
+        if (!tracks || tracks.length === 0) return;
+        let activated: string | null = null;
+        // First pass — exact match on muxLang.
+        for (let i = 0; i < tracks.length; i++) {
+          const tr = tracks[i];
+          if ((tr.kind === "subtitles" || tr.kind === "captions") && tr.language === muxLang) {
+            tr.mode = "showing";
+            activated = muxLang;
+            break;
+          }
+        }
+        // Second pass — fall back to English.
+        if (!activated) {
+          for (let i = 0; i < tracks.length; i++) {
+            const tr = tracks[i];
+            if ((tr.kind === "subtitles" || tr.kind === "captions") && (tr.language === "en" || tr.language === "en-US")) {
+              tr.mode = "showing";
+              activated = tr.language;
+              break;
+            }
+          }
+        }
+        // Hide every other subtitle/caption track to keep just one rendered.
+        for (let i = 0; i < tracks.length; i++) {
+          const tr = tracks[i];
+          if ((tr.kind === "subtitles" || tr.kind === "captions") && tr.language !== activated) {
+            tr.mode = "hidden";
+          }
+        }
+      };
+      // textTracks are populated asynchronously after metadata loads. Apply
+      // now if they're available, and again on addtrack / loadedmetadata.
+      const video = getVideoElement();
+      if (video) {
+        apply();
+        const onAddTrack = () => apply();
+        const onMeta = () => apply();
+        video.textTracks.addEventListener("addtrack", onAddTrack);
+        video.addEventListener("loadedmetadata", onMeta);
+        return () => {
+          video.textTracks.removeEventListener("addtrack", onAddTrack);
+          video.removeEventListener("loadedmetadata", onMeta);
+        };
+      }
+      // Player not mounted yet — retry once shortly. The custom-overlay
+      // useEffect below uses a similar 800ms delayed init.
+      const timer = setTimeout(apply, 800);
+      return () => clearTimeout(timer);
+    }, [muxLang, getVideoElement]);
 
     // Expose methods via ref
     useImperativeHandle(
@@ -528,6 +595,9 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           primaryColor="#D4AF37"
           secondaryColor="#8c8c8c"
           playbackRates={[0.5, 0.75, 1, 1.25, 1.5] as any}
+          /* Initial-load track selection — keeps the rendered HTML in sync
+           * with the page locale before the textTracks listener fires. */
+          {...({ defaultSubtitlesLang: muxLang } as any)}
           metadata={{
             video_title: metadata?.video_title || undefined,
             video_id: metadata?.video_id || playbackId,

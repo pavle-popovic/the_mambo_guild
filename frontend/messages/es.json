@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Cae, se levanta, sigue bailando."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Controles de vídeo",
+    "minimize": "Minimizar controles",
+    "speed": "Velocidad",
+    "frames": "Cuadros",
+    "abLoop": "Bucle A/B",
+    "playbackSpeed": "Velocidad de reproducción",
+    "framePrecision": "Precisión por cuadro",
+    "close": "Cerrar",
+    "frameByFrame": "Cuadro a cuadro",
+    "stepBackward": "Cuadro anterior",
+    "stepForward": "Cuadro siguiente",
+    "pauseFirst": "Pausa el vídeo primero",
+    "pauseToStep": "Pausar para avanzar",
+    "back": "atrás",
+    "forward": "adelante",
+    "enableAbLoop": "Activar bucle A/B",
+    "turnOffAbLoop": "Desactivar bucle A/B",
+    "abLoopHint": "Arrastra los marcadores A y B sobre el vídeo para fijar el bucle.",
+    "slowSpeedWarning": "Las velocidades lentas pueden afectar la calidad del audio"
+  },
+  "questLog": {
+    "currentWorld": "Mundo actual",
+    "progress": "Progreso",
+    "week": "Semana",
+    "day": "Día",
+    "nowPlaying": "Reproduciendo ahora",
+    "min": "min"
   }
 }

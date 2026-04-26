@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Падает, поднимается, продолжает танцевать."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Управление видео",
+    "minimize": "Свернуть управление",
+    "speed": "Скорость",
+    "frames": "Кадры",
+    "abLoop": "Цикл A/B",
+    "playbackSpeed": "Скорость воспроизведения",
+    "framePrecision": "Покадровая точность",
+    "close": "Закрыть",
+    "frameByFrame": "Покадрово",
+    "stepBackward": "Кадр назад",
+    "stepForward": "Кадр вперёд",
+    "pauseFirst": "Сначала поставьте видео на паузу",
+    "pauseToStep": "Пауза для покадрового перемещения",
+    "back": "назад",
+    "forward": "вперёд",
+    "enableAbLoop": "Включить цикл A/B",
+    "turnOffAbLoop": "Выключить цикл A/B",
+    "abLoopHint": "Перетащите маркеры A и B на видео, чтобы задать цикл.",
+    "slowSpeedWarning": "Низкая скорость может снизить качество звука"
+  },
+  "questLog": {
+    "currentWorld": "Текущий мир",
+    "progress": "Прогресс",
+    "week": "Неделя",
+    "day": "День",
+    "nowPlaying": "Сейчас играет",
+    "min": "мин"
   }
 }

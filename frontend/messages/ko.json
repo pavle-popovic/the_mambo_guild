@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "쓰러지고, 일어나고, 계속 춤춘다."
+  },
+  "videoPlayerControls": {
+    "videoControls": "비디오 컨트롤",
+    "minimize": "컨트롤 최소화",
+    "speed": "속도",
+    "frames": "프레임",
+    "abLoop": "A/B 루프",
+    "playbackSpeed": "재생 속도",
+    "framePrecision": "프레임 정밀도",
+    "close": "닫기",
+    "frameByFrame": "프레임 단위",
+    "stepBackward": "한 프레임 뒤로",
+    "stepForward": "한 프레임 앞으로",
+    "pauseFirst": "먼저 영상을 일시 정지하세요",
+    "pauseToStep": "일시 정지 후 이동",
+    "back": "뒤로",
+    "forward": "앞으로",
+    "enableAbLoop": "A/B 루프 켜기",
+    "turnOffAbLoop": "A/B 루프 끄기",
+    "abLoopHint": "비디오의 A 와 B 마커를 끌어 루프 구간을 설정하세요.",
+    "slowSpeedWarning": "느린 속도는 오디오 품질에 영향을 줄 수 있습니다"
+  },
+  "questLog": {
+    "currentWorld": "현재 월드",
+    "progress": "진행도",
+    "week": "주차",
+    "day": "일차",
+    "nowPlaying": "재생 중",
+    "min": "분"
   }
 }

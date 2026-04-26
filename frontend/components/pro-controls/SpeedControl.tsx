@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import type { MuxVideoPlayerHandle } from "../MuxVideoPlayer";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface SpeedControlProps {
   playerRef: React.RefObject<MuxVideoPlayerHandle | null>;
@@ -11,6 +12,7 @@ const SPEED_OPTIONS = [0.5, 0.75, 1, 1.25, 1.5];
 
 export default function SpeedControl({ playerRef }: SpeedControlProps) {
   const [currentSpeed, setCurrentSpeed] = useState(1);
+  const t = useTranslations("videoPlayerControls");
 
   // Sync speed state with video element when it changes externally
   useEffect(() => {
@@ -38,7 +40,7 @@ export default function SpeedControl({ playerRef }: SpeedControlProps) {
   return (
     <div className="flex flex-col gap-2">
       <div className="flex justify-between items-center mb-1">
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">Speed</span>
+        <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">{t("speed")}</span>
         <span className="text-xs font-mono text-mambo-gold">{currentSpeed}x</span>
       </div>
 
@@ -74,7 +76,7 @@ export default function SpeedControl({ playerRef }: SpeedControlProps) {
               clipRule="evenodd"
             />
           </svg>
-          <span>Slower speeds may affect audio quality</span>
+          <span>{t("slowSpeedWarning")}</span>
         </div>
       )}
     </div>

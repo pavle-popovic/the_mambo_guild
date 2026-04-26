@@ -3,6 +3,8 @@
 import { useMemo, useEffect, useRef } from "react";
 import { FaLock, FaCheck, FaPlay } from "react-icons/fa";
 import Link from "next/link";
+import { useTranslations } from "@/i18n/useTranslations";
+import { useLocale } from "@/i18n/client";
 
 interface Lesson {
   id: string;
@@ -30,6 +32,15 @@ export default function QuestLogSidebar({
   worldTitle,
   worldProgress,
 }: QuestLogSidebarProps) {
+  const t = useTranslations("questLog");
+  const locale = useLocale();
+  // CJK languages put the count after the unit label, Western languages before.
+  // E.g. zh "第 1 周" vs en "Week 1". The injected translations use the bare
+  // word ("Week"/"Day" or "第"); we format the order locally here.
+  const isZh = locale === "zh";
+  const isJa = locale === "ja";
+  const formatWeek = (n: number) => isZh ? `第 ${n} 周` : isJa ? `第 ${n} 週` : `${t("week")} ${n}`;
+  const formatDay = (n: number) => isZh ? `第 ${n} 天` : isJa ? `${n} 日目` : `${t("day")} ${n}`;
   // Memoize completed count calculation
   const completedCount = useMemo(() => {
     return lessons.filter((l) => l.is_completed).length;
@@ -131,12 +142,12 @@ export default function QuestLogSidebar({
     <aside className="w-full bg-mambo-panel flex flex-col">
       <div className="p-6 border-b border-gray-800 bg-black/20">
         <h3 className="font-bold text-gray-500 text-[10px] uppercase tracking-wider mb-2">
-          Current World
+          {t("currentWorld")}
         </h3>
         <div className="font-serif font-bold text-xl text-white mb-4">{worldTitle}</div>
-        
+
         <div className="flex justify-between text-xs mb-1">
-          <span className="text-gray-400">Progress</span>
+          <span className="text-gray-400">{t("progress")}</span>
           <span className="text-mambo-gold font-bold">{Math.round(progressPercentage)}%</span>
         </div>
         <div className="w-full bg-gray-800 h-1.5 rounded-full overflow-hidden relative">
@@ -170,17 +181,17 @@ export default function QuestLogSidebar({
                   {/* Week Header */}
                   <div className="border-l-2 border-mambo-blue/50 pl-2">
                     <h4 className="text-xs font-bold text-mambo-blue uppercase tracking-wider">
-                      Week {week}
+                      {formatWeek(week)}
                     </h4>
                   </div>
-                  
+
                   {/* Days within this week */}
                   {days.map(({ day, lessons: dayLessons }) => (
                     <div key={day} className="pl-4 space-y-2">
                       {/* Day Header */}
                       <div className="flex items-center gap-2 mb-1">
                         <h5 className="text-[10px] font-semibold text-gray-500 uppercase tracking-wider">
-                          Day {day}
+                          {formatDay(day)}
                         </h5>
                         <div className="flex-1 h-px bg-gray-800" />
                       </div>
@@ -240,7 +251,7 @@ export default function QuestLogSidebar({
                                 {isActive ? (
                                   <>
                                     {lesson.title}
-                                    <div className="text-[9px] text-mambo-blue font-bold">Now Playing</div>
+                                    <div className="text-[9px] text-mambo-blue font-bold">{t("nowPlaying")}</div>
                                   </>
                                 ) : (
                                   lesson.title
@@ -248,7 +259,7 @@ export default function QuestLogSidebar({
                               </div>
                               {!isActive && (
                                 <div className="text-[9px] text-gray-600">
-                                  {lesson.duration_minutes ? `${lesson.duration_minutes} min • ` : ""}
+                                  {lesson.duration_minutes ? `${lesson.duration_minutes} ${t("min")} • ` : ""}
                                   {lesson.xp_value} XP
                                 </div>
                               )}

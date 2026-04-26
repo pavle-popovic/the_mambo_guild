@@ -6,6 +6,7 @@ import SpeedControl from "./pro-controls/SpeedControl";
 import FrameByFrame from "./pro-controls/FrameByFrame";
 import { SlidersHorizontal } from "lucide-react";
 import { FaRedo } from "react-icons/fa";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface VideoControlsProps {
   playerRef: React.RefObject<MuxVideoPlayerHandle | null>;
@@ -27,6 +28,7 @@ export default function VideoControls({
   onToggleAB,
 }: VideoControlsProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState<"speed" | "frames" | null>(null);
+  const t = useTranslations("videoPlayerControls");
 
   // Keyboard shortcuts for frame stepping (available to all users now)
   const handleKeyDown = useCallback(
@@ -64,7 +66,7 @@ export default function VideoControls({
             className={`flex flex-col items-center gap-1 ${mobileMenuOpen === "speed" ? "text-mambo-gold" : "text-gray-300"}`}
           >
             <span className="text-xl font-bold">1x</span>
-            <span className="text-[10px] uppercase font-bold tracking-wider">Speed</span>
+            <span className="text-[10px] uppercase font-bold tracking-wider">{t("speed")}</span>
           </button>
 
           {/* Frame Steps */}
@@ -73,7 +75,7 @@ export default function VideoControls({
             className={`flex flex-col items-center gap-1 ${mobileMenuOpen === "frames" ? "text-mambo-gold" : "text-gray-300"}`}
           >
             <span className="text-xl">⏯</span>
-            <span className="text-[10px] uppercase font-bold tracking-wider">Frames</span>
+            <span className="text-[10px] uppercase font-bold tracking-wider">{t("frames")}</span>
           </button>
 
           {/* A/B Loop toggle */}
@@ -83,7 +85,7 @@ export default function VideoControls({
               className={`flex flex-col items-center gap-1 ${abEnabled ? "text-mambo-gold" : "text-gray-300"}`}
             >
               <FaRedo className={`text-xl ${abEnabled ? "animate-spin" : ""}`} style={{ animationDuration: "2s" }} />
-              <span className="text-[10px] uppercase font-bold tracking-wider">A/B Loop</span>
+              <span className="text-[10px] uppercase font-bold tracking-wider">{t("abLoop")}</span>
             </button>
           )}
         </div>
@@ -93,10 +95,10 @@ export default function VideoControls({
           <div className="absolute bottom-full left-0 w-full bg-gray-900/95 backdrop-blur-xl border-t border-white/10 p-4 rounded-t-2xl animate-slide-up shadow-2xl">
             <div className="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
               <span className="text-sm font-bold text-white uppercase tracking-wider">
-                {mobileMenuOpen === "speed" && "Playback Speed"}
-                {mobileMenuOpen === "frames" && "Frame Precision"}
+                {mobileMenuOpen === "speed" && t("playbackSpeed")}
+                {mobileMenuOpen === "frames" && t("framePrecision")}
               </span>
-              <button onClick={() => setMobileMenuOpen(null)} className="text-xs text-gray-400 p-2">Close</button>
+              <button onClick={() => setMobileMenuOpen(null)} className="text-xs text-gray-400 p-2">{t("close")}</button>
             </div>
 
             {mobileMenuOpen === "speed" && <SpeedControl playerRef={playerRef} />}
@@ -113,13 +115,13 @@ export default function VideoControls({
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-2">
           <SlidersHorizontal size={16} className="text-mambo-blue" />
-          <span className="text-xs font-bold text-white/80 uppercase tracking-wider">Video Controls</span>
+          <span className="text-xs font-bold text-white/80 uppercase tracking-wider">{t("videoControls")}</span>
         </div>
         {onCollapse && (
           <button
             onClick={onCollapse}
             className="text-gray-500 hover:text-white transition-colors p-1"
-            title="Minimize Controls"
+            title={t("minimize")}
           >
             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -152,11 +154,11 @@ export default function VideoControls({
               }`}
             >
               <FaRedo className={`shrink-0 ${abEnabled ? "animate-spin" : ""}`} style={{ animationDuration: "2s" }} />
-              <span>{abEnabled ? "Turn OFF A/B Loop" : "Enable A/B Loop"}</span>
+              <span>{abEnabled ? t("turnOffAbLoop") : t("enableAbLoop")}</span>
             </button>
             {abEnabled && (
               <p className="text-[10px] text-gray-400 text-center mt-1.5">
-                Drag the A and B markers on the video to set the loop.
+                {t("abLoopHint")}
               </p>
             )}
           </div>

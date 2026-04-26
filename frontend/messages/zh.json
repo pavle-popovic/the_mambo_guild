@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "跌倒，起身，继续跳舞。"
+  },
+  "videoPlayerControls": {
+    "videoControls": "视频控制",
+    "minimize": "最小化控制",
+    "speed": "速度",
+    "frames": "帧",
+    "abLoop": "A/B 循环",
+    "playbackSpeed": "播放速度",
+    "framePrecision": "逐帧精度",
+    "close": "关闭",
+    "frameByFrame": "逐帧",
+    "stepBackward": "上一帧",
+    "stepForward": "下一帧",
+    "pauseFirst": "请先暂停视频",
+    "pauseToStep": "暂停后逐帧",
+    "back": "后退",
+    "forward": "前进",
+    "enableAbLoop": "开启 A/B 循环",
+    "turnOffAbLoop": "关闭 A/B 循环",
+    "abLoopHint": "在视频上拖动 A 和 B 标记来设置循环区间。",
+    "slowSpeedWarning": "较慢的速度可能影响音频质量"
+  },
+  "questLog": {
+    "currentWorld": "当前世界",
+    "progress": "进度",
+    "week": "第",
+    "day": "第",
+    "nowPlaying": "正在播放",
+    "min": "分钟"
   }
 }

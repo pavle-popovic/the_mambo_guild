@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "倒れて、立ち上がって、踊り続ける。"
+  },
+  "videoPlayerControls": {
+    "videoControls": "ビデオコントロール",
+    "minimize": "コントロールを最小化",
+    "speed": "速度",
+    "frames": "フレーム",
+    "abLoop": "A/B ループ",
+    "playbackSpeed": "再生速度",
+    "framePrecision": "フレーム精度",
+    "close": "閉じる",
+    "frameByFrame": "フレーム単位",
+    "stepBackward": "1 フレーム戻る",
+    "stepForward": "1 フレーム進む",
+    "pauseFirst": "先に動画を一時停止してください",
+    "pauseToStep": "一時停止してフレーム送り",
+    "back": "戻る",
+    "forward": "進む",
+    "enableAbLoop": "A/B ループを有効化",
+    "turnOffAbLoop": "A/B ループをオフ",
+    "abLoopHint": "ビデオ上の A と B のマーカーをドラッグしてループを設定。",
+    "slowSpeedWarning": "再生速度が遅すぎると音質が下がることがあります"
+  },
+  "questLog": {
+    "currentWorld": "現在のワールド",
+    "progress": "進捗",
+    "week": "週",
+    "day": "日",
+    "nowPlaying": "再生中",
+    "min": "分"
   }
 }

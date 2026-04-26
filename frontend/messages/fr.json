@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Tombe, se relève, continue de danser."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Commandes vidéo",
+    "minimize": "Réduire les commandes",
+    "speed": "Vitesse",
+    "frames": "Images",
+    "abLoop": "Boucle A/B",
+    "playbackSpeed": "Vitesse de lecture",
+    "framePrecision": "Précision image par image",
+    "close": "Fermer",
+    "frameByFrame": "Image par image",
+    "stepBackward": "Image précédente",
+    "stepForward": "Image suivante",
+    "pauseFirst": "Mets d'abord la vidéo en pause",
+    "pauseToStep": "Mets en pause pour avancer",
+    "back": "arrière",
+    "forward": "avant",
+    "enableAbLoop": "Activer la boucle A/B",
+    "turnOffAbLoop": "Désactiver la boucle A/B",
+    "abLoopHint": "Fais glisser les marqueurs A et B sur la vidéo pour définir la boucle.",
+    "slowSpeedWarning": "Les vitesses lentes peuvent altérer la qualité audio"
+  },
+  "questLog": {
+    "currentWorld": "Monde actuel",
+    "progress": "Progression",
+    "week": "Semaine",
+    "day": "Jour",
+    "nowPlaying": "En cours de lecture",
+    "min": "min"
   }
 }

@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Valt, staat op, blijft dansen."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Videobediening",
+    "minimize": "Bediening minimaliseren",
+    "speed": "Snelheid",
+    "frames": "Frames",
+    "abLoop": "A/B-loop",
+    "playbackSpeed": "Afspeelsnelheid",
+    "framePrecision": "Framepreciesie",
+    "close": "Sluiten",
+    "frameByFrame": "Frame per frame",
+    "stepBackward": "Frame terug",
+    "stepForward": "Frame vooruit",
+    "pauseFirst": "Pauzeer eerst de video",
+    "pauseToStep": "Pauzeer om frame voor frame te gaan",
+    "back": "terug",
+    "forward": "vooruit",
+    "enableAbLoop": "A/B-loop inschakelen",
+    "turnOffAbLoop": "A/B-loop uitzetten",
+    "abLoopHint": "Sleep de A- en B-markers op de video om de loop in te stellen.",
+    "slowSpeedWarning": "Lagere snelheden kunnen de audiokwaliteit beïnvloeden"
+  },
+  "questLog": {
+    "currentWorld": "Huidige wereld",
+    "progress": "Voortgang",
+    "week": "Week",
+    "day": "Dag",
+    "nowPlaying": "Nu aan het afspelen",
+    "min": "min"
   }
 }

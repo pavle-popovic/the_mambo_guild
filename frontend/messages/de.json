@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Fällt, steht auf, tanzt weiter."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Videosteuerung",
+    "minimize": "Steuerung minimieren",
+    "speed": "Geschwindigkeit",
+    "frames": "Bilder",
+    "abLoop": "A/B-Loop",
+    "playbackSpeed": "Wiedergabegeschwindigkeit",
+    "framePrecision": "Einzelbildgenauigkeit",
+    "close": "Schließen",
+    "frameByFrame": "Bild für Bild",
+    "stepBackward": "Bild zurück",
+    "stepForward": "Bild vor",
+    "pauseFirst": "Pausiere das Video zuerst",
+    "pauseToStep": "Pausiere, um Bild für Bild zu gehen",
+    "back": "zurück",
+    "forward": "vor",
+    "enableAbLoop": "A/B-Loop aktivieren",
+    "turnOffAbLoop": "A/B-Loop ausschalten",
+    "abLoopHint": "Ziehe die A- und B-Marker im Video, um den Loop festzulegen.",
+    "slowSpeedWarning": "Langsamere Geschwindigkeiten können die Audioqualität beeinträchtigen"
+  },
+  "questLog": {
+    "currentWorld": "Aktuelle Welt",
+    "progress": "Fortschritt",
+    "week": "Woche",
+    "day": "Tag",
+    "nowPlaying": "Wird abgespielt",
+    "min": "Min."
   }
 }

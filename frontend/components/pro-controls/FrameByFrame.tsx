@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import type { MuxVideoPlayerHandle } from "../MuxVideoPlayer";
 import { FaStepBackward, FaStepForward } from "react-icons/fa";
+import { useTranslations } from "@/i18n/useTranslations";
 
 interface FrameByFrameProps {
   playerRef: React.RefObject<MuxVideoPlayerHandle | null>;
@@ -13,6 +14,7 @@ const FRAME_DURATION = 0.04;
 
 export default function FrameByFrame({ playerRef }: FrameByFrameProps) {
   const [isPaused, setIsPaused] = useState(true);
+  const t = useTranslations("videoPlayerControls");
 
   // Track pause state
   useEffect(() => {
@@ -54,7 +56,7 @@ export default function FrameByFrame({ playerRef }: FrameByFrameProps) {
   return (
     <div className="flex flex-col gap-2">
       <span className="text-xs font-bold text-gray-400 uppercase tracking-wider">
-        Frame-by-Frame
+        {t("frameByFrame")}
       </span>
       <div className="flex items-center gap-3">
         {/* Step Backward Button */}
@@ -68,7 +70,7 @@ export default function FrameByFrame({ playerRef }: FrameByFrameProps) {
               : "bg-black/10 border-white/5 text-gray-600 cursor-not-allowed"
             }
           `}
-          title={isPaused ? "Step backward (,)" : "Pause video first"}
+          title={isPaused ? `${t("stepBackward")} (,)` : t("pauseFirst")}
         >
           <FaStepBackward className="text-sm" />
         </button>
@@ -84,7 +86,7 @@ export default function FrameByFrame({ playerRef }: FrameByFrameProps) {
               : "bg-black/10 border-white/5 text-gray-600 cursor-not-allowed"
             }
           `}
-          title={isPaused ? "Step forward (.)" : "Pause video first"}
+          title={isPaused ? `${t("stepForward")} (.)` : t("pauseFirst")}
         >
           <FaStepForward className="text-sm" />
         </button>
@@ -95,7 +97,7 @@ export default function FrameByFrame({ playerRef }: FrameByFrameProps) {
             onClick={handlePause}
             className="text-[10px] font-bold uppercase tracking-wider text-gray-400 hover:text-white transition-colors px-3 py-1.5 bg-black/40 border border-white/10 hover:bg-white/5 rounded-md"
           >
-            Pause to step
+            {t("pauseToStep")}
           </button>
         )}
       </div>
@@ -104,11 +106,11 @@ export default function FrameByFrame({ playerRef }: FrameByFrameProps) {
       <div className="text-xs text-gray-500 flex items-center gap-3">
         <span className="flex items-center gap-1">
           <kbd className="px-1.5 py-0.5 bg-gray-800 rounded text-gray-400 font-mono">,</kbd>
-          <span>back</span>
+          <span>{t("back")}</span>
         </span>
         <span className="flex items-center gap-1">
           <kbd className="px-1.5 py-0.5 bg-gray-800 rounded text-gray-400 font-mono">.</kbd>
-          <span>forward</span>
+          <span>{t("forward")}</span>
         </span>
       </div>
     </div>

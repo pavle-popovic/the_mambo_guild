@@ -1740,5 +1740,34 @@
   "cosmetics": {
     "title_the_phoenix_label": "The Phoenix",
     "title_the_phoenix_description": "Upada, wstaje, dalej tańczy."
+  },
+  "videoPlayerControls": {
+    "videoControls": "Sterowanie wideo",
+    "minimize": "Zminimalizuj sterowanie",
+    "speed": "Prędkość",
+    "frames": "Klatki",
+    "abLoop": "Pętla A/B",
+    "playbackSpeed": "Prędkość odtwarzania",
+    "framePrecision": "Precyzja klatkowa",
+    "close": "Zamknij",
+    "frameByFrame": "Klatka po klatce",
+    "stepBackward": "Klatka wstecz",
+    "stepForward": "Klatka dalej",
+    "pauseFirst": "Najpierw zatrzymaj wideo",
+    "pauseToStep": "Zatrzymaj, aby przesuwać klatkami",
+    "back": "wstecz",
+    "forward": "dalej",
+    "enableAbLoop": "Włącz pętlę A/B",
+    "turnOffAbLoop": "Wyłącz pętlę A/B",
+    "abLoopHint": "Przeciągnij markery A i B na wideo, aby ustawić pętlę.",
+    "slowSpeedWarning": "Niższe prędkości mogą obniżyć jakość dźwięku"
+  },
+  "questLog": {
+    "currentWorld": "Aktualny świat",
+    "progress": "Postęp",
+    "week": "Tydzień",
+    "day": "Dzień",
+    "nowPlaying": "Aktualnie odtwarzane",
+    "min": "min"
   }
 }
