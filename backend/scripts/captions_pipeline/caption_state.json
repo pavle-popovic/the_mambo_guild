@@ -6111,14 +6111,16 @@
     "Mambo101Edited__Suzy_Q_3_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777232403.622303
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.0338376
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777232403.683834
         },
         "es": {
           "status": "translated",
