@@ -626,6 +626,7 @@
       "downgradeLose2": "Roundtable Zoom 통화 잃음",
       "downgradeLose3": "Guild Master 좌석 해제 (30석 한정)",
       "downgradeKeep1": "모든 Pro 기능과 전체 강의 액세스 유지",
+      "downgradeCooldownNotice": "변경 후 30일 동안 Guild Master로 다시 업그레이드할 수 없습니다.",
       "stayOnGuildMaster": "Guild Master 유지",
       "switching": "전환 중...",
       "modalClose": "닫기",

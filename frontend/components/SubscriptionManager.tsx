@@ -321,6 +321,16 @@ export default function SubscriptionManager() {
               <span>{t("downgradeKeep1")}</span>
             </li>
           </ul>
+          {/* 30-day re-upgrade cooldown notice. Backend enforces the same
+              rule via /payments/update-subscription (returns 409 if the
+              user tries to upgrade back inside the window). Surfacing it
+              here so the choice is informed before they confirm. */}
+          <div
+            role="alert"
+            className="mb-5 px-3 py-2 rounded-md border border-amber-500/30 bg-amber-500/5 text-xs leading-relaxed text-amber-200/90"
+          >
+            {t("downgradeCooldownNotice")}
+          </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               onClick={close}

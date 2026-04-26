@@ -88,6 +88,17 @@ def _fire_subscribe_and_purchase(
 # and refuse new PERFORMER checkouts when the cap is hit.
 GUILD_MASTER_SEAT_CAP = 30
 
+# Days a user must wait after downgrading Performer→Advanced before they
+# can upgrade back to Performer. Closes the proration-cycle abuse path
+# where someone repeatedly upgrades for 1 day to attend the weekly
+# Roundtable / pull DJ Booth content / etc., then downgrades to dodge
+# the full $59. Read by update_subscription against
+# Subscription.last_performer_downgrade_at. Does NOT apply to fresh
+# /create-checkout-session subscriptions (those pay full price; not the
+# exploit). Cleared on full cancellation so a clean cancel-and-rebuy
+# doesn't carry the penalty.
+PERFORMER_REUPGRADE_COOLDOWN_DAYS = 30
+
 # Arbitrary int key for the Postgres advisory lock used to serialize the
 # seat-cap read/modify window. Any constant works; pick one unlikely to collide
 # with other advisory locks in the codebase.
@@ -782,6 +793,12 @@ async def stripe_webhook(
             # "ACTIVE" rows after a failed renewal.
             db_subscription.stripe_subscription_id = stripe_sub_id
             db_subscription.status = db_status
+            # Snapshot the OLD tier before we overwrite it. Used below to
+            # detect a Performer→Advanced transition and stamp the
+            # re-upgrade cooldown anchor for defense in depth (catches
+            # downgrades initiated outside our update_subscription
+            # endpoint, e.g. via the Stripe dashboard / support tooling).
+            previous_tier = db_subscription.tier
             # Promote tier on good-standing states. On past_due we revoke
             # premium access immediately by dropping to ROOKIE — Stripe Smart
             # Retries can run for ~14 days otherwise, during which a delinquent
@@ -797,6 +814,18 @@ async def stripe_webhook(
             if db_status == SubscriptionStatus.CANCELED:
                 db_subscription.tier = SubscriptionTier.ROOKIE
                 db_subscription.cancel_at_period_end = False
+            # Stamp the cooldown anchor if this event represents a
+            # Performer→Advanced transition (and the new state is a
+            # subscribed one — past_due / canceled drops are not what
+            # we're guarding). Belt-and-braces with the synchronous stamp
+            # in update_subscription: an admin/CLI downgrade still
+            # triggers the cooldown for the user.
+            if (
+                previous_tier == SubscriptionTier.PERFORMER
+                and db_subscription.tier == SubscriptionTier.ADVANCED
+                and db_status in (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE)
+            ):
+                db_subscription.last_performer_downgrade_at = datetime.now(timezone.utc)
             db.commit()
             db.refresh(db_subscription)
 
@@ -1014,6 +1043,12 @@ async def stripe_webhook(
             db_subscription.status = SubscriptionStatus.CANCELED
             db_subscription.tier = SubscriptionTier.ROOKIE
             db_subscription.cancel_at_period_end = False
+            # Clear the re-upgrade cooldown anchor on a clean cancellation.
+            # Once the user has fully exited the subscription, any future
+            # purchase is a fresh checkout (paid in full, not the
+            # proration-cycle exploit) and should not carry the penalty
+            # forward into a brand-new subscription life.
+            db_subscription.last_performer_downgrade_at = None
             db.commit()
             db.refresh(db_subscription)
 
@@ -1361,13 +1396,49 @@ def update_subscription(
                 detail="No Stripe subscription ID found. Cannot update."
             )
 
+        # Pre-compute the transition shape once so each subsequent check
+        # reads the same intent. `is_upgrade_request_to_performer` is the
+        # broad "user is trying to become Performer" signal (covers
+        # Advanced→Performer and any other → Performer); the existing
+        # `is_upgrade_to_performer` further down only flags the
+        # TRIALING→Performer subset (which needs trial_end="now"). Both
+        # exist intentionally — keep them distinct.
+        is_upgrade_request_to_performer = (
+            request_data.new_price_id == PERFORMER_PRICE_ID
+            and subscription.tier != SubscriptionTier.PERFORMER
+        )
+        is_downgrade_performer_to_advanced = (
+            request_data.new_price_id == ADVANCED_PRICE_ID
+            and subscription.tier == SubscriptionTier.PERFORMER
+        )
+
+        # 30-day Performer re-upgrade cooldown. Refuse a re-upgrade if the
+        # user has downgraded Performer→Advanced inside the cooldown
+        # window. This is what closes the proration-cycle exploit
+        # surfaced by the M6 audit; the path through /create-checkout-
+        # session is intentionally NOT gated (a fresh checkout pays full
+        # $59 and is not the exploit). Cleared by the
+        # customer.subscription.deleted webhook so a clean cancel-and-
+        # rebuy doesn't carry the penalty.
+        if is_upgrade_request_to_performer and subscription.last_performer_downgrade_at is not None:
+            last_dg = subscription.last_performer_downgrade_at
+            if last_dg.tzinfo is None:
+                last_dg = last_dg.replace(tzinfo=timezone.utc)
+            cooldown_lifts_at = last_dg + timedelta(days=PERFORMER_REUPGRADE_COOLDOWN_DAYS)
+            if datetime.now(timezone.utc) < cooldown_lifts_at:
+                when_label = cooldown_lifts_at.strftime("%B %d, %Y")
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail=(
+                        f"Guild Master re-upgrade is available on {when_label}. "
+                        "There's a 30-day cooldown after downgrading."
+                    ),
+                )
+
         # If this user is upgrading *into* Guild Master, enforce the seat cap.
         # Their current tier being PERFORMER already means they occupy a seat,
         # so only count the cap when they're NOT already PERFORMER.
-        if (
-            request_data.new_price_id == PERFORMER_PRICE_ID
-            and subscription.tier != SubscriptionTier.PERFORMER
-        ):
+        if is_upgrade_request_to_performer:
             _lock_guild_master_seats(db)
             if _guild_master_seats_taken(db) >= GUILD_MASTER_SEAT_CAP:
                 raise HTTPException(
@@ -1475,6 +1546,13 @@ def update_subscription(
         subscription.cancel_at_period_end = False
         if is_upgrade_to_performer:
             subscription.status = SubscriptionStatus.ACTIVE
+        # Stamp the cooldown anchor only on a real Performer→Advanced
+        # transition. Stripe.modify above succeeded, so the downgrade is
+        # committed on Stripe's side; failing to stamp here would let the
+        # next call slip through the cooldown. Stamp inside the same
+        # transaction as the tier write so a rollback below clears both.
+        if is_downgrade_performer_to_advanced:
+            subscription.last_performer_downgrade_at = datetime.now(timezone.utc)
         db.commit()
         db.refresh(subscription)
 

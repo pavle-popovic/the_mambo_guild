@@ -626,6 +626,7 @@
       "downgradeLose2": "فقدان مكالمات Zoom في Roundtable",
       "downgradeLose3": "إخلاء مقعدك في Guild Master (محدود بـ 30 مقعدًا)",
       "downgradeKeep1": "الاحتفاظ بجميع ميزات Pro والوصول الكامل للدورات",
+      "downgradeCooldownNotice": "بعد التبديل، لن تتمكن من الترقية إلى Guild Master لمدة 30 يومًا.",
       "stayOnGuildMaster": "البقاء في Guild Master",
       "switching": "جاري التبديل...",
       "modalClose": "إغلاق",

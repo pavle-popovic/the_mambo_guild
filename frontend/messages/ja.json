@@ -626,6 +626,7 @@
       "downgradeLose2": "Roundtable Zoom 通話を失う",
       "downgradeLose3": "Guild Master 席を解放（上限30名）",
       "downgradeKeep1": "すべての Pro 機能とコース全体へのアクセスを維持",
+      "downgradeCooldownNotice": "切り替え後、30日間はGuild Masterへの再アップグレードができません。",
       "stayOnGuildMaster": "Guild Master を続ける",
       "switching": "切り替え中...",
       "modalClose": "閉じる",

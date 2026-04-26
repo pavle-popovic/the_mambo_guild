@@ -626,6 +626,7 @@
       "downgradeLose2": "Roundtable Zoom-Calls verlieren",
       "downgradeLose3": "Deinen Guild-Master-Platz freigeben (auf 30 begrenzt)",
       "downgradeKeep1": "Alle Pro-Funktionen und vollen Kurszugang behalten",
+      "downgradeCooldownNotice": "Nach dem Wechsel kannst du 30 Tage lang nicht zurück zu Guild Master upgraden.",
       "stayOnGuildMaster": "Auf Guild Master bleiben",
       "switching": "Wird gewechselt...",
       "modalClose": "Schließen",

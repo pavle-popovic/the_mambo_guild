@@ -626,6 +626,7 @@
       "downgradeLose2": "失去 Roundtable Zoom 会议",
       "downgradeLose3": "释放您的 Guild Master 名额（限 30 人）",
       "downgradeKeep1": "保留所有 Pro 功能和完整课程访问权",
+      "downgradeCooldownNotice": "切换后,30天内将无法升级回 Guild Master.",
       "stayOnGuildMaster": "继续 Guild Master",
       "switching": "切换中...",
       "modalClose": "关闭",

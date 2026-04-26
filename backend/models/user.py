@@ -151,6 +151,13 @@ class Subscription(Base):
     current_period_end = Column(DateTime, nullable=True)
     cancel_at_period_end = Column(Boolean, default=False, nullable=False, server_default="false")
 
+    # Re-upgrade cooldown anchor. Set when the user transitions
+    # Performer→Advanced; read by /payments/update-subscription to refuse
+    # an upgrade-to-Performer for the next PERFORMER_REUPGRADE_COOLDOWN_DAYS.
+    # Cleared on full cancellation (customer.subscription.deleted) so a
+    # clean cancel-and-rebuy doesn't carry the penalty forward.
+    last_performer_downgrade_at = Column(DateTime, nullable=True)
+
     # Relationships
     user = relationship("User", back_populates="subscription")
 
