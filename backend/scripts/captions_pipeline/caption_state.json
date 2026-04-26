@@ -3451,14 +3451,16 @@
     "Mambo101Edited__Basic_Step_1_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224322.6255372
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.134264
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224322.9599211
         },
         "es": {
           "status": "translated",
@@ -3513,14 +3515,16 @@
     "Mambo101Edited__Basic_Step_2_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224323.5513844
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.193995
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224323.5528977
         },
         "es": {
           "status": "translated",
@@ -3637,14 +3641,16 @@
     "Mambo101Edited__Basic_Step_2_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224323.278606
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.227122
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224323.2996309
         },
         "es": {
           "status": "translated",
