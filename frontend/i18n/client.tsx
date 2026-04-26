@@ -38,11 +38,13 @@ import React, {
   createContext,
   useCallback,
   useContext,
+  useEffect,
+  useState,
   useTransition,
   type ReactNode,
 } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { LOCALE_COOKIE, LOCALES, LOCALE_META, type Locale } from './config';
+import { DEFAULT_LOCALE, LOCALE_COOKIE, LOCALES, LOCALE_META, type Locale } from './config';
 import { isReadyVariant } from './seo-routing';
 
 const NON_DEFAULT_LOCALES: ReadonlySet<string> = new Set(
@@ -76,6 +78,37 @@ function targetPathForLocale(currentPath: string, next: Locale): string {
   return unprefixed;
 }
 
+/** Detect the locale that the URL or cookie wants us to be in. */
+function detectClientLocale(pathname: string): Locale | null {
+  if (typeof document === 'undefined') return null;
+
+  // 1) URL prefix wins — when the user is on /<locale>/<path>, the rendered
+  //    body is in <locale>, so the chrome MUST match. The middleware sets the
+  //    cookie too, but on a first visit the cookie isn't yet visible to the
+  //    SSR pass.
+  const segs = pathname.split('/').filter(Boolean);
+  if (segs.length >= 1 && NON_DEFAULT_LOCALES.has(segs[0])) {
+    return segs[0] as Locale;
+  }
+
+  // 2) Cookie set by middleware or a previous selector click.
+  const cookieMatch = document.cookie.match(new RegExp(`${LOCALE_COOKIE}=([^;]+)`));
+  const cookieVal = cookieMatch?.[1];
+  if (cookieVal && (LOCALES as readonly string[]).includes(cookieVal)) {
+    return cookieVal as Locale;
+  }
+
+  // 3) localStorage fallback (Safari iOS purges cookies aggressively).
+  try {
+    const lsVal = window.localStorage.getItem(LOCALE_COOKIE);
+    if (lsVal && (LOCALES as readonly string[]).includes(lsVal)) {
+      return lsVal as Locale;
+    }
+  } catch {}
+
+  return null;
+}
+
 // ─── Context ─────────────────────────────────────────────────────────────────
 
 interface LocaleContextValue {
@@ -98,6 +131,39 @@ export function LocaleProvider({
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
   const pathname = usePathname();
+  const [locale, setLocaleState] = useState<Locale>(initialLocale);
+
+  // After mount, sync state with the actual current locale source. Two
+  // critical cases this handles:
+  //   1. SSR rendered with DEFAULT_LOCALE because document is undefined
+  //      server-side, but the client cookie says something else.
+  //   2. User landed on /<locale>/<seo-path>: the URL is the source of truth
+  //      for the rendered body; the chrome must match it, even if the
+  //      previous-session cookie disagreed.
+  // We re-run when pathname changes so locale-prefix navigations stay synced.
+  useEffect(() => {
+    const detected = detectClientLocale(pathname || '/') ?? DEFAULT_LOCALE;
+    if (detected !== locale) {
+      setLocaleState(detected);
+      document.documentElement.lang = detected;
+      document.documentElement.dir = LOCALE_META[detected].dir;
+      // If the URL forced a locale change, re-pin the cookie so subsequent
+      // requests (and future SSRs) agree with the URL.
+      const cookieMatch = document.cookie.match(new RegExp(`${LOCALE_COOKIE}=([^;]+)`));
+      if (cookieMatch?.[1] !== detected) {
+        document.cookie = [
+          `${LOCALE_COOKIE}=${detected}`,
+          'path=/',
+          'max-age=31536000',
+          'SameSite=Lax',
+        ].join('; ');
+        try {
+          window.localStorage.setItem(LOCALE_COOKIE, detected);
+        } catch {}
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   const setLocale = useCallback(
     (next: Locale) => {
@@ -121,15 +187,19 @@ export function LocaleProvider({
       }
 
       // Set <html lang> and dir immediately for instant visual feedback
-      // (server will confirm on next request)
       document.documentElement.lang = next;
       document.documentElement.dir = LOCALE_META[next].dir;
+
+      // Update the React state so all consumers (chrome, selector itself)
+      // re-render with the new locale immediately, without waiting for a
+      // navigation round-trip.
+      setLocaleState(next);
 
       // SEO-aware navigation: if the new locale's URL variant is ready for
       // this path, push to /<locale>/<path>. If we're on /<oldLocale>/<seo-path>
       // and switching to a locale that doesn't have it (or to en), strip the
       // prefix back to the canonical English URL. Otherwise stay put and let
-      // router.refresh() re-render the chrome from the cookie.
+      // router.refresh() re-render server components from the cookie.
       const current = pathname || '/';
       const target = targetPathForLocale(current, next);
 
@@ -145,7 +215,7 @@ export function LocaleProvider({
   );
 
   return (
-    <LocaleContext.Provider value={{ locale: initialLocale, setLocale, isPending }}>
+    <LocaleContext.Provider value={{ locale, setLocale, isPending }}>
       {children}
     </LocaleContext.Provider>
   );
