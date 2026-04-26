@@ -1407,14 +1407,16 @@
     "BodymovementsEdited__Head_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777211349.041859
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.1147075
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777211352.5504167
         },
         "es": {
           "status": "translated",
@@ -1469,14 +1471,16 @@
     "BodymovementsEdited__Hips_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777211352.8781557
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.1642487
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777211352.8824017
         },
         "es": {
           "status": "translated",
