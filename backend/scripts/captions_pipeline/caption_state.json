@@ -14132,49 +14132,64 @@
     "Mambo301Edited__Bodymovement_5_Lessonn_2": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208456.7404118
         },
         "de": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.2959385
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.2984793
         },
         "es": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.3179858
         },
         "fr": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.3341038
         },
         "it": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.3381343
         },
         "ja": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.3443673
         },
         "ko": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.3728547
         },
         "nl": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.3759885
         },
         "pl": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.3984919
         },
         "pt": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.400905
         },
         "ru": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.4087217
         },
         "sr": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.412683
         },
         "tr": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.4159393
         },
         "zh": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208460.419038
         }
       }
     },
