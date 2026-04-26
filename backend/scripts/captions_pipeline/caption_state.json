@@ -1537,14 +1537,16 @@
     "BodymovementsEdited__Hips_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213597.998165
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.1842527
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213598.0262885
         },
         "es": {
           "status": "translated",
