@@ -5031,14 +5031,16 @@
     "Mambo101Edited__Flares_1_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231155.7221155
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.796208
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231155.7422533
         },
         "es": {
           "status": "translated",
@@ -5281,14 +5283,16 @@
     "Mambo101Edited__Pattern_1_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231155.4358876
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.8832893
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231155.4663434
         },
         "es": {
           "status": "translated",
@@ -5529,14 +5533,16 @@
     "Mambo101Edited__Styling_1_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231155.9965978
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.9991598
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231156.027136
         },
         "es": {
           "status": "translated",
@@ -5843,14 +5849,16 @@
     "Mambo101Edited__SuzyQ_2_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231209.7059903
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.2239661
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231209.7286835
         },
         "es": {
           "status": "translated",
@@ -6279,14 +6287,16 @@
     "Mambo101Edited__Suzy_Q_3_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231155.064895
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.0881906
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231155.1711197
         },
         "es": {
           "status": "translated",
