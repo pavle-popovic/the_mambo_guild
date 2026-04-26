@@ -2883,14 +2883,16 @@
     "BrunoMarsEdited__ChaChaCha": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216082.7139316
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.9305365
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216082.7167375
         },
         "es": {
           "status": "translated",
@@ -3007,14 +3009,16 @@
     "IrimoEdited__Irimo_Demo": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216082.9416697
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.9878564
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216082.9437969
         },
         "es": {
           "status": "translated",
