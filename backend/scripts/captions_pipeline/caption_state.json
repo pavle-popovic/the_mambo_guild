@@ -1345,14 +1345,16 @@
     "BodymovementsEdited__Head_Lesson_2": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213477.8166635
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.1010873
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213477.8842852
         },
         "es": {
           "status": "translated",
