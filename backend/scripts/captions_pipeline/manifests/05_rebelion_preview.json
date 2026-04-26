@@ -1,0 +1,20 @@
+{
+  "stem": "RebelionEdited__Rebelion_Preview",
+  "translations": {
+    "ar": {"1": "شغّل الموسيقى."},
+    "de": {"1": "Musik an."},
+    "el": {"1": "Βάλε τη μουσική."},
+    "es": {"1": "Pon la música."},
+    "fr": {"1": "Lance la musique."},
+    "it": {"1": "Fai partire la musica."},
+    "ja": {"1": "音楽スタート。"},
+    "ko": {"1": "음악 시작."},
+    "nl": {"1": "Muziek aan."},
+    "pl": {"1": "Włącz muzykę."},
+    "pt": {"1": "Bota a música."},
+    "ru": {"1": "Включай музыку."},
+    "sr": {"1": "Пусти музику."},
+    "tr": {"1": "Müziği aç."},
+    "zh": {"1": "放音乐。"}
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "stem": "TaxistaEdited__Taxista_Preview",
+  "translations": {
+    "ar": {"1": "للخلف، افتح، اركل."},
+    "de": {"1": "Zurück, öffnen, Kick."},
+    "el": {"1": "Πίσω, άνοιγμα, κλωτσιά."},
+    "es": {"1": "Atrás, abre, kick."},
+    "fr": {"1": "Arrière, ouvre, kick."},
+    "it": {"1": "Indietro, apri, kick."},
+    "ja": {"1": "後ろ、開いて、キック。"},
+    "ko": {"1": "뒤로, 열고, 킥."},
+    "nl": {"1": "Achter, open, kick."},
+    "pl": {"1": "Tył, otwórz, kick."},
+    "pt": {"1": "Trás, abre, kick."},
+    "ru": {"1": "Назад, открой, кик."},
+    "sr": {"1": "Назад, отвори, кик."},
+    "tr": {"1": "Geri, aç, kick."},
+    "zh": {"1": "后退，打开，踢。"}
+  }
+}

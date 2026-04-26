@@ -1,0 +1,65 @@
+{
+  "stem": "RebelionEdited__Rebelion_Demo",
+  "translations": {
+    "ar": {
+      "1": "ما نتعلّمه هو أنّ",
+      "2": "بإمكانك أن تكون فنانًا."
+    },
+    "de": {
+      "1": "Was wir lernen, ist, dass",
+      "2": "du ein Künstler sein kannst."
+    },
+    "el": {
+      "1": "Αυτό που μαθαίνουμε είναι ότι",
+      "2": "μπορείς να γίνεις καλλιτέχνης."
+    },
+    "es": {
+      "1": "Lo que aprendemos es que",
+      "2": "puedes ser un artista."
+    },
+    "fr": {
+      "1": "Ce que nous apprenons, c'est que",
+      "2": "tu peux être un artiste."
+    },
+    "it": {
+      "1": "Quello che impariamo è che",
+      "2": "puoi essere un artista."
+    },
+    "ja": {
+      "1": "私たちが学ぶのは",
+      "2": "あなたがアーティストになれること。"
+    },
+    "ko": {
+      "1": "우리가 배우는 것은",
+      "2": "당신이 예술가가 될 수 있다는 것이다."
+    },
+    "nl": {
+      "1": "Wat we leren, is dat",
+      "2": "je een artiest kunt zijn."
+    },
+    "pl": {
+      "1": "Uczymy się, że",
+      "2": "możesz być artystą."
+    },
+    "pt": {
+      "1": "O que aprendemos é que",
+      "2": "você pode ser um artista."
+    },
+    "ru": {
+      "1": "Мы учимся тому, что",
+      "2": "ты можешь быть артистом."
+    },
+    "sr": {
+      "1": "Оно што учимо је",
+      "2": "да можеш бити уметник."
+    },
+    "tr": {
+      "1": "Öğrendiğimiz şey şu:",
+      "2": "sen bir sanatçı olabilirsin."
+    },
+    "zh": {
+      "1": "我们学到的是",
+      "2": "你可以成为一名艺术家。"
+    }
+  }
+}

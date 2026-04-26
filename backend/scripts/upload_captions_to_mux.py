@@ -51,7 +51,9 @@ CAPTION_BASE = MG_BASE / "caption_cleanup"
 # Locale -> (Mux language name, chunked caption dir name)
 CAPTION_LANGS = {
     "en": ("English",    "Clean_Captions_chunked"),
+    "ar": ("Arabic",     "Captions_ar_chunked"),
     "de": ("German",     "Captions_de_chunked"),
+    "el": ("Greek",      "Captions_el_chunked"),
     "es": ("Spanish",    "Captions_es_chunked"),
     "fr": ("French",     "Captions_fr_chunked"),
     "it": ("Italian",    "Captions_it_chunked"),

@@ -237,7 +237,9 @@ def process_dir(in_dir: Path, out_dir: Path, stats: dict):
 
 LOCALE_DIRS = {
     "en": "Clean_Captions",
+    "ar": "Captions_ar",
     "de": "Captions_de",
+    "el": "Captions_el",
     "es": "Captions_es",
     "fr": "Captions_fr",
     "it": "Captions_it",
