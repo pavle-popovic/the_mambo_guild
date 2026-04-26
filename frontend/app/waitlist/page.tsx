@@ -167,10 +167,10 @@ export default function WaitlistPage() {
     const [honeypot, setHoneypot] = useState('');
     const formMountTime = useRef<number>(Date.now());
 
-    // Countdown to launch: April 29, 2026
+    // Countdown to launch: April 29, 2026 at 18:00 GMT
     const [countdown, setCountdown] = useState({ days: 0, hours: 0, minutes: 0, seconds: 0 });
     useEffect(() => {
-        const launchDate = new Date('2026-04-29T00:00:00').getTime();
+        const launchDate = new Date('2026-04-29T18:00:00Z').getTime();
         const tick = () => {
             const now = Date.now();
             const diff = Math.max(0, launchDate - now);
