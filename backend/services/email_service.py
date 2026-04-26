@@ -211,10 +211,21 @@ def send_announcement_email(email: str, name: str, subject: str, message: str) -
         return False
 
     try:
+        from html import escape
+
         from_email = settings.FROM_EMAIL
 
-        # Convert newlines to <br> for HTML rendering
-        html_message = message.replace("\n", "<br>")
+        # HTML-escape user-supplied fields BEFORE expanding newlines to <br>.
+        # Without this, an admin (or anyone who eventually gains write access
+        # to this endpoint) can inject arbitrary HTML/script into a broadcast
+        # email — e.g., a tracking pixel that leaks recipient identity, or
+        # a phishing link styled to look like a Mambo Guild action button.
+        # Other emails in this module (send_coaching_feedback_email,
+        # send_subscription_canceled_email, etc.) already escape the same
+        # way; this one was the outlier. Recipient name comes from the
+        # user_profiles table and could be self-injected, so escape it too.
+        safe_message = escape(message).replace("\n", "<br>")
+        safe_name = escape(name)
 
         result = resend.Emails.send({
             "from": from_email,
@@ -273,8 +284,8 @@ def send_announcement_email(email: str, name: str, subject: str, message: str) -
             <body>
                 <div class="container">
                     <div class="badge">The Mambo Guild</div>
-                    <p>Hi {name},</p>
-                    <p>{html_message}</p>
+                    <p>Hi {safe_name},</p>
+                    <p>{safe_message}</p>
                     <hr class="divider">
                     <p class="footer">
                         You're receiving this because you're a member of The Mambo Guild.<br>

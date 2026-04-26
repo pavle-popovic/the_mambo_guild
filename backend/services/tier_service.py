@@ -9,6 +9,7 @@ enum comparisons across routers, centralise the ordering here.
 """
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy.orm import Session
 
@@ -28,6 +29,13 @@ def user_tier(user_id: str, db: Session) -> str:
 
     Returns 'rookie' if the user has no active subscription or is past-due /
     cancelled. `SubscriptionStatus.TRIALING` counts as the subscribed tier.
+
+    Defense in depth: if Stripe ever fails to deliver a renewal webhook,
+    the local row can stay ACTIVE past its true period end. Treat an
+    expired period as effective Rookie so tier-gated features don't keep
+    granting access on a lapsed subscription. premium.is_guild_master
+    already does this check; mirroring it here keeps every tier-gated
+    surface (shop, feature flags, etc.) consistent.
     """
     sub = (
         db.query(Subscription)
@@ -42,6 +50,14 @@ def user_tier(user_id: str, db: Session) -> str:
     )
     if not sub:
         return "rookie"
+    period_end = sub.current_period_end
+    if period_end is not None:
+        # Naive datetimes from older rows: treat as UTC so the comparison
+        # below doesn't raise.
+        if period_end.tzinfo is None:
+            period_end = period_end.replace(tzinfo=timezone.utc)
+        if period_end < datetime.now(timezone.utc):
+            return "rookie"
     return sub.tier.value if isinstance(sub.tier, SubscriptionTier) else str(sub.tier)
 
 

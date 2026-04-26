@@ -41,11 +41,11 @@ R2_BASE = "https://pub-bad1fce3595144f2bac8492efa3aec64.r2.dev/badges"
 
 # (active_badge_id)  ->  (orphan_image_slug)
 MAPPING: dict[str, str] = {
-    # liked_* (Crowd Favorite) — direct name match with crowd_favorite_*
-    "liked_bronze":  "crowd_favorite_bronze",
+    # liked_* (Crowd Favorite — total likes received):
+    "liked_bronze":  "crowd_favorite_bronze_v3",
     "liked_silver":  "crowd_favorite_silver",
     "liked_gold":    "crowd_favorite_gold",
-    "liked_diamond": "crowd_favorite_diamond",
+    "liked_diamond": "liked_diamond", # Newly generated!
 
     # motw_love_* (Move Magnet) — now has dedicated artwork!
     "motw_love_bronze":  "motw_love_bronze",
@@ -57,14 +57,14 @@ MAPPING: dict[str, str] = {
     "guild_bronze":  "human_metronome_bronze",
     "guild_silver":  "human_metronome_silver",
     "guild_gold":    "human_metronome_gold",
-    "guild_diamond": "human_metronome_diamond",
+    "guild_diamond": "guild_diamond", # Newly generated!
 
     # promoter — now has dedicated artwork!
     "promoter": "promoter",
     
     # pro_member, guild_master, founder_diamond
-    "pro_member": "pro_member",
-    "guild_master": "guild_master",
+    "pro_member": "pro_member_v3",
+    "guild_master": "guild_master_v2",
     "founder_diamond": "founder_diamond",
 
     # --- Fallback singletons for the remaining families ---
@@ -73,17 +73,17 @@ MAPPING: dict[str, str] = {
     # until proper per-tier artwork is uploaded; swapping later only requires
     # editing this map.
 
-    # guild_love_* (Guild Applause — likes on guild posts): responder vibe.
-    "guild_love_bronze":  "responder_style",
-    "guild_love_silver":  "responder_style",
-    "guild_love_gold":    "responder_style",
-    "guild_love_diamond": "responder_style",
+    # guild_love_* (Guild Applause — likes on guild posts):
+    "guild_love_bronze":  "guild_love_bronze",
+    "guild_love_silver":  "guild_love_silver",
+    "guild_love_gold":    "guild_love_gold",
+    "guild_love_diamond": "guild_love_diamond", # Newly generated!
 
-    # motw_* (Move Master — MOTW video count): maestro.
-    "motw_bronze":  "maestro_style",
-    "motw_silver":  "maestro_style",
-    "motw_gold":    "maestro_style",
-    "motw_diamond": "maestro_style",
+    # motw_* (Move Master — MOTW video count):
+    "motw_bronze":  "motw_bronze_v3",
+    "motw_silver":  "motw_silver",
+    "motw_gold":    "motw_gold",
+    "motw_diamond": "motw_diamond", # Newly generated!
 
     # original_* (The Originator — original video count) — now has dedicated artwork!
     "original_bronze":  "original_bronze",
@@ -91,11 +91,11 @@ MAPPING: dict[str, str] = {
     "original_gold":    "original_gold",
     "original_diamond": "original_diamond",
 
-    # original_love_* (Fan Favorite — likes on original posts): fire = love.
-    "original_love_bronze":  "fire_style",
-    "original_love_silver":  "fire_style",
-    "original_love_gold":    "fire_style",
-    "original_love_diamond": "fire_style",
+    # original_love_* (Fan Favorite — likes on original posts):
+    "original_love_bronze":  "original_love_bronze",
+    "original_love_silver":  "original_love_silver",
+    "original_love_gold":    "original_love_gold",
+    "original_love_diamond": "original_love_diamond", # Newly generated!
 }
 
 

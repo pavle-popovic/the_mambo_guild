@@ -133,7 +133,25 @@
       "Bash(/c/Users/pavle/miniconda3/python backend/scripts/upload_captions_to_mux.py --dry-run --only-lang en)",
       "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/pavle/miniconda3/python backend/scripts/upload_captions_to_mux.py --dry-run --only-lang en)",
       "Bash(/c/Users/pavle/miniconda3/python -c \"from dotenv import load_dotenv; import os; load_dotenv\\('.env'\\); print\\(os.environ['DATABASE_URL'].replace\\(':6543/', ':5432/'\\)\\)\")",
-      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/pavle/miniconda3/python *)"
+      "Bash(PYTHONIOENCODING=utf-8 PYTHONUTF8=1 /c/Users/pavle/miniconda3/python *)",
+      "Bash(PYTHONIOENCODING=utf-8 python pachanga_edits.py --dry)",
+      "Bash(PYTHONIOENCODING=utf-8 python *)",
+      "Bash(tee backend/scripts/broadcast_launch_round2.log)",
+      "Bash(sed -E 's/\\(=.*\\)$/=<redacted>/')",
+      "Bash(mkdir *)",
+      "Bash(cygpath -w /tmp/bugshots)",
+      "Bash(awk '/03:\\(3[0-9]|4[0-9]|5[0-4]\\)/,/03:5[5-9]/' \"d:/MamboGuild/caption_cleanup/Clean_Captions_chunked/Mambo101Edited__Turn_1_Lesson_1.vtt\")",
+      "Bash(sed -n '14,20p')",
+      "Bash(sed -n '14,20p' \"d:/MamboGuild/caption_cleanup/Clean_Captions_chunked/RebelionEdited__Rebelion_Lesson.vtt\")",
+      "Bash(awk '/^00:06:\\(2[5-9]|3[0-9]|4[0-5]\\)/{f=1} f{print; if \\(/^$/\\) f--}' \"d:/MamboGuild/caption_cleanup/Clean_Captions_chunked/Mambo101Edited__Twist_1_Lesson_1.vtt\")",
+      "Bash(awk 'NR>=100 && NR<=115' frontend/messages/sr.raw.txt)",
+      "Bash(npx -y typescript@5 tsc --noEmit -p .)",
+      "Bash(venv/Scripts/python.exe -m pytest --version)",
+      "Bash(tail -20 \"C:\\\\\\\\Users\\\\\\\\pavle\\\\\\\\AppData\\\\\\\\Local\\\\\\\\Temp\\\\\\\\claude\\\\\\\\C--Users-pavle-Desktop-salsa-lab-v2\\\\\\\\83e4f9a0-0b0d-4586-9a46-754106742d8e\\\\\\\\tasks\\\\\\\\bip1rd4v3.output\")",
+      "Bash(ls /mnt)",
+      "Bash(ls /cygdrive)",
+      "Read(//c//**)",
+      "Bash(sort -t_ -k1n)"
     ]
   }
 }

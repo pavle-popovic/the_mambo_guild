@@ -211,8 +211,20 @@ def process_daily_login(user_id: str, db: Session) -> dict:
     """
     Process daily login bonus.
     Returns dict with amount earned, streak info, etc.
+
+    The profile row is locked with SELECT ... FOR UPDATE before the
+    last_daily_claim check so two parallel calls (e.g., a saved-credentials
+    user opening two tabs that both auto-fire /auth/login → /claves/daily)
+    can't both pass the date check and bank the bonus twice. The lock is
+    released on commit; earn_claves below re-locks the same row, which is
+    a no-op when the lock is already held.
     """
-    profile = get_user_profile(user_id, db)
+    profile = (
+        db.query(UserProfile)
+        .filter(UserProfile.user_id == user_id)
+        .with_for_update()
+        .first()
+    )
     if not profile:
         return {"success": False, "message": "Profile not found"}
 

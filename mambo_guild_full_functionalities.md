@@ -154,8 +154,16 @@ The Mambo Guild is **a gamified online salsa dance learning management system** 
 - Validation: 3-30 characters, unique (case-insensitive)
 
 ### User Profile Modal
-- Clickable user avatars across the app open a `UserProfileModal` with avatar, name, level, quick stats, and an **Instagram connect link** (`instagram_url` field on UserProfile)
+- Clickable user avatars across the app open a `UserProfileModal` at parity with the full profile page:
+  - **Avatar with equipped cosmetic border** — `equipped_border_sku` is passed through to `GuildMasterAvatar`, so Aurora / Crown Jewel / etc. render around the preview exactly like on the feed
+  - **Equipped title chip** under the username (via `getTitleSpec` + `TitleChip`)
+  - **Tier pill** (Guild Master / PRO / tier name)
+  - **Level + XP progress bar** with XP-to-next-level microcopy, using the same `Math.pow(level, 2) * 100` curve as the profile page
+  - **5 displayed badges** in a fixed 5-slot grid — mirrors `BadgeTrophyCase`'s featured set (`earned.slice(0, 5)` against the `display_order`-sorted list the backend returns); empty slots render as dim locked cells
+  - **6 stat chips**: Streak, Rep, Claves 🥢, Badges total, Solved, Reactions received
+  - **Instagram connect link** (`instagram_url` field on UserProfile)
 - The owner-edit flow refreshes `instagram_url` in context immediately after save so the UI updates without a reload
+- No new API exposure — all surfaced fields were already returned by `/api/users/public/{username}`; the modal just stops under-utilizing the payload
 
 ### Mobile Profile (RPG Character Sheet)
 - Redesigned portrait profile fits all key info on first screen: compact avatar header, level progress bar, 3x2 stats grid, community stats row, and featured badges

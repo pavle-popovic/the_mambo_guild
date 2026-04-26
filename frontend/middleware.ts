@@ -87,7 +87,13 @@ export async function middleware(request: NextRequest) {
     }
 
     // --- Waitlist velvet rope with beta bypass ----------------------------
-    const isWaitlistMode = process.env.NEXT_PUBLIC_WAITLIST_MODE === 'true';
+    // NOTE: NEXT_PUBLIC_* vars are inlined at build time and are NOT available
+    // as real runtime env vars in Edge middleware. Use WAITLIST_MODE (server-side)
+    // as the authoritative variable, with NEXT_PUBLIC_WAITLIST_MODE as fallback
+    // for local dev compatibility.
+    const isWaitlistMode =
+        process.env.WAITLIST_MODE === 'true' ||
+        process.env.NEXT_PUBLIC_WAITLIST_MODE === 'true';
     if (isWaitlistMode) {
         const isPublicPath =
             PUBLIC_WHEN_WAITLIST.some(p => path.startsWith(p)) || path.includes('.');

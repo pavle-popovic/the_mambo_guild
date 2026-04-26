@@ -6,7 +6,7 @@ import stripe
 from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, Response, status, Request
-from sqlalchemy import text
+from sqlalchemy import text, or_, and_
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
@@ -107,12 +107,65 @@ def _lock_guild_master_seats(db: Session) -> None:
         logger.debug("Advisory lock unavailable — continuing without seat serialization")
 
 
+# Time window after which an INCOMPLETE Subscription row is considered an
+# abandoned checkout and stops counting toward the Guild Master seat cap /
+# blocking new checkouts for the same user. 30 minutes covers the
+# overwhelming majority of real Stripe Checkout completion times; the
+# Stripe Checkout Session itself expires after 24h but we don't want to
+# punish a user that long for an abandoned tab.
+_PENDING_CHECKOUT_TTL = timedelta(minutes=30)
+
+
+def _lock_user_for_checkout(db: Session, user_id) -> None:
+    """
+    Per-user transaction-scoped advisory lock. Serializes one user's
+    create_checkout_session calls so two concurrent tabs/clicks can't both
+    pass the trial-eligibility check before either has flipped
+    has_used_trial=True (H2 in the audit). The key is derived from the
+    UUID (deterministic across processes/instances) and uses bit 30 to
+    avoid colliding with the small constant key used by
+    _lock_guild_master_seats.
+    """
+    try:
+        if isinstance(user_id, uuid.UUID):
+            uid_int = user_id.int
+        else:
+            uid_int = uuid.UUID(str(user_id)).int
+        # bits 0..29 carry the UUID hash, bit 30 namespaces this lock.
+        key = (1 << 30) | (uid_int & 0x3FFFFFFF)
+        db.execute(text("SELECT pg_advisory_xact_lock(:k)"), {"k": key})
+    except Exception:
+        logger.debug("Advisory lock unavailable — continuing without per-user serialization")
+
+
 def _guild_master_seats_taken(db: Session) -> int:
+    """
+    Live count of Performer seats consumed.
+
+    Includes both promoted subs (TRIALING/ACTIVE) AND recently-created
+    INCOMPLETE checkouts that intend to be Performer (so that several
+    concurrent buyers all chasing the last seat at taken=29 can't each
+    pass the cap check before any of their webhooks have fired — H3 in
+    the audit). The INCOMPLETE row's tier is set to PERFORMER at
+    create_checkout_session time, and current_period_end carries the
+    creation timestamp until a webhook overwrites it, so the staleness
+    cutoff just compares against that.
+    """
+    pending_cutoff = datetime.now(timezone.utc) - _PENDING_CHECKOUT_TTL
     return (
         db.query(Subscription)
         .filter(
             Subscription.tier == SubscriptionTier.PERFORMER,
-            Subscription.status.in_((SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING)),
+            or_(
+                Subscription.status.in_((
+                    SubscriptionStatus.ACTIVE,
+                    SubscriptionStatus.TRIALING,
+                )),
+                and_(
+                    Subscription.status == SubscriptionStatus.INCOMPLETE,
+                    Subscription.current_period_end >= pending_cutoff,
+                ),
+            ),
         )
         .count()
     )
@@ -233,8 +286,13 @@ def _email_has_prior_stripe_subscription(email: str) -> bool:
         # the as-typed form (no Gmail-alias collapsing happened) so we don't
         # fire a redundant query.
         if normalized and normalized != email.strip().lower():
+            # Escape backslashes and single quotes so an email with an
+            # apostrophe (e.g., o'brien@…) doesn't break the Stripe search
+            # query syntax (which would fail the query, fall through to
+            # fail-closed, and permanently deny that user a trial).
+            escaped_normalized = normalized.replace("\\", "\\\\").replace("'", "\\'")
             search_results = stripe.Customer.search(
-                query=f"metadata['normalized_email']:'{normalized}'",
+                query=f"metadata['normalized_email']:'{escaped_normalized}'",
                 limit=10,
             )
             for cust in search_results.auto_paging_iter():
@@ -282,6 +340,11 @@ def create_checkout_session(
     Create a Stripe Checkout Session for subscription.
     Validates price_id against allowed Price IDs (Advanced/Performer).
     """
+    # L1: one operation_id per request, used to derive idempotency keys for
+    # every Stripe write below. If the SDK retries on a connection error,
+    # Stripe returns the cached response keyed off this id instead of
+    # double-creating customers / checkout sessions.
+    operation_id = str(uuid.uuid4())
     try:
         # Validate price_id
         if request_data.price_id not in [ADVANCED_PRICE_ID, PERFORMER_PRICE_ID]:
@@ -293,6 +356,25 @@ def create_checkout_session(
         # Open-redirect defense — only allow our own frontend as the return target.
         safe_success_url = _validate_return_url(request_data.success_url, "success_url")
         safe_cancel_url = _validate_return_url(request_data.cancel_url, "cancel_url")
+
+        # H2: serialize this user's checkout flow so two concurrent
+        # tabs/clicks can't both pass the trial-eligibility check before
+        # either has flipped has_used_trial=True via the webhook. Held for
+        # the rest of this transaction; released on the final commit/
+        # rollback.
+        _lock_user_for_checkout(db, current_user.id)
+
+        # The local Subscription row's tier is stamped to match the price
+        # the user is buying (H3). This is what _guild_master_seats_taken
+        # reads to count pending Performer checkouts toward the seat cap.
+        intended_tier = (
+            SubscriptionTier.PERFORMER
+            if request_data.price_id == PERFORMER_PRICE_ID
+            else SubscriptionTier.ADVANCED
+        )
+        # Used both as the placeholder current_period_end and as the
+        # "last-touched" timestamp the recent-INCOMPLETE check below reads.
+        intended_period_end = datetime.now(timezone.utc)
 
         # Allow creating checkout session even if user has active subscription
         # (for upgrades/downgrades, we'll use update-subscription endpoint instead)
@@ -309,9 +391,31 @@ def create_checkout_session(
                 detail="User already has an active subscription. Use update-subscription to change plans."
             )
 
+        # H2: refuse to start a parallel checkout if the user has a
+        # recently-touched INCOMPLETE row. The user-lock above prevents
+        # two requests from racing in a single instance, but a recent
+        # INCOMPLETE also blocks a second attempt across instances /
+        # browser sessions. Once a webhook flips the status off
+        # INCOMPLETE, this check stops applying.
+        if (
+            existing_subscription
+            and existing_subscription.status == SubscriptionStatus.INCOMPLETE
+            and existing_subscription.current_period_end is not None
+        ):
+            last_touched = existing_subscription.current_period_end
+            if last_touched.tzinfo is None:
+                last_touched = last_touched.replace(tzinfo=timezone.utc)
+            if last_touched >= datetime.now(timezone.utc) - _PENDING_CHECKOUT_TTL:
+                raise HTTPException(
+                    status_code=status.HTTP_409_CONFLICT,
+                    detail="A checkout is already in progress. Please complete or cancel it before starting a new one.",
+                )
+
         # Enforce the Guild Master seat cap on new checkouts. Serialize the
         # read/modify window with an advisory lock so concurrent checkouts
-        # can't both pass at taken=29.
+        # can't both pass at taken=29. _guild_master_seats_taken now also
+        # counts recent INCOMPLETE Performer rows, so the cap holds even
+        # before a webhook arrives — see H3 in the audit.
         if request_data.price_id == PERFORMER_PRICE_ID:
             _lock_guild_master_seats(db)
             if _guild_master_seats_taken(db) >= GUILD_MASTER_SEAT_CAP:
@@ -335,9 +439,31 @@ def create_checkout_session(
                 "user_id": str(current_user.id),
                 "normalized_email": normalize_email_for_dedup(current_user.email),
             }
-            existing_customers = stripe.Customer.list(email=current_user.email, limit=1)
-            if existing_customers.data:
-                customer = existing_customers.data[0]
+            # M3: list up to 10 customers, not 1. Stripe sometimes ends up
+            # with multiple customers under the same email (manual dashboard
+            # creation, retry races, support-tooling spawns). Picking just
+            # data[0] arbitrarily means later attempts may pick a different
+            # one — and the metadata backfill (which feeds the trial-abuse
+            # alias-lookup at _email_has_prior_stripe_subscription) only
+            # touches the chosen one, leaving siblings unenriched.
+            existing_customers = stripe.Customer.list(email=current_user.email, limit=10)
+            candidates = list(existing_customers.data)
+            customer = None
+            if candidates:
+                # Prefer the customer whose metadata.user_id matches the
+                # current logged-in user — that's a definitive match and
+                # avoids consolidating onto a stranger's customer if the
+                # email got reused after a prior account was deleted.
+                target_uid = str(current_user.id)
+                for c in candidates:
+                    if (c.metadata or {}).get("user_id") == target_uid:
+                        customer = c
+                        break
+                # Fall back to data[0] (Stripe orders by created desc, so
+                # this is the newest — same default behavior as before).
+                if customer is None:
+                    customer = candidates[0]
+
                 # Ensure both metadata fields are attached. We compare each
                 # key individually because Stripe.modify replaces metadata
                 # wholesale only if we pass it; an existing customer could
@@ -345,32 +471,53 @@ def create_checkout_session(
                 # Stripe customer pre-dating this guard).
                 existing_md = customer.metadata or {}
                 if any(existing_md.get(k) != v for k, v in customer_metadata.items()):
-                    stripe.Customer.modify(customer.id, metadata=customer_metadata)
+                    stripe.Customer.modify(
+                        customer.id,
+                        metadata=customer_metadata,
+                        idempotency_key=f"cust_modify:{customer.id}:{operation_id}",
+                    )
             else:
                 customer = stripe.Customer.create(
                     email=current_user.email,
                     metadata=customer_metadata,
+                    idempotency_key=f"cust_create:{current_user.id}:{operation_id}",
                 )
             stripe_customer_id = customer.id
-            
-            # Update or create subscription record with stripe_customer_id
+
+            # Update or create subscription record with stripe_customer_id.
+            # Stamp tier=intended_tier (H3 seat counting) and a fresh
+            # current_period_end timestamp (H2 recent-INCOMPLETE marker).
             if not current_user.subscription:
                 new_subscription = Subscription(
                     id=uuid.uuid4(),
                     user_id=current_user.id,
                     stripe_customer_id=stripe_customer_id,
-                    status=SubscriptionStatus.INCOMPLETE,  # Will be updated by webhook
-                    tier=SubscriptionTier.ROOKIE,  # Default, will be updated
-                    current_period_end=datetime.now(timezone.utc)  # Placeholder
+                    status=SubscriptionStatus.INCOMPLETE,
+                    tier=intended_tier,
+                    current_period_end=intended_period_end,
                 )
                 db.add(new_subscription)
             else:
                 current_user.subscription.stripe_customer_id = stripe_customer_id
                 current_user.subscription.status = SubscriptionStatus.INCOMPLETE
-            db.commit()
+                current_user.subscription.tier = intended_tier
+                current_user.subscription.current_period_end = intended_period_end
+            # H2: flush, don't commit. Committing would release the
+            # per-user advisory lock before we've created the Stripe
+            # Checkout Session, reopening the trial-eligibility race.
+            # The transaction is committed at the end of the handler.
+            db.flush()
             # Only refresh the subscription relationship — full graph refresh
             # is expensive and unnecessary here.
             db.refresh(current_user, attribute_names=["subscription"])
+        else:
+            # Existing customer reused. Still stamp the row's tier and
+            # touch timestamp so seat counting and recent-INCOMPLETE see
+            # this attempt instead of an old one.
+            current_user.subscription.status = SubscriptionStatus.INCOMPLETE
+            current_user.subscription.tier = intended_tier
+            current_user.subscription.current_period_end = intended_period_end
+            db.flush()
 
         # 7-day free trial is offered once per user, on their first paid
         # subscription attempt. After that (canceled-and-returning customers,
@@ -399,10 +546,23 @@ def create_checkout_session(
             cancel_url=safe_cancel_url,
             metadata={"user_id": str(current_user.id)},
             trial_period_days=trial_period_days,
+            idempotency_key=f"checkout:{current_user.id}:{operation_id}",
         )
+
+        # H2: commit now — *before* analytics — so the per-user advisory
+        # lock and the seat-cap lock are held through the trial-eligibility
+        # check and the Stripe Checkout creation. If the Stripe call had
+        # raised above, the except blocks below would db.rollback() and
+        # release the locks without persisting an orphaned INCOMPLETE row.
+        # From this commit onward, any concurrent create_checkout_session
+        # for this user will see the recent-INCOMPLETE row (committed
+        # here) and 409 via the recent-INCOMPLETE guard.
+        db.commit()
 
         # Fire InitiateCheckout to Meta CAPI. Value reflects the tier's list
         # price so Meta's bidder can prioritise high-value checkouts.
+        # track_event commits its own row internally — failures inside it
+        # cannot roll back the checkout state we just persisted.
         tier_value = 59.0 if request_data.price_id == PERFORMER_PRICE_ID else 39.0
         tier_name = "performer" if request_data.price_id == PERFORMER_PRICE_ID else "advanced"
         analytics_event_id = None
@@ -430,11 +590,19 @@ def create_checkout_session(
             url=checkout_session.url,
             analytics_event_id=analytics_event_id,
         )
+    except HTTPException:
+        # Make sure validation/business-rule rejections release locks and
+        # discard any pending row writes (e.g. a flushed INCOMPLETE row
+        # that we never want to keep on a 4xx).
+        db.rollback()
+        raise
     except stripe.error.StripeError as e:
         logger.error(f"Stripe error creating checkout session for user {current_user.id}: {e}")
+        db.rollback()
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Payment processing error. Please try again.")
     except Exception as e:
         logger.error(f"Unexpected error creating checkout session for user {current_user.id}: {e}")
+        db.rollback()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail="An unexpected error occurred. Please try again."
@@ -475,17 +643,34 @@ async def stripe_webhook(
         logger.warning(f"Invalid Stripe webhook signature: {e}")
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid signature")
 
-    # Idempotency guard — Stripe retries webhooks on any 5xx, and replays are
-    # legal. Without this, invoice.payment_succeeded would re-grant XP/bonuses
-    # on every retry. Insert the event id first; if it already exists, we've
-    # already processed this event and should no-op with 200.
-    try:
-        db.add(StripeWebhookEvent(event_id=event["id"], event_type=event["type"]))
-        db.commit()
-    except IntegrityError:
-        db.rollback()
-        logger.info(f"Stripe webhook {event['id']} ({event['type']}) already processed — skipping")
+    # Idempotency guard — Stripe retries webhooks on any 5xx, and replays
+    # are legal. Without this, invoice.payment_succeeded would re-grant
+    # XP/bonuses on every retry.
+    #
+    # Pattern: SELECT-then-INSERT-at-end. Previously the row was inserted
+    # *before* processing — that meant any transient handler failure
+    # (Stripe API blip, DB hiccup) committed the idempotency row first
+    # and silently dropped Stripe's retry, permanently losing the event.
+    # Now we only mark as processed once the handler has run cleanly. On
+    # failure we return 5xx so Stripe retries. The trade-off: two
+    # near-simultaneous retries from Stripe could both pass the SELECT;
+    # the unique-PK INSERT at the end catches the race (work has already
+    # been done by both, but each operation in the handlers below is
+    # designed to be idempotent — set tier=X, set status=Y, the
+    # subscription_bonus reason key, etc.).
+    already_processed = db.query(StripeWebhookEvent).filter(
+        StripeWebhookEvent.event_id == event["id"]
+    ).first()
+    if already_processed:
+        logger.info(
+            f"Stripe webhook {event['id']} ({event['type']}) already "
+            f"processed — skipping"
+        )
         return {"status": "already_processed"}
+
+    # Set to True only by handlers whose core work raised. We refuse to
+    # mark the event processed in that case, so Stripe will retry.
+    webhook_handler_failed = False
 
     # Resolve a Stripe subscription payload to our internal tier enum. We
     # match on price.id against the hard-coded constants first (most robust —
@@ -545,6 +730,51 @@ async def stripe_webhook(
         db_subscription = db.query(Subscription).filter(
             Subscription.stripe_customer_id == customer_id
         ).first()
+
+        # Metadata fallback. The customer_id lookup misses in two real
+        # scenarios: (a) the subscription was created externally (Stripe
+        # dashboard, support tooling, promo) so no INCOMPLETE row exists
+        # yet, and (b) the local row is stamped with an older
+        # stripe_customer_id (e.g. user wiped + re-created with the same
+        # email, where create_checkout_session reuses the old customer).
+        # Without a fallback, this entire handler silently no-ops:
+        # has_used_trial never flips, tier never promotes, badges never
+        # revoke. Mirror the metadata-fallback pattern from
+        # invoice.payment_succeeded.
+        if not db_subscription:
+            user_id_from_metadata = (sub_obj.get("metadata") or {}).get("user_id")
+            if user_id_from_metadata:
+                try:
+                    user_uuid = uuid.UUID(user_id_from_metadata)
+                except (ValueError, TypeError):
+                    logger.warning(
+                        f"webhook {event['type']}: invalid user_id metadata "
+                        f"{user_id_from_metadata!r} on sub {stripe_sub_id}"
+                    )
+                    user_uuid = None
+                if user_uuid and db.query(User).filter(User.id == user_uuid).first():
+                    db_subscription = db.query(Subscription).filter(
+                        Subscription.user_id == user_uuid
+                    ).first()
+                    if db_subscription:
+                        # Local row exists for this user but under a different
+                        # stripe_customer_id. Re-stamp it so future webhooks
+                        # for this customer find it directly.
+                        db_subscription.stripe_customer_id = customer_id
+                    else:
+                        # No local row at all (externally-created sub) —
+                        # create one in INCOMPLETE state. The block below
+                        # will immediately promote it based on stripe_status.
+                        db_subscription = Subscription(
+                            id=uuid.uuid4(),
+                            user_id=user_uuid,
+                            stripe_customer_id=customer_id,
+                            status=SubscriptionStatus.INCOMPLETE,
+                            tier=SubscriptionTier.ROOKIE,
+                            current_period_end=datetime.now(timezone.utc),
+                        )
+                        db.add(db_subscription)
+                        db.flush()
 
         if db_subscription:
             # Always mirror the Stripe status, including past_due / canceled /
@@ -615,6 +845,16 @@ async def stripe_webhook(
                     )
                 except Exception:
                     logger.exception("webhook: StartTrial tracking failed (non-fatal)")
+        else:
+            # Both lookups missed. Most likely the subscription was created
+            # in Stripe with no resolvable user_id metadata (e.g. legacy
+            # promo flow). Log loud — without state to mirror, this user's
+            # tier and trial flag will not get updated.
+            logger.warning(
+                f"webhook {event['type']}: no DB row for customer "
+                f"{customer_id} and no resolvable user_id metadata on "
+                f"sub {stripe_sub_id} — state not mirrored"
+            )
 
     if event["type"] == "invoice.payment_succeeded":
         invoice = event["data"]["object"]
@@ -745,15 +985,18 @@ async def stripe_webhook(
                                 )
 
             except stripe.error.StripeError as e:
-                # Never raise 5xx from a webhook handler — Stripe will retry
-                # and our idempotency row has already been committed, which
-                # means the retry would be swallowed as "already_processed"
-                # OR (worse) loop forever depending on timing. Log and ack.
+                # Core processing failed (Stripe API blip on retrieve, etc.).
+                # Don't mark the event as processed — let Stripe retry. The
+                # 503 returned at the bottom of the handler is what triggers
+                # the retry; here we just rollback our partial DB writes
+                # and signal the failure via webhook_handler_failed.
                 logger.error(f"Stripe API error retrieving subscription {subscription_id}: {e}")
                 db.rollback()
+                webhook_handler_failed = True
             except Exception as e:
                 logger.exception(f"Error processing invoice.payment_succeeded for subscription {subscription_id}: {e}")
                 db.rollback()
+                webhook_handler_failed = True
 
     elif event["type"] == "customer.subscription.deleted":
         subscription = event["data"]["object"]
@@ -915,7 +1158,12 @@ async def stripe_webhook(
                 SubscriptionStatus.PAST_DUE,
             ):
                 try:
-                    stripe.Subscription.delete(db_subscription.stripe_subscription_id)
+                    # L1: key off the webhook event id so a Stripe retry of
+                    # this same charge.refunded event doesn't double-cancel.
+                    stripe.Subscription.delete(
+                        db_subscription.stripe_subscription_id,
+                        idempotency_key=f"sub_delete_refund:{event['id']}",
+                    )
                     logger.info(
                         f"charge.refunded: cancelled Stripe sub {db_subscription.stripe_subscription_id} "
                         f"after full refund of charge {charge.get('id')}"
@@ -987,7 +1235,12 @@ async def stripe_webhook(
         # Cancel in Stripe (idempotent: already-cancelled raises InvalidRequest)
         if db_subscription.stripe_subscription_id:
             try:
-                stripe.Subscription.delete(db_subscription.stripe_subscription_id)
+                # L1: key off the webhook event id so a Stripe retry of this
+                # same dispute event doesn't double-cancel.
+                stripe.Subscription.delete(
+                    db_subscription.stripe_subscription_id,
+                    idempotency_key=f"sub_delete_dispute:{event['id']}",
+                )
             except stripe.error.InvalidRequestError:
                 pass
             except stripe.error.StripeError:
@@ -1041,6 +1294,28 @@ async def stripe_webhook(
         except Exception:
             logger.exception("webhook: SubscriptionDisputed tracking failed (non-fatal)")
 
+    # Refuse to mark a failed event as processed — return 5xx so Stripe
+    # retries with the same event id, and a future call will re-enter
+    # the handler from the top.
+    if webhook_handler_failed:
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail="Webhook processing failed; will retry",
+        )
+
+    # Mark as processed. IntegrityError here means a near-simultaneous
+    # retry inserted first — the work has been done by both, but our
+    # handlers are designed to be idempotent so this is safe.
+    try:
+        db.add(StripeWebhookEvent(event_id=event["id"], event_type=event["type"]))
+        db.commit()
+    except IntegrityError:
+        db.rollback()
+        logger.info(
+            f"Stripe webhook {event['id']} ({event['type']}) marked "
+            f"already_processed concurrently — both runs completed"
+        )
+
     return {"status": "success"}
 
 
@@ -1054,6 +1329,7 @@ def update_subscription(
     Update an existing subscription (upgrade or downgrade).
     Changes the subscription to a new price tier.
     """
+    operation_id = str(uuid.uuid4())  # L1: idempotency-key basis
     try:
         # Validate price_id
         if request_data.new_price_id not in [ADVANCED_PRICE_ID, PERFORMER_PRICE_ID]:
@@ -1123,11 +1399,15 @@ def update_subscription(
         # NOTE (security): `always_invoice` on downgrade issues a prorated
         # credit immediately. A user could theoretically churn
         # upgrade→downgrade→upgrade to harvest Guild Master perks without
-        # paying full price. Proper fix is to defer downgrades to period end
-        # via stripe.SubscriptionSchedule — tracked as a followup. For now the
-        # one-time `subscription_bonus:<tier>` guard in clave_service prevents
-        # XP farming, and Guild Master seat cap enforcement (#4) keeps repeat
-        # upgrades gated by seat availability.
+        # paying full price. The exposure is bounded by two existing
+        # guardrails: the one-time `subscription_bonus:<tier>` reason key
+        # in clave_service prevents farming the XP/badge bonuses, and the
+        # 30-seat Guild Master cap (which now includes recent INCOMPLETE
+        # checkouts via H3) gates repeat upgrades on seat availability.
+        # Deferring downgrades via stripe.SubscriptionSchedule was
+        # considered and rejected — the UX cost (immediate downgrade
+        # confirmation copy, modal flow, expectations users carry over
+        # from other SaaS) outweighed the bounded financial exposure.
         modify_kwargs: Dict[str, Any] = {
             "items": [{
                 "id": subscription_item_id,
@@ -1152,6 +1432,7 @@ def update_subscription(
         updated_subscription = stripe.Subscription.modify(
             subscription.stripe_subscription_id,
             **modify_kwargs,
+            idempotency_key=f"sub_modify:{subscription.stripe_subscription_id}:{operation_id}",
         )
 
         # Determine the new tier based on price_id
@@ -1196,13 +1477,13 @@ def update_subscription(
             subscription.status = SubscriptionStatus.ACTIVE
         db.commit()
         db.refresh(subscription)
-        
+
         return SubscriptionResponse(
             success=True,
             message="Subscription updated successfully.",
             tier=new_tier.value
         )
-        
+
     except stripe.error.StripeError:
         logger.exception(f"Stripe error updating subscription for user {current_user.id}")
         raise HTTPException(
@@ -1229,6 +1510,7 @@ def cancel_subscription(
     User retains full tier access until `current_period_end`, then the
     `customer.subscription.deleted` webhook drops them to Rookie.
     """
+    operation_id = str(uuid.uuid4())  # L1: idempotency-key basis
     try:
         subscription = db.query(Subscription).filter(
             Subscription.user_id == current_user.id
@@ -1265,6 +1547,7 @@ def cancel_subscription(
         stripe.Subscription.modify(
             subscription.stripe_subscription_id,
             cancel_at_period_end=True,
+            idempotency_key=f"sub_cancel:{subscription.stripe_subscription_id}:{operation_id}",
         )
 
         subscription.cancel_at_period_end = True
@@ -1299,6 +1582,7 @@ def resume_subscription(
     Undo a scheduled cancellation. Only valid while the subscription is still
     active but flagged `cancel_at_period_end=True`.
     """
+    operation_id = str(uuid.uuid4())  # L1: idempotency-key basis
     try:
         subscription = db.query(Subscription).filter(
             Subscription.user_id == current_user.id
@@ -1311,6 +1595,7 @@ def resume_subscription(
         stripe.Subscription.modify(
             subscription.stripe_subscription_id,
             cancel_at_period_end=False,
+            idempotency_key=f"sub_resume:{subscription.stripe_subscription_id}:{operation_id}",
         )
         subscription.cancel_at_period_end = False
         db.commit()
@@ -1355,6 +1640,7 @@ def create_portal_session(
     Auth-only. The portal session is scoped to this user's Stripe customer,
     so an authenticated request can never reach a different user's billing.
     """
+    operation_id = str(uuid.uuid4())  # L1: idempotency-key basis
     try:
         safe_return_url = _validate_return_url(request_data.return_url, "return_url")
 
@@ -1370,6 +1656,7 @@ def create_portal_session(
         portal_session = stripe.billing_portal.Session.create(
             customer=subscription.stripe_customer_id,
             return_url=safe_return_url,
+            idempotency_key=f"portal:{subscription.stripe_customer_id}:{operation_id}",
         )
         return PortalSessionResponse(url=portal_session.url)
     except HTTPException:
