@@ -3199,14 +3199,16 @@
     "Mambo101Edited__Basic_Step_1_Drill_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224241.5911005
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.0600533
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224241.6647782
         },
         "es": {
           "status": "translated",
@@ -3261,14 +3263,16 @@
     "Mambo101Edited__Basic_Step_1_Drill_2": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216150.0862837
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.0765946
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777216153.908082
         },
         "es": {
           "status": "translated",
