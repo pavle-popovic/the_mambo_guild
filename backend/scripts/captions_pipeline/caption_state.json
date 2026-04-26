@@ -3,14 +3,16 @@
     "BodymovementsEdited__Arm_Wave_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208592.1177611
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.3484006
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208623.7146866
         },
         "es": {
           "status": "translated",
@@ -65,14 +67,16 @@
     "BodymovementsEdited__Arm_Wave_Lesson": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208786.3160744
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.3781815
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208862.670212
         },
         "es": {
           "status": "translated",
@@ -127,14 +131,16 @@
     "BodymovementsEdited__Arm_Wave_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208883.5171628
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.3939407
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208887.3679833
         },
         "es": {
           "status": "translated",
@@ -189,14 +195,16 @@
     "BodymovementsEdited__Bodymovement_1_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777208978.7054317
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.4480648
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209023.6477308
         },
         "es": {
           "status": "translated",
@@ -251,14 +259,16 @@
     "BodymovementsEdited__Bodymovement_1_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209265.5290978
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.472316
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209365.3108048
         },
         "es": {
           "status": "translated",
