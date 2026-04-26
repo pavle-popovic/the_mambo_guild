@@ -323,14 +323,16 @@
     "BodymovementsEdited__Bodymovement_1_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209887.6672986
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.476072
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209891.1759157
         },
         "es": {
           "status": "translated",
@@ -385,14 +387,16 @@
     "BodymovementsEdited__Bodymovement_2_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209983.5134566
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.555987
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209987.3434296
         },
         "es": {
           "status": "translated",
@@ -509,14 +513,16 @@
     "BodymovementsEdited__Bodymovement_2_Preveiw": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209910.308361
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.592863
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209910.446933
         },
         "es": {
           "status": "translated",
@@ -571,14 +577,16 @@
     "BodymovementsEdited__Bodymovement_2_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209910.7251556
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.64397
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777209910.749745
         },
         "es": {
           "status": "translated",
