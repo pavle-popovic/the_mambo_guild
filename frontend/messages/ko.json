@@ -882,6 +882,10 @@
     "invalidFileType": "잘못된 파일 형식입니다"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "학습 계속하기",
+      "visitCommunity": "커뮤니티 방문하기"
+    },
     "hero": {
       "credentialBadge": "학습 경험 디자인 기반",
       "title": "세계 1위 게이미피케이션 온라인 살사 학교",

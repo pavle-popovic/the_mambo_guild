@@ -8,6 +8,7 @@ import { FaCalendarAlt, FaStar, FaTimes } from "react-icons/fa";
 import { HiSparkles } from "react-icons/hi";
 import { apiClient, type ReleaseScheduleItemDTO } from "@/lib/api";
 import { useTranslations } from "@/i18n/useTranslations";
+import { useAuth } from "@/contexts/AuthContext";
 
 // ============ DATA ============
 type ReleaseType = "choreo" | "course";
@@ -436,6 +437,8 @@ function CountdownHero({ release }: { release: ReleaseItem }) {
 // ============ LANDING SECTION ============
 export default function ReleaseScheduleSection() {
     const t = useTranslations("landing.releases");
+    const tSubscribed = useTranslations("landing.subscribed");
+    const { user } = useAuth();
     const items = useReleaseSchedule();
     const next = useNextRelease(items);
     return (
@@ -472,10 +475,10 @@ export default function ReleaseScheduleSection() {
                     className="mt-10 text-center md:mt-14"
                 >
                     <Link
-                        href="/register"
+                        href={user ? "/courses" : "/register"}
                         className="inline-flex items-center gap-2 rounded-full bg-gradient-to-r from-mambo-gold to-amber-500 px-6 py-3 text-sm font-bold text-black shadow-[0_0_20px_rgba(212,175,55,0.3)] transition-all hover:from-amber-500 hover:to-mambo-gold hover:shadow-[0_0_30px_rgba(212,175,55,0.5)] md:px-8 md:py-4 md:text-base"
                     >
-                        <FaCalendarAlt /> {t("cta")}
+                        <FaCalendarAlt /> {user ? tSubscribed("continueLearning") : t("cta")}
                     </Link>
                     <p className="mt-3 text-xs text-gray-500">{t("ctaHint")}</p>
                 </motion.div>

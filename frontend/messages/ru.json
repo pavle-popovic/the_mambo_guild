@@ -882,6 +882,10 @@
     "invalidFileType": "Недопустимый тип файла"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "Продолжить обучение",
+      "visitCommunity": "Посетить сообщество"
+    },
     "hero": {
       "credentialBadge": "Построено на основе Learning Experience Design",
       "title": "Онлайн-школа сальсы №1 в мире с геймификацией",

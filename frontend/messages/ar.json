@@ -882,6 +882,10 @@
     "invalidFileType": "نوع ملف غير صالح"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "متابعة التعلم",
+      "visitCommunity": "زيارة المجتمع"
+    },
     "hero": {
       "credentialBadge": "مبني على تصميم تجربة التعلّم",
       "title": "مدرسة السالسا أونلاين المُلعَّبة رقم 1 في العالم",

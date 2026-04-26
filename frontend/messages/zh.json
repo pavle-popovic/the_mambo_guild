@@ -882,6 +882,10 @@
     "invalidFileType": "无效的文件类型"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "继续学习",
+      "visitCommunity": "访问社区"
+    },
     "hero": {
       "credentialBadge": "基于学习体验设计打造",
       "title": "全球第一的游戏化在线萨尔萨学校",

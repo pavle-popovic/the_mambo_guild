@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import Link from "next/link";
 import { FaTimes } from "react-icons/fa";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LevelSelectionModalProps {
     isOpen: boolean;
@@ -30,6 +31,7 @@ const levelContent = {
 };
 
 export default function LevelSelectionModal({ isOpen, onClose, levelTitle }: LevelSelectionModalProps) {
+    const { user } = useAuth();
     // Prevent scrolling when modal is open
     useEffect(() => {
         if (isOpen) {
@@ -104,12 +106,14 @@ export default function LevelSelectionModal({ isOpen, onClose, levelTitle }: Lev
                             {/* CTA Footer */}
                             <div className="p-8 pt-4 bg-black/20 text-center">
                                 <Link
-                                    href={`/register?level=${encodeURIComponent(levelTitle)}`}
+                                    href={user ? "/courses" : `/register?level=${encodeURIComponent(levelTitle)}`}
                                     className="inline-block w-full py-4 bg-amber-400 hover:bg-amber-500 text-zinc-950 font-bold text-lg rounded-xl transition-all shadow-[0_0_20px_rgba(251,191,36,0.2)] hover:shadow-[0_0_30px_rgba(251,191,36,0.4)] hover:scale-[1.02]"
                                 >
-                                    Create Free Profile to Watch Lesson 1
+                                    {user ? "Go to Courses" : "Create Free Profile to Watch Lesson 1"}
                                 </Link>
-                                <p className="text-zinc-500 text-xs mt-3">No credit card required. Instant access.</p>
+                                {!user && (
+                                    <p className="text-zinc-500 text-xs mt-3">No credit card required. Instant access.</p>
+                                )}
                             </div>
 
                         </motion.div>

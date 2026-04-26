@@ -882,6 +882,10 @@
     "invalidFileType": "Неисправан тип фајла"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "Nastavi učenje",
+      "visitCommunity": "Poseti zajednicu"
+    },
     "hero": {
       "credentialBadge": "Засновано на Learning Experience Design-у",
       "title": "Светска #1 геймификована онлајн школа Salse",

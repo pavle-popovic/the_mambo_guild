@@ -7,9 +7,12 @@ import { FaQuoteLeft, FaStar, FaUserCircle } from "react-icons/fa";
 import Link from "next/link";
 import { Clickable } from "@/components/ui/motion";
 import { useTranslations } from "@/i18n/useTranslations";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function TestimonialsSection() {
   const t = useTranslations("landing.testimonials");
+  const tSubscribed = useTranslations("landing.subscribed");
+  const { user } = useAuth();
   const [isPaused, setIsPaused] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -101,10 +104,10 @@ export default function TestimonialsSection() {
                       </p>
                       <Clickable>
                         <Link
-                          href="/register"
+                          href={user ? "/community" : "/register"}
                           className="px-4 sm:px-6 py-2 bg-gradient-to-r from-mambo-blue to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-full text-xs sm:text-sm transition-all shadow-lg shadow-blue-500/25"
                         >
-                          {t("ctaButton")}
+                          {user ? tSubscribed("visitCommunity") : t("ctaButton")}
                         </Link>
                       </Clickable>
                     </GlassCard>

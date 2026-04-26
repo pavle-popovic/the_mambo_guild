@@ -882,6 +882,10 @@
     "invalidFileType": "Geçersiz dosya türü"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "Öğrenmeye Devam Et",
+      "visitCommunity": "Topluluğu Ziyaret Et"
+    },
     "hero": {
       "credentialBadge": "Learning Experience Design üzerine kurulu",
       "title": "Dünyanın #1 Oyunlaştırılmış Online Salsa Okulu",

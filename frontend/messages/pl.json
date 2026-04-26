@@ -882,6 +882,10 @@
     "invalidFileType": "Nieprawidłowy typ pliku"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "Kontynuuj naukę",
+      "visitCommunity": "Odwiedź społeczność"
+    },
     "hero": {
       "credentialBadge": "Zbudowane na Learning Experience Design",
       "title": "Szkoła salsy online nr 1 z grywalizacją na świecie",

@@ -882,6 +882,10 @@
     "invalidFileType": "Invalid file type"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "Συνέχεια μάθησης",
+      "visitCommunity": "Επίσκεψη στην Κοινότητα"
+    },
     "hero": {
       "credentialBadge": "Βασισμένο στο Learning Experience Design",
       "title": "Η Νο 1 online σχολή σάλσας με gamification στον κόσμο",

@@ -6,9 +6,14 @@ import Link from "next/link";
 import { FaCheck, FaCertificate } from "react-icons/fa";
 import Mambobot from "./Mambobot";
 import { useTranslations } from "@/i18n/useTranslations";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function NewHero() {
     const t = useTranslations("landing.hero");
+    const tSubscribed = useTranslations("landing.subscribed");
+    const { user } = useAuth();
+    const ctaHref = user ? "/courses" : "/register";
+    const ctaLabel = user ? tSubscribed("continueLearning") : t("cta");
     const bulletPoints = [
         t("bulletNoPartner"),
         t("bulletLanguages"),
@@ -219,10 +224,10 @@ export default function NewHero() {
                             </span>
                         </div>
                         <Link
-                            href="/register"
+                            href={ctaHref}
                             className="relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3 px-7 xl:py-3.5 xl:px-8 rounded-full text-base xl:text-lg whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 landscape-phone:!py-2 landscape-phone:!px-4 landscape-phone:!text-[11px]"
                         >
-                            {t("cta")}
+                            {ctaLabel}
                         </Link>
                     </motion.div>
                 </motion.div>
@@ -244,10 +249,10 @@ export default function NewHero() {
                         </span>
                     </div>
                     <Link
-                        href="/register"
+                        href={ctaHref}
                         className="w-full relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-6 rounded-full text-sm transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50"
                     >
-                        {t("cta")}
+                        {ctaLabel}
                     </Link>
                 </motion.div>
             </div>

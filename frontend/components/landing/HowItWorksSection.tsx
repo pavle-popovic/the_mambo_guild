@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { useTranslations } from "@/i18n/useTranslations";
+import { useAuth } from "@/contexts/AuthContext";
 
 type PillarImageData = {
   src: string;
@@ -141,6 +142,8 @@ function PillarMedia({
 
 export default function HowItWorksSection() {
   const t = useTranslations("landing.howItWorks");
+  const tSubscribed = useTranslations("landing.subscribed");
+  const { user } = useAuth();
 
   const pillars: Pillar[] = [
     {
@@ -394,10 +397,10 @@ export default function HowItWorksSection() {
               </p>
               <div className="mt-8 flex items-center justify-center landscape-phone:mt-5">
                 <Link
-                  href="/register"
+                  href={user ? "/courses" : "/register"}
                   className="w-full sm:w-auto bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-8 rounded-full text-base sm:text-lg tracking-wide shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm"
                 >
-                  {t("closingCta")}
+                  {user ? tSubscribed("continueLearning") : t("closingCta")}
                 </Link>
               </div>
             </div>

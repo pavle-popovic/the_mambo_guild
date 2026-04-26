@@ -882,6 +882,10 @@
     "invalidFileType": "Ongeldig bestandstype"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "Doorgaan met leren",
+      "visitCommunity": "Bezoek de community"
+    },
     "hero": {
       "credentialBadge": "Gebouwd op Learning Experience Design",
       "title": "'s Werelds #1 gamified online salsaschool",

@@ -882,6 +882,10 @@
     "invalidFileType": "無効なファイルタイプです"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "学習を続ける",
+      "visitCommunity": "コミュニティを訪問"
+    },
     "hero": {
       "credentialBadge": "ラーニング・エクスペリエンス・デザインに基づいて設計",
       "title": "世界No.1のゲーミフィケーション型オンラインサルサ教室",

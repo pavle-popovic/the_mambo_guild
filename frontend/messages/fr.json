@@ -882,6 +882,10 @@
     "invalidFileType": "Type de fichier invalide"
   },
   "landing": {
+    "subscribed": {
+      "continueLearning": "Continuer l'apprentissage",
+      "visitCommunity": "Visiter la communauté"
+    },
     "hero": {
       "credentialBadge": "Fondé sur le Learning Experience Design",
       "title": "L'école de salsa en ligne gamifiée n°1 au monde",

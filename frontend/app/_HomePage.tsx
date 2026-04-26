@@ -23,6 +23,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 export default function HomePage() {
     const { user } = useAuth();
     const t = useTranslations("landing");
+    const tSubscribed = useTranslations("landing.subscribed");
     const [showStickyCta, setShowStickyCta] = useState(false);
 
     // Show sticky CTA after scrolling past the hero
@@ -102,10 +103,10 @@ export default function HomePage() {
             >
                 <div className="bg-black/60 backdrop-blur-xl border-t border-white/15 px-4 py-3 sm:py-4 flex items-center justify-center shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
                     <Link
-                        href="/register"
+                        href={user ? "/courses" : "/register"}
                         className="w-full max-w-md bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] hover:bg-[linear-gradient(135deg,#FCE205_20%,#D4AF37_100%)] text-black font-extrabold py-3.5 sm:py-4 px-8 rounded-full text-base sm:text-lg active:scale-[0.97] transition-all text-center shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 tracking-wide"
                     >
-                        {t("stickyCta")}
+                        {user ? tSubscribed("continueLearning") : t("stickyCta")}
                     </Link>
                 </div>
             </div>
