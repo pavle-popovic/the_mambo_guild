@@ -40,7 +40,11 @@ const PUBLIC_WHEN_WAITLIST = [
     '/waitlist', '/api', '/_next', '/favicon.ico',
     '/login', '/register', '/forgot-password', '/reset-password',
     '/beta', // magic-link landing that sets the bypass cookie
-    ...SEO_ROUTES.map((r) => r.path),
+    // SEO pillar/blog pages stay crawlable. The homepage is intentionally
+    // excluded — `/` as a startsWith pattern matches every URL, which would
+    // unlock the entire site. Hreflang/sitemap still advertise `/` because
+    // SEO_ROUTES is unchanged; only the waitlist whitelist drops it.
+    ...SEO_ROUTES.map((r) => r.path).filter((p) => p !== '/'),
 ];
 
 export async function middleware(request: NextRequest) {
