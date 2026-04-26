@@ -451,14 +451,16 @@
     "BodymovementsEdited__Bodymovement_2_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210495.45339
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594242.5785506
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777210495.493634
         },
         "es": {
           "status": "translated",
