@@ -1795,14 +1795,16 @@
     "BodymovementsEdited__Knee_1_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213870.3398159
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.4360266
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213870.3418965
         },
         "es": {
           "status": "translated",
@@ -1857,14 +1859,16 @@
     "BodymovementsEdited__Knee_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213870.103235
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.451398
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213870.105298
         },
         "es": {
           "status": "translated",
@@ -1919,14 +1923,16 @@
     "BodymovementsEdited__Knee_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213866.2684572
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.465016
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213869.788475
         },
         "es": {
           "status": "translated",
