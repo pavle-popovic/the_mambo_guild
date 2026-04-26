@@ -3771,14 +3771,16 @@
     "Mambo101Edited__Basic_Step_3_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224860.7732337
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.3271544
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777224860.7928724
         },
         "es": {
           "status": "translated",
