@@ -302,7 +302,9 @@ export default function PostDetailModal({
     try {
       await apiClient.updatePost(postId, {
         title: editTitle.trim(),
-        body: post.post_type === "lab" ? editBody.trim() : undefined,
+        // Stage notes are optional — send "" (not undefined) so a user can
+        // clear the note. Lab questions enforce non-empty above.
+        body: post.post_type === "lab" ? editBody.trim() : editBody,
         tags: editTags,
         is_wip: editIsWip,
         feedback_type: editFeedbackType,
@@ -760,27 +762,28 @@ export default function PostDetailModal({
                   </div>
                 )}
 
-                {/* Body (for Lab posts) */}
-                {post.post_type === "lab" && (
-                  isEditing ? (
-                    <div className="mb-4">
-                      <label className="block text-sm font-medium text-white/70 mb-2">
-                        {t("questionBodyLabel")}
-                      </label>
-                      <textarea
-                        value={editBody}
-                        onChange={(e) => setEditBody(e.target.value)}
-                        rows={6}
-                        className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-none"
-                        placeholder={t("questionBodyPlaceholder")}
-                      />
-                    </div>
-                  ) : post.body ? (
-                    <div className="mb-6 p-4 bg-white/5 rounded-lg">
-                      <p className="text-white/80 whitespace-pre-wrap">{post.body}</p>
-                    </div>
-                  ) : null
-                )}
+                {/* Body — Lab posts use it for the question text, stage posts
+                    use it for the optional "What you worked on" note. The
+                    composer captures this for both types but it was previously
+                    rendered only for Lab; stage notes were silently invisible. */}
+                {isEditing ? (
+                  <div className="mb-4">
+                    <label className="block text-sm font-medium text-white/70 mb-2">
+                      {post.post_type === "lab" ? t("questionBodyLabel") : t("contextLabel")}
+                    </label>
+                    <textarea
+                      value={editBody}
+                      onChange={(e) => setEditBody(e.target.value)}
+                      rows={post.post_type === "lab" ? 6 : 3}
+                      className="w-full px-4 py-2 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/40 focus:outline-none focus:ring-2 focus:ring-amber-500/50 resize-none"
+                      placeholder={post.post_type === "lab" ? t("questionBodyPlaceholder") : t("contextPlaceholder")}
+                    />
+                  </div>
+                ) : post.body ? (
+                  <div className="mb-6 p-4 bg-white/5 rounded-lg">
+                    <p className="text-white/80 whitespace-pre-wrap">{post.body}</p>
+                  </div>
+                ) : null}
 
                 {/* Edit Options */}
                 {isEditing && (
