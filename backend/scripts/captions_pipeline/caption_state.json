@@ -4157,14 +4157,16 @@
     "Mambo101Edited__Combo_2_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231836.514367
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.4660416
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231836.518915
         },
         "es": {
           "status": "translated",
@@ -5351,14 +5353,16 @@
     "Mambo101Edited__Styling_1_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231800.6069252
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.9181626
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231800.6504984
         },
         "es": {
           "status": "translated",
