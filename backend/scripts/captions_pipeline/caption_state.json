@@ -3967,14 +3967,16 @@
     "Mambo101Edited__Combo_1_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231035.7647276
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.4095535
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777231035.7736018
         },
         "es": {
           "status": "translated",
@@ -4091,14 +4093,16 @@
     "Mambo101Edited__Combo_1_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777230960.988091
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.4324937
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777230961.0058088
         },
         "es": {
           "status": "translated",
@@ -4277,14 +4281,16 @@
     "Mambo101Edited__Combo_2_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777230961.2333617
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.5108964
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777230961.2507443
         },
         "es": {
           "status": "translated",
@@ -4463,14 +4469,16 @@
     "Mambo101Edited__Combo_3_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777230961.493916
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.5862045
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777230961.5142474
         },
         "es": {
           "status": "translated",
@@ -4773,14 +4781,16 @@
     "Mambo101Edited__Combo_4_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777230961.7421777
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.6991196
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777230961.7560833
         },
         "es": {
           "status": "translated",
