@@ -4921,14 +4921,16 @@
     "Mambo101Edited__Flares_1_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777244049.6629145
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.7600257
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777244049.9986038
         },
         "es": {
           "status": "translated",
