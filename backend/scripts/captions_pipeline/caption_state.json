@@ -1597,14 +1597,16 @@
     "BodymovementsEdited__Hips_Lesson_2": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213380.3497567
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.2005372
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213384.1682642
         },
         "es": {
           "status": "translated",
@@ -1659,14 +1661,16 @@
     "BodymovementsEdited__Hips_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213296.875924
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.2827578
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213300.419291
         },
         "es": {
           "status": "translated",
@@ -1721,14 +1725,16 @@
     "BodymovementsEdited__IntroBodymovement": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213300.7890866
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.393937
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777213300.7916324
         },
         "es": {
           "status": "translated",
