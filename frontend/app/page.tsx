@@ -1,114 +1,36 @@
-"use client";
+import type { Metadata } from "next";
+import { SITE_URL, SITE_NAME } from "@/lib/site";
+import { hreflangAlternates } from "@/i18n/seo-routing";
+import { getLandingMeta } from "./_seo/landing-meta";
+import HomePage from "./_HomePage";
 
-import { useState, useEffect } from "react";
-import {
-    NewHero,
-    FounderAuthorityStrip,
-    TrendingModulesSection,
-    HowItWorksSection,
-    SkillTreeTeaser,
-    ReleaseScheduleSection,
-    TestimonialsSection,
-    LandingPricingSection,
-    FAQSection,
-    LandingSchemas,
-} from "@/components/landing";
-import NavBar from "@/components/NavBar";
-import Footer from "@/components/Footer";
-import Link from "next/link";
+const PAGE_PATH = "/";
 
-import { useAuth } from "@/contexts/AuthContext";
-import { useTranslations } from "@/i18n/useTranslations";
+const { title, description } = getLandingMeta(PAGE_PATH, "en");
 
-export default function HomePage() {
-    const { user } = useAuth();
-    const t = useTranslations("landing");
-    const [showStickyCta, setShowStickyCta] = useState(false);
+export const metadata: Metadata = {
+    title,
+    description,
+    alternates: {
+        canonical: PAGE_PATH,
+        languages: hreflangAlternates(PAGE_PATH),
+    },
+    openGraph: {
+        type: "website",
+        url: SITE_URL,
+        title,
+        description,
+        siteName: SITE_NAME,
+        images: [{ url: "/opengraph-image", width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: ["/opengraph-image"],
+    },
+};
 
-    // Show sticky CTA after scrolling past the hero
-    useEffect(() => {
-        const handleScroll = () => {
-            setShowStickyCta(window.scrollY > window.innerHeight * 0.5);
-        };
-        window.addEventListener("scroll", handleScroll, { passive: true });
-        return () => window.removeEventListener("scroll", handleScroll);
-    }, []);
-
-    return (
-        <>
-            {/* Navigation Bar */}
-            <NavBar user={user || undefined} />
-
-            <main className="min-h-screen text-white selection:bg-[#39FF14] selection:text-black overflow-x-hidden relative">
-                {/* Hero Section - with chatbot included */}
-                <section className="relative min-h-screen z-10">
-                    <NewHero />
-                </section>
-
-                {/* Founder Authority Strip — social proof / credibility */}
-                <section className="relative z-10">
-                    <FounderAuthorityStrip />
-                </section>
-
-                {/* Trending Modules Carousel */}
-                <section className="relative z-10">
-                    <TrendingModulesSection />
-                </section>
-
-                {/* How It Works — 5-pillar conversion showcase */}
-                <section className="relative z-10">
-                    <HowItWorksSection />
-                </section>
-
-                {/* Skill Tree / Gamification Teaser */}
-                <section className="relative z-10">
-                    <SkillTreeTeaser />
-                </section>
-
-                {/* Release Calendar / Upcoming Drops */}
-                <section className="relative z-10">
-                    <ReleaseScheduleSection />
-                </section>
-
-                {/* Testimonials */}
-                <section className="relative z-10">
-                    <TestimonialsSection />
-                </section>
-
-                {/* Pricing — conversion close with grandfather urgency + cancel-anytime */}
-                <section className="relative z-10" id="pricing">
-                    <LandingPricingSection />
-                </section>
-
-                {/* FAQ — schema.org FAQPage for GEO + SEO */}
-                <section className="relative z-10">
-                    <FAQSection />
-                </section>
-
-                {/* Structured data for GEO: Course + VideoObject + Breadcrumb */}
-                <LandingSchemas />
-
-                {/* Footer — add bottom padding on mobile for sticky CTA */}
-                <div className="pb-16">
-                    <Footer />
-                </div>
-            </main>
-
-            {/* Sticky bottom CTA — appears after scrolling past hero */}
-            <div
-                className={`mobile-sticky-cta fixed bottom-0 left-0 right-0 z-50 transition-all duration-500 ${
-                    showStickyCta ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
-                }`}
-            >
-                <div className="bg-black/60 backdrop-blur-xl border-t border-white/15 px-4 py-3 sm:py-4 flex items-center justify-center shadow-[0_-8px_32px_rgba(0,0,0,0.5)]">
-                    <Link
-                        href="/register"
-                        className="w-full max-w-md bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] hover:bg-[linear-gradient(135deg,#FCE205_20%,#D4AF37_100%)] text-black font-extrabold py-3.5 sm:py-4 px-8 rounded-full text-base sm:text-lg active:scale-[0.97] transition-all text-center shadow-[0_0_25px_rgba(252,226,5,0.4),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 tracking-wide"
-                    >
-                        {t("stickyCta")}
-                    </Link>
-                </div>
-            </div>
-        </>
-    );
+export default function Home() {
+    return <HomePage />;
 }

@@ -28,6 +28,13 @@ const ALL_NON_EN: readonly Exclude<Locale, "en">[] = [
 
 /** Routes that opt into URL-based locale routing. */
 export const SEO_ROUTES: readonly SeoRoute[] = [
+  // Tier 3 — landing surface (homepage + courses + pricing). Body content
+  // is served via the existing client pages, translations come from
+  // messages/*.json. SSR locale comes from app/[locale]/layout.tsx.
+  { path: "/",                         readyLocales: ALL_NON_EN },
+  { path: "/courses",                  readyLocales: ALL_NON_EN },
+  { path: "/pricing",                  readyLocales: ALL_NON_EN },
+  // Tier 2 — pillar marketing pages and blog hub.
   { path: "/blog",                     readyLocales: ALL_NON_EN },
   { path: "/blog/mambo-history",       readyLocales: ALL_NON_EN },
   { path: "/blog/the-85-percent-rule", readyLocales: ALL_NON_EN },
