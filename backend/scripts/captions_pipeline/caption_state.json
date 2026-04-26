@@ -4537,14 +4537,16 @@
     "Mambo101Edited__Combo_4_Drill_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777233845.2773805
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.625278
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777233845.2801294
         },
         "es": {
           "status": "translated",
