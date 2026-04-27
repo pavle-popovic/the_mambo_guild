@@ -2947,14 +2947,16 @@
     "BrunoMarsEdited__ChaChaChaBrunoMarsDanceLesson": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777277799.0678637
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594243.9706743
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777277799.0909827
         },
         "es": {
           "status": "translated",
