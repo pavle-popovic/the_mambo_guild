@@ -7299,14 +7299,16 @@
     "Mambo101Edited__Taps_1_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777282889.2578073
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.7501168
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777282892.8002272
         },
         "es": {
           "status": "translated",
