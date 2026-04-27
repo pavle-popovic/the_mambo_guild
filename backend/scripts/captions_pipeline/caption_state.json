@@ -7491,14 +7491,16 @@
     "Mambo101Edited__Taps_2_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777283382.0897434
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.83242
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777283382.091615
         },
         "es": {
           "status": "translated",
