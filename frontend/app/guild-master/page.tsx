@@ -261,8 +261,8 @@ export default function GuildMasterPage() {
     }
 
     const duration = await getVideoDuration(file);
-    if (duration && duration > 100) {
-      setUploadError("Video must be 100 seconds or less.");
+    if (duration && duration > 60) {
+      setUploadError(`Videos must be 60 seconds or shorter. Your video is ${Math.ceil(duration)}s — please trim it before uploading.`);
       setUploadStatus("error");
       return;
     }

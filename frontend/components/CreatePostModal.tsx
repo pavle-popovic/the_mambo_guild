@@ -64,7 +64,7 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
   const [muxAssetId] = useState<string | null>(null);
   const [muxPlaybackId] = useState<string | null>(null);
   const [videoDuration] = useState<number | null>(null);
-  const [, setUploadId] = useState<string | null>(null);
+  const [uploadId, setUploadId] = useState<string | null>(null);
   const [, setCreatedPostId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -110,12 +110,30 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
     );
   };
 
+  const MAX_VIDEO_SECONDS = 60;
+
   const handleVideoSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
 
     if (!file.type.startsWith("video/")) {
       alert(t("selectVideoFile"));
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+
+    // Check duration before anything else
+    const duration = await new Promise<number>((resolve) => {
+      const url = URL.createObjectURL(file);
+      const video = document.createElement("video");
+      video.preload = "metadata";
+      video.onloadedmetadata = () => { URL.revokeObjectURL(url); resolve(video.duration); };
+      video.onerror = () => { URL.revokeObjectURL(url); resolve(0); };
+      video.src = url;
+    });
+
+    if (duration > MAX_VIDEO_SECONDS) {
+      setError(`Videos must be ${MAX_VIDEO_SECONDS} seconds or shorter. Your video is ${Math.ceil(duration)}s — please trim it before uploading.`);
       if (fileInputRef.current) fileInputRef.current.value = "";
       return;
     }
@@ -229,11 +247,11 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 setUploadId(upload_id);
 
                 let pollCount = 0;
-                const maxPolls = 30;
+                const maxPolls = 150; // 5 minutes at 2s intervals — covers slow phone-video transcodes
                 const pollInterval = setInterval(async () => {
                   pollCount++;
                   try {
-                    const status = await apiClient.checkMuxUploadStatus(undefined, undefined, postId);
+                    const status = await apiClient.checkMuxUploadStatus(undefined, undefined, postId, undefined, upload_id);
                     if (status.status === "ready" && status.playback_id) {
                       clearInterval(pollInterval);
                       window.dispatchEvent(new Event("post-video-ready"));

@@ -597,12 +597,13 @@ class ApiClient {
     });
   }
 
-  async checkMuxUploadStatus(lessonId?: string, courseId?: string, postId?: string, levelId?: string) {
+  async checkMuxUploadStatus(lessonId?: string, courseId?: string, postId?: string, levelId?: string, uploadId?: string) {
     const params = new URLSearchParams();
     if (lessonId) params.append("lesson_id", lessonId);
     if (courseId) params.append("course_id", courseId);
     if (postId) params.append("post_id", postId);
     if (levelId) params.append("level_id", levelId);
+    if (uploadId) params.append("upload_id", uploadId);
 
     return this.request<{
       status: "ready" | "processing" | "error";

@@ -783,3 +783,105 @@ def ghost_reply(
     reply.moderation_status = ModerationStatus.GHOSTED.value
     db.commit()
     return {"success": True, "message": "Reply permanently ghosted"}
+
+
+@router.post("/backfill-mux-posts")
+def backfill_mux_posts(
+    admin_user: User = Depends(get_admin_user),
+    db: Session = Depends(get_db),
+    dry_run: bool = False,
+):
+    """
+    One-shot: scan recent Mux assets and link any community post that still has
+    mux_asset_id=NULL back to its Mux video. Safe to run multiple times.
+    """
+    import json as _json
+    from config import settings
+    from models.community import Post
+
+    if not settings.MUX_TOKEN_ID or not settings.MUX_TOKEN_SECRET:
+        raise HTTPException(status_code=500, detail="Mux credentials not configured")
+
+    try:
+        from mux_python import AssetsApi, ApiClient, Configuration
+        configuration = Configuration()
+        configuration.username = settings.MUX_TOKEN_ID
+        configuration.password = settings.MUX_TOKEN_SECRET
+        api_client = ApiClient(configuration)
+        assets_api = AssetsApi(api_client)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Mux SDK error: {e}")
+
+    fixed = []
+    skipped = 0
+    page = 1
+    page_size = 100
+
+    while True:
+        try:
+            resp = assets_api.list_assets(limit=page_size, page=page)
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Mux API error on page {page}: {e}")
+
+        assets = resp.data or []
+        if not assets:
+            break
+
+        for asset in assets:
+            if not asset.passthrough:
+                continue
+            try:
+                pdata = _json.loads(asset.passthrough) if isinstance(asset.passthrough, str) else asset.passthrough
+            except Exception:
+                continue
+
+            post_id = pdata.get("post_id")
+            if not post_id:
+                continue
+
+            if not asset.playback_ids:
+                skipped += 1
+                continue
+
+            playback_id = asset.playback_ids[0].id
+            post = db.query(Post).filter(Post.id == post_id).first()
+            if not post:
+                skipped += 1
+                continue
+            if post.mux_asset_id:
+                skipped += 1
+                continue
+
+            if not dry_run:
+                post.mux_asset_id = asset.id
+                post.mux_playback_id = playback_id
+                db.commit()
+
+                reward_info = None
+                try:
+                    from services import posting_reward_service
+                    outcome = posting_reward_service.award_post_reward(str(post.id), db)
+                    if outcome.get("awarded"):
+                        db.commit()
+                        reward_info = outcome
+                except Exception:
+                    db.rollback()
+
+            fixed.append({
+                "post_id": post_id,
+                "title": post.title,
+                "asset_id": asset.id,
+                "playback_id": playback_id,
+                "reward": reward_info,
+            })
+
+        if len(assets) < page_size:
+            break
+        page += 1
+
+    return {
+        "dry_run": dry_run,
+        "fixed": len(fixed),
+        "skipped": skipped,
+        "posts": fixed,
+    }
