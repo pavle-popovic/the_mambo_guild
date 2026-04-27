@@ -263,8 +263,15 @@ def create_post(
             "balance": balance
         }
     
-    # AI Gatekeeper on post content (fail-closed).
-    moderation_status = evaluate_post(title=title, body=body)
+    # AI Gatekeeper on post content. Stage posts are video — the title is
+    # just a label, not the content, so short generic titles ("Basic Combo
+    # 1", "Beginner Combo 2") repeatedly tripped the "gibberish/filler"
+    # rule and silenced legitimate dancers. Lab posts always have a body
+    # with the actual question text, so moderation still applies there.
+    if post_type == "stage":
+        moderation_status = ModerationStatus.ACTIVE.value
+    else:
+        moderation_status = evaluate_post(title=title, body=body)
 
     # Create post
     post = Post(
