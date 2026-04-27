@@ -6211,14 +6211,16 @@
     "Mambo101Edited__Suzy_Q_3_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777280107.2299283
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.0529768
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777280110.7896786
         },
         "es": {
           "status": "translated",
