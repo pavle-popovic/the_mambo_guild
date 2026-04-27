@@ -4,12 +4,16 @@ tier (no ABR ladder → stutters on slow networks) into "plus" tier.
 
 Strategy:
   1. Find every Post.mux_asset_id where the asset is on basic.
-  2. Create a NEW Mux asset that ingests the OLD asset's HLS stream
-     (https://stream.mux.com/{playback_id}.m3u8) with video_quality=plus
-     and max_resolution_tier=1080p. Mux supports URL inputs natively.
-  3. Wait until the new asset is ready, then swap the post's
+  2. Request temporary master access on the old asset → Mux exposes
+     a 24h-signed URL to the original mezzanine.mp4 it kept on file.
+  3. Create a NEW Mux asset that ingests that mezzanine URL with
+     video_quality=plus + max_resolution_tier=1080p.
+  4. Wait until the new asset is ready, then swap the post's
      mux_asset_id / mux_playback_id atomically.
-  4. Delete the old asset to free Mux storage.
+  5. Delete the old asset to free Mux storage.
+
+  (Note: tried .m3u8 input first — Mux rejects it as "not a valid
+  video or audio file". Master access is the only path.)
 
 Run from backend/:
     python scripts/reencode_basic_community_videos.py [--dry-run] [--limit N]
@@ -38,6 +42,7 @@ def run(dry_run: bool = False, limit: int | None = None):
     from mux_python import (
         AssetsApi, ApiClient, Configuration,
         CreateAssetRequest, InputSettings,
+        UpdateAssetMasterAccessRequest,
     )
     cfg = Configuration()
     cfg.username = settings.MUX_TOKEN_ID
@@ -86,9 +91,57 @@ def run(dry_run: bool = False, limit: int | None = None):
                 logger.info("  DRY RUN: would re-encode")
                 continue
 
-            input_url = f"https://stream.mux.com/{post.mux_playback_id}.m3u8"
+            # Step 1: ensure master access is set (24h signed URL to mezzanine).
+            # If it's already temporary, Mux returns "Download already exists" —
+            # that's fine, we just skip the request and read the URL straight
+            # from the asset.
+            existing_master = getattr(old_asset, "master", None)
+            already_ready = (
+                existing_master
+                and getattr(existing_master, "status", None) == "ready"
+                and getattr(existing_master, "url", None)
+            )
+            if not already_ready:
+                try:
+                    assets_api.update_asset_master_access(
+                        old_asset.id,
+                        UpdateAssetMasterAccessRequest(master_access="temporary"),
+                    )
+                except Exception as e:
+                    msg = str(e)
+                    if "already exists" in msg.lower():
+                        logger.info("  master-access already requested (re-use)")
+                    else:
+                        logger.error(f"  master-access request FAILED: {e}")
+                        continue
+
+            # Step 2: poll until master.status == "ready"
+            master_url = None
+            master_deadline = time.time() + 120
+            while time.time() < master_deadline:
+                try:
+                    fresh_old = assets_api.get_asset(old_asset.id).data
+                except Exception as e:
+                    logger.warning(f"  master poll error: {e}")
+                    time.sleep(3)
+                    continue
+                m = getattr(fresh_old, "master", None)
+                if m and getattr(m, "status", None) == "ready" and getattr(m, "url", None):
+                    master_url = m.url
+                    break
+                if m and getattr(m, "status", None) == "errored":
+                    logger.error(f"  master access errored — original file not retrievable")
+                    break
+                time.sleep(3)
+
+            if not master_url:
+                logger.warning(f"  no master URL available, skipping")
+                continue
+
+            logger.info(f"  master ready, ingesting into new asset (video_quality=plus)")
+
             new_request = CreateAssetRequest(
-                input=[InputSettings(url=input_url)],
+                input=[InputSettings(url=master_url)],
                 playback_policies=["public"],
                 video_quality="plus",
                 max_resolution_tier="1080p",
