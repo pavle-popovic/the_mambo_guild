@@ -196,19 +196,19 @@ export default function NotificationBell() {
       const parsed = parseMessage(n.type, n.message);
       if (!parsed) return n.message;
 
-      // New rows: backend supplies actor_username + serves an action-only
-      // body. The avatar+username header renders separately, so the message
-      // here is just the verb and post title.
-      if (n.actor_username && parsed.format === "action") {
+      // We have actor info — use action-only translation regardless of
+      // whether the stored message is the new short format or a legacy
+      // backfilled row that still has the old "Founder liked..." text.
+      // The avatar + clickable @username render separately above.
+      if (n.actor_username) {
         const action = t(`types.${n.type}.action`, { postTitle: parsed.postTitle });
         if (action && !action.startsWith("types.")) return action;
       }
 
-      // Legacy rows (pre-migration) have the actor name baked into the
-      // message and no actor_id. Use the original full-sentence template
-      // so the user still sees who acted, even without the avatar/link.
-      const legacyName =
-        parsed.format === "legacy" ? parsed.legacyName : (n.actor_username ? `@${n.actor_username}` : "");
+      // No actor info: pre-migration rows that the backfill couldn't match.
+      // Use the original full-sentence template so the user at least sees
+      // the legacy first_name baked into the message.
+      const legacyName = parsed.format === "legacy" ? parsed.legacyName : "";
       const full = t(`types.${n.type}.message`, {
         name: legacyName,
         postTitle: parsed.postTitle,
@@ -292,14 +292,14 @@ export default function NotificationBell() {
                   const actorUsername = notification.actor_username;
                   const actorAvatar = notification.actor_avatar_url;
                   const profileHref = actorUsername ? `/u/${encodeURIComponent(actorUsername)}` : null;
-                  // Show the inline @username link only when the message body
-                  // is the action-only format. For legacy rows the actor name
-                  // is already inside translateMessage(), so prepending here
-                  // would double it.
+                  // Whenever we have actor_username, translateMessage returns
+                  // the action-only string ("liked your post X"), so the
+                  // inline @username link can prepend without doubling up.
+                  // The avatar+link render based on actor info, not the
+                  // stored message format.
                   const showInlineUsername =
                     !!actorUsername &&
-                    (notification.type === "reaction_received" || notification.type === "reply_received") &&
-                    parseMessage(notification.type, notification.message)?.format === "action";
+                    (notification.type === "reaction_received" || notification.type === "reply_received");
                   return (
                     <motion.div
                       key={notification.id}
