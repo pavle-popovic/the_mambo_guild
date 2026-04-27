@@ -1579,22 +1579,38 @@ def update_subscription(
                 }
                 for it in phase1["items"]
             ]
-            stripe.SubscriptionSchedule.modify(
-                schedule.id,
-                end_behavior="release",
-                phases=[
-                    {
-                        "items": phase1_items,
-                        "start_date": phase1["start_date"],
-                        "end_date": phase1["end_date"],
-                    },
-                    {
-                        "items": [{"price": ADVANCED_PRICE_ID, "quantity": 1}],
-                        "proration_behavior": "none",
-                    },
-                ],
-                idempotency_key=f"sched_modify:{schedule.id}:{operation_id}",
-            )
+            try:
+                stripe.SubscriptionSchedule.modify(
+                    schedule.id,
+                    end_behavior="release",
+                    phases=[
+                        {
+                            "items": phase1_items,
+                            "start_date": phase1["start_date"],
+                            "end_date": phase1["end_date"],
+                        },
+                        {
+                            "items": [{"price": ADVANCED_PRICE_ID, "quantity": 1}],
+                            "proration_behavior": "none",
+                        },
+                    ],
+                    idempotency_key=f"sched_modify:{schedule.id}:{operation_id}",
+                )
+            except stripe.error.StripeError:
+                # modify() failed — clean up the orphaned schedule so the
+                # subscription doesn't get stuck (create() would reject a
+                # second from_subscription= call on a sub that already has
+                # an active schedule). Canceling the schedule is safe: it
+                # was phase-0-only (Performer until period_end, no change
+                # from current), so canceling it leaves billing unchanged.
+                try:
+                    stripe.SubscriptionSchedule.cancel(schedule.id)
+                except Exception:
+                    logger.exception(
+                        f"update_subscription: failed to cancel orphaned schedule "
+                        f"{schedule.id} after modify failure — manual cleanup may be required"
+                    )
+                raise  # re-raise the original StripeError to the outer handler
 
             subscription.stripe_schedule_id = schedule.id
             subscription.scheduled_tier = SubscriptionTier.ADVANCED.value

@@ -279,7 +279,7 @@ export default function SubscriptionManager() {
                 disabled={submitting === "keepGuildMaster"}
                 className="px-4 py-2 rounded-lg border border-mambo-gold/40 bg-mambo-gold/10 text-mambo-gold font-semibold text-sm hover:bg-mambo-gold/20 transition disabled:opacity-50"
               >
-                {submitting === "keepGuildMaster" ? t("resuming") : t("keepGuildMaster")}
+                {submitting === "keepGuildMaster" ? t("switching") : t("keepGuildMaster")}
               </button>
             )}
 
