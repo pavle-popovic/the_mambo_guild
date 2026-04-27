@@ -6531,14 +6531,16 @@
     "Mambo101Edited__Swing_1_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777280851.4532373
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.362902
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777280851.6149566
         },
         "es": {
           "status": "translated",
