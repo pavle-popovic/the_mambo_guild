@@ -6595,14 +6595,16 @@
     "Mambo101Edited__Swing_2_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777280986.782318
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.4130023
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777280986.786702
         },
         "es": {
           "status": "translated",
