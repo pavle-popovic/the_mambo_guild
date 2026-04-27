@@ -7171,14 +7171,16 @@
     "Mambo101Edited__Syncopation_2_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777282550.1492026
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.6686027
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777282550.184945
         },
         "es": {
           "status": "translated",
