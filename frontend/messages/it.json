@@ -648,6 +648,8 @@
     "videoTypeMotw": "🔥 Mossa della settimana",
     "videoTypeOriginal": "🎵 Original",
     "videoTypeGuild": "👏 Guild",
+    "filterLabel": "Filtro",
+    "allTopics": "Tutti gli argomenti",
     "theStage": "Condividi la tua Pratica",
     "theLab": "Discussioni",
     "myPosts": "I Miei Post",
@@ -1176,7 +1178,7 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Accesso Anticipato",
-    "copyright": "© 2024 The Mambo Guild. Continua a ballare.",
+    "copyright": "© 2026 The Mambo Guild. Continua a ballare.",
     "learnBlog": "Blog"
   },
   "pricingPage": {

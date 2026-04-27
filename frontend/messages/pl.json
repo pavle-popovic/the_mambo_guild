@@ -648,6 +648,8 @@
     "videoTypeMotw": "🔥 Ruch tygodnia",
     "videoTypeOriginal": "🎵 Oryginał",
     "videoTypeGuild": "👏 Gildia",
+    "filterLabel": "Filtr",
+    "allTopics": "Wszystkie tematy",
     "theStage": "Podziel się Praktyką",
     "theLab": "Dyskusje",
     "myPosts": "Moje posty",
@@ -1176,7 +1178,7 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Wczesny dostęp",
-    "copyright": "© 2024 The Mambo Guild. Tańcz dalej.",
+    "copyright": "© 2026 The Mambo Guild. Tańcz dalej.",
     "learnBlog": "Blog"
   },
   "pricingPage": {

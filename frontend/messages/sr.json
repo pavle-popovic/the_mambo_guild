@@ -648,6 +648,8 @@
     "videoTypeMotw": "🔥 Покрет недеље",
     "videoTypeOriginal": "🎵 Оригинал",
     "videoTypeGuild": "👏 Гилда",
+    "filterLabel": "Филтер",
+    "allTopics": "Све теме",
     "theStage": "Подели своју вежбу",
     "theLab": "Дискусије",
     "myPosts": "Моје објаве",
@@ -1176,7 +1178,7 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Рани приступ",
-    "copyright": "© 2024 The Mambo Guild. Настави да плешеш.",
+    "copyright": "© 2026 The Mambo Guild. Настави да плешеш.",
     "learnBlog": "Блог"
   },
   "pricingPage": {

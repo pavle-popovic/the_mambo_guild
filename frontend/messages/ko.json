@@ -648,6 +648,8 @@
     "videoTypeMotw": "🔥 이번 주의 무브",
     "videoTypeOriginal": "🎵 오리지널",
     "videoTypeGuild": "👏 길드",
+    "filterLabel": "필터",
+    "allTopics": "모든 주제",
     "theStage": "연습 공유하기",
     "theLab": "토론",
     "myPosts": "내 게시물",
@@ -1176,7 +1178,7 @@
     "connectInstagram": "인스타그램",
     "connectYoutube": "유튜브",
     "connectEarlyAccess": "얼리 액세스",
-    "copyright": "© 2024 The Mambo Guild. 계속 춤춰요.",
+    "copyright": "© 2026 The Mambo Guild. 계속 춤춰요.",
     "learnBlog": "블로그"
   },
   "pricingPage": {

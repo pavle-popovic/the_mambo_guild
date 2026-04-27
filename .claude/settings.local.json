@@ -151,7 +151,11 @@
       "Bash(ls /mnt)",
       "Bash(ls /cygdrive)",
       "Read(//c//**)",
-      "Bash(sort -t_ -k1n)"
+      "Bash(sort -t_ -k1n)",
+      "Bash(railway --version)",
+      "Bash(railway status *)",
+      "Skill(schedule)",
+      "mcp__railway-mcp-server__get-logs"
     ]
   }
 }

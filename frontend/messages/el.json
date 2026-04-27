@@ -648,6 +648,8 @@
     "videoTypeMotw": "🔥 Κίνηση της εβδομάδας",
     "videoTypeOriginal": "🎵 Πρωτότυπο",
     "videoTypeGuild": "👏 Συντεχνία",
+    "filterLabel": "Φίλτρο",
+    "allTopics": "Όλα τα θέματα",
     "theStage": "Μοιράσου την Εξάσκησή σου",
     "theLab": "Συζητήσεις",
     "myPosts": "Τα Posts μου",
@@ -1176,7 +1178,7 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Early Access",
-    "copyright": "© 2024 The Mambo Guild. Συνέχισε να χορεύεις.",
+    "copyright": "© 2026 The Mambo Guild. Συνέχισε να χορεύεις.",
     "learnBlog": "Blog"
   },
   "pricingPage": {

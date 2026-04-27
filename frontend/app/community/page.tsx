@@ -67,8 +67,8 @@ export default function CommunityPage() {
 
     // Mobile search & dropdowns
     const [searchQuery, setSearchQuery] = useState("");
-    const [levelDropdownOpen, setLevelDropdownOpen] = useState(false);
-    const levelDropdownRef = useRef<HTMLDivElement>(null);
+    const [tagDropdownOpen, setTagDropdownOpen] = useState(false);
+    const tagDropdownRef = useRef<HTMLDivElement>(null);
     const searchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [isMobile, setIsMobile] = useState(false);
 
@@ -107,7 +107,7 @@ export default function CommunityPage() {
     // Click-outside for mobile dropdowns
     useEffect(() => {
         const handleClick = (e: MouseEvent) => {
-            if (levelDropdownRef.current && !levelDropdownRef.current.contains(e.target as Node)) setLevelDropdownOpen(false);
+            if (tagDropdownRef.current && !tagDropdownRef.current.contains(e.target as Node)) setTagDropdownOpen(false);
         };
         document.addEventListener("mousedown", handleClick);
         return () => document.removeEventListener("mousedown", handleClick);
@@ -365,42 +365,60 @@ export default function CommunityPage() {
                                 <ShoppingBag size={15} />
                             </Link>
 
-                            {/* Level Dropdown */}
-                            <div className="relative flex-1" ref={levelDropdownRef}>
+                            {/* Tag (Filter) Dropdown — top trending tags from
+                                the current feed. Tap an entry to single-select;
+                                tap "All Topics" to clear. Mirrors the desktop
+                                sidebar's single-tag selection model. */}
+                            <div className="relative flex-1" ref={tagDropdownRef}>
                                 <button
-                                    onClick={() => setLevelDropdownOpen(!levelDropdownOpen)}
+                                    onClick={() => setTagDropdownOpen(!tagDropdownOpen)}
                                     className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
-                                        selectedLevels.length > 0
-                                            ? "bg-amber-500/10 border-amber-500/40"
+                                        selectedTopics.length > 0
+                                            ? "bg-cyan-500/10 border-cyan-400/40"
                                             : "bg-white/[0.04] border-white/10"
-                                    } ${levelDropdownOpen ? "border-amber-400/60 bg-white/[0.08]" : ""}`}
+                                    } ${tagDropdownOpen ? "border-cyan-400/60 bg-white/[0.08]" : ""}`}
                                 >
-                                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">{t("levelLabel")}</span>
-                                    <span className={`text-[11px] font-bold ${selectedLevels.length > 0 ? "text-amber-300" : "text-white"}`}>
-                                        {selectedLevels.length > 0
-                                            ? levelOptions.find((o) => o.value === selectedLevels[0])?.label || t("allLevels")
-                                            : t("allLevels")}
+                                    <span className="absolute left-3 top-1.5 text-[9px] uppercase tracking-widest text-gray-500 font-semibold">{t("filterLabel")}</span>
+                                    <span className={`text-[11px] font-bold truncate block pr-2 ${selectedTopics.length > 0 ? "text-cyan-200" : "text-white"}`}>
+                                        {selectedTopics.length > 0 ? `#${selectedTopics[0]}` : t("allTopics")}
                                     </span>
-                                    <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 text-gray-400 transition-transform ${levelDropdownOpen ? "rotate-180" : ""}`} />
+                                    <ChevronDown className={`absolute right-2 bottom-2.5 w-3 h-3 text-gray-400 transition-transform ${tagDropdownOpen ? "rotate-180" : ""}`} />
                                 </button>
-                                {levelDropdownOpen && (
-                                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)]">
-                                        {levelOptions.map((opt) => (
-                                            <button
-                                                key={opt.value}
-                                                onClick={() => {
-                                                    setSelectedLevels(opt.value ? [opt.value] : []);
-                                                    setLevelDropdownOpen(false);
-                                                }}
-                                                className={`w-full px-3 py-2.5 text-left text-[12px] font-semibold transition-all ${
-                                                    (opt.value === "" && selectedLevels.length === 0) || selectedLevels.includes(opt.value)
-                                                        ? "bg-amber-500/20 text-amber-300"
-                                                        : "text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]"
-                                                }`}
-                                            >
-                                                {opt.label}
-                                            </button>
-                                        ))}
+                                {tagDropdownOpen && (
+                                    <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-gray-900/90 backdrop-blur-xl border border-white/15 rounded-xl overflow-hidden shadow-[0_8px_32px_rgba(0,0,0,0.5)] max-h-72 overflow-y-auto">
+                                        <button
+                                            onClick={() => {
+                                                setSelectedTopics([]);
+                                                setTagDropdownOpen(false);
+                                            }}
+                                            className={`w-full px-3 py-2.5 text-left text-[12px] font-semibold transition-all ${
+                                                selectedTopics.length === 0
+                                                    ? "bg-cyan-500/20 text-cyan-200"
+                                                    : "text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]"
+                                            }`}
+                                        >
+                                            {t("allTopics")}
+                                        </button>
+                                        {mobileTrendingTags.map((tag) => {
+                                            const active = selectedTopics.includes(tag);
+                                            return (
+                                                <button
+                                                    key={tag}
+                                                    onClick={() => {
+                                                        if (searchQuery) handleSearch("");
+                                                        setSelectedTopics(active ? [] : [tag]);
+                                                        setTagDropdownOpen(false);
+                                                    }}
+                                                    className={`w-full px-3 py-2.5 text-left text-[12px] font-semibold transition-all ${
+                                                        active
+                                                            ? "bg-cyan-500/20 text-cyan-200"
+                                                            : "text-gray-300 hover:bg-white/[0.08] hover:text-white active:bg-white/[0.12]"
+                                                    }`}
+                                                >
+                                                    #{tag}
+                                                </button>
+                                            );
+                                        })}
                                     </div>
                                 )}
                             </div>
@@ -457,37 +475,32 @@ export default function CommunityPage() {
                             </div>
                         )}
 
-                        {/* Mobile tag chips — horizontal-scrolling strip of
-                            the top trending tags. Hidden on lg+ where the
-                            full sidebar shows trending tags with counts.
-                            Negative margin + horizontal padding makes the
-                            strip bleed to the screen edge so the row visibly
-                            scrolls instead of looking truncated. */}
-                        {mobileTrendingTags.length > 0 && (
-                            <div className="lg:hidden mb-3 -mx-4 sm:-mx-6 px-4 sm:px-6 overflow-x-auto scrollbar-none">
-                                <div className="flex items-center gap-2 w-max">
-                                    {mobileTrendingTags.map((tag) => {
-                                        const active = selectedTopics.includes(tag);
-                                        return (
-                                            <button
-                                                key={tag}
-                                                onClick={() => {
-                                                    if (searchQuery) handleSearch("");
-                                                    setSelectedTopics(active ? [] : [tag]);
-                                                }}
-                                                className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all border flex-shrink-0 ${
-                                                    active
-                                                        ? "bg-cyan-500/20 border-cyan-400/60 text-cyan-200 shadow-[0_0_10px_rgba(34,211,238,0.15)]"
-                                                        : "bg-white/[0.04] border-white/10 text-white/60 hover:border-white/25 hover:text-white/80"
-                                                }`}
-                                            >
-                                                #{tag}
-                                            </button>
-                                        );
-                                    })}
-                                </div>
+                        {/* Mobile level chips — horizontally-scrollable. The
+                            tag selection is now in the dropdown above; the
+                            level filter is light enough (5 options) to fit
+                            inline as a chip strip without crowding. */}
+                        <div className="lg:hidden mb-3 -mx-4 sm:-mx-6 px-4 sm:px-6 overflow-x-auto scrollbar-none">
+                            <div className="flex items-center gap-2 w-max">
+                                {levelOptions.map((opt) => {
+                                    const active = opt.value === ""
+                                        ? selectedLevels.length === 0
+                                        : selectedLevels.includes(opt.value);
+                                    return (
+                                        <button
+                                            key={opt.value || "all"}
+                                            onClick={() => setSelectedLevels(opt.value ? [opt.value] : [])}
+                                            className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all border flex-shrink-0 ${
+                                                active
+                                                    ? "bg-amber-500/20 border-amber-400/60 text-amber-200 shadow-[0_0_10px_rgba(252,226,5,0.15)]"
+                                                    : "bg-white/[0.04] border-white/10 text-white/60 hover:border-white/25 hover:text-white/80"
+                                            }`}
+                                        >
+                                            {opt.label}
+                                        </button>
+                                    );
+                                })}
                             </div>
-                        )}
+                        </div>
 
                         {/* Active tag chip — set by trending-tag click */}
                         {selectedTopics.length > 0 && (

@@ -648,6 +648,8 @@
     "videoTypeMotw": "🔥 Движение недели",
     "videoTypeOriginal": "🎵 Оригинал",
     "videoTypeGuild": "👏 Гильдия",
+    "filterLabel": "Фильтр",
+    "allTopics": "Все темы",
     "theStage": "Поделись Практикой",
     "theLab": "Обсуждения",
     "myPosts": "Мои посты",
@@ -1176,7 +1178,7 @@
     "connectInstagram": "Instagram",
     "connectYoutube": "YouTube",
     "connectEarlyAccess": "Ранний доступ",
-    "copyright": "© 2024 The Mambo Guild. Продолжайте танцевать.",
+    "copyright": "© 2026 The Mambo Guild. Продолжайте танцевать.",
     "learnBlog": "Блог"
   },
   "pricingPage": {
