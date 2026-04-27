@@ -720,8 +720,16 @@ def check_question_eligibility(
 ):
     """
     Pre-check to see if user can post a new question.
-    Checks slot limit based on subscription tier.
+    Checks tier gate first, then slot limit.
     """
+    from services.tier_service import can_participate_in_community
+    if not can_participate_in_community(str(current_user.id), db):
+        return UploadCheckResponse(
+            allowed=False,
+            current_slots=0,
+            max_slots=0,
+            message="Asking questions in the Lab is for paid Mambo Guild members. Subscribe to participate.",
+        )
     from services.clave_service import get_question_slot_status
     status = get_question_slot_status(str(current_user.id), db)
     return UploadCheckResponse(**status)
@@ -734,8 +742,16 @@ def check_upload_eligibility(
 ):
     """
     Pre-upload check to see if user can upload a new video.
-    Checks slot limit based on subscription tier.
+    Checks tier gate first, then slot limit.
     """
+    from services.tier_service import can_participate_in_community
+    if not can_participate_in_community(str(current_user.id), db):
+        return UploadCheckResponse(
+            allowed=False,
+            current_slots=0,
+            max_slots=0,
+            message="Sharing videos on the Stage is for paid Mambo Guild members. Subscribe to participate.",
+        )
     from services.clave_service import get_video_slot_status
     status = get_video_slot_status(str(current_user.id), db)
     return UploadCheckResponse(**status)

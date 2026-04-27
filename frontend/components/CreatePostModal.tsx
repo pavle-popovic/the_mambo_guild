@@ -71,17 +71,25 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
   // Question slot status (Lab only)
   const [questionSlots, setQuestionSlots] = useState<{ current_slots: number; max_slots: number } | null>(null);
 
-  // Fetch slot status when modal opens (Lab only)
+  // Eligibility (tier gate). null = still loading; an object means we got a verdict.
+  const [eligibility, setEligibility] = useState<{ allowed: boolean; message: string } | null>(null);
+
+  // Fetch eligibility + slot status when modal opens
   useEffect(() => {
     if (!isOpen) return;
-    if (mode === "lab") {
-      apiClient
-        .getQuestionSlotStatus()
-        .then((status) => {
+    setEligibility(null);
+    const fetcher = mode === "lab" ? apiClient.getQuestionSlotStatus() : apiClient.getSlotStatus();
+    fetcher
+      .then((status: any) => {
+        setEligibility({ allowed: !!status.allowed, message: status.message || "" });
+        if (mode === "lab") {
           setQuestionSlots({ current_slots: status.current_slots, max_slots: status.max_slots });
-        })
-        .catch(() => {});
-    }
+        }
+      })
+      .catch(() => {
+        // Don't block on a failed precheck — handleSubmit will re-check.
+        setEligibility({ allowed: true, message: "" });
+      });
   }, [isOpen, mode]);
 
   // Reset form when modal closes
@@ -401,6 +409,25 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               </p>
             </div>
 
+            {/* Tier gate: free/trial users see an upgrade CTA instead of the form. */}
+            {eligibility && !eligibility.allowed && /member/i.test(eligibility.message) ? (
+              <div className="py-6 text-center">
+                <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-gradient-to-br from-amber-500/30 to-amber-600/30 border border-amber-400/40 flex items-center justify-center text-2xl">
+                  🔒
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Members Only</h3>
+                <p className="text-white/70 text-sm mb-6 max-w-md mx-auto leading-relaxed">
+                  {eligibility.message}
+                </p>
+                <a
+                  href="/pricing"
+                  className="inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold transition shadow-lg shadow-amber-500/20"
+                >
+                  See Plans
+                </a>
+              </div>
+            ) : (
+              <>
             {/* Nudge banner */}
             <div className="mb-5 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-100/80 text-xs leading-relaxed">
               {t("nudgePoster")}
@@ -633,6 +660,8 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
             <p className="text-[11px] text-amber-300/80 mt-1 text-center">
               {mode === "stage" ? "Earn +40 🥢 on post" : "Earn +12 🥢 on post"}
             </p>
+              </>
+            )}
           </GlassCard>
 
           <AnimatePresence>

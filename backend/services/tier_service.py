@@ -71,3 +71,31 @@ def require_tier_at_least(user_id: str, required: Optional[str], db: Session) ->
     needed = _TIER_RANK.get(required, 99)
     have = _TIER_RANK.get(user_tier(user_id, db), -1)
     return have >= needed
+
+
+def can_participate_in_community(user_id: str, db: Session) -> bool:
+    """True iff the user is on a fully-paid (non-trial) Advanced/Performer
+    subscription. Stricter than `user_tier`: trialing users are blocked.
+
+    The point: a malicious actor wanting to abuse the community would have
+    to commit a real $39 charge AND wait out a 7-day trial. Free-tier and
+    trialing users can read the community but not post or comment.
+    """
+    sub = (
+        db.query(Subscription)
+        .filter(
+            Subscription.user_id == user_id,
+            Subscription.status == SubscriptionStatus.ACTIVE,
+        )
+        .first()
+    )
+    if not sub:
+        return False
+    period_end = sub.current_period_end
+    if period_end is not None:
+        if period_end.tzinfo is None:
+            period_end = period_end.replace(tzinfo=timezone.utc)
+        if period_end < datetime.now(timezone.utc):
+            return False
+    tier_value = sub.tier.value if isinstance(sub.tier, SubscriptionTier) else str(sub.tier)
+    return tier_value in ("advanced", "performer")

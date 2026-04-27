@@ -13,6 +13,7 @@ import uuid
 from models.user import User, UserProfile, Subscription, SubscriptionTier, SubscriptionStatus
 from models.community import Post, PostReply, PostReaction, CommunityTag, ModerationStatus, SavedPost
 from services.moderation_service import evaluate_reply, evaluate_post
+from services.tier_service import can_participate_in_community
 from services.mux_service import delete_asset as delete_mux_asset
 from services import rate_limit_service
 from services.clave_service import (
@@ -191,6 +192,17 @@ def create_post(
     Create a new post.
     Returns: {success, post, message} or {success: False, message}
     """
+    # Tier gate: only fully-paid (non-trial) subscribers can post. Free
+    # tier and trialing users can read the community but not post.
+    # Economic friction: a malicious actor would have to pay $39 and wait
+    # out a 7-day trial — vastly more effective than text-based AI moderation.
+    if not can_participate_in_community(user_id, db):
+        return {
+            "success": False,
+            "message": "Posting in the community is for paid Mambo Guild members. Subscribe to share your practice or ask questions.",
+            "tier_required": True,
+        }
+
     # Hourly rate limit (anti-spam; the only gate now that posting is free).
     allowed, info = rate_limit_service.check("post", user_id, db)
     if not allowed:
@@ -586,6 +598,14 @@ def add_reply(
     post = db.query(Post).filter(Post.id == post_id, Post.is_deleted == False).first()
     if not post:
         return {"success": False, "message": "Post not found"}
+
+    # Tier gate: only fully-paid (non-trial) subscribers can comment.
+    if not can_participate_in_community(user_id, db):
+        return {
+            "success": False,
+            "message": "Commenting is for paid Mambo Guild members. Subscribe to join the conversation.",
+            "tier_required": True,
+        }
 
     # Check feedback_type - "hype" mode disables comments
     if post.feedback_type == "hype":

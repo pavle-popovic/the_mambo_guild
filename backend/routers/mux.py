@@ -184,6 +184,15 @@ def create_mux_upload_url(
         # Community post uploads require authenticated user
         if not current_user_opt:
             raise HTTPException(status_code=401, detail="Authentication required for community post uploads")
+        # Tier gate: defense in depth — post_service also checks, but we
+        # block the Mux upload URL itself so a free/trial user can't even
+        # consume Mux storage by pre-uploading.
+        from services.tier_service import can_participate_in_community
+        if not can_participate_in_community(str(current_user_opt.id), db):
+            raise HTTPException(
+                status_code=403,
+                detail="Posting in the community is for paid Mambo Guild members. Subscribe to share your practice.",
+            )
     elif coaching_val:
         # Guild Master coaching submission uploads require authenticated Guild Master
         if not current_user_opt:

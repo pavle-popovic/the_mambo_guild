@@ -105,7 +105,17 @@ def get_slot_status(
 ):
     """
     Get video slot status (how many slots used vs limit).
+    Free/trial tiers can't post — surface the gate here so the modal
+    shows an "upgrade" CTA instead of the upload form.
     """
+    from services.tier_service import can_participate_in_community
+    if not can_participate_in_community(str(current_user.id), db):
+        return {
+            "allowed": False,
+            "current_slots": 0,
+            "max_slots": 0,
+            "message": "Sharing videos on the Stage is for paid Mambo Guild members. Subscribe to participate.",
+        }
     return clave_service.get_video_slot_status(str(current_user.id), db)
 
 
