@@ -585,20 +585,6 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               </div>
             </div>
 
-            {/* WIP Toggle */}
-            <div className="mb-6 flex items-center gap-3">
-              <input
-                type="checkbox"
-                id="wip"
-                checked={isWip}
-                onChange={(e) => setIsWip(e.target.checked)}
-                className="w-5 h-5 rounded bg-white/10 border-white/20 text-amber-500 focus:ring-amber-500"
-              />
-              <label htmlFor="wip" className="text-sm text-white/70 cursor-pointer">
-                {t("markWip")}
-              </label>
-            </div>
-
             {/* Submit */}
             <div className="flex gap-3">
               <MagicButton

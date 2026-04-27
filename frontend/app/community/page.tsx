@@ -63,6 +63,7 @@ export default function CommunityPage() {
     // Filters
     const [selectedLevels, setSelectedLevels] = useState<string[]>([]);
     const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
+    const [selectedVideoType, setSelectedVideoType] = useState<"motw" | "original" | "guild" | null>(null);
 
     // Mobile search & dropdowns
     const [searchQuery, setSearchQuery] = useState("");
@@ -123,6 +124,7 @@ export default function CommunityPage() {
                 const results = await apiClient.searchPosts(query, {
                     post_type: viewMode === "lab" ? "lab" : viewMode === "stage" ? "stage" : undefined,
                     tags: selectedTopics.length > 0 ? selectedTopics : undefined,
+                    video_type: viewMode === "stage" && selectedVideoType ? selectedVideoType : undefined,
                 }) as Post[];
                 setPosts(results);
             } catch (err) {
@@ -131,7 +133,7 @@ export default function CommunityPage() {
                 setIsLoading(false);
             }
         }, 300);
-    }, [viewMode, selectedTopics]);
+    }, [viewMode, selectedTopics, selectedVideoType]);
 
     // When search is cleared, reload normal feed
     useEffect(() => {
@@ -163,6 +165,7 @@ export default function CommunityPage() {
                     post_type: viewMode === "my_posts" ? undefined : viewMode,
                     tag: selectedTopics.length === 1 ? selectedTopics[0] : undefined,
                     tags: selectedTopics.length > 1 ? selectedTopics : undefined,
+                    video_type: viewMode === "stage" && selectedVideoType ? selectedVideoType : undefined,
                     forceRefresh: true,
                 })) as Post[];
             }
@@ -175,7 +178,7 @@ export default function CommunityPage() {
         } finally {
             setIsLoading(false);
         }
-    }, [viewMode, selectedTopics, isPreviewMode]);
+    }, [viewMode, selectedTopics, selectedVideoType, isPreviewMode]);
 
     useEffect(() => {
         if (!authLoading) {
@@ -398,6 +401,34 @@ export default function CommunityPage() {
                                 )}
                             </div>
                         </div>
+
+                        {/* Video-type chips — only meaningful on the Stage feed.
+                            Hidden on lab/saved/my_posts where video_type is null. */}
+                        {viewMode === "stage" && (
+                            <div className="mb-3 flex flex-wrap items-center gap-2">
+                                {([
+                                    { value: null, label: t("videoTypeAll") },
+                                    { value: "motw", label: t("videoTypeMotw") },
+                                    { value: "original", label: t("videoTypeOriginal") },
+                                    { value: "guild", label: t("videoTypeGuild") },
+                                ] as const).map((opt) => {
+                                    const active = selectedVideoType === opt.value;
+                                    return (
+                                        <button
+                                            key={opt.value ?? "all"}
+                                            onClick={() => setSelectedVideoType(opt.value)}
+                                            className={`px-3 py-1 rounded-full text-[11px] font-bold transition-all border ${
+                                                active
+                                                    ? "bg-amber-500/20 border-amber-400/60 text-amber-200 shadow-[0_0_12px_rgba(252,226,5,0.15)]"
+                                                    : "bg-white/[0.04] border-white/10 text-white/60 hover:border-white/25 hover:text-white/80"
+                                            }`}
+                                        >
+                                            {opt.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        )}
 
                         {/* Active tag chip — set by trending-tag click */}
                         {selectedTopics.length > 0 && (

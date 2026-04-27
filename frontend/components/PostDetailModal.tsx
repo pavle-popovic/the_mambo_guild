@@ -832,11 +832,6 @@ export default function PostDetailModal({
                         #{tag}
                       </span>
                     ))}
-                    {post.is_wip && (
-                      <span className="text-xs px-2 py-1 rounded bg-orange-500/30 text-orange-200">
-                        {t("wipTag")}
-                      </span>
-                    )}
                     {post.post_type === "lab" && (
                       <span
                         className={cn(
@@ -878,15 +873,6 @@ export default function PostDetailModal({
                 {/* Edit Options */}
                 {isEditing && (
                   <div className="mb-6 p-4 bg-white/5 rounded-lg space-y-3">
-                    <label className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="checkbox"
-                        checked={editIsWip}
-                        onChange={(e) => setEditIsWip(e.target.checked)}
-                        className="w-4 h-4 rounded bg-white/10 border-white/20 text-amber-500 focus:ring-amber-500/50"
-                      />
-                      <span className="text-sm text-white/80">{t("markWip")}</span>
-                    </label>
                     {post.post_type === "stage" && (
                       <div>
                         <label className="block text-sm font-medium text-white/70 mb-2">

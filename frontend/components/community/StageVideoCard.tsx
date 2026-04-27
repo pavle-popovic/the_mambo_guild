@@ -163,15 +163,6 @@ export default function StageVideoCard({
                     </div>
                 )}
 
-                {/* WIP Banner */}
-                {post.is_wip && (
-                    <div className="absolute top-3 left-0 right-0 z-10 flex justify-center">
-                        <div className="bg-orange-500/90 py-1 px-3 rounded-full shadow-lg border border-black/20 backdrop-blur-sm">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-black">{t("workInProgress")}</span>
-                        </div>
-                    </div>
-                )}
-
                 {/* Maestro Reviewed Badge - Palladium Era */}
                 {post.has_instructor_comment && (
                     <div className="absolute top-3 right-3 z-10">
@@ -179,6 +170,43 @@ export default function StageVideoCard({
                             <Award size={12} />
                             <span>{t("maestroBadge")}</span>
                         </div>
+                    </div>
+                )}
+
+                {/* Always-visible attribution — small avatar + @username pill
+                    pinned bottom-left of every thumbnail (both default and
+                    compact). Tapping opens the poster's profile without
+                    triggering the post-detail click. The wider thumbnail's
+                    hover overlay still shows the larger avatar; this pill is
+                    the always-on identifier so users can tell at a glance
+                    whose video they're looking at. */}
+                {!isLocked && post.user.username && (
+                    <div className="absolute bottom-1 left-1 lg:bottom-2 lg:left-2 z-20">
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                                setShowProfileModal(true);
+                            }}
+                            className="inline-flex items-center gap-1 lg:gap-1.5 rounded-full bg-black/60 backdrop-blur-sm px-1.5 py-0.5 lg:px-2 lg:py-1 ring-1 ring-white/15 hover:ring-mambo-gold/60 transition focus:outline-none focus:ring-mambo-gold/60 max-w-[80%]"
+                            aria-label={t("viewProfileAria", { username: post.user.username })}
+                        >
+                            <GuildMasterAvatar
+                                avatarUrl={post.user.avatar_url}
+                                username={post.user.username}
+                                isPro={post.user.is_pro}
+                                isGuildMaster={post.user.is_guild_master}
+                                size="xs"
+                                showBadge={false}
+                                equippedBorderSku={post.user.equipped_border_sku}
+                            />
+                            <span className={cn(
+                                "font-semibold text-white/95 truncate",
+                                isCompact ? "text-[9px] max-w-[60px]" : "text-[11px] lg:text-xs max-w-[110px]"
+                            )}>
+                                @{post.user.username}
+                            </span>
+                        </button>
                     </div>
                 )}
 

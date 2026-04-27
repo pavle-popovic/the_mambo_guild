@@ -1163,6 +1163,7 @@ class ApiClient {
     post_type?: 'stage' | 'lab';
     tag?: string;
     tags?: string[];
+    video_type?: 'motw' | 'original' | 'guild';
     skip?: number;
     limit?: number;
     forceRefresh?: boolean;
@@ -1174,6 +1175,7 @@ class ApiClient {
     } else if (options?.tag) {
       params.append("tag", options.tag);
     }
+    if (options?.video_type) params.append("video_type", options.video_type);
     if (options?.skip !== undefined) params.append("skip", String(options.skip));
     if (options?.limit !== undefined) params.append("limit", String(options.limit));
 
@@ -1395,6 +1397,7 @@ class ApiClient {
     post_type?: 'stage' | 'lab';
     tag?: string;
     tags?: string[];
+    video_type?: 'motw' | 'original' | 'guild';
     skip?: number;
     limit?: number;
   }) {
@@ -1405,6 +1408,7 @@ class ApiClient {
     } else if (options?.tag) {
       params.append("tag", options.tag);
     }
+    if (options?.video_type) params.append("video_type", options.video_type);
     if (options?.skip !== undefined) params.append("skip", String(options.skip));
     if (options?.limit !== undefined) params.append("limit", String(options.limit));
 

@@ -89,6 +89,7 @@ def get_feed(
     post_type: Optional[str] = Query(None, description="Filter by 'stage' or 'lab'"),
     tag: Optional[str] = Query(None, description="Filter by single tag slug"),
     tags: Optional[str] = Query(None, description="Comma-separated tag slugs for multi-tag filter"),
+    video_type: Optional[str] = Query(None, description="Filter stage videos by 'motw', 'original', or 'guild'"),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=50),
     current_user: Optional[User] = Depends(get_current_user_optional),
@@ -100,6 +101,7 @@ def get_feed(
     - post_type=stage: Video posts (The Stage)
     - post_type=lab: Q&A posts (The Lab)
     - tags: Comma-separated tag slugs for multi-tag filter
+    - video_type: motw / original / guild (only meaningful for stage posts)
     """
     tags_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else None
     # Unauthenticated visitors get a 3-post preview for the community landing
@@ -108,6 +110,7 @@ def get_feed(
         post_type=post_type,
         tag=tag,
         tags=tags_list,
+        video_type=video_type,
         skip=skip,
         limit=effective_limit,
         current_user_id=str(current_user.id) if current_user else None,
@@ -755,13 +758,14 @@ def search_posts(
     post_type: Optional[str] = Query(None),
     tag: Optional[str] = Query(None, description="Filter by single tag slug"),
     tags: Optional[str] = Query(None, description="Comma-separated tag slugs"),
+    video_type: Optional[str] = Query(None, description="Filter stage videos by 'motw', 'original', or 'guild'"),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1, le=50),
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
     """
-    Search posts by title and/or tags.
+    Search posts by title, username, and/or tags.
     """
     tags_list = [t.strip() for t in tags.split(",") if t.strip()] if tags else None
     posts = post_service.search_posts(
@@ -769,6 +773,7 @@ def search_posts(
         post_type=post_type,
         tag=tag,
         tags=tags_list,
+        video_type=video_type,
         skip=skip,
         limit=limit,
         current_user_id=str(current_user.id),

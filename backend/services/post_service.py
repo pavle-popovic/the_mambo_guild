@@ -305,10 +305,14 @@ def create_post(
     }
 
 
+_VALID_VIDEO_TYPES = {"motw", "original", "guild"}
+
+
 def get_feed(
     post_type: str = None,
     tag: str = None,
     tags: List[str] = None,
+    video_type: str = None,
     skip: int = 0,
     limit: int = 20,
     current_user_id: str = None,
@@ -333,6 +337,10 @@ def get_feed(
 
     if post_type:
         query = query.filter(Post.post_type == post_type)
+
+    if video_type and video_type in _VALID_VIDEO_TYPES:
+        # video_type only applies to stage posts; lab posts have it null.
+        query = query.filter(Post.video_type == video_type)
 
     if tags and len(tags) > 0:
         # Multi-tag filter: post must have ANY of the specified tags
@@ -854,28 +862,37 @@ def search_posts(
     post_type: str = None,
     tag: str = None,
     tags: List[str] = None,
+    video_type: str = None,
     skip: int = 0,
     limit: int = 20,
     current_user_id: str = None,
     db: Session = None
 ) -> List[dict]:
     """
-    Search posts by title and/or tags.
-    Title search uses ILIKE; also matches if query appears in any tag.
-    Additional tag/tags params filter results to specific tags.
+    Search posts by title, author username, and/or tags.
+    Title and username use ILIKE; also matches if query appears in any tag.
+    Additional tag/tags/video_type params narrow results.
     Shadowban: flagged posts are returned only to their author.
     """
     from sqlalchemy import or_
+    from models.user import UserProfile
 
     # Escape ILIKE special characters to prevent wildcard injection
     escaped_query = query.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+    pattern = f"%{escaped_query}%"
 
-    # Search by title OR tag content match
-    search_query = db.query(Post).filter(
-        Post.is_deleted == False,
-        or_(
-            Post.title.ilike(f"%{escaped_query}%"),
-            Post.tags.any(query.lower())
+    # Search title OR username (via outer join — keeps posts whose author
+    # has no profile row from being silently dropped) OR tag content.
+    search_query = (
+        db.query(Post)
+        .outerjoin(UserProfile, UserProfile.user_id == Post.user_id)
+        .filter(
+            Post.is_deleted == False,
+            or_(
+                Post.title.ilike(pattern),
+                UserProfile.username.ilike(pattern),
+                Post.tags.any(query.lower()),
+            ),
         )
     )
 
@@ -892,13 +909,26 @@ def search_posts(
     if post_type:
         search_query = search_query.filter(Post.post_type == post_type)
 
+    if video_type and video_type in _VALID_VIDEO_TYPES:
+        search_query = search_query.filter(Post.video_type == video_type)
+
     # Additional tag filtering
     if tags and len(tags) > 0:
         search_query = search_query.filter(or_(*[Post.tags.any(t) for t in tags]))
     elif tag:
         search_query = search_query.filter(Post.tags.any(tag))
 
-    posts = search_query.order_by(desc(Post.created_at)).offset(skip).limit(limit).all()
+    # The outer join to user_profiles can dup posts if a user has multiple
+    # profile rows (shouldn't happen, but the join could in theory). Use
+    # distinct() to be safe.
+    posts = (
+        search_query
+        .distinct(Post.id)
+        .order_by(Post.id, desc(Post.created_at))
+        .offset(skip)
+        .limit(limit)
+        .all()
+    )
     return _format_posts_bulk(posts, current_user_id, db)
 
 
