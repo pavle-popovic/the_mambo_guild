@@ -206,9 +206,13 @@ export default function NavBar({ user }: NavBarProps) {
           </div>
 
           {/* Tablet hamburger: between md and xl, the centre nav is hidden, so
-              expose a hamburger that opens the existing mobile menu. (B3) */}
+              expose a hamburger that opens the existing mobile menu. ml-auto
+              pushes itself + the desktop right-cluster (which sits next in
+              the source order) all the way to the right edge — without it
+              the hidden centre nav doesn't take up its flex-1, so the whole
+              right side packs against the logo. (B3) */}
           <button
-            className="hidden md:flex xl:hidden p-2 text-gray-300 hover:text-white transition-colors mr-1"
+            className="hidden md:flex xl:hidden p-2 text-gray-300 hover:text-white transition-colors mr-1 ml-auto"
             onClick={() => { setIsMobileMenuOpen(!isMobileMenuOpen); UISound.click(); }}
             aria-label={t('toggleNavMenu')}
           >
