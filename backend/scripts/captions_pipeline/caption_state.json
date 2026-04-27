@@ -7619,14 +7619,16 @@
     "Mambo101Edited__Taps_2_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777300045.7632053
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.8629837
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777300045.7754745
         },
         "es": {
           "status": "translated",
