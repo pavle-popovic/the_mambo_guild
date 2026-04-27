@@ -113,7 +113,7 @@ export default function HomePage() {
                             </Link>
                             <Link
                                 href="/community"
-                                className="flex-1 bg-[linear-gradient(135deg,rgba(99,102,241,0.15)_0%,rgba(139,92,246,0.15)_100%)] backdrop-blur-md border border-indigo-400/30 hover:bg-[linear-gradient(135deg,rgba(99,102,241,0.25)_0%,rgba(139,92,246,0.25)_100%)] hover:border-indigo-400/60 text-indigo-200 font-extrabold py-3.5 sm:py-4 px-3 sm:px-5 rounded-full text-sm sm:text-base active:scale-[0.97] transition-all text-center shadow-[0_0_20px_rgba(99,102,241,0.25),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-indigo-400/20 tracking-wide whitespace-nowrap"
+                                className="flex-1 bg-[linear-gradient(135deg,rgba(59,130,246,0.25)_0%,rgba(168,85,247,0.25)_100%)] backdrop-blur-md border border-blue-400/40 hover:bg-[linear-gradient(135deg,rgba(59,130,246,0.4)_0%,rgba(168,85,247,0.4)_100%)] hover:border-purple-400/60 text-blue-100 font-extrabold py-3.5 sm:py-4 px-3 sm:px-5 rounded-full text-sm sm:text-base active:scale-[0.97] transition-all text-center shadow-[0_0_20px_rgba(168,85,247,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] ring-1 ring-blue-400/30 tracking-wide whitespace-nowrap"
                             >
                                 {tSubscribed("shareProgress")}
                             </Link>

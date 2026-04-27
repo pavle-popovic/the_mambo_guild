@@ -232,7 +232,7 @@ export default function NewHero() {
                                 </Link>
                                 <Link
                                     href="/community"
-                                    className="relative bg-[linear-gradient(135deg,rgba(99,102,241,0.15)_0%,rgba(139,92,246,0.15)_100%)] backdrop-blur-md border border-indigo-400/30 hover:bg-[linear-gradient(135deg,rgba(99,102,241,0.25)_0%,rgba(139,92,246,0.25)_100%)] hover:border-indigo-400/60 text-indigo-200 font-extrabold py-3 px-5 xl:py-3.5 xl:px-6 rounded-full text-sm xl:text-base whitespace-nowrap transition-all transform hover:-translate-y-1 text-center shadow-[0_0_20px_rgba(99,102,241,0.25),inset_0_1px_0_rgba(255,255,255,0.1)] ring-1 ring-indigo-400/20 landscape-phone:!py-2 landscape-phone:!px-3 landscape-phone:!text-[10px]"
+                                    className="relative bg-[linear-gradient(135deg,rgba(59,130,246,0.25)_0%,rgba(168,85,247,0.25)_100%)] backdrop-blur-md border border-blue-400/40 hover:bg-[linear-gradient(135deg,rgba(59,130,246,0.4)_0%,rgba(168,85,247,0.4)_100%)] hover:border-purple-400/60 text-blue-100 font-extrabold py-3 px-5 xl:py-3.5 xl:px-6 rounded-full text-sm xl:text-base whitespace-nowrap transition-all transform hover:-translate-y-1 text-center shadow-[0_0_20px_rgba(168,85,247,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] ring-1 ring-blue-400/30 landscape-phone:!py-2 landscape-phone:!px-3 landscape-phone:!text-[10px]"
                                 >
                                     {tSubscribed("shareProgress")}
                                 </Link>
@@ -274,7 +274,7 @@ export default function NewHero() {
                             </Link>
                             <Link
                                 href="/community"
-                                className="flex-1 relative bg-white/5 backdrop-blur-md border border-[#D4AF37]/40 hover:bg-white/10 hover:border-[#D4AF37]/70 text-[#D4AF37] font-extrabold py-3.5 px-3 rounded-full text-sm transition-all transform hover:-translate-y-1 text-center shadow-[0_0_20px_rgba(212,175,55,0.15)] ring-1 ring-[#D4AF37]/20 whitespace-nowrap"
+                                className="flex-1 relative bg-[linear-gradient(135deg,rgba(59,130,246,0.25)_0%,rgba(168,85,247,0.25)_100%)] backdrop-blur-md border border-blue-400/40 hover:bg-[linear-gradient(135deg,rgba(59,130,246,0.4)_0%,rgba(168,85,247,0.4)_100%)] hover:border-purple-400/60 text-blue-100 font-extrabold py-3.5 px-3 rounded-full text-sm transition-all transform hover:-translate-y-1 text-center shadow-[0_0_20px_rgba(168,85,247,0.3),inset_0_1px_0_rgba(255,255,255,0.2)] ring-1 ring-blue-400/30 whitespace-nowrap"
                             >
                                 {tSubscribed("shareProgress")}
                             </Link>
