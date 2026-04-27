@@ -16,6 +16,8 @@ import LabQuestionRow from "@/components/community/LabQuestionRow";
 import PreviewCTABar from "@/components/community/PreviewCTABar";
 import CreatePostModal from "@/components/CreatePostModal";
 import PostDetailModal from "@/components/PostDetailModal";
+import { ClaveWallet } from "@/components/ClaveWallet";
+import { WalletModal } from "@/components/WalletModal";
 import { useTranslations } from "@/i18n/useTranslations";
 
 interface Post {
@@ -76,6 +78,7 @@ export default function CommunityPage() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [selectedPostId, setSelectedPostId] = useState<string | null>(null);
     const [isPostDetailOpen, setIsPostDetailOpen] = useState(false);
+    const [isWalletOpen, setIsWalletOpen] = useState(false);
 
     // Check if user is a paying member (has tier above rookie/free)
     const userTier = user?.tier?.toLowerCase() || "rookie";
@@ -369,6 +372,16 @@ export default function CommunityPage() {
                                     {t("myPostsTab")}
                                 </button>
                             </div>
+
+                            {/* Clave wallet — only renders on mobile (the
+                                desktop navbar still hosts its own wallet
+                                pill). Sits next to the toggle so the user
+                                always sees their balance while browsing. */}
+                            {!!user && (
+                                <div className="flex-shrink-0">
+                                    <ClaveWallet onOpenWallet={() => setIsWalletOpen(true)} />
+                                </div>
+                            )}
 
                             {/* Tag (Filter) Dropdown — top trending tags from
                                 the current feed. Tap an entry to single-select;
@@ -720,6 +733,11 @@ export default function CommunityPage() {
                     onRefresh={loadPosts}
                 />
             )}
+
+            {/* Wallet modal — opened by the in-row ClaveWallet pill. The
+                navbar has its own modal/pill on desktop; on mobile the
+                navbar wallet was removed and this is the only path. */}
+            <WalletModal isOpen={isWalletOpen} onClose={() => setIsWalletOpen(false)} />
 
             <Footer />
         </div>

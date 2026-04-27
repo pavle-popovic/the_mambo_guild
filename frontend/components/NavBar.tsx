@@ -168,12 +168,11 @@ export default function NavBar({ user }: NavBarProps) {
             <NavLink href="/blog" activePaths={["/blog", "/what-is-salsa-on2", "/salsa-on1-vs-on2"]}>{t('blog')}</NavLink>
           </div>
 
-          {/* Mobile: Hamburger + minimal icons */}
+          {/* Mobile: Hamburger + minimal icons.
+              Note: the community page renders its own ClaveWallet next to
+              the Stage/Lab/Mine toggle, so we don't double it up here. */}
           <div className="flex md:hidden items-center gap-2 ml-auto">
             <LocaleSwitcher compact hideIcon />
-            {isAuthenticated && pathname === "/community" && (
-              <ClaveWallet onOpenWallet={() => setIsWalletOpen(true)} />
-            )}
             {isAuthenticated && <NotificationBell />}
             {isAuthenticated && (
               <div className="relative w-8 h-8">
@@ -216,8 +215,15 @@ export default function NavBar({ user }: NavBarProps) {
             {isMobileMenuOpen ? <X size={22} /> : <Menu size={22} />}
           </button>
 
-          {/* Desktop right-side items */}
-          <div className="hidden md:flex gap-2 lg:gap-3 items-center shrink-0">
+          {/* Desktop right-side items.
+              Slightly looser gap on the community route (lg:gap-4) so the
+              wallet pill has breathing room next to the Studio button —
+              both are wide pill-shaped elements with their own gradient
+              backgrounds and were crowding each other at gap-3. */}
+          <div className={cn(
+            "hidden md:flex items-center shrink-0",
+            pathname === "/community" ? "gap-2 lg:gap-4" : "gap-2 lg:gap-3"
+          )}>
             {isAuthenticated ? (
               <>
                 {/* Clave Wallet (v4.0) - Only show on Community page */}
