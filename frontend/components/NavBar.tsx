@@ -4,7 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { FaFire, FaBolt } from "react-icons/fa";
-import { Star, Crown, Headphones, Video, Radio, ChevronDown, Menu, X } from "lucide-react";
+import { Star, Crown, Headphones, Video, Radio, ChevronDown, Menu, X, Shield } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { useEffect, useState, useCallback, useRef } from "react";
@@ -331,6 +331,26 @@ export default function NavBar({ user }: NavBarProps) {
                               <p className="text-xs text-gray-400">{t('roundtableSubtitle')}</p>
                             </div>
                           </Link>
+
+                          {/* Admin shortcut — only rendered for admin users.
+                              Lives inside Studio so the navbar's right-side
+                              cluster doesn't get a third gradient pill that
+                              crowds the wallet on the community route. */}
+                          {user.role?.toLowerCase() === "admin" && (
+                            <Link
+                              href="/admin"
+                              onClick={() => setIsStudioOpen(false)}
+                              className="flex items-center gap-3 p-3 rounded-lg hover:bg-red-500/10 transition-colors group mt-1 border-t border-gray-700/50 pt-3"
+                            >
+                              <div className="w-10 h-10 rounded-lg bg-gradient-to-br from-red-500/20 to-rose-500/20 border border-red-400/30 flex items-center justify-center">
+                                <Shield size={18} className="text-red-400" />
+                              </div>
+                              <div className="flex-1">
+                                <span className="text-sm font-semibold text-white">{t('admin')}</span>
+                                <p className="text-xs text-gray-400">{t('adminPanel') !== 'adminPanel' ? t('adminPanel') : 'Admin tools'}</p>
+                              </div>
+                            </Link>
+                          )}
                         </div>
 
                         {/* Guild Master Status */}
@@ -362,17 +382,6 @@ export default function NavBar({ user }: NavBarProps) {
                     )}
                   </AnimatePresence>
                 </div>
-
-                {/* Admin Link */}
-                {user.role?.toLowerCase() === "admin" && (
-                  <Link
-                    href="/admin"
-                    className="hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/20 border border-red-400/30 hover:bg-red-500/30 transition-all"
-                    onMouseEnter={handleNavHover}
-                  >
-                    <span className="text-xs font-bold text-red-300">{t('admin')}</span>
-                  </Link>
-                )}
 
                 {/* Notification Bell */}
                 <NotificationBell />

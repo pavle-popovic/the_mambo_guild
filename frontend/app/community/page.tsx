@@ -330,17 +330,17 @@ export default function CommunityPage() {
                             </Link>
                         </div>
 
-                        {/* Toggle + Filter Row — flex-wrap so the toggle and
-                            the Filter dropdown reflow onto two rows on the
-                            narrowest devices instead of overflowing. The
-                            Filter dropdown gets min-w-[160px] so its label
-                            never gets clipped on the first row. */}
-                        <div className="flex flex-wrap items-center gap-2">
+                        {/* Toggle + Filter Row — flex-wrap so the toggle,
+                            wallet, and Filter dropdown reflow gracefully on
+                            the narrowest devices instead of overflowing.
+                            Padding/text shrinks on landscape-phone (short
+                            viewport) so all three fit a single row. */}
+                        <div className="flex flex-wrap items-center gap-2 landscape-phone:gap-1.5">
                             {/* Stage/Lab Toggle */}
                             <div className="flex bg-white/[0.04] rounded-full p-0.5 border border-white/10 flex-shrink-0">
                                 <button
                                     onClick={() => { setViewMode("stage"); setSearchQuery(""); }}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all landscape-phone:!px-2 landscape-phone:!py-1 landscape-phone:!gap-1 ${
                                         viewMode === "stage"
                                             ? "bg-white/10 text-mambo-gold shadow-[0_0_12px_rgba(252,226,5,0.15)]"
                                             : "text-white/50"
@@ -351,7 +351,7 @@ export default function CommunityPage() {
                                 </button>
                                 <button
                                     onClick={() => { setViewMode("lab"); setSearchQuery(""); }}
-                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all ${
+                                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-[11px] font-bold transition-all landscape-phone:!px-2 landscape-phone:!py-1 landscape-phone:!gap-1 ${
                                         viewMode === "lab"
                                             ? "bg-white/10 text-mambo-gold shadow-[0_0_12px_rgba(252,226,5,0.15)]"
                                             : "text-white/50"
@@ -378,7 +378,7 @@ export default function CommunityPage() {
                                 pill). Sits next to the toggle so the user
                                 always sees their balance while browsing. */}
                             {!!user && (
-                                <div className="flex-shrink-0">
+                                <div className="flex-shrink-0 landscape-phone:scale-[0.92] landscape-phone:origin-left">
                                     <ClaveWallet onOpenWallet={() => setIsWalletOpen(true)} />
                                 </div>
                             )}
@@ -387,7 +387,7 @@ export default function CommunityPage() {
                                 the current feed. Tap an entry to single-select;
                                 tap "All Topics" to clear. Mirrors the desktop
                                 sidebar's single-tag selection model. */}
-                            <div className="relative flex-1 min-w-[160px]" ref={tagDropdownRef}>
+                            <div className="relative flex-1 min-w-[140px] landscape-phone:min-w-[120px]" ref={tagDropdownRef}>
                                 <button
                                     onClick={() => setTagDropdownOpen(!tagDropdownOpen)}
                                     className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
