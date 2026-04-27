@@ -6787,14 +6787,16 @@
     "Mambo101Edited__Syncopation_1_Drill": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777281476.5880318
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.5226185
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777281476.9216032
         },
         "es": {
           "status": "translated",
