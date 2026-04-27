@@ -7427,14 +7427,16 @@
     "Mambo101Edited__Taps_1_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777283252.3282666
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.7765985
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777283252.4458315
         },
         "es": {
           "status": "translated",
