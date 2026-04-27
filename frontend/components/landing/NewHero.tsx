@@ -232,7 +232,7 @@ export default function NewHero() {
                                 </Link>
                                 <Link
                                     href="/community"
-                                    className="relative bg-[linear-gradient(135deg,#3B82F6_0%,#1D4ED8_100%)] text-white font-extrabold py-3 px-5 xl:py-3.5 xl:px-6 rounded-full text-sm xl:text-base whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_20px_rgba(59,130,246,0.4)] ring-2 ring-blue-400/50 landscape-phone:!py-2 landscape-phone:!px-3 landscape-phone:!text-[10px]"
+                                    className="relative bg-white/5 backdrop-blur-md border border-[#D4AF37]/40 hover:bg-white/10 hover:border-[#D4AF37]/70 text-[#D4AF37] font-extrabold py-3 px-5 xl:py-3.5 xl:px-6 rounded-full text-sm xl:text-base whitespace-nowrap transition-all transform hover:-translate-y-1 text-center shadow-[0_0_20px_rgba(212,175,55,0.15)] ring-1 ring-[#D4AF37]/20 landscape-phone:!py-2 landscape-phone:!px-3 landscape-phone:!text-[10px]"
                                 >
                                     {tSubscribed("shareProgress")}
                                 </Link>
@@ -274,7 +274,7 @@ export default function NewHero() {
                             </Link>
                             <Link
                                 href="/community"
-                                className="flex-1 relative bg-[linear-gradient(135deg,#3B82F6_0%,#1D4ED8_100%)] text-white font-extrabold py-3.5 px-3 rounded-full text-sm transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_20px_rgba(59,130,246,0.4)] ring-2 ring-blue-400/50 whitespace-nowrap"
+                                className="flex-1 relative bg-white/5 backdrop-blur-md border border-[#D4AF37]/40 hover:bg-white/10 hover:border-[#D4AF37]/70 text-[#D4AF37] font-extrabold py-3.5 px-3 rounded-full text-sm transition-all transform hover:-translate-y-1 text-center shadow-[0_0_20px_rgba(212,175,55,0.15)] ring-1 ring-[#D4AF37]/20 whitespace-nowrap"
                             >
                                 {tSubscribed("shareProgress")}
                             </Link>

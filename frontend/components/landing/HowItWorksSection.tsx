@@ -407,7 +407,7 @@ export default function HowItWorksSection() {
                     </Link>
                     <Link
                       href="/community"
-                      className="flex-1 sm:flex-initial bg-[linear-gradient(135deg,#3B82F6_0%,#1D4ED8_100%)] text-white font-extrabold py-3.5 px-4 sm:px-7 rounded-full text-sm sm:text-base tracking-wide shadow-[0_0_20px_rgba(59,130,246,0.35)] ring-2 ring-blue-400/50 active:scale-[0.97] transition-all hover:brightness-110 landscape-phone:py-2.5 landscape-phone:text-sm text-center whitespace-nowrap"
+                      className="flex-1 sm:flex-initial bg-white/5 backdrop-blur-md border border-[#D4AF37]/40 hover:bg-white/10 hover:border-[#D4AF37]/70 text-[#D4AF37] font-extrabold py-3.5 px-4 sm:px-7 rounded-full text-sm sm:text-base tracking-wide shadow-[0_0_20px_rgba(212,175,55,0.15)] ring-1 ring-[#D4AF37]/20 active:scale-[0.97] transition-all landscape-phone:py-2.5 landscape-phone:text-sm text-center whitespace-nowrap"
                     >
                       {tSubscribed("shareProgress")}
                     </Link>

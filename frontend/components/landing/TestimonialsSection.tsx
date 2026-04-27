@@ -106,7 +106,7 @@ export default function TestimonialsSection() {
                       <Clickable>
                         <Link
                           href={isSubscribed ? "/community" : "/register"}
-                          className="px-4 sm:px-6 py-2 bg-gradient-to-r from-mambo-blue to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-bold rounded-full text-xs sm:text-sm transition-all shadow-lg shadow-blue-500/25"
+                          className="px-4 sm:px-6 py-2 bg-white/5 backdrop-blur-md border border-[#D4AF37]/40 hover:bg-white/10 hover:border-[#D4AF37]/70 text-[#D4AF37] font-bold rounded-full text-xs sm:text-sm transition-all shadow-[0_0_16px_rgba(212,175,55,0.15)] ring-1 ring-[#D4AF37]/20"
                         >
                           {isSubscribed ? tSubscribed("shareProgress") : t("ctaButton")}
                         </Link>
