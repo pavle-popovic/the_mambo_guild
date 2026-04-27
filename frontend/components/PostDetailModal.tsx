@@ -955,9 +955,15 @@ export default function PostDetailModal({
                     <h3 className="text-lg font-semibold text-white mb-2">
                       {t("writeReply")}
                     </h3>
-                    <p className="mb-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-100/80 text-xs leading-relaxed">
-                      {t("nudgeReply")}
-                    </p>
+                    {/* The "tell them what they did well…" nudge is feedback
+                        coaching framing — only fits Stage (practice video)
+                        posts, not Lab discussions where users are just
+                        chatting. User-reported issue. */}
+                    {post.post_type === "stage" && (
+                      <p className="mb-3 px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-100/80 text-xs leading-relaxed">
+                        {t("nudgeReply")}
+                      </p>
+                    )}
                     <div className="space-y-3">
                       <textarea
                         value={replyContent}
