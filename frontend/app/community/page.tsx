@@ -149,7 +149,6 @@ export default function CommunityPage() {
         { value: "beginner", label: t("beginner") },
         { value: "intermediate", label: t("intermediate") },
         { value: "advanced", label: t("advanced") },
-        { value: "master", label: t("master") },
     ];
 
     // Load posts - load for everyone including preview mode
@@ -300,25 +299,40 @@ export default function CommunityPage() {
 
                     {/* Mobile Header — search, toggle, filters */}
                     <div className="lg:hidden col-span-12 order-1 sticky top-16 z-40 bg-black/80 backdrop-blur-xl -mx-4 px-4 pb-3 pt-2 border-b border-white/10">
-                        {/* Search Bar */}
-                        <div className="relative mb-2.5">
-                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
-                            <input
-                                type="text"
-                                value={searchQuery}
-                                onChange={(e) => handleSearch(e.target.value)}
-                                placeholder={t("searchPlaceholder")}
-                                className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-8 py-2.5 text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-white/20 transition-all"
-                            />
-                            {searchQuery && (
-                                <button onClick={() => handleSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
-                                    <X className="w-3.5 h-3.5 text-gray-400 hover:text-white transition" />
-                                </button>
-                            )}
+                        {/* Search Bar — Shop link sits inside the trailing
+                            slot so it doesn't fight for space in the
+                            filter row below. */}
+                        <div className="relative mb-2.5 flex items-center gap-2">
+                            <div className="relative flex-1 min-w-0">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
+                                <input
+                                    type="text"
+                                    value={searchQuery}
+                                    onChange={(e) => handleSearch(e.target.value)}
+                                    placeholder={t("searchPlaceholder")}
+                                    className="w-full bg-white/[0.04] border border-white/10 rounded-xl pl-9 pr-8 py-2.5 text-[13px] text-white placeholder-gray-500 focus:outline-none focus:border-white/20 transition-all"
+                                />
+                                {searchQuery && (
+                                    <button onClick={() => handleSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2">
+                                        <X className="w-3.5 h-3.5 text-gray-400 hover:text-white transition" />
+                                    </button>
+                                )}
+                            </div>
+                            <Link
+                                href="/shop"
+                                aria-label={tShop("pageTitle")}
+                                className="flex-shrink-0 inline-flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-amber-300 hover:text-amber-100 hover:from-amber-500/30 hover:to-orange-500/30 hover:border-amber-500/60 transition-all"
+                            >
+                                <ShoppingBag size={16} />
+                            </Link>
                         </div>
 
-                        {/* Toggle + Filters Row */}
-                        <div className="flex items-center gap-2">
+                        {/* Toggle + Filter Row — flex-wrap so the toggle and
+                            the Filter dropdown reflow onto two rows on the
+                            narrowest devices instead of overflowing. The
+                            Filter dropdown gets min-w-[160px] so its label
+                            never gets clipped on the first row. */}
+                        <div className="flex flex-wrap items-center gap-2">
                             {/* Stage/Lab Toggle */}
                             <div className="flex bg-white/[0.04] rounded-full p-0.5 border border-white/10 flex-shrink-0">
                                 <button
@@ -356,20 +370,11 @@ export default function CommunityPage() {
                                 </button>
                             </div>
 
-                            {/* Shop shortcut (mobile) */}
-                            <Link
-                                href="/shop"
-                                aria-label={tShop("pageTitle")}
-                                className="flex-shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full bg-gradient-to-br from-amber-500/20 to-orange-500/20 border border-amber-500/40 text-amber-300 hover:text-amber-100 hover:from-amber-500/30 hover:to-orange-500/30 hover:border-amber-500/60 transition-all"
-                            >
-                                <ShoppingBag size={15} />
-                            </Link>
-
                             {/* Tag (Filter) Dropdown — top trending tags from
                                 the current feed. Tap an entry to single-select;
                                 tap "All Topics" to clear. Mirrors the desktop
                                 sidebar's single-tag selection model. */}
-                            <div className="relative flex-1" ref={tagDropdownRef}>
+                            <div className="relative flex-1 min-w-[160px]" ref={tagDropdownRef}>
                                 <button
                                     onClick={() => setTagDropdownOpen(!tagDropdownOpen)}
                                     className={`w-full border rounded-xl pl-3 pt-5 pb-1.5 pr-7 text-left focus:outline-none transition-all relative ${
