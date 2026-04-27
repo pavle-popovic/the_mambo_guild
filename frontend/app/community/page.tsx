@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Plus, Search, X, Tv, FlaskConical, ChevronDown, Bookmark, ShoppingBag } from "lucide-react";
 import Link from "next/link";
@@ -223,6 +223,33 @@ export default function CommunityPage() {
         }
     };
 
+    // Mobile trending tags — top by frequency in the current feed.
+    // Desktop has the full sidebar; this strip is the lg:hidden mobile
+    // equivalent. Selected tags are always included at the front so they
+    // don't vanish when the active filter narrows the feed to one tag.
+    const mobileTrendingTags = useMemo(() => {
+        const counts: Record<string, number> = {};
+        posts.forEach((p) => {
+            (p.tags || []).forEach((t) => {
+                const norm = t.replace(/^#/, "");
+                if (!norm) return;
+                counts[norm] = (counts[norm] || 0) + 1;
+            });
+        });
+        const trending = Object.entries(counts)
+            .sort((a, b) => b[1] - a[1])
+            .map(([tag]) => tag);
+        const seen = new Set<string>();
+        const merged: string[] = [];
+        for (const tag of [...selectedTopics, ...trending]) {
+            if (!seen.has(tag)) {
+                seen.add(tag);
+                merged.push(tag);
+            }
+        }
+        return merged.slice(0, 10);
+    }, [posts, selectedTopics]);
+
     // Filter posts by level
     const filteredPosts = posts.filter((post) => {
         if (selectedLevels.length > 0) {
@@ -427,6 +454,38 @@ export default function CommunityPage() {
                                         </button>
                                     );
                                 })}
+                            </div>
+                        )}
+
+                        {/* Mobile tag chips — horizontal-scrolling strip of
+                            the top trending tags. Hidden on lg+ where the
+                            full sidebar shows trending tags with counts.
+                            Negative margin + horizontal padding makes the
+                            strip bleed to the screen edge so the row visibly
+                            scrolls instead of looking truncated. */}
+                        {mobileTrendingTags.length > 0 && (
+                            <div className="lg:hidden mb-3 -mx-4 sm:-mx-6 px-4 sm:px-6 overflow-x-auto scrollbar-none">
+                                <div className="flex items-center gap-2 w-max">
+                                    {mobileTrendingTags.map((tag) => {
+                                        const active = selectedTopics.includes(tag);
+                                        return (
+                                            <button
+                                                key={tag}
+                                                onClick={() => {
+                                                    if (searchQuery) handleSearch("");
+                                                    setSelectedTopics(active ? [] : [tag]);
+                                                }}
+                                                className={`px-3 py-1 rounded-full text-[11px] font-bold whitespace-nowrap transition-all border flex-shrink-0 ${
+                                                    active
+                                                        ? "bg-cyan-500/20 border-cyan-400/60 text-cyan-200 shadow-[0_0_10px_rgba(34,211,238,0.15)]"
+                                                        : "bg-white/[0.04] border-white/10 text-white/60 hover:border-white/25 hover:text-white/80"
+                                                }`}
+                                            >
+                                                #{tag}
+                                            </button>
+                                        );
+                                    })}
+                                </div>
                             </div>
                         )}
 
