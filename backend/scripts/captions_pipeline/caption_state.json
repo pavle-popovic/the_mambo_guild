@@ -3075,14 +3075,16 @@
     "IrimoEdited__Irimo_Lesson": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777278384.0993016
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594244.0226772
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777278384.1223314
         },
         "es": {
           "status": "translated",
