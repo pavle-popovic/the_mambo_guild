@@ -409,17 +409,21 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               </p>
             </div>
 
-            {/* Tier gate. Two variants:
+            {/* Tier gate. Two variants, distinguished by the backend's
+                gate-state-discriminating message text:
                   - trial:   security copy, no CTA (they already pay)
-                  - members: upgrade CTA → /pricing */}
+                  - members: upgrade CTA → /pricing
+                Detection uses the canonical English message (the regex
+                anchors are stable strings the backend always emits);
+                the displayed copy is fully localised via t(). */}
             {eligibility && !eligibility.allowed && /trial/i.test(eligibility.message) ? (
               <div className="py-6 text-center">
                 <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-gradient-to-br from-amber-500/30 to-amber-600/30 border border-amber-400/40 flex items-center justify-center text-2xl">
                   🔒
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Posting Locked During Trial</h3>
+                <h3 className="text-xl font-bold text-white mb-2">{t("tierGateTrialTitle")}</h3>
                 <p className="text-white/70 text-sm max-w-md mx-auto leading-relaxed">
-                  {eligibility.message}
+                  {t("tierGateTrialMessage")}
                 </p>
               </div>
             ) : eligibility && !eligibility.allowed && /member/i.test(eligibility.message) ? (
@@ -427,15 +431,15 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
                 <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-gradient-to-br from-amber-500/30 to-amber-600/30 border border-amber-400/40 flex items-center justify-center text-2xl">
                   🔒
                 </div>
-                <h3 className="text-xl font-bold text-white mb-2">Members Only</h3>
+                <h3 className="text-xl font-bold text-white mb-2">{t("tierGateMembersTitle")}</h3>
                 <p className="text-white/70 text-sm mb-6 max-w-md mx-auto leading-relaxed">
-                  {eligibility.message}
+                  {t("tierGateMembersMessage")}
                 </p>
                 <a
                   href="/pricing"
                   className="inline-block px-6 py-3 rounded-lg bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-bold transition shadow-lg shadow-amber-500/20"
                 >
-                  See Plans
+                  {t("tierGateSeePlans")}
                 </a>
               </div>
             ) : (
