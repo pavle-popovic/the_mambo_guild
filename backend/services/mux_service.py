@@ -78,10 +78,18 @@ def create_direct_upload(
         print(f"[MUX] Building asset request, is_community={is_community}", flush=True)
 
         if is_community:
-            print(f"[MUX] Community upload - capping at 1080p (min supported tier), was 720p but invalid", flush=True)
+            # Community upload — `video_quality="plus"` is the critical
+            # setting: it gives Mux's full ABR ladder (240p/360p/480p/720p
+            # /1080p auto-switching) instead of the single-rendition
+            # `basic` tier the account defaults to. Without this, phone-
+            # shot 60fps clips have no lower-bitrate fallback and stutter
+            # on any non-perfect network. Resolution tier still capped at
+            # 1080p (Mux's lowest cap).
+            print(f"[MUX] Community upload - video_quality=plus, max 1080p", flush=True)
             asset_request = CreateAssetRequest(
                 playback_policies=["public"],
                 test=test,
+                video_quality="plus",
                 max_resolution_tier="1080p",
                 passthrough=passthrough if passthrough else None,
                 meta=meta
