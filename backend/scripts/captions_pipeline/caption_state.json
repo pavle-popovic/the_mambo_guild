@@ -6467,14 +6467,16 @@
     "Mambo101Edited__Swing_1_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777280691.5104892
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.3485196
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777280695.0499897
         },
         "es": {
           "status": "translated",
