@@ -6723,14 +6723,16 @@
     "Mambo101Edited__Swing_2_Preview": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777281322.4724784
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.4645405
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777281322.5108984
         },
         "es": {
           "status": "translated",
