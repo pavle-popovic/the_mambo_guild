@@ -495,12 +495,6 @@ function PricingPageContent() {
                         {tp("guildMasterFeature5")}
                       </li>
                     </ul>
-                    {/* Roundtable admission policy note — sets the 7-day
-                        continuous-membership expectation upfront so brand-new
-                        subscribers don't expect to join the very next call. */}
-                    <p className="text-[11px] text-gray-500 mb-4 leading-relaxed text-left">
-                      {tr("admissionPolicyShort")}
-                    </p>
                     <Clickable>
                       {(() => {
                         const gmFull = guildMasterSeats?.is_full === true;

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   Radio, Calendar, Play, Users, Crown, Lock,
-  ArrowLeft, ExternalLink, Tag, X, CalendarPlus, Download, Info
+  ArrowLeft, ExternalLink, Tag, X, CalendarPlus, Download
 } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
@@ -81,13 +81,6 @@ function LockedPage({ user }: { user: any }) {
                 <span className="text-gray-300">{t("perk3")}</span>
               </div>
             </div>
-
-            {/* Admission policy note — shown before upgrade so users
-                know the 7-day continuous-membership rule upfront. */}
-            <p className="text-xs text-gray-500 max-w-md mx-auto mb-8 leading-relaxed">
-              <Info size={12} className="inline mr-1 -mt-0.5 text-amber-400/60" />
-              {t("admissionPolicyShort")}
-            </p>
 
             <Link
               href="/pricing"
@@ -370,30 +363,6 @@ export default function RoundtablePage() {
                       </a>
                     </div>
                   )}
-                </div>
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Admission Policy Disclaimer — sets expectations so users
-              who subscribe last-minute don't expect immediate access and
-              gives the host a stated rule to point at when denying. */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.15 }}
-            className="mb-12"
-          >
-            <div className="rounded-2xl p-5 border border-white/10 bg-white/5">
-              <div className="flex items-start gap-3">
-                <Info size={20} className="text-amber-400 mt-0.5 shrink-0" />
-                <div>
-                  <h3 className="text-sm font-bold text-amber-300 uppercase tracking-wide mb-2">
-                    {t("admissionPolicyTitle")}
-                  </h3>
-                  <p className="text-sm text-gray-300 leading-relaxed">
-                    {t("admissionPolicyFull")}
-                  </p>
                 </div>
               </div>
             </div>
