@@ -361,35 +361,51 @@ def get_post_detail(
         if str(post.user_id) != str(current_user_id or ""):
             return None
 
-    # Get replies ordered by accepted answer first, then by date
-    replies = db.query(PostReply).filter(
-        PostReply.post_id == post_id,
-        PostReply.is_deleted == False
-    ).order_by(
-        desc(PostReply.is_accepted_answer),
-        PostReply.created_at
-    ).all()
-
-    # Shadowban filter: show flagged/ghosted replies ONLY to their author
-    visible_replies = [
-        r for r in replies
-        if r.moderation_status == ModerationStatus.ACTIVE.value
-        or str(r.user_id) == current_user_id
-    ]
-
     response = _format_post_response(post, current_user_id, db)
 
-    # Batch-load reply authors to avoid N+1
-    reply_user_ids = list({r.user_id for r in visible_replies})
-    reply_users = db.query(User).filter(User.id.in_(reply_user_ids)).options(
-        joinedload(User.profile), joinedload(User.subscription)
-    ).all() if reply_user_ids else []
-    reply_user_map = {str(u.id): u for u in reply_users}
+    # Reply load is wrapped in try/except so a transient SELECT failure
+    # (e.g. mid-deploy when an additive column hasn't propagated to the
+    # schema cache yet) degrades gracefully — the post itself still
+    # renders with an empty replies list instead of bubbling a 5xx that
+    # Railway maps to 502 for the whole modal.
+    try:
+        replies = db.query(PostReply).filter(
+            PostReply.post_id == post_id,
+            PostReply.is_deleted == False
+        ).order_by(
+            desc(PostReply.is_accepted_answer),
+            PostReply.created_at
+        ).all()
 
-    response["replies"] = [
-        _format_reply_response(r, db, user=reply_user_map.get(str(r.user_id)))
-        for r in visible_replies
-    ]
+        # Shadowban filter: show flagged/ghosted replies ONLY to their author
+        visible_replies = [
+            r for r in replies
+            if r.moderation_status == ModerationStatus.ACTIVE.value
+            or str(r.user_id) == current_user_id
+        ]
+
+        # Batch-load reply authors to avoid N+1
+        reply_user_ids = list({r.user_id for r in visible_replies})
+        reply_users = db.query(User).filter(User.id.in_(reply_user_ids)).options(
+            joinedload(User.profile), joinedload(User.subscription)
+        ).all() if reply_user_ids else []
+        reply_user_map = {str(u.id): u for u in reply_users}
+
+        response["replies"] = [
+            _format_reply_response(r, db, user=reply_user_map.get(str(r.user_id)))
+            for r in visible_replies
+        ]
+    except Exception:
+        # Roll back any partial state on this connection so the next
+        # query starts clean. Surface the error in logs so the operator
+        # sees it; client gets the post with no replies, not a 5xx.
+        try:
+            db.rollback()
+        except Exception:
+            pass
+        logger.exception("get_post_detail: reply load failed for post %s", post_id)
+        response["replies"] = []
+
     return response
 
 

@@ -1016,17 +1016,26 @@ export default function PostDetailModal({
                     </h3>
                     {(() => {
                       // Build a parent → children index from the flat reply
-                      // list so we can render the tree depth-first.
-                      // Top-level replies key on null. Server caps depth at
-                      // 5 so the recursion is bounded.
+                      // list. Orphan handling: if a reply's parent isn't in
+                      // the visible list (parent was soft-deleted, or the
+                      // server filtered it for moderation), promote the
+                      // reply to top-level so it doesn't silently disappear
+                      // from the thread.
+                      const visibleIds = new Set((post.replies || []).map(r => r.id));
                       const repliesByParent = new Map<string | null, typeof post.replies>();
                       for (const r of post.replies) {
-                        const key = (r.parent_reply_id ?? null) as string | null;
+                        let key = (r.parent_reply_id ?? null) as string | null;
+                        if (key && !visibleIds.has(key)) key = null;
                         if (!repliesByParent.has(key)) repliesByParent.set(key, []);
                         repliesByParent.get(key)!.push(r);
                       }
                       const topLevel = repliesByParent.get(null) || [];
                       const MAX_VISUAL_DEPTH = 3;
+                      // Defensive recursion bound. Server flattens threads to
+                      // 2 levels and the FK has no cycle, so we should never
+                      // exceed depth 1 in practice — this fence catches any
+                      // surprise bad data without taking down the modal.
+                      const MAX_RECURSION_DEPTH = 8;
                       // The outer block already gates on feedback_type !== "hype",
                       // so any reply rendered here is in coach mode and can take
                       // a nested reply.
@@ -1037,6 +1046,7 @@ export default function PostDetailModal({
                         depth: number,
                         index: number,
                       ): React.ReactNode => {
+                        if (depth > MAX_RECURSION_DEPTH) return null;
                         const isOptimistic = reply.id.startsWith("temp-");
                         const isReplyOwner = currentUserId && String(currentUserId) === String(reply.user.id);
                         const isAdmin = user?.role === "admin";
