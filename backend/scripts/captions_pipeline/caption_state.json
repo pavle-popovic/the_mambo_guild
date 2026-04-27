@@ -7107,14 +7107,16 @@
     "Mambo101Edited__Syncopation_2_Lesson_2": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777282499.4293523
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.6568284
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777282502.9761348
         },
         "es": {
           "status": "translated",
