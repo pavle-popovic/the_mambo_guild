@@ -106,6 +106,11 @@ export default function PostDetailModal({
   const [isSubmittingReply, setIsSubmittingReply] = useState(false);
   const [playerInitialized, setPlayerInitialized] = useState(false);
   const [profileModalUsername, setProfileModalUsername] = useState<string | null>(null);
+  // Set from onLoadedMetadata so the player wrapper hugs the video's
+  // native aspect ratio. Lessons use the same pattern. Without this, a
+  // portrait phone clip sits letter-boxed in a wide wrapper and the
+  // shadow-DOM object-fit retries cause initial-frame stutter.
+  const [videoAspect, setVideoAspect] = useState<string | null>(null);
 
   // Reply edit/delete state
   const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
@@ -142,6 +147,7 @@ export default function PostDetailModal({
       // Reset optimistic state when opening modal
       setOptimisticReaction(null);
       setPlayerInitialized(false); // Reset tap-to-play state
+      setVideoAspect(null);
       loadPost({ skipIfOptimistic: false });
       apiClient.getCommunityTags().then(setTags).catch(console.error);
 
@@ -711,17 +717,35 @@ export default function PostDetailModal({
                           </div>
                         </div>
                       ) : (
-                        // Full Mux player (only loads after user taps)
+                        // Full Mux player (only loads after user taps).
+                        // Wrapper hugs the video's native aspect once
+                        // metadata loads — no letterboxing → no shadow-DOM
+                        // object-fit retry → no startup compositing churn.
                         <div
-                          className="relative rounded-lg overflow-hidden bg-black"
-                          style={{ height: "55vh" }}
+                          className="relative rounded-lg overflow-hidden bg-black mx-auto"
+                          style={
+                            videoAspect
+                              ? { aspectRatio: videoAspect, maxHeight: "70vh", maxWidth: "100%" }
+                              : { maxHeight: "70vh", aspectRatio: "9 / 16" }
+                          }
                         >
                           <MuxVideoPlayer
                             playbackId={post.mux_playback_id}
                             autoPlay={true}
-                            containFit
                             maxResolution="720p"
                             preload="auto"
+                            onLoadedMetadata={(_duration: number) => {
+                              // Pull the actual frame dimensions out of the
+                              // <video> element so the wrapper sizes to
+                              // whatever the user uploaded (portrait clips
+                              // get a 9:16 hug, landscape stays 16:9, etc.).
+                              const vid = document.querySelector(
+                                "mux-player video"
+                              ) as HTMLVideoElement | null;
+                              if (vid?.videoWidth && vid?.videoHeight) {
+                                setVideoAspect(`${vid.videoWidth} / ${vid.videoHeight}`);
+                              }
+                            }}
                             metadata={{
                               video_title: post.title,
                               video_id: post.id,
