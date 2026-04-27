@@ -147,6 +147,16 @@ def _ensure_tables() -> None:
             "notifications.actor_id backfill skipped: %s", exc
         )
 
+    # Threaded replies: parent_reply_id FK on post_replies (nullable, SET
+    # NULL on parent delete so subtrees are never cascade-vaporised).
+    try:
+        from migrations.add_post_reply_parent import run as _add_post_reply_parent
+        _add_post_reply_parent()
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning(
+            "post_replies.parent_reply_id migration skipped: %s", exc
+        )
+
     # Seed release_schedule_items with the launch lineup so the admin
     # editor and the landing page agree on day one. Only inserts when
     # the table is empty — never overwrites later edits.

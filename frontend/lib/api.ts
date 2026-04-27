@@ -1302,7 +1302,7 @@ class ApiClient {
     });
   }
 
-  async addReply(postId: string, content: string, muxAssetId?: string, muxPlaybackId?: string) {
+  async addReply(postId: string, content: string, muxAssetId?: string, muxPlaybackId?: string, parentReplyId?: string) {
     return this.request<{
       success: boolean;
       reply?: any;
@@ -1313,6 +1313,7 @@ class ApiClient {
         content,
         mux_asset_id: muxAssetId,
         mux_playback_id: muxPlaybackId,
+        parent_reply_id: parentReplyId,
       }),
     });
   }

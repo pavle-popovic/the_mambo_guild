@@ -768,6 +768,8 @@
     "commentsCount": "💬 {count} commentaires",
     "writeReply": "Écrire une Réponse",
     "replyPlaceholder": "Écrivez votre réponse ou question...",
+    "replyButton": "Répondre",
+    "replyingTo": "En réponse à @{username}",
     "replyCost": "Dis-lui ce qui va bien, et une chose à ajuster. Attitude avant Aptitude.",
     "posting": "Publication...",
     "postReply": "Poster la réponse",

@@ -768,6 +768,8 @@
     "commentsCount": "💬 {count} Kommentare",
     "writeReply": "Antwort Schreiben",
     "replyPlaceholder": "Schreibe deine Antwort oder Frage...",
+    "replyButton": "Antworten",
+    "replyingTo": "Antwort an @{username}",
     "replyCost": "Sag, was gut war, und eine Sache zum Anpassen. Haltung vor Können.",
     "posting": "Wird gepostet...",
     "postReply": "Antwort posten",

@@ -768,6 +768,8 @@
     "commentsCount": "💬 {count} comentarios",
     "writeReply": "Escribe una Respuesta",
     "replyPlaceholder": "Escribe tu respuesta o pregunta...",
+    "replyButton": "Responder",
+    "replyingTo": "Respondiendo a @{username}",
     "replyCost": "Dile qué hizo bien y una cosa que puede ajustar. Actitud sobre Aptitud.",
     "posting": "Publicando...",
     "postReply": "Publicar Respuesta",

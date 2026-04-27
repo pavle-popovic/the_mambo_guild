@@ -125,7 +125,16 @@ class PostReply(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     post_id = Column(UUID(as_uuid=True), ForeignKey("posts.id", ondelete="CASCADE"), nullable=False, index=True)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
-    
+    # Nested reply pointer. NULL = top-level reply on the post. ON DELETE
+    # SET NULL so a moderator deleting one reply can't vaporise the whole
+    # subtree underneath it.
+    parent_reply_id = Column(
+        UUID(as_uuid=True),
+        ForeignKey("post_replies.id", ondelete="SET NULL"),
+        nullable=True,
+        index=True,
+    )
+
     content = Column(Text, nullable=False)
     mux_asset_id = Column(String(100), nullable=True)  # Optional video reply
     mux_playback_id = Column(String(100), nullable=True)

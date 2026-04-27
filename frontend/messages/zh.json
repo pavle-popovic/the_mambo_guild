@@ -768,6 +768,8 @@
     "commentsCount": "💬 {count} 条评论",
     "writeReply": "写回复",
     "replyPlaceholder": "写下你的回复或问题...",
+    "replyButton": "回复",
+    "replyingTo": "正在回复 @{username}",
     "replyCost": "先说做得好的地方，再点一个可以调整的地方。态度胜于技术。",
     "posting": "发布中...",
     "postReply": "发布回复",

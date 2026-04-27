@@ -768,6 +768,8 @@
     "commentsCount": "💬 {count} komentarzy",
     "writeReply": "Napisz odpowiedź",
     "replyPlaceholder": "Napisz swoją odpowiedź lub pytanie...",
+    "replyButton": "Odpowiedz",
+    "replyingTo": "Odpowiadasz @{username}",
     "replyCost": "Powiedz, co poszło dobrze, i jedną rzecz do poprawki. Postawa ponad Umiejętność.",
     "posting": "Publikowanie...",
     "postReply": "Opublikuj odpowiedź",

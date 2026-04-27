@@ -164,6 +164,7 @@ def _format_reply_response(reply: PostReply, db: Session, user: User = None) -> 
         "is_accepted_answer": reply.is_accepted_answer,
         "moderation_status": reply.moderation_status or "active",
         "created_at": reply.created_at,
+        "parent_reply_id": str(reply.parent_reply_id) if reply.parent_reply_id else None,
     }
 
 
@@ -498,12 +499,54 @@ def remove_reaction(
     }
 
 
+_MAX_REPLY_DEPTH = 5  # cap server-side; UI also caps visual indent at 4
+
+
+def _resolve_reply_parent(
+    parent_reply_id: str,
+    post_id: str,
+    db: Session,
+) -> tuple[bool, str, "PostReply | None"]:
+    """Validate a parent_reply_id for nesting.
+
+    Returns (ok, message, parent). The parent must (a) exist and not be
+    soft-deleted, (b) belong to the same post (prevents cross-post
+    nesting via crafted IDs), (c) sit at a depth that leaves room for
+    one more level under _MAX_REPLY_DEPTH (so the new reply itself is
+    still within the cap).
+    """
+    parent = db.query(PostReply).filter(
+        PostReply.id == parent_reply_id,
+        PostReply.is_deleted == False,
+    ).first()
+    if not parent:
+        return (False, "Parent reply not found", None)
+    if str(parent.post_id) != str(post_id):
+        return (False, "Parent reply belongs to a different post", None)
+
+    # Walk up to count depth. _MAX_REPLY_DEPTH bounds the loop, so the
+    # SET NULL FK alone (which can't create cycles) plus this counter
+    # make a runaway chain impossible.
+    depth = 1
+    cursor = parent
+    while cursor.parent_reply_id is not None and depth < _MAX_REPLY_DEPTH + 2:
+        depth += 1
+        cursor = db.query(PostReply).filter(PostReply.id == cursor.parent_reply_id).first()
+        if cursor is None:
+            break
+    if depth >= _MAX_REPLY_DEPTH:
+        return (False, "Reply thread is too deeply nested", None)
+
+    return (True, "", parent)
+
+
 def add_reply(
     post_id: str,
     user_id: str,
     content: str,
     mux_asset_id: str = None,
     mux_playback_id: str = None,
+    parent_reply_id: str = None,
     db: Session = None
 ) -> dict:
     """
@@ -516,6 +559,13 @@ def add_reply(
     # Check feedback_type - "hype" mode disables comments
     if post.feedback_type == "hype":
         return {"success": False, "message": "Comments are disabled on this post (Hype mode)"}
+
+    # Validate the nesting target before we run rate-limits or AI moderation
+    # — otherwise a bad parent_reply_id could waste a rate-limit slot.
+    if parent_reply_id:
+        ok, message, _parent = _resolve_reply_parent(parent_reply_id, post_id, db)
+        if not ok:
+            return {"success": False, "message": message}
 
     # Hourly rate limit.
     allowed, info = rate_limit_service.check("reply", user_id, db)
@@ -532,7 +582,7 @@ def add_reply(
             "required": COST_COMMENT,
             "balance": balance
         }
-    
+
     # AI Gatekeeper: evaluate reply content before saving
     moderation_status = evaluate_reply(content)
 
@@ -541,6 +591,7 @@ def add_reply(
         id=uuid.uuid4(),
         post_id=post_id,
         user_id=user_id,
+        parent_reply_id=parent_reply_id,
         content=content,
         mux_asset_id=mux_asset_id,
         mux_playback_id=mux_playback_id,

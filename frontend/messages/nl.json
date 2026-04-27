@@ -768,6 +768,8 @@
     "commentsCount": "💬 {count} reacties",
     "writeReply": "Schrijf een reactie",
     "replyPlaceholder": "Schrijf je reactie of vraag...",
+    "replyButton": "Reageren",
+    "replyingTo": "Reageert op @{username}",
     "replyCost": "Zeg wat goed ging en één ding om aan te passen. Houding boven Kunnen.",
     "posting": "Plaatsen...",
     "postReply": "Reactie plaatsen",

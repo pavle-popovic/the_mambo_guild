@@ -768,6 +768,8 @@
     "commentsCount": "💬 {count} コメント",
     "writeReply": "返信を書く",
     "replyPlaceholder": "返信または質問を書いてください...",
+    "replyButton": "返信",
+    "replyingTo": "@{username}さんへの返信",
     "replyCost": "良かった点と、ひとつ改善できる点を伝えよう。技術より姿勢。",
     "posting": "投稿中...",
     "postReply": "返信を投稿",

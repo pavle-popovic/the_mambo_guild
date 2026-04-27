@@ -367,6 +367,7 @@ def add_reply(
         content=request.content,
         mux_asset_id=request.mux_asset_id,
         mux_playback_id=request.mux_playback_id,
+        parent_reply_id=request.parent_reply_id,
         db=db
     )
 
@@ -388,19 +389,41 @@ def add_reply(
         ).scalar() or 0
         badge_service.check_and_award_badges(str(current_user.id), "comments_posted", comment_count, db)
 
-        # Notify post owner about the reply (don't notify self)
+        # Notify post owner about the reply (don't notify self).
+        # For nested replies, also notify the parent reply's author (a
+        # direct reply to their comment is more relevant to them than the
+        # post owner). Both notifications are deduped against the actor
+        # so users never get pinged about their own actions.
         post = db.query(Post).filter(Post.id == post_id).first()
-        if post and str(post.user_id) != str(current_user.id):
-            notification_service.create_notification(
-                user_id=str(post.user_id),
-                type="reply_received",
-                title="💬 New Reply",
-                message=f"replied to your post \"{post.title[:50]}\"",
-                reference_type="post",
-                reference_id=str(post.id),
-                actor_id=str(current_user.id),
-                db=db
-            )
+        if post:
+            notified: set[str] = {str(current_user.id)}
+            if str(post.user_id) not in notified:
+                notification_service.create_notification(
+                    user_id=str(post.user_id),
+                    type="reply_received",
+                    title="💬 New Reply",
+                    message=f"replied to your post \"{post.title[:50]}\"",
+                    reference_type="post",
+                    reference_id=str(post.id),
+                    actor_id=str(current_user.id),
+                    db=db
+                )
+                notified.add(str(post.user_id))
+
+            if request.parent_reply_id:
+                from models.community import PostReply
+                parent = db.query(PostReply).filter(PostReply.id == request.parent_reply_id).first()
+                if parent and str(parent.user_id) not in notified:
+                    notification_service.create_notification(
+                        user_id=str(parent.user_id),
+                        type="reply_received",
+                        title="💬 New Reply",
+                        message=f"replied to your comment on \"{post.title[:50]}\"",
+                        reference_type="post",
+                        reference_id=str(post.id),
+                        actor_id=str(current_user.id),
+                        db=db
+                    )
 
         db.commit()
 

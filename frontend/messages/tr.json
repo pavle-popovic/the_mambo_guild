@@ -777,6 +777,8 @@
     "commentsCount": "💬 {count} yorum",
     "writeReply": "Yanıt Yaz",
     "replyPlaceholder": "Yanıtını veya soruyu yaz...",
+    "replyButton": "Yanıtla",
+    "replyingTo": "@{username} kullanıcısına yanıt veriyorsunuz",
     "replyCost": "Onlara iyi yaptıklarını ve düzeltmeleri gereken bir şeyi söyle. Yetenek değil tutum.",
     "posting": "Yayınlanıyor...",
     "postReply": "Yanıt Yayınla",

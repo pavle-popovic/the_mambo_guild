@@ -768,6 +768,8 @@
     "commentsCount": "💬 {count} commenti",
     "writeReply": "Scrivi una Risposta",
     "replyPlaceholder": "Scrivi la tua risposta o domanda...",
+    "replyButton": "Rispondi",
+    "replyingTo": "In risposta a @{username}",
     "replyCost": "Dille cosa ha fatto bene e una cosa da sistemare. Attitudine prima di Abilità.",
     "posting": "Pubblicazione...",
     "postReply": "Pubblica Risposta",

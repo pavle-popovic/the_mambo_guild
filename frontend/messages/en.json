@@ -777,6 +777,8 @@
     "commentsCount": "💬 {count} comments",
     "writeReply": "Write a Reply",
     "replyPlaceholder": "Write your reply or question...",
+    "replyButton": "Reply",
+    "replyingTo": "Replying to @{username}",
     "replyCost": "Tell them what they did well, and one thing to tweak. Attitude over Aptitude.",
     "posting": "Posting...",
     "postReply": "Post Reply",

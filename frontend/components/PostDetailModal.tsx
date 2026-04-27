@@ -67,6 +67,7 @@ interface Post {
     mux_playback_id: string | null;
     is_accepted_answer: boolean;
     created_at: string;
+    parent_reply_id?: string | null;
   }>;
   created_at: string;
   updated_at: string;
@@ -110,6 +111,14 @@ export default function PostDetailModal({
   const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
   const [editingReplyContent, setEditingReplyContent] = useState("");
   const [deletingReplyId, setDeletingReplyId] = useState<string | null>(null);
+
+  // Nested-reply composer: which reply has its inline composer open + the
+  // content being typed. Only one inline composer is open at a time so the
+  // UI doesn't fill up with empty boxes if a user clicks Reply on several
+  // siblings before writing anything.
+  const [replyingToId, setReplyingToId] = useState<string | null>(null);
+  const [nestedReplyContent, setNestedReplyContent] = useState("");
+  const [isSubmittingNestedReply, setIsSubmittingNestedReply] = useState(false);
 
   // Optimistic state management
   const [optimisticReaction, setOptimisticReaction] = useState<{
@@ -411,6 +420,87 @@ export default function PostDetailModal({
       setReplyContent(replyText); // Restore text on error
     } finally {
       setIsSubmittingReply(false);
+    }
+  };
+
+  const handleSubmitNestedReply = async (parentReplyId: string) => {
+    if (!nestedReplyContent.trim() || !post) return;
+    setIsSubmittingNestedReply(true);
+    setError(null);
+    const replyText = nestedReplyContent.trim();
+
+    const optimisticReply = {
+      id: `temp-${Date.now()}`,
+      content: replyText,
+      parent_reply_id: parentReplyId,
+      user: user ? {
+        id: user.id,
+        username: (user as any).username || "",
+        first_name: user.first_name || "You",
+        last_name: user.last_name || "",
+        avatar_url: user.avatar_url || null,
+        is_pro: user.is_pro || false,
+        level: user.level || 1,
+      } : {
+        id: currentUserId || "",
+        username: "",
+        first_name: "You",
+        last_name: "",
+        avatar_url: null,
+        is_pro: false,
+        level: 1,
+      },
+      is_accepted_answer: false,
+      created_at: new Date().toISOString(),
+      mux_playback_id: null,
+    };
+
+    setPost(prev => prev ? {
+      ...prev,
+      replies: [...(prev.replies || []), optimisticReply],
+      reply_count: (prev.reply_count || 0) + 1,
+    } : null);
+
+    setNestedReplyContent("");
+    setReplyingToId(null);
+
+    try {
+      await apiClient.addReply(postId, replyText, undefined, undefined, parentReplyId);
+      UISoundClick();
+      // Reload to swap the optimistic temp- row for the real one + pick up
+      // any badge/notification side-effects.
+      setTimeout(async () => {
+        try {
+          const freshPost = await apiClient.getPost(postId, { forceRefresh: true });
+          setPost(prev => {
+            if (!prev) return freshPost as Post;
+            const withoutTemp = prev.replies?.filter(r => !r.id.startsWith('temp-')) || [];
+            const serverReplies = freshPost.replies || [];
+            const existingIds = new Set(withoutTemp.map(r => r.id));
+            const newReplies = serverReplies.filter((sr: any) => !existingIds.has(sr.id));
+            return {
+              ...(freshPost as Post),
+              replies: [...withoutTemp, ...newReplies],
+            };
+          });
+          onRefresh?.();
+        } catch (err) {
+          console.error("Failed to reload post after nested reply:", err);
+        }
+      }, 1500);
+    } catch (err: any) {
+      setError(err.message || t("failedPostReply"));
+      // Revert optimistic state and restore the typed text so the user
+      // can retry without losing their reply.
+      setPost(prev => prev ? {
+        ...prev,
+        replies: prev.replies?.filter(r => r.id !== optimisticReply.id) || [],
+        reply_count: Math.max(0, (prev.reply_count || 0) - 1),
+      } : null);
+      setNestedReplyContent(replyText);
+      setReplyingToId(parentReplyId);
+    } finally {
+      setIsSubmittingNestedReply(false);
     }
   };
 
@@ -924,155 +1014,248 @@ export default function PostDetailModal({
                     <h3 className="text-lg font-semibold text-white mb-4">
                       {t("repliesCount", { count: post.reply_count })}
                     </h3>
-                    <div className="space-y-4">
-                      <AnimatePresence mode="popLayout">
-                      {post.replies.map((reply, index) => {
+                    {(() => {
+                      // Build a parent → children index from the flat reply
+                      // list so we can render the tree depth-first.
+                      // Top-level replies key on null. Server caps depth at
+                      // 5 so the recursion is bounded.
+                      const repliesByParent = new Map<string | null, typeof post.replies>();
+                      for (const r of post.replies) {
+                        const key = (r.parent_reply_id ?? null) as string | null;
+                        if (!repliesByParent.has(key)) repliesByParent.set(key, []);
+                        repliesByParent.get(key)!.push(r);
+                      }
+                      const topLevel = repliesByParent.get(null) || [];
+                      const MAX_VISUAL_DEPTH = 3;
+                      // The outer block already gates on feedback_type !== "hype",
+                      // so any reply rendered here is in coach mode and can take
+                      // a nested reply.
+                      const allowReplies = true;
+
+                      const renderReplyTree = (
+                        reply: NonNullable<typeof post.replies>[number],
+                        depth: number,
+                        index: number,
+                      ): React.ReactNode => {
                         const isOptimistic = reply.id.startsWith("temp-");
                         const isReplyOwner = currentUserId && String(currentUserId) === String(reply.user.id);
                         const isAdmin = user?.role === "admin";
                         const canEditReply = (isReplyOwner || isAdmin) && !isOptimistic;
+                        const children = repliesByParent.get(reply.id) || [];
+                        const hasComposerOpen = replyingToId === reply.id;
+
                         return (
-                          <motion.div
-                            key={reply.id}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            exit={{ opacity: 0, x: 20, height: 0 }}
-                            transition={{ duration: 0.3, delay: index * 0.05 }}
-                            layout
-                          >
-                          <GlassCard
-                            className={cn(
-                              "p-4",
-                              isOptimistic && "opacity-70",
-                              reply.user.is_guild_master && "guild-master-comment"
-                            )}
-                          >
-                            <div className="flex items-start gap-3">
-                              <button
-                                type="button"
-                                onClick={() => reply.user.username && setProfileModalUsername(reply.user.username)}
-                                className="rounded-full transition hover:ring-2 hover:ring-mambo-gold/50 focus:outline-none focus:ring-2 focus:ring-mambo-gold/50"
-                                aria-label={t("viewProfileAria", { username: reply.user.username || "user" })}
+                          <div key={reply.id}>
+                            <motion.div
+                              initial={{ opacity: 0, x: -20 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 20, height: 0 }}
+                              transition={{ duration: 0.3, delay: index * 0.05 }}
+                              layout
+                            >
+                              <GlassCard
+                                className={cn(
+                                  "p-4",
+                                  isOptimistic && "opacity-70",
+                                  reply.user.is_guild_master && "guild-master-comment"
+                                )}
                               >
-                                <GuildMasterAvatar
-                                  avatarUrl={reply.user.avatar_url}
-                                  username={reply.user.username}
-                                  isPro={reply.user.is_pro}
-                                  isGuildMaster={reply.user.is_guild_master}
-                                  size="sm"
-                                  equippedBorderSku={reply.user.equipped_border_sku}
-                                />
-                              </button>
-                              <div className="flex-1">
-                                <div className="flex items-center gap-2 mb-1">
+                                <div className="flex items-start gap-3">
                                   <button
                                     type="button"
                                     onClick={() => reply.user.username && setProfileModalUsername(reply.user.username)}
-                                    className="rounded transition hover:opacity-80 focus:outline-none"
+                                    className="rounded-full transition hover:ring-2 hover:ring-mambo-gold/50 focus:outline-none focus:ring-2 focus:ring-mambo-gold/50"
+                                    aria-label={t("viewProfileAria", { username: reply.user.username || "user" })}
                                   >
-                                    <GuildMasterUsername
+                                    <GuildMasterAvatar
+                                      avatarUrl={reply.user.avatar_url}
                                       username={reply.user.username}
-                                      firstName={reply.user.first_name}
-                                      lastName={reply.user.last_name}
                                       isPro={reply.user.is_pro}
                                       isGuildMaster={reply.user.is_guild_master}
-                                      equippedTitleSku={reply.user.equipped_title_sku}
-                                      className="text-sm"
+                                      size="sm"
+                                      equippedBorderSku={reply.user.equipped_border_sku}
                                     />
                                   </button>
-                                  {isOptimistic && (
-                                    <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200">
-                                      {t("postingTag")}
-                                    </span>
-                                  )}
-                                  {reply.is_accepted_answer && (
-                                    <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/30 text-green-200">
-                                      {t("solutionTag")}
-                                    </span>
-                                  )}
-                                  {!isOptimistic && currentUserId && String(currentUserId) === String(post.user.id) && post.post_type === "lab" && !reply.is_accepted_answer && (
-                                    <button
-                                      onClick={() => handleMarkSolution(reply.id)}
-                                      className="text-xs px-2 py-1 rounded bg-green-500/20 hover:bg-green-500/30 text-green-200 transition"
-                                      title={t("markSolutionTitle")}
-                                    >
-                                      {t("acceptBtn")}
-                                    </button>
-                                  )}
+                                  <div className="flex-1 min-w-0">
+                                    <div className="flex items-center gap-2 mb-1 flex-wrap">
+                                      <button
+                                        type="button"
+                                        onClick={() => reply.user.username && setProfileModalUsername(reply.user.username)}
+                                        className="rounded transition hover:opacity-80 focus:outline-none"
+                                      >
+                                        <GuildMasterUsername
+                                          username={reply.user.username}
+                                          firstName={reply.user.first_name}
+                                          lastName={reply.user.last_name}
+                                          isPro={reply.user.is_pro}
+                                          isGuildMaster={reply.user.is_guild_master}
+                                          equippedTitleSku={reply.user.equipped_title_sku}
+                                          className="text-sm"
+                                        />
+                                      </button>
+                                      {isOptimistic && (
+                                        <span className="text-xs px-1.5 py-0.5 rounded bg-amber-500/30 text-amber-200">
+                                          {t("postingTag")}
+                                        </span>
+                                      )}
+                                      {reply.is_accepted_answer && (
+                                        <span className="text-xs px-1.5 py-0.5 rounded bg-green-500/30 text-green-200">
+                                          {t("solutionTag")}
+                                        </span>
+                                      )}
+                                      {!isOptimistic && currentUserId && String(currentUserId) === String(post.user.id) && post.post_type === "lab" && !reply.is_accepted_answer && (
+                                        <button
+                                          onClick={() => handleMarkSolution(reply.id)}
+                                          className="text-xs px-2 py-1 rounded bg-green-500/20 hover:bg-green-500/30 text-green-200 transition"
+                                          title={t("markSolutionTitle")}
+                                        >
+                                          {t("acceptBtn")}
+                                        </button>
+                                      )}
 
-                                  {/* Reply Edit/Delete Buttons */}
-                                  {canEditReply && (
-                                    <div className="ml-auto flex items-center gap-1">
+                                      {/* Reply Edit/Delete Buttons */}
+                                      {canEditReply && (
+                                        <div className="ml-auto flex items-center gap-1">
+                                          <button
+                                            onClick={() => {
+                                              setEditingReplyId(reply.id);
+                                              setEditingReplyContent(reply.content);
+                                            }}
+                                            className="p-1 rounded hover:bg-white/10 text-white/40 hover:text-white/70 transition"
+                                            title={t("editReplyTitle")}
+                                          >
+                                            <FaEdit size={12} />
+                                          </button>
+                                          <button
+                                            onClick={() => setDeletingReplyId(reply.id)}
+                                            className="p-1 rounded hover:bg-red-500/20 text-white/40 hover:text-red-400 transition"
+                                            title={t("deleteReplyTitle")}
+                                          >
+                                            <FaTrash size={12} />
+                                          </button>
+                                        </div>
+                                      )}
+                                    </div>
+
+                                    {/* Inline Edit or Content */}
+                                    {editingReplyId === reply.id ? (
+                                      <div className="space-y-2">
+                                        <textarea
+                                          value={editingReplyContent}
+                                          onChange={(e) => setEditingReplyContent(e.target.value)}
+                                          className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                                          rows={3}
+                                        />
+                                        <div className="flex gap-2">
+                                          <button
+                                            onClick={() => handleUpdateReply(reply.id)}
+                                            className="px-3 py-1 rounded bg-[#D4AF37]/20 text-[#FCE205] text-xs font-bold hover:bg-[#D4AF37]/30 transition"
+                                          >
+                                            {t("saveBtn")}
+                                          </button>
+                                          <button
+                                            onClick={() => { setEditingReplyId(null); setEditingReplyContent(""); }}
+                                            className="px-3 py-1 rounded text-white/50 text-xs hover:text-white/70 transition"
+                                          >
+                                            {t("cancelBtn")}
+                                          </button>
+                                        </div>
+                                      </div>
+                                    ) : (
+                                      <p className="text-white/80 text-sm whitespace-pre-wrap">
+                                        {reply.content}
+                                      </p>
+                                    )}
+
+                                    {reply.mux_playback_id && (
+                                      <div className="mt-2">
+                                        <MuxVideoPlayer
+                                          playbackId={reply.mux_playback_id}
+                                          metadata={{
+                                            video_title: t("replyVideoTitle", { title: post.title }),
+                                            video_id: reply.id,
+                                          }}
+                                        />
+                                      </div>
+                                    )}
+
+                                    {/* Reply-to-reply trigger. Hidden during inline edit
+                                        and on the optimistic temp- row so users can't
+                                        nest under a reply that hasn't landed yet. */}
+                                    {allowReplies && !isOptimistic && editingReplyId !== reply.id && !hasComposerOpen && (
                                       <button
                                         onClick={() => {
-                                          setEditingReplyId(reply.id);
-                                          setEditingReplyContent(reply.content);
+                                          setReplyingToId(reply.id);
+                                          setNestedReplyContent("");
                                         }}
-                                        className="p-1 rounded hover:bg-white/10 text-white/40 hover:text-white/70 transition"
-                                        title={t("editReplyTitle")}
+                                        className="mt-2 text-xs text-white/50 hover:text-[#D4AF37] transition-colors font-medium"
                                       >
-                                        <FaEdit size={12} />
+                                        {t("replyButton")}
                                       </button>
-                                      <button
-                                        onClick={() => setDeletingReplyId(reply.id)}
-                                        className="p-1 rounded hover:bg-red-500/20 text-white/40 hover:text-red-400 transition"
-                                        title={t("deleteReplyTitle")}
-                                      >
-                                        <FaTrash size={12} />
-                                      </button>
-                                    </div>
-                                  )}
+                                    )}
+                                  </div>
                                 </div>
+                              </GlassCard>
+                            </motion.div>
 
-                                {/* Inline Edit or Content */}
-                                {editingReplyId === reply.id ? (
-                                  <div className="space-y-2">
-                                    <textarea
-                                      value={editingReplyContent}
-                                      onChange={(e) => setEditingReplyContent(e.target.value)}
-                                      className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
-                                      rows={3}
-                                    />
-                                    <div className="flex gap-2">
-                                      <button
-                                        onClick={() => handleUpdateReply(reply.id)}
-                                        className="px-3 py-1 rounded bg-[#D4AF37]/20 text-[#FCE205] text-xs font-bold hover:bg-[#D4AF37]/30 transition"
-                                      >
-                                        {t("saveBtn")}
-                                      </button>
-                                      <button
-                                        onClick={() => { setEditingReplyId(null); setEditingReplyContent(""); }}
-                                        className="px-3 py-1 rounded text-white/50 text-xs hover:text-white/70 transition"
-                                      >
-                                        {t("cancelBtn")}
-                                      </button>
-                                    </div>
-                                  </div>
-                                ) : (
-                                  <p className="text-white/80 text-sm whitespace-pre-wrap">
-                                    {reply.content}
-                                  </p>
-                                )}
+                            {/* Inline composer — opens directly under the reply
+                                being responded to. Reuses the existing copy. */}
+                            {hasComposerOpen && (
+                              <div className="mt-2 ml-3 sm:ml-6 border-l-2 border-[#D4AF37]/30 pl-3 sm:pl-4">
+                                <p className="text-xs text-white/50 mb-2">
+                                  {t("replyingTo", { username: reply.user.username || reply.user.first_name || "" })}
+                                </p>
+                                <textarea
+                                  value={nestedReplyContent}
+                                  onChange={(e) => setNestedReplyContent(e.target.value)}
+                                  placeholder={t("replyPlaceholder")}
+                                  rows={3}
+                                  className="w-full bg-white/5 border border-white/10 rounded-lg p-2 text-white text-sm resize-none focus:outline-none focus:ring-1 focus:ring-[#D4AF37]"
+                                  autoFocus
+                                />
+                                <div className="flex gap-2 mt-2">
+                                  <button
+                                    onClick={() => handleSubmitNestedReply(reply.id)}
+                                    disabled={!nestedReplyContent.trim() || isSubmittingNestedReply}
+                                    className="px-3 py-1 rounded bg-[#D4AF37]/20 text-[#FCE205] text-xs font-bold hover:bg-[#D4AF37]/30 transition disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isSubmittingNestedReply ? t("postingTag") : t("postReply")}
+                                  </button>
+                                  <button
+                                    onClick={() => { setReplyingToId(null); setNestedReplyContent(""); }}
+                                    className="px-3 py-1 rounded text-white/50 text-xs hover:text-white/70 transition"
+                                  >
+                                    {t("cancelBtn")}
+                                  </button>
+                                </div>
+                              </div>
+                            )}
 
-                                {reply.mux_playback_id && (
-                                  <div className="mt-2">
-                                    <MuxVideoPlayer
-                                      playbackId={reply.mux_playback_id}
-                                      metadata={{
-                                        video_title: t("replyVideoTitle", { title: post.title }),
-                                        video_id: reply.id,
-                                      }}
-                                    />
-                                  </div>
+                            {/* Children — indented one level (visual cap at
+                                MAX_VISUAL_DEPTH so deep threads stay readable
+                                on mobile; the tree structure is preserved). */}
+                            {children.length > 0 && (
+                              <div className={cn(
+                                "mt-3 space-y-3",
+                                depth < MAX_VISUAL_DEPTH && "ml-3 sm:ml-6 border-l-2 border-white/5 pl-3 sm:pl-4",
+                              )}>
+                                {children.map((child, childIndex) =>
+                                  renderReplyTree(child, depth + 1, childIndex)
                                 )}
                               </div>
-                            </div>
-                          </GlassCard>
-                          </motion.div>
+                            )}
+                          </div>
                         );
-                      })}
-                      </AnimatePresence>
-                    </div>
+                      };
+
+                      return (
+                        <div className="space-y-4">
+                          <AnimatePresence mode="popLayout">
+                            {topLevel.map((reply, index) => renderReplyTree(reply, 0, index))}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
 

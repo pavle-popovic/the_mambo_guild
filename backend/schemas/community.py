@@ -153,6 +153,9 @@ class ReplyCreateRequest(BaseModel):
     content: str = Field(..., min_length=1, max_length=2000)
     mux_asset_id: Optional[str] = None  # Optional video reply
     mux_playback_id: Optional[str] = None
+    # When set, this reply is a child of the referenced reply (threaded
+    # reply). Server validates same-post + depth limit.
+    parent_reply_id: Optional[str] = None
 
 
 class ReplyUpdateRequest(BaseModel):

@@ -768,6 +768,8 @@
     "commentsCount": "💬 {count} تعليق",
     "writeReply": "اكتب ردًا",
     "replyPlaceholder": "اكتب ردك أو سؤالك...",
+    "replyButton": "رد",
+    "replyingTo": "رد على @{username}",
     "replyCost": "قل ما الذي نجح، وشيئًا واحدًا للتعديل. الموقف قبل المهارة.",
     "posting": "جاري النشر...",
     "postReply": "انشر الرد",
