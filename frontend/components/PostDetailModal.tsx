@@ -1181,12 +1181,16 @@ export default function PostDetailModal({
 
                                     {/* Reply-to-reply trigger. Hidden during inline edit
                                         and on the optimistic temp- row so users can't
-                                        nest under a reply that hasn't landed yet. */}
+                                        nest under a reply that hasn't landed yet.
+                                        Pre-fills "@username " so a reply-to-reply
+                                        keeps a clear addressee even after the backend
+                                        flattens it onto the thread root (Instagram). */}
                                     {allowReplies && !isOptimistic && editingReplyId !== reply.id && !hasComposerOpen && (
                                       <button
                                         onClick={() => {
                                           setReplyingToId(reply.id);
-                                          setNestedReplyContent("");
+                                          const handle = reply.user.username;
+                                          setNestedReplyContent(handle ? `@${handle} ` : "");
                                         }}
                                         className="mt-2 text-xs text-white/50 hover:text-[#D4AF37] transition-colors font-medium"
                                       >

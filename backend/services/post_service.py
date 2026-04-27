@@ -499,21 +499,22 @@ def remove_reaction(
     }
 
 
-_MAX_REPLY_DEPTH = 5  # cap server-side; UI also caps visual indent at 4
-
-
 def _resolve_reply_parent(
     parent_reply_id: str,
     post_id: str,
     db: Session,
-) -> tuple[bool, str, "PostReply | None"]:
-    """Validate a parent_reply_id for nesting.
+) -> tuple[bool, str, "str | None"]:
+    """Resolve the actual parent_reply_id for a new threaded reply.
 
-    Returns (ok, message, parent). The parent must (a) exist and not be
-    soft-deleted, (b) belong to the same post (prevents cross-post
-    nesting via crafted IDs), (c) sit at a depth that leaves room for
-    one more level under _MAX_REPLY_DEPTH (so the new reply itself is
-    still within the cap).
+    Returns (ok, message, resolved_parent_id). The parent must exist,
+    not be soft-deleted, and belong to the same post (prevents
+    cross-post nesting via crafted IDs).
+
+    Instagram-style flattening: if the requested parent is itself a
+    nested reply, attach the new reply to the thread root instead, so
+    every reply-to-reply lands as a sibling under the original
+    top-level comment. This caps threading at exactly two visual
+    levels regardless of how deep the user clicks Reply.
     """
     parent = db.query(PostReply).filter(
         PostReply.id == parent_reply_id,
@@ -524,20 +525,19 @@ def _resolve_reply_parent(
     if str(parent.post_id) != str(post_id):
         return (False, "Parent reply belongs to a different post", None)
 
-    # Walk up to count depth. _MAX_REPLY_DEPTH bounds the loop, so the
-    # SET NULL FK alone (which can't create cycles) plus this counter
-    # make a runaway chain impossible.
-    depth = 1
-    cursor = parent
-    while cursor.parent_reply_id is not None and depth < _MAX_REPLY_DEPTH + 2:
-        depth += 1
-        cursor = db.query(PostReply).filter(PostReply.id == cursor.parent_reply_id).first()
-        if cursor is None:
-            break
-    if depth >= _MAX_REPLY_DEPTH:
-        return (False, "Reply thread is too deeply nested", None)
+    # If the target reply has its own parent, attach to that root
+    # instead. Verify the root still exists and isn't soft-deleted —
+    # if the root was removed, attach to the requested target so the
+    # reply doesn't disappear entirely.
+    if parent.parent_reply_id is not None:
+        root = db.query(PostReply).filter(
+            PostReply.id == parent.parent_reply_id,
+            PostReply.is_deleted == False,
+        ).first()
+        if root is not None:
+            return (True, "", str(root.id))
 
-    return (True, "", parent)
+    return (True, "", str(parent.id))
 
 
 def add_reply(
@@ -562,10 +562,14 @@ def add_reply(
 
     # Validate the nesting target before we run rate-limits or AI moderation
     # — otherwise a bad parent_reply_id could waste a rate-limit slot.
+    # The resolver also flattens replies-to-nested-replies onto the thread
+    # root (Instagram pattern), so we always end up with at most one level
+    # of nesting per post.
     if parent_reply_id:
-        ok, message, _parent = _resolve_reply_parent(parent_reply_id, post_id, db)
+        ok, message, resolved_parent_id = _resolve_reply_parent(parent_reply_id, post_id, db)
         if not ok:
             return {"success": False, "message": message}
+        parent_reply_id = resolved_parent_id
 
     # Hourly rate limit.
     allowed, info = rate_limit_service.check("reply", user_id, db)
