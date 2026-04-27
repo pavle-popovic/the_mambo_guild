@@ -245,6 +245,7 @@ function PricingPageContent() {
   // to true the moment the user clicks "cancel" — they keep access until
   // periodEnd and we show a warning banner during that window.
   const cancelAtPeriodEnd = !!user?.subscription_cancel_at_period_end;
+  const scheduledTier = user?.subscription_scheduled_tier || null;
   const periodEnd = user?.subscription_period_end || null;
   const periodEndLabel = periodEnd
     ? new Date(periodEnd).toLocaleDateString(undefined, {
@@ -264,6 +265,10 @@ function PricingPageContent() {
       {cancelAtPeriodEnd && periodEndLabel ? (
         <div className="rounded-md border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200">
           Access ends on <span className="font-semibold">{periodEndLabel}</span>.
+        </div>
+      ) : scheduledTier && periodEndLabel ? (
+        <div className="rounded-md border border-orange-500/30 bg-orange-500/10 px-3 py-2 text-xs text-orange-200">
+          Downgrading to Pro on <span className="font-semibold">{periodEndLabel}</span>.
         </div>
       ) : periodEndLabel ? (
         <div className="text-[11px] text-gray-500">Renews on {periodEndLabel}</div>

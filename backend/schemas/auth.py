@@ -106,6 +106,11 @@ class UserProfileResponse(BaseModel):
     subscription_cancel_at_period_end: bool = False
     subscription_period_end: Optional[datetime] = None
     subscription_status: Optional[str] = None   # "trialing" | "active" | ...
+    # When set, the tier the subscription will drop to at period_end via a
+    # Stripe SubscriptionSchedule. Currently only "advanced" — written when
+    # the user schedules a Performer→Pro downgrade. Drives the
+    # "Downgrading on …" banner and the "Keep Guild Master" CTA.
+    subscription_scheduled_tier: Optional[str] = None
     has_used_trial: bool = False
 
     # Gamification v4

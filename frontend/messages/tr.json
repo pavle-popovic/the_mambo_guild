@@ -626,7 +626,6 @@
       "downgradeLose2": "Roundtable Zoom görüşmelerini kaybet",
       "downgradeLose3": "Guild Master koltuğunuzu serbest bırak (30 ile sınırlı)",
       "downgradeKeep1": "Tüm Pro özelliklerini ve kursların tam erişimini koru",
-      "downgradeCooldownNotice": "Geçişten sonra 30 gün boyunca Guild Master seviyesine geri yükseltme yapamazsınız.",
       "stayOnGuildMaster": "Guild Master'da kal",
       "switching": "Geçiliyor...",
       "modalClose": "Kapat",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "Abonelik devam ettirildi.",
       "toastResumeError": "Devam ettirilemedi.",
       "toastDowngradeSuccess": "Pro'ya geçildi.",
-      "toastDowngradeError": "Plan değiştirilemedi."
+      "toastDowngradeError": "Plan değiştirilemedi.",
+      "downgradeScheduledOn": "{date} tarihinde Pro'ya geçiş yapılacak. O tarihe kadar tam Guild Master erişiminiz devam edecek.",
+      "keepGuildMaster": "Guild Master'da Kal",
+      "confirmDowngradeBody": "Mevcut ayınız tamamen ödendi. {date} tarihindeki sonraki yenilemenizde Pro'ya ($39/ay) geçeceksiniz.",
+      "toastDowngradeCanceled": "Guild Master'da kalıyorsunuz."
     }
   },
   "community": {

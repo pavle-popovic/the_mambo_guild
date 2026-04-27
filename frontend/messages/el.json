@@ -626,7 +626,6 @@
       "downgradeLose2": "Απώλεια κλήσεων Roundtable Zoom",
       "downgradeLose3": "Απελευθέρωση της θέσης σας Guild Master (όριο 30)",
       "downgradeKeep1": "Διατήρηση όλων των λειτουργιών Pro και πλήρους πρόσβασης σε μαθήματα",
-      "downgradeCooldownNotice": "Μετά την αλλαγή, δεν θα μπορείτε να επιστρέψετε στο Guild Master για 30 ημέρες.",
       "stayOnGuildMaster": "Παραμονή σε Guild Master",
       "switching": "Αλλαγή...",
       "modalClose": "Κλείσιμο",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "Η συνδρομή επαναφέρθηκε.",
       "toastResumeError": "Η επαναφορά απέτυχε.",
       "toastDowngradeSuccess": "Αλλαγή σε Pro.",
-      "toastDowngradeError": "Δεν ήταν δυνατή η αλλαγή πλάνου."
+      "toastDowngradeError": "Δεν ήταν δυνατή η αλλαγή πλάνου.",
+      "downgradeScheduledOn": "Μετάβαση στο Pro στις {date}. Θα διατηρήσετε πλήρη πρόσβαση Guild Master μέχρι τότε.",
+      "keepGuildMaster": "Διατήρηση Guild Master",
+      "confirmDowngradeBody": "Ο τρέχων μήνας σας έχει πληρωθεί πλήρως. Θα μεταβείτε στο Pro ($39/μήνα) κατά την επόμενη ανανέωσή σας στις {date}.",
+      "toastDowngradeCanceled": "Παραμένετε στο Guild Master."
     }
   },
   "community": {

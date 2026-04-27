@@ -626,7 +626,6 @@
       "downgradeLose2": "Губитак Roundtable Zoom позива",
       "downgradeLose3": "Ослобађање твог Guild Master места (ограничено на 30)",
       "downgradeKeep1": "Задржавање свих Pro функција и пуног приступа курсевима",
-      "downgradeCooldownNotice": "Након промене, нећете моћи да се вратите на Guild Master 30 дана.",
       "stayOnGuildMaster": "Остани на Guild Master",
       "switching": "Прелазак...",
       "modalClose": "Затвори",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "Претплата настављена.",
       "toastResumeError": "Није могуће наставити.",
       "toastDowngradeSuccess": "Прелазак на Pro завршен.",
-      "toastDowngradeError": "Није могуће променити план."
+      "toastDowngradeError": "Није могуће променити план.",
+      "downgradeScheduledOn": "Прелазак на Pro {date}. Задржаћеш пун приступ Guild Master до тада.",
+      "keepGuildMaster": "Задржати Guild Master",
+      "confirmDowngradeBody": "Твој тренутни месец је у потпуности плаћен. Прелазиш на Pro ($39/мес.) при следећем обнављању {date}.",
+      "toastDowngradeCanceled": "Остајеш на Guild Master."
     }
   },
   "community": {

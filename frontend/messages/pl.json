@@ -626,7 +626,6 @@
       "downgradeLose2": "Stracić rozmowy Zoom Roundtable",
       "downgradeLose3": "Zwolnić swoje miejsce Guild Master (limit 30)",
       "downgradeKeep1": "Zachować wszystkie funkcje Pro i pełny dostęp do kursów",
-      "downgradeCooldownNotice": "Po przełączeniu nie będziesz mógł wrócić do Guild Master przez 30 dni.",
       "stayOnGuildMaster": "Zostań na Guild Master",
       "switching": "Zmiana...",
       "modalClose": "Zamknij",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "Subskrypcja wznowiona.",
       "toastResumeError": "Nie udało się wznowić.",
       "toastDowngradeSuccess": "Przejście na Pro zakończone.",
-      "toastDowngradeError": "Nie udało się zmienić planu."
+      "toastDowngradeError": "Nie udało się zmienić planu.",
+      "downgradeScheduledOn": "Przejście na Pro dnia {date}. Zachowasz pełny dostęp Guild Master do tego czasu.",
+      "keepGuildMaster": "Zachowaj Guild Master",
+      "confirmDowngradeBody": "Twój bieżący miesiąc jest w pełni opłacony. Przejdziesz na Pro ($39/mies.) przy następnym odnowieniu dnia {date}.",
+      "toastDowngradeCanceled": "Pozostajesz na Guild Master."
     }
   },
   "community": {

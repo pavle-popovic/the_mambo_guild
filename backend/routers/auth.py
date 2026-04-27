@@ -567,6 +567,7 @@ def get_current_user_profile(
     cancel_at_period_end = bool(subscription.cancel_at_period_end) if subscription else False
     period_end = subscription.current_period_end if subscription else None
     sub_status = subscription.status.value if subscription and subscription.status else None
+    scheduled_tier = subscription.scheduled_tier if subscription else None
     has_used_trial = bool(profile.has_used_trial) if hasattr(profile, "has_used_trial") else False
 
     today = datetime.now()
@@ -600,6 +601,7 @@ def get_current_user_profile(
         subscription_cancel_at_period_end=cancel_at_period_end,
         subscription_period_end=period_end,
         subscription_status=sub_status,
+        subscription_scheduled_tier=scheduled_tier,
         has_used_trial=has_used_trial,
         current_level_tag=profile.current_level_tag.value if hasattr(profile, 'current_level_tag') else "Beginner",
         reputation=profile.reputation if hasattr(profile, 'reputation') else 0,

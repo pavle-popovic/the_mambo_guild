@@ -148,14 +148,25 @@ class Subscription(Base):
         default=SubscriptionTier.ROOKIE,
         nullable=False
     )
+    current_period_start = Column(DateTime, nullable=True)
     current_period_end = Column(DateTime, nullable=True)
     cancel_at_period_end = Column(Boolean, default=False, nullable=False, server_default="false")
 
-    # Re-upgrade cooldown anchor. Set when the user transitions
-    # Performer→Advanced; read by /payments/update-subscription to refuse
-    # an upgrade-to-Performer for the next PERFORMER_REUPGRADE_COOLDOWN_DAYS.
-    # Cleared on full cancellation (customer.subscription.deleted) so a
-    # clean cancel-and-rebuy doesn't carry the penalty forward.
+    # Deferred-downgrade fields (migration 027). When the user schedules
+    # a Performer→Pro change, we create a stripe.SubscriptionSchedule
+    # whose phase 1 keeps Performer until current_period_end and phase 2
+    # switches to Advanced. `scheduled_tier` carries the target tier
+    # ("advanced") and `stripe_schedule_id` carries the Stripe object id
+    # we manage (release on user-undo, on cancel, or auto-released by
+    # Stripe at phase 2 start). Both NULL means "no scheduled change".
+    scheduled_tier = Column(String(32), nullable=True)
+    stripe_schedule_id = Column(String(255), nullable=True)
+
+    # Legacy cooldown anchor from migration 026. The 30-day re-upgrade
+    # cooldown that read this column was deleted with the deferred-
+    # downgrade rollout (migration 027) — the proration-cycle exploit
+    # it guarded is now closed at the billing layer. Column kept for one
+    # release as a rollback escape hatch; drop in a follow-up.
     last_performer_downgrade_at = Column(DateTime, nullable=True)
 
     # Relationships

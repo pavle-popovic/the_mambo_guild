@@ -626,7 +626,6 @@
       "downgradeLose2": "Perder as chamadas Zoom da Roundtable",
       "downgradeLose3": "Liberar seu lugar de Guild Master (limitado a 30)",
       "downgradeKeep1": "Manter todas as funções Pro e o acesso total aos cursos",
-      "downgradeCooldownNotice": "Após a troca, você não poderá voltar para o Guild Master por 30 dias.",
       "stayOnGuildMaster": "Ficar em Guild Master",
       "switching": "Mudando...",
       "modalClose": "Fechar",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "Assinatura retomada.",
       "toastResumeError": "Não foi possível retomar.",
       "toastDowngradeSuccess": "Mudou para Pro.",
-      "toastDowngradeError": "Não foi possível mudar de plano."
+      "toastDowngradeError": "Não foi possível mudar de plano.",
+      "downgradeScheduledOn": "Mudando para Pro em {date}. Você terá acesso completo ao Guild Master até lá.",
+      "keepGuildMaster": "Manter Guild Master",
+      "confirmDowngradeBody": "Seu mês atual está totalmente pago. Você mudará para Pro ($39/mês) na sua próxima renovação em {date}.",
+      "toastDowngradeCanceled": "Permanecendo no Guild Master."
     }
   },
   "community": {

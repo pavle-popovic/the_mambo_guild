@@ -626,7 +626,6 @@
       "downgradeLose2": "Lose Roundtable Zoom calls",
       "downgradeLose3": "Free up your Guild Master seat (capped at 30)",
       "downgradeKeep1": "Keep all Pro features and full course access",
-      "downgradeCooldownNotice": "After switching, you won't be able to upgrade back to Guild Master for 30 days.",
       "stayOnGuildMaster": "Stay on Guild Master",
       "switching": "Switching...",
       "modalClose": "Close",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "Subscription resumed.",
       "toastResumeError": "Could not resume.",
       "toastDowngradeSuccess": "Switched to Pro.",
-      "toastDowngradeError": "Could not switch plans."
+      "toastDowngradeError": "Could not switch plans.",
+      "downgradeScheduledOn": "Switching to Pro on {date}. You'll keep full Guild Master access until then.",
+      "keepGuildMaster": "Keep Guild Master",
+      "confirmDowngradeBody": "Your current month is fully paid. You'll switch to Pro ($39/mo) at your next renewal on {date}.",
+      "toastDowngradeCanceled": "Staying on Guild Master."
     }
   },
   "community": {

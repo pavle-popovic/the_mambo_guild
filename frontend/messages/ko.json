@@ -626,7 +626,6 @@
       "downgradeLose2": "Roundtable Zoom 통화 잃음",
       "downgradeLose3": "Guild Master 좌석 해제 (30석 한정)",
       "downgradeKeep1": "모든 Pro 기능과 전체 강의 액세스 유지",
-      "downgradeCooldownNotice": "변경 후 30일 동안 Guild Master로 다시 업그레이드할 수 없습니다.",
       "stayOnGuildMaster": "Guild Master 유지",
       "switching": "전환 중...",
       "modalClose": "닫기",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "구독이 재개되었습니다.",
       "toastResumeError": "재개할 수 없습니다.",
       "toastDowngradeSuccess": "Pro로 전환되었습니다.",
-      "toastDowngradeError": "플랜을 변경할 수 없습니다."
+      "toastDowngradeError": "플랜을 변경할 수 없습니다.",
+      "downgradeScheduledOn": "{date}에 Pro로 전환됩니다. 그때까지 Guild Master 전체 기능을 이용할 수 있습니다.",
+      "keepGuildMaster": "Guild Master 유지",
+      "confirmDowngradeBody": "현재 달은 이미 결제되었습니다. {date} 다음 갱신 시 Pro($39/월)로 전환됩니다.",
+      "toastDowngradeCanceled": "Guild Master를 유지합니다."
     }
   },
   "community": {

@@ -626,7 +626,6 @@
       "downgradeLose2": "فقدان مكالمات Zoom في Roundtable",
       "downgradeLose3": "إخلاء مقعدك في Guild Master (محدود بـ 30 مقعدًا)",
       "downgradeKeep1": "الاحتفاظ بجميع ميزات Pro والوصول الكامل للدورات",
-      "downgradeCooldownNotice": "بعد التبديل، لن تتمكن من الترقية إلى Guild Master لمدة 30 يومًا.",
       "stayOnGuildMaster": "البقاء في Guild Master",
       "switching": "جاري التبديل...",
       "modalClose": "إغلاق",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "تم استئناف الاشتراك.",
       "toastResumeError": "تعذر الاستئناف.",
       "toastDowngradeSuccess": "تم التبديل إلى Pro.",
-      "toastDowngradeError": "تعذر تغيير الخطة."
+      "toastDowngradeError": "تعذر تغيير الخطة.",
+      "downgradeScheduledOn": "التحويل إلى Pro في {date}. ستحتفظ بكامل صلاحيات Guild Master حتى ذلك الحين.",
+      "keepGuildMaster": "الاحتفاظ بـ Guild Master",
+      "confirmDowngradeBody": "شهرك الحالي مدفوع بالكامل. ستنتقل إلى Pro ($39/شهر) عند تجديدك القادم في {date}.",
+      "toastDowngradeCanceled": "ستبقى في Guild Master."
     }
   },
   "community": {

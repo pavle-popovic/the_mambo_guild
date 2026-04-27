@@ -103,6 +103,14 @@ class SubscriptionResponse(BaseModel):
     success: bool
     message: str
     tier: Optional[str] = None
+    # Deferred-downgrade surface. `scheduled_tier` is the tier that will
+    # take effect at `current_period_end` (currently only "advanced", set
+    # on a scheduled Performer→Pro change). `cancel_at_period_end` mirrors
+    # the Stripe flag so the UI can render the "subscription will end on"
+    # banner without a second round-trip.
+    scheduled_tier: Optional[str] = None
+    cancel_at_period_end: Optional[bool] = None
+    current_period_end: Optional[datetime] = None
 
 
 

@@ -4,7 +4,7 @@ Handles Live Calls, Coaching Submissions, and DJ Booth tracks.
 All endpoints require Guild Master (PERFORMER) tier unless noted.
 """
 import logging
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 from typing import List, Optional, Tuple
 import uuid
 
@@ -96,16 +96,6 @@ def require_guild_master(user: User):
         )
 
 
-# Minimum days between two subscription-source coaching submissions. The
-# calendar-month uniqueness DB constraint already blocks two submissions in
-# the same month, but a user can otherwise churn Pro→Performer→Pro across
-# month boundaries (e.g. submit on day 28, re-upgrade on day 32) and harvest
-# extra credits while paying only Stripe proration fees. A 25-day floor
-# closes that window: legit monthly users have ~30-day gaps and pass; the
-# churn pattern requires gaps under 28 days and is rejected.
-COACHING_SUBSCRIPTION_COOLDOWN_DAYS = 25
-
-
 def _ensure_utc(dt: Optional[datetime]) -> Optional[datetime]:
     """Coerce a naive UTC timestamp to tz-aware. Some legacy rows were stored
     naive; comparing them against datetime.now(tz=UTC) crashes on tz mismatch."""
@@ -120,39 +110,62 @@ def _subscription_coaching_eligibility(
     db: Session, user_id: uuid.UUID, now: datetime
 ) -> Tuple[bool, Optional["CoachingSubmission"], Optional[datetime]]:
     """
-    Decide whether `user_id` can claim their subscription-tier coaching slot.
+    Decide whether `user_id` can claim their subscription-tier coaching slot
+    for the current Stripe billing period.
 
     Returns ``(can_submit, blocking_submission, next_credit_at)``:
     - ``can_submit`` is True when nothing blocks a new submission.
-    - ``blocking_submission`` is the most recent subscription-source row that
-      forces the cooldown (None when the user is eligible).
-    - ``next_credit_at`` is when the cooldown lifts, or the 1st of next
-      calendar month if the calendar-uniqueness rule is the binding gate.
+    - ``blocking_submission`` is the row that forces the gate (None when
+      the user is eligible).
+    - ``next_credit_at`` is when the user becomes eligible again — period_end
+      when the per-period gate is binding, the 1st of next calendar month
+      when the legacy calendar-month gate is binding.
 
-    Combines two checks:
-      1. ``COACHING_SUBSCRIPTION_COOLDOWN_DAYS`` since the last subscription
-         submission — defeats Pro→Performer→Pro churn across month boundaries.
-      2. The pre-existing calendar-month uniqueness — a legacy belt-and-braces
-         check that is also enforced at DB level by a UniqueConstraint.
+    Gate: at most one subscription-source submission per Stripe billing
+    period (`current_period_start` … `current_period_end`). When the user
+    renews, `current_period_start` advances and they become eligible
+    again. The deferred-downgrade Performer→Pro transition fires at
+    `current_period_end`, so a downgrading user gets exactly the slots
+    of the periods they paid for — never more, never less.
+
+    Why this replaces the old 25-day cooldown: the cooldown defended
+    against the proration-cycle exploit (subscribe → submit → cancel for
+    refund). With deferred downgrade there is no refund, no proration
+    credit on downgrade — every Performer month is paid in full and
+    non-refundable, so the exploit class is closed at the billing layer.
+    The per-period gate is the cleaner replacement.
+
+    Legacy fallback: subscriptions without `current_period_start` (rows
+    pre-dating migration 027 that haven't received a subscription.*
+    webhook yet) fall back to the historical calendar-month unique
+    constraint. Webhooks populate the field on the next event.
     """
-    last_sub_submission = (
-        db.query(CoachingSubmission)
-        .filter(
-            CoachingSubmission.user_id == user_id,
-            CoachingSubmission.source == "subscription",
-        )
-        .order_by(desc(CoachingSubmission.submitted_at))
+    sub = (
+        db.query(Subscription)
+        .filter(Subscription.user_id == user_id)
         .first()
     )
+    period_start = _ensure_utc(sub.current_period_start) if sub else None
+    period_end = _ensure_utc(sub.current_period_end) if sub else None
 
-    # (1) Cooldown gate.
-    if last_sub_submission is not None:
-        last_at = _ensure_utc(last_sub_submission.submitted_at) or now
-        cooldown_lifts_at = last_at + timedelta(days=COACHING_SUBSCRIPTION_COOLDOWN_DAYS)
-        if now < cooldown_lifts_at:
-            return False, last_sub_submission, cooldown_lifts_at
+    # (1) Per-period gate. The authoritative check.
+    if period_start is not None:
+        in_period = (
+            db.query(CoachingSubmission)
+            .filter(
+                CoachingSubmission.user_id == user_id,
+                CoachingSubmission.source == "subscription",
+                CoachingSubmission.submitted_at >= period_start,
+            )
+            .order_by(desc(CoachingSubmission.submitted_at))
+            .first()
+        )
+        if in_period is not None:
+            return False, in_period, period_end
 
-    # (2) Calendar-month gate (kept for parity with the DB unique constraint).
+    # (2) Calendar-month gate. Kept for parity with the DB unique constraint
+    # on (user_id, submission_month, submission_year) and as a fallback when
+    # `current_period_start` is null on a legacy row.
     current_month_existing = (
         db.query(CoachingSubmission)
         .filter(

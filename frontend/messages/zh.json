@@ -626,7 +626,6 @@
       "downgradeLose2": "失去 Roundtable Zoom 会议",
       "downgradeLose3": "释放您的 Guild Master 名额（限 30 人）",
       "downgradeKeep1": "保留所有 Pro 功能和完整课程访问权",
-      "downgradeCooldownNotice": "切换后,30天内将无法升级回 Guild Master.",
       "stayOnGuildMaster": "继续 Guild Master",
       "switching": "切换中...",
       "modalClose": "关闭",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "订阅已恢复。",
       "toastResumeError": "无法恢复。",
       "toastDowngradeSuccess": "已切换到 Pro。",
-      "toastDowngradeError": "无法更改计划。"
+      "toastDowngradeError": "无法更改计划。",
+      "downgradeScheduledOn": "将于{date}切换至Pro。在此之前您可继续享有完整的Guild Master权限。",
+      "keepGuildMaster": "保留Guild Master",
+      "confirmDowngradeBody": "您本月费用已全额支付。将于{date}下次续费时切换至Pro（$39/月）。",
+      "toastDowngradeCanceled": "继续保留Guild Master。"
     }
   },
   "community": {

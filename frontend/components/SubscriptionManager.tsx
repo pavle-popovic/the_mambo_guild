@@ -12,8 +12,8 @@ import { ADVANCED_PRICE_ID } from "@/lib/site";
 // - Single-step cancel modal with equal-weight buttons (no "type CANCEL" gate,
 //   no 3-step funnel) so the cancel path is at-least-as-easy-as-signup, in
 //   line with FTC click-to-cancel and EU/UK consumer rules.
-// - Status-driven hero: surfaces trialing / cancel-scheduled / past-due
-//   inline so the user always sees what's happening before they act.
+// - Status-driven hero: surfaces trialing / cancel-scheduled / past-due /
+//   downgrade-scheduled inline so the user always sees what's happening.
 // - Stripe Customer Portal handles card update / invoices / address — we
 //   don't reimplement any of that.
 
@@ -35,6 +35,7 @@ export default function SubscriptionManager() {
   const isAdvanced = tier === "advanced";
   const isPaidTier = isPerformer || isAdvanced;
   const isScheduledToCancel = !!user.subscription_cancel_at_period_end;
+  const isScheduledToDowngrade = !!user.subscription_scheduled_tier;
   const isTrialing = status === "trialing";
   const isPastDue = status === "past_due";
 
@@ -124,6 +125,23 @@ export default function SubscriptionManager() {
     }
   };
 
+  const handleKeepGuildMaster = async () => {
+    setSubmitting("keepGuildMaster");
+    try {
+      const res = await apiClient.cancelScheduledDowngrade();
+      if (res.success) {
+        toast.success(t("toastDowngradeCanceled"));
+        await refreshUser();
+      } else {
+        toast.error(t("toastDowngradeError"));
+      }
+    } catch (err: any) {
+      toast.error(err?.message || t("toastDowngradeError"));
+    } finally {
+      setSubmitting(null);
+    }
+  };
+
   // ---- Past-due: show recovery card ONLY. No plan label (tier was revoked),
   // no cancel/resume controls — fixing billing is the only action that
   // makes sense here.
@@ -164,7 +182,7 @@ export default function SubscriptionManager() {
     );
   }
 
-  // ---- Active / trialing / scheduled-to-cancel
+  // ---- Active / trialing / scheduled-to-cancel / scheduled-to-downgrade
   return (
     <>
       <section
@@ -205,14 +223,21 @@ export default function SubscriptionManager() {
               </p>
             </div>
           )}
-          {!isScheduledToCancel && isTrialing && periodEndLabel && (
+          {!isScheduledToCancel && isScheduledToDowngrade && periodEndLabel && (
+            <div className="mb-4 rounded-lg border border-orange-500/30 bg-orange-500/10 px-3 py-2.5">
+              <p className="text-sm text-orange-100">
+                {t("downgradeScheduledOn", { date: periodEndLabel })}
+              </p>
+            </div>
+          )}
+          {!isScheduledToCancel && !isScheduledToDowngrade && isTrialing && periodEndLabel && (
             <div className="mb-4 rounded-lg border border-blue-500/30 bg-blue-500/10 px-3 py-2.5">
               <p className="text-sm text-blue-100">
                 {t("trialingBanner", { price: planPrice, date: periodEndLabel })}
               </p>
             </div>
           )}
-          {!isScheduledToCancel && !isTrialing && periodEndLabel && (
+          {!isScheduledToCancel && !isScheduledToDowngrade && !isTrialing && periodEndLabel && (
             <p className="text-sm text-gray-400 mb-4">
               {t("renewsOn", { date: periodEndLabel })}
             </p>
@@ -237,12 +262,24 @@ export default function SubscriptionManager() {
               </button>
             )}
 
-            {isPerformer && !isScheduledToCancel && (
+            {/* Performer: show "Switch to Pro" only when no downgrade/cancel is pending */}
+            {isPerformer && !isScheduledToCancel && !isScheduledToDowngrade && (
               <button
                 onClick={() => setModal("downgrade")}
                 className="px-4 py-2 rounded-lg border border-gray-700 bg-gray-900/60 text-mambo-text font-semibold text-sm hover:bg-gray-800 transition"
               >
                 {t("switchToPro")}
+              </button>
+            )}
+
+            {/* Performer with pending downgrade: show "Keep Guild Master" CTA */}
+            {isPerformer && isScheduledToDowngrade && !isScheduledToCancel && (
+              <button
+                onClick={handleKeepGuildMaster}
+                disabled={submitting === "keepGuildMaster"}
+                className="px-4 py-2 rounded-lg border border-mambo-gold/40 bg-mambo-gold/10 text-mambo-gold font-semibold text-sm hover:bg-mambo-gold/20 transition disabled:opacity-50"
+              >
+                {submitting === "keepGuildMaster" ? t("resuming") : t("keepGuildMaster")}
               </button>
             )}
 
@@ -296,13 +333,17 @@ export default function SubscriptionManager() {
         </ModalShell>
       )}
 
-      {/* Downgrade modal — Performer → Pro. */}
+      {/* Downgrade modal — Performer to Pro. Deferred: takes effect at period end, no refund. */}
       {modal === "downgrade" && (
         <ModalShell onClose={close} closeAria={t("modalClose")}>
           <h2 className="text-xl font-serif font-bold text-mambo-text mb-2">
             {t("downgradeTitle")}
           </h2>
-          <p className="text-sm text-gray-400 mb-4">{t("downgradeBody")}</p>
+          <p className="text-sm text-gray-400 mb-4">
+            {periodEndLabel
+              ? t("confirmDowngradeBody", { date: periodEndLabel })
+              : t("downgradeBody")}
+          </p>
           <ul className="space-y-2 mb-5 text-sm">
             <li className="flex items-start gap-2 text-gray-300">
               <span className="text-red-400 mt-0.5 leading-none">−</span>
@@ -321,16 +362,6 @@ export default function SubscriptionManager() {
               <span>{t("downgradeKeep1")}</span>
             </li>
           </ul>
-          {/* 30-day re-upgrade cooldown notice. Backend enforces the same
-              rule via /payments/update-subscription (returns 409 if the
-              user tries to upgrade back inside the window). Surfacing it
-              here so the choice is informed before they confirm. */}
-          <div
-            role="alert"
-            className="mb-5 px-3 py-2 rounded-md border border-amber-500/30 bg-amber-500/5 text-xs leading-relaxed text-amber-200/90"
-          >
-            {t("downgradeCooldownNotice")}
-          </div>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
             <button
               onClick={close}

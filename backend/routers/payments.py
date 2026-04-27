@@ -88,17 +88,6 @@ def _fire_subscribe_and_purchase(
 # and refuse new PERFORMER checkouts when the cap is hit.
 GUILD_MASTER_SEAT_CAP = 30
 
-# Days a user must wait after downgrading Performer→Advanced before they
-# can upgrade back to Performer. Closes the proration-cycle abuse path
-# where someone repeatedly upgrades for 1 day to attend the weekly
-# Roundtable / pull DJ Booth content / etc., then downgrades to dodge
-# the full $59. Read by update_subscription against
-# Subscription.last_performer_downgrade_at. Does NOT apply to fresh
-# /create-checkout-session subscriptions (those pay full price; not the
-# exploit). Cleared on full cancellation so a clean cancel-and-rebuy
-# doesn't carry the penalty.
-PERFORMER_REUPGRADE_COOLDOWN_DAYS = 30
-
 # Arbitrary int key for the Postgres advisory lock used to serialize the
 # seat-cap read/modify window. Any constant works; pick one unlikely to collide
 # with other advisory locks in the codebase.
@@ -794,10 +783,9 @@ async def stripe_webhook(
             db_subscription.stripe_subscription_id = stripe_sub_id
             db_subscription.status = db_status
             # Snapshot the OLD tier before we overwrite it. Used below to
-            # detect a Performer→Advanced transition and stamp the
-            # re-upgrade cooldown anchor for defense in depth (catches
-            # downgrades initiated outside our update_subscription
-            # endpoint, e.g. via the Stripe dashboard / support tooling).
+            # detect a Performer→Advanced transition (the deferred-downgrade
+            # phase change Stripe fires at the period boundary) and clear the
+            # scheduled_tier markers we set in update_subscription.
             previous_tier = db_subscription.tier
             # Promote tier on good-standing states. On past_due we revoke
             # premium access immediately by dropping to ROOKIE — Stripe Smart
@@ -808,24 +796,34 @@ async def stripe_webhook(
             if db_status in (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE):
                 db_subscription.tier = tier
                 db_subscription.current_period_end = period_end_dt
+                # Mirror current_period_start so the per-period coaching gate
+                # (premium.py) can window submissions to the user's actual
+                # paid window. Stripe API 2025+ moved this off the root onto
+                # each item, same as current_period_end.
+                period_start_ts = sub_obj.get("current_period_start") or (
+                    items[0].get("current_period_start") if items else None
+                )
+                if period_start_ts:
+                    db_subscription.current_period_start = datetime.fromtimestamp(
+                        period_start_ts, tz=timezone.utc
+                    )
             elif db_status == SubscriptionStatus.PAST_DUE:
                 db_subscription.tier = SubscriptionTier.ROOKIE
             db_subscription.cancel_at_period_end = bool(sub_obj.get("cancel_at_period_end"))
             if db_status == SubscriptionStatus.CANCELED:
                 db_subscription.tier = SubscriptionTier.ROOKIE
                 db_subscription.cancel_at_period_end = False
-            # Stamp the cooldown anchor if this event represents a
-            # Performer→Advanced transition (and the new state is a
-            # subscribed one — past_due / canceled drops are not what
-            # we're guarding). Belt-and-braces with the synchronous stamp
-            # in update_subscription: an admin/CLI downgrade still
-            # triggers the cooldown for the user.
+            # If this event reflects the deferred downgrade firing — Stripe
+            # transitioned the schedule's phase 1 → phase 2 at the period
+            # boundary — clear the schedule markers. The new phase price is
+            # already mirrored above (price.id resolved → tier=ADVANCED).
             if (
                 previous_tier == SubscriptionTier.PERFORMER
                 and db_subscription.tier == SubscriptionTier.ADVANCED
                 and db_status in (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE)
             ):
-                db_subscription.last_performer_downgrade_at = datetime.now(timezone.utc)
+                db_subscription.scheduled_tier = None
+                db_subscription.stripe_schedule_id = None
             db.commit()
             db.refresh(db_subscription)
 
@@ -1043,12 +1041,16 @@ async def stripe_webhook(
             db_subscription.status = SubscriptionStatus.CANCELED
             db_subscription.tier = SubscriptionTier.ROOKIE
             db_subscription.cancel_at_period_end = False
-            # Clear the re-upgrade cooldown anchor on a clean cancellation.
-            # Once the user has fully exited the subscription, any future
-            # purchase is a fresh checkout (paid in full, not the
-            # proration-cycle exploit) and should not carry the penalty
-            # forward into a brand-new subscription life.
+            # Clear all scheduled-change markers on a final cancellation.
+            # `last_performer_downgrade_at` is the legacy 30-day cooldown
+            # anchor (no longer read; cleared for forward compatibility);
+            # `scheduled_tier` / `stripe_schedule_id` are the deferred-
+            # downgrade markers — Stripe aborts the schedule when the
+            # underlying sub is canceled, but mirror that here too so the
+            # DB never holds a dangling schedule reference.
             db_subscription.last_performer_downgrade_at = None
+            db_subscription.scheduled_tier = None
+            db_subscription.stripe_schedule_id = None
             db.commit()
             db.refresh(db_subscription)
 
@@ -1329,6 +1331,44 @@ async def stripe_webhook(
         except Exception:
             logger.exception("webhook: SubscriptionDisputed tracking failed (non-fatal)")
 
+    elif event["type"] in (
+        "subscription_schedule.released",
+        "subscription_schedule.canceled",
+        "subscription_schedule.aborted",
+    ):
+        # Lifecycle events for the deferred-downgrade schedule. We treat all
+        # three the same: the schedule is no longer driving billing, so clear
+        # the DB markers we set when scheduling. The actual price/tier of
+        # the subscription is owned by `customer.subscription.updated`,
+        # which will arrive (or already has arrived) for any phase change
+        # — we don't touch tier here.
+        #
+        # Why three event types: `released` is the happy path (user undid
+        # the downgrade, or phase 2 began and Stripe auto-released as
+        # configured). `canceled` fires if the schedule itself was canceled
+        # via API. `aborted` fires when the underlying sub was canceled
+        # while a schedule was active. All three should leave the DB in
+        # the same "no schedule pending" shape.
+        sched_obj = event["data"]["object"]
+        schedule_id = sched_obj.get("id")
+        if schedule_id:
+            db_sub = db.query(Subscription).filter(
+                Subscription.stripe_schedule_id == schedule_id
+            ).first()
+            if db_sub:
+                db_sub.stripe_schedule_id = None
+                db_sub.scheduled_tier = None
+                db.commit()
+                logger.info(
+                    f"webhook {event['type']}: cleared schedule markers for "
+                    f"user {db_sub.user_id} (sched={schedule_id})"
+                )
+            else:
+                logger.info(
+                    f"webhook {event['type']}: no DB row carries schedule "
+                    f"{schedule_id} — already cleared or never tracked."
+                )
+
     # Refuse to mark a failed event as processed — return 5xx so Stripe
     # retries with the same event id, and a future call will re-enter
     # the handler from the top.
@@ -1361,48 +1401,67 @@ def update_subscription(
     db: Session = Depends(get_db),
 ):
     """
-    Update an existing subscription (upgrade or downgrade).
-    Changes the subscription to a new price tier.
+    Change the user's tier on their existing Stripe subscription.
+
+    Three legal transitions:
+
+      • Pro→Performer (and trial→Performer): immediate prorated charge.
+        The user gets Performer access right now; the unused remainder of
+        the Pro period is credited via Stripe proration. Trial users have
+        their trial ended (`trial_end="now"`) and are charged the full
+        Performer rate immediately — Guild Master has no free trial.
+
+      • Performer→Pro: SCHEDULED for the next period boundary via
+        `stripe.SubscriptionSchedule`. The user keeps Performer access
+        through `current_period_end`, then auto-drops to Pro on Stripe's
+        next billing tick. No proration credit, no refund — they don't
+        get back what they've already paid for. This closes the proration-
+        cycle exploit class entirely (see migration 027).
+
+      • Performer→Performer while a downgrade is pending: releases the
+        schedule (the user changed their mind about the downgrade). No
+        Stripe billing change. Idempotent.
+
+    Rejected:
+      • cancel_at_period_end=True: the user must resume before changing plans.
+      • Trialing user attempting Performer→Pro: trial is on Pro to begin with;
+        the only way out of a trial is cancel.
+      • Repeated downgrade requests: 409 with the existing landing date.
     """
     operation_id = str(uuid.uuid4())  # L1: idempotency-key basis
     try:
-        # Validate price_id
         if request_data.new_price_id not in [ADVANCED_PRICE_ID, PERFORMER_PRICE_ID]:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid price ID. Only Advanced and Performer tiers are available."
             )
-        
-        # Get user's subscription
+
         subscription = db.query(Subscription).filter(
             Subscription.user_id == current_user.id
         ).first()
-        
+
         if not subscription:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="No subscription found for this user."
             )
-        
+
         if subscription.status not in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING):
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Subscription is not active. Cannot update."
             )
-        
+
         if not subscription.stripe_subscription_id:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="No Stripe subscription ID found. Cannot update."
             )
 
-        # Pre-compute the transition shape once so each subsequent check
-        # reads the same intent. `is_upgrade_request_to_performer` is the
-        # broad "user is trying to become Performer" signal (covers
-        # Advanced→Performer and any other → Performer); the existing
-        # `is_upgrade_to_performer` further down only flags the
-        # TRIALING→Performer subset (which needs trial_end="now"). Both
-        # exist intentionally — keep them distinct.
+        # Pre-compute the transition shape once so each subsequent check reads
+        # the same intent. `is_release_pending_downgrade` covers the "I changed
+        # my mind, keep me on Performer" path — same target tier, but a
+        # schedule exists that we need to release.
         is_upgrade_request_to_performer = (
             request_data.new_price_id == PERFORMER_PRICE_ID
             and subscription.tier != SubscriptionTier.PERFORMER
@@ -1411,33 +1470,153 @@ def update_subscription(
             request_data.new_price_id == ADVANCED_PRICE_ID
             and subscription.tier == SubscriptionTier.PERFORMER
         )
+        is_release_pending_downgrade = (
+            request_data.new_price_id == PERFORMER_PRICE_ID
+            and subscription.tier == SubscriptionTier.PERFORMER
+            and subscription.stripe_schedule_id is not None
+        )
 
-        # 30-day Performer re-upgrade cooldown. Refuse a re-upgrade if the
-        # user has downgraded Performer→Advanced inside the cooldown
-        # window. This is what closes the proration-cycle exploit
-        # surfaced by the M6 audit; the path through /create-checkout-
-        # session is intentionally NOT gated (a fresh checkout pays full
-        # $59 and is not the exploit). Cleared by the
-        # customer.subscription.deleted webhook so a clean cancel-and-
-        # rebuy doesn't carry the penalty.
-        if is_upgrade_request_to_performer and subscription.last_performer_downgrade_at is not None:
-            last_dg = subscription.last_performer_downgrade_at
-            if last_dg.tzinfo is None:
-                last_dg = last_dg.replace(tzinfo=timezone.utc)
-            cooldown_lifts_at = last_dg + timedelta(days=PERFORMER_REUPGRADE_COOLDOWN_DAYS)
-            if datetime.now(timezone.utc) < cooldown_lifts_at:
-                when_label = cooldown_lifts_at.strftime("%B %d, %Y")
+        # A scheduled cancel and a tier change are mutually exclusive — the
+        # user must resume their subscription before changing plans, otherwise
+        # the cancel_at_period_end flag and any downgrade schedule would race
+        # at the period boundary.
+        if subscription.cancel_at_period_end:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Resume your subscription before changing plans.",
+            )
+
+        # ------------------------------------------------------------------
+        # Path A — release a pending downgrade (user changed their mind).
+        # No Stripe billing change required: they're already on Performer.
+        # We just release the schedule and clear the DB markers. The Stripe
+        # `subscription_schedule.released` webhook will arrive shortly and
+        # confirm the same state.
+        # ------------------------------------------------------------------
+        if is_release_pending_downgrade:
+            try:
+                stripe.SubscriptionSchedule.release(
+                    subscription.stripe_schedule_id,
+                    idempotency_key=f"sched_release:{subscription.stripe_schedule_id}:{operation_id}",
+                )
+            except stripe.error.InvalidRequestError as e:
+                # Schedule already released or in a terminal state. The goal
+                # (no pending downgrade) is met either way.
+                logger.info(
+                    f"update_subscription: schedule {subscription.stripe_schedule_id} "
+                    f"already released or terminal: {e}"
+                )
+            subscription.stripe_schedule_id = None
+            subscription.scheduled_tier = None
+            db.commit()
+            db.refresh(subscription)
+            return SubscriptionResponse(
+                success=True,
+                message="Downgrade canceled. You're still Guild Master.",
+                tier=subscription.tier.value,
+                scheduled_tier=None,
+                cancel_at_period_end=subscription.cancel_at_period_end,
+                current_period_end=subscription.current_period_end,
+            )
+
+        # ------------------------------------------------------------------
+        # Path B — schedule a Performer→Pro downgrade for the next boundary.
+        # ------------------------------------------------------------------
+        if is_downgrade_performer_to_advanced:
+            # Idempotency: don't stack schedules. Surface the existing landing
+            # date instead of duplicating work or charging double.
+            if subscription.stripe_schedule_id is not None:
+                landing = (
+                    subscription.current_period_end.strftime("%B %d, %Y")
+                    if subscription.current_period_end else None
+                )
+                msg = (
+                    f"Downgrade is already scheduled for {landing}."
+                    if landing else "Downgrade is already scheduled."
+                )
                 raise HTTPException(
-                    status_code=status.HTTP_409_CONFLICT,
-                    detail=(
-                        f"Guild Master re-upgrade is available on {when_label}. "
-                        "There's a 30-day cooldown after downgrading."
-                    ),
+                    status_code=status.HTTP_409_CONFLICT, detail=msg
                 )
 
-        # If this user is upgrading *into* Guild Master, enforce the seat cap.
-        # Their current tier being PERFORMER already means they occupy a seat,
-        # so only count the cap when they're NOT already PERFORMER.
+            # A trialing Performer is not a real state in our model (trial is
+            # only on Pro); reject defensively so we never schedule a
+            # downgrade against a $0 trial period.
+            if subscription.status == SubscriptionStatus.TRIALING:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Cannot schedule a downgrade during a trial.",
+                )
+
+            stripe_subscription = stripe.Subscription.retrieve(subscription.stripe_subscription_id)
+            if stripe_subscription.get("customer") != subscription.stripe_customer_id:
+                logger.error(
+                    f"Customer mismatch on update_subscription: user {current_user.id} "
+                    f"local customer {subscription.stripe_customer_id} vs stripe "
+                    f"{stripe_subscription.get('customer')}"
+                )
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Subscription record is inconsistent. Please contact support.",
+                )
+
+            # Create a SubscriptionSchedule from the existing sub. This seeds
+            # phase 0 from the current state (Performer until current_period_end).
+            # We then append phase 1 with the Pro price and `end_behavior=
+            # "release"`, so when phase 1 begins at the boundary the schedule
+            # auto-detaches and the sub continues as a regular Pro subscription
+            # billing $39/mo forever after. Stripe rejects `iterations` on
+            # phases inside `phases=[...]`, so phase 1 is open-ended; Stripe
+            # auto-derives its end_date from the price's billing interval.
+            schedule = stripe.SubscriptionSchedule.create(
+                from_subscription=subscription.stripe_subscription_id,
+                idempotency_key=f"sched_create:{subscription.stripe_subscription_id}:{operation_id}",
+            )
+            phase1 = schedule.phases[0]
+            phase1_items = [
+                {
+                    "price": it["price"]["id"] if hasattr(it["price"], "id") else it["price"],
+                    "quantity": it["quantity"],
+                }
+                for it in phase1["items"]
+            ]
+            stripe.SubscriptionSchedule.modify(
+                schedule.id,
+                end_behavior="release",
+                phases=[
+                    {
+                        "items": phase1_items,
+                        "start_date": phase1["start_date"],
+                        "end_date": phase1["end_date"],
+                    },
+                    {
+                        "items": [{"price": ADVANCED_PRICE_ID, "quantity": 1}],
+                        "proration_behavior": "none",
+                    },
+                ],
+                idempotency_key=f"sched_modify:{schedule.id}:{operation_id}",
+            )
+
+            subscription.stripe_schedule_id = schedule.id
+            subscription.scheduled_tier = SubscriptionTier.ADVANCED.value
+            db.commit()
+            db.refresh(subscription)
+
+            landing = (
+                subscription.current_period_end.strftime("%B %d, %Y")
+                if subscription.current_period_end else "the next billing date"
+            )
+            return SubscriptionResponse(
+                success=True,
+                message=f"Downgrade scheduled. You'll keep Guild Master through {landing}.",
+                tier=subscription.tier.value,
+                scheduled_tier=SubscriptionTier.ADVANCED.value,
+                cancel_at_period_end=subscription.cancel_at_period_end,
+                current_period_end=subscription.current_period_end,
+            )
+
+        # ------------------------------------------------------------------
+        # Path C — immediate prorated upgrade (Pro→Performer or trial→Performer).
+        # ------------------------------------------------------------------
         if is_upgrade_request_to_performer:
             _lock_guild_master_seats(db)
             if _guild_master_seats_taken(db) >= GUILD_MASTER_SEAT_CAP:
@@ -1446,7 +1625,6 @@ def update_subscription(
                     detail="Guild Master is currently full. Join the waitlist to be notified when a seat opens up.",
                 )
 
-        # Retrieve the Stripe subscription
         stripe_subscription = stripe.Subscription.retrieve(subscription.stripe_subscription_id)
 
         # Defense-in-depth — confirm the Stripe sub actually belongs to the
@@ -1467,18 +1645,6 @@ def update_subscription(
         # Use bracket access: `sub.items` collides with dict.items method.
         subscription_item_id = stripe_subscription["items"]["data"][0]["id"]
 
-        # NOTE (security): `always_invoice` on downgrade issues a prorated
-        # credit immediately. A user could theoretically churn
-        # upgrade→downgrade→upgrade to harvest Guild Master perks without
-        # paying full price. The exposure is bounded by two existing
-        # guardrails: the one-time `subscription_bonus:<tier>` reason key
-        # in clave_service prevents farming the XP/badge bonuses, and the
-        # 30-seat Guild Master cap (which now includes recent INCOMPLETE
-        # checkouts via H3) gates repeat upgrades on seat availability.
-        # Deferring downgrades via stripe.SubscriptionSchedule was
-        # considered and rejected — the UX cost (immediate downgrade
-        # confirmation copy, modal flow, expectations users carry over
-        # from other SaaS) outweighed the bounded financial exposure.
         modify_kwargs: Dict[str, Any] = {
             "items": [{
                 "id": subscription_item_id,
@@ -1499,14 +1665,12 @@ def update_subscription(
         if is_upgrade_to_performer:
             modify_kwargs["trial_end"] = "now"
 
-        # Update the subscription with the new price
         updated_subscription = stripe.Subscription.modify(
             subscription.stripe_subscription_id,
             **modify_kwargs,
             idempotency_key=f"sub_modify:{subscription.stripe_subscription_id}:{operation_id}",
         )
 
-        # Determine the new tier based on price_id
         price_id_to_tier = {
             ADVANCED_PRICE_ID: SubscriptionTier.ADVANCED,
             PERFORMER_PRICE_ID: SubscriptionTier.PERFORMER,
@@ -1540,26 +1704,21 @@ def update_subscription(
             else subscription.current_period_end
         )
 
-        # Update our database
         subscription.tier = new_tier
         subscription.current_period_end = period_end_dt
         subscription.cancel_at_period_end = False
         if is_upgrade_to_performer:
             subscription.status = SubscriptionStatus.ACTIVE
-        # Stamp the cooldown anchor only on a real Performer→Advanced
-        # transition. Stripe.modify above succeeded, so the downgrade is
-        # committed on Stripe's side; failing to stamp here would let the
-        # next call slip through the cooldown. Stamp inside the same
-        # transaction as the tier write so a rollback below clears both.
-        if is_downgrade_performer_to_advanced:
-            subscription.last_performer_downgrade_at = datetime.now(timezone.utc)
         db.commit()
         db.refresh(subscription)
 
         return SubscriptionResponse(
             success=True,
             message="Subscription updated successfully.",
-            tier=new_tier.value
+            tier=new_tier.value,
+            scheduled_tier=subscription.scheduled_tier,
+            cancel_at_period_end=subscription.cancel_at_period_end,
+            current_period_end=subscription.current_period_end,
         )
 
     except stripe.error.StripeError:
@@ -1611,13 +1770,41 @@ def cancel_subscription(
             subscription.status = SubscriptionStatus.CANCELED
             subscription.tier = SubscriptionTier.ROOKIE
             subscription.cancel_at_period_end = False
+            subscription.scheduled_tier = None
+            subscription.stripe_schedule_id = None
             db.commit()
             db.refresh(subscription)
             return SubscriptionResponse(
                 success=True,
                 message="Subscription canceled.",
-                tier="rookie"
+                tier="rookie",
+                scheduled_tier=None,
+                cancel_at_period_end=False,
+                current_period_end=subscription.current_period_end,
             )
+
+        # Release any pending downgrade schedule first. Cancel and
+        # scheduled-downgrade are mutually exclusive at the period boundary
+        # — the user is asking to end the subscription entirely, so the
+        # phase-2 (Pro) future is moot. We release the schedule so Stripe
+        # doesn't try to transition the sub to Pro on the very tick we want
+        # it to end. Stripe also auto-aborts schedules when the underlying
+        # sub is canceled, but doing it explicitly avoids the race window
+        # and keeps our DB row clean immediately.
+        if subscription.stripe_schedule_id:
+            try:
+                stripe.SubscriptionSchedule.release(
+                    subscription.stripe_schedule_id,
+                    idempotency_key=f"sched_release_on_cancel:{subscription.stripe_schedule_id}:{operation_id}",
+                )
+            except stripe.error.InvalidRequestError as e:
+                logger.info(
+                    f"cancel_subscription: schedule {subscription.stripe_schedule_id} "
+                    f"already released or terminal: {e}"
+                )
+            subscription.stripe_schedule_id = None
+            subscription.scheduled_tier = None
+            db.commit()
 
         # Schedule cancellation at period end in Stripe. User keeps access
         # until then. Stripe will fire customer.subscription.deleted at the
@@ -1636,6 +1823,9 @@ def cancel_subscription(
             success=True,
             message="Your subscription will end at the close of this billing period.",
             tier=subscription.tier.value,
+            scheduled_tier=subscription.scheduled_tier,
+            cancel_at_period_end=subscription.cancel_at_period_end,
+            current_period_end=subscription.current_period_end,
         )
         
     except stripe.error.StripeError as e:
@@ -1683,6 +1873,9 @@ def resume_subscription(
             success=True,
             message="Subscription resumed. Welcome back!",
             tier=subscription.tier.value,
+            scheduled_tier=subscription.scheduled_tier,
+            cancel_at_period_end=subscription.cancel_at_period_end,
+            current_period_end=subscription.current_period_end,
         )
     except stripe.error.StripeError as e:
         logger.error(f"Stripe error resuming subscription for user {current_user.id}: {e}")
@@ -1691,6 +1884,72 @@ def resume_subscription(
         raise
     except Exception as e:
         logger.error(f"Unexpected error resuming subscription for user {current_user.id}: {e}")
+        raise HTTPException(status_code=500, detail="An unexpected error occurred.")
+
+
+@router.post("/cancel-scheduled-downgrade", response_model=SubscriptionResponse)
+def cancel_scheduled_downgrade(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Undo a pending Performer→Pro downgrade that hasn't fired yet.
+
+    Releases the Stripe SubscriptionSchedule and clears the DB markers.
+    The subscription stays on Performer at the same period boundary; no
+    proration, no charge. Only valid while `scheduled_tier` is set and the
+    schedule hasn't transitioned to phase 2 yet.
+
+    Note: this is the "Keep Guild Master" affordance. Calling
+    /update-subscription with new_price_id=PERFORMER while pending also
+    releases the schedule (same end state) — both paths exist so the UI
+    and any external scripts can use whichever feels natural.
+    """
+    operation_id = str(uuid.uuid4())  # L1: idempotency-key basis
+    try:
+        subscription = db.query(Subscription).filter(
+            Subscription.user_id == current_user.id
+        ).first()
+        if not subscription:
+            raise HTTPException(status_code=404, detail="No subscription found.")
+        if not subscription.stripe_schedule_id:
+            raise HTTPException(
+                status_code=400, detail="No scheduled downgrade to cancel."
+            )
+
+        try:
+            stripe.SubscriptionSchedule.release(
+                subscription.stripe_schedule_id,
+                idempotency_key=f"sched_release:{subscription.stripe_schedule_id}:{operation_id}",
+            )
+        except stripe.error.InvalidRequestError as e:
+            # Schedule already released or in a terminal state. Treat as
+            # success — the goal (no pending downgrade) is met.
+            logger.info(
+                f"cancel_scheduled_downgrade: schedule {subscription.stripe_schedule_id} "
+                f"already released or terminal: {e}"
+            )
+
+        subscription.stripe_schedule_id = None
+        subscription.scheduled_tier = None
+        db.commit()
+        db.refresh(subscription)
+
+        return SubscriptionResponse(
+            success=True,
+            message="Downgrade canceled. You're still Guild Master.",
+            tier=subscription.tier.value,
+            scheduled_tier=None,
+            cancel_at_period_end=subscription.cancel_at_period_end,
+            current_period_end=subscription.current_period_end,
+        )
+    except stripe.error.StripeError as e:
+        logger.error(f"Stripe error releasing schedule for user {current_user.id}: {e}")
+        raise HTTPException(status_code=400, detail="Payment processing error. Please try again.")
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Unexpected error releasing schedule for user {current_user.id}: {e}")
         raise HTTPException(status_code=500, detail="An unexpected error occurred.")
 
 

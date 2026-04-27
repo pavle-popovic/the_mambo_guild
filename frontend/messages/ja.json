@@ -626,7 +626,6 @@
       "downgradeLose2": "Roundtable Zoom 通話を失う",
       "downgradeLose3": "Guild Master 席を解放（上限30名）",
       "downgradeKeep1": "すべての Pro 機能とコース全体へのアクセスを維持",
-      "downgradeCooldownNotice": "切り替え後、30日間はGuild Masterへの再アップグレードができません。",
       "stayOnGuildMaster": "Guild Master を続ける",
       "switching": "切り替え中...",
       "modalClose": "閉じる",
@@ -636,7 +635,11 @@
       "toastResumeSuccess": "サブスクリプションを再開しました。",
       "toastResumeError": "再開できませんでした。",
       "toastDowngradeSuccess": "Pro に切り替えました。",
-      "toastDowngradeError": "プランを変更できませんでした。"
+      "toastDowngradeError": "プランを変更できませんでした。",
+      "downgradeScheduledOn": "{date}にProへ移行します。それまでGuild Masterの全機能をご利用いただけます。",
+      "keepGuildMaster": "Guild Masterを維持",
+      "confirmDowngradeBody": "現在の月分は支払い済みです。{date}の次回更新時にPro（$39/月）へ移行します。",
+      "toastDowngradeCanceled": "Guild Masterを継続します。"
     }
   },
   "community": {

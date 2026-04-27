@@ -482,6 +482,7 @@ class ApiClient {
       subscription_cancel_at_period_end?: boolean;
       subscription_period_end?: string | null;
       subscription_status?: string | null;
+      subscription_scheduled_tier?: string | null;
       reputation: number;
       current_claves: number;
       badges: Array<{
@@ -1032,6 +1033,9 @@ class ApiClient {
       success: boolean;
       message: string;
       tier?: string;
+      scheduled_tier?: string | null;
+      cancel_at_period_end?: boolean;
+      current_period_end?: string | null;
     }>("/api/payments/update-subscription", {
       method: "POST",
       body: JSON.stringify({
@@ -1045,6 +1049,9 @@ class ApiClient {
       success: boolean;
       message: string;
       tier?: string;
+      scheduled_tier?: string | null;
+      cancel_at_period_end?: boolean;
+      current_period_end?: string | null;
     }>("/api/payments/cancel-subscription", {
       method: "POST",
     });
@@ -1055,7 +1062,23 @@ class ApiClient {
       success: boolean;
       message: string;
       tier?: string;
+      scheduled_tier?: string | null;
+      cancel_at_period_end?: boolean;
+      current_period_end?: string | null;
     }>("/api/payments/resume-subscription", {
+      method: "POST",
+    });
+  }
+
+  async cancelScheduledDowngrade() {
+    return this.request<{
+      success: boolean;
+      message: string;
+      tier?: string;
+      scheduled_tier?: string | null;
+      cancel_at_period_end?: boolean;
+      current_period_end?: string | null;
+    }>("/api/payments/cancel-scheduled-downgrade", {
       method: "POST",
     });
   }

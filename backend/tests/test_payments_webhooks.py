@@ -63,19 +63,43 @@ def test_email_helpers_importable():
 
 def test_coaching_exploit_helpers_present():
     """
-    Wiring check for the upgrade/downgrade exploit fixes:
-    - premium._subscription_coaching_eligibility   (Exploit #1 cooldown)
-    - premium.COACHING_SUBSCRIPTION_COOLDOWN_DAYS  (the constant)
-    - payments._expire_pending_subscription_coaching (Exploit #6 revocation)
+    Wiring check for the coaching gating + refund-revocation surface:
+    - premium._subscription_coaching_eligibility (per-period gate)
+    - payments._expire_pending_subscription_coaching (refund/dispute revocation)
+
+    The 25-day churn cooldown was retired with migration 027 (deferred
+    downgrade). The proration-cycle exploit it guarded is now closed at
+    the billing layer — every Performer month is fully paid and non-
+    refundable, so per-period gating is sufficient.
     """
     from routers import premium, payments
     assert callable(premium._subscription_coaching_eligibility)
-    assert isinstance(premium.COACHING_SUBSCRIPTION_COOLDOWN_DAYS, int)
-    assert premium.COACHING_SUBSCRIPTION_COOLDOWN_DAYS >= 25, (
-        "Cooldown must be >=25 days to keep churn unprofitable; reducing it "
-        "without a billing-cycle snapshot column re-opens Exploit #1."
-    )
     assert callable(payments._expire_pending_subscription_coaching)
+    # Cooldown constant must NOT exist — its presence would mean a partial
+    # revert of the deferred-downgrade rollout that left the gate stale.
+    assert not hasattr(premium, "COACHING_SUBSCRIPTION_COOLDOWN_DAYS"), (
+        "COACHING_SUBSCRIPTION_COOLDOWN_DAYS was removed in the deferred-"
+        "downgrade rollout. Don't re-add it without a design review."
+    )
+
+
+def test_deferred_downgrade_routes_registered():
+    """
+    The deferred-downgrade endpoint must be mounted, and the legacy
+    cooldown constant must be gone from payments.py too.
+    """
+    from routers import payments
+
+    paths = {(route.path, tuple(sorted(route.methods))) for route in payments.router.routes}
+    assert ("/payments/cancel-scheduled-downgrade", ("POST",)) in paths
+    assert ("/payments/update-subscription", ("POST",)) in paths
+    # The 30-day re-upgrade cooldown is retired. Guard against a partial
+    # revert that re-introduces the constant without re-introducing the
+    # check (would silently break tests that imported it elsewhere).
+    assert not hasattr(payments, "PERFORMER_REUPGRADE_COOLDOWN_DAYS"), (
+        "PERFORMER_REUPGRADE_COOLDOWN_DAYS was removed in the deferred-"
+        "downgrade rollout. Don't re-add it without a design review."
+    )
 
 
 def test_price_ids_are_env_overridable(monkeypatch):
