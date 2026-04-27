@@ -13,7 +13,7 @@ import uuid
 from models.user import User, UserProfile, Subscription, SubscriptionTier, SubscriptionStatus
 from models.community import Post, PostReply, PostReaction, CommunityTag, ModerationStatus, SavedPost
 from services.moderation_service import evaluate_reply, evaluate_post
-from services.tier_service import can_participate_in_community
+from services.tier_service import community_participation_status, community_gate_message
 from services.mux_service import delete_asset as delete_mux_asset
 from services import rate_limit_service
 from services.clave_service import (
@@ -192,15 +192,15 @@ def create_post(
     Create a new post.
     Returns: {success, post, message} or {success: False, message}
     """
-    # Tier gate: only fully-paid (non-trial) subscribers can post. Free
-    # tier and trialing users can read the community but not post.
-    # Economic friction: a malicious actor would have to pay $39 and wait
-    # out a 7-day trial — vastly more effective than text-based AI moderation.
-    if not can_participate_in_community(user_id, db):
+    # Tier gate. Free/expired users always blocked; trialing users blocked
+    # only when the BLOCK_TRIAL_FROM_COMMUNITY_POSTING flag is on.
+    gate = community_participation_status(user_id, db)
+    if not gate["allowed"]:
         return {
             "success": False,
-            "message": "Posting in the community is for paid Mambo Guild members. Subscribe to share your practice or ask questions.",
+            "message": community_gate_message(gate["state"], surface="post"),
             "tier_required": True,
+            "gate_state": gate["state"],
         }
 
     # Hourly rate limit (anti-spam; the only gate now that posting is free).
@@ -599,12 +599,14 @@ def add_reply(
     if not post:
         return {"success": False, "message": "Post not found"}
 
-    # Tier gate: only fully-paid (non-trial) subscribers can comment.
-    if not can_participate_in_community(user_id, db):
+    # Tier gate (same flag as posting).
+    gate = community_participation_status(user_id, db)
+    if not gate["allowed"]:
         return {
             "success": False,
-            "message": "Commenting is for paid Mambo Guild members. Subscribe to join the conversation.",
+            "message": community_gate_message(gate["state"], surface="comment"),
             "tier_required": True,
+            "gate_state": gate["state"],
         }
 
     # Check feedback_type - "hype" mode disables comments

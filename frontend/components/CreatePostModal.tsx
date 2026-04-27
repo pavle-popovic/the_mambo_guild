@@ -409,8 +409,20 @@ export function CreatePostModal({ isOpen, onClose, mode, onPostCreated }: Create
               </p>
             </div>
 
-            {/* Tier gate: free/trial users see an upgrade CTA instead of the form. */}
-            {eligibility && !eligibility.allowed && /member/i.test(eligibility.message) ? (
+            {/* Tier gate. Two variants:
+                  - trial:   security copy, no CTA (they already pay)
+                  - members: upgrade CTA → /pricing */}
+            {eligibility && !eligibility.allowed && /trial/i.test(eligibility.message) ? (
+              <div className="py-6 text-center">
+                <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-gradient-to-br from-amber-500/30 to-amber-600/30 border border-amber-400/40 flex items-center justify-center text-2xl">
+                  🔒
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">Posting Locked During Trial</h3>
+                <p className="text-white/70 text-sm max-w-md mx-auto leading-relaxed">
+                  {eligibility.message}
+                </p>
+              </div>
+            ) : eligibility && !eligibility.allowed && /member/i.test(eligibility.message) ? (
               <div className="py-6 text-center">
                 <div className="mx-auto mb-4 w-14 h-14 rounded-full bg-gradient-to-br from-amber-500/30 to-amber-600/30 border border-amber-400/40 flex items-center justify-center text-2xl">
                   🔒

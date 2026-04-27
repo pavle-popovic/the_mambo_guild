@@ -132,6 +132,14 @@ class Settings:
     # Anthropic (Claude) API - used by moderation_service and ai_chat
     ANTHROPIC_API_KEY: Optional[str] = os.getenv("ANTHROPIC_API_KEY")
 
+    # Community: when True, trialing users can NOT post or comment (only
+    # status=ACTIVE on Advanced/Performer can). Default False = trial users
+    # can author content. Flip to True later to require a fully-paid period
+    # before posting (extra friction against drive-by abuse).
+    BLOCK_TRIAL_FROM_COMMUNITY_POSTING: bool = (
+        os.getenv("BLOCK_TRIAL_FROM_COMMUNITY_POSTING", "false").lower() == "true"
+    )
+
     # AI/Gemini Configuration - SECURITY: API key must be set via environment variable
     _gemini_api_key: Optional[str] = os.getenv("GEMINI_API_KEY")
 

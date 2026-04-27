@@ -722,13 +722,14 @@ def check_question_eligibility(
     Pre-check to see if user can post a new question.
     Checks tier gate first, then slot limit.
     """
-    from services.tier_service import can_participate_in_community
-    if not can_participate_in_community(str(current_user.id), db):
+    from services.tier_service import community_participation_status, community_gate_message
+    gate = community_participation_status(str(current_user.id), db)
+    if not gate["allowed"]:
         return UploadCheckResponse(
             allowed=False,
             current_slots=0,
             max_slots=0,
-            message="Asking questions in the Lab is for paid Mambo Guild members. Subscribe to participate.",
+            message=community_gate_message(gate["state"], surface="post"),
         )
     from services.clave_service import get_question_slot_status
     status = get_question_slot_status(str(current_user.id), db)
@@ -744,13 +745,14 @@ def check_upload_eligibility(
     Pre-upload check to see if user can upload a new video.
     Checks tier gate first, then slot limit.
     """
-    from services.tier_service import can_participate_in_community
-    if not can_participate_in_community(str(current_user.id), db):
+    from services.tier_service import community_participation_status, community_gate_message
+    gate = community_participation_status(str(current_user.id), db)
+    if not gate["allowed"]:
         return UploadCheckResponse(
             allowed=False,
             current_slots=0,
             max_slots=0,
-            message="Sharing videos on the Stage is for paid Mambo Guild members. Subscribe to participate.",
+            message=community_gate_message(gate["state"], surface="post"),
         )
     from services.clave_service import get_video_slot_status
     status = get_video_slot_status(str(current_user.id), db)

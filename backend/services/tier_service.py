@@ -73,29 +73,70 @@ def require_tier_at_least(user_id: str, required: Optional[str], db: Session) ->
     return have >= needed
 
 
-def can_participate_in_community(user_id: str, db: Session) -> bool:
-    """True iff the user is on a fully-paid (non-trial) Advanced/Performer
-    subscription. Stricter than `user_tier`: trialing users are blocked.
+def community_participation_status(user_id: str, db: Session) -> dict:
+    """Resolve whether a user can post/comment in the community.
 
-    The point: a malicious actor wanting to abuse the community would have
-    to commit a real $39 charge AND wait out a 7-day trial. Free-tier and
-    trialing users can read the community but not post or comment.
+    Returns a dict so the caller can branch on `state`:
+      - "allowed"  → user has paid access and can author content
+      - "free"     → no paid subscription (rookie / inactive); blocked
+      - "trial"    → trialing on a paid tier; blocked ONLY when the
+                     BLOCK_TRIAL_FROM_COMMUNITY_POSTING flag is on
+      - "expired"  → had a sub but the period ended; treat as free
+
+    The flag-gated trial path lets us flip on stricter friction later
+    (forcing a real $39 charge + 7-day wait before posting) without
+    a code change. Default off so trialing members can author today.
     """
+    from config import settings
+
     sub = (
         db.query(Subscription)
         .filter(
             Subscription.user_id == user_id,
-            Subscription.status == SubscriptionStatus.ACTIVE,
+            Subscription.status.in_([SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING]),
         )
         .first()
     )
     if not sub:
-        return False
+        return {"state": "free", "allowed": False}
+
     period_end = sub.current_period_end
     if period_end is not None:
         if period_end.tzinfo is None:
             period_end = period_end.replace(tzinfo=timezone.utc)
         if period_end < datetime.now(timezone.utc):
-            return False
+            return {"state": "expired", "allowed": False}
+
     tier_value = sub.tier.value if isinstance(sub.tier, SubscriptionTier) else str(sub.tier)
-    return tier_value in ("advanced", "performer")
+    if tier_value not in ("advanced", "performer"):
+        return {"state": "free", "allowed": False}
+
+    if sub.status == SubscriptionStatus.TRIALING and settings.BLOCK_TRIAL_FROM_COMMUNITY_POSTING:
+        return {"state": "trial", "allowed": False}
+
+    return {"state": "allowed", "allowed": True}
+
+
+def can_participate_in_community(user_id: str, db: Session) -> bool:
+    """Boolean wrapper for `community_participation_status`."""
+    return community_participation_status(user_id, db)["allowed"]
+
+
+# Frontend-facing messages keyed by the participation state. Centralised
+# here so the upgrade banner and the inline error stay in sync.
+COMMUNITY_GATE_MESSAGES = {
+    "free": "Posting in the community is for paid Mambo Guild members. Subscribe to share your practice or ask questions.",
+    "expired": "Your subscription has lapsed. Renew to keep posting in the community.",
+    "trial": "For security reasons, posting is not possible during your free trial. You'll be able to post once your trial ends and your first payment is processed.",
+}
+
+
+def community_gate_message(state: str, *, surface: str = "post") -> str:
+    """Return the user-facing message for a blocked participation state.
+
+    `surface` lets us tweak wording for the lab/stage/comment endpoints
+    without duplicating the trial copy across places.
+    """
+    if state == "free" and surface == "comment":
+        return "Commenting is for paid Mambo Guild members. Subscribe to join the conversation."
+    return COMMUNITY_GATE_MESSAGES.get(state, COMMUNITY_GATE_MESSAGES["free"])
