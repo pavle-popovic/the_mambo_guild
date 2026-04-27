@@ -563,11 +563,11 @@ export default function PostDetailModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/80 backdrop-blur-sm">
-      <div className="relative w-full max-w-4xl max-h-[95dvh] sm:max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900/95 to-black/95 rounded-xl sm:rounded-2xl border border-white/10 shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/95">
+      <div className="relative w-full max-w-4xl max-h-[95dvh] sm:max-h-[90vh] overflow-y-auto bg-gradient-to-br from-gray-900 to-black rounded-xl sm:rounded-2xl border border-white/10 shadow-2xl">
         {/* Header */}
         <div
-          className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-4 pb-3 sm:pb-4 bg-black/60 backdrop-blur-md border-b border-white/10"
+          className="sticky top-0 z-10 flex items-center justify-between px-3 sm:px-4 pb-3 sm:pb-4 bg-black/95 border-b border-white/10"
           style={{ paddingTop: "max(0.75rem, env(safe-area-inset-top))" }}
         >
           <h2 className="text-base sm:text-xl font-semibold text-white">{t("postDetails")}</h2>
