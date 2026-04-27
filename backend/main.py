@@ -149,12 +149,19 @@ def _ensure_tables() -> None:
 
     # Threaded replies: parent_reply_id FK on post_replies (nullable, SET
     # NULL on parent delete so subtrees are never cascade-vaporised).
+    # Logged at ERROR (not warning) because the SQLAlchemy model declares
+    # this column unconditionally — without it, every post-detail fetch
+    # 500s on the post_replies SELECT.
     try:
         from migrations.add_post_reply_parent import run as _add_post_reply_parent
         _add_post_reply_parent()
     except Exception as exc:
-        logging.getLogger("uvicorn.error").warning(
-            "post_replies.parent_reply_id migration skipped: %s", exc
+        logging.getLogger("uvicorn.error").error(
+            "post_replies.parent_reply_id migration FAILED: %s "
+            "(post-detail loads will 500 until this is resolved — run "
+            "`python -m migrations.add_post_reply_parent` against the prod DB).",
+            exc,
+            exc_info=True,
         )
 
     # Seed release_schedule_items with the launch lineup so the admin
