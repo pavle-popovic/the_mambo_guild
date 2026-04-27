@@ -720,6 +720,13 @@ export default function PostDetailModal({
                             playbackId={post.mux_playback_id}
                             autoPlay={true}
                             containFit
+                            // Community clips are short-form and
+                            // played in a modal, not the full lesson
+                            // surface — capping the rendition at 720p
+                            // and preloading eagerly cuts the start-up
+                            // buffer hang reported on /community.
+                            maxResolution="720p"
+                            preload="auto"
                             metadata={{
                               video_title: post.title,
                               video_id: post.id,
@@ -1173,6 +1180,7 @@ export default function PostDetailModal({
                                       <div className="mt-2">
                                         <MuxVideoPlayer
                                           playbackId={reply.mux_playback_id}
+                                          maxResolution="720p"
                                           metadata={{
                                             video_title: t("replyVideoTitle", { title: post.title }),
                                             video_id: reply.id,

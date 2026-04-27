@@ -20,6 +20,21 @@ interface MuxVideoPlayerProps {
   className?: string;
   containFit?: boolean;
   onCaptionChange?: (text: string) => void;
+  /**
+   * Cap on the rendition the player will request. Mux supports
+   * "720p" | "1080p" | "1440p" | "2160p". Lower values cut buffering on
+   * tight upstream pipes — use "720p" for short-form / community clips.
+   * Default "1080p" matches the lesson-content quality bar.
+   */
+  maxResolution?: "720p" | "1080p" | "1440p" | "2160p";
+  /**
+   * HTML preload hint forwarded to the underlying video element.
+   * "auto" begins downloading bytes as soon as the player mounts (good
+   * for short clips behind a click-to-open modal); "metadata" waits for
+   * play. Default mirrors the original behaviour: "auto" iff autoplay,
+   * "metadata" otherwise.
+   */
+  preload?: "none" | "metadata" | "auto";
   metadata?: {
     video_title?: string;
     video_id?: string;
@@ -58,6 +73,8 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       className,
       containFit,
       onCaptionChange,
+      maxResolution = "1080p",
+      preload,
       metadata,
       overlay,
     },
@@ -589,8 +606,8 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
           playbackId={playbackId}
           streamType="on-demand"
           autoPlay={autoPlay}
-          maxResolution="1080p"
-          preload={autoPlay ? "auto" : "metadata"}
+          maxResolution={maxResolution}
+          preload={preload ?? (autoPlay ? "auto" : "metadata")}
           poster={posterUrl}
           primaryColor="#D4AF37"
           secondaryColor="#8c8c8c"
