@@ -136,6 +136,17 @@ def _ensure_tables() -> None:
             "notifications.actor_id migration skipped: %s", exc
         )
 
+    # Recover actor for pre-migration reaction/reply notifications by
+    # matching the action timestamp. Idempotent (WHERE actor_id IS NULL),
+    # so subsequent boots are zero-cost no-ops.
+    try:
+        from migrations.backfill_notification_actors import run as _backfill_notification_actors
+        _backfill_notification_actors()
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning(
+            "notifications.actor_id backfill skipped: %s", exc
+        )
+
     # Seed release_schedule_items with the launch lineup so the admin
     # editor and the landing page agree on day one. Only inserts when
     # the table is empty — never overwrites later edits.

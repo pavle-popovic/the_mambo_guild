@@ -32,26 +32,40 @@ const KNOWN_TYPES = new Set([
 
 // New (post-migration) backend stores action-only messages like
 // `liked your post "X"`. Legacy rows still have the actor name baked in
-// (`Founder liked your post "X"`). Both regexes are tried in order so the
-// dropdown keeps rendering correctly across the rolling deploy.
-const MESSAGE_PATTERNS: Record<string, RegExp[]> = {
+// (`Founder liked your post "X"`). Each pattern is tagged so we can tell
+// the two formats apart and decide which translation key to use — without
+// this distinction, legacy rows lose their actor name entirely (regex
+// strips it but no actor_id exists to render the avatar+username header).
+type Pattern = { regex: RegExp; format: "action" | "legacy" };
+const MESSAGE_PATTERNS: Record<string, Pattern[]> = {
   reaction_received: [
-    /^liked your post "(.+)"$/,
-    /^(?:.+?) liked your post "(.+)"$/,
+    { regex: /^liked your post "(.+)"$/, format: "action" },
+    { regex: /^(.+?) liked your post "(.+)"$/, format: "legacy" },
   ],
   reply_received: [
-    /^replied to your post "(.+)"$/,
-    /^(?:.+?) replied to your post "(.+)"$/,
+    { regex: /^replied to your post "(.+)"$/, format: "action" },
+    { regex: /^(.+?) replied to your post "(.+)"$/, format: "legacy" },
   ],
-  badge_earned: [/^You earned the (.+) badge!$/],
+  badge_earned: [
+    { regex: /^You earned the (.+) badge!$/, format: "action" },
+  ],
 };
 
-function extractPostTitle(type: string, message: string): string | null {
+type ParsedMessage =
+  | { format: "action"; postTitle: string }
+  | { format: "legacy"; legacyName: string; postTitle: string }
+  | null;
+
+function parseMessage(type: string, message: string): ParsedMessage {
   const patterns = MESSAGE_PATTERNS[type];
   if (!patterns) return null;
-  for (const pattern of patterns) {
-    const match = message.match(pattern);
-    if (match) return match[1] ?? null;
+  for (const { regex, format } of patterns) {
+    const match = message.match(regex);
+    if (!match) continue;
+    if (format === "action") {
+      return { format: "action", postTitle: match[1] ?? "" };
+    }
+    return { format: "legacy", legacyName: match[1] ?? "", postTitle: match[2] ?? "" };
   }
   return null;
 }
@@ -179,20 +193,32 @@ export default function NotificationBell() {
     if (!KNOWN_TYPES.has(n.type)) return n.message;
 
     if (n.type === "reaction_received" || n.type === "reply_received") {
-      const postTitle = extractPostTitle(n.type, n.message);
-      if (postTitle === null) return n.message;
-      // Action-only translation key — the actor avatar+username render
-      // separately. Falls back to the legacy `{name} ...` template (with
-      // name stripped) for any locale that hasn't shipped the new key.
-      const action = t(`types.${n.type}.action`, { postTitle });
-      if (action && !action.startsWith("types.")) return action;
-      const legacy = t(`types.${n.type}.message`, { name: "", postTitle });
-      if (legacy && !legacy.startsWith("types.")) return legacy.trim();
+      const parsed = parseMessage(n.type, n.message);
+      if (!parsed) return n.message;
+
+      // New rows: backend supplies actor_username + serves an action-only
+      // body. The avatar+username header renders separately, so the message
+      // here is just the verb and post title.
+      if (n.actor_username && parsed.format === "action") {
+        const action = t(`types.${n.type}.action`, { postTitle: parsed.postTitle });
+        if (action && !action.startsWith("types.")) return action;
+      }
+
+      // Legacy rows (pre-migration) have the actor name baked into the
+      // message and no actor_id. Use the original full-sentence template
+      // so the user still sees who acted, even without the avatar/link.
+      const legacyName =
+        parsed.format === "legacy" ? parsed.legacyName : (n.actor_username ? `@${n.actor_username}` : "");
+      const full = t(`types.${n.type}.message`, {
+        name: legacyName,
+        postTitle: parsed.postTitle,
+      });
+      if (full && !full.startsWith("types.")) return full.trim();
       return n.message;
     }
 
     if (n.type === "badge_earned") {
-      const match = n.message.match(MESSAGE_PATTERNS.badge_earned[0]);
+      const match = n.message.match(MESSAGE_PATTERNS.badge_earned[0].regex);
       if (match) {
         const translated = t(`types.${n.type}.message`, { badgeName: match[1] });
         if (translated && !translated.startsWith("types.")) return translated;
@@ -266,6 +292,14 @@ export default function NotificationBell() {
                   const actorUsername = notification.actor_username;
                   const actorAvatar = notification.actor_avatar_url;
                   const profileHref = actorUsername ? `/u/${encodeURIComponent(actorUsername)}` : null;
+                  // Show the inline @username link only when the message body
+                  // is the action-only format. For legacy rows the actor name
+                  // is already inside translateMessage(), so prepending here
+                  // would double it.
+                  const showInlineUsername =
+                    !!actorUsername &&
+                    (notification.type === "reaction_received" || notification.type === "reply_received") &&
+                    parseMessage(notification.type, notification.message)?.format === "action";
                   return (
                     <motion.div
                       key={notification.id}
@@ -306,16 +340,18 @@ export default function NotificationBell() {
                         <div className={`min-w-0 flex-1 ${!notification.is_read || profileHref ? "" : "ml-4"}`}>
                           <p className="text-sm font-medium text-white/90">{translateTitle(notification)}</p>
                           <p className="text-xs text-white/50 mt-0.5">
-                            {profileHref && (
-                              <Link
-                                href={profileHref}
-                                onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
-                                className="font-semibold text-white/80 hover:text-[#D4AF37] transition-colors"
-                              >
-                                @{actorUsername}
-                              </Link>
+                            {showInlineUsername && profileHref && (
+                              <>
+                                <Link
+                                  href={profileHref}
+                                  onClick={(e) => { e.stopPropagation(); setIsOpen(false); }}
+                                  className="font-semibold text-white/80 hover:text-[#D4AF37] transition-colors"
+                                >
+                                  @{actorUsername}
+                                </Link>
+                                {" "}
+                              </>
                             )}
-                            {profileHref && " "}
                             {translateMessage(notification)}
                           </p>
                           <p className="text-[10px] text-white/30 mt-1">{formatTime(notification.created_at)}</p>
