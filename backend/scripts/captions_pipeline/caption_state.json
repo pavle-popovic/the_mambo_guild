@@ -5699,14 +5699,16 @@
     "Mambo101Edited__SuzyQ_1_Lesson_1": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777279208.1067245
         },
         "de": {
           "status": "translated",
           "translated_mtime": 1776594245.132599
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777279211.581794
         },
         "es": {
           "status": "translated",
