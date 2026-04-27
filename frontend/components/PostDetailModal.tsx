@@ -3,7 +3,7 @@
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { FaTimes, FaTrash, FaEdit, FaHeart, FaRegHeart, FaSave, FaBookmark, FaRegBookmark } from "react-icons/fa";
-import MuxVideoPlayer from "./MuxVideoPlayer";
+import SimpleMuxPlayer from "./SimpleMuxPlayer";
 import { apiClient } from "@/lib/api";
 import { useUISound } from "@/hooks/useUISound";
 import { useAuth } from "@/contexts/AuthContext";
@@ -716,15 +716,10 @@ export default function PostDetailModal({
                           className="relative rounded-lg overflow-hidden bg-black"
                           style={{ height: "55vh" }}
                         >
-                          <MuxVideoPlayer
+                          <SimpleMuxPlayer
                             playbackId={post.mux_playback_id}
                             autoPlay={true}
                             containFit
-                            // Community clips are short-form and
-                            // played in a modal, not the full lesson
-                            // surface — capping the rendition at 720p
-                            // and preloading eagerly cuts the start-up
-                            // buffer hang reported on /community.
                             maxResolution="720p"
                             preload="auto"
                             metadata={{
@@ -1178,7 +1173,7 @@ export default function PostDetailModal({
 
                                     {reply.mux_playback_id && (
                                       <div className="mt-2">
-                                        <MuxVideoPlayer
+                                        <SimpleMuxPlayer
                                           playbackId={reply.mux_playback_id}
                                           maxResolution="720p"
                                           metadata={{
