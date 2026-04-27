@@ -164,6 +164,17 @@ def _ensure_tables() -> None:
             exc_info=True,
         )
 
+    # Flatten any pre-existing nested replies onto the thread root so the
+    # Instagram-style 2-level threading invariant holds for old rows too.
+    # Idempotent (touches zero rows once data is flat).
+    try:
+        from migrations.flatten_post_reply_threads import run as _flatten_post_reply_threads
+        _flatten_post_reply_threads()
+    except Exception as exc:
+        logging.getLogger("uvicorn.error").warning(
+            "post_replies thread flatten skipped: %s", exc
+        )
+
     # Seed release_schedule_items with the launch lineup so the admin
     # editor and the landing page agree on day one. Only inserts when
     # the table is empty — never overwrites later edits.
