@@ -100,6 +100,12 @@ export default function LandingPricingSection() {
   const router = useRouter();
   const [loading, setLoading] = useState<string>(""); // Initialize as empty string to avoid null === null match
   const [showAuthModal, setShowAuthModal] = useState(false);
+  const tPricing = useTranslations("pricingPage");
+  // Trial is one-shot: once consumed, the Pro CTA must say "Subscribe" so the
+  // user isn't surprised by an immediate charge.
+  const proCtaLabel = user?.has_used_trial
+    ? tPricing("proSubscribeNoTrial")
+    : t("proCta");
   const [guildMasterSeats, setGuildMasterSeats] = useState<{
     total: number;
     taken: number;
@@ -133,9 +139,9 @@ export default function LandingPricingSection() {
       return;
     }
 
-    // Not logged in - show auth modal
+    // Not logged in - send to login with return URL
     if (!user) {
-      setShowAuthModal(true);
+      router.push(`/login?redirect=/pricing`);
       return;
     }
 
@@ -180,6 +186,7 @@ export default function LandingPricingSection() {
 
       if (
         error.message?.includes("Could not validate credentials") ||
+        error.message?.includes("Authentication required") ||
         error.message?.includes("401") ||
         error.message?.includes("Unauthorized")
       ) {
@@ -382,7 +389,11 @@ export default function LandingPricingSection() {
                               : "border border-gray-600 hover:border-gray-500 hover:bg-gray-800/50 text-mambo-text shadow-md"
                               }`}
                           >
-                            {loading === plan.priceId ? t("loading") : plan.cta}
+                            {loading === plan.priceId
+                            ? t("loading")
+                            : plan.id === "full-access"
+                              ? proCtaLabel
+                              : plan.cta}
                           </button>
                         )}
                       </Clickable>

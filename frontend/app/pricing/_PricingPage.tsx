@@ -141,7 +141,7 @@ function PricingPageContent() {
 
   const handleSubscribe = async (priceId: string, tierName: string) => {
     if (!user) {
-      setShowAuthModal(true);
+      router.push(`/login?redirect=/pricing`);
       return;
     }
 
@@ -184,6 +184,7 @@ function PricingPageContent() {
       console.error("Failed to create checkout session:", error);
 
       if (error.message?.includes("Could not validate credentials") ||
+        error.message?.includes("Authentication required") ||
         error.message?.includes("401") ||
         error.message?.includes("Unauthorized")) {
         toast.error(t("toastSessionExpired"));
@@ -208,7 +209,7 @@ function PricingPageContent() {
 
   const handleUpgrade = async () => {
     if (!user) {
-      setShowAuthModal(true);
+      router.push(`/login?redirect=/pricing`);
       return;
     }
 
@@ -236,7 +237,7 @@ function PricingPageContent() {
   // (paid Pro users are already used to monthly billing).
   const handleUpgradeClick = () => {
     if (!user) {
-      setShowAuthModal(true);
+      router.push(`/login?redirect=/pricing`);
       return;
     }
     const isTrialingAdvanced =
