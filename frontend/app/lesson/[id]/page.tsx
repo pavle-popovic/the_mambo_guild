@@ -885,14 +885,18 @@ export default function LessonPage() {
                           Mux's control strip. bottom offset clears the scrubber
                           on desktop and mobile. */}
                       {abLoop.enabled && (
-                        <div className="absolute left-0 right-0 bottom-[52px] md:bottom-[56px] z-20 px-1 md:px-2 py-2 bg-black/70 backdrop-blur-sm">
+                        <div className="absolute left-0 right-0 bottom-[52px] md:bottom-[56px] z-20 px-1 md:px-2 py-2 bg-black/25">
                           <ABLoopBar state={abLoop} duration={videoDuration} />
                         </div>
                       )}
                       <MuxVideoPlayer
                         ref={videoPlayerRef}
                         playbackId={lesson.mux_playback_id}
-                        onEnded={() => { setVideoPlaying(false); setVideoEnded(true); }}
+                        onEnded={() => {
+                          if (abLoop.handleEnded()) return;
+                          setVideoPlaying(false);
+                          setVideoEnded(true);
+                        }}
                         onPlay={() => setVideoEnded(false)}
                         onLoadedMetadata={(duration) => {
                           setVideoDuration(duration);

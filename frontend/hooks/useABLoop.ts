@@ -18,6 +18,10 @@ export interface ABLoopState {
    * (yellow loop segment + current-time indicator), and users expect to tap
    * it to advance the video. */
   seek: (t: number) => void;
+  /** Call from the page's onEnded. Returns true if the loop consumed the
+   * event (seeked back to A and resumed). Covers the B==duration case
+   * where the natural `ended` fires before the 80 ms poll catches t >= b. */
+  handleEnded: () => boolean;
 }
 
 export function useABLoop(
@@ -69,8 +73,17 @@ export function useABLoop(
   }, [playerRef]);
 
   const setATime = useCallback((t: number) => {
-    setATimeRaw(Math.max(0, Math.min(t, bRef.current - MIN_LOOP)));
-  }, []);
+    const clamped = Math.max(0, Math.min(t, bRef.current - MIN_LOOP));
+    setATimeRaw(clamped);
+    // Live-preview: keep the playhead pinned to A while the user drags it,
+    // so the rendered frame tracks the marker. Without this, users can't
+    // tell which frame they're parking A on without disabling the loop.
+    const p = playerRef.current;
+    if (p) {
+      p.setCurrentTime(clamped);
+      setCurrentTime(clamped);
+    }
+  }, [playerRef]);
 
   const setBTime = useCallback((t: number) => {
     setBTimeRaw(Math.max(t, aRef.current + MIN_LOOP));
@@ -84,5 +97,15 @@ export function useABLoop(
     setCurrentTime(clamped);
   }, [playerRef, duration]);
 
-  return { enabled, aTime, bTime, currentTime, toggle, setATime, setBTime, seek };
+  const handleEnded = useCallback((): boolean => {
+    if (!enabledRef.current) return false;
+    if (bRef.current <= aRef.current) return false;
+    const p = playerRef.current;
+    if (!p) return false;
+    p.setCurrentTime(aRef.current);
+    p.play();
+    return true;
+  }, [playerRef]);
+
+  return { enabled, aTime, bTime, currentTime, toggle, setATime, setBTime, seek, handleEnded };
 }
