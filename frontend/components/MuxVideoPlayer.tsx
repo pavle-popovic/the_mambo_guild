@@ -596,6 +596,40 @@ const MuxVideoPlayer = forwardRef<MuxVideoPlayerHandle, MuxVideoPlayerProps>(
       if (onCaptionChange) onCaptionChange(captionText);
     }, [captionText, onCaptionChange]);
 
+    // Bump the underlying hls.js forward-buffer so HLS segment-boundary
+    // micro-stutters don't interrupt playback. Default maxBufferLength
+    // is 30s; 90s is plenty for community clips (most are <60s, so the
+    // entire video buffers up-front) and helps lesson playback survive
+    // brief network dips. Reaches into Mux Player's private `_hls`
+    // (officially documented as the supported escape hatch for hls.js
+    // tuning). Retries with a short interval because _hls is populated
+    // asynchronously after mount.
+    useEffect(() => {
+      let cancelled = false;
+      const tryConfigure = () => {
+        if (cancelled) return;
+        const hls = (muxPlayerRef.current as any)?._hls;
+        if (hls?.config) {
+          hls.config.maxBufferLength = 90;
+          hls.config.maxMaxBufferLength = 600;
+          hls.config.maxBufferSize = 120 * 1000 * 1000; // 120 MB
+          return true;
+        }
+        return false;
+      };
+      if (!tryConfigure()) {
+        const interval = setInterval(() => {
+          if (tryConfigure()) clearInterval(interval);
+        }, 200);
+        const stop = setTimeout(() => clearInterval(interval), 5000);
+        return () => {
+          cancelled = true;
+          clearInterval(interval);
+          clearTimeout(stop);
+        };
+      }
+    }, [playbackId]);
+
     const posterUrl =
       poster || (playbackId ? `https://image.mux.com/${playbackId}/thumbnail.png` : undefined);
 
