@@ -282,8 +282,19 @@ export default function CommunityPage() {
         <div className="min-h-[100dvh] bg-transparent pb-[env(safe-area-inset-bottom)]">
             <NavBar user={user || undefined} />
 
-            {/* Main Content - 3 Column Grid */}
-            <div className="max-w-7xl mx-auto px-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] sm:pb-32 pt-20 sm:pt-24 relative">
+            {/* Main Content - 3 Column Grid.
+                When the post-detail modal is open, the feed grid is
+                hidden via CSS (display:none) so background StageVideoCard
+                images/GIFs and avatar borders aren't decoded/animated
+                while a community video plays in the modal. Symptom this
+                fixes: video shows DECODER_UNDERFLOW in chrome://media-
+                internals on desktop because background work was
+                preempting decode time. Modal stays visible because it's
+                a fixed-positioned sibling, not a child of this grid. */}
+            <div
+                className="max-w-7xl mx-auto px-4 pb-[calc(env(safe-area-inset-bottom)+5rem)] sm:pb-32 pt-20 sm:pt-24 relative"
+                style={isPostDetailOpen ? { display: "none" } : undefined}
+            >
                 <div className="grid grid-cols-12 gap-4 lg:gap-6">
                     {/* Left Sidebar — hidden on mobile, replaced by mobile header */}
                     <div className="hidden lg:block lg:col-span-2 lg:order-1">
