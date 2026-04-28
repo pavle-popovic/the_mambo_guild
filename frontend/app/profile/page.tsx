@@ -596,7 +596,6 @@ export default function ProfilePage() {
                   </button>
                 </div>
               </div>
-              <p className="text-gray-400 mb-4">{t("memberSinceYear")}</p>
 
               {/* Instagram Link */}
               <div className="mb-6">
