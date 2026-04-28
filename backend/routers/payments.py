@@ -539,7 +539,7 @@ def create_checkout_session(
         trial_period_days = 7 if trial_eligible else None
 
         # Create Stripe Checkout Session
-        checkout_session = stripe_service.create_checkout_session(
+        _checkout_kwargs = dict(
             customer_id=stripe_customer_id,
             price_id=request_data.price_id,
             success_url=safe_success_url,
@@ -548,6 +548,32 @@ def create_checkout_session(
             trial_period_days=trial_period_days,
             idempotency_key=f"checkout:{current_user.id}:{operation_id}",
         )
+        try:
+            checkout_session = stripe_service.create_checkout_session(**_checkout_kwargs)
+        except ValueError as _exc:
+            if "No such customer" not in str(_exc):
+                raise
+            # Stored customer ID is stale (deleted or Stripe env mismatch).
+            # Mint a fresh customer and retry once.
+            logger.warning(
+                f"checkout: stale stripe_customer_id {stripe_customer_id} for user "
+                f"{current_user.id} — creating replacement"
+            )
+            _new_customer = stripe.Customer.create(
+                email=current_user.email,
+                metadata={
+                    "user_id": str(current_user.id),
+                    "normalized_email": normalize_email_for_dedup(current_user.email),
+                },
+                idempotency_key=f"cust_create:{current_user.id}:{operation_id}:recover",
+            )
+            stripe_customer_id = _new_customer.id
+            if current_user.subscription:
+                current_user.subscription.stripe_customer_id = stripe_customer_id
+            db.flush()
+            _checkout_kwargs["customer_id"] = stripe_customer_id
+            _checkout_kwargs["idempotency_key"] = f"checkout:{current_user.id}:{operation_id}:r2"
+            checkout_session = stripe_service.create_checkout_session(**_checkout_kwargs)
 
         # H2: commit now — *before* analytics — so the per-user advisory
         # lock and the seat-cap lock are held through the trial-eligibility

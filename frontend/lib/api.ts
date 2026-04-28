@@ -483,6 +483,7 @@ class ApiClient {
       subscription_period_end?: string | null;
       subscription_status?: string | null;
       subscription_scheduled_tier?: string | null;
+      has_used_trial?: boolean;
       reputation: number;
       current_claves: number;
       badges: Array<{

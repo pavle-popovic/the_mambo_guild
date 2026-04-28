@@ -259,6 +259,14 @@ function PricingPageContent() {
   const isRookie = currentTier === "rookie";
   const isAdvanced = currentTier === "advanced";
   const isPerformer = currentTier === "performer";
+  // Trial is one-shot per user. Once burned, the Advanced CTA must say
+  // "Subscribe" so the user isn't surprised by an immediate $39 charge —
+  // the backend's create_checkout_session silently drops trial_period_days
+  // for these users (see payments.py trial_eligible gate). Logged-out
+  // visitors get the optimistic trial label since their state is unknown.
+  const proCtaLabel = user?.has_used_trial
+    ? t("proSubscribeNoTrial")
+    : t("proStartTrial");
 
   // Subscription billing state (active sub only). cancel_at_period_end flips
   // to true the moment the user clicks "cancel" — they keep access until
@@ -454,7 +462,7 @@ function PricingPageContent() {
                           disabled={loading === ADVANCED_PRICE_ID}
                           className="block w-full py-4 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black rounded-lg font-bold transition-all duration-300 shadow-lg shadow-yellow-500/25 hover:shadow-xl hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {loading === ADVANCED_PRICE_ID ? tp("loading") : t("proStartTrial")}
+                          {loading === ADVANCED_PRICE_ID ? tp("loading") : proCtaLabel}
                         </button>
                       ) : isRookie ? (
                         <button
@@ -462,7 +470,7 @@ function PricingPageContent() {
                           disabled={loading === ADVANCED_PRICE_ID}
                           className="block w-full py-4 bg-gradient-to-r from-mambo-gold via-yellow-500 to-orange-500 hover:from-yellow-400 hover:via-yellow-500 hover:to-orange-400 text-black rounded-lg font-bold transition-all duration-300 shadow-lg shadow-yellow-500/25 hover:shadow-xl hover:shadow-yellow-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          {loading === ADVANCED_PRICE_ID ? tp("loading") : t("proStartTrial")}
+                          {loading === ADVANCED_PRICE_ID ? tp("loading") : proCtaLabel}
                         </button>
                       ) : isAdvanced ? (
                         <>
