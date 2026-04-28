@@ -95,7 +95,10 @@ function PricingPageContent() {
     const expectedTier = (searchParams.get("tier") || "").toLowerCase();
 
     if (canceled === "true") {
-      console.log("Payment canceled");
+      // Reset the INCOMPLETE guard so the user can try again immediately
+      // without hitting the 30-min dedup window. Fire-and-forget — failure
+      // is harmless (they just wait for the TTL to expire naturally).
+      apiClient.cancelCheckout().catch(() => {});
       return;
     }
 

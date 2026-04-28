@@ -1030,6 +1030,12 @@ class ApiClient {
     });
   }
 
+  async cancelCheckout() {
+    return this.request<{ status: string }>("/api/payments/cancel-checkout", {
+      method: "POST",
+    });
+  }
+
   async updateSubscription(newPriceId: string) {
     return this.request<{
       success: boolean;

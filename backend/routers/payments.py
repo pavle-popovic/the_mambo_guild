@@ -635,6 +635,23 @@ def create_checkout_session(
         )
 
 
+@router.post("/cancel-checkout")
+def cancel_checkout(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """Called when the user explicitly returns from Stripe with ?canceled=true.
+    Resets the INCOMPLETE guard so they can start a fresh checkout immediately
+    without waiting out the 30-minute dedup window."""
+    if (
+        current_user.subscription
+        and current_user.subscription.status == SubscriptionStatus.INCOMPLETE
+    ):
+        current_user.subscription.current_period_end = datetime(2020, 1, 1, tzinfo=timezone.utc)
+        db.commit()
+    return {"status": "ok"}
+
+
 @router.post("/webhook")
 async def stripe_webhook(
     request: Request,
