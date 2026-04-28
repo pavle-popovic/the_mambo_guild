@@ -66,6 +66,8 @@
       "loginLink": "Accedi",
       "passwordMismatch": "Le password non coincidono",
       "passwordTooShort": "La password deve essere di almeno 8 caratteri",
+      "passwordTooLong": "La password non può superare 72 caratteri",
+      "passwordTooWeak": "La password deve contenere almeno una lettera e un numero",
       "genericError": "Registrazione non riuscita. Riprova."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "Conferma la tua password",
       "passwordMismatch": "Le password non coincidono",
       "passwordTooShort": "La password deve essere di almeno 8 caratteri",
+      "passwordTooLong": "La password non può superare 72 caratteri",
+      "passwordTooWeak": "La password deve contenere almeno una lettera e un numero",
       "submit": "Reimposta password",
       "submitting": "Reimpostazione...",
       "successTitle": "Password reimpostata con successo!",
@@ -101,6 +105,32 @@
       "failedToReset": "Impossibile reimpostare la password",
       "genericError": "Impossibile reimpostare la password. Il link potrebbe essere scaduto.",
       "loading": "Caricamento..."
+    },
+    "verifyEmail": {
+      "missingToken": "Nessun token di verifica in questo link. Usa il link dalla tua email.",
+      "verifyingTitle": "Verifica della tua email",
+      "verifyingBody": "Ci vuole solo un secondo.",
+      "successTitle": "Tutto pronto",
+      "successBody": "La tua email è verificata. Puoi iniziare la tua prova gratuita ora.",
+      "startTrialCta": "Inizia la mia prova gratuita",
+      "browseFreeCta": "Esplora prima i contenuti gratuiti",
+      "errorTitle": "Verifica non riuscita",
+      "errorBody": "Questo link non è valido o è scaduto. Richiedi una nuova email di verifica.",
+      "loginCta": "Accedi",
+      "homeCta": "Torna alla home",
+      "genericError": "Qualcosa è andato storto. Riprova.",
+      "modalTitle": "Verifica la tua email",
+      "modalBody": "Abbiamo inviato un link di verifica alla tua casella. Clicca per iniziare la prova gratuita.",
+      "checkInboxHint": "Controlla la casella dell'email con cui ti sei registrato.",
+      "close": "Chiudi",
+      "resendButton": "Reinvia email",
+      "resending": "Invio...",
+      "resendSuccess": "Email di verifica inviata. Controlla la tua casella.",
+      "resendError": "Impossibile reinviare l'email. Riprova.",
+      "alreadyVerifiedButton": "Ho già verificato",
+      "refreshing": "Verifica...",
+      "refreshError": "Impossibile aggiornare il tuo stato. Riprova.",
+      "notYetVerified": "Non vediamo ancora un'email verificata. Controlla la tua casella o richiedi un nuovo link."
     }
   },
   "authPrompt": {

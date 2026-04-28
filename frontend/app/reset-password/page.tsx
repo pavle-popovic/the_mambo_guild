@@ -31,9 +31,21 @@ function ResetPasswordPageContent() {
     e.preventDefault();
     setError("");
 
-    // Client-side validation
+    // Client-side validation — must mirror backend ResetPasswordRequest
+    // (length 8-72, at least one letter and one digit). Without these,
+    // the API returns a 422 with a structured error array that previously
+    // surfaced as "[object Object]" — users couldn't see what was wrong
+    // and assumed the new password was set successfully.
     if (password.length < 8) {
       setError(t("passwordTooShort"));
+      return;
+    }
+    if (password.length > 72) {
+      setError(t("passwordTooLong"));
+      return;
+    }
+    if (!/[a-zA-Z]/.test(password) || !/\d/.test(password)) {
+      setError(t("passwordTooWeak"));
       return;
     }
 
@@ -64,7 +76,15 @@ function ResetPasswordPageContent() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.detail || t("failedToReset"));
+        // Pydantic 422 errors return detail as an array of {loc,msg,type}
+        // objects. Surface the first message rather than coercing the array.
+        let msg: string = t("failedToReset");
+        if (Array.isArray(errorData.detail)) {
+          msg = errorData.detail[0]?.msg || msg;
+        } else if (typeof errorData.detail === "string") {
+          msg = errorData.detail;
+        }
+        throw new Error(msg);
       }
 
       setSuccess(true);

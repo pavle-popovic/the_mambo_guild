@@ -484,6 +484,7 @@ class ApiClient {
       subscription_status?: string | null;
       subscription_scheduled_tier?: string | null;
       has_used_trial?: boolean;
+      is_verified?: boolean;
       reputation: number;
       current_claves: number;
       badges: Array<{
@@ -1034,6 +1035,21 @@ class ApiClient {
     return this.request<{ status: string }>("/api/payments/cancel-checkout", {
       method: "POST",
     });
+  }
+
+  // Email verification
+  async verifyEmail(token: string) {
+    return this.request<{ message: string; is_verified: boolean }>(
+      "/api/auth/verify-email",
+      { method: "POST", body: JSON.stringify({ token }) },
+    );
+  }
+
+  async resendVerification() {
+    return this.request<{ message: string; is_verified: boolean }>(
+      "/api/auth/send-verification",
+      { method: "POST" },
+    );
   }
 
   async updateSubscription(newPriceId: string) {

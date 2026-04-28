@@ -62,7 +62,7 @@ from models.premium import (
     WeeklyMeetingConfig,
     ReleaseScheduleItem,
 )
-from models.payment import StripeWebhookEvent, MuxWebhookEvent, XPAuditLog
+from models.payment import StripeWebhookEvent, MuxWebhookEvent, XPAuditLog, PaymentCardFingerprint
 from models.analytics import UserEvent
 from models.shop import ShopItem, ShopPurchase
 

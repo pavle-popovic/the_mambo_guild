@@ -66,6 +66,8 @@
       "loginLink": "Inloggen",
       "passwordMismatch": "Wachtwoorden komen niet overeen",
       "passwordTooShort": "Wachtwoord moet minimaal 8 tekens lang zijn",
+      "passwordTooLong": "Wachtwoord mag niet langer zijn dan 72 tekens",
+      "passwordTooWeak": "Wachtwoord moet minstens één letter en één cijfer bevatten",
       "genericError": "Registratie mislukt. Probeer opnieuw."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "Bevestig je wachtwoord",
       "passwordMismatch": "Wachtwoorden komen niet overeen",
       "passwordTooShort": "Wachtwoord moet minimaal 8 tekens lang zijn",
+      "passwordTooLong": "Wachtwoord mag niet langer zijn dan 72 tekens",
+      "passwordTooWeak": "Wachtwoord moet minstens één letter en één cijfer bevatten",
       "submit": "Wachtwoord resetten",
       "submitting": "Resetten...",
       "successTitle": "Wachtwoord succesvol gereset!",
@@ -101,6 +105,32 @@
       "failedToReset": "Kon wachtwoord niet resetten",
       "genericError": "Kon wachtwoord niet resetten. De link is mogelijk verlopen.",
       "loading": "Laden..."
+    },
+    "verifyEmail": {
+      "missingToken": "Geen verificatietoken in deze link. Gebruik de link uit je e-mail.",
+      "verifyingTitle": "Je e-mail wordt geverifieerd",
+      "verifyingBody": "Dit duurt maar een seconde.",
+      "successTitle": "Helemaal klaar",
+      "successBody": "Je e-mail is geverifieerd. Je kunt nu je gratis proefperiode starten.",
+      "startTrialCta": "Start mijn gratis proefperiode",
+      "browseFreeCta": "Eerst gratis inhoud bekijken",
+      "errorTitle": "Verificatie mislukt",
+      "errorBody": "Deze link is ongeldig of verlopen. Vraag een nieuwe verificatie-e-mail aan.",
+      "loginCta": "Inloggen",
+      "homeCta": "Terug naar home",
+      "genericError": "Er is iets misgegaan. Probeer het opnieuw.",
+      "modalTitle": "Verifieer je e-mail",
+      "modalBody": "We hebben een verificatielink naar je inbox gestuurd. Klik erop om je gratis proefperiode te starten.",
+      "checkInboxHint": "Controleer de inbox van het e-mailadres waarmee je je hebt aangemeld.",
+      "close": "Sluiten",
+      "resendButton": "E-mail opnieuw versturen",
+      "resending": "Versturen...",
+      "resendSuccess": "Verificatie-e-mail verstuurd. Controleer je inbox.",
+      "resendError": "E-mail kon niet opnieuw worden verzonden. Probeer het opnieuw.",
+      "alreadyVerifiedButton": "Ik heb al geverifieerd",
+      "refreshing": "Controleren...",
+      "refreshError": "Status kon niet worden vernieuwd. Probeer het opnieuw.",
+      "notYetVerified": "We zien nog geen geverifieerd e-mailadres. Controleer je inbox of vraag een nieuwe link aan."
     }
   },
   "authPrompt": {

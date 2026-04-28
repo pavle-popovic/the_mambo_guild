@@ -9,10 +9,30 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, case
 
 from models.community import UserStats, UserBadge, BadgeDefinition, BadgeTier
-from models.community import Post, PostReply, PostReaction, ClaveTransaction, ModerationStatus
+from models.community import Post, PostReply, PostReaction, ClaveTransaction, ModerationStatus, FounderClaim
 from models.user import UserProfile
 
 logger = logging.getLogger(__name__)
+
+
+# Founder Diamond is gated: pre-launch we auto-awarded it to every
+# waitlister, but the live rule requires the user to actually start a
+# subscription (try_claim writes a founder_claims row). Until the
+# revocation sweep runs at the post-deadline cutoff, plenty of orphan
+# user_badges rows still exist. Filter at the read layer so /me and
+# every other badge listing reflects the gated rule immediately, without
+# touching the underlying user_badges data.
+_GATED_BADGE_ID = "founder_diamond"
+
+
+def _user_has_founder_claim(user_id: str, db: Session) -> bool:
+    """True iff the user has a row in founder_claims (the new gated rule)."""
+    return (
+        db.query(FounderClaim)
+        .filter(FounderClaim.user_id == user_id)
+        .first()
+        is not None
+    )
 
 # Trigger Categories matching PRD
 TRIGGER_OP_CRITIC = "reactions_given"      # Category A
@@ -278,11 +298,19 @@ def get_all_badges_for_user(user_id: str, db: Session):
     all_defs = db.query(BadgeDefinition).all()
     user_badges = db.query(UserBadge).filter(UserBadge.user_id == user_id).all()
     earned_map = {ub.badge_id: ub for ub in user_badges}
-    
+
+    # Gated-badge enforcement (see _user_has_founder_claim above).
+    has_founder_claim = _user_has_founder_claim(user_id, db)
+
     results = []
     for bd in all_defs:
         ub = earned_map.get(bd.id)
         is_earned = ub is not None
+        # Founder Diamond shows as earned ONLY when a claim row exists.
+        # Pre-launch orphan user_badges rows render as unearned (locked).
+        if bd.id == _GATED_BADGE_ID and is_earned and not has_founder_claim:
+            is_earned = False
+            ub = None
         results.append({
             "id": bd.id,
             "name": bd.name,
@@ -296,10 +324,10 @@ def get_all_badges_for_user(user_id: str, db: Session):
             "earned_at": ub.earned_at if ub else None,
             "display_order": ub.display_order if ub and ub.display_order is not None else 0
         })
-    
+
     # Sort: Earned first, then by display_order (if > 0), then by threshold desc
     results.sort(key=lambda x: (
-        not x['is_earned'], 
+        not x['is_earned'],
         x['display_order'] if x['display_order'] > 0 else 9999,
         -(x['requirement_value'] or 0)
     ))
@@ -318,10 +346,16 @@ def get_user_badges(user_id: str, db: Session) -> list:
         .options(joinedload(UserBadge.badge))
         .all()
     )
+    # Gated-badge enforcement: hide founder_diamond unless the user has a
+    # founder_claims row (live rule), even if user_badges still has it from
+    # the pre-launch auto-award.
+    has_founder_claim = _user_has_founder_claim(user_id, db)
     results = []
     for ub in user_badges:
         bd = ub.badge
         if bd:
+            if bd.id == _GATED_BADGE_ID and not has_founder_claim:
+                continue
             results.append({
                 "id": bd.id,
                 "name": bd.name,

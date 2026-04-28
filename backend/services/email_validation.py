@@ -2,6 +2,14 @@
 Email-validation helpers used at registration and at trial-eligibility
 checks to defend against trial-abuse loops.
 
+Three independent layers:
+  1. Disposable-domain blocklist — frozenset lookup, O(1).
+  2. Plus-alias / dot normalisation for dedup queries.
+  3. DNS-deliverability check (MX/A record present) at registration time
+     to catch made-up domains like "asdfasdf@asdfasdf.com" that aren't on
+     any blocklist. Fail-open on DNS errors so legit users never get
+     locked out by transient resolver issues.
+
 Two independent goals:
 
 1. Reject signups from known disposable / throwaway email services.
@@ -36,6 +44,10 @@ Two independent goals:
    The canonical form is used only for dedup queries.
 """
 from __future__ import annotations
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Curated frozenset of disposable email service domains.
@@ -219,6 +231,69 @@ def is_disposable_email(email: str) -> bool:
     if not domain:
         return False
     return domain in DISPOSABLE_EMAIL_DOMAINS
+
+
+def has_deliverable_domain(email: str, timeout: float = 3.0) -> bool:
+    """
+    True if the email's domain resolves to an MX (or fallback A/AAAA) record.
+
+    Used at registration / trial-activation as a third defense layer,
+    after the blocklist and Pydantic format check. Catches entirely
+    made-up domains ("asdfasdf@asdfasdf.com") that the blocklist won't
+    cover because they don't exist on any list — they don't exist at all.
+
+    Fail-open semantics: returns True on DNS errors, timeouts, or any
+    unexpected exception. Reasoning: a transient DNS hiccup or a slow
+    resolver should NEVER block a real signup. The blocklist + Stripe-
+    side checks are the durable defense; this is a cheap extra filter
+    for the obvious case.
+
+    timeout: maximum seconds to spend on the DNS lookup. Capped at 3s by
+    default so registration latency stays bounded.
+    """
+    if not email or "@" not in email:
+        return False
+    try:
+        # email_validator is a hard dep (Pydantic EmailStr requires it).
+        # check_deliverability=True does an MX lookup via dnspython, falling
+        # back to A/AAAA if no MX. globally_deliverable=False relaxes the
+        # rule against single-label TLDs etc. — we don't need it.
+        from email_validator import validate_email, EmailNotValidError, EmailUndeliverableError
+        try:
+            validate_email(email, check_deliverability=True, dns_resolver=_get_dns_resolver(timeout))
+            return True
+        except EmailUndeliverableError:
+            # Domain has no MX/A record → undeliverable.
+            return False
+        except EmailNotValidError:
+            # Format issue — Pydantic should have caught this, but if we
+            # get here treat as undeliverable.
+            return False
+    except Exception:
+        # DNS resolver missing, network down, library mismatch, etc.
+        # Fail OPEN — never block a legit user on infra problems.
+        logger.warning(
+            "has_deliverable_domain: DNS check skipped (likely env issue) for domain %r",
+            email.rsplit("@", 1)[-1] if "@" in email else email,
+            exc_info=False,
+        )
+        return True
+
+
+def _get_dns_resolver(timeout: float):
+    """
+    Build a dnspython resolver with a tight timeout so a single slow DNS
+    lookup can't stall the registration endpoint. Returns None on any
+    error so email_validator falls back to its default resolver.
+    """
+    try:
+        import dns.resolver
+        resolver = dns.resolver.Resolver()
+        resolver.timeout = timeout
+        resolver.lifetime = timeout
+        return resolver
+    except Exception:
+        return None
 
 
 def normalize_email_for_dedup(email: str) -> str:

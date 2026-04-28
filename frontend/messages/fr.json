@@ -66,6 +66,8 @@
       "loginLink": "Se connecter",
       "passwordMismatch": "Les mots de passe ne correspondent pas",
       "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+      "passwordTooLong": "Le mot de passe ne peut pas dépasser 72 caractères",
+      "passwordTooWeak": "Le mot de passe doit contenir au moins une lettre et un chiffre",
       "genericError": "Échec de l'inscription. Veuillez réessayer."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "Confirmez votre mot de passe",
       "passwordMismatch": "Les mots de passe ne correspondent pas",
       "passwordTooShort": "Le mot de passe doit contenir au moins 8 caractères",
+      "passwordTooLong": "Le mot de passe ne peut pas dépasser 72 caractères",
+      "passwordTooWeak": "Le mot de passe doit contenir au moins une lettre et un chiffre",
       "submit": "Réinitialiser le mot de passe",
       "submitting": "Réinitialisation...",
       "successTitle": "Mot de passe réinitialisé !",
@@ -101,6 +105,32 @@
       "failedToReset": "Échec de la réinitialisation du mot de passe",
       "genericError": "Échec de la réinitialisation. Le lien a peut-être expiré.",
       "loading": "Chargement..."
+    },
+    "verifyEmail": {
+      "missingToken": "Pas de jeton de vérification dans ce lien. Utilisez le lien de votre e-mail.",
+      "verifyingTitle": "Vérification de votre e-mail",
+      "verifyingBody": "Cela ne prendra qu'une seconde.",
+      "successTitle": "Tout est prêt",
+      "successBody": "Votre e-mail est vérifié. Vous pouvez démarrer votre essai gratuit.",
+      "startTrialCta": "Démarrer mon essai gratuit",
+      "browseFreeCta": "Explorer le contenu gratuit d'abord",
+      "errorTitle": "Échec de la vérification",
+      "errorBody": "Ce lien n'est pas valide ou a expiré. Demandez un nouveau lien de vérification.",
+      "loginCta": "Connexion",
+      "homeCta": "Retour à l'accueil",
+      "genericError": "Une erreur s'est produite. Réessayez.",
+      "modalTitle": "Vérifiez votre e-mail",
+      "modalBody": "Nous avons envoyé un lien de vérification dans votre boîte. Cliquez pour démarrer votre essai gratuit.",
+      "checkInboxHint": "Vérifiez la boîte de l'e-mail avec lequel vous vous êtes inscrit.",
+      "close": "Fermer",
+      "resendButton": "Renvoyer l'e-mail",
+      "resending": "Envoi...",
+      "resendSuccess": "E-mail de vérification envoyé. Vérifiez votre boîte.",
+      "resendError": "Impossible de renvoyer l'e-mail. Réessayez.",
+      "alreadyVerifiedButton": "J'ai déjà vérifié",
+      "refreshing": "Vérification...",
+      "refreshError": "Impossible de rafraîchir votre statut. Réessayez.",
+      "notYetVerified": "Nous ne voyons pas encore d'e-mail vérifié. Vérifiez votre boîte ou demandez un nouveau lien."
     }
   },
   "authPrompt": {

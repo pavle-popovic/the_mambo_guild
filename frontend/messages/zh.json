@@ -66,6 +66,8 @@
       "loginLink": "登录",
       "passwordMismatch": "两次输入的密码不一致",
       "passwordTooShort": "密码长度至少为 8 个字符",
+      "passwordTooLong": "密码不能超过 72 个字符",
+      "passwordTooWeak": "密码必须至少包含一个字母和一个数字",
       "genericError": "注册失败。请重试。"
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "确认你的密码",
       "passwordMismatch": "两次输入的密码不一致",
       "passwordTooShort": "密码长度至少为 8 个字符",
+      "passwordTooLong": "密码不能超过 72 个字符",
+      "passwordTooWeak": "密码必须至少包含一个字母和一个数字",
       "submit": "重置密码",
       "submitting": "重置中...",
       "successTitle": "密码重置成功！",
@@ -101,6 +105,32 @@
       "failedToReset": "无法重置密码",
       "genericError": "无法重置密码。链接可能已过期。",
       "loading": "加载中..."
+    },
+    "verifyEmail": {
+      "missingToken": "此链接中没有验证令牌。请使用邮件中的链接。",
+      "verifyingTitle": "正在验证您的邮箱",
+      "verifyingBody": "只需几秒钟。",
+      "successTitle": "全部完成",
+      "successBody": "您的邮箱已验证。现在可以开始免费试用。",
+      "startTrialCta": "开始我的免费试用",
+      "browseFreeCta": "先浏览免费内容",
+      "errorTitle": "验证失败",
+      "errorBody": "此链接无效或已过期。请请求新的验证邮件。",
+      "loginCta": "登录",
+      "homeCta": "返回首页",
+      "genericError": "出了点问题。请重试。",
+      "modalTitle": "验证您的邮箱",
+      "modalBody": "我们已向您的收件箱发送验证链接。点击它即可开始免费试用。",
+      "checkInboxHint": "请查看您注册时使用的邮箱收件箱。",
+      "close": "关闭",
+      "resendButton": "重新发送邮件",
+      "resending": "发送中...",
+      "resendSuccess": "验证邮件已发送。请查看您的收件箱。",
+      "resendError": "无法重新发送邮件。请重试。",
+      "alreadyVerifiedButton": "我已验证",
+      "refreshing": "检查中...",
+      "refreshError": "无法刷新您的状态。请重试。",
+      "notYetVerified": "尚未看到已验证的邮箱。请查看收件箱或请求新链接。"
     }
   },
   "authPrompt": {

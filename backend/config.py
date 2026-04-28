@@ -115,6 +115,13 @@ class Settings:
     # Password Reset Configuration
     PASSWORD_RESET_EXPIRE_MINUTES: int = int(os.getenv("PASSWORD_RESET_EXPIRE_MINUTES", "60"))  # 1 hour default
 
+    # Email verification token lifetime. 24h is the industry-standard middle
+    # ground (1h is too tight for users who skim inbox once a day; 7d gives
+    # an unnecessarily wide replay window). Token is single-use anyway —
+    # blacklisted in Redis after consumption — so even within the window a
+    # link can't be reused.
+    EMAIL_VERIFICATION_EXPIRE_HOURS: int = int(os.getenv("EMAIL_VERIFICATION_EXPIRE_HOURS", "24"))
+
     # Stripe Configuration
     STRIPE_SECRET_KEY: Optional[str] = os.getenv("STRIPE_SECRET_KEY")
     STRIPE_WEBHOOK_SECRET: Optional[str] = os.getenv("STRIPE_WEBHOOK_SECRET")

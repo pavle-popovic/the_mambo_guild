@@ -76,6 +76,66 @@ def send_password_reset_email(email: str, reset_token: str) -> bool:
         return False
 
 
+def send_email_verification_email(email: str, verification_token: str) -> bool:
+    """
+    Send an email-verification link. The token is consumed by
+    POST /api/auth/verify-email which flips users.is_verified to True.
+
+    Verification gates trial activation only (not signup or browsing) —
+    so this email is the one-and-only friction point an attacker hits
+    when farming trials with throwaway domains. A real mailbox is now
+    required to extract any trial value.
+
+    Returns True iff Resend accepted the message.
+    """
+    if not resend or not settings.RESEND_API_KEY:
+        logger.error("Resend client not configured. Cannot send verification email.")
+        return False
+
+    try:
+        verify_url = f"{settings.FRONTEND_URL}/verify-email?token={verification_token}"
+        from_email = settings.FROM_EMAIL
+        ttl_hours = settings.EMAIL_VERIFICATION_EXPIRE_HOURS
+
+        result = resend.Emails.send({
+            "from": from_email,
+            "to": [email],
+            "subject": "Verify your email - The Mambo Guild",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                    .button {{ display: inline-block; padding: 12px 24px; background-color: #D4AF37; color: #111; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }}
+                    .button:hover {{ background-color: #C7A030; }}
+                    .footer {{ color: #888; font-size: 12px; margin-top: 24px; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>Verify your email</h1>
+                    <p>Welcome to The Mambo Guild. To start your free trial and unlock the full library, please confirm this is your email address.</p>
+                    <a href="{verify_url}" class="button">Verify my email</a>
+                    <p>This link expires in {ttl_hours} hours.</p>
+                    <p>If you didn't create an account, you can safely ignore this email.</p>
+                    <p>Trouble with the button? Paste this link into your browser:</p>
+                    <p style="word-break: break-all; color: #666;">{verify_url}</p>
+                    <p class="footer">The Mambo Guild &middot; sent by Pavle Popovic</p>
+                </div>
+            </body>
+            </html>
+            """,
+        })
+
+        logger.info(f"Email verification sent to {email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send email verification to {email}: {str(e)}")
+        return False
+
+
 def send_coaching_feedback_email(student_email: str, student_name: str, feedback_url: str) -> bool:
     """
     Send email to student notifying them their coaching feedback video is ready.

@@ -66,6 +66,8 @@
       "loginLink": "Zaloguj się",
       "passwordMismatch": "Hasła nie są zgodne",
       "passwordTooShort": "Hasło musi mieć co najmniej 8 znaków",
+      "passwordTooLong": "Hasło nie może przekraczać 72 znaków",
+      "passwordTooWeak": "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
       "genericError": "Rejestracja nie powiodła się. Spróbuj ponownie."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "Potwierdź hasło",
       "passwordMismatch": "Hasła nie są zgodne",
       "passwordTooShort": "Hasło musi mieć co najmniej 8 znaków",
+      "passwordTooLong": "Hasło nie może przekraczać 72 znaków",
+      "passwordTooWeak": "Hasło musi zawierać co najmniej jedną literę i jedną cyfrę",
       "submit": "Resetuj hasło",
       "submitting": "Resetowanie...",
       "successTitle": "Hasło zostało zresetowane!",
@@ -101,6 +105,32 @@
       "failedToReset": "Nie udało się zresetować hasła",
       "genericError": "Nie udało się zresetować hasła. Link mógł wygasnąć.",
       "loading": "Ładowanie..."
+    },
+    "verifyEmail": {
+      "missingToken": "Brak tokenu weryfikacji w tym linku. Użyj linku z e-maila.",
+      "verifyingTitle": "Weryfikacja Twojego e-maila",
+      "verifyingBody": "To zajmie tylko sekundę.",
+      "successTitle": "Gotowe",
+      "successBody": "Twój e-mail został zweryfikowany. Możesz rozpocząć darmowy okres próbny.",
+      "startTrialCta": "Rozpocznij darmowy okres próbny",
+      "browseFreeCta": "Najpierw przejrzyj darmowe treści",
+      "errorTitle": "Weryfikacja nieudana",
+      "errorBody": "Ten link jest nieprawidłowy lub wygasł. Poproś o nowy e-mail weryfikacyjny.",
+      "loginCta": "Zaloguj się",
+      "homeCta": "Wróć do strony głównej",
+      "genericError": "Coś poszło nie tak. Spróbuj ponownie.",
+      "modalTitle": "Zweryfikuj swój e-mail",
+      "modalBody": "Wysłaliśmy link weryfikacyjny na Twoją skrzynkę. Kliknij go, aby rozpocząć darmowy okres próbny.",
+      "checkInboxHint": "Sprawdź skrzynkę e-maila, którego użyłeś przy rejestracji.",
+      "close": "Zamknij",
+      "resendButton": "Wyślij ponownie",
+      "resending": "Wysyłanie...",
+      "resendSuccess": "E-mail weryfikacyjny wysłany. Sprawdź skrzynkę.",
+      "resendError": "Nie udało się wysłać e-maila. Spróbuj ponownie.",
+      "alreadyVerifiedButton": "Już zweryfikowałem",
+      "refreshing": "Sprawdzanie...",
+      "refreshError": "Nie udało się odświeżyć statusu. Spróbuj ponownie.",
+      "notYetVerified": "Nie widzimy jeszcze zweryfikowanego e-maila. Sprawdź skrzynkę lub poproś o nowy link."
     }
   },
   "authPrompt": {

@@ -7,15 +7,16 @@ from models import get_db
 from models.user import User, UserProfile, CurrentLevelTag, Subscription, SubscriptionTier, SubscriptionStatus, UserRole
 from schemas.auth import (
     UserRegisterRequest, UserLoginRequest, TokenResponse, UserProfileResponse,
-    ForgotPasswordRequest, ResetPasswordRequest
+    ForgotPasswordRequest, ResetPasswordRequest,
+    VerifyEmailRequest, ResendVerificationRequest,
 )
 from services.auth_service import verify_password, get_password_hash, create_access_token, create_refresh_token, decode_access_token
 from services.gamification_service import update_streak
-from services.email_service import send_password_reset_email, send_waitlist_welcome_email
+from services.email_service import send_password_reset_email, send_waitlist_welcome_email, send_email_verification_email
 from services.redis_service import set_oauth_state, verify_oauth_state, check_rate_limit
 from services.clave_service import process_daily_login, award_new_user_bonus, award_referral_bonus
 from services.analytics_service import track_event, capture_first_touch
-from services.email_validation import is_disposable_email, normalize_email_for_dedup
+from services.email_validation import is_disposable_email, normalize_email_for_dedup, has_deliverable_domain
 from utils.request import client_ip as get_client_ip
 from dependencies import get_current_user
 from config import settings
@@ -73,6 +74,12 @@ router = APIRouter()
 
 # Password reset token serializer
 reset_serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
+# Email verification token serializer. Different salt from the password
+# reset serializer so a leaked verification token can't be replayed
+# against the reset endpoint and vice versa (defense-in-depth — the
+# endpoints already validate independently, but distinct salts give us
+# free isolation if a salt-handling bug is ever introduced).
+verify_email_serializer = URLSafeTimedSerializer(settings.SECRET_KEY)
 
 # OAuth clients (initialized conditionally)
 google_oauth = None
@@ -132,6 +139,19 @@ def register(
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Please use a permanent email address. Disposable or temporary email services are not accepted."
+            )
+
+        # Trial-abuse defense layer 1b: DNS deliverability. Catches made-up
+        # domains ("asdfasdf@asdfasdf.com") that are too obscure to ever
+        # land on a public blocklist because they don't exist. Fail-open
+        # on resolver issues — this is a bonus filter, not the main one.
+        if (
+            not _is_admin_test_account(user_data.username)
+            and not has_deliverable_domain(user_data.email)
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="That email domain doesn't appear to receive mail. Please use a real email address.",
             )
 
         # Password validation is handled by Pydantic schema (confirm_password and strength check)
@@ -283,6 +303,24 @@ def register(
             )
         except Exception:
             logger.exception("register: welcome email enqueue failed (non-fatal)")
+
+        # Email verification — send the one-and-only friction point an
+        # attacker hits when farming trials with throwaway email domains.
+        # is_verified stays False until the user clicks the link;
+        # create_checkout_session refuses to start a free trial until
+        # the flag is True (real-billed upgrades are still allowed for
+        # logged-in users — only the gratis 7-day trial is gated).
+        try:
+            verify_token = verify_email_serializer.dumps(
+                str(user_id), salt="email-verification"
+            )
+            background_tasks.add_task(
+                send_email_verification_email,
+                user.email,
+                verify_token,
+            )
+        except Exception:
+            logger.exception("register: verification email enqueue failed (non-fatal)")
 
         # Create tokens
         access_token = create_access_token(data={"sub": str(user_id)})
@@ -578,6 +616,7 @@ def get_current_user_profile(
     sub_status = subscription.status.value if subscription and subscription.status else None
     scheduled_tier = subscription.scheduled_tier if subscription else None
     has_used_trial = bool(profile.has_used_trial) if hasattr(profile, "has_used_trial") else False
+    is_verified = bool(getattr(current_user, "is_verified", False))
 
     today = datetime.now()
     # Award daily login entries/claves logic if needed here, but it's handled in login
@@ -612,6 +651,7 @@ def get_current_user_profile(
         subscription_status=sub_status,
         subscription_scheduled_tier=scheduled_tier,
         has_used_trial=has_used_trial,
+        is_verified=is_verified,
         current_level_tag=profile.current_level_tag.value if hasattr(profile, 'current_level_tag') else "Beginner",
         reputation=profile.reputation if hasattr(profile, 'reputation') else 0,
         current_claves=profile.current_claves if hasattr(profile, 'current_claves') else 0,
@@ -1091,6 +1131,145 @@ def reset_password(
             detail="Invalid or expired reset token"
         )
 
+
+# -------------------------------------------------------------------------
+# EMAIL VERIFICATION
+# -------------------------------------------------------------------------
+# Two endpoints:
+#   POST /verify-email          — exchange a signed token for is_verified=True
+#   POST /send-verification     — re-send the link to the logged-in user
+#
+# A verification email is also sent automatically at the end of the
+# /register handler (see above). Waitlisters who claim via /reset-password
+# are auto-verified at claim time (proof-of-inbox is implicit in clicking
+# the password-reset link they got by email).
+#
+# Token: itsdangerous URLSafeTimedSerializer, salt="email-verification",
+# max_age = settings.EMAIL_VERIFICATION_EXPIRE_HOURS * 3600. Single-use
+# enforcement via Redis blacklist after consumption (mirrors the password-
+# reset path).
+
+@router.post("/verify-email", status_code=status.HTTP_200_OK)
+def verify_email(
+    request_data: VerifyEmailRequest,
+    db: Session = Depends(get_db),
+):
+    """
+    Exchange a signed verification token for users.is_verified=True.
+
+    Idempotent: if the user is already verified, return success rather
+    than 4xx — a user clicking the link a second time should see "all
+    set," not "this link has expired."
+    """
+    from services.redis_service import blacklist_token, is_token_blacklisted
+
+    try:
+        # Single-use enforcement.
+        if is_token_blacklisted(request_data.token):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="This verification link has already been used. Please request a new one if needed.",
+            )
+
+        user_id_str = verify_email_serializer.loads(
+            request_data.token,
+            salt="email-verification",
+            max_age=settings.EMAIL_VERIFICATION_EXPIRE_HOURS * 3600,
+        )
+        try:
+            user_id = uuid.UUID(user_id_str)
+        except (ValueError, TypeError):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid verification token",
+            )
+
+        user = db.query(User).filter(User.id == user_id).first()
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid verification token",
+            )
+
+        if not user.is_verified:
+            user.is_verified = True
+            db.commit()
+            logger.info(f"User {user.id} verified email via /verify-email")
+
+        # Burn the token so it cannot be replayed within its TTL.
+        try:
+            blacklist_token(
+                request_data.token,
+                settings.EMAIL_VERIFICATION_EXPIRE_HOURS * 3600,
+            )
+        except Exception:
+            logger.exception("verify_email: failed to blacklist used token (non-fatal)")
+
+        return {"message": "Email verified", "is_verified": True}
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Email verification error: {type(e).__name__}")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Invalid or expired verification token",
+        )
+
+
+@router.post("/send-verification", status_code=status.HTTP_200_OK)
+def send_verification(
+    background_tasks: BackgroundTasks,
+    request: Request,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    """
+    Re-send the email-verification link to the currently-logged-in user.
+
+    Rate limited to 3 sends per email per 10 minutes and 10 per IP per
+    hour — a verification email is the loudest dark-pattern surface in
+    the auth stack and we never want to be a spam vector. Returns 200
+    even when the user is already verified, to avoid leaking state.
+    """
+    if current_user.is_verified:
+        # No-op for already-verified users. Silent success — don't burn
+        # rate-limit budget or email quota on a duplicate.
+        return {"message": "Email already verified", "is_verified": True}
+
+    email = current_user.email.lower().strip()
+    client_ip = get_client_ip(request)
+
+    if not check_rate_limit(email, "send_verification", max_requests=3, window_seconds=600):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many verification email requests. Please wait a few minutes before trying again.",
+        )
+    if not check_rate_limit(client_ip, "send_verification_ip", max_requests=10, window_seconds=3600):
+        raise HTTPException(
+            status_code=status.HTTP_429_TOO_MANY_REQUESTS,
+            detail="Too many verification email requests from this network. Please try again later.",
+        )
+
+    try:
+        token = verify_email_serializer.dumps(
+            str(current_user.id), salt="email-verification"
+        )
+        background_tasks.add_task(
+            send_email_verification_email,
+            current_user.email,
+            token,
+        )
+    except Exception:
+        logger.exception("send_verification: enqueue failed")
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail="Failed to send verification email. Please try again.",
+        )
+
+    return {"message": "Verification email sent", "is_verified": False}
+
+
 # -------------------------------------------------------------------------
 # WAITLIST & VELVET ROPE AUTH
 # -------------------------------------------------------------------------
@@ -1134,6 +1313,12 @@ def join_waitlist(
         # temporarymail.com hands out @allfreemail.net addresses which we use for QA.
         if not _is_admin_test_account(request.username) and _is_blocked_domain(email):
             raise HTTPException(status_code=400, detail="This email domain is not accepted. Please use a real email address.")
+
+        # 2b. DNS deliverability check — catches "asdfasdf@asdfasdf.com" patterns
+        # that aren't on any blocklist because the domain doesn't exist at all.
+        # Fail-open on DNS errors; admin test accounts bypass.
+        if not _is_admin_test_account(request.username) and not has_deliverable_domain(email):
+            raise HTTPException(status_code=400, detail="That email domain doesn't appear to receive mail. Please use a real email address.")
 
         # 3. Honeypot: frontend sends hp="" for humans, bots fill it in
         if getattr(request, "hp", None):

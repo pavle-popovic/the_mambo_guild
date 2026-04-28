@@ -66,6 +66,8 @@
       "loginLink": "Entrar",
       "passwordMismatch": "As senhas não coincidem",
       "passwordTooShort": "A senha deve ter pelo menos 8 caracteres",
+      "passwordTooLong": "A senha não pode ter mais de 72 caracteres",
+      "passwordTooWeak": "A senha deve conter pelo menos uma letra e um número",
       "genericError": "Falha ao registrar. Tente novamente."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "Confirme sua senha",
       "passwordMismatch": "As senhas não coincidem",
       "passwordTooShort": "A senha deve ter pelo menos 8 caracteres",
+      "passwordTooLong": "A senha não pode ter mais de 72 caracteres",
+      "passwordTooWeak": "A senha deve conter pelo menos uma letra e um número",
       "submit": "Redefinir senha",
       "submitting": "Redefinindo...",
       "successTitle": "Senha redefinida com sucesso!",
@@ -101,6 +105,32 @@
       "failedToReset": "Falha ao redefinir a senha",
       "genericError": "Falha ao redefinir a senha. O link pode ter expirado.",
       "loading": "Carregando..."
+    },
+    "verifyEmail": {
+      "missingToken": "Sem token de verificação neste link. Use o link do seu e-mail.",
+      "verifyingTitle": "Verificando seu e-mail",
+      "verifyingBody": "Só leva um segundo.",
+      "successTitle": "Tudo pronto",
+      "successBody": "Seu e-mail está verificado. Você pode começar seu teste grátis.",
+      "startTrialCta": "Começar meu teste grátis",
+      "browseFreeCta": "Explorar o conteúdo grátis primeiro",
+      "errorTitle": "Falha na verificação",
+      "errorBody": "Este link é inválido ou expirou. Solicite um novo e-mail de verificação.",
+      "loginCta": "Entrar",
+      "homeCta": "Voltar ao início",
+      "genericError": "Algo deu errado. Tente novamente.",
+      "modalTitle": "Verifique seu e-mail",
+      "modalBody": "Enviamos um link de verificação para sua caixa de entrada. Clique para iniciar seu teste grátis.",
+      "checkInboxHint": "Verifique a caixa do e-mail com o qual você se cadastrou.",
+      "close": "Fechar",
+      "resendButton": "Reenviar e-mail",
+      "resending": "Enviando...",
+      "resendSuccess": "E-mail de verificação enviado. Verifique sua caixa.",
+      "resendError": "Não foi possível reenviar o e-mail. Tente novamente.",
+      "alreadyVerifiedButton": "Já verifiquei",
+      "refreshing": "Verificando...",
+      "refreshError": "Não foi possível atualizar seu status. Tente novamente.",
+      "notYetVerified": "Ainda não vemos um e-mail verificado. Verifique sua caixa ou solicite um novo link."
     }
   },
   "authPrompt": {

@@ -112,6 +112,11 @@ class UserProfileResponse(BaseModel):
     # "Downgrading on …" banner and the "Keep Guild Master" CTA.
     subscription_scheduled_tier: Optional[str] = None
     has_used_trial: bool = False
+    # True once the user has clicked the email-verification link (or
+    # auto-true for OAuth signups + waitlisters who claimed their account).
+    # Frontend uses this to surface a "verify your email" banner and to
+    # gate the "Start Free Trial" CTA before it round-trips to Stripe.
+    is_verified: bool = False
 
     # Gamification v4
     reputation: int = 0
@@ -159,3 +164,16 @@ class ResetPasswordRequest(BaseModel):
 
 class BadgeReorderRequest(BaseModel):
     badge_ids: List[str]
+
+
+class VerifyEmailRequest(BaseModel):
+    """Body of POST /api/auth/verify-email — exchanges a signed token for a
+    flip of users.is_verified to True."""
+    token: str
+
+
+class ResendVerificationRequest(BaseModel):
+    """Body of POST /api/auth/send-verification — re-sends a verification
+    link to the currently-logged-in user. No fields needed; the user is
+    derived from the auth cookie."""
+    pass

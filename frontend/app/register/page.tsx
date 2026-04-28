@@ -35,9 +35,24 @@ export default function RegisterPage() {
       return;
     }
 
-    // Password strength check
-    if (formData.password.length < 8) {
+    // Password strength check — must mirror backend (length 8-72, letter + digit).
+    // Without this, users get a 422 from Pydantic that returns a structured
+    // detail array (not a plain string), which the API client surfaces as
+    // gibberish — that's the "system accepted the password but login fails"
+    // bug report.
+    const pwd = formData.password;
+    if (pwd.length < 8) {
       setPasswordError(t("passwordTooShort"));
+      setLoading(false);
+      return;
+    }
+    if (pwd.length > 72) {
+      setPasswordError(t("passwordTooLong"));
+      setLoading(false);
+      return;
+    }
+    if (!/[a-zA-Z]/.test(pwd) || !/\d/.test(pwd)) {
+      setPasswordError(t("passwordTooWeak"));
       setLoading(false);
       return;
     }
@@ -124,6 +139,7 @@ export default function RegisterPage() {
                 }}
                 required
                 minLength={8}
+                maxLength={72}
                 className="w-full bg-black/50 border border-white/10 rounded-lg p-3 text-mambo-text-light focus:border-mambo-blue focus:outline-none transition"
               />
               <p className="text-xs text-gray-500 mt-1">{t("passwordHelper")}</p>

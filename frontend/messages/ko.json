@@ -66,6 +66,8 @@
       "loginLink": "로그인",
       "passwordMismatch": "비밀번호가 일치하지 않습니다",
       "passwordTooShort": "비밀번호는 최소 8자 이상이어야 합니다",
+      "passwordTooLong": "비밀번호는 72자를 초과할 수 없습니다",
+      "passwordTooWeak": "비밀번호는 영문자와 숫자를 각각 하나 이상 포함해야 합니다",
       "genericError": "회원가입 실패. 다시 시도해 주세요."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "비밀번호 확인",
       "passwordMismatch": "비밀번호가 일치하지 않습니다",
       "passwordTooShort": "비밀번호는 최소 8자 이상이어야 합니다",
+      "passwordTooLong": "비밀번호는 72자를 초과할 수 없습니다",
+      "passwordTooWeak": "비밀번호는 영문자와 숫자를 각각 하나 이상 포함해야 합니다",
       "submit": "비밀번호 재설정",
       "submitting": "재설정 중...",
       "successTitle": "비밀번호가 재설정되었습니다!",
@@ -101,6 +105,32 @@
       "failedToReset": "비밀번호를 재설정하지 못했습니다",
       "genericError": "비밀번호를 재설정하지 못했습니다. 링크가 만료되었을 수 있습니다.",
       "loading": "로딩 중..."
+    },
+    "verifyEmail": {
+      "missingToken": "이 링크에 인증 토큰이 없습니다. 이메일의 링크를 사용해주세요.",
+      "verifyingTitle": "이메일 인증 중",
+      "verifyingBody": "잠시만 기다려주세요.",
+      "successTitle": "준비 완료",
+      "successBody": "이메일이 인증되었습니다. 무료 체험을 시작할 수 있습니다.",
+      "startTrialCta": "무료 체험 시작하기",
+      "browseFreeCta": "먼저 무료 콘텐츠 둘러보기",
+      "errorTitle": "인증 실패",
+      "errorBody": "이 링크가 유효하지 않거나 만료되었습니다. 새 인증 이메일을 요청하세요.",
+      "loginCta": "로그인",
+      "homeCta": "홈으로 돌아가기",
+      "genericError": "문제가 발생했습니다. 다시 시도해주세요.",
+      "modalTitle": "이메일을 인증해주세요",
+      "modalBody": "받은편지함으로 인증 링크를 보냈습니다. 클릭하여 무료 체험을 시작하세요.",
+      "checkInboxHint": "가입한 이메일의 받은편지함을 확인하세요.",
+      "close": "닫기",
+      "resendButton": "이메일 재전송",
+      "resending": "전송 중...",
+      "resendSuccess": "인증 이메일이 전송되었습니다. 받은편지함을 확인하세요.",
+      "resendError": "이메일을 재전송할 수 없습니다. 다시 시도해주세요.",
+      "alreadyVerifiedButton": "이미 인증했어요",
+      "refreshing": "확인 중...",
+      "refreshError": "상태를 새로고침할 수 없습니다. 다시 시도해주세요.",
+      "notYetVerified": "아직 인증된 이메일이 보이지 않습니다. 받은편지함을 확인하거나 새 링크를 요청하세요."
     }
   },
   "authPrompt": {

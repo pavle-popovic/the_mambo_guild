@@ -10,6 +10,7 @@ import { apiClient } from "@/lib/api";
 import { FaCheck, FaTimes, FaCrown } from "react-icons/fa";
 import { FadeIn, StaggerContainer, StaggerItem, HoverCard, Clickable } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
+import EmailVerificationModal from "@/components/EmailVerificationModal";
 import { toast } from "sonner";
 import {
   CONTACT_EMAIL,
@@ -46,6 +47,12 @@ function PricingPageContent() {
   // trial ends" instead see a $59 charge same instant. The modal below
   // surfaces both consequences before firing the API call.
   const [showTrialUpgradeModal, setShowTrialUpgradeModal] = useState(false);
+  // Email-verification gate. Opened when /api/payments/create-checkout-session
+  // returns "email_verification_required". The pendingTrialPriceId lets us
+  // resume the original checkout immediately after the user verifies +
+  // refreshes — no second click required.
+  const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
+  const [pendingTrialPriceId, setPendingTrialPriceId] = useState<string | null>(null);
   const [guildMasterSeats, setGuildMasterSeats] = useState<{
     total: number;
     taken: number;
@@ -192,6 +199,12 @@ function PricingPageContent() {
         error.message?.includes("Unauthorized")) {
         toast.error(t("toastSessionExpired"));
         router.push(`/login?redirect=/pricing`);
+      } else if (error.message?.includes("email_verification_required")) {
+        // Backend refuses to start the trial until is_verified=true.
+        // Open the verification modal instead of showing a raw toast —
+        // it lets the user resend the link or refresh to confirm.
+        setPendingTrialPriceId(priceId);
+        setShowVerifyEmailModal(true);
       } else {
         toast.error(error.message || t("toastCheckoutFailed"));
       }
@@ -350,6 +363,33 @@ function PricingPageContent() {
               </div>
             </div>
           )}
+          {/* Trust bar — pinned ABOVE the pricing tiers so the cancel-anytime
+              guarantee is the first thing visitors see in the pricing section
+              (replaces the previous below-cards placement). */}
+          <div className="mb-10 sm:mb-14">
+            <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8 text-center sm:text-left">
+              <div className="flex items-center gap-2.5 text-sm text-white/80">
+                <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span><span className="font-semibold text-white">{tp("trustCancelAnytime")}</span> — {tp("trustCancelAnytimeDesc")}</span>
+              </div>
+              <div className="hidden sm:block h-5 w-px bg-white/10" />
+              <div className="flex items-center gap-2.5 text-sm text-white/80">
+                <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                  <path d="M5 9V7a5 5 0 0110 0v2h1a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2h1zm8 0V7a3 3 0 10-6 0v2h6z" />
+                </svg>
+                <span><span className="font-semibold text-white">{tp("trustLocked")}</span></span>
+              </div>
+              <div className="hidden sm:block h-5 w-px bg-white/10" />
+              <div className="flex items-center gap-2.5 text-sm text-white/80">
+                <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                </svg>
+                <span>{tp("trustSecurePre")} <span className="font-semibold text-white">{tp("trustSecureBrand")}</span> {tp("trustSecurePost")}</span>
+              </div>
+            </div>
+          </div>
           <StaggerContainer className="grid md:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
             {/* Rookie Tier */}
             <StaggerItem>
@@ -611,33 +651,9 @@ function PricingPageContent() {
             </StaggerItem>
           </StaggerContainer>
 
-          <div className="mt-14 sm:mt-20">
-            <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8 text-center sm:text-left">
-              <div className="flex items-center gap-2.5 text-sm text-white/80">
-                <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span><span className="font-semibold text-white">{tp("trustCancelAnytime")}</span> — {tp("trustCancelAnytimeDesc")}</span>
-              </div>
-              <div className="hidden sm:block h-5 w-px bg-white/10" />
-              <div className="flex items-center gap-2.5 text-sm text-white/80">
-                <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                  <path d="M5 9V7a5 5 0 0110 0v2h1a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2h1zm8 0V7a3 3 0 10-6 0v2h6z" />
-                </svg>
-                <span><span className="font-semibold text-white">{tp("trustLocked")}</span></span>
-              </div>
-              <div className="hidden sm:block h-5 w-px bg-white/10" />
-              <div className="flex items-center gap-2.5 text-sm text-white/80">
-                <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                  <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-                <span>{tp("trustSecurePre")} <span className="font-semibold text-white">{tp("trustSecureBrand")}</span> {tp("trustSecurePost")}</span>
-              </div>
-            </div>
-            <p className="mt-6 text-center text-gray-500 text-sm">
-              {t("contactPrompt")} <a href={`mailto:${CONTACT_EMAIL}`} className="text-mambo-gold/90 hover:text-mambo-gold">{CONTACT_EMAIL}</a>
-            </p>
-          </div>
+          <p className="mt-14 sm:mt-20 text-center text-gray-500 text-sm">
+            {t("contactPrompt")} <a href={`mailto:${CONTACT_EMAIL}`} className="text-mambo-gold/90 hover:text-mambo-gold">{CONTACT_EMAIL}</a>
+          </p>
         </div>
       </FadeIn>
 
@@ -646,6 +662,25 @@ function PricingPageContent() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         type="login"
+      />
+
+      {/* Email verification gate — surfaces when the backend rejects a
+          fresh-trial checkout with "email_verification_required". */}
+      <EmailVerificationModal
+        isOpen={showVerifyEmailModal}
+        onClose={() => {
+          setShowVerifyEmailModal(false);
+          setPendingTrialPriceId(null);
+        }}
+        onVerified={() => {
+          // User verified mid-flow — resume the original checkout.
+          const resumeId = pendingTrialPriceId;
+          setPendingTrialPriceId(null);
+          if (resumeId) {
+            const tier = resumeId === PERFORMER_PRICE_ID ? "performer" : "advanced";
+            handleSubscribe(resumeId, tier);
+          }
+        }}
       />
 
       {/* Upgrade confirmation — shown for all Pro→Guild Master attempts.

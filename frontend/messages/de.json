@@ -66,6 +66,8 @@
       "loginLink": "Anmelden",
       "passwordMismatch": "Die Passwörter stimmen nicht überein",
       "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
+      "passwordTooLong": "Das Passwort darf 72 Zeichen nicht überschreiten",
+      "passwordTooWeak": "Das Passwort muss mindestens einen Buchstaben und eine Zahl enthalten",
       "genericError": "Registrierung fehlgeschlagen. Bitte versuche es erneut."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "Passwort bestätigen",
       "passwordMismatch": "Die Passwörter stimmen nicht überein",
       "passwordTooShort": "Das Passwort muss mindestens 8 Zeichen lang sein",
+      "passwordTooLong": "Das Passwort darf 72 Zeichen nicht überschreiten",
+      "passwordTooWeak": "Das Passwort muss mindestens einen Buchstaben und eine Zahl enthalten",
       "submit": "Passwort zurücksetzen",
       "submitting": "Wird zurückgesetzt...",
       "successTitle": "Passwort erfolgreich zurückgesetzt!",
@@ -101,6 +105,32 @@
       "failedToReset": "Passwort konnte nicht zurückgesetzt werden",
       "genericError": "Passwort konnte nicht zurückgesetzt werden. Der Link ist möglicherweise abgelaufen.",
       "loading": "Laden..."
+    },
+    "verifyEmail": {
+      "missingToken": "Kein Verifizierungs-Token in diesem Link. Bitte nutze den Link aus deiner E-Mail.",
+      "verifyingTitle": "Deine E-Mail wird verifiziert",
+      "verifyingBody": "Das dauert nur eine Sekunde.",
+      "successTitle": "Alles bereit",
+      "successBody": "Deine E-Mail ist verifiziert. Du kannst jetzt deine kostenlose Testphase starten.",
+      "startTrialCta": "Kostenlose Testphase starten",
+      "browseFreeCta": "Erst kostenlose Inhalte ansehen",
+      "errorTitle": "Verifizierung fehlgeschlagen",
+      "errorBody": "Dieser Link ist ungültig oder abgelaufen. Bitte fordere eine neue Verifizierungs-E-Mail an.",
+      "loginCta": "Anmelden",
+      "homeCta": "Zurück zur Startseite",
+      "genericError": "Etwas ist schiefgelaufen. Bitte versuche es erneut.",
+      "modalTitle": "Verifiziere deine E-Mail",
+      "modalBody": "Wir haben einen Verifizierungslink an dein Postfach gesendet. Klicke darauf, um deine kostenlose Testphase zu starten.",
+      "checkInboxHint": "Schau in das Postfach der E-Mail, mit der du dich registriert hast.",
+      "close": "Schließen",
+      "resendButton": "E-Mail erneut senden",
+      "resending": "Wird gesendet...",
+      "resendSuccess": "Verifizierungs-E-Mail gesendet. Schau in dein Postfach.",
+      "resendError": "E-Mail konnte nicht erneut gesendet werden. Bitte versuche es erneut.",
+      "alreadyVerifiedButton": "Ich habe bereits verifiziert",
+      "refreshing": "Wird geprüft...",
+      "refreshError": "Status konnte nicht aktualisiert werden. Bitte versuche es erneut.",
+      "notYetVerified": "Wir sehen noch keine verifizierte E-Mail. Schau in dein Postfach oder fordere einen neuen Link an."
     }
   },
   "authPrompt": {

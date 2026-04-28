@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { HoverCard, Clickable, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
+import EmailVerificationModal from "@/components/EmailVerificationModal";
 import {
   daysUntilProGrandfatherEnd,
   ADVANCED_PRICE_ID,
@@ -100,6 +101,9 @@ export default function LandingPricingSection() {
   const router = useRouter();
   const [loading, setLoading] = useState<string>(""); // Initialize as empty string to avoid null === null match
   const [showAuthModal, setShowAuthModal] = useState(false);
+  // Email-verification gate. See _PricingPage.tsx for the same pattern.
+  const [showVerifyEmailModal, setShowVerifyEmailModal] = useState(false);
+  const [pendingTrialPriceId, setPendingTrialPriceId] = useState<string | null>(null);
   const tPricing = useTranslations("pricingPage");
   // Trial is one-shot: once consumed, the Pro CTA must say "Subscribe" so the
   // user isn't surprised by an immediate charge.
@@ -192,6 +196,11 @@ export default function LandingPricingSection() {
       ) {
         alert(tAlerts("sessionExpired"));
         router.push(`/login?redirect=/pricing`);
+      } else if (error.message?.includes("email_verification_required")) {
+        // Backend gates the free trial on email verification — open the
+        // modal instead of dumping the raw 400 message via alert().
+        setPendingTrialPriceId(priceId);
+        setShowVerifyEmailModal(true);
       } else {
         alert(error.message || tAlerts("checkoutFailed"));
       }
@@ -215,6 +224,39 @@ export default function LandingPricingSection() {
           <h2 className="text-4xl md:text-5xl font-extrabold mb-8 text-mambo-text tracking-tight">
             {t("headingPre")} <span className="text-mambo-gold drop-shadow-md">{t("headingAccent")}</span>
           </h2>
+        </motion.div>
+
+        {/* Trust bar — pinned ABOVE the pricing tiers so the cancel-anytime
+            guarantee is the first thing visitors see in the pricing section. */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="mb-10 sm:mb-14"
+        >
+          <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8 text-center sm:text-left">
+            <div className="flex items-center gap-2.5 text-sm text-white/80">
+              <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span><span className="font-semibold text-white">{t("trustCancelAnytime")}</span> — {t("trustCancelAnytimeDesc")}</span>
+            </div>
+            <div className="hidden sm:block h-5 w-px bg-white/10" />
+            <div className="flex items-center gap-2.5 text-sm text-white/80">
+              <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                <path d="M5 9V7a5 5 0 0110 0v2h1a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2h1zm8 0V7a3 3 0 10-6 0v2h6z" />
+              </svg>
+              <span><span className="font-semibold text-white">{t("trustLocked")}</span> — {t("trustLockedDesc")}</span>
+            </div>
+            <div className="hidden sm:block h-5 w-px bg-white/10" />
+            <div className="flex items-center gap-2.5 text-sm text-white/80">
+              <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
+                <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+              </svg>
+              <span>{t("trustSecurePre")} <span className="font-semibold text-white">{t("trustSecureBrand")}</span> {t("trustSecurePost")}</span>
+            </div>
+          </div>
         </motion.div>
 
         {/* Pricing grid */}
@@ -405,42 +447,11 @@ export default function LandingPricingSection() {
           })}
         </StaggerContainer>
 
-        {/* Trust bar — cancel-anytime + Stripe + lifetime price lock */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.3, duration: 0.5 }}
-          className="mt-10 sm:mt-14"
-        >
-          <div className="mx-auto max-w-3xl rounded-2xl border border-white/10 bg-white/[0.03] px-5 py-4 sm:py-5 flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-8 text-center sm:text-left">
-            <div className="flex items-center gap-2.5 text-sm text-white/80">
-              <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span><span className="font-semibold text-white">{t("trustCancelAnytime")}</span> — {t("trustCancelAnytimeDesc")}</span>
-            </div>
-            <div className="hidden sm:block h-5 w-px bg-white/10" />
-            <div className="flex items-center gap-2.5 text-sm text-white/80">
-              <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                <path d="M5 9V7a5 5 0 0110 0v2h1a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2v-6a2 2 0 012-2h1zm8 0V7a3 3 0 10-6 0v2h6z" />
-              </svg>
-              <span><span className="font-semibold text-white">{t("trustLocked")}</span> — {t("trustLockedDesc")}</span>
-            </div>
-            <div className="hidden sm:block h-5 w-px bg-white/10" />
-            <div className="flex items-center gap-2.5 text-sm text-white/80">
-              <svg className="w-4 h-4 text-mambo-gold shrink-0" viewBox="0 0 20 20" fill="currentColor" aria-hidden>
-                <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              <span>{t("trustSecurePre")} <span className="font-semibold text-white">{t("trustSecureBrand")}</span> {t("trustSecurePost")}</span>
-            </div>
-          </div>
-          <p className="mt-5 text-center text-gray-500 text-xs">
-            <Link href="/pricing" className="text-mambo-gold/90 hover:text-mambo-gold underline-offset-4 hover:underline">
-              {t("seeFullPricing")}
-            </Link>
-          </p>
-        </motion.div>
+        <p className="mt-10 sm:mt-14 text-center text-gray-500 text-xs">
+          <Link href="/pricing" className="text-mambo-gold/90 hover:text-mambo-gold underline-offset-4 hover:underline">
+            {t("seeFullPricing")}
+          </Link>
+        </p>
       </div>
 
       {/* Auth Prompt Modal */}
@@ -448,6 +459,26 @@ export default function LandingPricingSection() {
         isOpen={showAuthModal}
         onClose={() => setShowAuthModal(false)}
         type="login"
+      />
+
+      {/* Email verification gate — opened when checkout returns
+          "email_verification_required" for an unverified user. */}
+      <EmailVerificationModal
+        isOpen={showVerifyEmailModal}
+        onClose={() => {
+          setShowVerifyEmailModal(false);
+          setPendingTrialPriceId(null);
+        }}
+        onVerified={() => {
+          const resumeId = pendingTrialPriceId;
+          setPendingTrialPriceId(null);
+          if (resumeId) {
+            // Resume the original checkout. planId from the original click
+            // isn't preserved here; "advanced" is the only trial-eligible
+            // plan, so it's the only path that can hit this modal.
+            handleSubscribe(resumeId, "full-access");
+          }
+        }}
       />
     </section>
   );

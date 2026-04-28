@@ -66,6 +66,8 @@
       "loginLink": "Giriş yap",
       "passwordMismatch": "Şifreler eşleşmiyor",
       "passwordTooShort": "Şifre en az 8 karakter olmalı",
+      "passwordTooLong": "Parola 72 karakterden uzun olamaz",
+      "passwordTooWeak": "Parola en az bir harf ve bir rakam içermelidir",
       "genericError": "Kayıt başarısız. Lütfen tekrar dene."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "Şifreni doğrula",
       "passwordMismatch": "Şifreler eşleşmiyor",
       "passwordTooShort": "Şifre en az 8 karakter olmalı",
+      "passwordTooLong": "Parola 72 karakterden uzun olamaz",
+      "passwordTooWeak": "Parola en az bir harf ve bir rakam içermelidir",
       "submit": "Şifreyi Sıfırla",
       "submitting": "Sıfırlanıyor...",
       "successTitle": "Şifre başarıyla sıfırlandı!",
@@ -101,6 +105,32 @@
       "failedToReset": "Şifre sıfırlanamadı",
       "genericError": "Şifre sıfırlanamadı. Bağlantının süresi dolmuş olabilir.",
       "loading": "Yükleniyor..."
+    },
+    "verifyEmail": {
+      "missingToken": "Bu bağlantıda doğrulama belirteci yok. Lütfen e-postanızdaki bağlantıyı kullanın.",
+      "verifyingTitle": "E-postanız doğrulanıyor",
+      "verifyingBody": "Sadece bir saniye sürer.",
+      "successTitle": "Her şey hazır",
+      "successBody": "E-postanız doğrulandı. Şimdi ücretsiz denemenize başlayabilirsiniz.",
+      "startTrialCta": "Ücretsiz denememi başlat",
+      "browseFreeCta": "Önce ücretsiz içeriğe göz at",
+      "errorTitle": "Doğrulama başarısız",
+      "errorBody": "Bu bağlantı geçersiz veya süresi dolmuş. Yeni bir doğrulama e-postası isteyin.",
+      "loginCta": "Giriş yap",
+      "homeCta": "Ana sayfaya dön",
+      "genericError": "Bir şeyler ters gitti. Tekrar deneyin.",
+      "modalTitle": "E-postanı doğrula",
+      "modalBody": "Gelen kutuna bir doğrulama bağlantısı gönderdik. Ücretsiz denemeye başlamak için tıkla.",
+      "checkInboxHint": "Kayıt olduğun e-postanın gelen kutusunu kontrol et.",
+      "close": "Kapat",
+      "resendButton": "E-postayı tekrar gönder",
+      "resending": "Gönderiliyor...",
+      "resendSuccess": "Doğrulama e-postası gönderildi. Gelen kutunu kontrol et.",
+      "resendError": "E-posta tekrar gönderilemedi. Tekrar dene.",
+      "alreadyVerifiedButton": "Zaten doğruladım",
+      "refreshing": "Kontrol ediliyor...",
+      "refreshError": "Durum yenilenemedi. Tekrar dene.",
+      "notYetVerified": "Henüz doğrulanmış bir e-posta görmüyoruz. Gelen kutunu kontrol et veya yeni bir bağlantı iste."
     }
   },
   "authPrompt": {

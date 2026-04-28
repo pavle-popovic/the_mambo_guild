@@ -66,6 +66,8 @@
       "loginLink": "Iniciar sesión",
       "passwordMismatch": "Las contraseñas no coinciden",
       "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+      "passwordTooLong": "La contraseña no puede superar 72 caracteres",
+      "passwordTooWeak": "La contraseña debe contener al menos una letra y un número",
       "genericError": "Error al registrarse. Inténtalo de nuevo."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "Confirma tu contraseña",
       "passwordMismatch": "Las contraseñas no coinciden",
       "passwordTooShort": "La contraseña debe tener al menos 8 caracteres",
+      "passwordTooLong": "La contraseña no puede superar 72 caracteres",
+      "passwordTooWeak": "La contraseña debe contener al menos una letra y un número",
       "submit": "Restablecer contraseña",
       "submitting": "Restableciendo...",
       "successTitle": "¡Contraseña restablecida con éxito!",
@@ -101,6 +105,32 @@
       "failedToReset": "No se pudo restablecer la contraseña",
       "genericError": "No se pudo restablecer la contraseña. El enlace puede haber caducado.",
       "loading": "Cargando..."
+    },
+    "verifyEmail": {
+      "missingToken": "No hay un token de verificación en este enlace. Usa el enlace de tu correo.",
+      "verifyingTitle": "Verificando tu correo",
+      "verifyingBody": "Solo toma un segundo.",
+      "successTitle": "Todo listo",
+      "successBody": "Tu correo está verificado. Ya puedes comenzar tu prueba gratuita.",
+      "startTrialCta": "Comenzar mi prueba gratuita",
+      "browseFreeCta": "Explora el contenido gratis primero",
+      "errorTitle": "La verificación falló",
+      "errorBody": "Este enlace no es válido o ha expirado. Solicita un nuevo correo de verificación.",
+      "loginCta": "Iniciar sesión",
+      "homeCta": "Volver al inicio",
+      "genericError": "Algo salió mal. Inténtalo de nuevo.",
+      "modalTitle": "Verifica tu correo",
+      "modalBody": "Te enviamos un enlace de verificación. Haz clic para comenzar tu prueba gratuita.",
+      "checkInboxHint": "Revisa la bandeja del correo con el que te registraste.",
+      "close": "Cerrar",
+      "resendButton": "Reenviar correo",
+      "resending": "Enviando...",
+      "resendSuccess": "Correo de verificación enviado. Revisa tu bandeja.",
+      "resendError": "No pudimos reenviar el correo. Inténtalo de nuevo.",
+      "alreadyVerifiedButton": "Ya verifiqué",
+      "refreshing": "Comprobando...",
+      "refreshError": "No se pudo actualizar tu estado. Inténtalo de nuevo.",
+      "notYetVerified": "Aún no vemos un correo verificado. Revisa tu bandeja o solicita un nuevo enlace."
     }
   },
   "authPrompt": {

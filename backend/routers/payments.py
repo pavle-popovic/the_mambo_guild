@@ -25,7 +25,7 @@ from services.email_service import (
     send_payment_failed_email,
     send_subscription_canceled_email,
 )
-from services.email_validation import is_disposable_email, normalize_email_for_dedup
+from services.email_validation import is_disposable_email, normalize_email_for_dedup, has_deliverable_domain
 from config import settings
 
 from schemas.course import (
@@ -523,6 +523,26 @@ def create_checkout_session(
         # subscription attempt. After that (canceled-and-returning customers,
         # upgrades, etc.) they pay from day 0.
         profile = db.query(UserProfile).filter(UserProfile.user_id == current_user.id).first()
+
+        # Email-verification gate. Only fires when the user is about to
+        # claim a NEW free trial on the Advanced tier — i.e., the
+        # exact path the throwaway-email abuse loop targets. Already-
+        # used-trial users (legitimate or otherwise) bypass; they
+        # either verified earlier under the old flow or are paying
+        # cash now, neither of which is a trial-farm vector. Performer
+        # has no trial so verification isn't required there either.
+        # Frontend matches on "email_verification_required" in the
+        # detail string to surface the verify-email modal.
+        if (
+            request_data.price_id == ADVANCED_PRICE_ID
+            and bool(profile and not profile.has_used_trial)
+            and not bool(getattr(current_user, "is_verified", False))
+        ):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="email_verification_required: Please verify your email before starting your free trial. We sent you a verification link when you signed up — check your inbox.",
+            )
+
         # Free trial is ADVANCED-tier only. Guild Master (PERFORMER) is a
         # separate product with no trial. Defense-in-depth disposable-email
         # check (registration also blocks these — this is the second layer
@@ -534,6 +554,7 @@ def create_checkout_session(
             bool(profile and not profile.has_used_trial)
             and request_data.price_id == ADVANCED_PRICE_ID
             and not is_disposable_email(current_user.email)
+            and has_deliverable_domain(current_user.email)
             and not _email_has_prior_stripe_subscription(current_user.email)
         )
         trial_period_days = 7 if trial_eligible else None
@@ -895,6 +916,30 @@ async def stripe_webhook(
                 if user_profile and not user_profile.has_used_trial:
                     user_profile.has_used_trial = True
                     db.commit()
+
+                # Card-fingerprint dedup. Closes the same-card-different-email
+                # trial-farm loophole. If the card on this trial has already
+                # been used by a DIFFERENT user, the service collapses
+                # trial_end to now (Stripe immediately invoices). Fail-open
+                # on any error so legitimate trials are never blocked by a
+                # bug in this defense.
+                try:
+                    from services import card_fingerprint_service
+                    was_blocked = card_fingerprint_service.check_and_record_trial_card(
+                        stripe_sub_id, db_subscription.user_id, db
+                    )
+                    db.commit()
+                    if was_blocked:
+                        logger.info(
+                            "webhook: trial collapsed for user %s on sub %s — "
+                            "card fingerprint reused across accounts",
+                            db_subscription.user_id, stripe_sub_id,
+                        )
+                except Exception:
+                    logger.exception(
+                        "webhook: card_fingerprint check failed (non-fatal)"
+                    )
+                    db.rollback()
 
                 # Fire StartTrial to Meta CAPI. $0 value but predicted_ltv
                 # tells the bidder to treat this as potential $39/mo revenue.

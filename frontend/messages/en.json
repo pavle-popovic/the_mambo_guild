@@ -66,6 +66,8 @@
       "loginLink": "Log in",
       "passwordMismatch": "Passwords do not match",
       "passwordTooShort": "Password must be at least 8 characters long",
+      "passwordTooLong": "Password cannot exceed 72 characters",
+      "passwordTooWeak": "Password must contain at least one letter and one number",
       "genericError": "Registration failed. Please try again."
     },
     "forgotPassword": {
@@ -91,6 +93,8 @@
       "confirmPasswordPlaceholder": "Confirm your password",
       "passwordMismatch": "Passwords do not match",
       "passwordTooShort": "Password must be at least 8 characters long",
+      "passwordTooLong": "Password cannot exceed 72 characters",
+      "passwordTooWeak": "Password must contain at least one letter and one number",
       "submit": "Reset Password",
       "submitting": "Resetting...",
       "successTitle": "Password reset successful!",
@@ -101,6 +105,32 @@
       "failedToReset": "Failed to reset password",
       "genericError": "Failed to reset password. The link may have expired.",
       "loading": "Loading..."
+    },
+    "verifyEmail": {
+      "missingToken": "No verification token in this link. Please use the link from your email.",
+      "verifyingTitle": "Verifying your email",
+      "verifyingBody": "This only takes a second.",
+      "successTitle": "You're all set",
+      "successBody": "Your email is verified. You can start your free trial now.",
+      "startTrialCta": "Start my free trial",
+      "browseFreeCta": "Browse free content first",
+      "errorTitle": "Verification failed",
+      "errorBody": "This link is invalid or has expired. Please request a new verification email.",
+      "loginCta": "Log in",
+      "homeCta": "Back to home",
+      "genericError": "Something went wrong. Please try again.",
+      "modalTitle": "Verify your email",
+      "modalBody": "We sent a verification link to your inbox. Click it to start your free trial.",
+      "checkInboxHint": "Check the inbox for the email you signed up with.",
+      "close": "Close",
+      "resendButton": "Resend email",
+      "resending": "Sending...",
+      "resendSuccess": "Verification email sent. Check your inbox.",
+      "resendError": "Could not resend the verification email. Please try again.",
+      "alreadyVerifiedButton": "I already verified",
+      "refreshing": "Checking...",
+      "refreshError": "Could not refresh your status. Please try again.",
+      "notYetVerified": "We don't see a verified email yet. Check your inbox or request a new link."
     }
   },
   "authPrompt": {
