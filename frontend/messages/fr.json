@@ -1853,6 +1853,15 @@
       "bullet3": "Ajoute jusqu'à 5 tags pour que les bonnes personnes la trouvent.",
       "bullet4": "Marque une publication comme Travail en Cours si tu veux des commentaires doux."
     },
+    "videoTypes": {
+      "eyebrow": "TYPES DE VIDÉO",
+      "title": "Trois types de clips de pratique",
+      "body": "Chaque publication de Pratique entre dans l'une des trois catégories. Choisis celle qui correspond à ce que tu as filmé. Chacune construit sa propre famille de badges.",
+      "bullet1": "Pas de la semaine, c'est ta version du pas de la semaine. Donne le badge Maître du Pas.",
+      "bullet2": "Original, c'est ta propre choré ou ton freestyle. Donne le badge L'Originateur.",
+      "bullet3": "Guild, c'est un combo d'un cours ou d'une répétition Guild. Donne le badge Grande Classe.",
+      "bullet4": "Les likes sur tout type de vidéo comptent aussi pour le badge Chouchou du Public."
+    },
     "reactions": {
       "eyebrow": "RÉACTIONS ET COMMENTAIRES",
       "title": "Soutiens les autres danseurs",
@@ -1883,7 +1892,7 @@
       "eyebrow": "LA BOUTIQUE",
       "title": "Dépense tes claves",
       "body": "Ouvre la Boutique pour transformer tes claves en cosmétiques et améliorations.",
-      "bullet1": "Les cadres encadrent ton avatar. Les titres se posent sous ton nom.",
+      "bullet1": "Les cadres encadrent ton avatar. Les titres se posent sous ton nom. Équipe-les ou change-les à tout moment dans ton Inventaire.",
       "bullet2": "Les deux viennent en quatre raretés, de Commun à Légendaire.",
       "bullet3": "Achète des places vidéo ou question en plus quand les tiennes sont épuisées.",
       "bullet4": "Économise pour un Ticket Doré et réserve une séance en tête à tête avec un Maestro."

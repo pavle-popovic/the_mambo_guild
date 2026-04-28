@@ -1853,6 +1853,15 @@
       "bullet3": "Aggiungi fino a 5 tag così le persone giuste la trovano.",
       "bullet4": "Segna una pubblicazione come Lavori in Corso se vuoi commenti gentili."
     },
+    "videoTypes": {
+      "eyebrow": "TIPI DI VIDEO",
+      "title": "Tre tipi di clip di pratica",
+      "body": "Ogni post di Pratica rientra in una di tre categorie. Scegli quella che corrisponde a ciò che hai filmato. Ognuna costruisce la propria famiglia di badge.",
+      "bullet1": "Passo della settimana è la tua versione del passo della settimana. Sblocca il badge Maestro del Passo.",
+      "bullet2": "Originale è la tua coreografia o freestyle. Sblocca il badge L'Originatore.",
+      "bullet3": "Guild è una combo di una lezione o prova del Guild. Sblocca il badge Classe da Maestro.",
+      "bullet4": "I mi piace su qualunque tipo di video contano anche per il badge Preferito del Pubblico."
+    },
     "reactions": {
       "eyebrow": "REAZIONI E COMMENTI",
       "title": "Esserci per gli altri ballerini",
@@ -1883,7 +1892,7 @@
       "eyebrow": "IL NEGOZIO",
       "title": "Spendi i tuoi claves",
       "body": "Apri il Negozio per trasformare i claves in cosmetici e potenziamenti.",
-      "bullet1": "I bordi incorniciano il tuo avatar. I titoli stanno sotto il tuo nome.",
+      "bullet1": "I bordi incorniciano il tuo avatar. I titoli stanno sotto il tuo nome. Equipaggiali o cambiali in qualsiasi momento nel tuo Inventario.",
       "bullet2": "Entrambi vengono in quattro rarità, da Comune a Leggendario.",
       "bullet3": "Compra slot extra di video o domanda quando i tuoi finiscono.",
       "bullet4": "Risparmia per un Biglietto d'Oro e prenota una sessione uno a uno con un Maestro."

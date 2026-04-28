@@ -1852,6 +1852,15 @@
       "bullet3": "Add up to 5 tags so the right people find it.",
       "bullet4": "Mark a post Work in Progress if you want gentle feedback."
     },
+    "videoTypes": {
+      "eyebrow": "VIDEO TYPES",
+      "title": "Three flavors of practice clip",
+      "body": "Every Practice post fits one of three buckets. Pick the one that matches what you filmed. Each one builds its own badge family.",
+      "bullet1": "Move of the Week is your take on this week's challenge move. Earns the Move Master badge.",
+      "bullet2": "Original is your own choreo or freestyle. Earns The Originator badge.",
+      "bullet3": "Guild is a combo from a Guild class or rehearsal. Earns the Class Act badge.",
+      "bullet4": "Likes on any video type also count toward the Crowd Favorite badge."
+    },
     "reactions": {
       "eyebrow": "REACTIONS AND COMMENTS",
       "title": "Show up for other dancers",
@@ -1882,7 +1891,7 @@
       "eyebrow": "THE SHOP",
       "title": "Spend your claves",
       "body": "Open the Shop to turn claves into cosmetics and upgrades.",
-      "bullet1": "Borders frame your avatar. Titles sit under your name.",
+      "bullet1": "Borders frame your avatar. Titles sit under your name. Equip or swap them anytime in your Inventory.",
       "bullet2": "Both come in four rarities, from Common to Legendary.",
       "bullet3": "Buy extra video or question slots when yours run out.",
       "bullet4": "Save up for a Golden Ticket to book a 1 on 1 review with a Maestro."

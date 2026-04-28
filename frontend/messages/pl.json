@@ -1853,6 +1853,15 @@
       "bullet3": "Dodaj do 5 tagów, żeby właściwe osoby znalazły wpis.",
       "bullet4": "Oznacz wpis jako Praca w toku, jeśli chcesz łagodnych komentarzy."
     },
+    "videoTypes": {
+      "eyebrow": "TYPY WIDEO",
+      "title": "Trzy rodzaje klipów treningowych",
+      "body": "Każdy post treningowy pasuje do jednej z trzech kategorii. Wybierz tę, która odpowiada nagraniu. Każda buduje własną rodzinę odznak.",
+      "bullet1": "Ruch tygodnia to twoja wersja figury tygodnia. Daje odznakę Mistrz Ruchu.",
+      "bullet2": "Oryginał to twoja własna choreografia lub freestyle. Daje odznakę Twórca.",
+      "bullet3": "Guild to kombinacja z lekcji lub próby Guildu. Daje odznakę Klasa Sama w Sobie.",
+      "bullet4": "Polubienia na każdym typie wideo liczą się też do odznaki Ulubieniec Publiczności."
+    },
     "reactions": {
       "eyebrow": "REAKCJE I KOMENTARZE",
       "title": "Bądź tam dla innych tancerzy",
@@ -1883,7 +1892,7 @@
       "eyebrow": "SKLEP",
       "title": "Wydaj swoje claves",
       "body": "Otwórz Sklep, by zamienić claves na kosmetyki i ulepszenia.",
-      "bullet1": "Ramki oprawiają twój awatar. Tytuły siedzą pod twoim imieniem.",
+      "bullet1": "Ramki oprawiają twój awatar. Tytuły siedzą pod twoim imieniem. Załóż je lub zmień w dowolnej chwili w Ekwipunku.",
       "bullet2": "Oba mają cztery rzadkości, od Pospolitej do Legendarnej.",
       "bullet3": "Kupuj dodatkowe sloty na wideo lub pytania, gdy twoje się skończą.",
       "bullet4": "Uzbieraj na Złoty Bilet i umów sesję 1 na 1 z Maestro."

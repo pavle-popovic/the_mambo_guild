@@ -1853,6 +1853,15 @@
       "bullet3": "Füge bis zu 5 Tags hinzu, damit die richtigen Leute ihn finden.",
       "bullet4": "Markiere einen Beitrag als Work in Progress, wenn du sanftes Feedback willst."
     },
+    "videoTypes": {
+      "eyebrow": "VIDEOARTEN",
+      "title": "Drei Arten von Praxisclips",
+      "body": "Jeder Praxis-Beitrag passt in eine von drei Kategorien. Wähle die, die zu deinem Video passt. Jede schaltet ihre eigene Abzeichenfamilie frei.",
+      "bullet1": "Move der Woche ist deine Version des Wochenmoves. Bringt das Move-Meister Abzeichen.",
+      "bullet2": "Original ist deine eigene Choreo oder dein Freestyle. Bringt das Der Erschaffer Abzeichen.",
+      "bullet3": "Guild ist eine Kombo aus einer Guild-Stunde oder Probe. Bringt das Klasse-Akt Abzeichen.",
+      "bullet4": "Likes auf jede Videoart zählen auch für das Publikumsliebling Abzeichen."
+    },
     "reactions": {
       "eyebrow": "REAKTIONEN UND KOMMENTARE",
       "title": "Sei für andere Tänzer da",
@@ -1883,7 +1892,7 @@
       "eyebrow": "DER SHOP",
       "title": "Gib deine Claves aus",
       "body": "Öffne den Shop, um Claves in Kosmetik und Upgrades zu verwandeln.",
-      "bullet1": "Rahmen umrahmen deinen Avatar. Titel stehen unter deinem Namen.",
+      "bullet1": "Rahmen umrahmen deinen Avatar. Titel stehen unter deinem Namen. Rüste sie jederzeit in deinem Inventar aus oder tausche sie.",
       "bullet2": "Beide kommen in vier Seltenheitsgraden, von Gewöhnlich bis Legendär.",
       "bullet3": "Kaufe extra Video- oder Fragen-Slots, wenn deine ausgehen.",
       "bullet4": "Spare auf ein Goldenes Ticket und buche eine 1-zu-1-Session mit einem Maestro."

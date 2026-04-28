@@ -1853,6 +1853,15 @@
       "bullet3": "Añade hasta 5 etiquetas para que la gente adecuada lo encuentre.",
       "bullet4": "Marca la publicación como Trabajo en Progreso si quieres comentarios suaves."
     },
+    "videoTypes": {
+      "eyebrow": "TIPOS DE VIDEO",
+      "title": "Tres tipos de clips de práctica",
+      "body": "Cada publicación de Práctica encaja en uno de tres tipos. Elige el que coincida con lo que grabaste. Cada uno construye su propia familia de insignias.",
+      "bullet1": "Paso de la semana es tu versión del paso destacado de la semana. Te otorga la insignia Maestro del Movimiento.",
+      "bullet2": "Original es tu propia coreografía o freestyle. Te otorga la insignia El Originador.",
+      "bullet3": "Guild es un combo de una clase o ensayo del Guild. Te otorga la insignia Clase Magistral.",
+      "bullet4": "Los me gusta en cualquier tipo de video también suman para la insignia Favorito del Público."
+    },
     "reactions": {
       "eyebrow": "REACCIONES Y COMENTARIOS",
       "title": "Apoya a otros bailarines",
@@ -1883,7 +1892,7 @@
       "eyebrow": "LA TIENDA",
       "title": "Gasta tus claves",
       "body": "Abre la Tienda para convertir claves en cosméticos y mejoras.",
-      "bullet1": "Los marcos rodean tu avatar. Los títulos se ponen bajo tu nombre.",
+      "bullet1": "Los marcos rodean tu avatar. Los títulos se ponen bajo tu nombre. Equípalos o cámbialos cuando quieras en tu Inventario.",
       "bullet2": "Ambos vienen en cuatro rarezas, de Común a Legendaria.",
       "bullet3": "Compra ranuras extra de vídeo o pregunta cuando se te acaben las tuyas.",
       "bullet4": "Ahorra para un Boleto Dorado y reserva una sesión 1 a 1 con un Maestro."

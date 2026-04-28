@@ -10,6 +10,7 @@ import {
   Award,
   ShoppingBag,
   Shield,
+  Video,
   ArrowLeft,
   ArrowRight,
 } from "lucide-react";
@@ -73,6 +74,12 @@ export default function CommunityGuidePage() {
       icon: <PenSquare className="h-6 w-6 sm:h-7 sm:w-7 landscape-phone:h-5 landscape-phone:w-5" strokeWidth={1.6} />,
       bulletKeys: ["bullet1", "bullet2", "bullet3", "bullet4"],
       iconTint: "from-amber-300/25 to-orange-500/25 text-amber-200 ring-amber-300/30",
+    },
+    {
+      key: "videoTypes",
+      icon: <Video className="h-6 w-6 sm:h-7 sm:w-7 landscape-phone:h-5 landscape-phone:w-5" strokeWidth={1.6} />,
+      bulletKeys: ["bullet1", "bullet2", "bullet3", "bullet4"],
+      iconTint: "from-cyan-400/25 to-teal-500/25 text-cyan-200 ring-cyan-300/30",
     },
     {
       key: "reactions",

@@ -1853,6 +1853,15 @@
       "bullet3": "Doğru kişilerin bulması için en fazla 5 etiket ekle.",
       "bullet4": "Yumuşak geri bildirim istiyorsan gönderini Çalışmada olarak işaretle."
     },
+    "videoTypes": {
+      "eyebrow": "VİDEO TÜRLERİ",
+      "title": "Üç tür pratik klibi",
+      "body": "Her Pratik gönderisi üç türden birine girer. Çektiğine uyanı seç. Her biri kendi rozet ailesini geliştirir.",
+      "bullet1": "Move of the Week bu haftanın hareketinin senin yorumun. Move Master rozetini kazandırır.",
+      "bullet2": "Orijinal kendi koreografin ya da serbest stilin. The Originator rozetini kazandırır.",
+      "bullet3": "Guild bir Guild dersi veya provasından bir kombo. Class Act rozetini kazandırır.",
+      "bullet4": "Herhangi bir video türündeki beğeniler Crowd Favorite rozetine de sayılır."
+    },
     "reactions": {
       "eyebrow": "TEPKİLER VE YORUMLAR",
       "title": "Diğer dansçıların yanında ol",
@@ -1883,7 +1892,7 @@
       "eyebrow": "MAĞAZA",
       "title": "Claves'lerini harca",
       "body": "Mağazayı açarak claves'lerini kozmetik ve yükseltmelere çevir.",
-      "bullet1": "Çerçeveler avatarını sarar. Unvanlar adının altında durur.",
+      "bullet1": "Çerçeveler avatarını sarar. Unvanlar adının altında durur. Envanterinde istediğin zaman tak veya değiştir.",
       "bullet2": "İkisi de Yaygın'dan Efsanevi'ye dört nadirlikte gelir.",
       "bullet3": "Kendi yuvaların bittiğinde fazladan video veya soru yuvası satın al.",
       "bullet4": "Bir Altın Bilet için biriktir ve bir Maestro ile birebir bir inceleme ayarla."

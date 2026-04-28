@@ -1853,6 +1853,15 @@
       "bullet3": "Voeg tot 5 tags toe zodat de juiste mensen het vinden.",
       "bullet4": "Markeer een bericht als Werk in Uitvoering als je zachte feedback wilt."
     },
+    "videoTypes": {
+      "eyebrow": "VIDEOTYPES",
+      "title": "Drie soorten oefenclips",
+      "body": "Elke Oefenpost past in een van drie categorieën. Kies degene die past bij wat je hebt gefilmd. Elk type bouwt zijn eigen badge-familie op.",
+      "bullet1": "Move van de week is jouw versie van de move van de week. Levert de Move Meester badge op.",
+      "bullet2": "Origineel is je eigen choreo of freestyle. Levert De Originator badge op.",
+      "bullet3": "Guild is een combo uit een Guild-les of repetitie. Levert de Klassestuk badge op.",
+      "bullet4": "Likes op elk videotype tellen ook mee voor de Publiekslieveling badge."
+    },
     "reactions": {
       "eyebrow": "REACTIES EN COMMENTAREN",
       "title": "Wees er voor andere dansers",
@@ -1883,7 +1892,7 @@
       "eyebrow": "DE WINKEL",
       "title": "Geef je claves uit",
       "body": "Open de Winkel om claves om te zetten in cosmetics en upgrades.",
-      "bullet1": "Randen omlijsten je avatar. Titels staan onder je naam.",
+      "bullet1": "Randen omlijsten je avatar. Titels staan onder je naam. Wissel ze op elk moment in je Inventaris.",
       "bullet2": "Beide komen in vier zeldzaamheden, van Gewoon tot Legendarisch.",
       "bullet3": "Koop extra video- of vraag-slots als die van jou op zijn.",
       "bullet4": "Spaar voor een Gouden Ticket en boek een 1 op 1 sessie met een Maestro."
