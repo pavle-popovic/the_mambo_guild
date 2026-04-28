@@ -328,39 +328,22 @@ function PricingPageContent() {
 
       <FadeIn>
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-10 pt-20 sm:pt-24 text-center">
-          {/* Founder Diamond CTA — only rendered when the cap data has
-              loaded AND the claim window is still open. Hidden post-deadline
-              and post-cap so we don't dangle a dead promise. */}
+          {/* Founder Diamond CTA — slim one-liner. Cap counter removed:
+              the urgency now comes from the deadline alone, not a public
+              "X of 300 left" countdown that fluctuates and adds visual
+              weight. Hidden post-deadline so we don't dangle a dead promise. */}
           {founderStatus && !founderStatus.expired && (
-            <div className="mx-auto mb-8 max-w-3xl rounded-xl border border-mambo-gold/40 bg-gradient-to-r from-mambo-gold/10 via-yellow-500/10 to-orange-500/10 px-5 py-4 sm:py-5 shadow-lg shadow-amber-900/20">
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 text-center sm:text-left">
-                <div className="flex items-center gap-2.5 shrink-0">
-                  <span className="relative flex h-2 w-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60" />
-                    <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold" />
-                  </span>
-                  <span className="text-[10px] font-bold uppercase tracking-widest text-mambo-gold">
-                    {tf("eyebrow")}
-                  </span>
-                </div>
-                <div className="text-sm leading-snug text-white/90">
-                  {tf("cta")}
-                </div>
-                <div className="shrink-0">
-                  {founderStatus.remaining > 0 ? (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-mambo-gold/20 px-3 py-1 text-xs font-bold text-mambo-gold whitespace-nowrap">
-                      {tf("seatsRemaining", {
-                        remaining: founderStatus.remaining,
-                        cap: founderStatus.cap,
-                      })}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold text-red-300 whitespace-nowrap">
-                      {tf("allClaimed")}
-                    </span>
-                  )}
-                </div>
-              </div>
+            <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-mambo-gold/30 bg-gradient-to-r from-mambo-gold/10 via-yellow-500/10 to-orange-500/10 px-3 py-1 shadow shadow-amber-900/10">
+              <span className="relative flex h-1.5 w-1.5 shrink-0">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold" />
+              </span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold whitespace-nowrap">
+                {tf("eyebrow")}
+              </span>
+              <span className="text-[11px] leading-none text-white/85 whitespace-nowrap">
+                {tf("cta")}
+              </span>
             </div>
           )}
           {/* Trust bar — pinned ABOVE the pricing tiers so the cancel-anytime
