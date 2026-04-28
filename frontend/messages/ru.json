@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "Лимит — 30 участников.",
     "guildMasterUpgrade": "Улучшить",
     "trialUpgradeTitle": "Перейти на Guild Master?",
+    "activeUpgradeBody": "Сегодня будет списана пропорциональная сумма за оставшиеся дни текущего расчётного периода, затем $59/месяц начиная со следующего продления.",
     "trialUpgradeBody": "Ваш бесплатный пробный период заканчивается сейчас, и сегодня будет списано $59 за первый месяц Guild Master.",
     "trialUpgradeConfirm": "Подтвердить переход",
     "trialUpgradeCancel": "Отмена",

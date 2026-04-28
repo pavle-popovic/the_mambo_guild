@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "Περιορισμένο σε 30 μέλη.",
     "guildMasterUpgrade": "Αναβάθμιση",
     "trialUpgradeTitle": "Αναβάθμιση σε Guild Master;",
+    "activeUpgradeBody": "Σήμερα θα χρεωθείτε ένα αναλογικό ποσό για τις υπόλοιπες ημέρες του κύκλου χρέωσής σας, στη συνέχεια $59/μήνα από την επόμενη ανανέωσή σας.",
     "trialUpgradeBody": "Η δωρεάν δοκιμή σας τελειώνει τώρα και θα χρεωθείτε $59 σήμερα για τον πρώτο σας μήνα Guild Master.",
     "trialUpgradeConfirm": "Επιβεβαίωση αναβάθμισης",
     "trialUpgradeCancel": "Ακύρωση",

@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "Limitado a 30 membros.",
     "guildMasterUpgrade": "Upgrade",
     "trialUpgradeTitle": "Mudar para Guild Master?",
+    "activeUpgradeBody": "Será cobrado um valor proporcional hoje pelos dias restantes do seu ciclo de cobrança e, em seguida, $59/mês a partir da sua próxima renovação.",
     "trialUpgradeBody": "Seu período de teste gratuito termina agora e será cobrado $59 hoje pelo seu primeiro mês de Guild Master.",
     "trialUpgradeConfirm": "Confirmar upgrade",
     "trialUpgradeCancel": "Cancelar",

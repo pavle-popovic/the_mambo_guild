@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "Limit 30 członków.",
     "guildMasterUpgrade": "Ulepsz",
     "trialUpgradeTitle": "Przejść na Guild Master?",
+    "activeUpgradeBody": "Dziś zostanie pobrana proporcjonalna kwota za pozostałe dni cyklu rozliczeniowego, a następnie $59/miesiąc od kolejnego odnowienia.",
     "trialUpgradeBody": "Twój bezpłatny okres próbny kończy się teraz i dziś zostanie pobrana opłata $59 za pierwszy miesiąc Guild Master.",
     "trialUpgradeConfirm": "Potwierdź ulepszenie",
     "trialUpgradeCancel": "Anuluj",

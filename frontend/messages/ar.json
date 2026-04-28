@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "محدود بـ 30 عضواً.",
     "guildMasterUpgrade": "ترقية",
     "trialUpgradeTitle": "الترقية إلى Guild Master؟",
+    "activeUpgradeBody": "سيتم اليوم خصم مبلغ نسبي مقابل الأيام المتبقية من دورة الفوترة، ثم $59/شهرياً ابتداءً من تجديدك القادم.",
     "trialUpgradeBody": "تنتهي تجربتك المجانية الآن وسيتم خصم $59 اليوم مقابل شهرك الأول من Guild Master.",
     "trialUpgradeConfirm": "تأكيد الترقية",
     "trialUpgradeCancel": "إلغاء",

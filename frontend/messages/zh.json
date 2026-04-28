@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "限30位会员。",
     "guildMasterUpgrade": "升级",
     "trialUpgradeTitle": "升级到 Guild Master？",
+    "activeUpgradeBody": "今天将按您当前计费周期剩余天数收取按比例计算的金额，之后从下次续费起每月收取 $59。",
     "trialUpgradeBody": "您的免费试用现在结束，今天将向您收取 $59 作为 Guild Master 第一个月费用。",
     "trialUpgradeConfirm": "确认升级",
     "trialUpgradeCancel": "取消",

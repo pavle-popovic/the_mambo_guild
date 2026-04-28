@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "Лимитирано на 30 чланова.",
     "guildMasterUpgrade": "Унапреди",
     "trialUpgradeTitle": "Прећи на Guild Master?",
+    "activeUpgradeBody": "Данас ће бити наплаћен пропорционални износ за преостале дане тренутног циклуса наплате, а затим $59/месечно од следећег обнављања.",
     "trialUpgradeBody": "Ваш бесплатни пробни период се завршава сада и данас ће бити наплаћено $59 за први месец Guild Master.",
     "trialUpgradeConfirm": "Потврди прелазак",
     "trialUpgradeCancel": "Откажи",

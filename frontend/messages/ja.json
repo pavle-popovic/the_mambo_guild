@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "30名限定。",
     "guildMasterUpgrade": "アップグレード",
     "trialUpgradeTitle": "Guild Master にアップグレードしますか？",
+    "activeUpgradeBody": "現在の請求サイクルの残り日数分の日割り金額が今日請求され、次回の更新から月額$59となります。",
     "trialUpgradeBody": "無料トライアルがここで終了し、Guild Master の初月分として今日 $59 が請求されます。",
     "trialUpgradeConfirm": "アップグレードを確定",
     "trialUpgradeCancel": "キャンセル",

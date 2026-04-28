@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "30명 한정.",
     "guildMasterUpgrade": "업그레이드",
     "trialUpgradeTitle": "Guild Master로 업그레이드할까요?",
+    "activeUpgradeBody": "오늘 현재 청구 주기의 남은 일수에 대한 일할 금액이 청구되며, 다음 갱신부터는 월 $59가 청구됩니다.",
     "trialUpgradeBody": "무료 체험이 지금 종료되며 Guild Master 첫 달 요금으로 오늘 $59가 결제됩니다.",
     "trialUpgradeConfirm": "업그레이드 확정",
     "trialUpgradeCancel": "취소",

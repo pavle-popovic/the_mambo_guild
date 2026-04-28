@@ -235,22 +235,14 @@ function PricingPageContent() {
     }
   };
 
-  // Click gate: trial-Advanced users see a confirmation step that names the
-  // immediate-charge consequence; everyone else upgrades straight through
-  // (paid Pro users are already used to monthly billing).
+  // All upgrade attempts go through a confirmation modal so the user sees
+  // exactly what they'll be charged before money moves.
   const handleUpgradeClick = () => {
     if (!user) {
       router.push(`/login?redirect=/pricing`);
       return;
     }
-    const isTrialingAdvanced =
-      (user.subscription_status || "").toLowerCase() === "trialing"
-      && (user.tier || "").toLowerCase() === "advanced";
-    if (isTrialingAdvanced) {
-      setShowTrialUpgradeModal(true);
-      return;
-    }
-    handleUpgrade();
+    setShowTrialUpgradeModal(true);
   };
 
   const handleConfirmTrialUpgrade = async () => {
@@ -656,10 +648,9 @@ function PricingPageContent() {
         type="login"
       />
 
-      {/* Trial-to-Performer upgrade confirmation. Only fires for users in
-          status=trialing on the Advanced tier. Stops the surprise-billing
-          complaint vector — clicking "Upgrade" otherwise charges $59 and
-          ends the trial in the same instant with no warning. */}
+      {/* Upgrade confirmation — shown for all Pro→Guild Master attempts.
+          Body text differs: trialing users are warned their trial ends now;
+          active users see the proration + new recurring rate. */}
       {showTrialUpgradeModal && (
         <div
           className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
@@ -680,7 +671,9 @@ function PricingPageContent() {
               {t("trialUpgradeTitle")}
             </h2>
             <p className="text-sm text-gray-300 mb-6">
-              {t("trialUpgradeBody")}
+              {(user?.subscription_status || "").toLowerCase() === "trialing"
+                ? t("trialUpgradeBody")
+                : t("activeUpgradeBody")}
             </p>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
               <button

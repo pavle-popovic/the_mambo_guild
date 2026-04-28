@@ -1203,6 +1203,7 @@
     "guildMasterCapped": "Gelimiteerd tot 30 leden.",
     "guildMasterUpgrade": "Upgrade",
     "trialUpgradeTitle": "Upgraden naar Guild Master?",
+    "activeUpgradeBody": "Vandaag wordt een bedrag pro rata in rekening gebracht voor de resterende dagen van je factureringscyclus, daarna $59/maand vanaf je volgende verlenging.",
     "trialUpgradeBody": "Je gratis proefperiode eindigt nu en er wordt vandaag $59 in rekening gebracht voor je eerste maand Guild Master.",
     "trialUpgradeConfirm": "Upgrade bevestigen",
     "trialUpgradeCancel": "Annuleren",
