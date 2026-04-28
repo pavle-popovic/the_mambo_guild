@@ -1790,5 +1790,78 @@
     "day": "Day",
     "nowPlaying": "Now Playing",
     "min": "min"
+  },
+  "communityGuide": {
+    "metaTitle": "Community Guide",
+    "backToCommunity": "Back to Community",
+    "eyebrow": "GUIDE",
+    "heading": "How the {accent} works",
+    "headingAccent": "community",
+    "subheading": "A short tour of the rooms, the rewards, and the rules. About a 3 minute read.",
+    "rooms": {
+      "eyebrow": "TWO ROOMS",
+      "title": "Practice and Discussions",
+      "body": "The community has two halves. Pick the one that fits what you need today.",
+      "bullet1": "Practice is for short clips. Post a video, get reactions and notes.",
+      "bullet2": "Discussions is for questions and ideas. Ask, reply, get help.",
+      "bullet3": "Switch between them with the tabs at the top of the feed."
+    },
+    "posting": {
+      "eyebrow": "POSTING",
+      "title": "Sharing your first post",
+      "body": "Posting is open to paid members. Free accounts can read everything.",
+      "bullet1": "Practice posts need a video up to 60 seconds and a title.",
+      "bullet2": "Discussion posts need a title and a question of at least 40 characters.",
+      "bullet3": "Add up to 5 tags so the right people find it.",
+      "bullet4": "Mark a post Work in Progress if you want gentle feedback."
+    },
+    "reactions": {
+      "eyebrow": "REACTIONS AND COMMENTS",
+      "title": "Show up for other dancers",
+      "body": "Reactions and comments are free and unlimited. They are also how you climb badges.",
+      "bullet1": "Tap the like under a post to send a reaction.",
+      "bullet2": "Comments open under every post. Reply, then reply to replies.",
+      "bullet3": "On Discussion posts, the author can mark one comment as the accepted answer."
+    },
+    "claves": {
+      "eyebrow": "CLAVES",
+      "title": "The currency you earn by showing up",
+      "body": "Claves are the in-app currency. You earn them by posting, helping, and logging in.",
+      "bullet1": "A Practice video pays 40 claves. A Discussion question pays 12.",
+      "bullet2": "An accepted answer pays 15 claves.",
+      "bullet3": "Daily logins drop a small bonus. Every 5 day streak adds more.",
+      "bullet4": "There is a daily cap and a 60 second cooldown between posts."
+    },
+    "badges": {
+      "eyebrow": "BADGES",
+      "title": "Climb the trophy case",
+      "body": "Badges sit on your profile and mark milestones. Each one comes in Bronze, Silver, Gold, and Diamond.",
+      "bullet1": "Post videos for Center Stage. Get likes for Firestarter.",
+      "bullet2": "React to others for Talent Scout. Comment often for The Socialite.",
+      "bullet3": "Get an answer accepted for The Professor.",
+      "bullet4": "Keep a streak alive for Unstoppable. Badges unlock on their own."
+    },
+    "shop": {
+      "eyebrow": "THE SHOP",
+      "title": "Spend your claves",
+      "body": "Open the Shop to turn claves into cosmetics and upgrades.",
+      "bullet1": "Borders frame your avatar. Titles sit under your name.",
+      "bullet2": "Both come in four rarities, from Common to Legendary.",
+      "bullet3": "Buy extra video or question slots when yours run out.",
+      "bullet4": "Save up for a Golden Ticket to book a 1 on 1 review with a Maestro."
+    },
+    "rules": {
+      "eyebrow": "GROUND RULES",
+      "title": "Keep the floor friendly",
+      "body": "A few simple guardrails keep this place useful for everyone.",
+      "bullet1": "Be kind. Attitude over Aptitude, always.",
+      "bullet2": "Discussion comments pass through a light filter. Practice clips do not.",
+      "bullet3": "Posts are limited per day so the feed stays signal, not noise.",
+      "bullet4": "Report anything that feels off. The team reads every flag."
+    },
+    "ctaTitle": "Ready to step on the floor?",
+    "ctaBody": "Open the community and post your first clip or question.",
+    "ctaPrimary": "Open Community",
+    "ctaSecondary": "Visit the Shop"
   }
 }

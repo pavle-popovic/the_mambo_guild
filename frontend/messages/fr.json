@@ -1790,5 +1790,78 @@
     "day": "Jour",
     "nowPlaying": "En cours de lecture",
     "min": "min"
+  },
+  "communityGuide": {
+    "metaTitle": "Guide de la Communauté",
+    "backToCommunity": "Retour à la Communauté",
+    "eyebrow": "GUIDE",
+    "heading": "Comment fonctionne la {accent}",
+    "headingAccent": "communauté",
+    "subheading": "Une visite rapide des salles, des récompenses et des règles. Environ 3 minutes de lecture.",
+    "rooms": {
+      "eyebrow": "DEUX SALLES",
+      "title": "Pratique et Discussions",
+      "body": "La communauté a deux moitiés. Choisis celle qui correspond à ce dont tu as besoin aujourd'hui.",
+      "bullet1": "Pratique est pour les clips courts. Publie une vidéo et reçois des réactions et des notes.",
+      "bullet2": "Discussions est pour les questions et les idées. Demande, réponds, obtiens de l'aide.",
+      "bullet3": "Bascule entre les deux avec les onglets en haut du fil."
+    },
+    "posting": {
+      "eyebrow": "PUBLIER",
+      "title": "Partager ta première publication",
+      "body": "Publier est ouvert aux membres payants. Les comptes gratuits peuvent tout lire.",
+      "bullet1": "Les publications de Pratique demandent une vidéo jusqu'à 60 secondes et un titre.",
+      "bullet2": "Les publications de Discussion demandent un titre et une question d'au moins 40 caractères.",
+      "bullet3": "Ajoute jusqu'à 5 tags pour que les bonnes personnes la trouvent.",
+      "bullet4": "Marque une publication comme Travail en Cours si tu veux des commentaires doux."
+    },
+    "reactions": {
+      "eyebrow": "RÉACTIONS ET COMMENTAIRES",
+      "title": "Soutiens les autres danseurs",
+      "body": "Les réactions et les commentaires sont gratuits et illimités. C'est aussi comme ça que tu grimpes les badges.",
+      "bullet1": "Appuie sur le like sous une publication pour envoyer une réaction.",
+      "bullet2": "Les commentaires s'ouvrent sous chaque publication. Réponds, puis réponds aux réponses.",
+      "bullet3": "Sur les publications de Discussion, l'auteur peut marquer un commentaire comme réponse acceptée."
+    },
+    "claves": {
+      "eyebrow": "CLAVES",
+      "title": "La monnaie que tu gagnes en étant présent",
+      "body": "Les Claves sont la monnaie dans l'app. Tu en gagnes en publiant, en aidant et en te connectant.",
+      "bullet1": "Une vidéo de Pratique paie 40 claves. Une question de Discussion paie 12.",
+      "bullet2": "Une réponse acceptée paie 15 claves.",
+      "bullet3": "Les connexions quotidiennes donnent un petit bonus. Chaque série de 5 jours en ajoute.",
+      "bullet4": "Il y a un plafond quotidien et 60 secondes d'attente entre les publications."
+    },
+    "badges": {
+      "eyebrow": "BADGES",
+      "title": "Grimpe la vitrine à trophées",
+      "body": "Les badges sont sur ton profil et marquent les étapes. Chacun vient en Bronze, Argent, Or et Diamant.",
+      "bullet1": "Publie des vidéos pour Sous les Projecteurs. Reçois des likes pour Met le Feu.",
+      "bullet2": "Réagis aux autres pour Dénicheur de Talents. Commente souvent pour Mondain.",
+      "bullet3": "Obtiens une réponse acceptée pour Le Professeur.",
+      "bullet4": "Garde une série en vie pour Inarrêtable. Les badges se débloquent tout seuls."
+    },
+    "shop": {
+      "eyebrow": "LA BOUTIQUE",
+      "title": "Dépense tes claves",
+      "body": "Ouvre la Boutique pour transformer tes claves en cosmétiques et améliorations.",
+      "bullet1": "Les cadres encadrent ton avatar. Les titres se posent sous ton nom.",
+      "bullet2": "Les deux viennent en quatre raretés, de Commun à Légendaire.",
+      "bullet3": "Achète des places vidéo ou question en plus quand les tiennes sont épuisées.",
+      "bullet4": "Économise pour un Ticket Doré et réserve une séance en tête à tête avec un Maestro."
+    },
+    "rules": {
+      "eyebrow": "RÈGLES DE BASE",
+      "title": "Garde la piste accueillante",
+      "body": "Quelques garde-fous simples gardent cet endroit utile pour tout le monde.",
+      "bullet1": "Sois gentil. L'Attitude avant l'Aptitude, toujours.",
+      "bullet2": "Les commentaires de Discussion passent par un filtre léger. Les clips de Pratique non.",
+      "bullet3": "Les publications sont limitées par jour pour que le fil reste utile, pas bruyant.",
+      "bullet4": "Signale tout ce qui semble louche. L'équipe lit chaque alerte."
+    },
+    "ctaTitle": "Prêt à entrer sur la piste ?",
+    "ctaBody": "Ouvre la communauté et publie ton premier clip ou ta première question.",
+    "ctaPrimary": "Ouvrir la Communauté",
+    "ctaSecondary": "Visiter la Boutique"
   }
 }

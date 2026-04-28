@@ -1790,5 +1790,78 @@
     "day": "Dzień",
     "nowPlaying": "Aktualnie odtwarzane",
     "min": "min"
+  },
+  "communityGuide": {
+    "metaTitle": "Przewodnik po Społeczności",
+    "backToCommunity": "Wróć do Społeczności",
+    "eyebrow": "PRZEWODNIK",
+    "heading": "Jak działa {accent}",
+    "headingAccent": "społeczność",
+    "subheading": "Krótka wycieczka po pokojach, nagrodach i zasadach. Około 3 minut czytania.",
+    "rooms": {
+      "eyebrow": "DWA POKOJE",
+      "title": "Praktyka i Dyskusje",
+      "body": "Społeczność ma dwie połowy. Wybierz tę, która pasuje do tego, czego potrzebujesz dziś.",
+      "bullet1": "Praktyka jest na krótkie klipy. Wrzuć wideo i odbierz reakcje i komentarze.",
+      "bullet2": "Dyskusje są na pytania i pomysły. Pytaj, odpowiadaj, proś o pomoc.",
+      "bullet3": "Przełączaj się między nimi zakładkami u góry kanału."
+    },
+    "posting": {
+      "eyebrow": "PUBLIKOWANIE",
+      "title": "Twój pierwszy wpis",
+      "body": "Publikowanie jest dla płacących członków. Darmowe konta mogą czytać wszystko.",
+      "bullet1": "Wpisy w Praktyce wymagają wideo do 60 sekund i tytułu.",
+      "bullet2": "Wpisy w Dyskusjach wymagają tytułu i pytania o długości co najmniej 40 znaków.",
+      "bullet3": "Dodaj do 5 tagów, żeby właściwe osoby znalazły wpis.",
+      "bullet4": "Oznacz wpis jako Praca w toku, jeśli chcesz łagodnych komentarzy."
+    },
+    "reactions": {
+      "eyebrow": "REAKCJE I KOMENTARZE",
+      "title": "Bądź tam dla innych tancerzy",
+      "body": "Reakcje i komentarze są darmowe i nieograniczone. Tak też zdobywasz odznaki.",
+      "bullet1": "Stuknij polubienie pod wpisem, by wysłać reakcję.",
+      "bullet2": "Komentarze są otwarte pod każdym wpisem. Odpowiadaj, a potem odpowiadaj na odpowiedzi.",
+      "bullet3": "W Dyskusjach autor może oznaczyć jeden komentarz jako zaakceptowaną odpowiedź."
+    },
+    "claves": {
+      "eyebrow": "CLAVES",
+      "title": "Waluta, którą zdobywasz, gdy się pojawiasz",
+      "body": "Claves to waluta w aplikacji. Zdobywasz ją za publikowanie, pomaganie i logowanie.",
+      "bullet1": "Wideo z Praktyki daje 40 claves. Pytanie z Dyskusji daje 12.",
+      "bullet2": "Zaakceptowana odpowiedź daje 15 claves.",
+      "bullet3": "Codzienne logowanie daje mały bonus. Co 5 dni z rzędu dorzuca więcej.",
+      "bullet4": "Jest dzienny limit i 60 sekund przerwy między wpisami."
+    },
+    "badges": {
+      "eyebrow": "ODZNAKI",
+      "title": "Wspinaj się po gablocie trofeów",
+      "body": "Odznaki siedzą na twoim profilu i wyznaczają kamienie milowe. Każda jest w Brązie, Srebrze, Złocie i Diamencie.",
+      "bullet1": "Wrzucaj wideo dla Na Środku Sceny. Łap polubienia dla Podpalacza.",
+      "bullet2": "Reaguj na innych dla Łowcy Talentów. Komentuj często dla Duszy Towarzystwa.",
+      "bullet3": "Niech twoja odpowiedź zostanie zaakceptowana dla Profesora.",
+      "bullet4": "Utrzymuj passę dla Nie Do Zatrzymania. Odznaki odblokowują się same."
+    },
+    "shop": {
+      "eyebrow": "SKLEP",
+      "title": "Wydaj swoje claves",
+      "body": "Otwórz Sklep, by zamienić claves na kosmetyki i ulepszenia.",
+      "bullet1": "Ramki oprawiają twój awatar. Tytuły siedzą pod twoim imieniem.",
+      "bullet2": "Oba mają cztery rzadkości, od Pospolitej do Legendarnej.",
+      "bullet3": "Kupuj dodatkowe sloty na wideo lub pytania, gdy twoje się skończą.",
+      "bullet4": "Uzbieraj na Złoty Bilet i umów sesję 1 na 1 z Maestro."
+    },
+    "rules": {
+      "eyebrow": "ZASADY",
+      "title": "Trzymaj parkiet przyjaznym",
+      "body": "Kilka prostych barierek utrzymuje to miejsce użytecznym dla wszystkich.",
+      "bullet1": "Bądź miły. Postawa przed Umiejętnością, zawsze.",
+      "bullet2": "Komentarze w Dyskusjach przechodzą przez lekki filtr. Klipy z Praktyki nie.",
+      "bullet3": "Wpisy mają dzienny limit, żeby kanał był sygnałem, a nie szumem.",
+      "bullet4": "Zgłaszaj wszystko, co wydaje się nie tak. Zespół czyta każde zgłoszenie."
+    },
+    "ctaTitle": "Gotów wejść na parkiet?",
+    "ctaBody": "Otwórz społeczność i opublikuj pierwszy klip albo pytanie.",
+    "ctaPrimary": "Otwórz Społeczność",
+    "ctaSecondary": "Odwiedź Sklep"
   }
 }

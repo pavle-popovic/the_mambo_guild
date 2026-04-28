@@ -1790,5 +1790,78 @@
     "day": "Dag",
     "nowPlaying": "Nu aan het afspelen",
     "min": "min"
+  },
+  "communityGuide": {
+    "metaTitle": "Community Gids",
+    "backToCommunity": "Terug naar Community",
+    "eyebrow": "GIDS",
+    "heading": "Hoe de {accent} werkt",
+    "headingAccent": "community",
+    "subheading": "Een korte rondleiding langs de kamers, beloningen en regels. Ongeveer 3 minuten lezen.",
+    "rooms": {
+      "eyebrow": "TWEE KAMERS",
+      "title": "Oefenen en Discussies",
+      "body": "De community heeft twee helften. Kies degene die past bij wat je vandaag nodig hebt.",
+      "bullet1": "Oefenen is voor korte clips. Plaats een video en krijg reacties en notities.",
+      "bullet2": "Discussies is voor vragen en ideeën. Vraag, antwoord, krijg hulp.",
+      "bullet3": "Wissel tussen beide met de tabs bovenaan de feed."
+    },
+    "posting": {
+      "eyebrow": "PLAATSEN",
+      "title": "Je eerste bericht delen",
+      "body": "Plaatsen staat open voor betalende leden. Gratis accounts kunnen alles lezen.",
+      "bullet1": "Oefen-berichten hebben een video tot 60 seconden en een titel nodig.",
+      "bullet2": "Discussie-berichten hebben een titel en een vraag van minstens 40 tekens nodig.",
+      "bullet3": "Voeg tot 5 tags toe zodat de juiste mensen het vinden.",
+      "bullet4": "Markeer een bericht als Werk in Uitvoering als je zachte feedback wilt."
+    },
+    "reactions": {
+      "eyebrow": "REACTIES EN COMMENTAREN",
+      "title": "Wees er voor andere dansers",
+      "body": "Reacties en commentaren zijn gratis en onbeperkt. Zo klim je ook in de badges.",
+      "bullet1": "Tik op de like onder een bericht om een reactie te sturen.",
+      "bullet2": "Onder elk bericht staan commentaren open. Reageer, en reageer op reacties.",
+      "bullet3": "In Discussie-berichten kan de auteur één commentaar markeren als geaccepteerd antwoord."
+    },
+    "claves": {
+      "eyebrow": "CLAVES",
+      "title": "De munt die je verdient door op te dagen",
+      "body": "Claves zijn de munt in de app. Je verdient ze door te plaatsen, te helpen en in te loggen.",
+      "bullet1": "Een Oefen-video levert 40 claves. Een Discussie-vraag levert 12.",
+      "bullet2": "Een geaccepteerd antwoord levert 15 claves.",
+      "bullet3": "Dagelijkse logins geven een kleine bonus. Elke reeks van 5 dagen voegt meer toe.",
+      "bullet4": "Er is een daglimiet en 60 seconden wachten tussen berichten."
+    },
+    "badges": {
+      "eyebrow": "BADGES",
+      "title": "Klim de prijzenkast op",
+      "body": "Badges staan op je profiel en markeren mijlpalen. Elk komt in Brons, Zilver, Goud en Diamant.",
+      "bullet1": "Plaats video's voor In de Schijnwerpers. Krijg likes voor Vuurmaker.",
+      "bullet2": "Reageer op anderen voor Talentenspotter. Reageer vaak voor Sociale Ster.",
+      "bullet3": "Krijg een antwoord geaccepteerd voor De Professor.",
+      "bullet4": "Houd een reeks levend voor Niet Te Stoppen. Badges ontgrendelen vanzelf."
+    },
+    "shop": {
+      "eyebrow": "DE WINKEL",
+      "title": "Geef je claves uit",
+      "body": "Open de Winkel om claves om te zetten in cosmetics en upgrades.",
+      "bullet1": "Randen omlijsten je avatar. Titels staan onder je naam.",
+      "bullet2": "Beide komen in vier zeldzaamheden, van Gewoon tot Legendarisch.",
+      "bullet3": "Koop extra video- of vraag-slots als die van jou op zijn.",
+      "bullet4": "Spaar voor een Gouden Ticket en boek een 1 op 1 sessie met een Maestro."
+    },
+    "rules": {
+      "eyebrow": "BASISREGELS",
+      "title": "Houd de vloer vriendelijk",
+      "body": "Een paar simpele vangrails houden deze plek nuttig voor iedereen.",
+      "bullet1": "Wees aardig. Houding boven Aanleg, altijd.",
+      "bullet2": "Discussie-commentaren gaan door een licht filter. Oefen-clips niet.",
+      "bullet3": "Berichten zijn beperkt per dag zodat de feed signaal blijft, geen ruis.",
+      "bullet4": "Meld alles wat verkeerd voelt. Het team leest elke melding."
+    },
+    "ctaTitle": "Klaar om de dansvloer op te stappen?",
+    "ctaBody": "Open de community en plaats je eerste clip of vraag.",
+    "ctaPrimary": "Open Community",
+    "ctaSecondary": "Bezoek de Winkel"
   }
 }

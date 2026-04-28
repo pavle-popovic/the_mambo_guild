@@ -1790,5 +1790,78 @@
     "day": "Dia",
     "nowPlaying": "A reproduzir",
     "min": "min"
+  },
+  "communityGuide": {
+    "metaTitle": "Guia da Comunidade",
+    "backToCommunity": "Voltar à Comunidade",
+    "eyebrow": "GUIA",
+    "heading": "Como funciona a {accent}",
+    "headingAccent": "comunidade",
+    "subheading": "Um passeio rápido pelas salas, recompensas e regras. Cerca de 3 minutos de leitura.",
+    "rooms": {
+      "eyebrow": "DUAS SALAS",
+      "title": "Prática e Discussões",
+      "body": "A comunidade tem duas metades. Escolha a que encaixa no que você precisa hoje.",
+      "bullet1": "Prática é para clipes curtos. Poste um vídeo e receba reações e comentários.",
+      "bullet2": "Discussões é para perguntas e ideias. Pergunte, responda, peça ajuda.",
+      "bullet3": "Alterne entre elas pelas abas no topo do feed."
+    },
+    "posting": {
+      "eyebrow": "PUBLICAR",
+      "title": "Sua primeira publicação",
+      "body": "Publicar é para membros pagantes. Contas gratuitas podem ler tudo.",
+      "bullet1": "Publicações de Prática precisam de um vídeo de até 60 segundos e um título.",
+      "bullet2": "Publicações de Discussão precisam de um título e uma pergunta com pelo menos 40 caracteres.",
+      "bullet3": "Adicione até 5 tags para que as pessoas certas encontrem.",
+      "bullet4": "Marque uma publicação como Trabalho em Progresso se quiser comentários suaves."
+    },
+    "reactions": {
+      "eyebrow": "REAÇÕES E COMENTÁRIOS",
+      "title": "Apareça por outros dançarinos",
+      "body": "Reações e comentários são gratuitos e ilimitados. Também é como você sobe nas insígnias.",
+      "bullet1": "Toque no like abaixo de uma publicação para enviar uma reação.",
+      "bullet2": "Os comentários ficam abertos sob cada publicação. Responda, e depois responda às respostas.",
+      "bullet3": "Em publicações de Discussão, o autor pode marcar um comentário como resposta aceita."
+    },
+    "claves": {
+      "eyebrow": "CLAVES",
+      "title": "A moeda que você ganha aparecendo",
+      "body": "Claves são a moeda dentro do app. Você ganha publicando, ajudando e entrando todo dia.",
+      "bullet1": "Um vídeo de Prática paga 40 claves. Uma pergunta de Discussão paga 12.",
+      "bullet2": "Uma resposta aceita paga 15 claves.",
+      "bullet3": "Os logins diários dão um pequeno bônus. Cada sequência de 5 dias soma mais.",
+      "bullet4": "Há um teto diário e um intervalo de 60 segundos entre publicações."
+    },
+    "badges": {
+      "eyebrow": "INSÍGNIAS",
+      "title": "Suba na vitrine de troféus",
+      "body": "As insígnias aparecem no seu perfil e marcam marcos. Cada uma vem em Bronze, Prata, Ouro e Diamante.",
+      "bullet1": "Poste vídeos para Centro do Palco. Receba likes para Fogo no Palco.",
+      "bullet2": "Reaja aos outros para Caçador de Talentos. Comente muito para Estrela Social.",
+      "bullet3": "Tenha uma resposta aceita para O Professor.",
+      "bullet4": "Mantenha uma sequência viva para Imparável. As insígnias se desbloqueiam sozinhas."
+    },
+    "shop": {
+      "eyebrow": "A LOJA",
+      "title": "Gaste seus claves",
+      "body": "Abra a Loja para transformar claves em cosméticos e upgrades.",
+      "bullet1": "Bordas emolduram seu avatar. Títulos ficam sob seu nome.",
+      "bullet2": "Ambos vêm em quatro raridades, de Comum a Lendária.",
+      "bullet3": "Compre vagas extras de vídeo ou pergunta quando as suas acabarem.",
+      "bullet4": "Junte para um Bilhete Dourado e marque uma sessão 1 a 1 com um Maestro."
+    },
+    "rules": {
+      "eyebrow": "REGRAS BÁSICAS",
+      "title": "Mantenha a pista amigável",
+      "body": "Algumas regras simples mantêm este lugar útil para todos.",
+      "bullet1": "Seja gentil. Atitude antes de Aptidão, sempre.",
+      "bullet2": "Os comentários de Discussão passam por um filtro leve. Os clipes de Prática não.",
+      "bullet3": "As publicações têm um limite diário para o feed ser sinal e não ruído.",
+      "bullet4": "Reporte qualquer coisa estranha. A equipe lê cada aviso."
+    },
+    "ctaTitle": "Pronto para pisar na pista?",
+    "ctaBody": "Abra a comunidade e poste seu primeiro clipe ou pergunta.",
+    "ctaPrimary": "Abrir Comunidade",
+    "ctaSecondary": "Visitar a Loja"
   }
 }

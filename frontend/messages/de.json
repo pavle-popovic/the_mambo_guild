@@ -1790,5 +1790,78 @@
     "day": "Tag",
     "nowPlaying": "Wird abgespielt",
     "min": "Min."
+  },
+  "communityGuide": {
+    "metaTitle": "Community-Leitfaden",
+    "backToCommunity": "Zurück zur Community",
+    "eyebrow": "LEITFADEN",
+    "heading": "Wie die {accent} funktioniert",
+    "headingAccent": "Community",
+    "subheading": "Ein kurzer Rundgang durch die Räume, die Belohnungen und die Regeln. Etwa 3 Minuten Lesezeit.",
+    "rooms": {
+      "eyebrow": "ZWEI RÄUME",
+      "title": "Übung und Diskussionen",
+      "body": "Die Community hat zwei Hälften. Wähle die, die zu dem passt, was du heute brauchst.",
+      "bullet1": "Übung ist für kurze Clips. Poste ein Video, hol dir Reaktionen und Notizen.",
+      "bullet2": "Diskussionen ist für Fragen und Ideen. Frag, antworte, hol dir Hilfe.",
+      "bullet3": "Wechsle zwischen ihnen mit den Tabs oben im Feed."
+    },
+    "posting": {
+      "eyebrow": "POSTEN",
+      "title": "Dein erster Beitrag",
+      "body": "Posten ist für zahlende Mitglieder offen. Kostenlose Konten können alles lesen.",
+      "bullet1": "Übungs-Beiträge brauchen ein Video bis zu 60 Sekunden und einen Titel.",
+      "bullet2": "Diskussions-Beiträge brauchen einen Titel und eine Frage mit mindestens 40 Zeichen.",
+      "bullet3": "Füge bis zu 5 Tags hinzu, damit die richtigen Leute ihn finden.",
+      "bullet4": "Markiere einen Beitrag als Work in Progress, wenn du sanftes Feedback willst."
+    },
+    "reactions": {
+      "eyebrow": "REAKTIONEN UND KOMMENTARE",
+      "title": "Sei für andere Tänzer da",
+      "body": "Reaktionen und Kommentare sind gratis und unbegrenzt. So kletterst du auch bei den Abzeichen hoch.",
+      "bullet1": "Tippe auf das Like unter einem Beitrag, um eine Reaktion zu senden.",
+      "bullet2": "Kommentare öffnen sich unter jedem Beitrag. Antworte, dann antworte auf Antworten.",
+      "bullet3": "Bei Diskussions-Beiträgen kann der Autor einen Kommentar als angenommene Antwort markieren."
+    },
+    "claves": {
+      "eyebrow": "CLAVES",
+      "title": "Die Währung, die du dir verdienst, wenn du da bist",
+      "body": "Claves sind die In-App-Währung. Du verdienst sie durch Posten, Helfen und Einloggen.",
+      "bullet1": "Ein Übungs-Video bringt 40 Claves. Eine Diskussions-Frage bringt 12.",
+      "bullet2": "Eine angenommene Antwort bringt 15 Claves.",
+      "bullet3": "Tägliche Logins geben einen kleinen Bonus. Jede 5-Tage-Serie legt mehr drauf.",
+      "bullet4": "Es gibt ein Tageslimit und 60 Sekunden Wartezeit zwischen Beiträgen."
+    },
+    "badges": {
+      "eyebrow": "ABZEICHEN",
+      "title": "Klettere die Trophäen-Vitrine hoch",
+      "body": "Abzeichen sitzen auf deinem Profil und markieren Meilensteine. Jedes kommt in Bronze, Silber, Gold und Diamant.",
+      "bullet1": "Poste Videos für Im Rampenlicht. Hol dir Likes für Funkenschläger.",
+      "bullet2": "Reagiere auf andere für Talentscout. Kommentiere oft für Geselligkeitstalent.",
+      "bullet3": "Erhalte eine angenommene Antwort für Der Professor.",
+      "bullet4": "Halte eine Serie am Leben für Unaufhaltsam. Abzeichen schalten sich von selbst frei."
+    },
+    "shop": {
+      "eyebrow": "DER SHOP",
+      "title": "Gib deine Claves aus",
+      "body": "Öffne den Shop, um Claves in Kosmetik und Upgrades zu verwandeln.",
+      "bullet1": "Rahmen umrahmen deinen Avatar. Titel stehen unter deinem Namen.",
+      "bullet2": "Beide kommen in vier Seltenheitsgraden, von Gewöhnlich bis Legendär.",
+      "bullet3": "Kaufe extra Video- oder Fragen-Slots, wenn deine ausgehen.",
+      "bullet4": "Spare auf ein Goldenes Ticket und buche eine 1-zu-1-Session mit einem Maestro."
+    },
+    "rules": {
+      "eyebrow": "GRUNDREGELN",
+      "title": "Halte die Tanzfläche freundlich",
+      "body": "Ein paar einfache Leitplanken halten diesen Ort für alle nützlich.",
+      "bullet1": "Sei nett. Haltung vor Können, immer.",
+      "bullet2": "Diskussions-Kommentare laufen durch einen leichten Filter. Übungs-Clips nicht.",
+      "bullet3": "Beiträge sind pro Tag begrenzt, damit der Feed Signal bleibt, nicht Lärm.",
+      "bullet4": "Melde alles, was sich falsch anfühlt. Das Team liest jede Meldung."
+    },
+    "ctaTitle": "Bereit, auf die Tanzfläche zu treten?",
+    "ctaBody": "Öffne die Community und poste deinen ersten Clip oder deine erste Frage.",
+    "ctaPrimary": "Community öffnen",
+    "ctaSecondary": "Shop besuchen"
   }
 }

@@ -1790,5 +1790,78 @@
     "day": "Día",
     "nowPlaying": "Reproduciendo ahora",
     "min": "min"
+  },
+  "communityGuide": {
+    "metaTitle": "Guía de la Comunidad",
+    "backToCommunity": "Volver a la Comunidad",
+    "eyebrow": "GUÍA",
+    "heading": "Cómo funciona la {accent}",
+    "headingAccent": "comunidad",
+    "subheading": "Un recorrido breve por las salas, las recompensas y las reglas. Unos 3 minutos de lectura.",
+    "rooms": {
+      "eyebrow": "DOS SALAS",
+      "title": "Práctica y Discusiones",
+      "body": "La comunidad tiene dos mitades. Elige la que te encaje hoy.",
+      "bullet1": "Práctica es para clips cortos. Sube un vídeo y recibe reacciones y comentarios.",
+      "bullet2": "Discusiones es para preguntas e ideas. Pregunta, responde y consigue ayuda.",
+      "bullet3": "Cambia entre ellas con las pestañas en la parte de arriba del feed."
+    },
+    "posting": {
+      "eyebrow": "PUBLICAR",
+      "title": "Tu primera publicación",
+      "body": "Publicar está abierto a miembros de pago. Las cuentas gratuitas pueden leerlo todo.",
+      "bullet1": "Las publicaciones de Práctica necesitan un vídeo de hasta 60 segundos y un título.",
+      "bullet2": "Las publicaciones de Discusión necesitan un título y una pregunta de al menos 40 caracteres.",
+      "bullet3": "Añade hasta 5 etiquetas para que la gente adecuada lo encuentre.",
+      "bullet4": "Marca la publicación como Trabajo en Progreso si quieres comentarios suaves."
+    },
+    "reactions": {
+      "eyebrow": "REACCIONES Y COMENTARIOS",
+      "title": "Apoya a otros bailarines",
+      "body": "Las reacciones y los comentarios son gratis e ilimitados. También son la forma de subir insignias.",
+      "bullet1": "Toca el like debajo de una publicación para enviar una reacción.",
+      "bullet2": "Los comentarios se abren bajo cada publicación. Responde, y luego responde a las respuestas.",
+      "bullet3": "En las publicaciones de Discusión, el autor puede marcar un comentario como respuesta aceptada."
+    },
+    "claves": {
+      "eyebrow": "CLAVES",
+      "title": "La moneda que ganas por aparecer",
+      "body": "Los Claves son la moneda dentro de la app. Los ganas al publicar, ayudar y entrar cada día.",
+      "bullet1": "Un vídeo de Práctica paga 40 claves. Una pregunta de Discusión paga 12.",
+      "bullet2": "Una respuesta aceptada paga 15 claves.",
+      "bullet3": "Los inicios de sesión diarios dan un pequeño bono. Cada racha de 5 días suma más.",
+      "bullet4": "Hay un tope diario y una espera de 60 segundos entre publicaciones."
+    },
+    "badges": {
+      "eyebrow": "INSIGNIAS",
+      "title": "Sube por la vitrina de trofeos",
+      "body": "Las insignias se ven en tu perfil y marcan hitos. Cada una viene en Bronce, Plata, Oro y Diamante.",
+      "bullet1": "Sube vídeos para Centro del Escenario. Recibe likes para Encendedor.",
+      "bullet2": "Reacciona a otros para Cazatalentos. Comenta a menudo para Alma Social.",
+      "bullet3": "Consigue una respuesta aceptada para El Profesor.",
+      "bullet4": "Mantén una racha viva para Imparable. Las insignias se desbloquean solas."
+    },
+    "shop": {
+      "eyebrow": "LA TIENDA",
+      "title": "Gasta tus claves",
+      "body": "Abre la Tienda para convertir claves en cosméticos y mejoras.",
+      "bullet1": "Los marcos rodean tu avatar. Los títulos se ponen bajo tu nombre.",
+      "bullet2": "Ambos vienen en cuatro rarezas, de Común a Legendaria.",
+      "bullet3": "Compra ranuras extra de vídeo o pregunta cuando se te acaben las tuyas.",
+      "bullet4": "Ahorra para un Boleto Dorado y reserva una sesión 1 a 1 con un Maestro."
+    },
+    "rules": {
+      "eyebrow": "REGLAS BÁSICAS",
+      "title": "Mantén la pista amable",
+      "body": "Unas pocas barreras simples mantienen este lugar útil para todos.",
+      "bullet1": "Sé amable. Actitud antes que Aptitud, siempre.",
+      "bullet2": "Los comentarios de Discusión pasan por un filtro ligero. Los clips de Práctica no.",
+      "bullet3": "Las publicaciones tienen un límite diario para que el feed sea señal y no ruido.",
+      "bullet4": "Reporta cualquier cosa que se sienta mal. El equipo lee cada aviso."
+    },
+    "ctaTitle": "¿Listo para entrar a la pista?",
+    "ctaBody": "Abre la comunidad y publica tu primer clip o pregunta.",
+    "ctaPrimary": "Abrir Comunidad",
+    "ctaSecondary": "Visitar la Tienda"
   }
 }

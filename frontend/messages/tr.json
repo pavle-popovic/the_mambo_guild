@@ -1790,5 +1790,78 @@
     "day": "Gün",
     "nowPlaying": "Şimdi Oynatılıyor",
     "min": "dk"
+  },
+  "communityGuide": {
+    "metaTitle": "Topluluk Kılavuzu",
+    "backToCommunity": "Topluluğa Dön",
+    "eyebrow": "KILAVUZ",
+    "heading": "{accent} nasıl çalışır",
+    "headingAccent": "topluluk",
+    "subheading": "Odaların, ödüllerin ve kuralların kısa bir turu. Yaklaşık 3 dakikalık okuma.",
+    "rooms": {
+      "eyebrow": "İKİ ODA",
+      "title": "Pratik ve Tartışmalar",
+      "body": "Topluluğun iki yarısı var. Bugün ihtiyacın olana uygun olanı seç.",
+      "bullet1": "Pratik kısa klipler içindir. Bir video paylaş, tepki ve not al.",
+      "bullet2": "Tartışmalar sorular ve fikirler içindir. Sor, yanıtla, yardım al.",
+      "bullet3": "Akışın üstündeki sekmelerle ikisi arasında geçiş yap."
+    },
+    "posting": {
+      "eyebrow": "PAYLAŞIM",
+      "title": "İlk paylaşımını yapma",
+      "body": "Paylaşım ücretli üyelere açık. Ücretsiz hesaplar her şeyi okuyabilir.",
+      "bullet1": "Pratik gönderileri en fazla 60 saniyelik bir video ve başlık ister.",
+      "bullet2": "Tartışma gönderileri en az 40 karakterlik bir soru ve başlık ister.",
+      "bullet3": "Doğru kişilerin bulması için en fazla 5 etiket ekle.",
+      "bullet4": "Yumuşak geri bildirim istiyorsan gönderini Çalışmada olarak işaretle."
+    },
+    "reactions": {
+      "eyebrow": "TEPKİLER VE YORUMLAR",
+      "title": "Diğer dansçıların yanında ol",
+      "body": "Tepkiler ve yorumlar ücretsiz ve sınırsızdır. Aynı zamanda rozet basamaklarını da böyle çıkarsın.",
+      "bullet1": "Tepki göndermek için gönderinin altındaki beğeniye dokun.",
+      "bullet2": "Yorumlar her gönderinin altında açıktır. Yanıtla, sonra yanıtlara yanıt ver.",
+      "bullet3": "Tartışma gönderilerinde yazar bir yorumu kabul edilen yanıt olarak işaretleyebilir."
+    },
+    "claves": {
+      "eyebrow": "CLAVES",
+      "title": "Görünerek kazandığın para birimi",
+      "body": "Claves uygulama içi para birimidir. Paylaşarak, yardım ederek ve giriş yaparak kazanırsın.",
+      "bullet1": "Bir Pratik videosu 40 claves verir. Bir Tartışma sorusu 12 verir.",
+      "bullet2": "Kabul edilmiş bir yanıt 15 claves verir.",
+      "bullet3": "Günlük girişler küçük bir bonus düşürür. Her 5 günlük seri daha fazlasını ekler.",
+      "bullet4": "Günlük bir üst sınır ve gönderiler arasında 60 saniyelik bekleme vardır."
+    },
+    "badges": {
+      "eyebrow": "ROZETLER",
+      "title": "Kupa vitrinini tırman",
+      "body": "Rozetler profilinde durur ve dönüm noktalarını işaretler. Her biri Bronz, Gümüş, Altın ve Elmas olarak gelir.",
+      "bullet1": "Video paylaşarak Center Stage rozetini topla. Beğeni alarak Firestarter rozetini topla.",
+      "bullet2": "Başkalarına tepki vererek Talent Scout. Sık yorum yaparak The Socialite.",
+      "bullet3": "Bir yanıtın kabul edilirse The Professor.",
+      "bullet4": "Bir seriyi yaşat ve Unstoppable rozetini al. Rozetler kendiliğinden açılır."
+    },
+    "shop": {
+      "eyebrow": "MAĞAZA",
+      "title": "Claves'lerini harca",
+      "body": "Mağazayı açarak claves'lerini kozmetik ve yükseltmelere çevir.",
+      "bullet1": "Çerçeveler avatarını sarar. Unvanlar adının altında durur.",
+      "bullet2": "İkisi de Yaygın'dan Efsanevi'ye dört nadirlikte gelir.",
+      "bullet3": "Kendi yuvaların bittiğinde fazladan video veya soru yuvası satın al.",
+      "bullet4": "Bir Altın Bilet için biriktir ve bir Maestro ile birebir bir inceleme ayarla."
+    },
+    "rules": {
+      "eyebrow": "TEMEL KURALLAR",
+      "title": "Pisti dostane tut",
+      "body": "Birkaç basit korkuluk burayı herkes için yararlı kılar.",
+      "bullet1": "Nazik ol. Her zaman Tutum Yetenek'ten önce gelir.",
+      "bullet2": "Tartışma yorumları hafif bir filtreden geçer. Pratik klipleri geçmez.",
+      "bullet3": "Akışın gürültü değil sinyal kalması için günlük gönderi sınırı vardır.",
+      "bullet4": "Yanlış gibi gelen her şeyi bildir. Ekip her bildirimi okur."
+    },
+    "ctaTitle": "Piste çıkmaya hazır mısın?",
+    "ctaBody": "Topluluğu aç ve ilk klibini ya da sorunu paylaş.",
+    "ctaPrimary": "Topluluğu Aç",
+    "ctaSecondary": "Mağazayı Ziyaret Et"
   }
 }
