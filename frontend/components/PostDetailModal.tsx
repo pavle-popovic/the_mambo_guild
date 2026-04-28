@@ -719,14 +719,33 @@ export default function PostDetailModal({
                       ) : (
                         // Full Mux player (only loads after user taps).
                         // Wrapper hugs the video's native aspect once
-                        // metadata loads — no letterboxing → no shadow-DOM
-                        // object-fit retry → no startup compositing churn.
+                        // metadata loads. Plus: transform/will-change/
+                        // isolation are deliberate — they force Chrome
+                        // to composite the video as part of the page
+                        // instead of using the hardware-video-overlay
+                        // path, which has a desktop bug for this site
+                        // (DevTools-open masks it because DevTools also
+                        // disables hw overlays). Without these the
+                        // video plays in slow-mo / stutters.
                         <div
                           className="relative rounded-lg overflow-hidden bg-black mx-auto"
                           style={
                             videoAspect
-                              ? { aspectRatio: videoAspect, maxHeight: "70vh", maxWidth: "100%" }
-                              : { maxHeight: "70vh", aspectRatio: "9 / 16" }
+                              ? {
+                                  aspectRatio: videoAspect,
+                                  maxHeight: "70vh",
+                                  maxWidth: "100%",
+                                  transform: "translateZ(0)",
+                                  willChange: "transform",
+                                  isolation: "isolate",
+                                }
+                              : {
+                                  maxHeight: "70vh",
+                                  aspectRatio: "9 / 16",
+                                  transform: "translateZ(0)",
+                                  willChange: "transform",
+                                  isolation: "isolate",
+                                }
                           }
                         >
                           <MuxVideoPlayer
