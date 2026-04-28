@@ -11,8 +11,15 @@ import { useAuth } from "@/contexts/AuthContext";
 export default function NewHero() {
     const t = useTranslations("landing.hero");
     const tSubscribed = useTranslations("landing.subscribed");
+    const tPricing = useTranslations("pricingPage");
     const { user } = useAuth();
     const isSubscribed = user?.tier === "advanced" || user?.tier === "performer";
+    // Logged-in but not subscribed: if they already used their trial, the CTA
+    // must say "Subscribe" and go to /pricing, not /register.
+    const unsubscribedCtaLabel = user?.has_used_trial
+        ? tPricing("proSubscribeNoTrial")
+        : t("cta");
+    const unsubscribedCtaHref = user ? "/pricing" : "/register";
     const bulletPoints = [
         t("bulletNoPartner"),
         t("bulletLanguages"),
@@ -239,10 +246,10 @@ export default function NewHero() {
                             </div>
                         ) : (
                             <Link
-                                href="/register"
+                                href={unsubscribedCtaHref}
                                 className="relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3 px-7 xl:py-3.5 xl:px-8 rounded-full text-base xl:text-lg whitespace-nowrap transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50 landscape-phone:!py-2 landscape-phone:!px-4 landscape-phone:!text-[11px]"
                             >
-                                {t("cta")}
+                                {unsubscribedCtaLabel}
                             </Link>
                         )}
                     </motion.div>
@@ -281,10 +288,10 @@ export default function NewHero() {
                         </div>
                     ) : (
                         <Link
-                            href="/register"
+                            href={unsubscribedCtaHref}
                             className="w-full relative bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black font-extrabold py-3.5 px-6 rounded-full text-sm transition-all transform hover:-translate-y-1 hover:brightness-110 text-center shadow-[0_0_25px_rgba(252,226,5,0.45),0_0_50px_rgba(212,175,55,0.2)] ring-2 ring-amber-400/50"
                         >
-                            {t("cta")}
+                            {unsubscribedCtaLabel}
                         </Link>
                     )}
                 </motion.div>
