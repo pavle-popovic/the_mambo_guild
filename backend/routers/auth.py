@@ -563,7 +563,16 @@ def get_current_user_profile(
         )
 
     subscription = db.query(Subscription).filter(Subscription.user_id == current_user.id).first()
-    tier = subscription.tier if subscription else "rookie"
+    # Only surface a paid tier when the subscription is in a billable state.
+    # INCOMPLETE means checkout was created but Stripe hasn't confirmed payment
+    # yet — treat it the same as ROOKIE so the frontend doesn't show "Current
+    # Plan" on a tier the user hasn't actually paid for.
+    _PAID_STATUSES = {SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING, SubscriptionStatus.PAST_DUE}
+    tier = (
+        subscription.tier
+        if subscription and subscription.status in _PAID_STATUSES
+        else SubscriptionTier.ROOKIE
+    )
     cancel_at_period_end = bool(subscription.cancel_at_period_end) if subscription else False
     period_end = subscription.current_period_end if subscription else None
     sub_status = subscription.status.value if subscription and subscription.status else None
