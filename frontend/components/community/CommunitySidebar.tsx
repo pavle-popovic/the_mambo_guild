@@ -102,15 +102,24 @@ export default function CommunitySidebar({
             {/* Community Guide CTA */}
             <Link
                 href="/community/guide"
-                className="group flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#FCE205]/40 hover:bg-white/[0.06] transition-all"
+                className="group relative overflow-hidden flex items-center gap-3 px-3 sm:px-4 py-3 rounded-xl bg-gradient-to-r from-[#FCE205]/[0.10] via-[#FCE205]/[0.06] to-[#D4AF37]/[0.04] border border-[#FCE205]/30 hover:border-[#FCE205]/60 hover:from-[#FCE205]/[0.18] hover:to-[#D4AF37]/[0.10] transition-colors shadow-[0_0_18px_rgba(252,226,5,0.08)] hover:shadow-[0_0_24px_rgba(252,226,5,0.18)]"
             >
-                <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-white/70 group-hover:text-[#FCE205] transition-colors">
-                    <BookOpen size={14} />
+                {/* Shine sweep on hover */}
+                <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-y-0 left-0 w-1/2 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-[220%] transition-transform duration-[1100ms] ease-out"
+                />
+                <div className="relative flex-shrink-0 w-8 h-8 rounded-lg bg-gradient-to-br from-[#FCE205] to-[#D4AF37] flex items-center justify-center text-black shadow-lg shadow-[#FCE205]/25">
+                    <BookOpen size={14} strokeWidth={2.5} />
                 </div>
-                <span className="flex-1 text-sm font-medium text-white/70 group-hover:text-white transition-colors truncate">
-                    {tGuide("metaTitle")}
-                </span>
-                <span className="text-white/30 group-hover:text-[#FCE205] transition-colors text-sm">→</span>
+                <div className="relative flex-1 min-w-0">
+                    <div className="font-serif tracking-wide text-[13px] sm:text-sm font-bold text-[#FCE205] group-hover:text-amber-100 leading-tight break-words drop-shadow-[0_0_8px_rgba(252,226,5,0.25)]">
+                        {tGuide("metaTitle")}
+                    </div>
+                    <div className="text-[9px] sm:text-[10px] text-white/40 uppercase tracking-wider mt-0.5">
+                        {tGuide("eyebrow")} →
+                    </div>
+                </div>
             </Link>
 
             {/* Shop CTA */}
