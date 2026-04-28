@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useMemo, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Search, X, Tv, FlaskConical, ChevronDown, Bookmark, ShoppingBag } from "lucide-react";
+import { Plus, Search, X, Tv, FlaskConical, ChevronDown, Bookmark, ShoppingBag, BookOpen } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import NavBar from "@/components/NavBar";
@@ -55,6 +55,7 @@ type ViewMode = "stage" | "lab" | "saved" | "my_posts";
 export default function CommunityPage() {
     const t = useTranslations("community");
     const tShop = useTranslations("shop");
+    const tGuide = useTranslations("communityGuide");
     const router = useRouter();
     const { user, loading: authLoading } = useAuth();
     const [viewMode, setViewMode] = useState<ViewMode>("stage");
@@ -313,6 +314,27 @@ export default function CommunityPage() {
 
                     {/* Mobile Header — search, toggle, filters */}
                     <div className="lg:hidden col-span-12 order-1 sticky top-16 z-40 bg-black/80 backdrop-blur-xl -mx-4 px-4 pb-3 pt-2 border-b border-white/10">
+                        {/* Community Guide CTA — sits above the search bar so
+                            new users land on the tutorial before scrolling
+                            into the feed. Same gold/shine treatment as the
+                            desktop sidebar version, compressed to one row. */}
+                        <Link
+                            href="/community/guide"
+                            className="group relative overflow-hidden flex items-center gap-2.5 mb-2.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[#FCE205]/[0.10] via-[#FCE205]/[0.06] to-[#D4AF37]/[0.04] border border-[#FCE205]/30 active:bg-[#FCE205]/[0.16] transition-colors shadow-[0_0_18px_rgba(252,226,5,0.08)]"
+                        >
+                            <span
+                                aria-hidden
+                                className="pointer-events-none absolute inset-y-0 left-0 w-1/2 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent group-hover:translate-x-[220%] transition-transform duration-[1100ms] ease-out"
+                            />
+                            <div className="relative flex-shrink-0 w-7 h-7 rounded-lg bg-gradient-to-br from-[#FCE205] to-[#D4AF37] flex items-center justify-center text-black shadow-md shadow-[#FCE205]/25">
+                                <BookOpen size={13} strokeWidth={2.5} />
+                            </div>
+                            <span className="relative flex-1 min-w-0 font-serif tracking-wide text-[13px] font-bold text-[#FCE205] leading-tight break-words drop-shadow-[0_0_8px_rgba(252,226,5,0.25)]">
+                                {tGuide("metaTitle")}
+                            </span>
+                            <span className="relative text-[#FCE205]/70 text-sm">→</span>
+                        </Link>
+
                         {/* Search Bar — Shop link sits inside the trailing
                             slot so it doesn't fight for space in the
                             filter row below. */}
