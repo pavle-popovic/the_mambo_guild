@@ -10,6 +10,7 @@ import PurchaseModal from "@/components/shop/PurchaseModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient, type ShopItem } from "@/lib/api";
 import { useTranslations } from "@/i18n/useTranslations";
+import { BookOpen } from "lucide-react";
 
 type TabKind = "ticket" | "border" | "title" | "utility";
 
@@ -22,6 +23,7 @@ export default function ShopPage() {
   const router = useRouter();
   const { user, loading: authLoading, refreshUser } = useAuth();
   const t = useTranslations("shop");
+  const tGuide = useTranslations("communityGuide");
   const [activeTab, setActiveTab] = useState<TabKind>("border");
   const [items, setItems] = useState<ShopItem[]>([]);
   const [inventory, setInventory] = useState<Set<string>>(new Set());
@@ -100,7 +102,7 @@ export default function ShopPage() {
         <header className="mb-10 text-center">
           <h1 className="text-4xl md:text-5xl font-black tracking-tight">{t("pageTitle")}</h1>
           <p className="text-white/60 mt-3 max-w-2xl mx-auto">{t("pageSubtitle")}</p>
-          <div className="mt-6 inline-flex items-center gap-6 bg-white/5 rounded-full px-6 py-2 border border-white/10">
+          <div className="mt-6 inline-flex flex-wrap items-center justify-center gap-x-6 gap-y-2 bg-white/5 rounded-full px-6 py-2 border border-white/10">
             <span className="text-white/60 text-sm">{t("balanceLabel")}</span>
             <span className="text-amber-300 font-bold text-lg">
               {balance} <span className="text-xs">🥢</span>
@@ -110,6 +112,13 @@ export default function ShopPage() {
               className="text-sm text-white/80 hover:text-amber-300 underline underline-offset-2"
             >
               {t("viewInventory")}
+            </Link>
+            <Link
+              href="/community/guide"
+              className="inline-flex items-center gap-1.5 text-sm text-white/80 hover:text-amber-300 underline underline-offset-2"
+            >
+              <BookOpen size={13} />
+              {tGuide("metaTitle")}
             </Link>
           </div>
         </header>

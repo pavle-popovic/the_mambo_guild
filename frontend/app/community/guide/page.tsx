@@ -16,6 +16,7 @@ import {
 import type { ReactNode } from "react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTranslations } from "@/i18n/useTranslations";
 
 const easeOut = [0.25, 0.1, 0.25, 1] as const;
@@ -58,6 +59,7 @@ function GoldDot() {
 
 export default function CommunityGuidePage() {
   const t = useTranslations("communityGuide");
+  const { user } = useAuth();
 
   const sections: Section[] = [
     {
@@ -106,7 +108,13 @@ export default function CommunityGuidePage() {
 
   return (
     <>
-      <NavBar />
+      <NavBar
+        user={
+          user
+            ? { ...user, avatar_url: user.avatar_url || undefined }
+            : undefined
+        }
+      />
       <main className="min-h-screen bg-mambo-dark text-mambo-text">
         {/* ─── Hero ─────────────────────────────────────────────────────── */}
         <section

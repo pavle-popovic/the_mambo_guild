@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { ShoppingBag, Package } from "lucide-react";
+import { ShoppingBag, Package, BookOpen } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { apiClient } from "@/lib/api";
@@ -74,6 +74,7 @@ function formatDate(dateString: string): string {
 
 export function WalletModal({ isOpen, onClose }: WalletModalProps) {
   const tShop = useTranslations("shop");
+  const tGuide = useTranslations("communityGuide");
   const [wallet, setWallet] = useState<WalletData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isClaiming, setIsClaiming] = useState(false);
@@ -185,7 +186,7 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
                 </div>
 
                 {/* Shop CTA */}
-                <div className="mb-4 grid grid-cols-2 gap-2">
+                <div className="mb-2 grid grid-cols-2 gap-2">
                   <Link
                     href="/shop"
                     onClick={onClose}
@@ -203,6 +204,17 @@ export function WalletModal({ isOpen, onClose }: WalletModalProps) {
                     <span className="truncate">{tShop("inventoryTitle")}</span>
                   </Link>
                 </div>
+
+                {/* Community Guide link */}
+                <Link
+                  href="/community/guide"
+                  onClick={onClose}
+                  className="mb-4 group flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-white/[0.03] border border-white/10 hover:bg-white/[0.06] hover:border-white/20 transition-all text-white/70 hover:text-white text-xs font-medium"
+                >
+                  <BookOpen size={13} />
+                  <span className="truncate">{tGuide("metaTitle")}</span>
+                  <span className="text-white/30 group-hover:text-white/60 transition-colors">→</span>
+                </Link>
 
                 {/* Video Slots */}
                 <div className="mb-4 p-3 rounded-lg bg-white/5 border border-white/10">

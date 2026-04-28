@@ -3,7 +3,7 @@
 import { useMemo } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Tv, FlaskConical, Bookmark, ShoppingBag } from "lucide-react";
+import { Tv, FlaskConical, Bookmark, ShoppingBag, BookOpen } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslations } from "@/i18n/useTranslations";
 
@@ -32,6 +32,7 @@ export default function CommunitySidebar({
 }: CommunitySidebarProps) {
     const t = useTranslations("community");
     const tShop = useTranslations("shop");
+    const tGuide = useTranslations("communityGuide");
     const levels = [
         { id: "level-1", label: t("beginner"), value: "beginner", keywords: ["beginner", "level 1", "level-1", "I"] },
         { id: "level-2", label: t("intermediate"), value: "intermediate", keywords: ["intermediate", "level 2", "level-2", "II"] },
@@ -97,6 +98,20 @@ export default function CommunitySidebar({
 
             {/* Separator */}
             <div className="h-px bg-gradient-to-r from-transparent via-white/10 to-transparent" />
+
+            {/* Community Guide CTA */}
+            <Link
+                href="/community/guide"
+                className="group flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/[0.03] border border-white/10 hover:border-[#FCE205]/40 hover:bg-white/[0.06] transition-all"
+            >
+                <div className="flex-shrink-0 w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-white/70 group-hover:text-[#FCE205] transition-colors">
+                    <BookOpen size={14} />
+                </div>
+                <span className="flex-1 text-sm font-medium text-white/70 group-hover:text-white transition-colors truncate">
+                    {tGuide("metaTitle")}
+                </span>
+                <span className="text-white/30 group-hover:text-[#FCE205] transition-colors text-sm">→</span>
+            </Link>
 
             {/* Shop CTA */}
             <Link
