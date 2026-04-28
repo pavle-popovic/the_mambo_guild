@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Guild Masterを維持",
     "downgradeConfirm": "了解しました、Proにダウングレードします",
     "downgradeProcessing": "ダウングレード中...",
-    "contactPrompt": "ご質問は下記までメール"
+    "contactPrompt": "ご質問は下記までメール",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "2026年5月6日までに無料トライアルを開始してバッジを獲得しよう",
+      "seatsRemaining": "ファウンダー枠 残り {remaining} / {cap}",
+      "allClaimed": "300のファウンダー枠はすべて埋まりました"
+    }
   },
   "instructors": {
     "pageTitle": "インストラクター紹介",

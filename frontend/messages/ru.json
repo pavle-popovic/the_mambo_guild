@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Оставить Guild Master",
     "downgradeConfirm": "Понятно, перейти на Pro",
     "downgradeProcessing": "Понижение тарифа...",
-    "contactPrompt": "Вопросы? Напишите на"
+    "contactPrompt": "Вопросы? Напишите на",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Получите значок, активировав бесплатную пробную версию до 6 мая 2026 года",
+      "seatsRemaining": "Осталось {remaining} / {cap} мест основателей",
+      "allClaimed": "Все 300 мест основателей заняты"
+    }
   },
   "instructors": {
     "pageTitle": "Познакомьтесь со своими инструкторами",

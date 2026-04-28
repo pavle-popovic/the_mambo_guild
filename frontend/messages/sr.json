@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Задржи Guild Master",
     "downgradeConfirm": "Разумем, пребаци на Pro",
     "downgradeProcessing": "Деградација...",
-    "contactPrompt": "Питања? Пошаљи имејл на"
+    "contactPrompt": "Питања? Пошаљи имејл на",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Освоји свој беџ покретањем бесплатне пробе пре 6. маја 2026.",
+      "seatsRemaining": "Преостало оснивачких места: {remaining} / {cap}",
+      "allClaimed": "Свих 300 оснивачких места је попуњено"
+    }
   },
   "instructors": {
     "pageTitle": "Упознај своје инструкторе",

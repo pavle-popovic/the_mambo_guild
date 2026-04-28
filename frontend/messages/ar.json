@@ -1229,7 +1229,13 @@
     "downgradeKeep": "الاحتفاظ بـ Guild Master",
     "downgradeConfirm": "أتفهّم، قم بالتراجع إلى Pro",
     "downgradeProcessing": "جاري التراجع...",
-    "contactPrompt": "أسئلة؟ راسلنا على"
+    "contactPrompt": "أسئلة؟ راسلنا على",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "احصل على شارتك ببدء تجربتك المجانية قبل 6 مايو 2026",
+      "seatsRemaining": "متبقٍ {remaining} / {cap} مقعد مؤسس",
+      "allClaimed": "تم حجز جميع مقاعد المؤسسين الـ 300"
+    }
   },
   "instructors": {
     "pageTitle": "تعرّف على مدرّبيك",

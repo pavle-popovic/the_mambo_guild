@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Guild Master'ı Koru",
     "downgradeConfirm": "Anladım, Pro'ya düşür",
     "downgradeProcessing": "Düşürülüyor...",
-    "contactPrompt": "Sorular? E-posta gönder"
+    "contactPrompt": "Sorular? E-posta gönder",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "6 Mayıs 2026'dan önce ücretsiz denemeni başlatarak rozetini al",
+      "seatsRemaining": "{remaining} / {cap} kurucu koltuğu kaldı",
+      "allClaimed": "300 kurucu koltuğunun tamamı doldu"
+    }
   },
   "instructors": {
     "pageTitle": "Eğitmenlerinle Tanış",

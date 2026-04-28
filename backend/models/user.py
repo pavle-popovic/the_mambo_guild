@@ -81,6 +81,11 @@ class UserProfile(Base):
     # Streak Freezes System
     weekly_free_freeze_used = Column(Boolean, default=False, nullable=False)
     has_used_trial = Column(Boolean, default=False, nullable=False, server_default="false")
+    # Durable marker: this account originally came in via the velvet-rope
+    # waitlist. Stays true after auth_provider flips from 'waitlist' to
+    # 'email' on /reset-password claim, so the Founder Diamond trial gate
+    # in the Stripe webhook can still recognise former waitlisters.
+    was_waitlister = Column(Boolean, default=False, nullable=False, server_default="false")
     inventory_freezes = Column(Integer, default=0, nullable=False)
     last_freeze_reset_date = Column(Date, nullable=True)  # Track weekly reset
 

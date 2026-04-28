@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Zachowaj Guild Master",
     "downgradeConfirm": "Rozumiem, obniż do Pro",
     "downgradeProcessing": "Obniżanie...",
-    "contactPrompt": "Pytania? Napisz na"
+    "contactPrompt": "Pytania? Napisz na",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Odbierz swoją odznakę, aktywując bezpłatny okres próbny przed 6 maja 2026",
+      "seatsRemaining": "Pozostało miejsc założyciela: {remaining} / {cap}",
+      "allClaimed": "Wszystkie 300 miejsc założyciela zajęte"
+    }
   },
   "instructors": {
     "pageTitle": "Poznaj swoich instruktorów",

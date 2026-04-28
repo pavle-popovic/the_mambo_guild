@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Guild Master behalten",
     "downgradeConfirm": "Verstanden, auf Pro herabstufen",
     "downgradeProcessing": "Wird herabgestuft...",
-    "contactPrompt": "Fragen? Schreib an"
+    "contactPrompt": "Fragen? Schreib an",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Sichere dir dein Abzeichen mit deiner kostenlosen Testphase vor dem 6. Mai 2026",
+      "seatsRemaining": "Noch {remaining} / {cap} Founder-Plätze frei",
+      "allClaimed": "Alle 300 Founder-Plätze sind vergeben"
+    }
   },
   "instructors": {
     "pageTitle": "Lerne deine Instruktoren kennen",

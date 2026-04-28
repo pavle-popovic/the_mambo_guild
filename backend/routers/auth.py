@@ -1177,7 +1177,11 @@ def join_waitlist(
             current_level_tag=CurrentLevelTag.BEGINNER,
             referral_code=new_referral_code,
             referred_by_code=request.referrer_code,
-            badges="[]"
+            badges="[]",
+            # Durable origin marker. Survives the auth_provider flip on
+            # /reset-password claim so the Founder Diamond gate in the
+            # Stripe webhook can still recognise this user as eligible.
+            was_waitlister=True,
         )
         db.add(profile)
 
@@ -1189,15 +1193,13 @@ def join_waitlist(
             status=SubscriptionStatus.INCOMPLETE
         )
         db.add(subscription)
-        
+
         db.commit() # Commit to generate IDs
 
-        # Award Founder Badge
-        from services import badge_service
-        try:
-            badge_service.award_badge(str(user_id), "founder_diamond", db)
-        except Exception as e:
-            logger.error(f"Failed to award founder badge: {e}")
+        # NOTE: Founder Diamond is no longer auto-awarded at waitlist
+        # signup. The gated rule (capped 300 seats, deadline 2026-05-06
+        # 18:00 UTC) is enforced in the Stripe webhook when this user
+        # starts a subscription. See services/founder_badge_service.py.
 
         # NOTE: referrer promoter-milestone check also deferred to claim time.
         # See /reset-password handler for the payout + milestone logic.

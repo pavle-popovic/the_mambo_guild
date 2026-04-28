@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Manter Guild Master",
     "downgradeConfirm": "Entendi, fazer downgrade para Pro",
     "downgradeProcessing": "Fazendo downgrade...",
-    "contactPrompt": "Dúvidas? Envie e-mail para"
+    "contactPrompt": "Dúvidas? Envie e-mail para",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Garanta seu badge ativando o teste gratuito antes de 6 de maio de 2026",
+      "seatsRemaining": "{remaining} / {cap} vagas de fundador restantes",
+      "allClaimed": "As 300 vagas de fundador foram preenchidas"
+    }
   },
   "instructors": {
     "pageTitle": "Conheça seus Instrutores",

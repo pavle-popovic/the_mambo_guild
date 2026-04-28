@@ -1093,6 +1093,16 @@ class ApiClient {
     }>("/api/payments/guild-master-seats");
   }
 
+  async getFounderBadgeStatus() {
+    return this.request<{
+      claimed: number;
+      remaining: number;
+      cap: number;
+      deadline: string;
+      expired: boolean;
+    }>("/api/founder-badge/status");
+  }
+
   async createPortalSession(returnUrl: string) {
     return this.request<{ url: string }>("/api/payments/create-portal-session", {
       method: "POST",

@@ -872,6 +872,25 @@ async def stripe_webhook(
                     )
                 except Exception:
                     logger.exception("webhook: StartTrial tracking failed (non-fatal)")
+
+            # Founder Diamond — gated claim. Fires once per user, on the
+            # first webhook that promotes them to TRIALING or ACTIVE.
+            # Cap (300) and deadline (2026-05-06 18:00 UTC) enforced
+            # inside try_claim with a Postgres advisory lock. Wrapped
+            # so any failure here never blocks the rest of the webhook.
+            if db_status in (SubscriptionStatus.TRIALING, SubscriptionStatus.ACTIVE):
+                try:
+                    from services.founder_badge_service import try_claim as _founder_try_claim
+                    position = _founder_try_claim(db_subscription.user_id, db)
+                    if position is not None:
+                        db.commit()
+                        logger.info(
+                            "webhook: founder_diamond claimed at position "
+                            "%d by user %s", position, db_subscription.user_id,
+                        )
+                except Exception:
+                    logger.exception("webhook: founder_diamond claim failed (non-fatal)")
+                    db.rollback()
         else:
             # Both lookups missed. Most likely the subscription was created
             # in Stripe with no resolvable user_id metadata (e.g. legacy

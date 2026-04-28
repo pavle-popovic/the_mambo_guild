@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Κράτα Guild Master",
     "downgradeConfirm": "Κατάλαβα, υποβάθμιση σε Pro",
     "downgradeProcessing": "Υποβάθμιση...",
-    "contactPrompt": "Απορίες; Στείλε email"
+    "contactPrompt": "Απορίες; Στείλε email",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Διεκδίκησε το σήμα σου ξεκινώντας τη δωρεάν δοκιμή πριν τις 6 Μαΐου 2026",
+      "seatsRemaining": "Απομένουν {remaining} / {cap} θέσεις ιδρυτή",
+      "allClaimed": "Και οι 300 θέσεις ιδρυτή έχουν καλυφθεί"
+    }
   },
   "instructors": {
     "pageTitle": "Γνώρισε τους Δασκάλους σου",

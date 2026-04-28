@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Garder Guild Master",
     "downgradeConfirm": "Je comprends, rétrograder vers Pro",
     "downgradeProcessing": "Rétrogradation en cours...",
-    "contactPrompt": "Des questions ? Écrivez à"
+    "contactPrompt": "Des questions ? Écrivez à",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Obtenez votre badge en activant votre essai gratuit avant le 6 mai 2026",
+      "seatsRemaining": "{remaining} / {cap} places de fondateur restantes",
+      "allClaimed": "Les 300 places de fondateur sont prises"
+    }
   },
   "instructors": {
     "pageTitle": "Rencontrez vos instructeurs",

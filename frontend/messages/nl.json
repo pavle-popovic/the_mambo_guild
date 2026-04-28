@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Behoud Guild Master",
     "downgradeConfirm": "Ik begrijp het, downgrade naar Pro",
     "downgradeProcessing": "Downgraden...",
-    "contactPrompt": "Vragen? Mail naar"
+    "contactPrompt": "Vragen? Mail naar",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Claim je badge door je gratis proefperiode te starten vóór 6 mei 2026",
+      "seatsRemaining": "Nog {remaining} / {cap} founder-plekken vrij",
+      "allClaimed": "Alle 300 founder-plekken zijn vergeven"
+    }
   },
   "instructors": {
     "pageTitle": "Ontmoet je Instructeurs",

@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Keep Guild Master",
     "downgradeConfirm": "I understand, downgrade to Pro",
     "downgradeProcessing": "Downgrading...",
-    "contactPrompt": "Questions? Email"
+    "contactPrompt": "Questions? Email",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Claim your badge by getting your free trial before 6 May 2026",
+      "seatsRemaining": "{remaining} / {cap} founder seats left",
+      "allClaimed": "All 300 founder seats claimed"
+    }
   },
   "instructors": {
     "pageTitle": "Meet Your Instructors",

@@ -225,7 +225,7 @@ class UserBadge(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True)
     badge_id = Column(String(50), ForeignKey("badge_definitions.id"), nullable=False)
-    
+
     earned_at = Column(DateTime, default=datetime.utcnow, nullable=False)
     display_order = Column(Integer, default=0)  # For custom profile sorting
 
@@ -237,6 +237,25 @@ class UserBadge(Base):
     __table_args__ = (
         UniqueConstraint("user_id", "badge_id", name="unique_user_badge"),
     )
+
+
+class FounderClaim(Base):
+    """
+    One row per user who has claimed a Founder Diamond seat under the
+    new gated rule (waitlister + started a subscription before the
+    May 6 18:00 UTC cutoff). Cap of 300 enforced at the application
+    layer with a Postgres advisory lock; this table only enforces
+    uniqueness per user and per claim_position.
+
+    Pre-existing badge holders are NOT in this table — they have
+    until the cutoff to start a trial and earn a row, otherwise
+    the revocation sweep removes their badge.
+    """
+    __tablename__ = "founder_claims"
+
+    user_id = Column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
+    claim_position = Column(Integer, nullable=False, unique=True, index=True)
+    claimed_at = Column(DateTime(timezone=True), default=datetime.utcnow, nullable=False)
 
 
 class UserStats(Base):

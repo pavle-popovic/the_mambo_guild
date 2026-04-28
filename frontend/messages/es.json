@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Mantener Guild Master",
     "downgradeConfirm": "Entiendo, bajar a Pro",
     "downgradeProcessing": "Bajando de plan...",
-    "contactPrompt": "¿Preguntas? Escríbenos a"
+    "contactPrompt": "¿Preguntas? Escríbenos a",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Reclama tu insignia activando tu prueba gratuita antes del 6 de mayo de 2026",
+      "seatsRemaining": "Quedan {remaining} / {cap} plazas de fundador",
+      "allClaimed": "Las 300 plazas de fundador están agotadas"
+    }
   },
   "instructors": {
     "pageTitle": "Conoce a tus Instructores",

@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Guild Master 유지",
     "downgradeConfirm": "이해했습니다, Pro로 다운그레이드",
     "downgradeProcessing": "다운그레이드 중...",
-    "contactPrompt": "궁금한 점이 있나요? 이메일"
+    "contactPrompt": "궁금한 점이 있나요? 이메일",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "2026년 5월 6일 전에 무료 체험을 시작하고 배지를 획득하세요",
+      "seatsRemaining": "파운더 자리 {remaining} / {cap} 남음",
+      "allClaimed": "300개 파운더 자리가 모두 채워졌습니다"
+    }
   },
   "instructors": {
     "pageTitle": "강사진 소개",

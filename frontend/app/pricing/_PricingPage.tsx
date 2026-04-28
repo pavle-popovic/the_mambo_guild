@@ -21,6 +21,7 @@ import { useTranslations } from "@/i18n/useTranslations";
 
 function PricingPageContent() {
   const t = useTranslations("pricingPage");
+  const tf = useTranslations("pricingPage.founderBadge");
   const tp = useTranslations("landing.pricing");
   const tr = useTranslations("roundtable");
   const { user, refreshUser } = useAuth();
@@ -28,6 +29,16 @@ function PricingPageContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
+  // Founder Diamond seat counter — capped at 300, deadline 2026-05-06
+  // 18:00 UTC. Status fetched once on mount; the 30s edge cache on the
+  // backend keeps the number reasonably fresh on a quick page reload.
+  const [founderStatus, setFounderStatus] = useState<{
+    claimed: number;
+    remaining: number;
+    cap: number;
+    deadline: string;
+    expired: boolean;
+  } | null>(null);
   // Trial-Advanced users upgrading to Performer trigger an immediate $59
   // charge AND end their free trial NOW (see backend update_subscription
   // path that sets trial_end="now"). Without a confirmation step, users
@@ -60,6 +71,14 @@ function PricingPageContent() {
       })
       .catch((err) => {
         console.error("Failed to fetch Guild Master seats:", err);
+      });
+    apiClient
+      .getFounderBadgeStatus()
+      .then((s) => {
+        if (!cancelled) setFounderStatus(s);
+      })
+      .catch((err) => {
+        console.error("Failed to fetch Founder badge status:", err);
       });
     return () => {
       cancelled = true;
@@ -292,6 +311,41 @@ function PricingPageContent() {
 
       <FadeIn>
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-10 pt-20 sm:pt-24 text-center">
+          {/* Founder Diamond CTA — only rendered when the cap data has
+              loaded AND the claim window is still open. Hidden post-deadline
+              and post-cap so we don't dangle a dead promise. */}
+          {founderStatus && !founderStatus.expired && (
+            <div className="mx-auto mb-8 max-w-3xl rounded-xl border border-mambo-gold/40 bg-gradient-to-r from-mambo-gold/10 via-yellow-500/10 to-orange-500/10 px-5 py-4 sm:py-5 shadow-lg shadow-amber-900/20">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 text-center sm:text-left">
+                <div className="flex items-center gap-2.5 shrink-0">
+                  <span className="relative flex h-2 w-2">
+                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60" />
+                    <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold" />
+                  </span>
+                  <span className="text-[10px] font-bold uppercase tracking-widest text-mambo-gold">
+                    {tf("eyebrow")}
+                  </span>
+                </div>
+                <div className="text-sm leading-snug text-white/90">
+                  {tf("cta")}
+                </div>
+                <div className="shrink-0">
+                  {founderStatus.remaining > 0 ? (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-mambo-gold/20 px-3 py-1 text-xs font-bold text-mambo-gold whitespace-nowrap">
+                      {tf("seatsRemaining", {
+                        remaining: founderStatus.remaining,
+                        cap: founderStatus.cap,
+                      })}
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 rounded-full bg-red-500/20 px-3 py-1 text-xs font-bold text-red-300 whitespace-nowrap">
+                      {tf("allClaimed")}
+                    </span>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
           <StaggerContainer className="grid md:grid-cols-3 gap-4 sm:gap-8 max-w-6xl mx-auto">
             {/* Rookie Tier */}
             <StaggerItem>

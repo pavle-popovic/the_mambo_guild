@@ -1229,7 +1229,13 @@
     "downgradeKeep": "Mantieni Guild Master",
     "downgradeConfirm": "Ho capito, effettua il downgrade a Pro",
     "downgradeProcessing": "Downgrade in corso...",
-    "contactPrompt": "Domande? Scrivi a"
+    "contactPrompt": "Domande? Scrivi a",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "Ottieni il tuo badge attivando la prova gratuita entro il 6 maggio 2026",
+      "seatsRemaining": "{remaining} / {cap} posti da fondatore disponibili",
+      "allClaimed": "Tutti i 300 posti da fondatore sono esauriti"
+    }
   },
   "instructors": {
     "pageTitle": "Incontra i Tuoi Istruttori",

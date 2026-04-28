@@ -1229,7 +1229,13 @@
     "downgradeKeep": "保留 Guild Master",
     "downgradeConfirm": "我已了解，降级到 Pro",
     "downgradeProcessing": "降级中...",
-    "contactPrompt": "有问题？请发邮件至"
+    "contactPrompt": "有问题？请发邮件至",
+    "founderBadge": {
+      "eyebrow": "Founder Diamond",
+      "cta": "在2026年5月6日前开启免费试用，领取你的徽章",
+      "seatsRemaining": "创始人席位剩余 {remaining} / {cap}",
+      "allClaimed": "300个创始人席位已全部领完"
+    }
   },
   "instructors": {
     "pageTitle": "认识你的导师",

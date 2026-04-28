@@ -40,6 +40,9 @@ from .analytics import router as analytics_router
 # The Guild Shop
 from .shop import router as shop_router
 
+# Founder Diamond — public seat counter for /pricing
+from .founder import router as founder_router
+
 # Register routers
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(courses_router, prefix="/courses", tags=["courses"])
@@ -77,3 +80,6 @@ api_router.include_router(analytics_router, prefix="/analytics", tags=["analytic
 
 # The Guild Shop
 api_router.include_router(shop_router, tags=["shop"])
+
+# Founder Diamond — public seat counter for /pricing
+api_router.include_router(founder_router, tags=["founder"])
