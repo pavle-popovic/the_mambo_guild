@@ -15,6 +15,7 @@ from pydantic import BaseModel, Field
 from services.email_service import (
     send_ambassador_application_email,
     send_bug_report_email,
+    send_review_email,
 )
 from services.redis_service import check_rate_limit
 from services.storage_service import get_storage_service
@@ -202,6 +203,60 @@ def submit_ambassador_application(
         raise HTTPException(
             status_code=500,
             detail="Could not send your application right now. Please try again or email pavlepopovic@themamboguild.com directly.",
+        )
+
+    return {"status": "ok"}
+
+
+class ReviewSubmissionRequest(BaseModel):
+    name: str = Field(..., min_length=2, max_length=120)
+    email: str = Field(..., min_length=5, max_length=320)
+    rating: int = Field(..., ge=1, le=5)
+    role: Optional[str] = Field(None, max_length=200)
+    message: str = Field(..., min_length=20, max_length=4000)
+    page_url: str = Field(..., max_length=2000)
+
+
+@router.post("/review")
+def submit_review(payload: ReviewSubmissionRequest, request: Request):
+    """
+    Receive a "Give Review" submission from the landing page testimonials section
+    and forward it to support@themamboguild.com. Unauthenticated so anyone who
+    has tried the platform can leave feedback.
+
+    Rate-limited to 5 submissions per IP per hour to blunt spam.
+    """
+    client_ip = _client_ip(request)
+
+    if not _EMAIL_RE.match(payload.email.strip()):
+        raise HTTPException(status_code=400, detail="Please enter a valid email address.")
+
+    if not check_rate_limit(
+        identifier=client_ip,
+        action="review_submission",
+        max_requests=5,
+        window_seconds=3600,
+    ):
+        logger.warning(f"Review submission rate limit exceeded for IP {client_ip}")
+        raise HTTPException(
+            status_code=429,
+            detail="You've already sent a few reviews. Please wait a bit before sending another, or email support@themamboguild.com directly.",
+        )
+
+    sent = send_review_email(
+        reviewer_name=payload.name.strip(),
+        reviewer_email=payload.email.strip(),
+        rating=payload.rating,
+        role=(payload.role or "").strip() or None,
+        message=payload.message.strip(),
+        page_url=payload.page_url,
+        client_ip=client_ip,
+    )
+
+    if not sent:
+        raise HTTPException(
+            status_code=500,
+            detail="Could not send your review right now. Please try again or email support@themamboguild.com directly.",
         )
 
     return {"status": "ok"}

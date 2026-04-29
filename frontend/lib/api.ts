@@ -671,6 +671,24 @@ class ApiClient {
     );
   }
 
+  // Review submission (landing page testimonials section)
+  async submitReview(payload: {
+    name: string;
+    email: string;
+    rating: number;
+    role: string | null;
+    message: string;
+    page_url: string;
+  }) {
+    return this.request<{ status: string }>(
+      "/api/support/review",
+      {
+        method: "POST",
+        body: JSON.stringify(payload),
+      }
+    );
+  }
+
   // Image upload endpoints (R2 presigned URLs)
   async getPresignedUploadUrl(fileType: string, folder: "avatars" | "thumbnails") {
     return this.request<{

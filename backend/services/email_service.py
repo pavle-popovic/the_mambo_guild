@@ -593,6 +593,73 @@ def send_ambassador_application_email(
         return False
 
 
+def send_review_email(
+    reviewer_name: str,
+    reviewer_email: str,
+    rating: int,
+    message: str,
+    role: Optional[str],
+    page_url: str,
+    client_ip: str,
+) -> bool:
+    """
+    Forward a "Give Review" submission from the landing page testimonials section
+    to support@themamboguild.com. Reply-to is set to the reviewer so Pavle can
+    reply directly and ask permission before publishing.
+    """
+    if not resend or not settings.RESEND_API_KEY:
+        logger.error("Resend client not configured. Cannot send review email.")
+        return False
+
+    try:
+        from_email = settings.FROM_EMAIL
+        to_email = "support@themamboguild.com"
+
+        from html import escape
+        safe_name = escape(reviewer_name)
+        safe_email = escape(reviewer_email)
+        safe_role = escape(role or "(not provided)")
+        safe_message = escape(message).replace("\n", "<br>")
+        safe_page_url = escape(page_url)
+        safe_ip = escape(client_ip)
+        clamped_rating = max(1, min(5, int(rating)))
+        stars = "★" * clamped_rating + "☆" * (5 - clamped_rating)
+
+        result = resend.Emails.send({
+            "from": from_email,
+            "to": [to_email],
+            "reply_to": reviewer_email,
+            "subject": f"[Review] {clamped_rating}/5 from {reviewer_name}",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <body style="font-family: -apple-system, Segoe UI, Arial, sans-serif; color:#222; max-width:720px; margin:0 auto; padding:24px;">
+                <h2 style="border-bottom:2px solid #D4AF37; padding-bottom:8px;">New Review Submission</h2>
+                <p style="font-size:22px; color:#D4AF37; letter-spacing:4px; margin:0 0 16px 0;">{stars} <span style="color:#666; font-size:14px; letter-spacing:0;">({clamped_rating}/5)</span></p>
+                <table style="border-collapse:collapse; margin-bottom:16px;">
+                    <tr><td style="padding:4px 12px;color:#666;">Name</td><td style="padding:4px 12px;">{safe_name}</td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Email</td><td style="padding:4px 12px;"><a href="mailto:{safe_email}">{safe_email}</a></td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Role / Background</td><td style="padding:4px 12px;">{safe_role}</td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Submitted from</td><td style="padding:4px 12px;"><a href="{safe_page_url}">{safe_page_url}</a></td></tr>
+                    <tr><td style="padding:4px 12px;color:#666;">Client IP</td><td style="padding:4px 12px;font-family:monospace;">{safe_ip}</td></tr>
+                </table>
+
+                <h3>Their review</h3>
+                <div style="background:#f9f7f1; border-left:3px solid #D4AF37; padding:12px 16px; white-space:pre-wrap;">{safe_message}</div>
+
+                <p style="color:#888; font-size:12px; margin-top:32px;">Reply to this email to thank {safe_name} and ask permission before publishing on the landing page.</p>
+            </body>
+            </html>
+            """,
+        })
+
+        logger.info(f"Review email sent to {to_email} (reviewer: {reviewer_email}, rating: {clamped_rating})")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send review email: {str(e)}")
+        return False
+
+
 def send_payment_failed_email(
     email: str,
     name: str,
