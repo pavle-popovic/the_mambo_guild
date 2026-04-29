@@ -33,16 +33,28 @@ function VerifyEmailPageContent() {
 
     (async () => {
       try {
+        // Backend now also auto-logs-in here: returns access+refresh
+        // tokens and sets httpOnly cookies. apiClient sends
+        // credentials:"include" by default so the browser stores them.
         await apiClient.verifyEmail(token);
-        // Refresh the auth context so the rest of the app sees is_verified=true
-        // immediately; otherwise the user would see the "verify your email"
-        // banner until the next page navigation.
+        // Refresh the auth context so the rest of the app sees the
+        // freshly-verified, freshly-logged-in user immediately.
         try {
           await refreshUser();
         } catch {
-          // Not logged in — still show success; they'll log in fresh.
+          // Auth context refresh failed for a transient reason — fall
+          // through to the success + auto-redirect anyway; AuthContext
+          // will reconcile on the next page.
         }
         setStatus("success");
+        // Auto-redirect to /pricing after a brief success display.
+        // Verification + login are now both done — landing the user on
+        // the trial CTA is the natural next step. 1.4s is long enough
+        // for the success checkmark to register, short enough to feel
+        // snappy.
+        setTimeout(() => {
+          router.push("/pricing");
+        }, 1400);
       } catch (err: any) {
         setStatus("error");
         setErrorMsg(err?.message || t("genericError"));
@@ -81,21 +93,17 @@ function VerifyEmailPageContent() {
                 ✓
               </div>
               <h1 className="text-2xl font-bold text-mambo-text mb-2">{t("successTitle")}</h1>
-              <p className="text-gray-300 text-sm mb-6">{t("successBody")}</p>
-              <div className="flex flex-col gap-3">
-                <button
-                  onClick={() => router.push("/pricing")}
-                  className="w-full bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] hover:brightness-110 text-black font-bold py-3 px-6 rounded-lg transition"
-                >
-                  {t("startTrialCta")}
-                </button>
-                <Link
-                  href="/courses"
-                  className="text-sm text-gray-400 hover:text-mambo-text transition"
-                >
-                  {t("browseFreeCta")}
-                </Link>
-              </div>
+              <p className="text-gray-300 text-sm">{t("successBody")}</p>
+              {/* Manual buttons removed — page now auto-redirects to /pricing
+                  after ~1.4s (see useEffect above). The link below is a
+                  no-friction escape hatch for users on flaky connections
+                  where the timer-driven router.push might feel slow. */}
+              <Link
+                href="/pricing"
+                className="inline-block mt-6 text-sm text-mambo-gold/90 hover:text-mambo-gold underline-offset-4 hover:underline"
+              >
+                {t("startTrialCta")} →
+              </Link>
             </>
           )}
 

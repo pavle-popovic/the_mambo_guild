@@ -1243,17 +1243,28 @@ def reset_password(
 # enforcement via Redis blacklist after consumption (mirrors the password-
 # reset path).
 
-@router.post("/verify-email", status_code=status.HTTP_200_OK)
+@router.post("/verify-email", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 def verify_email(
+    response: Response,
     request_data: VerifyEmailRequest,
     db: Session = Depends(get_db),
 ):
     """
-    Exchange a signed verification token for users.is_verified=True.
+    Exchange a signed verification token for users.is_verified=True
+    AND auto-log the user in.
 
-    Idempotent: if the user is already verified, return success rather
-    than 4xx — a user clicking the link a second time should see "all
-    set," not "this link has expired."
+    Why auto-login: the only thing that produces a valid token is
+    receiving the verification email, and the only thing that produces
+    that email is owning the inbox we registered. By the time the
+    user reaches this endpoint, they've already proven email control
+    twice (once at signup with the address, once by clicking the link).
+    Asking them to enter their password on top of that is gratuitous
+    friction — same logic as the password-reset auto-login.
+
+    Idempotent: if the user is already verified, return success +
+    fresh tokens rather than 4xx — a user clicking the link a second
+    time should see "all set" with their session refreshed, not a
+    stale error.
     """
     from services.redis_service import blacklist_token, is_token_blacklisted
 
@@ -1299,7 +1310,16 @@ def verify_email(
         except Exception:
             logger.exception("verify_email: failed to blacklist used token (non-fatal)")
 
-        return {"message": "Email verified", "is_verified": True}
+        # Auto-login: mint tokens + set auth cookies so the frontend can
+        # deep-link straight into /pricing without an extra password
+        # entry. Same _set_auth_cookies helper used by /login, /register,
+        # /reset-password — cookie attrs (httpOnly, secure, samesite,
+        # max_age, domain) stay consistent across all four entry points.
+        access_token = create_access_token(data={"sub": str(user.id)})
+        refresh_token = create_refresh_token(data={"sub": str(user.id)})
+        _set_auth_cookies(response, access_token, refresh_token)
+
+        return TokenResponse(access_token=access_token, token_type="bearer")
 
     except HTTPException:
         raise
