@@ -3,6 +3,7 @@
 import { useEffect, useState, Suspense, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { apiClient } from "@/lib/api";
 import NavBar from "@/components/NavBar";
 
 function AuthCallbackContent() {
@@ -48,8 +49,29 @@ function AuthCallbackContent() {
         // Refresh user profile - this will use the httpOnly cookie automatically
         await refreshUser();
 
-        // Redirect to courses immediately
-        router.replace("/courses");
+        // Tier-aware destination — keeps the OAuth callback consistent with
+        // the other auth entry points (register, reset-password, verify-
+        // email all aim at /pricing) WITHOUT annoying returning paying
+        // customers who log in daily and don't want to see the pricing
+        // page every time. Re-fetch the profile directly because the
+        // closure-captured `user` from useAuth would be stale right after
+        // refreshUser() resolved.
+        let dest = "/pricing";
+        try {
+          const profile = await apiClient.getProfile();
+          const tier = (profile.tier || "").toLowerCase();
+          // advanced = Pro, performer = Guild Master. Both are paying
+          // tiers — drop them straight into the app. Rookie / unknown
+          // → /pricing where the trial CTA lives.
+          if (tier === "advanced" || tier === "performer") {
+            dest = "/courses";
+          }
+        } catch {
+          // /me failed for a transient reason — default to /pricing.
+          // The pricing page itself shows current-plan state anyway,
+          // so paying users won't see a misleading "subscribe now" CTA.
+        }
+        router.replace(dest);
       } catch (err: any) {
         console.error("Auth callback error:", err);
         setError(err.message || "Authentication failed. Please try again.");
