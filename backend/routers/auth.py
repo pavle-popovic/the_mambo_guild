@@ -772,6 +772,7 @@ async def oauth_login(provider: str, request: Request):
 
 @router.get("/callback/google")
 async def google_callback(
+    background_tasks: BackgroundTasks,
     code: str = Query(...),
     state: str = Query(...),
     request: Request = None,
@@ -873,7 +874,13 @@ async def google_callback(
         
         # Check if user exists
         user = db.query(User).filter(User.email == email.lower().strip()).first()
-        
+
+        # Tracks whether this callback created a new account (vs. logging
+        # in an existing one or linking OAuth to an existing email account).
+        # Drives the welcome-email + CompleteRegistration CAPI fire below
+        # so they only fire on genuine first-time signups.
+        is_new_signup = user is None
+
         if user:
             # User exists - check if we need to link OAuth account
             if user.auth_provider == "email" and not user.social_id:
@@ -923,7 +930,56 @@ async def google_callback(
             update_streak(str(user.id), db)
         except Exception:
             pass  # Non-critical, continue even if streak update fails
-        
+
+        # First-time OAuth signup side-effects: welcome email +
+        # CompleteRegistration CAPI fire. Mirrors the manual /register
+        # path so OAuth users land in the same downstream funnels (Resend
+        # template, Meta Ads attribution). Skipped for existing-user
+        # logins and for the OAuth-linking branch above so we never
+        # re-welcome a user who already received the email on /register.
+        # All wrapped non-fatal so a Resend / CAPI outage cannot fail
+        # the OAuth callback and lock the user out.
+        if is_new_signup:
+            try:
+                profile = (
+                    db.query(UserProfile)
+                    .filter(UserProfile.user_id == user.id)
+                    .first()
+                )
+                # OAuth users have no username at signup (set later via
+                # profile settings) — fall back to first_name then email
+                # local-part so the welcome email's salutation is never
+                # blank/None.
+                friendly_name = (
+                    (profile.username if profile and profile.username else None)
+                    or (first_name or "").strip()
+                    or email.split("@")[0]
+                )
+                referral_code = profile.referral_code if profile else ""
+                referral_link = f"{settings.FRONTEND_URL}/waitlist?ref={referral_code}"
+                background_tasks.add_task(
+                    send_waitlist_welcome_email,
+                    user.email,
+                    friendly_name,
+                    referral_link,
+                )
+            except Exception:
+                logger.exception("oauth: welcome email enqueue failed (non-fatal)")
+
+            try:
+                track_event(
+                    db=db,
+                    event_name="CompleteRegistration",
+                    user_id=user.id,
+                    value=5.0,
+                    currency="USD",
+                    properties={"method": "google"},
+                    request=request,
+                    background_tasks=background_tasks,
+                )
+            except Exception:
+                logger.exception("oauth: CompleteRegistration tracking failed (non-fatal)")
+
         # Create tokens
         access_token = create_access_token(data={"sub": str(user.id)})
         refresh_token = create_refresh_token(data={"sub": str(user.id)})
