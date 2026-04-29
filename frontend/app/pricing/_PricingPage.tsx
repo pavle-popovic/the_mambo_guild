@@ -22,7 +22,6 @@ import { useTranslations } from "@/i18n/useTranslations";
 
 function PricingPageContent() {
   const t = useTranslations("pricingPage");
-  const tf = useTranslations("pricingPage.founderBadge");
   const tp = useTranslations("landing.pricing");
   const tr = useTranslations("roundtable");
   const { user, refreshUser } = useAuth();
@@ -30,16 +29,6 @@ function PricingPageContent() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState<string | null>(null);
   const [showAuthModal, setShowAuthModal] = useState(false);
-  // Founder Diamond seat counter — capped at 300, deadline 2026-05-06
-  // 18:00 UTC. Status fetched once on mount; the 30s edge cache on the
-  // backend keeps the number reasonably fresh on a quick page reload.
-  const [founderStatus, setFounderStatus] = useState<{
-    claimed: number;
-    remaining: number;
-    cap: number;
-    deadline: string;
-    expired: boolean;
-  } | null>(null);
   // Trial-Advanced users upgrading to Performer trigger an immediate $59
   // charge AND end their free trial NOW (see backend update_subscription
   // path that sets trial_end="now"). Without a confirmation step, users
@@ -78,14 +67,6 @@ function PricingPageContent() {
       })
       .catch((err) => {
         console.error("Failed to fetch Guild Master seats:", err);
-      });
-    apiClient
-      .getFounderBadgeStatus()
-      .then((s) => {
-        if (!cancelled) setFounderStatus(s);
-      })
-      .catch((err) => {
-        console.error("Failed to fetch Founder badge status:", err);
       });
     return () => {
       cancelled = true;
@@ -328,24 +309,6 @@ function PricingPageContent() {
 
       <FadeIn>
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-10 pt-20 sm:pt-24 text-center">
-          {/* Founder Diamond CTA — slim one-liner. Cap counter removed:
-              the urgency now comes from the deadline alone, not a public
-              "X of 300 left" countdown that fluctuates and adds visual
-              weight. Hidden post-deadline so we don't dangle a dead promise. */}
-          {founderStatus && !founderStatus.expired && (
-            <div className="mx-auto mb-5 inline-flex items-center gap-2 rounded-full border border-mambo-gold/30 bg-gradient-to-r from-mambo-gold/10 via-yellow-500/10 to-orange-500/10 px-3 py-1 shadow shadow-amber-900/10">
-              <span className="relative flex h-1.5 w-1.5 shrink-0">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold" />
-              </span>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-mambo-gold whitespace-nowrap">
-                {tf("eyebrow")}
-              </span>
-              <span className="text-[11px] leading-none text-white/85 whitespace-nowrap">
-                {tf("cta")}
-              </span>
-            </div>
-          )}
           {/* Trust bar — pinned ABOVE the pricing tiers so the cancel-anytime
               guarantee is the first thing visitors see in the pricing section
               (replaces the previous below-cards placement). */}
