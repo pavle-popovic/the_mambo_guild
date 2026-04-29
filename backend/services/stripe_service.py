@@ -62,6 +62,12 @@ def create_checkout_session(
         "metadata": metadata or {},
         "subscription_data": subscription_data,
         "payment_method_collection": "always" if trial_period_days else "if_required",
+        # Surfaces the "Add promotion code" field on Stripe-hosted checkout.
+        # Required for any Promotion code (Vanguard tester discounts, future
+        # campaigns) to actually be redeemable. Coupon-discounted invoices
+        # are handled correctly downstream — see the amount_paid branch in
+        # routers/payments.py invoice.payment_succeeded.
+        "allow_promotion_codes": True,
         # Tight expiry so checkout.session.expired fires quickly on
         # abandoned tabs (matched by the webhook handler that releases
         # the local seat reservation).
