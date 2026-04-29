@@ -98,7 +98,7 @@
       "submit": "Reimposta password",
       "submitting": "Reimpostazione...",
       "successTitle": "Password reimpostata con successo!",
-      "successBody": "Reindirizzamento alla pagina di accesso...",
+      "successBody": "Accesso in corso...",
       "backToLogin": "Torna all'accesso",
       "invalidToken": "Token di reset non valido",
       "invalidOrMissingToken": "Token di reset non valido o mancante. Richiedi un nuovo link.",

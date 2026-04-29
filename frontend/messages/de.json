@@ -98,7 +98,7 @@
       "submit": "Passwort zurücksetzen",
       "submitting": "Wird zurückgesetzt...",
       "successTitle": "Passwort erfolgreich zurückgesetzt!",
-      "successBody": "Weiterleitung zur Anmeldeseite...",
+      "successBody": "Sie werden angemeldet...",
       "backToLogin": "Zurück zur Anmeldung",
       "invalidToken": "Ungültiges Zurücksetz-Token",
       "invalidOrMissingToken": "Ungültiges oder fehlendes Zurücksetz-Token. Bitte fordere einen neuen Link an.",

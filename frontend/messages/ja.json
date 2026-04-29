@@ -98,7 +98,7 @@
       "submit": "パスワードを再設定",
       "submitting": "再設定中...",
       "successTitle": "パスワードが再設定されました！",
-      "successBody": "ログインページへリダイレクト中...",
+      "successBody": "ログイン中...",
       "backToLogin": "ログインに戻る",
       "invalidToken": "再設定トークンが無効です",
       "invalidOrMissingToken": "再設定トークンが無効または不足しています。新しいリンクをリクエストしてください。",

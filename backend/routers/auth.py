@@ -1080,13 +1080,25 @@ def forgot_password(
         return {"message": "If the email exists, a password reset link has been sent."}
 
 
-@router.post("/reset-password", status_code=status.HTTP_200_OK)
+@router.post("/reset-password", response_model=TokenResponse, status_code=status.HTTP_200_OK)
 def reset_password(
+    response: Response,
     request_data: ResetPasswordRequest,
     db: Session = Depends(get_db)
 ):
     """
-    Reset password using token from email.
+    Reset password using token from email — and auto-log-in.
+
+    Industry-standard consumer-SaaS pattern: a successful reset proves
+    inbox ownership (the user clicked the link from their email), so we
+    mint access + refresh tokens and set the auth cookies in the same
+    response. The frontend can then deep-link straight into the app
+    without an extra "now log in with your new password" step.
+
+    Particularly important on the waitlist-claim path, where this IS
+    the activation moment: requiring a second login round-trip just
+    after the user finally set a password is the kind of friction
+    that drops conversion measurably.
     """
     from services.redis_service import blacklist_token, is_token_blacklisted
 
@@ -1194,7 +1206,15 @@ def reset_password(
         except Exception:
             logger.exception("reset_password: failed to blacklist used token (non-fatal)")
 
-        return {"message": "Password reset successfully"}
+        # Auto-login: mint tokens + set auth cookies so the frontend can
+        # deep-link into the app without a second password entry. Same
+        # cookie helper used by /login and /register, so cookie attrs
+        # (httpOnly, secure, samesite, domain, max_age) stay consistent.
+        access_token = create_access_token(data={"sub": str(user.id)})
+        refresh_token = create_refresh_token(data={"sub": str(user.id)})
+        _set_auth_cookies(response, access_token, refresh_token)
+
+        return TokenResponse(access_token=access_token, token_type="bearer")
 
     except HTTPException:
         raise

@@ -98,7 +98,7 @@
       "submit": "Resetuj hasło",
       "submitting": "Resetowanie...",
       "successTitle": "Hasło zostało zresetowane!",
-      "successBody": "Przekierowywanie do strony logowania...",
+      "successBody": "Logowanie...",
       "backToLogin": "Powrót do logowania",
       "invalidToken": "Nieprawidłowy token resetu",
       "invalidOrMissingToken": "Nieprawidłowy lub brakujący token resetu. Poproś o nowy link.",

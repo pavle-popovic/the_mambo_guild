@@ -98,7 +98,7 @@
       "submit": "Reset Password",
       "submitting": "Resetting...",
       "successTitle": "Password reset successful!",
-      "successBody": "Redirecting to login page...",
+      "successBody": "Logging you in...",
       "backToLogin": "Back to Login",
       "invalidToken": "Invalid reset token",
       "invalidOrMissingToken": "Invalid or missing reset token. Please request a new password reset link.",

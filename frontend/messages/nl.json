@@ -98,7 +98,7 @@
       "submit": "Wachtwoord resetten",
       "submitting": "Resetten...",
       "successTitle": "Wachtwoord succesvol gereset!",
-      "successBody": "Doorverwijzen naar de inlogpagina...",
+      "successBody": "Inloggen...",
       "backToLogin": "Terug naar inloggen",
       "invalidToken": "Ongeldige reset-token",
       "invalidOrMissingToken": "Ongeldige of ontbrekende reset-token. Vraag een nieuwe link aan.",

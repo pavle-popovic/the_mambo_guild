@@ -98,7 +98,7 @@
       "submit": "Şifreyi Sıfırla",
       "submitting": "Sıfırlanıyor...",
       "successTitle": "Şifre başarıyla sıfırlandı!",
-      "successBody": "Giriş sayfasına yönlendiriliyorsun...",
+      "successBody": "Oturum açılıyor...",
       "backToLogin": "Girişe Dön",
       "invalidToken": "Geçersiz sıfırlama tokeni",
       "invalidOrMissingToken": "Geçersiz veya eksik sıfırlama tokeni. Yeni bir şifre sıfırlama bağlantısı iste.",

@@ -4,10 +4,12 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import NavBar from "@/components/NavBar";
+import { useAuth } from "@/contexts/AuthContext";
 import { useTranslations } from "@/i18n/useTranslations";
 
 function ResetPasswordPageContent() {
   const t = useTranslations("auth.resetPassword");
+  const { refreshUser } = useAuth();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
@@ -64,6 +66,11 @@ function ResetPasswordPageContent() {
     try {
       const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000"}/api/auth/reset-password`, {
         method: "POST",
+        // credentials:"include" is REQUIRED so the browser stores the
+        // httpOnly auth cookies the backend sets on this response.
+        // Without it, cross-origin Set-Cookie headers are silently
+        // dropped and the auto-login below produces a logged-OUT user.
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -87,11 +94,25 @@ function ResetPasswordPageContent() {
         throw new Error(msg);
       }
 
+      // Backend now mints tokens + sets cookies in the response —
+      // populate AuthContext from /me so every component re-renders
+      // with the logged-in user, then deep-link straight into the app.
+      // Sending to /pricing rather than /courses because for waitlist
+      // claimers this is the activation moment and starting a Founder
+      // trial is the highest-leverage next action; regular forgot-
+      // password users are also fine landing here (one click to
+      // /courses if they don't want to upgrade).
+      try {
+        await refreshUser();
+      } catch {
+        // Cookie set but /me failed for a transient reason — fall
+        // through to /pricing anyway; AuthContext will recover on
+        // the next navigation.
+      }
       setSuccess(true);
-      // Redirect to login after 2 seconds
       setTimeout(() => {
-        router.push("/login");
-      }, 2000);
+        router.push("/pricing");
+      }, 1200);
     } catch (err: any) {
       setError(err.message || t("genericError"));
     } finally {

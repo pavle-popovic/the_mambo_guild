@@ -98,7 +98,7 @@
       "submit": "Restablecer contraseña",
       "submitting": "Restableciendo...",
       "successTitle": "¡Contraseña restablecida con éxito!",
-      "successBody": "Redirigiendo a la página de inicio de sesión...",
+      "successBody": "Iniciando sesión...",
       "backToLogin": "Volver al inicio de sesión",
       "invalidToken": "Token de restablecimiento no válido",
       "invalidOrMissingToken": "Token de restablecimiento no válido o ausente. Solicita un nuevo enlace.",

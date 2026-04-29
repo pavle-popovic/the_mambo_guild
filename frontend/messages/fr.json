@@ -98,7 +98,7 @@
       "submit": "Réinitialiser le mot de passe",
       "submitting": "Réinitialisation...",
       "successTitle": "Mot de passe réinitialisé !",
-      "successBody": "Redirection vers la page de connexion...",
+      "successBody": "Connexion en cours...",
       "backToLogin": "Retour à la connexion",
       "invalidToken": "Jeton de réinitialisation invalide",
       "invalidOrMissingToken": "Jeton de réinitialisation invalide ou manquant. Veuillez demander un nouveau lien.",

@@ -98,7 +98,7 @@
       "submit": "Redefinir senha",
       "submitting": "Redefinindo...",
       "successTitle": "Senha redefinida com sucesso!",
-      "successBody": "Redirecionando para a página de login...",
+      "successBody": "Fazendo login...",
       "backToLogin": "Voltar ao login",
       "invalidToken": "Token de redefinição inválido",
       "invalidOrMissingToken": "Token de redefinição inválido ou ausente. Solicite um novo link.",
