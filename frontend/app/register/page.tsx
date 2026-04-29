@@ -64,7 +64,14 @@ export default function RegisterPage() {
         password: formData.password,
         confirm_password: formData.confirmPassword,
       });
-      router.push("/courses");
+      // Land on the post-signup verify-email screen so the user
+      // immediately understands they have a verification email waiting.
+      // Sending them straight to /courses (the old behavior) hid the
+      // verification step entirely — they only discovered it later when
+      // the trial CTA failed, which read as a bug. The new page offers
+      // resend / "I already verified" / "browse free content" so they
+      // always have a clear next action.
+      router.push("/verify-email-sent");
     } catch (err: any) {
       setError(err.message || t("genericError"));
     } finally {
