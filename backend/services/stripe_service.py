@@ -1,9 +1,22 @@
 import stripe
+import time
 from typing import Dict, Any
 
 from config import settings
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
+
+# Stripe Checkout sessions default to 24h before they expire. For our
+# Guild Master seat-cap design (30 seats, abandoned tabs hold a seat
+# until our local 30-min TTL expires), 24h is way too long. Cap the
+# session lifetime at Stripe's MINIMUM allowed (30 min) so abandoned
+# checkouts release their seat as quickly as possible. The
+# `checkout.session.expired` webhook fires the instant Stripe expires
+# the session, letting our handler immediately drop the local
+# INCOMPLETE row out of the cap counter — see the matching handler
+# in routers/payments.py.
+_CHECKOUT_SESSION_EXPIRY_SECONDS = 30 * 60  # 30 min — Stripe's minimum
+
 
 def create_checkout_session(
     customer_id: str,
@@ -25,6 +38,9 @@ def create_checkout_session(
     a duplicate call with the same key (within Stripe's 24h dedup window).
     Lets the caller make the create call retry-safe under transient errors
     without minting two Checkout Sessions for one user click.
+
+    `expires_at` is set to ~30 minutes from creation so abandoned tabs
+    free their seat as fast as Stripe allows (30min is the API minimum).
     """
     subscription_data: Dict[str, Any] = {
         "metadata": metadata or {},
@@ -46,6 +62,10 @@ def create_checkout_session(
         "metadata": metadata or {},
         "subscription_data": subscription_data,
         "payment_method_collection": "always" if trial_period_days else "if_required",
+        # Tight expiry so checkout.session.expired fires quickly on
+        # abandoned tabs (matched by the webhook handler that releases
+        # the local seat reservation).
+        "expires_at": int(time.time()) + _CHECKOUT_SESSION_EXPIRY_SECONDS,
     }
     if idempotency_key:
         create_kwargs["idempotency_key"] = idempotency_key

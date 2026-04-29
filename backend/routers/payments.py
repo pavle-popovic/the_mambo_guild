@@ -1438,6 +1438,76 @@ async def stripe_webhook(
         except Exception:
             logger.exception("webhook: SubscriptionDisputed tracking failed (non-fatal)")
 
+    elif event["type"] == "checkout.session.completed":
+        # The user successfully paid (or signed up for a trial via
+        # Checkout). The state-mirroring (tier promote, has_used_trial,
+        # founder claim, fingerprint check) is owned by the
+        # customer.subscription.* handler above which fires alongside
+        # this event. Here we just emit a clear audit-log line and
+        # opportunistically refresh the local INCOMPLETE row's touch
+        # timestamp, so the seat is held a little longer in the rare
+        # case where Stripe delivers checkout.session.completed BEFORE
+        # customer.subscription.created (race window of seconds, but
+        # observed in Stripe's docs). After that race resolves, the
+        # subscription handler flips status off INCOMPLETE entirely.
+        session = event["data"]["object"]
+        user_id_meta = (session.get("metadata") or {}).get("user_id")
+        if user_id_meta:
+            try:
+                user_uuid = uuid.UUID(user_id_meta)
+            except (ValueError, TypeError):
+                user_uuid = None
+            if user_uuid:
+                db_sub = db.query(Subscription).filter(
+                    Subscription.user_id == user_uuid
+                ).first()
+                if db_sub and db_sub.status == SubscriptionStatus.INCOMPLETE:
+                    db_sub.current_period_end = datetime.now(timezone.utc)
+                    db.commit()
+                logger.info(
+                    f"checkout.session.completed: user {user_uuid} "
+                    f"session {session.get('id')}"
+                )
+
+    elif event["type"] == "checkout.session.expired":
+        # Stripe expired the Checkout Session (we set expires_at=30min
+        # in stripe_service.create_checkout_session). The user opened
+        # the page but never completed payment.
+        #
+        # Release the seat NOW instead of waiting for our local 30-min
+        # TTL (`_PENDING_CHECKOUT_TTL`) to decay. Critical for the
+        # Guild Master cap on launch-day rush — abandoned tabs would
+        # otherwise lock real seats away from real buyers.
+        #
+        # Done by zeroing current_period_end on the INCOMPLETE row,
+        # which is the same touch timestamp _guild_master_seats_taken
+        # reads to decide whether to count a row toward the cap.
+        # 2020-01-01 is well before the cutoff at any future call site,
+        # so the row drops out of the count immediately. Same trick
+        # the explicit /cancel-checkout endpoint uses for the
+        # frontend's "user clicked back" path.
+        session = event["data"]["object"]
+        user_id_meta = (session.get("metadata") or {}).get("user_id")
+        if user_id_meta:
+            try:
+                user_uuid = uuid.UUID(user_id_meta)
+            except (ValueError, TypeError):
+                user_uuid = None
+            if user_uuid:
+                db_sub = db.query(Subscription).filter(
+                    Subscription.user_id == user_uuid,
+                    Subscription.status == SubscriptionStatus.INCOMPLETE,
+                ).first()
+                if db_sub:
+                    db_sub.current_period_end = datetime(
+                        2020, 1, 1, tzinfo=timezone.utc
+                    )
+                    db.commit()
+                    logger.info(
+                        f"checkout.session.expired: released seat for "
+                        f"user {user_uuid} (session {session.get('id')})"
+                    )
+
     elif event["type"] in (
         "subscription_schedule.released",
         "subscription_schedule.canceled",
