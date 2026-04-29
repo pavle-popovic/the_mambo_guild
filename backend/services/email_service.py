@@ -76,6 +76,70 @@ def send_password_reset_email(email: str, reset_token: str) -> bool:
         return False
 
 
+def send_trial_collapsed_email(email: str) -> bool:
+    """
+    Sent when card_fingerprint_service collapses a trial because the
+    payment method has already been used for a free trial on a different
+    account. Tells the user what happened so they don't think it's a
+    generic Stripe payment failure (the default Stripe email is opaque).
+
+    Two audiences this serves:
+      1. Trial-farmers: clear "you cannot bypass this with a new email"
+         message. Discourages further abuse.
+      2. Legitimate edge-case users (family/couple sharing a card):
+         actionable explanation. They can either pay full price now or
+         use a different card.
+    """
+    if not resend or not settings.RESEND_API_KEY:
+        logger.error("Resend not configured. Cannot send trial-collapsed email.")
+        return False
+
+    try:
+        from_email = settings.FROM_EMAIL
+        pricing_url = f"{settings.FRONTEND_URL}/pricing"
+
+        result = resend.Emails.send({
+            "from": from_email,
+            "to": [email],
+            "subject": "About your free trial - The Mambo Guild",
+            "html": f"""
+            <!DOCTYPE html>
+            <html>
+            <head>
+                <style>
+                    body {{ font-family: Arial, sans-serif; line-height: 1.6; color: #333; }}
+                    .container {{ max-width: 600px; margin: 0 auto; padding: 20px; }}
+                    .button {{ display: inline-block; padding: 12px 24px; background-color: #D4AF37; color: #111; text-decoration: none; border-radius: 5px; margin: 20px 0; font-weight: bold; }}
+                    .button:hover {{ background-color: #C7A030; }}
+                    .footer {{ color: #888; font-size: 12px; margin-top: 24px; }}
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <h1>About your free trial</h1>
+                    <p>Thanks for signing up to The Mambo Guild.</p>
+                    <p>The card you used to start your free trial has already been used for a previous trial on another account. Our free trial is one per customer, so we couldn't apply the 7 free days to this subscription.</p>
+                    <p>If you'd still like to subscribe, you have two options:</p>
+                    <ul>
+                        <li>Continue with this card and pay the regular monthly price from today.</li>
+                        <li>Cancel and re-subscribe with a different payment method to use a free trial.</li>
+                    </ul>
+                    <a href="{pricing_url}" class="button">Manage my subscription</a>
+                    <p>If you believe this is a mistake (for example, you share a card with a family member who already had a trial), reply to this email and we'll sort it out.</p>
+                    <p class="footer">The Mambo Guild &middot; sent by Pavle Popovic</p>
+                </div>
+            </body>
+            </html>
+            """,
+        })
+
+        logger.info(f"Trial-collapsed email sent to {email}")
+        return True
+    except Exception as e:
+        logger.error(f"Failed to send trial-collapsed email to {email}: {str(e)}")
+        return False
+
+
 def send_email_verification_email(email: str, verification_token: str) -> bool:
     """
     Send an email-verification link. The token is consumed by

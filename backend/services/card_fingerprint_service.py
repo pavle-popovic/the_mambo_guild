@@ -46,6 +46,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import Session
 
 from models.payment import PaymentCardFingerprint
+from models.user import User
 
 logger = logging.getLogger(__name__)
 
@@ -155,6 +156,23 @@ def check_and_record_trial_card(
         # Still record this attempt — distinguishes "blocked at first
         # reuse" from "blocked again on retries" if we ever audit.
         _insert_fingerprint_row(fingerprint, user_id, pm_id, db)
+
+        # Tell the user what just happened. Default Stripe "payment
+        # failed" email is opaque ("update your payment method") and
+        # leaves both fraudsters and legitimate edge-case users
+        # (family/couple sharing one card) confused. Our email gives
+        # the actual reason and a clear path forward. Wrapped non-
+        # fatal so a Resend outage cannot break the webhook handler.
+        try:
+            user = db.query(User).filter(User.id == user_id).first()
+            if user and user.email:
+                from services.email_service import send_trial_collapsed_email
+                send_trial_collapsed_email(user.email)
+        except Exception:
+            logger.exception(
+                "card_fingerprint: trial-collapsed email send failed (non-fatal)"
+            )
+
         return True
 
     # Happy path: first time we see this card for this user. Record it

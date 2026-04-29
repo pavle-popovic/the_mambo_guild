@@ -46,17 +46,56 @@ Two independent goals:
 from __future__ import annotations
 
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
 
-# Curated frozenset of disposable email service domains.
-# Sources: top entries from disposable-email-domains/disposable_email_blocklist
-# and the npm 'disposable-email-domains' package, filtered to PURE disposable
-# services (excluding privacy-forwarding services like Apple Hide-My-Email,
-# Firefox Relay, DuckDuckGo Email, etc. which have legitimate users).
-# Updated 2026-04 — refresh annually if abuse patterns shift.
-DISPOSABLE_EMAIL_DOMAINS: frozenset[str] = frozenset({
+def _load_external_blocklist() -> frozenset[str]:
+    """
+    Load the bundled disposable-email-domains blocklist (~5,400 domains)
+    from disposable_blocklist.txt. Sourced from
+    github.com/disposable-email-domains/disposable-email-domains, the
+    canonical community-maintained list. One domain per line, lowercase,
+    blank lines + '#' comments tolerated. Returns an empty frozenset on
+    any read error so the module still imports cleanly during tests.
+
+    Refresh policy: the file is committed to the repo. Re-download it
+    quarterly (or whenever a new disposable service is observed in
+    abuse logs) and commit the new version. No runtime fetch — that
+    would add a startup dependency on GitHub being reachable.
+    """
+    path = os.path.join(os.path.dirname(__file__), "disposable_blocklist.txt")
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            domains = {
+                line.strip().lower()
+                for line in f
+                if line.strip() and not line.strip().startswith("#")
+            }
+        logger.info("Loaded %d disposable-email domains from %s", len(domains), path)
+        return frozenset(domains)
+    except FileNotFoundError:
+        logger.warning(
+            "disposable_blocklist.txt not found at %s — falling back to "
+            "the curated in-code subset only", path,
+        )
+        return frozenset()
+    except Exception as e:
+        logger.exception("Failed to load disposable blocklist: %s", e)
+        return frozenset()
+
+
+# Curated, hand-maintained subset of high-confidence disposable services.
+# This list is layered ON TOP of the external 5,400-domain blocklist
+# loaded from disposable_blocklist.txt. Anything in either set is blocked.
+# We keep a curated layer for two reasons:
+#   1. one-off bad actors observed in our own abuse logs that aren't yet
+#      on the public list
+#   2. zero risk of regression if the file ever fails to load — the
+#      curated set still catches the top ~250 most common services
+# Updated 2026-04 — refresh quarterly if abuse patterns shift.
+_CURATED_DISPOSABLE_EMAIL_DOMAINS: frozenset[str] = frozenset({
     # 10-minute / minute-mail family
     "10minutemail.com", "10minutemail.net", "10minutemail.info",
     "10minutemail.org", "10minutemail.co.uk", "10minutemail.us",
@@ -208,6 +247,16 @@ DISPOSABLE_EMAIL_DOMAINS: frozenset[str] = frozenset({
     "yuurok.com", "zehnminuten.de", "zehnminutenmail.de", "zoaxe.com",
     "zoemail.net", "zoemail.org", "zomg.info", "zxcv.com", "zxcvbnm.com",
 })
+
+
+# Final blocklist used by is_disposable_email. Union of:
+#   1. The 5,400-domain external file (canonical community list)
+#   2. The hand-maintained ~250-domain curated set above
+# Either layer alone would catch the majority of throwaway services;
+# the union catches everything either source knows about.
+DISPOSABLE_EMAIL_DOMAINS: frozenset[str] = (
+    _load_external_blocklist() | _CURATED_DISPOSABLE_EMAIL_DOMAINS
+)
 
 
 # Providers whose local-part should be alias-normalized in the same

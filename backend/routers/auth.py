@@ -46,8 +46,26 @@ BLOCKED_EMAIL_DOMAINS = {
     "tempmail.com", "temp-mail.org", "mohmal.com", "maildrop.cc",
 }
 
+def _test_accounts_allowed() -> bool:
+    """
+    Master gate for the username-pattern admin bypass. Defaults FALSE so
+    production refuses to honour the bypass even if an attacker guesses
+    the (publicly-visible-in-source-code) regex. Set ALLOW_TEST_ACCOUNTS=
+    true in your local .env when you need to register test{N} accounts
+    against disposable email services for QA — leave it unset on Railway.
+    Reading the env on every call so a runtime flip (e.g. a temporary
+    enable for a debugging session) takes effect without a restart.
+    """
+    return os.getenv("ALLOW_TEST_ACCOUNTS", "false").lower() == "true"
+
+
 def _is_admin_test_account(username: str) -> bool:
-    """Allow admin QA accounts with username pattern test{number} (e.g. test13)."""
+    """Allow admin QA accounts with username pattern test{number} (e.g. test13).
+    Only honoured when ALLOW_TEST_ACCOUNTS=true env var is set — otherwise
+    returns False so the disposable-email check fires unconditionally,
+    regardless of how clever the username is."""
+    if not _test_accounts_allowed():
+        return False
     return bool(re.match(r"^test\d+$", username.lower().strip()))
 
 def _is_blocked_domain(email: str) -> bool:
