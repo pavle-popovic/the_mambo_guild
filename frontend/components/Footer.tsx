@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useTranslations } from "@/i18n/useTranslations";
+import { CONTACT_EMAIL } from "@/lib/site";
 
 interface FooterProps {
   className?: string;
@@ -87,9 +88,12 @@ export default function Footer({ className = "" }: FooterProps) {
               </a>
             </li>
             <li>
-              <Link href="/waitlist" className="hover:text-mambo-blue transition">
-                {t("connectEarlyAccess")}
-              </Link>
+              <a
+                href={`mailto:${CONTACT_EMAIL}?subject=${encodeURIComponent("Mambo Guild Support")}`}
+                className="hover:text-mambo-blue transition"
+              >
+                {t("connectContactSupport")}
+              </a>
             </li>
           </ul>
         </div>
