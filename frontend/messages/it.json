@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "Distintivo ottenuto!",
         "message": "Hai ottenuto il distintivo {badgeName}!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "corso",
+          "choreo": "coreografia",
+          "topic": "argomento"
+        },
+        "title": "Nuovo {kind}: {name}",
+        "message": "{name} è online. Tocca per scoprirlo."
       }
     }
   },

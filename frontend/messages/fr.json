@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "Badge obtenu !",
         "message": "Vous avez obtenu le badge {badgeName} !"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "cours",
+          "choreo": "chorégraphie",
+          "topic": "thème"
+        },
+        "title": "Nouveau {kind} : {name}",
+        "message": "{name} est en ligne. Appuyez pour le découvrir."
       }
     }
   },

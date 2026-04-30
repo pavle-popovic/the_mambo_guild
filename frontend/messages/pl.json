@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "Zdobyto odznakę!",
         "message": "Zdobyłeś odznakę {badgeName}!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "kurs",
+          "choreo": "choreo",
+          "topic": "temat"
+        },
+        "title": "Nowy {kind}: {name}",
+        "message": "{name} jest już dostępny. Stuknij, aby zobaczyć."
       }
     }
   },

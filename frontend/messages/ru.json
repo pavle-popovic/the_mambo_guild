@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "Значок получен!",
         "message": "Вы получили значок {badgeName}!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "курс",
+          "choreo": "хореография",
+          "topic": "тема"
+        },
+        "title": "Новый {kind}: {name}",
+        "message": "{name} уже доступен. Нажмите, чтобы посмотреть."
       }
     }
   },

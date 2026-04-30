@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "バッジ獲得！",
         "message": "{badgeName}のバッジを獲得しました！"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "コース",
+          "choreo": "振付",
+          "topic": "トピック"
+        },
+        "title": "新しい{kind}: {name}",
+        "message": "{name} が公開されました。タップしてチェック。"
       }
     }
   },

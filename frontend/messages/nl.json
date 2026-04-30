@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "Badge verdiend!",
         "message": "Je hebt de {badgeName}-badge verdiend!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "cursus",
+          "choreo": "choreo",
+          "topic": "onderwerp"
+        },
+        "title": "Nieuwe {kind}: {name}",
+        "message": "{name} staat live. Tik om te bekijken."
       }
     }
   },

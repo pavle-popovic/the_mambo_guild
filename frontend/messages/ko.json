@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "배지 획득!",
         "message": "{badgeName} 배지를 획득했습니다!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "코스",
+          "choreo": "안무",
+          "topic": "주제"
+        },
+        "title": "새 {kind}: {name}",
+        "message": "{name}이(가) 공개됐어요. 탭해서 확인하세요."
       }
     }
   },

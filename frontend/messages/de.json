@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "Abzeichen erhalten!",
         "message": "Du hast das {badgeName}-Abzeichen erhalten!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "Kurs",
+          "choreo": "Choreo",
+          "topic": "Thema"
+        },
+        "title": "Neu: {kind} {name}",
+        "message": "{name} ist jetzt live. Tippe zum Anschauen."
       }
     }
   },

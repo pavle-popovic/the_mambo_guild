@@ -28,7 +28,19 @@ const KNOWN_TYPES = new Set([
   "coaching_feedback_ready",
   "weekly_meeting_scheduled",
   "badge_earned",
+  "course_published",
 ]);
+
+// Backend stores course_published title as `New {kind}: {name}` and
+// message as `{name} is live. Tap to check it out.`. Parse the title to
+// recover the kind so we can render a fully localized header.
+const COURSE_PUBLISHED_TITLE_RE = /^New (course|choreo|topic): (.+)$/;
+
+function parseCoursePublishedTitle(title: string): { kind: string; name: string } | null {
+  const m = title.match(COURSE_PUBLISHED_TITLE_RE);
+  if (!m) return null;
+  return { kind: m[1], name: m[2] };
+}
 
 // New (post-migration) backend stores action-only messages like
 // `liked your post "X"`. Legacy rows still have the actor name baked in
@@ -185,6 +197,19 @@ export default function NotificationBell() {
   };
 
   const translateTitle = (n: Notification): string => {
+    if (n.type === "course_published") {
+      const parsed = parseCoursePublishedTitle(n.title);
+      if (parsed) {
+        const kindLabel = t(`types.course_published.kinds.${parsed.kind}`);
+        const safeKind = kindLabel && !kindLabel.startsWith("types.") ? kindLabel : parsed.kind;
+        const translated = t("types.course_published.title", {
+          kind: safeKind,
+          name: parsed.name,
+        });
+        if (translated && !translated.startsWith("types.")) return translated;
+      }
+      return n.title;
+    }
     if (KNOWN_TYPES.has(n.type)) {
       const translated = t(`types.${n.type}.title`);
       if (translated && !translated.startsWith("types.")) return translated;
@@ -193,6 +218,13 @@ export default function NotificationBell() {
   };
 
   const translateMessage = (n: Notification): string => {
+    if (n.type === "course_published") {
+      const parsed = parseCoursePublishedTitle(n.title);
+      const name = parsed?.name ?? n.title;
+      const translated = t("types.course_published.message", { name });
+      if (translated && !translated.startsWith("types.")) return translated;
+      return n.message;
+    }
     if (!KNOWN_TYPES.has(n.type)) return n.message;
 
     if (n.type === "reaction_received" || n.type === "reply_received") {

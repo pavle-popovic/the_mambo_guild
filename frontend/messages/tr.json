@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "Rozet Kazanıldı!",
         "message": "{badgeName} rozetini kazandın!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "ders",
+          "choreo": "koreografi",
+          "topic": "konu"
+        },
+        "title": "Yeni {kind}: {name}",
+        "message": "{name} yayında. Görmek için dokun."
       }
     }
   },

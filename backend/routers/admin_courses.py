@@ -206,9 +206,9 @@ def create_course(
     # If created already published, fan out a notification to every user.
     if world.is_published:
         try:
-            notification_service.broadcast_course_published(
-                world, db, exclude_user_id=str(admin_user.id)
-            )
+            # Include the publishing admin too — the bell is the proof the
+            # broadcast actually fired, and the admin can just dismiss it.
+            notification_service.broadcast_course_published(world, db)
             db.commit()
         except Exception as exc:
             logger.exception("broadcast_course_published failed on create: %s", exc)
@@ -291,9 +291,9 @@ def update_course(
     # off and back on won't re-spam.
     if world.is_published and not was_published_before:
         try:
-            notification_service.broadcast_course_published(
-                world, db, exclude_user_id=str(admin_user.id)
-            )
+            # Include the publishing admin too — the bell is the proof the
+            # broadcast actually fired, and the admin can just dismiss it.
+            notification_service.broadcast_course_published(world, db)
             db.commit()
         except Exception as exc:
             logger.exception("broadcast_course_published failed on update: %s", exc)

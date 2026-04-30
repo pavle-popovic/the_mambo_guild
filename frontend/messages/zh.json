@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "获得徽章！",
         "message": "你获得了 {badgeName} 徽章！"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "课程",
+          "choreo": "编舞",
+          "topic": "话题"
+        },
+        "title": "新{kind}：{name}",
+        "message": "{name} 已上线。点击查看。"
       }
     }
   },

@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "حصلت على شارة!",
         "message": "لقد حصلت على شارة {badgeName}!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "دورة",
+          "choreo": "كوريو",
+          "topic": "موضوع"
+        },
+        "title": "{kind} جديد: {name}",
+        "message": "{name} متاح الآن. اضغط للمشاهدة."
       }
     }
   },

@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "Κέρδισες σήμα!",
         "message": "Κέρδισες το σήμα {badgeName}!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "μάθημα",
+          "choreo": "χορογραφία",
+          "topic": "θέμα"
+        },
+        "title": "Νέο {kind}: {name}",
+        "message": "Το {name} είναι διαθέσιμο. Πάτα για να δεις."
       }
     }
   },

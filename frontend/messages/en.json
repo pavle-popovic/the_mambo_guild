@@ -1790,6 +1790,15 @@
       "badge_earned": {
         "title": "Badge Earned!",
         "message": "You earned the {badgeName} badge!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "course",
+          "choreo": "choreo",
+          "topic": "topic"
+        },
+        "title": "New {kind}: {name}",
+        "message": "{name} is live. Tap to check it out."
       }
     }
   },

@@ -1791,6 +1791,15 @@
       "badge_earned": {
         "title": "¡Insignia obtenida!",
         "message": "¡Has ganado la insignia {badgeName}!"
+      },
+      "course_published": {
+        "kinds": {
+          "course": "curso",
+          "choreo": "coreografía",
+          "topic": "tema"
+        },
+        "title": "Nuevo {kind}: {name}",
+        "message": "{name} ya está disponible. Toca para verlo."
       }
     }
   },
