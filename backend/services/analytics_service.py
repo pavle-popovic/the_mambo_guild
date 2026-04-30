@@ -41,6 +41,21 @@ CONVERSION_EVENTS: frozenset[str] = frozenset({
     "Purchase",
 })
 
+# Events that should carry hashed PII (em/fn/ln) in the CAPI user_data block.
+# Low-intent events (PageView, ViewContent) repeat dozens of times per session
+# for a logged-in user, so attaching their email to every one tanks Meta's EMQ
+# with "duplicate email" warnings without improving attribution. external_id
+# + fbp/fbc + IP/UA is sufficient match signal for those surfaces; reserve
+# raw PII for the conversions Meta actually optimises against.
+PII_EVENTS: frozenset[str] = frozenset({
+    "Lead",
+    "CompleteRegistration",
+    "InitiateCheckout",
+    "StartTrial",
+    "Subscribe",
+    "Purchase",
+})
+
 
 def _read_fbp_cookie(request: Optional[Request]) -> Optional[str]:
     if request is None:
@@ -129,11 +144,12 @@ def track_event(
 
     if event_name in CONVERSION_EVENTS and background_tasks is not None:
         # Resolve user data eagerly while the session is hot so the background
-        # task doesn't have to juggle its own DB session.
+        # task doesn't have to juggle its own DB session. Only fetch PII for
+        # events in PII_EVENTS — see PII_EVENTS docstring above.
         user_email = None
         first_name = None
         last_name = None
-        if user_id is not None:
+        if user_id is not None and event_name in PII_EVENTS:
             user = db.query(User).filter(User.id == user_id).first()
             if user is not None:
                 user_email = user.email

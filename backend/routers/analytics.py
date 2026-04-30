@@ -39,9 +39,12 @@ def track(
 ) -> TrackEventResponse:
     # Rate limit per IP — keeps anonymous pixel traffic from being abused as
     # a free write endpoint. Authenticated users get the same ceiling; this
-    # is analytics, not interaction.
+    # is analytics, not interaction. 600/min (10/sec) is generous for a single
+    # session yet still chokes obvious bot abuse — sized so ad-driven bursts
+    # behind shared NAT (mobile carriers, office IPs) don't drop CAPI events
+    # and tank Pixel-vs-CAPI coverage in Meta Events Manager.
     ip = extract_client_ip(request)
-    if not check_rate_limit(ip, "analytics_track", max_requests=120, window_seconds=60):
+    if not check_rate_limit(ip, "analytics_track", max_requests=600, window_seconds=60):
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
             detail="Too many analytics events from this IP.",
