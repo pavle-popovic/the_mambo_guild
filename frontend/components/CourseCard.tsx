@@ -155,7 +155,9 @@ export default function CourseCard({ course, index, user, onCourseClick }: Cours
   };
 
   const duration = formatDuration(course.total_duration_minutes || 0);
-  const hasObjectives = course.objectives && course.objectives.length > 0;
+  // Choreos are a single performance video — no learning objectives.
+  const hasObjectives =
+    typeKey !== "choreo" && course.objectives && course.objectives.length > 0;
   const moduleCount = course.module_count ?? 0;
   const lessonCount = course.lesson_count ?? 0;
 
