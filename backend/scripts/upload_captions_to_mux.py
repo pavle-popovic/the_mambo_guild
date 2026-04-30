@@ -221,6 +221,11 @@ LESSON_TITLE_OVERRIDES = {
     ("mambo-101", "Intro to Mambo 101"): ("Mambo101Edited", "IntroMambo101"),
     ("mambo-201", "Intro to Mambo 201"): ("Mambo201Edited", "IntroMambo201"),
     ("mambo-301", "Intro to Mambo 301"): ("Mambo301Edited", "IntroMambo301"),
+    # Asset passthrough is `lesson:<lid>:2`; the auto-discovery sorts the
+    # bare `Smooth_Criminal_Demo` after the suffixed `Smooth_Criminal_Lesson`,
+    # so idx=1 picked the Demo VTT (just "Here we go!") instead of the full
+    # lesson dialog. Pin the stem so re-runs don't regress.
+    ("pachanga", "Choreo Smooth Criminal"): ("PachangaEdited", "Smooth_Criminal_Lesson"),
 }
 
 
