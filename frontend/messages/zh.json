@@ -911,7 +911,7 @@
     "emailInvalid": "请输入有效的电子邮件地址",
     "emailTaken": "此邮箱已被注册",
     "usernameTaken": "此用户名已被使用",
-    "usernameInvalid": "用户名必须为3-30个字符",
+    "usernameInvalid": "用户名只能包含字母、数字和下划线（3-30个字符）",
     "passwordTooShort": "密码至少需要8个字符",
     "passwordMismatch": "两次密码不一致",
     "loginFailed": "邮箱或密码错误",

@@ -911,7 +911,7 @@
     "emailInvalid": "Voer een geldig e-mailadres in",
     "emailTaken": "Dit e-mailadres is al geregistreerd",
     "usernameTaken": "Deze gebruikersnaam is al in gebruik",
-    "usernameInvalid": "Gebruikersnaam moet 3–30 tekens zijn",
+    "usernameInvalid": "Gebruikersnaam mag alleen letters, cijfers en lage streepjes bevatten (3-30 tekens)",
     "passwordTooShort": "Wachtwoord moet minimaal 8 tekens zijn",
     "passwordMismatch": "Wachtwoorden komen niet overeen",
     "loginFailed": "Onjuist e-mailadres of wachtwoord",

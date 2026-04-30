@@ -911,7 +911,7 @@
     "emailInvalid": "Please enter a valid email address",
     "emailTaken": "This email is already registered",
     "usernameTaken": "This username is taken",
-    "usernameInvalid": "Username must be 3–30 characters (letters, numbers, underscores)",
+    "usernameInvalid": "Το όνομα χρήστη μπορεί να περιέχει μόνο γράμματα, αριθμούς και κάτω παύλες (3-30 χαρακτήρες)",
     "passwordTooShort": "Password must be at least 8 characters",
     "passwordMismatch": "Passwords do not match",
     "loginFailed": "Incorrect email or password",

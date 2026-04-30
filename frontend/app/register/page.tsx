@@ -10,12 +10,17 @@ import { useTranslations } from "@/i18n/useTranslations";
 
 export default function RegisterPage() {
   const t = useTranslations("auth.register");
+  // Pulls translated copy for backend-mirrored field errors so users on
+  // non-English locales see the rule in their own language instead of the
+  // raw English ValueError that Pydantic surfaces.
+  const tErr = useTranslations("errors");
   const [formData, setFormData] = useState({
     username: "",
     email: "",
     password: "",
     confirmPassword: "",
   });
+  const [usernameError, setUsernameError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,8 +30,25 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+    setUsernameError("");
     setPasswordError("");
     setLoading(true);
+
+    // Username validation must mirror backend (3-30 chars, [a-zA-Z0-9_] only).
+    // Without this, the Pydantic ValueError comes back as a hard-coded English
+    // string and surfaces verbatim to non-English users — confusing for anyone
+    // browsing the site in es/it/de/etc. Catching it here lets us show the
+    // already-translated `errors.usernameInvalid` copy in the user's locale.
+    const username = formData.username;
+    if (
+      username.length < 3 ||
+      username.length > 30 ||
+      !/^[a-zA-Z0-9_]+$/.test(username)
+    ) {
+      setUsernameError(tErr("usernameInvalid"));
+      setLoading(false);
+      return;
+    }
 
     // Client-side validation: passwords must match
     if (formData.password !== formData.confirmPassword) {
@@ -107,15 +129,21 @@ export default function RegisterPage() {
               <input
                 type="text"
                 value={formData.username}
-                onChange={(e) =>
-                  setFormData({ ...formData, username: e.target.value })
-                }
+                onChange={(e) => {
+                  setFormData({ ...formData, username: e.target.value });
+                  setUsernameError("");
+                }}
                 required
                 minLength={3}
+                maxLength={30}
                 placeholder={t("handlePlaceholder")}
-                className="w-full bg-black/60 border border-mambo-blue/50 rounded-lg p-3 text-white focus:border-mambo-blue focus:ring-1 focus:ring-mambo-blue focus:outline-none transition shadow-inner"
+                className={`w-full bg-black/60 border rounded-lg p-3 text-white focus:ring-1 focus:outline-none transition shadow-inner ${usernameError ? "border-red-500 focus:border-red-500 focus:ring-red-500" : "border-mambo-blue/50 focus:border-mambo-blue focus:ring-mambo-blue"}`}
               />
-              <p className="text-[10px] text-gray-500 mt-1">{t("handleHelper")}</p>
+              {usernameError ? (
+                <p className="text-xs text-red-400 mt-1">{usernameError}</p>
+              ) : (
+                <p className="text-[10px] text-gray-500 mt-1">{t("handleHelper")}</p>
+              )}
             </div>
 
             <div>

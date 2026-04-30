@@ -911,7 +911,7 @@
     "emailInvalid": "Wprowadź prawidłowy adres e-mail",
     "emailTaken": "Ten e-mail jest już zarejestrowany",
     "usernameTaken": "Ta nazwa użytkownika jest już zajęta",
-    "usernameInvalid": "Nazwa użytkownika musi mieć od 3 do 30 znaków",
+    "usernameInvalid": "Nazwa użytkownika może zawierać tylko litery, cyfry i podkreślenia (3-30 znaków)",
     "passwordTooShort": "Hasło musi mieć co najmniej 8 znaków",
     "passwordMismatch": "Hasła nie pasują do siebie",
     "loginFailed": "Nieprawidłowy e-mail lub hasło",

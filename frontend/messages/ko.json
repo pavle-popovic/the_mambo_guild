@@ -911,7 +911,7 @@
     "emailInvalid": "유효한 이메일 주소를 입력해 주세요",
     "emailTaken": "이 이메일은 이미 등록되어 있습니다",
     "usernameTaken": "이 사용자명은 이미 사용 중입니다",
-    "usernameInvalid": "사용자명은 3~30자여야 합니다",
+    "usernameInvalid": "사용자명은 영문, 숫자, 밑줄만 사용 가능합니다 (3-30자)",
     "passwordTooShort": "비밀번호는 8자 이상이어야 합니다",
     "passwordMismatch": "비밀번호가 일치하지 않습니다",
     "loginFailed": "이메일 또는 비밀번호가 올바르지 않습니다",
