@@ -332,6 +332,9 @@ export default function LessonPage() {
           requestAnimationFrame(() => {
             if (nextLessonId) {
               router.push(`/lesson/${nextLessonId}`);
+            } else {
+              // No next lesson — exit to backHref (skill tree, or /courses for choreos)
+              router.push(backHref);
             }
           });
         });
@@ -356,8 +359,9 @@ export default function LessonPage() {
           // Navigate to next lesson in module
           sessionStorage.setItem('questbar_scroll_trigger', nextLessonId);
           router.push(`/lesson/${nextLessonId}`);
-        } else if (isCourseComplete) {
-          // Module complete — go back to skill tree (or courses grid for choreos)
+        } else {
+          // No next lesson in module — exit to backHref
+          // (skill tree for courses/topics, /courses grid for choreos)
           router.push(backHref);
         }
       };
@@ -389,8 +393,8 @@ export default function LessonPage() {
             });
           });
         } else {
-          // If no next lesson in module, just reload to show completed state
-          await loadLesson();
+          // No next lesson — exit to backHref (skill tree, or /courses for choreos)
+          router.push(backHref);
         }
         setCompleting(false);
         return;
