@@ -101,6 +101,15 @@ const REAL_TESTIMONIALS: Testimonial[] = [
     role: "Vanguard Member",
     rating: 5,
   },
+  {
+    id: 10,
+    type: "testimonial",
+    quote:
+      "A structured path for every level, from zero to advanced. Technique, musicality, dance history, all in the highest quality, with Pavle's constant support and a stimulating community. The real Mambo school for everyone.",
+    name: "Emanuele R.",
+    role: "6 years dancing, Italy",
+    rating: 5,
+  },
 ];
 
 export default function TestimonialsSection() {
