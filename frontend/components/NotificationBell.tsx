@@ -165,6 +165,9 @@ export default function NotificationBell() {
     } else if (ref === "weekly_meeting") {
       setIsOpen(false);
       window.location.href = "/studio/roundtable";
+    } else if (ref === "course" && refId) {
+      setIsOpen(false);
+      window.location.href = `/courses/${encodeURIComponent(refId)}`;
     }
   };
 

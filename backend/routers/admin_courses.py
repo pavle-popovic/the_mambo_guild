@@ -12,7 +12,11 @@ from models.course import World, Level, Lesson, Difficulty
 from models.progress import UserProgress, BossSubmission, Comment
 from schemas.course import WorldResponse, LessonResponse
 from dependencies import get_admin_user, get_current_user_optional
+from services import notification_service
 import uuid
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -198,7 +202,18 @@ def create_course(
     db.add(world)
     db.commit()
     db.refresh(world)
-    
+
+    # If created already published, fan out a notification to every user.
+    if world.is_published:
+        try:
+            notification_service.broadcast_course_published(
+                world, db, exclude_user_id=str(admin_user.id)
+            )
+            db.commit()
+        except Exception as exc:
+            logger.exception("broadcast_course_published failed on create: %s", exc)
+            db.rollback()
+
     difficulty_str = world.difficulty.value if hasattr(world.difficulty, 'value') else str(world.difficulty)
     return WorldResponse(
         id=str(world.id),
@@ -224,7 +239,10 @@ def update_course(
     world = db.query(World).filter(World.id == course_id).first()
     if not world:
         raise HTTPException(status_code=404, detail="Course not found")
-    
+
+    # Snapshot publish state before mutating so we can detect a flip below.
+    was_published_before = bool(world.is_published)
+
     # Update fields
     if course_data.title is not None:
         world.title = course_data.title
@@ -267,7 +285,20 @@ def update_course(
 
     db.commit()
     db.refresh(world)
-    
+
+    # On a false → true flip, fan out a notification to every user.
+    # broadcast_course_published is itself idempotent per world, so toggling
+    # off and back on won't re-spam.
+    if world.is_published and not was_published_before:
+        try:
+            notification_service.broadcast_course_published(
+                world, db, exclude_user_id=str(admin_user.id)
+            )
+            db.commit()
+        except Exception as exc:
+            logger.exception("broadcast_course_published failed on update: %s", exc)
+            db.rollback()
+
     difficulty_str = world.difficulty.value if hasattr(world.difficulty, 'value') else str(world.difficulty)
     return WorldResponse(
         id=str(world.id),

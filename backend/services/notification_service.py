@@ -5,7 +5,7 @@ import logging
 import uuid
 from typing import List, Optional
 from sqlalchemy.orm import Session
-from sqlalchemy import func, desc
+from sqlalchemy import func, desc, text
 
 from models.notification import Notification
 from models.user import UserProfile
@@ -43,6 +43,54 @@ def create_notification(
     db.flush()
     logger.info(f"Notification created for user {user_id}: {type} - {title}")
     return notification
+
+
+def broadcast_course_published(world, db: Session, exclude_user_id: Optional[str] = None) -> int:
+    """Notify every user that a new course/choreo/topic just went live.
+
+    Idempotent: if a `course_published` notification already exists for this
+    world, the call is a no-op. That way an admin toggling published off and
+    back on doesn't spam the bell a second time. Returns the number of rows
+    inserted (0 when skipped).
+    """
+    already = db.query(Notification.id).filter(
+        Notification.type == "course_published",
+        Notification.reference_id == str(world.id),
+    ).first()
+    if already:
+        logger.info(f"broadcast_course_published: already sent for {world.id}, skipping")
+        return 0
+
+    course_type = (world.course_type or "course").lower()
+    type_label = {"choreo": "choreo", "topic": "topic"}.get(course_type, "course")
+    title = f"New {type_label}: {world.title}"
+    message = f"{world.title} is live. Tap to check it out."
+
+    # Single SQL fan-out — one INSERT per user, atomic.
+    result = db.execute(
+        text(
+            """
+            INSERT INTO notifications (
+                id, user_id, actor_id, type, title, message,
+                reference_type, reference_id, is_read, created_at
+            )
+            SELECT gen_random_uuid(), users.id, NULL, :type, :title, :message,
+                   'course', :ref_id, false, NOW()
+            FROM users
+            WHERE (CAST(:exclude AS UUID) IS NULL OR users.id <> CAST(:exclude AS UUID))
+            """
+        ),
+        {
+            "type": "course_published",
+            "title": title,
+            "message": message,
+            "ref_id": str(world.id),
+            "exclude": str(exclude_user_id) if exclude_user_id else None,
+        },
+    )
+    count = result.rowcount or 0
+    logger.info(f"broadcast_course_published: inserted {count} notifications for {world.id}")
+    return count
 
 
 def get_notifications(
