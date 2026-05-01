@@ -96,12 +96,16 @@ def mux_clients():
 
 
 def create_direct_upload(uploads_api, passthrough: str) -> tuple[str, str]:
-    """Create a direct upload + return (upload_id, signed_url)."""
+    """Create a direct upload + return (upload_id, signed_url).
+
+    Use video_quality="plus" so the asset gets a real ABR ladder — the
+    account default ("basic") stutters on community lessons. Drop the
+    deprecated mp4_support="standard" (rejected by Mux on basic tier).
+    """
     new_settings = mux_python.CreateAssetRequest(
         playback_policy=[mux_python.PlaybackPolicy.PUBLIC],
         passthrough=passthrough,
-        # Smart MP4 helps with downloads if needed
-        mp4_support="standard",
+        video_quality="plus",
     )
     req = mux_python.CreateUploadRequest(
         new_asset_settings=new_settings,
@@ -189,8 +193,7 @@ def update_lesson_row(conn, lesson_id: str, asset_id: str, playback_id: str) -> 
         """
         UPDATE lessons
         SET mux_asset_id = %s,
-            mux_playback_id = %s,
-            updated_at = NOW()
+            mux_playback_id = %s
         WHERE id = %s
         """,
         (asset_id, playback_id, lesson_id),
