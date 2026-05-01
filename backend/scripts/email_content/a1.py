@@ -18,6 +18,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <h2>What you also get if you start the free 7-day trial before May 6, 18:00 UTC</h2>
 
+<div style="text-align: center; margin: 16px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="120" style="width: 120px; height: auto; display: inline-block;">
+</div>
+
 <ul>
     <li><strong>Founder Diamond.</strong> The permanent badge only the first 300 founders ever receive. After May 6 the badge is gone from the platform forever.</li>
     <li><strong>$39/month locked in for the life of your subscription.</strong> The price only goes up from here.</li>

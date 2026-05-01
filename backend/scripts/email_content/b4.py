@@ -10,6 +10,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <h1>6 hours.</h1>
 
+<div style="text-align: center; margin: 18px 0 18px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="140" style="width: 140px; height: auto; display: inline-block;">
+</div>
+
 <p><strong>6 hours until the Founder Diamond closes for good.</strong></p>
 
 <p>You activated. You verified. The only step left is the trial start. It takes 90 seconds.</p>

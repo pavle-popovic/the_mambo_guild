@@ -27,6 +27,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <p>The trial is genuinely no-risk. Card on file, $0 charged for 7 days, cancel in 2 clicks before day 8 (no form, no human, no resistance). If you stay past day 7, $39/month locks in for the lifetime of your subscription.</p>
 
+<div style="text-align: center; margin: 24px 0 16px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="120" style="width: 120px; height: auto; display: inline-block;">
+</div>
+
 <div class="scarcity">
     <strong>3 days until the Founder Diamond closes</strong> (Wednesday May 6 at 18:00 UTC, permanent badge, first 300 founders only).
 </div>

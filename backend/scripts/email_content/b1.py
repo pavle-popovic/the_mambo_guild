@@ -19,6 +19,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
     <li><strong>Founder Diamond closes May 6 at 18:00 UTC.</strong> Permanent badge, first 300 founders only. After Wednesday it is gone from the platform forever.</li>
 </ul>
 
+<div style="text-align: center; margin: 24px 0 16px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="120" style="width: 120px; height: auto; display: inline-block;">
+</div>
+
 <div class="cta-wrap">
     <a href="__FRONTEND_URL__/pricing" class="cta">Start my 7-day trial</a>
     <div class="cta-sub">You are already activated. This takes maybe 90 seconds.</div>

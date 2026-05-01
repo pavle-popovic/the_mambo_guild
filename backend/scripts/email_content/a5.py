@@ -10,6 +10,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <h1>24 hours.</h1>
 
+<div style="text-align: center; margin: 18px 0 18px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="140" style="width: 140px; height: auto; display: inline-block;">
+</div>
+
 <p>Tomorrow Wednesday May 6 at 18:00 UTC, the Founder Diamond gate closes permanently. The badge is gated on:</p>
 
 <ol>

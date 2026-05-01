@@ -10,6 +10,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <p>Quick note for trial members.</p>
 
+<div style="text-align: center; margin: 16px 0 16px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="120" style="width: 120px; height: auto; display: inline-block;">
+</div>
+
 <p>You are already locked in for the Founder Diamond. Your trial start before today's deadline secures it. <strong>Today is the final day for anyone else.</strong></p>
 
 <p>If you have dance partners or training buddies who have not joined the Guild yet, today is the cutoff. After 18:00 UTC the badge disappears from the platform for new members forever.</p>

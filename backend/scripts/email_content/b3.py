@@ -10,6 +10,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <h1>24 hours.</h1>
 
+<div style="text-align: center; margin: 18px 0 18px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="140" style="width: 140px; height: auto; display: inline-block;">
+</div>
+
 <p>Tomorrow Wednesday May 6 at 18:00 UTC, the Founder Diamond closes permanently. You are activated but not on the trial yet, meaning you are literally <strong>one screen</strong> away from securing the badge.</p>
 
 <p>The trial is no-risk. Card required (Stripe minimum), $0 charged for 7 days, cancel in 2 clicks before day 8 if it is not for you.</p>

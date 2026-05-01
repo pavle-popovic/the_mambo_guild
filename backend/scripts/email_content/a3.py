@@ -32,6 +32,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
     "It did not feel like just a course, it felt like being part of a community."
 </div>
 
+<div style="text-align: center; margin: 24px 0 16px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="120" style="width: 120px; height: auto; display: inline-block;">
+</div>
+
 <div class="scarcity">
     <strong>Founder Diamond closes Wednesday May 6 at 18:00 UTC.</strong> The badge is gated to the first 300 founders only. After Wednesday, no one ever gets that badge again.
 </div>

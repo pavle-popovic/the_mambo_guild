@@ -10,6 +10,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <h1>6 hours.</h1>
 
+<div style="text-align: center; margin: 18px 0 18px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="140" style="width: 140px; height: auto; display: inline-block;">
+</div>
+
 <p>At 18:00 UTC today the Founder Diamond closes for good. <strong>This is the final email.</strong></p>
 
 <h2>If you start your 7-day free trial before then</h2>

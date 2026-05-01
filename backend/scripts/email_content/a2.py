@@ -22,6 +22,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <p>The community + The Stage are paid-tier features, so participation is open to members on a Pro trial or higher. Casual, low-pressure, just for the dancers who feel like jumping in.</p>
 
+<div style="text-align: center; margin: 24px 0 16px 0;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="120" style="width: 120px; height: auto; display: inline-block;">
+</div>
+
 <p>Starting your free 7-day trial before <strong>May 6 at 18:00 UTC</strong> also locks in the <strong>Founder Diamond</strong>, the permanent badge gated to the first 300 founders only.</p>
 
 <div class="cta-wrap">
