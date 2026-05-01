@@ -1135,9 +1135,12 @@ class ApiClient {
   }
 
   async getFounderBadgeStatus() {
+    // Public endpoint: returns only cap + deadline + expired flag. The live
+    // `claimed` / `remaining` counts are intentionally NOT exposed (see
+    // backend/routers/founder.py module docstring). If a UI ever needs a
+    // count, build a separate authenticated endpoint with the founder's
+    // explicit decision on what to show.
     return this.request<{
-      claimed: number;
-      remaining: number;
       cap: number;
       deadline: string;
       expired: boolean;

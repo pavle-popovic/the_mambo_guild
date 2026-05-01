@@ -118,9 +118,14 @@ def test_webhook_calls_founder_try_claim():
 # ---------------------------------------------------------------------------
 
 def test_status_response_model_shape():
+    """Lock the public response shape so a future change can't accidentally
+    re-leak the live `claimed` / `remaining` counts. See routers/founder.py
+    docstring for why those fields are deliberately omitted."""
     from routers.founder import FounderBadgeStatusResponse
     fields = FounderBadgeStatusResponse.model_fields
-    assert set(fields) == {"claimed", "remaining", "cap", "deadline", "expired"}
+    assert set(fields) == {"cap", "deadline", "expired"}
+    assert "claimed" not in fields, "claimed must not be exposed publicly"
+    assert "remaining" not in fields, "remaining must not be exposed publicly"
 
 
 # ---------------------------------------------------------------------------
