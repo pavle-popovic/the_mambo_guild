@@ -81,7 +81,9 @@
       "successBody": "Si existe una cuenta con ese correo, te hemos enviado un enlace para restablecer la contraseña. Revisa tu bandeja de entrada y sigue las instrucciones.",
       "backToLogin": "Volver al inicio de sesión",
       "failedToSend": "No se pudo enviar el correo de restablecimiento",
-      "genericError": "No se pudo enviar el correo. Inténtalo de nuevo."
+      "genericError": "No se pudo enviar el correo. Inténtalo de nuevo.",
+      "oauthAccountTitle": "Inicia sesión con {provider}",
+      "oauthAccountBody": "Este correo está vinculado a tu cuenta de {provider}, así que no hay contraseña que restablecer. Ve a la página de inicio de sesión y haz clic en \"Continuar con {provider}\" para acceder a tu cuenta."
     },
     "resetPassword": {
       "title": "Restablecer contraseña",

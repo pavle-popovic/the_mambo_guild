@@ -81,7 +81,9 @@
       "successBody": "Jeśli istnieje konto z tym adresem e-mail, wysłaliśmy link do resetu hasła. Sprawdź skrzynkę i postępuj zgodnie z instrukcjami.",
       "backToLogin": "Powrót do logowania",
       "failedToSend": "Nie udało się wysłać e-maila z resetem",
-      "genericError": "Nie udało się wysłać e-maila. Spróbuj ponownie."
+      "genericError": "Nie udało się wysłać e-maila. Spróbuj ponownie.",
+      "oauthAccountTitle": "Zaloguj się przez {provider}",
+      "oauthAccountBody": "Ten e-mail jest powiązany z Twoim kontem {provider}, więc nie ma hasła do zresetowania. Przejdź do strony logowania i kliknij \"Kontynuuj z {provider}\", aby uzyskać dostęp do swojego konta."
     },
     "resetPassword": {
       "title": "Resetuj hasło",

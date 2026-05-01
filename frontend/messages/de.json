@@ -81,7 +81,9 @@
       "successBody": "Falls ein Konto mit dieser Adresse existiert, haben wir einen Link zum Zurücksetzen gesendet. Prüfe dein Postfach und folge den Anweisungen.",
       "backToLogin": "Zurück zur Anmeldung",
       "failedToSend": "E-Mail zum Zurücksetzen konnte nicht gesendet werden",
-      "genericError": "E-Mail konnte nicht gesendet werden. Versuche es erneut."
+      "genericError": "E-Mail konnte nicht gesendet werden. Versuche es erneut.",
+      "oauthAccountTitle": "Mit {provider} anmelden",
+      "oauthAccountBody": "Diese E-Mail ist mit deinem {provider}-Konto verknüpft, daher gibt es kein Passwort zum Zurücksetzen. Gehe zur Anmeldeseite und klicke auf \"Mit {provider} fortfahren\", um auf dein Konto zuzugreifen."
     },
     "resetPassword": {
       "title": "Passwort zurücksetzen",

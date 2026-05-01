@@ -81,7 +81,9 @@
       "successBody": "Se esiste un account con questa email, ti abbiamo inviato un link per reimpostare la password. Controlla la posta e segui le istruzioni.",
       "backToLogin": "Torna all'accesso",
       "failedToSend": "Impossibile inviare l'email di reset",
-      "genericError": "Impossibile inviare l'email. Riprova."
+      "genericError": "Impossibile inviare l'email. Riprova.",
+      "oauthAccountTitle": "Accedi con {provider}",
+      "oauthAccountBody": "Questa email è collegata al tuo account {provider}, quindi non c'è alcuna password da reimpostare. Vai alla pagina di accesso e clicca \"Continua con {provider}\" per accedere al tuo account."
     },
     "resetPassword": {
       "title": "Reimposta password",

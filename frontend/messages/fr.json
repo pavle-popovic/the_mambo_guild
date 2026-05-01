@@ -81,7 +81,9 @@
       "successBody": "Si un compte existe avec cette adresse, nous vous avons envoyé un lien de réinitialisation. Consultez votre boîte de réception et suivez les instructions.",
       "backToLogin": "Retour à la connexion",
       "failedToSend": "Impossible d'envoyer l'e-mail de réinitialisation",
-      "genericError": "Impossible d'envoyer l'e-mail. Veuillez réessayer."
+      "genericError": "Impossible d'envoyer l'e-mail. Veuillez réessayer.",
+      "oauthAccountTitle": "Connectez-vous avec {provider}",
+      "oauthAccountBody": "Cet e-mail est lié à votre compte {provider}, il n'y a donc pas de mot de passe à réinitialiser. Allez sur la page de connexion et cliquez sur \"Continuer avec {provider}\" pour accéder à votre compte."
     },
     "resetPassword": {
       "title": "Réinitialiser le mot de passe",

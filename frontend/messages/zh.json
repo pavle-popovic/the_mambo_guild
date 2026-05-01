@@ -81,7 +81,9 @@
       "successBody": "如果存在该邮箱对应的账户，我们已发送密码重置链接。请查看收件箱并按指示操作。",
       "backToLogin": "返回登录",
       "failedToSend": "无法发送重置邮件",
-      "genericError": "无法发送邮件。请重试。"
+      "genericError": "无法发送邮件。请重试。",
+      "oauthAccountTitle": "使用 {provider} 登录",
+      "oauthAccountBody": "此邮箱已绑定您的 {provider} 账号，因此无需重置密码。请前往登录页面，点击\"使用 {provider} 继续\"以访问您的账号。"
     },
     "resetPassword": {
       "title": "重置密码",

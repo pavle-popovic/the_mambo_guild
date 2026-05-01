@@ -12,6 +12,11 @@ export default function ForgotPasswordPage() {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  // Set when the backend tells us the email exists but the account is
+  // OAuth-registered (google/apple). Branches the UI to a "use Google/Apple
+  // to sign in" hint so users like Louie don't sit waiting for an email
+  // that will never arrive.
+  const [oauthProvider, setOauthProvider] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
@@ -19,6 +24,7 @@ export default function ForgotPasswordPage() {
     e.preventDefault();
     setError("");
     setSuccess(false);
+    setOauthProvider(null);
     setLoading(true);
 
     try {
@@ -35,13 +41,22 @@ export default function ForgotPasswordPage() {
         throw new Error(errorData.detail || t("failedToSend"));
       }
 
-      setSuccess(true);
+      const data = await response.json().catch(() => ({}));
+      if (data?.oauth_provider) {
+        setOauthProvider(String(data.oauth_provider));
+      } else {
+        setSuccess(true);
+      }
     } catch (err: any) {
       setError(err.message || t("genericError"));
     } finally {
       setLoading(false);
     }
   };
+
+  const providerLabel = oauthProvider
+    ? oauthProvider.charAt(0).toUpperCase() + oauthProvider.slice(1)
+    : "";
 
   return (
     <div className="min-h-screen bg-mambo-dark relative overflow-hidden">
@@ -72,7 +87,22 @@ export default function ForgotPasswordPage() {
             </div>
           )}
 
-          {success ? (
+          {oauthProvider ? (
+            <div className="space-y-4">
+              <div className="p-4 bg-amber-900/40 border border-amber-500/50 rounded-lg text-amber-100 text-sm">
+                <p className="font-semibold mb-2">
+                  {t("oauthAccountTitle", { provider: providerLabel })}
+                </p>
+                <p>{t("oauthAccountBody", { provider: providerLabel })}</p>
+              </div>
+              <Link
+                href="/login"
+                className="block w-full text-center bg-mambo-blue hover:bg-blue-600 text-white font-bold py-3 rounded-lg transition shadow-lg shadow-blue-600/20"
+              >
+                {t("backToLogin")}
+              </Link>
+            </div>
+          ) : success ? (
             <div className="space-y-4">
               <div className="p-4 bg-green-900/50 border border-green-500/50 rounded-lg text-green-200 text-sm">
                 <p className="font-semibold mb-2">{t("successTitle")}</p>

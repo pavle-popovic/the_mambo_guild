@@ -81,7 +81,9 @@
       "successBody": "If an account exists with that email, we've sent you a password reset link. Please check your inbox and follow the instructions.",
       "backToLogin": "Back to Login",
       "failedToSend": "Failed to send reset email",
-      "genericError": "Failed to send reset email. Please try again."
+      "genericError": "Failed to send reset email. Please try again.",
+      "oauthAccountTitle": "Use {provider} to sign in",
+      "oauthAccountBody": "This email is linked to your {provider} account, so there's no password to reset. Go to the login page and click \"Continue with {provider}\" to access your account."
     },
     "resetPassword": {
       "title": "Reset Password",

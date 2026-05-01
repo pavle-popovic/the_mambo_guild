@@ -1058,6 +1058,17 @@ def forgot_password(
              return {"message": "If the email exists, a password reset link has been sent."}
         # If allow_claim is True, we proceed for waitlist users
     elif user.auth_provider != "email" or not user.hashed_password:
+        # User exists but is OAuth-authenticated (google/apple). Surface the
+        # provider name so the frontend can render a "use Google/Apple to sign
+        # in" hint — the generic message leaves OAuth users waiting for an
+        # email that never arrives (they have no password to reset). Small
+        # enumeration risk accepted: leaks "this email is OAuth-registered"
+        # but not "this email is registered as email auth" vs "doesn't exist."
+        if user.auth_provider in ("google", "apple"):
+            return {
+                "message": "If the email exists, a password reset link has been sent.",
+                "oauth_provider": user.auth_provider,
+            }
         return {"message": "If the email exists, a password reset link has been sent."}
     
     try:

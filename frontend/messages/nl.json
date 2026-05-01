@@ -81,7 +81,9 @@
       "successBody": "Als er een account bestaat met dit e-mailadres, hebben we je een reset-link gestuurd. Check je inbox en volg de instructies.",
       "backToLogin": "Terug naar inloggen",
       "failedToSend": "Kon de reset-e-mail niet verzenden",
-      "genericError": "Kon de e-mail niet verzenden. Probeer opnieuw."
+      "genericError": "Kon de e-mail niet verzenden. Probeer opnieuw.",
+      "oauthAccountTitle": "Inloggen met {provider}",
+      "oauthAccountBody": "Dit e-mailadres is gekoppeld aan je {provider}-account, dus er is geen wachtwoord om te resetten. Ga naar de inlogpagina en klik op \"Doorgaan met {provider}\" om toegang te krijgen tot je account."
     },
     "resetPassword": {
       "title": "Wachtwoord resetten",

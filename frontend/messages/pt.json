@@ -81,7 +81,9 @@
       "successBody": "Se existir uma conta com esse e-mail, enviamos um link de redefinição de senha. Verifique sua caixa de entrada e siga as instruções.",
       "backToLogin": "Voltar ao login",
       "failedToSend": "Falha ao enviar o e-mail de redefinição",
-      "genericError": "Falha ao enviar o e-mail. Tente novamente."
+      "genericError": "Falha ao enviar o e-mail. Tente novamente.",
+      "oauthAccountTitle": "Entrar com {provider}",
+      "oauthAccountBody": "Este e-mail está vinculado à sua conta {provider}, então não há senha para redefinir. Vá para a página de login e clique em \"Continuar com {provider}\" para acessar sua conta."
     },
     "resetPassword": {
       "title": "Redefinir senha",

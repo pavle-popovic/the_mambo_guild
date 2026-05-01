@@ -81,7 +81,9 @@
       "successBody": "Bu e-postayla kayıtlı bir hesap varsa, şifre sıfırlama bağlantısı gönderdik. Gelen kutunu kontrol et ve talimatları izle.",
       "backToLogin": "Girişe Dön",
       "failedToSend": "Sıfırlama e-postası gönderilemedi",
-      "genericError": "Sıfırlama e-postası gönderilemedi. Lütfen tekrar dene."
+      "genericError": "Sıfırlama e-postası gönderilemedi. Lütfen tekrar dene.",
+      "oauthAccountTitle": "{provider} ile giriş yap",
+      "oauthAccountBody": "Bu e-posta {provider} hesabına bağlı, bu yüzden sıfırlanacak şifre yok. Giriş sayfasına git ve hesabına erişmek için \"{provider} ile devam et\" düğmesine tıkla."
     },
     "resetPassword": {
       "title": "Şifreyi Sıfırla",
