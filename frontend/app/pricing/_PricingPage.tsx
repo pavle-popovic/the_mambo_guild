@@ -428,13 +428,13 @@ function PricingPageContent() {
                         Shows under the Pro tier specifically (not the other
                         tiers) to nudge would-be subscribers. Endpoint at
                         /api/stats/registered-count, cached 5 min. */}
-                    <div className="mb-6 flex items-center gap-1.5 text-xs text-gray-400">
-                      <span className="relative flex h-1.5 w-1.5">
-                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
-                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold"></span>
+                    <div className="mb-6 inline-flex items-center gap-2 px-3.5 py-2 rounded-full bg-mambo-gold/10 border border-mambo-gold/40 text-sm font-semibold text-mambo-text shadow-[0_0_18px_rgba(212,175,55,0.18)]">
+                      <span className="relative flex h-2 w-2">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-70"></span>
+                        <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold"></span>
                       </span>
                       <span>
-                        <RegisteredUserCount /> dancers learning here
+                        Join <RegisteredUserCount /> Active Members
                       </span>
                     </div>
 

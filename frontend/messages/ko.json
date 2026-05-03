@@ -937,9 +937,9 @@
       "bulletNoPartner": "파트너 필요 없음",
       "bulletLanguages": "16개 언어 지원",
       "bulletOnDemand": "온디맨드, 언제 어디서나",
-      "socialProofPrefix": "이미",
+      "socialProofPrefix": "",
       "socialProofCount": "1,000명 이상의 댄서",
-      "socialProofSuffix": "가 함께하고 있습니다",
+      "socialProofSuffix": "명의 활성 멤버가 참여 중",
       "cta": "7일 무료 체험 시작하기!"
     },
     "founder": {

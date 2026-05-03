@@ -63,7 +63,7 @@ export default function LoginPage() {
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold"></span>
               </span>
               <span>
-                <RegisteredUserCount /> dancers learning right now
+                Join <RegisteredUserCount /> Active Members
               </span>
             </p>
           </div>

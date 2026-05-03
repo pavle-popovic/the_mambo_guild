@@ -937,9 +937,9 @@
       "bulletNoPartner": "パートナー不要",
       "bulletLanguages": "16言語対応",
       "bulletOnDemand": "オンデマンド、いつでも、どこでも",
-      "socialProofPrefix": "すでに",
+      "socialProofPrefix": "",
       "socialProofCount": "1,000人以上のダンサー",
-      "socialProofSuffix": "がリストに参加中",
+      "socialProofSuffix": "人のアクティブメンバーが参加中",
       "cta": "7日間の無料トライアルを始める！"
     },
     "founder": {

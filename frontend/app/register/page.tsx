@@ -119,7 +119,7 @@ export default function RegisterPage() {
                 <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold"></span>
               </span>
               <span>
-                Join <RegisteredUserCount /> dancers already in the Guild
+                Join <RegisteredUserCount /> Active Members
               </span>
             </p>
           </div>
