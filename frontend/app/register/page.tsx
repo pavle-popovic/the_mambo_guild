@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import NavBar from "@/components/NavBar";
+import RegisteredUserCount from "@/components/RegisteredUserCount";
 import { useAuth } from "@/contexts/AuthContext";
 import { useTranslations } from "@/i18n/useTranslations";
 
@@ -111,6 +112,16 @@ export default function RegisterPage() {
           <div className="text-center mb-6">
             <h1 className="text-2xl font-bold mb-1 text-mambo-text">{t("title")}</h1>
             <p className="text-gray-400 text-sm">{t("subtitle")}</p>
+            {/* Live social proof — count of real registered accounts. */}
+            <p className="text-xs text-gray-500 mt-3 flex items-center justify-center gap-1.5">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold"></span>
+              </span>
+              <span>
+                Join <RegisteredUserCount /> dancers already in the Guild
+              </span>
+            </p>
           </div>
 
           {error && (

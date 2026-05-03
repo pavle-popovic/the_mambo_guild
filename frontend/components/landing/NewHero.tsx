@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import Link from "next/link";
 import { FaCheck, FaCertificate } from "react-icons/fa";
 import Mambobot from "./Mambobot";
+import RegisteredUserCount from "@/components/RegisteredUserCount";
 import { useTranslations } from "@/i18n/useTranslations";
 import { useAuth } from "@/contexts/AuthContext";
 
@@ -226,7 +227,7 @@ export default function NewHero() {
                                 <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold landscape-phone:!h-1.5 landscape-phone:!w-1.5"></span>
                             </span>
                             <span>
-                                {t("socialProofPrefix")} <span className="font-bold text-mambo-gold">{t("socialProofCount")}</span> {t("socialProofSuffix")}
+                                {t("socialProofPrefix")} <RegisteredUserCount /> {t("socialProofSuffix")}
                             </span>
                         </div>
                         {isSubscribed ? (
@@ -268,7 +269,7 @@ export default function NewHero() {
                             <span className="relative inline-flex h-2 w-2 rounded-full bg-mambo-gold"></span>
                         </span>
                         <span>
-                            {t("socialProofPrefix")} <span className="font-bold text-mambo-gold">{t("socialProofCount")}</span> {t("socialProofSuffix")}
+                            {t("socialProofPrefix")} <RegisteredUserCount /> {t("socialProofSuffix")}
                         </span>
                     </div>
                     {isSubscribed ? (

@@ -11,6 +11,7 @@ import { FaCheck, FaTimes, FaCrown } from "react-icons/fa";
 import { FadeIn, StaggerContainer, StaggerItem, HoverCard, Clickable } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
 import EmailVerificationModal from "@/components/EmailVerificationModal";
+import RegisteredUserCount from "@/components/RegisteredUserCount";
 import { toast } from "sonner";
 import {
   CONTACT_EMAIL,
@@ -421,6 +422,20 @@ function PricingPageContent() {
                       <div className="text-xs leading-snug text-white/75">
                         {tp("proGrandfatherReason")}
                       </div>
+                    </div>
+
+                    {/* Live social proof — count of real registered accounts.
+                        Shows under the Pro tier specifically (not the other
+                        tiers) to nudge would-be subscribers. Endpoint at
+                        /api/stats/registered-count, cached 5 min. */}
+                    <div className="mb-6 flex items-center gap-1.5 text-xs text-gray-400">
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
+                        <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold"></span>
+                      </span>
+                      <span>
+                        <RegisteredUserCount /> dancers learning here
+                      </span>
                     </div>
 
                     <ul className="text-left space-y-4 mb-8 flex-1">

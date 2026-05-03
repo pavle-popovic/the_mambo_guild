@@ -43,6 +43,9 @@ from .shop import router as shop_router
 # Founder Diamond — public seat counter for /pricing
 from .founder import router as founder_router
 
+# Public stats — registered-user counter for Hero / Pricing / Login / Register
+from .stats import router as stats_router
+
 # Register routers
 api_router.include_router(auth_router, prefix="/auth", tags=["auth"])
 api_router.include_router(courses_router, prefix="/courses", tags=["courses"])
@@ -83,3 +86,6 @@ api_router.include_router(shop_router, tags=["shop"])
 
 # Founder Diamond — public seat counter for /pricing
 api_router.include_router(founder_router, tags=["founder"])
+
+# Public stats — live registered-user counter (Hero / Pricing / Auth pages)
+api_router.include_router(stats_router, tags=["stats"])

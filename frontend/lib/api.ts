@@ -1134,6 +1134,14 @@ class ApiClient {
     }>("/api/payments/guild-master-seats");
   }
 
+  async getRegisteredUserCount() {
+    // Public endpoint: live count of activated, verified accounts. Used
+    // as social proof on Hero, /pricing, /login, /register. Excludes
+    // unactivated waitlist signups (which would inflate the number with
+    // people who never opened an account).
+    return this.request<{ count: number }>("/api/stats/registered-count");
+  }
+
   async getFounderBadgeStatus() {
     // Public endpoint: returns only cap + deadline + expired flag. The live
     // `claimed` / `remaining` counts are intentionally NOT exposed (see

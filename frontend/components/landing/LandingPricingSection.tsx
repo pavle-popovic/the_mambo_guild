@@ -9,6 +9,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { HoverCard, Clickable, StaggerContainer, StaggerItem } from "@/components/ui/motion";
 import AuthPromptModal from "@/components/AuthPromptModal";
+import RegisteredUserCount from "@/components/RegisteredUserCount";
 import EmailVerificationModal from "@/components/EmailVerificationModal";
 import {
   daysUntilProGrandfatherEnd,
@@ -364,8 +365,24 @@ export default function LandingPricingSection() {
                           </div>
                         </div>
                       ) : (
-                        <div className="text-sm text-gray-500 mb-8">
-                          {plan.description}
+                        <div className="mb-8">
+                          <div className="text-sm text-gray-500">
+                            {plan.description}
+                          </div>
+                          {/* Live social proof — only on the Pro tier card.
+                              Shows real registered-account count from
+                              /api/stats/registered-count (cached 5min). */}
+                          {plan.id === "full-access" && (
+                            <div className="mt-2 flex items-center gap-1.5 text-xs text-gray-400">
+                              <span className="relative flex h-1.5 w-1.5">
+                                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mambo-gold opacity-60"></span>
+                                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-mambo-gold"></span>
+                              </span>
+                              <span>
+                                <RegisteredUserCount /> dancers learning here
+                              </span>
+                            </div>
+                          )}
                         </div>
                       )}
 
