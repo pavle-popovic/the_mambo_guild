@@ -14,7 +14,7 @@ Slot in the B series:
   b4   May 6   "6 hours" final
 """
 
-SEGMENT = "B"
+SEGMENT = "BW"
 SEND_AT_UTC = "2026-05-04T17:00:00Z"
 
 SUBJECT = "48 Hours left to claim your Founder Badge!"

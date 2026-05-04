@@ -22,6 +22,10 @@ Segment routing (SQL filter chosen by module.SEGMENT):
   BCD — UNION of B+C+D: everyone who has a real account, regardless of
         sub status. Used for one-off cross-cohort sends (e.g. the
         bonus Roundtable invite that goes to every member).
+  BW  — B intersected with was_waitlister=TRUE: activated accounts that
+        originally came in via the waitlist (excludes direct /register
+        signups). Use for Founder-Badge-related emails since the badge
+        is gated on waitlist origin.
 
 Token TTL: as long as you ship Segment A emails (which use __MAGIC_LINK__),
 PASSWORD_RESET_EXPIRE_MINUTES on Railway must be >= 1440. Script will warn
@@ -140,6 +144,23 @@ _SEGMENT_SQL = {
         WHERE s.status = 'active'
           AND u.email IS NOT NULL
           AND u.email <> ''
+        ORDER BY u.created_at NULLS LAST
+    """,
+    # B narrowed to former waitlisters only. Use for Founder-Badge
+    # nudges (the badge is gated on waitlist origin per
+    # project_founder_badge_gate). Excludes direct /register signups
+    # who would otherwise be told they can earn a badge they cannot.
+    "BW": """
+        SELECT u.id, u.email, up.username
+        FROM users u
+        JOIN user_profiles up ON up.user_id = u.id
+        LEFT JOIN subscriptions s ON s.user_id = u.id
+        WHERE u.auth_provider IN ('email', 'google', 'apple')
+          AND u.is_verified = TRUE
+          AND up.was_waitlister = TRUE
+          AND u.email IS NOT NULL
+          AND u.email <> ''
+          AND (s.status IS NULL OR s.status NOT IN ('active', 'trialing'))
         ORDER BY u.created_at NULLS LAST
     """,
     # UNION B + C + D. Everyone who has a real account (not a waitlist
