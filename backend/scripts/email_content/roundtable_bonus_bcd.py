@@ -41,7 +41,6 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
     <span style="display:block;font-size:12px;color:#777;margin-top:6px;font-family:Arial,sans-serif;">Studio menu, top right of the nav. The Roundtable is the live calls and archives item.</span>
 </p>
 
-<p>The link lives only on the platform, behind the trial gate. No public link.</p>
 
 <p>See you tomorrow.</p>
 
