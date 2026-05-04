@@ -128,6 +128,9 @@ SKIP_EMAILS = {
     # Unsubscribed during the day-4 broadcast (May 4)
     "mitsialf@gmail.com",
     "roland-meyer@gmx.ch",
+    "andreasarnold15@gmail.com",
+    "stine.kapaasen@gmail.com",
+    "vladimir.asmat@gmail.com",
     # GDPR Article 17 deletion request, fulfilled — see scripts/gdpr_deletion_log.txt
     "hakanceylan899@gmail.com",
     # Disposable / nonsense addresses
