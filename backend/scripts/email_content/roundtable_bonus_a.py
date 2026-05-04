@@ -12,7 +12,7 @@ SEGMENT = "A"
 SEND_AT_UTC = "2026-05-04T13:00:00Z"
 
 SUBJECT = "Live Masterclass tomorrow: how to enter flow state when you dance"
-PREHEADER = "Tue May 5, 18:00 UTC. Open to every paid and trial member, on the platform."
+PREHEADER = "Tue May 5, 18:00 UTC. Open to every member, on the platform."
 
 BODY_HTML = """<p>Hi __USERNAME__,</p>
 
@@ -22,7 +22,7 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <h2>What we will cover</h2>
 
-<p>That state where you stop coaching yourself in your head, stop forcing the count, and actually start dancing. We go through what to focus on, what to ignore, and how to find flow when your head gets noisy on the floor.</p>
+<p>That state where you stop getting overwhelmed, and actually start dancing. We go through what to focus on, what to ignore, and how to find flow when your head gets noisy on the floor.</p>
 
 <p>Then we apply it to <strong>this week's Footwork Challenge in the Community tab</strong>. You leave with one specific thing to drill, post, and get feedback on.</p>
 
@@ -41,13 +41,12 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
     <span style="display:block;font-size:12px;color:#777;margin-top:6px;font-family:Arial,sans-serif;">Studio menu, top right of the nav. The Roundtable is the live calls and archives item.</span>
 </p>
 
-<p>The link lives only on the platform, behind the trial gate. No public link.</p>
 
 <p>See you tomorrow.</p>
 
 <p style="margin-top: 32px;">Pavle</p>
 
-<p style="font-size: 13px; color: #666; margin-top: 24px;"><em>P.S. The next regular Guild Master Roundtable is back on its weekly Wednesday slot, <strong>May 13 at 18:00 UTC</strong>. Performers, that one stays yours.</em></p>
+<p style="font-size: 13px; color: #666; margin-top: 24px;"><em>P.S. The next regular Guild Masters only Roundtable is back on <strong>Wednesday May 13 at 18:00 UTC</strong>.</em></p>
 """
 
 BODY_TEXT = """Hi __USERNAME__,
@@ -59,7 +58,7 @@ Tomorrow, Tuesday May 5, 18:00 UTC, I am running a Live Masterclass on entering 
 
 WHAT WE WILL COVER
 ------------------
-That state where you stop coaching yourself in your head, stop forcing the count, and actually start dancing. We go through what to focus on, what to ignore, and how to find flow when your head gets noisy on the floor.
+That state where you stop getting overwhelmed, and actually start dancing. We go through what to focus on, what to ignore, and how to find flow when your head gets noisy on the floor.
 
 Then we apply it to this week's Footwork Challenge in the Community tab. You leave with one specific thing to drill, post, and get feedback on.
 
@@ -80,5 +79,5 @@ See you tomorrow.
 
 Pavle
 
-P.S. The next regular Guild Master Roundtable is back on its weekly Wednesday slot, May 13 at 18:00 UTC. Performers, that one stays yours.
+P.S. The next regular Guild Masters only Roundtable is back on Wednesday May 13 at 18:00 UTC.
 """
