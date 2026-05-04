@@ -44,6 +44,13 @@ export default function NavBar({ user }: NavBarProps) {
   const studioDropdownRef = useRef<HTMLDivElement>(null);
   const isAuthenticated = !!user;
   const isGuildMaster = user?.tier?.toLowerCase() === "performer";
+  // TEMP 2026-05-05: bonus Live Masterclass also opens Roundtable to Advanced
+  // + trial members (trial users carry tier="advanced"). Mirrors the gate
+  // widening in app/studio/roundtable/page.tsx. REVERT on or after
+  // 2026-05-06 18:00 UTC by replacing canAccessRoundtable call-sites with
+  // isGuildMaster (or just deleting the variable).
+  const canAccessRoundtable =
+    isGuildMaster || user?.tier?.toLowerCase() === "advanced";
 
   useEffect(() => {
     setMounted(true);
@@ -319,16 +326,16 @@ export default function NavBar({ user }: NavBarProps) {
                           >
                             <div className={cn(
                               "w-10 h-10 rounded-lg flex items-center justify-center",
-                              isGuildMaster 
+                              canAccessRoundtable
                                 ? "bg-gradient-to-br from-red-500/20 to-orange-500/20 border border-red-400/30"
                                 : "bg-gray-800 border border-gray-700"
                             )}>
-                              <Radio size={18} className={isGuildMaster ? "text-red-400" : "text-gray-500"} />
+                              <Radio size={18} className={canAccessRoundtable ? "text-red-400" : "text-gray-500"} />
                             </div>
                             <div className="flex-1">
                               <div className="flex items-center gap-2">
                                 <span className="text-sm font-semibold text-white">{t('roundtableShort')}</span>
-                                {!isGuildMaster && (
+                                {!canAccessRoundtable && (
                                   <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">{t('lockedTag')}</span>
                                 )}
                               </div>
@@ -515,7 +522,7 @@ export default function NavBar({ user }: NavBarProps) {
                     </Link>
                     <Link href="/studio/roundtable" onClick={() => setIsMobileMenuOpen(false)} className="px-4 py-3 rounded-lg text-gray-300 hover:text-white hover:bg-white/5 font-semibold flex items-center gap-2">
                       <Radio size={16} /> The Roundtable
-                      {!isGuildMaster && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>}
+                      {!canAccessRoundtable && <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold">LOCKED</span>}
                     </Link>
 
                     {user?.role?.toLowerCase() === "admin" && (
