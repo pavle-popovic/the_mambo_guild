@@ -109,6 +109,12 @@ export default function RoundtablePage() {
   const router = useRouter();
   const t = useTranslations("roundtable");
   const isGuildMaster = user?.tier?.toLowerCase() === "performer";
+  // TEMP 2026-05-05: bonus Live Masterclass open to Advanced + trial members
+  // (trial users carry tier="advanced"). REVERT on or after 2026-05-06 18:00 UTC,
+  // before the next Performer-only Roundtable on 2026-05-13. To revert: delete
+  // canAccessRoundtable and replace its three call-sites with isGuildMaster.
+  const canAccessRoundtable =
+    isGuildMaster || user?.tier?.toLowerCase() === "advanced";
 
   const [meetingConfig, setMeetingConfig] = useState<MeetingConfig | null>(null);
   const [archives, setArchives] = useState<WeeklyArchive[]>([]);
@@ -131,7 +137,7 @@ export default function RoundtablePage() {
 
   // Fetch meeting config and archives
   useEffect(() => {
-    if (!user || !isGuildMaster) return;
+    if (!user || !canAccessRoundtable) return;
 
     const fetchData = async () => {
       try {
@@ -158,7 +164,7 @@ export default function RoundtablePage() {
     };
 
     fetchData();
-  }, [user, isGuildMaster]);
+  }, [user, canAccessRoundtable]);
 
   // Countdown timer
   useEffect(() => {
@@ -225,7 +231,7 @@ export default function RoundtablePage() {
 
   if (!user) return null;
 
-  if (!isGuildMaster) return <LockedPage user={user} />;
+  if (!canAccessRoundtable) return <LockedPage user={user} />;
 
   return (
     <div className="min-h-screen bg-mambo-dark">
