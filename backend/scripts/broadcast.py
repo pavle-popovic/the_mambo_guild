@@ -15,9 +15,13 @@ Each email_id has its own resume file (already_sent_{email_id}.txt) so you
 can re-run safely without re-sending to the same person.
 
 Segment routing (SQL filter chosen by module.SEGMENT):
-  A — waitlisters who never activated, no active/trialing sub
-  B — activated (email/google/apple), verified, no active/trialing sub
-  C — currently in-trial
+  A   — waitlisters who never activated, no active/trialing sub
+  B   — activated (email/google/apple), verified, no active/trialing sub
+  C   — currently in-trial
+  D   — active paying subscribers (any tier)
+  BCD — UNION of B+C+D: everyone who has a real account, regardless of
+        sub status. Used for one-off cross-cohort sends (e.g. the
+        bonus Roundtable invite that goes to every member).
 
 Token TTL: as long as you ship Segment A emails (which use __MAGIC_LINK__),
 PASSWORD_RESET_EXPIRE_MINUTES on Railway must be >= 1440. Script will warn
@@ -124,6 +128,45 @@ _SEGMENT_SQL = {
           AND u.email <> ''
         ORDER BY u.created_at NULLS LAST
     """,
+    # Active paying subscribers (any tier — Advanced + Performer/Guild
+    # Master). Use carefully: these are your committed customers, so the
+    # bar for emailing them should be high (perk announcements, schedule
+    # changes, churn-risk-recovery etc.).
+    "D": """
+        SELECT u.id, u.email, up.username
+        FROM users u
+        JOIN user_profiles up ON up.user_id = u.id
+        JOIN subscriptions s ON s.user_id = u.id
+        WHERE s.status = 'active'
+          AND u.email IS NOT NULL
+          AND u.email <> ''
+        ORDER BY u.created_at NULLS LAST
+    """,
+    # UNION B + C + D. Everyone who has a real account (not a waitlist
+    # shadow row), regardless of sub status. EXISTS subqueries instead of
+    # JOIN+DISTINCT to avoid duplicate rows for users with multiple
+    # historical subscription rows (cancelled then resubscribed, etc.).
+    "BCD": """
+        SELECT u.id, u.email, up.username
+        FROM users u
+        JOIN user_profiles up ON up.user_id = u.id
+        WHERE u.email IS NOT NULL
+          AND u.email <> ''
+          AND (
+            EXISTS (SELECT 1 FROM subscriptions s
+                    WHERE s.user_id = u.id AND s.status = 'active')
+            OR
+            EXISTS (SELECT 1 FROM subscriptions s
+                    WHERE s.user_id = u.id AND s.status = 'trialing')
+            OR
+            (u.auth_provider IN ('email', 'google', 'apple')
+             AND u.is_verified = TRUE
+             AND NOT EXISTS (SELECT 1 FROM subscriptions s2
+                             WHERE s2.user_id = u.id
+                               AND s2.status IN ('active', 'trialing')))
+          )
+        ORDER BY u.created_at NULLS LAST
+    """,
 }
 
 
@@ -144,7 +187,8 @@ def load_email_module(email_id: str):
         sys.exit(f"Error: email module {email_id} missing fields: {missing}")
 
     if module.SEGMENT not in _SEGMENT_SQL:
-        sys.exit(f"Error: SEGMENT={module.SEGMENT!r} not one of A/B/C")
+        valid = "/".join(_SEGMENT_SQL.keys())
+        sys.exit(f"Error: SEGMENT={module.SEGMENT!r} not one of {valid}")
 
     return module
 
