@@ -96,6 +96,22 @@ def require_guild_master(user: User):
         )
 
 
+# TEMP 2026-05-05: bonus Live Masterclass opens The Roundtable to Advanced
+# subscribers + trial members for one session. Mirrors the frontend gate
+# widening in app/studio/roundtable/page.tsx and components/NavBar.tsx.
+# REVERT on or after 2026-05-06 18:00 UTC by deleting this helper and
+# restoring `require_guild_master(current_user)` at its three call sites
+# (the two roundtable read endpoints + the notification fan-out filter).
+def require_roundtable_access_temp(user: User):
+    """TEMP 2026-05-05 only — accept Performer OR Advanced (trial users
+    carry tier=ADVANCED with status=TRIALING)."""
+    sub = user.subscription
+    if sub and sub.status in (SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING) \
+       and sub.tier in (SubscriptionTier.PERFORMER, SubscriptionTier.ADVANCED):
+        return
+    require_guild_master(user)  # falls through to the original 403
+
+
 def _ensure_utc(dt: Optional[datetime]) -> Optional[datetime]:
     """Coerce a naive UTC timestamp to tz-aware. Some legacy rows were stored
     naive; comparing them against datetime.now(tz=UTC) crashes on tz mismatch."""
@@ -977,8 +993,12 @@ def get_weekly_meeting(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """Get the weekly meeting link and notes. Guild Master only."""
-    require_guild_master(current_user)
+    """Get the weekly meeting link and notes.
+
+    TEMP 2026-05-05: gate widened to Advanced + trial for the bonus Live
+    Masterclass session. Revert to require_guild_master after the session.
+    """
+    require_roundtable_access_temp(current_user)
 
     config = db.query(WeeklyMeetingConfig).filter(WeeklyMeetingConfig.id == 1).first()
     if not config:
@@ -1065,9 +1085,14 @@ def update_weekly_meeting(
 
     if schedule_changed:
         try:
+            # TEMP 2026-05-05: include Advanced + trialing in the fan-out so
+            # the bonus Masterclass invite reaches everyone the page now lets
+            # in. After the session, revert the filter back to:
+            #   Subscription.status == SubscriptionStatus.ACTIVE,
+            #   Subscription.tier == SubscriptionTier.PERFORMER,
             performers = db.query(User).join(Subscription, Subscription.user_id == User.id).filter(
-                Subscription.status == SubscriptionStatus.ACTIVE,
-                Subscription.tier == SubscriptionTier.PERFORMER,
+                Subscription.status.in_((SubscriptionStatus.ACTIVE, SubscriptionStatus.TRIALING)),
+                Subscription.tier.in_((SubscriptionTier.PERFORMER, SubscriptionTier.ADVANCED)),
             ).all()
             for performer in performers:
                 create_notification(
@@ -1107,9 +1132,11 @@ def get_weekly_archives(
 ):
     """
     Get all published weekly archives.
-    Requires Guild Master subscription.
+
+    TEMP 2026-05-05: gate widened to Advanced + trial for the bonus Live
+    Masterclass session. Revert to require_guild_master after the session.
     """
-    require_guild_master(current_user)
+    require_roundtable_access_temp(current_user)
     
     archives = db.query(WeeklyArchive).filter(
         WeeklyArchive.is_published == True
