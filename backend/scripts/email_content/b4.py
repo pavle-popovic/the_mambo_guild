@@ -1,6 +1,6 @@
 """B4 — May 6, Wednesday 12:00 UTC. Final 6-hour for activated-no-trial."""
 
-SEGMENT = "B"
+SEGMENT = "BW"
 SEND_AT_UTC = "2026-05-06T12:00:00Z"
 
 SUBJECT = "6 hours"
