@@ -11,7 +11,7 @@ who already have accounts).
 SEGMENT = "A"
 SEND_AT_UTC = "2026-05-04T13:00:00Z"
 
-SUBJECT = "Live Masterclass tomorrow: how to enter flow state when you dance"
+SUBJECT = "Live Masterclass Tomorrow: how to enter flow state when you dance"
 PREHEADER = "Tue May 5, 18:00 UTC. Open to every member, on the platform."
 
 BODY_HTML = """<p>Hi __USERNAME__,</p>

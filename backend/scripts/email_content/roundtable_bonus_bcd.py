@@ -11,7 +11,7 @@ waitlisters who never claimed their account).
 SEGMENT = "BCD"
 SEND_AT_UTC = "2026-05-04T13:00:00Z"
 
-SUBJECT = "Live Masterclass tomorrow: how to enter flow state when you dance"
+SUBJECT = "Live Masterclass Tomorrow: how to enter flow state when you dance"
 PREHEADER = "Tue May 5, 18:00 UTC. Open to every paid and trial member, on the platform."
 
 BODY_HTML = """<p>Hi __USERNAME__,</p>
@@ -29,8 +29,8 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 <h2>How to join</h2>
 
 <ol>
-    <li><strong>Log in</strong> at <a href="__FRONTEND_URL__/login">themamboguild.com/login</a>.</li>
-    <li>If you are not on a trial or subscription yet, you will be prompted at the door, start your 7-day free trial. Card required, $0 charged for 7 days, cancel in 2 clicks.</li>
+    <li><strong>Log in</strong> at <a href="__FRONTEND_URL__">themamboguild.com</a>.</li>
+    <li>If you do not have a free trial yet, <strong>grab one on the <a href="__FRONTEND_URL__/pricing">pricing page</a></strong>. Card required, $0 charged for 7 days, cancel in 2 clicks.</li>
     <li>Click <strong>Studio</strong> in the top nav.</li>
     <li>Click <strong>The Roundtable</strong>.</li>
     <li>Hit <strong>Join Meeting</strong> and add it to your calendar.</li>
@@ -65,8 +65,8 @@ Then we apply it to this week's Footwork Challenge in the Community tab. You lea
 
 HOW TO JOIN
 -----------
-1. Log in at __FRONTEND_URL__/login
-2. If you are not on a trial or subscription yet, you will be prompted at the door, start your 7-day free trial. Card required, $0 charged for 7 days, cancel in 2 clicks.
+1. Log in at __FRONTEND_URL__
+2. If you do not have a free trial yet, grab one on the pricing page (__FRONTEND_URL__/pricing). Card required, $0 charged for 7 days, cancel in 2 clicks.
 3. Click Studio in the top nav.
 4. Click The Roundtable.
 5. Hit Join Meeting and add it to your calendar.
