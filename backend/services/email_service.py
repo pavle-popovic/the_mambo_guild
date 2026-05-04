@@ -792,53 +792,52 @@ def send_subscription_canceled_email(
 
 def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -> bool:
     """
-    Send welcome email to new waitlist members.
-    
+    Welcome email sent to every new account creation (manual /register,
+    /waitlist signup, OAuth callback for first-time Google users).
+
+    Structure: brief intro -> 8 free YouTube classes -> bridge ("if you
+    enjoy these, you'll love what's inside") -> what's inside -> trial
+    CTA. Leads with free value so the email reads as a gift, not a
+    sales pitch, then bridges naturally from free content to the paid
+    Guild offering.
+
     Args:
         email: User's email address
         username: Reserved username
-        referral_link: Unique referral link for the user
-        
+        referral_link: Unique referral link for the user (for the
+            Guild Shop clave bonus)
+
     Returns:
         True if email sent successfully, False otherwise
     """
     if not resend or not settings.RESEND_API_KEY:
         logger.error("Resend client not configured. Cannot send welcome email.")
         return False
-        
+
     try:
         from_email = settings.FROM_EMAIL
-        
-        # "Book Club" / "Prestigious Guild" Aesthetic
-        # Colors
-        bg_color = "#F9F7F1"  # Cream/Paper
-        text_color = "#333333" # Dark Gray/Black
-        accent_color = "#D4AF37" # Gold (kept for subtle accents)
+
+        # "Book Club" / "Prestigious Guild" aesthetic — same palette as
+        # the launch broadcast and other transactional emails for brand
+        # consistency.
+        bg_color = "#F9F7F1"
+        text_color = "#333333"
+        pricing_url = f"{settings.FRONTEND_URL}/pricing"
+        courses_url = f"{settings.FRONTEND_URL}/courses"
 
         text_body = f"""Hi {username},
 
-===========================================
-WEEKEND BONUS
-===========================================
+Glad you're here.
 
-BRUNO MARS CHA CHA CHA
-A fresh intermediate cha cha cha routine set to a beloved Bruno Mars banger. Something to move to this weekend before the Guild opens.
+My name is Pavle Popovic. I am a professional dancer and have spent the past 10 years on the craft of training and how people actually learn to dance. I built The Mambo Guild because the salsa school I wanted as a student did not exist. Most online classes lack structure, so students plateau and quit.
 
-Watch the choreo:
-https://www.youtube.com/watch?v=c-01Oo_Pzso
+I hold certifications in Learning Experience Design and Gamification and applied those principles to the curriculum so you are not just memorising steps, you are actually learning to dance.
 
 
-BEGINNER CHALLENGE: MAMBO INN
-(less than 2 years dancing, Win Lifetime Access)
-https://www.youtube.com/watch?v=ticP-zMdeUk
+8 FREE CLASSES, ON ME
+---------------------
+Before anything else, here are 8 of my favourite free classes. Pick one, dance it, and see how I teach:
 
-OPEN CHALLENGE: MAMBO GOZON CHOREO
-(more advanced, Win Lifetime Access)
-https://www.youtube.com/watch?v=omiwxSIxnyc
-
-
-8 FREE CLASSES
--------------------------------------------
 - Salsa Bodymovement Musicality (La Gripe): https://www.youtube.com/watch?v=Ol54zPvVpx0
 - 14 Salsa Moves Ep. 2: https://www.youtube.com/watch?v=-Y4By7n2KCQ
 - Pachanga Fundamentals: https://www.youtube.com/watch?v=A12yU-b2O_s
@@ -849,34 +848,39 @@ https://www.youtube.com/watch?v=omiwxSIxnyc
 - Pachanga Module 11 (The Kick Tap Chuck): https://www.youtube.com/watch?v=ER1CMXeoAao
 
 
-Welcome to The Mambo Guild. I really appreciate your trust in joining this project and I am sure that together, we are going to build a beautiful community.
-
-Firstly, a quick intro: My name is Pavle Popovic, I am a professional dancer and have been devoting the past 10 years of my life mastering the art of training and learning about dancing. I started this project because I wanted to create the dance academy I wish I had when I started. I saw too many students getting stuck because most online classes lack a clear structure and path to mastery.
-
-I have studied and hold certifications in Learning Experience Design and Gamification, and decided to apply those scientific principles to this curriculum to ensure you aren't just memorizing steps, but actually learning to dance.
-
-The Guild opens its doors Wednesday, April 29th. Here's a quick tour of what you're about to step into.
+IF YOU ENJOY THESE, YOU WILL LOVE WHAT IS INSIDE
+------------------------------------------------
+Same teaching, ten times the depth, structured into a real curriculum, with the tools to actually drill it.
 
 THE VAULT
-Your arsenal of dance mastery.
-- 500+ lessons, from your first basic step to pro-level mechanics
+- 500+ lessons, beginner to pro
 - Three full Mambo courses and a complete Pachanga course
 - A full course on Salsa History and a full course on Effective Training Science
-- Bi-weekly choreographies and new courses, with expert guest teachers
+- New choreography every two weeks, guest teachers
 
-THE RPG OF DANCE
-Visualize your growth from Basic Steps to Boss Level. Every lesson unlocks a new node on your skill tree. Track your progress like a true gamer.
+THE SKILL TREE
+A clear visual path from your first basic step to advanced choreo. Every lesson unlocks the next so you always know what to drill next.
 
-THE STAGE
-Compete, collaborate, and get feedback from real pros. Climb the High Rollers leaderboard and earn legendary badges.
+THE STAGE AND THE LAB
+Post your progress videos, ask questions, get feedback. Climb the leaderboard, earn 38 badges from Bronze to Diamond.
 
-Doors open Wednesday, April 29th. Keep an eye on your inbox.
+THE VIDEO PLAYER
+Mirrored view, back view, captions in 16 languages, 0.25x to 2x speed, frame-by-frame, A/B loop.
+
+
+START MY 7-DAY FREE TRIAL
+{pricing_url}
+
+7 days free. Cancel anytime in two clicks. No call-to-cancel friction.
+
+
+See you inside.
 
 Pavle
 Founder, The Mambo Guild
 
--------------------------------------------
-P.S. Want to unlock 'Beta Tester' status early? Invite 3 friends using your unique extraction link:
+---
+P.S. Got a friend who would love this? Your referral link earns you claves you can spend in the Guild Shop:
 {referral_link}
 
 To unsubscribe, reply to pavlepopovic@themamboguild.com with "Unsubscribe".
@@ -885,170 +889,96 @@ To unsubscribe, reply to pavlepopovic@themamboguild.com with "Unsubscribe".
         result = resend.Emails.send({
             "from": f"The Mambo Guild <{from_email}>",
             "to": [email],
-            "subject": "Welcome to the Mambo Guild",
+            "subject": "Welcome to The Mambo Guild",
             "text": text_body,
             "html": f"""
             <!DOCTYPE html>
             <html>
             <head>
+                <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <title>Welcome to The Mambo Guild</title>
                 <style>
-                    body {{ 
-                        font-family: Georgia, 'Times New Roman', Times, serif; 
-                        background-color: {bg_color}; 
-                        color: {text_color}; 
-                        margin: 0; 
-                        padding: 0; 
-                        line-height: 1.8;
-                    }}
-                    .container {{ 
-                        max-width: 600px; 
-                        margin: 0 auto; 
-                        padding: 40px 20px; 
-                        background-color: {bg_color};
-                    }}
-                    h2 {{
-                        font-family: Georgia, 'Times New Roman', serif;
-                        color: #111;
-                        font-size: 20px;
-                        margin-top: 35px;
-                        margin-bottom: 15px;
-                        border-bottom: 1px solid #e0e0e0;
-                        padding-bottom: 10px;
-                    }}
-                    p, li {{ 
-                        font-size: 16px; 
-                        margin-bottom: 20px;
-                    }}
-                    strong {{
-                        color: #000;
-                    }}
-                    .highlight {{
-                        background-color: #fff;
-                        padding: 20px;
-                        border: 1px solid #e0e0e0;
-                        border-radius: 4px;
-                        margin: 30px 0;
-                    }}
-                    .link {{
-                        color: #b5952f;
-                        text-decoration: underline;
-                    }}
-                    .footer {{
-                        margin-top: 50px;
-                        font-size: 14px;
-                        color: #666;
-                        border-top: 1px solid #ddd;
-                        padding-top: 20px;
-                        font-style: italic;
-                    }}
-                    .emoji {{
-                        font-style: normal;
-                    }}
-                    .badge {{
-                        display: inline-block;
-                        background-color: #D4AF37;
-                        color: #000;
-                        font-size: 12px;
-                        font-weight: bold;
-                        letter-spacing: 2px;
-                        text-transform: uppercase;
-                        padding: 6px 14px;
-                        border-radius: 2px;
-                        font-family: Arial, sans-serif;
-                    }}
-                    .bonus-callout {{
-                        background-color: #fff;
-                        border: 1px solid #e0e0e0;
-                        border-left: 4px solid #D4AF37;
-                        padding: 24px 24px 20px;
-                        margin: 24px 0 40px;
-                        border-radius: 4px;
-                    }}
-                    .bonus-callout h3 {{
-                        font-family: Georgia, 'Times New Roman', serif;
-                        color: #111;
-                        font-size: 24px;
-                        margin: 10px 0 12px 0;
-                        line-height: 1.3;
-                    }}
-                    .bonus-callout p {{ margin-bottom: 12px; }}
-                    .feature-img {{
-                        width: 100%;
-                        max-width: 560px;
-                        height: auto;
-                        display: block;
-                        margin: 18px auto;
-                        border: 1px solid #e0e0e0;
-                        border-radius: 4px;
-                    }}
+                    body {{ font-family: Georgia, 'Times New Roman', Times, serif;
+                            background-color: {bg_color}; color: {text_color};
+                            margin: 0; padding: 0; line-height: 1.7; }}
+                    .container {{ max-width: 600px; margin: 0 auto;
+                                  padding: 36px 20px; background-color: {bg_color}; }}
+                    h1 {{ font-family: Georgia, serif; font-size: 28px;
+                          color: #111; margin: 0 0 12px 0; line-height: 1.2; }}
+                    h2 {{ font-family: Georgia, serif; color: #111;
+                          font-size: 19px; margin-top: 32px; margin-bottom: 8px;
+                          border-bottom: 1px solid #e0e0e0; padding-bottom: 6px; }}
+                    p {{ font-size: 15px; margin: 0 0 14px 0; color: #333; }}
+                    ul {{ padding-left: 20px; margin: 0 0 14px 0; }}
+                    li {{ font-size: 14px; margin-bottom: 6px; line-height: 1.6;
+                          color: #333; }}
+                    strong {{ color: #000; }}
+                    .badge {{ display: inline-block; background-color: #D4AF37;
+                              color: #000; font-size: 11px; font-weight: bold;
+                              letter-spacing: 2px; text-transform: uppercase;
+                              padding: 6px 14px; border-radius: 2px;
+                              margin-bottom: 18px; font-family: Arial, sans-serif; }}
+                    .cta-wrap {{ text-align: center; margin: 28px 0 8px 0; }}
+                    .cta {{ display: inline-block;
+                            background: linear-gradient(135deg,#FCE205 0%,#D4AF37 100%);
+                            color: #111; font-weight: bold; font-size: 16px;
+                            text-decoration: none; padding: 16px 28px;
+                            border-radius: 6px; font-family: Arial, sans-serif;
+                            letter-spacing: 0.3px; }}
+                    .cta-sub {{ text-align: center; font-size: 12px; color: #777;
+                                font-family: Arial, sans-serif; margin-top: 4px; }}
+                    .footer {{ margin-top: 44px; font-size: 12px; color: #888;
+                               font-style: italic; font-family: Arial, sans-serif;
+                               border-top: 1px solid #e0e0e0; padding-top: 18px; }}
+                    .footer a {{ color: #888; }}
+                    .link {{ color: #b5952f; text-decoration: underline; }}
                 </style>
             </head>
             <body>
                 <div class="container">
                     <p>Hi {username},</p>
 
-                    <div class="bonus-callout">
-                        <div class="badge">Weekend Bonus</div>
-                        <h3><span class="emoji">🎶</span> Bruno Mars Cha Cha Cha</h3>
-                        <p>A fresh intermediate cha cha cha routine set to a beloved Bruno Mars banger. Something to move to this weekend before the Guild opens.</p>
-                        <p style="margin-bottom:0;"><a href="https://www.youtube.com/watch?v=c-01Oo_Pzso" class="link"><strong>Watch the choreo &rarr;</strong></a></p>
+                    <div class="badge">Welcome to The Guild</div>
+                    <h1>Glad you're here.</h1>
+
+                    <p>My name is <strong>Pavle Popovic</strong>. I am a professional dancer and have spent the past 10 years on the craft of training and how people actually learn to dance.</p>
+                    <p>I built The Mambo Guild because the salsa school I wanted as a student did not exist. Most online classes lack structure, so students plateau and quit. I hold certifications in Learning Experience Design and Gamification and applied those principles to the curriculum so you are not just memorising steps, you are actually <em>learning to dance</em>.</p>
+
+                    <h2>8 free classes, on me</h2>
+                    <p>Before anything else, here are 8 of my favourite free classes. Pick one, dance it, and see how I teach:</p>
+                    <ul>
+                        <li><a href="https://www.youtube.com/watch?v=Ol54zPvVpx0" class="link">Salsa Bodymovement Musicality (La Gripe)</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=-Y4By7n2KCQ" class="link">14 Salsa Moves Ep. 2</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">Pachanga Fundamentals</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=57-zwVE1VXI" class="link">Rankankan Choreography</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">14 Salsa Moves Ep. 1</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=wcDocNANEVY" class="link">Salsa Romantica</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=RIMp6J02Th0" class="link">Afro Mambo Fusion</a></li>
+                        <li><a href="https://www.youtube.com/watch?v=ER1CMXeoAao" class="link">Pachanga Module 11 (The Kick Tap Chuck)</a></li>
+                    </ul>
+
+                    <h2>If you enjoy these, you will love what is inside</h2>
+                    <p>Same teaching, ten times the depth, structured into a real curriculum, with the tools to actually drill it.</p>
+                    <p><strong>The Vault.</strong> 500+ lessons, beginner to pro. Three full Mambo courses, a complete Pachanga course, a full course on Salsa History, and a full course on Effective Training Science. New choreography every two weeks, plus guest teachers.</p>
+                    <p><strong>The Skill Tree.</strong> A clear visual path from your first basic step to advanced choreo. Every lesson unlocks the next, so you always know what to drill next.</p>
+                    <p><strong>The Stage and the Lab.</strong> Post your progress videos, ask questions, get feedback. Climb the leaderboard, earn 38 badges from Bronze to Diamond.</p>
+                    <p><strong>The Video Player.</strong> Mirrored view, back view, captions in 16 languages, 0.25x to 2x speed, frame-by-frame, A/B loop.</p>
+
+                    <div class="cta-wrap">
+                        <a href="{pricing_url}" class="cta">Start my 7-day free trial</a>
+                        <div class="cta-sub">7 days free. Cancel anytime in two clicks.</div>
                     </div>
 
-                    <p><strong>🌱 Beginner Challenge: Mambo Inn (less than 2 years dancing, Win Lifetime Access!):</strong><br>
-                    <a href="https://www.youtube.com/watch?v=ticP-zMdeUk" class="link">https://www.youtube.com/watch?v=ticP-zMdeUk</a></p>
-
-                    <p><strong>🏆 Open Challenge: Mambo Gozón Choreo (more advanced, Win Lifetime Access!):</strong><br>
-                    <a href="https://www.youtube.com/watch?v=omiwxSIxnyc" class="link">https://www.youtube.com/watch?v=omiwxSIxnyc</a></p>
-
-                    <p><strong>8 Free Classes:</strong><br>
-                    Salsa Bodymovement Musicality (La Gripe): <a href="https://www.youtube.com/watch?v=Ol54zPvVpx0" class="link">https://www.youtube.com/watch?v=Ol54zPvVpx0</a><br>
-                    14 Salsa Moves Ep. 2: <a href="https://www.youtube.com/watch?v=-Y4By7n2KCQ" class="link">https://www.youtube.com/watch?v=-Y4By7n2KCQ</a><br>
-                    Pachanga Fundamentals: <a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">https://www.youtube.com/watch?v=A12yU-b2O_s</a><br>
-                    Rankankan Choreography: <a href="https://www.youtube.com/watch?v=57-zwVE1VXI" class="link">https://www.youtube.com/watch?v=57-zwVE1VXI</a><br>
-                    14 Salsa Moves Ep. 1: <a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">https://www.youtube.com/watch?v=5u_56JspFX8</a><br>
-                    Salsa Romantica: <a href="https://www.youtube.com/watch?v=wcDocNANEVY" class="link">https://www.youtube.com/watch?v=wcDocNANEVY</a><br>
-                    Afro Mambo Fusion: <a href="https://www.youtube.com/watch?v=RIMp6J02Th0" class="link">https://www.youtube.com/watch?v=RIMp6J02Th0</a><br>
-                    🎁 Pachanga Module 11 (The Kick Tap Chuck): <a href="https://www.youtube.com/watch?v=ER1CMXeoAao" class="link">https://www.youtube.com/watch?v=ER1CMXeoAao</a></p>
-
-                    <p>Welcome to The Mambo Guild. I really appreciate your trust in joining this project and I am sure that together, we are going to build a beautiful community. <span class="emoji">🥂</span></p>
-
-                    <p>Firstly, a quick intro: My name is <strong>Pavle Popovic</strong>, I am a professional dancer and have been devoting the past 10 years of my life mastering the art of training and learning about dancing. I started this project because I wanted to create the dance academy I wish I had when I started. I saw too many students getting stuck because most online classes lack a clear structure and path to mastery.</p>
-
-                    <p>I have studied and hold certifications in Learning Experience Design and Gamification; and decided to apply those scientific principles to this curriculum to ensure you aren't just memorizing steps, but actually <em>learning to dance</em>.</p>
-
-                    <p>The Guild opens its doors <strong>Wednesday, April 29th</strong>. Here's a quick tour of what you're about to step into. <span class="emoji">👇</span></p>
-
-                    <h2><span class="emoji">📚</span> The Vault</h2>
-                    <p><em>Your arsenal of dance mastery.</em></p>
-                    <ul>
-                        <li>500+ lessons, from your first basic step to pro-level mechanics</li>
-                        <li>Three full Mambo courses and a complete Pachanga course</li>
-                        <li>A full course on Salsa History and a full course on Effective Training Science</li>
-                        <li>Bi-weekly choreographies and new courses, with expert guest teachers</li>
-                    </ul>
-                    <img src="https://www.themamboguild.com/assets/Course_page.png" alt="The Vault" width="560" style="width:100%;max-width:560px;height:auto;display:block;margin:18px auto;border:1px solid #e0e0e0;border-radius:4px;" />
-
-                    <h2><span class="emoji">🌳</span> The RPG of Dance</h2>
-                    <p>Visualize your growth from Basic Steps to Boss Level. Every lesson unlocks a new node on your skill tree. Track your progress like a true gamer.</p>
-                    <img src="https://www.themamboguild.com/assets/skill-tree.png" alt="Skill tree" width="560" style="width:100%;max-width:560px;height:auto;display:block;margin:18px auto;border:1px solid #e0e0e0;border-radius:4px;" />
-
-                    <h2><span class="emoji">🏆</span> The Stage</h2>
-                    <p>Compete, collaborate, and get feedback from real pros. Climb the High Rollers leaderboard and earn legendary badges.</p>
-                    <img src="https://www.themamboguild.com/assets/community-ui.png" alt="The Stage" width="560" style="width:100%;max-width:560px;height:auto;display:block;margin:18px auto;border:1px solid #e0e0e0;border-radius:4px;" />
-
-                    <p>Doors open <strong>Wednesday, April 29th</strong>. Keep an eye on your inbox.</p>
+                    <p style="margin-top: 32px;">See you inside.</p>
 
                     <p>Pavle<br>
                     Founder, The Mambo Guild</p>
 
                     <div class="footer">
-                        <p>P.S. Want to unlock 'Beta Tester' status early? Invite 3 friends using your unique extraction link:<br>
+                        <p>P.S. Got a friend who would love this? Your referral link earns you claves you can spend in the Guild Shop:<br>
                         <a href="{referral_link}" class="link">{referral_link}</a></p>
-                    </div>
-
-                    <div style="text-align: center; margin-top: 30px; padding-top: 15px; border-top: 1px solid #eee;">
-                        <p style="font-size: 11px; color: #999;">If you no longer wish to receive these emails, <a href="mailto:pavlepopovic@themamboguild.com?subject=Unsubscribe&body=Please%20remove%20me%20from%20the%20mailing%20list." style="color: #999;">click here to unsubscribe</a>.</p>
+                        <p style="font-size: 11px; margin-top: 14px;"><a href="mailto:pavlepopovic@themamboguild.com?subject=Unsubscribe&body=Please%20remove%20me%20from%20the%20mailing%20list.">Unsubscribe</a></p>
                     </div>
                 </div>
             </body>
