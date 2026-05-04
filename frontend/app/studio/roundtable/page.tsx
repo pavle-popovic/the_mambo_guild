@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import NavBar from "@/components/NavBar";
 import Footer from "@/components/Footer";
+import AuthPromptModal from "@/components/AuthPromptModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { apiClient } from "@/lib/api";
 import { cn } from "@/lib/utils";
@@ -231,7 +232,20 @@ export default function RoundtablePage() {
 
   if (!user) return null;
 
-  if (!canAccessRoundtable) return <LockedPage user={user} />;
+  // Rookies (and any other tier that doesn't qualify) get the subscribe
+  // modal instead of the static LockedPage. Same pattern as lesson/[id]:
+  // it's a hard interrupt with a "View Pricing" CTA going to /pricing,
+  // and "Back" routes them out of the gated area.
+  if (!canAccessRoundtable) {
+    return (
+      <AuthPromptModal
+        isOpen={true}
+        onClose={() => router.push("/studio")}
+        type="subscribe"
+        courseTitle="The Roundtable: weekly live calls + masterclass archive"
+      />
+    );
+  }
 
   return (
     <div className="min-h-screen bg-mambo-dark">
