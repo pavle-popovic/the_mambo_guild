@@ -1,6 +1,6 @@
 """B1 — May 1, Friday. Activated-no-trial: acknowledge + soft trial nudge."""
 
-SEGMENT = "B"
+SEGMENT = "BW"
 SEND_AT_UTC = "2026-05-01T17:00:00Z"
 
 SUBJECT = "You're in, just one screen left"

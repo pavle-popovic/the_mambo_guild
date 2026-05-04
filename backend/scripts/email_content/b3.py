@@ -1,6 +1,6 @@
 """B3 — May 5, Tuesday. 24-hour reminder for activated-no-trial."""
 
-SEGMENT = "B"
+SEGMENT = "BW"
 SEND_AT_UTC = "2026-05-05T17:00:00Z"
 
 SUBJECT = "24 hours, and one screen between you and the badge"
