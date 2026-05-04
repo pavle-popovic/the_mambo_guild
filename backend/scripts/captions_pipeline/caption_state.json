@@ -23627,49 +23627,64 @@
     "SonerosDeBailadoresEdited__Soneros_Lesson": {
       "locales": {
         "ar": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777929975.721502
         },
         "de": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777928242.5904348
         },
         "el": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777929793.5317972
         },
         "es": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777927554.4058664
         },
         "fr": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777927896.8704803
         },
         "it": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777927730.3857522
         },
         "ja": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777929454.9788513
         },
         "ko": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777929297.1405106
         },
         "nl": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777928410.8094733
         },
         "pl": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777928768.4823248
         },
         "pt": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777928063.8708718
         },
         "ru": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777928570.9355655
         },
         "sr": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777928946.4466438
         },
         "tr": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777929123.0066588
         },
         "zh": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777929605.9138908
         }
       }
     },
