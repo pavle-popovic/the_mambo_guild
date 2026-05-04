@@ -1348,63 +1348,63 @@
       "locales": {
         "ar": {
           "status": "translated",
-          "translated_mtime": 1777213477.8166635
+          "translated_mtime": 1777543517.6107206
         },
         "de": {
           "status": "translated",
-          "translated_mtime": 1776594243.1010873
+          "translated_mtime": 1777542298.393588
         },
         "el": {
           "status": "translated",
-          "translated_mtime": 1777213477.8842852
+          "translated_mtime": 1777542497.054224
         },
         "es": {
           "status": "translated",
-          "translated_mtime": 1776594253.100548
+          "translated_mtime": 1777542097.2367382
         },
         "fr": {
           "status": "translated",
-          "translated_mtime": 1776594263.2877185
+          "translated_mtime": 1777542221.2903643
         },
         "it": {
           "status": "translated",
-          "translated_mtime": 1776594273.0270898
+          "translated_mtime": 1777542149.8932302
         },
         "ja": {
           "status": "translated",
-          "translated_mtime": 1776594283.4415815
+          "translated_mtime": 1777543520.8980234
         },
         "ko": {
           "status": "translated",
-          "translated_mtime": 1776594292.801496
+          "translated_mtime": 1777543522.231055
         },
         "nl": {
           "status": "translated",
-          "translated_mtime": 1776594302.2723894
+          "translated_mtime": 1777542390.9536757
         },
         "pl": {
           "status": "translated",
-          "translated_mtime": 1776594312.277293
+          "translated_mtime": 1777542396.9168732
         },
         "pt": {
           "status": "translated",
-          "translated_mtime": 1776594321.7455933
+          "translated_mtime": 1777542192.8180933
         },
         "ru": {
           "status": "translated",
-          "translated_mtime": 1776594332.1488917
+          "translated_mtime": 1777542457.413487
         },
         "sr": {
           "status": "translated",
-          "translated_mtime": 1776594342.7712522
+          "translated_mtime": 1777543505.2075543
         },
         "tr": {
           "status": "translated",
-          "translated_mtime": 1776594352.636135
+          "translated_mtime": 1777542480.8134367
         },
         "zh": {
           "status": "translated",
-          "translated_mtime": 1776594362.4267247
+          "translated_mtime": 1777543523.0871563
         }
       }
     },
@@ -11840,6 +11840,55 @@
         }
       }
     },
+    "Mambo201Edited__HeroVideo": {
+      "locales": {
+        "ar": {
+          "status": "missing"
+        },
+        "de": {
+          "status": "missing"
+        },
+        "el": {
+          "status": "missing"
+        },
+        "es": {
+          "status": "missing"
+        },
+        "fr": {
+          "status": "missing"
+        },
+        "it": {
+          "status": "missing"
+        },
+        "ja": {
+          "status": "missing"
+        },
+        "ko": {
+          "status": "missing"
+        },
+        "nl": {
+          "status": "missing"
+        },
+        "pl": {
+          "status": "missing"
+        },
+        "pt": {
+          "status": "missing"
+        },
+        "ru": {
+          "status": "missing"
+        },
+        "sr": {
+          "status": "missing"
+        },
+        "tr": {
+          "status": "missing"
+        },
+        "zh": {
+          "status": "missing"
+        }
+      }
+    },
     "Mambo201Edited__Hook_1_Drill": {
       "locales": {
         "ar": {
@@ -14589,6 +14638,55 @@
         "zh": {
           "status": "translated",
           "translated_mtime": 1777399641.120537
+        }
+      }
+    },
+    "Mambo301Edited__Bodymovement_5_Lesson_2": {
+      "locales": {
+        "ar": {
+          "status": "missing"
+        },
+        "de": {
+          "status": "missing"
+        },
+        "el": {
+          "status": "missing"
+        },
+        "es": {
+          "status": "missing"
+        },
+        "fr": {
+          "status": "missing"
+        },
+        "it": {
+          "status": "missing"
+        },
+        "ja": {
+          "status": "missing"
+        },
+        "ko": {
+          "status": "missing"
+        },
+        "nl": {
+          "status": "missing"
+        },
+        "pl": {
+          "status": "missing"
+        },
+        "pt": {
+          "status": "missing"
+        },
+        "ru": {
+          "status": "missing"
+        },
+        "sr": {
+          "status": "missing"
+        },
+        "tr": {
+          "status": "missing"
+        },
+        "zh": {
+          "status": "missing"
         }
       }
     },
@@ -19724,7 +19822,8 @@
           "status": "missing"
         },
         "es": {
-          "status": "missing"
+          "status": "translated",
+          "translated_mtime": 1777541149.3470106
         },
         "fr": {
           "status": "missing"
@@ -23522,6 +23621,55 @@
         "zh": {
           "status": "translated",
           "translated_mtime": 1776594371.8559897
+        }
+      }
+    },
+    "SonerosDeBailadoresEdited__Soneros_Lesson": {
+      "locales": {
+        "ar": {
+          "status": "missing"
+        },
+        "de": {
+          "status": "missing"
+        },
+        "el": {
+          "status": "missing"
+        },
+        "es": {
+          "status": "missing"
+        },
+        "fr": {
+          "status": "missing"
+        },
+        "it": {
+          "status": "missing"
+        },
+        "ja": {
+          "status": "missing"
+        },
+        "ko": {
+          "status": "missing"
+        },
+        "nl": {
+          "status": "missing"
+        },
+        "pl": {
+          "status": "missing"
+        },
+        "pt": {
+          "status": "missing"
+        },
+        "ru": {
+          "status": "missing"
+        },
+        "sr": {
+          "status": "missing"
+        },
+        "tr": {
+          "status": "missing"
+        },
+        "zh": {
+          "status": "missing"
         }
       }
     },

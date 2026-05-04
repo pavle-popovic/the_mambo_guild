@@ -207,6 +207,8 @@ CHOREO_ASSETS = {
         ("RebelionEdited", "Rebelion_Lesson", "Rebelion_Preview"),
     ("taxista", "Taxista, Full Choreography"):
         ("TaxistaEdited", "Taxista_Lesson", "Taxista_Preview"),
+    ("soneros-de-bailadores", "Soneros De Bailadores, Full Choreography"):
+        ("SonerosDeBailadoresEdited", "Soneros_Lesson", None),
 }
 
 VIDEO_EXTS = {".mp4", ".mov", ".wav", ".MP4", ".MOV", ".WAV"}
