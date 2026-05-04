@@ -28,7 +28,9 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
     <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="120" style="width: 120px; height: auto; display: inline-block;">
 </div>
 
-<p>In <strong>48 hours</strong> the Founder Diamond closes. After Wednesday May 6 at 18:00 UTC, no one ever gets that badge again. It will sit in the codebase as a relic of the platform's first week.</p>
+<p>In <strong>48 hours</strong> the Founder Diamond closes. After Wednesday May 6 at 18:00 UTC, no one ever gets that badge again.</p>
+
+<p><strong>Start your 7-day free trial before the deadline to lock the Founder Badge in on your profile forever.</strong></p>
 
 <p>You already created your account from the waitlist, which means the badge is one click away. You just have not started your trial yet. The badge is gated on starting a subscription before the deadline, capped at the first 300 Founders.</p>
 
@@ -66,7 +68,9 @@ BODY_TEXT = """Hi __USERNAME__,
 
 Pavle here. Quick personal note.
 
-In 48 hours the Founder Diamond closes. After Wednesday May 6 at 18:00 UTC, no one ever gets that badge again. It will sit in the codebase as a relic of the platform's first week.
+In 48 hours the Founder Diamond closes. After Wednesday May 6 at 18:00 UTC, no one ever gets that badge again.
+
+Start your 7-day free trial before the deadline to lock the Founder Badge in on your profile forever.
 
 You already created your account from the waitlist, which means the badge is one click away. You just have not started your trial yet. The badge is gated on starting a subscription before the deadline, capped at the first 300 Founders.
 

@@ -14,7 +14,9 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
     <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="120" style="width: 120px; height: auto; display: inline-block;">
 </div>
 
-<p>In <strong>48 hours</strong> the Founder Diamond closes. After Wednesday May 6 at 18:00 UTC, no one ever gets that badge again. It will sit in the codebase as a relic of the platform's first week.</p>
+<p>In <strong>48 hours</strong> the Founder Diamond closes. After Wednesday May 6 at 18:00 UTC, no one ever gets that badge again.</p>
+
+<p><strong>Start your 7-day free trial before the deadline to lock the Founder Badge in on your profile forever.</strong></p>
 
 <p>I built the Mambo Guild because I was tired of seeing beginners getting discouraged by poor teaching methods and toxic, ego-driven communities. Two times European Champion, certified in Learning Experience Design and Gamification, and the dancers who joined the early waitlist told me the same story over and over: they wanted clarity, structure, and a place that felt like a real community.</p>
 
@@ -50,7 +52,9 @@ BODY_TEXT = """Hi __USERNAME__,
 
 Pavle here. Quick personal note.
 
-In 48 hours the Founder Diamond closes. After Wednesday May 6 at 18:00 UTC, no one ever gets that badge again. It will sit in the codebase as a relic of the platform's first week.
+In 48 hours the Founder Diamond closes. After Wednesday May 6 at 18:00 UTC, no one ever gets that badge again.
+
+Start your 7-day free trial before the deadline to lock the Founder Badge in on your profile forever.
 
 I built the Mambo Guild because I was tired of seeing beginners getting discouraged by poor teaching methods and toxic, ego-driven communities. Two times European Champion, certified in Learning Experience Design and Gamification, and the dancers who joined the early waitlist told me the same story over and over: they wanted clarity, structure, and a place that felt like a real community.
 
