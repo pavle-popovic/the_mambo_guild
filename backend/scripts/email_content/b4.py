@@ -1,14 +1,14 @@
 """B4 — May 6, Wednesday. Final call for activated-no-trial.
 
 Pivoted from "6 hours" -> "end of the day" framing after Pavle moved
-the Founder Diamond cutoff to Wed 08:00 Rome (06:00 UTC May 7) to give
+the Founder Badge cutoff to Wed 08:00 Rome (06:00 UTC May 7) to give
 the US audience the rest of their day to act.
 """
 
 SEGMENT = "BW"
 SEND_AT_UTC = "2026-05-06T12:00:00Z"
 
-SUBJECT = "Last day to claim your Founder Diamond"
+SUBJECT = "Last day to claim your Founder Badge"
 PREHEADER = "Closes overnight: Wed 8am Rome / 2am NYC / 11pm Tue LA. Take your time."
 
 BODY_HTML = """<p>Hi __USERNAME__,</p>
@@ -16,10 +16,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 <h1>You have the end of the day.</h1>
 
 <div style="text-align: center; margin: 18px 0 18px 0;">
-    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="140" style="width: 140px; height: auto; display: inline-block;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Badge Badge" width="140" style="width: 140px; height: auto; display: inline-block;">
 </div>
 
-<p>The Founder Diamond closes overnight. After that, the badge is gone for good.</p>
+<p>The Founder Badge closes overnight. After that, the badge is gone for good.</p>
 
 <p>The exact cutoff is <strong>Wednesday May 7 at 06:00 UTC</strong>:</p>
 <ul>
@@ -37,14 +37,14 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <p style="margin-top: 32px;">Pavle</p>
 
-<p style="font-size: 13px; color: #666; margin-top: 24px;"><em>PS. After the cutoff, the trial is still available, the Vault is still available, $39/month is still available. The Founder Diamond is the only thing that is actually one-way.</em></p>
+<p style="font-size: 13px; color: #666; margin-top: 24px;"><em>PS. After the cutoff, the trial is still available, the Vault is still available, $39/month is still available. The Founder Badge is the only thing that is actually one-way.</em></p>
 """
 
 BODY_TEXT = """Hi __USERNAME__,
 
 YOU HAVE THE END OF THE DAY.
 
-The Founder Diamond closes overnight. After that, the badge is gone for good.
+The Founder Badge closes overnight. After that, the badge is gone for good.
 
 The exact cutoff is Wednesday May 7 at 06:00 UTC:
 - 8am Rome (Wed morning)
@@ -62,5 +62,5 @@ Card required, $0 charged for 7 days, cancel in 2 clicks before day 8.
 
 Pavle
 
-PS. After the cutoff, the trial is still available, the Vault is still available, $39/month is still available. The Founder Diamond is the only thing that is actually one-way.
+PS. After the cutoff, the trial is still available, the Vault is still available, $39/month is still available. The Founder Badge is the only thing that is actually one-way.
 """

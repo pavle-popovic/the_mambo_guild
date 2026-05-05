@@ -1,14 +1,14 @@
 """A6 — May 6, Wednesday. Final call, deadline extended to 06:00 UTC May 7.
 
 Pivoted from "6 hours" -> "end of the day" framing after Pavle moved
-the Founder Diamond cutoff to Wed 08:00 Rome (06:00 UTC May 7) to give
+the Founder Badge cutoff to Wed 08:00 Rome (06:00 UTC May 7) to give
 the US audience the rest of their day to act.
 """
 
 SEGMENT = "A"
 SEND_AT_UTC = "2026-05-06T12:00:00Z"
 
-SUBJECT = "Last day to claim your Founder Diamond"
+SUBJECT = "Last day to claim your Founder Badge"
 PREHEADER = "Closes overnight: Wed 8am Rome / 2am NYC / 11pm Tue LA. Take your time."
 
 BODY_HTML = """<p>Hi __USERNAME__,</p>
@@ -16,10 +16,10 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 <h1>You have the end of the day.</h1>
 
 <div style="text-align: center; margin: 18px 0 18px 0;">
-    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Diamond Badge" width="140" style="width: 140px; height: auto; display: inline-block;">
+    <img src="https://www.themamboguild.com/badges/founder_diamond.png" alt="Founder Badge Badge" width="140" style="width: 140px; height: auto; display: inline-block;">
 </div>
 
-<p>The Founder Diamond closes overnight. After that, the badge is gone for good. <strong>This is the final email.</strong></p>
+<p>The Founder Badge closes overnight. After that, the badge is gone for good. <strong>This is the final email.</strong></p>
 
 <p>The exact cutoff is <strong>Wednesday May 7 at 06:00 UTC</strong>, which is:</p>
 <ul>
@@ -30,7 +30,7 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <h2>If you start your 7-day free trial before then</h2>
 <ul>
-    <li>Founder Diamond locked in</li>
+    <li>Founder Badge locked in</li>
     <li>$39/month, locked at this rate (cancel anytime in 2 clicks, no questions asked)</li>
     <li>Full Vault, Skill Tree, Stage, Roundtable</li>
 </ul>
@@ -39,7 +39,7 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 <ul>
     <li>Same Vault, Skill Tree, Stage, Roundtable</li>
     <li>Same $39/month founder price (still locked in if you join soon, the public price rises in August)</li>
-    <li><strong>No Founder Diamond, ever</strong></li>
+    <li><strong>No Founder Badge, ever</strong></li>
 </ul>
 
 <div class="cta-wrap">
@@ -56,7 +56,7 @@ BODY_TEXT = """Hi __USERNAME__,
 
 YOU HAVE THE END OF THE DAY.
 
-The Founder Diamond closes overnight. After that, the badge is gone for good. This is the final email.
+The Founder Badge closes overnight. After that, the badge is gone for good. This is the final email.
 
 The exact cutoff is Wednesday May 7 at 06:00 UTC, which is:
 - 8am Rome (Wed morning)
@@ -66,7 +66,7 @@ The exact cutoff is Wednesday May 7 at 06:00 UTC, which is:
 
 IF YOU START YOUR 7-DAY FREE TRIAL BEFORE THEN
 ----------------------------------------------
-- Founder Diamond locked in
+- Founder Badge locked in
 - $39/month, locked at this rate (cancel anytime in 2 clicks, no questions asked)
 - Full Vault, Skill Tree, Stage, Roundtable
 
