@@ -3,8 +3,8 @@
 SEGMENT = "BW"
 SEND_AT_UTC = "2026-05-05T17:00:00Z"
 
-SUBJECT = "24 hours, and one screen between you and the badge"
-PREHEADER = "Tomorrow 18:00 UTC the gate closes."
+SUBJECT = "24 Hours left to claim your free trial!"
+PREHEADER = "Closes Wed 6 May, 18:00 UTC. Trial start locks the Founder Badge in forever."
 
 BODY_HTML = """<p>Hi __USERNAME__,</p>
 
