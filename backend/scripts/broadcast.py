@@ -26,6 +26,10 @@ Segment routing (SQL filter chosen by module.SEGMENT):
         originally came in via the waitlist (excludes direct /register
         signups). Use for Founder-Badge-related emails since the badge
         is gated on waitlist origin.
+  CD  — UNION of C+D: trialing + active subscribers. Use for sends
+        that should reach paying-or-trialing customers only (e.g.
+        live-session schedule changes that don't apply to lapsed B
+        users who have no sub).
 
 Token TTL: as long as you ship Segment A emails (which use __MAGIC_LINK__),
 PASSWORD_RESET_EXPIRE_MINUTES on Railway must be >= 1440. Script will warn
@@ -142,6 +146,19 @@ _SEGMENT_SQL = {
         JOIN user_profiles up ON up.user_id = u.id
         JOIN subscriptions s ON s.user_id = u.id
         WHERE s.status = 'active'
+          AND u.email IS NOT NULL
+          AND u.email <> ''
+        ORDER BY u.created_at NULLS LAST
+    """,
+    # UNION C + D. Anyone with a current subscription (trialing or
+    # active). Use for live-session and perk-related sends that only
+    # apply to paying-or-trialing members.
+    "CD": """
+        SELECT u.id, u.email, up.username
+        FROM users u
+        JOIN user_profiles up ON up.user_id = u.id
+        JOIN subscriptions s ON s.user_id = u.id
+        WHERE s.status IN ('active', 'trialing')
           AND u.email IS NOT NULL
           AND u.email <> ''
         ORDER BY u.created_at NULLS LAST
