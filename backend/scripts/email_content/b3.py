@@ -18,7 +18,7 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <p>The trial is no-risk. Card required (Stripe minimum), $0 charged for 7 days, cancel in 2 clicks before day 8 if it is not for you.</p>
 
-<p>If you stay past day 7: $39/month locked in for the lifetime of your subscription.</p>
+<p>If you stay past day 7: $39/month, locked at this rate for as long as you keep your subscription. Cancel anytime in 2 clicks, no questions asked, no commitment.</p>
 
 <div class="cta-wrap">
     <a href="__FRONTEND_URL__/pricing" class="cta">Start my 7-day trial</a>
@@ -37,7 +37,7 @@ Tomorrow Wednesday May 6 at 18:00 UTC, the Founder Diamond closes permanently. Y
 
 The trial is no-risk. Card required (Stripe minimum), $0 charged for 7 days, cancel in 2 clicks before day 8 if it is not for you.
 
-If you stay past day 7: $39/month locked in for the lifetime of your subscription.
+If you stay past day 7: $39/month, locked at this rate for as long as you keep your subscription. Cancel anytime in 2 clicks, no questions asked, no commitment.
 
 
 START MY 7-DAY TRIAL

@@ -1,27 +1,36 @@
-"""C1 — May 2, Saturday. Trialer onboarding / first-value moves."""
+"""C1 — Sunday May 3. MotW as the centerpiece for in-trial users."""
 
 SEGMENT = "C"
-SEND_AT_UTC = "2026-05-02T14:00:00Z"
+SEND_AT_UTC = "2026-05-03T17:00:00Z"
 
-SUBJECT = "Your trial is on, here's where to start"
-PREHEADER = "Three places to land first inside the Guild."
+SUBJECT = "Move of the Week is up. Go win it."
+PREHEADER = "Casual challenge in the community. You're already in, jump in if you want."
 
 BODY_HTML = """<p>Hi __USERNAME__,</p>
 
-<p>Welcome to the Guild. <strong>You are inside.</strong></p>
+<p>Welcome to the Guild. You're inside.</p>
 
-<p>A few suggestions for your first 24 hours:</p>
+<p>Just posted the first Move of the Week in the community:</p>
 
-<ol>
-    <li><strong>Watch the Bruno Mars Cha-Cha-Cha breakdown.</strong> It is the cleanest 8-minute showcase of the platform's teaching method (frame-by-frame, mirrored view, A/B loops). Even if you do not dance Cha-Cha-Cha, the technique style transfers to everything else.</li>
-    <li><strong>Open the Skill Tree.</strong> Pick a starting node based on your level. The path from "first basic step" to "advanced choreography" is structured so you always know what is next.</li>
-    <li><strong>Check the Move of the Week challenge in the community tab.</strong> I am opening the first one this weekend. If you want to take part, record your version of the move and post it on The Stage. I crown the first winner next Saturday. Casual, low-pressure, just for the dancers who feel like jumping in.</li>
-</ol>
+<div class="quote">
+Little casual competition for you guys. Learn the move, post your version on The Stage. My favourite gets 100 Claves to spend in the Guild Store and a feature in my Instagram Story, if you want it. No pressure, just for fun. I pick the winner Saturday. :D
+</div>
 
-<p>You have full access to all of this for the next 7 days. Day 8, $39/month auto-bills. As a Founder, that is locked in for the lifetime of your subscription. Cancel anytime in 2 clicks if it is not for you.</p>
+<p>You have full access. Jump in if you feel like it.</p>
+
+<h2>A few other places worth visiting in your trial week</h2>
+
+<p><strong>The Vault.</strong> 500+ classes. Watch the Bruno Mars Cha-Cha-Cha breakdown first, it shows the teaching method better than any words I could write.</p>
+
+<p><strong>The Skill Tree.</strong> Your personalized path through the Vault. No more "what do I do tonight?" decisions.</p>
+
+<p><strong>The Roundtable.</strong> Wednesday weekly Zoom session with me. Open Q&amp;A, technique deep-dive, occasional surprise guest.</p>
+
+<p>Your trial converts on day 8 at $39/month. As a Founder, your $39 rate stays locked even when the public price goes up. Cancel anytime in 2 clicks, no questions asked, no commitment.</p>
 
 <div class="cta-wrap">
-    <a href="__FRONTEND_URL__/courses" class="cta">Open the Vault</a>
+    <a href="__FRONTEND_URL__/community" class="cta">Open the community</a>
+    <div class="cta-sub">Move of the Week post is at the top of the feed.</div>
 </div>
 
 <p style="margin-top: 32px;">Pavle</p>
@@ -31,21 +40,30 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 BODY_TEXT = """Hi __USERNAME__,
 
-Welcome to the Guild. You are inside.
+Welcome to the Guild. You're inside.
 
-A few suggestions for your first 24 hours:
+Just posted the first Move of the Week in the community:
 
-1. Watch the Bruno Mars Cha-Cha-Cha breakdown. It is the cleanest 8-minute showcase of the platform's teaching method (frame-by-frame, mirrored view, A/B loops). Even if you do not dance Cha-Cha-Cha, the technique style transfers to everything else.
+"Little casual competition for you guys. Learn the move, post your version on The Stage. My favourite gets 100 Claves to spend in the Guild Store and a feature in my Instagram Story, if you want it. No pressure, just for fun. I pick the winner Saturday. :D"
 
-2. Open the Skill Tree. Pick a starting node based on your level. The path from "first basic step" to "advanced choreography" is structured so you always know what is next.
-
-3. Check the Move of the Week challenge in the community tab. I am opening the first one this weekend. If you want to take part, record your version of the move and post it on The Stage. I crown the first winner next Saturday. Casual, low-pressure, just for the dancers who feel like jumping in.
-
-You have full access to all of this for the next 7 days. Day 8, $39/month auto-bills. As a Founder, that is locked in for the lifetime of your subscription. Cancel anytime in 2 clicks if it is not for you.
+You have full access. Jump in if you feel like it.
 
 
-OPEN THE VAULT
-__FRONTEND_URL__/courses
+A FEW OTHER PLACES WORTH VISITING IN YOUR TRIAL WEEK
+----------------------------------------------------
+The Vault. 500+ classes. Watch the Bruno Mars Cha-Cha-Cha breakdown first, it shows the teaching method better than any words I could write.
+
+The Skill Tree. Your personalized path through the Vault. No more "what do I do tonight?" decisions.
+
+The Roundtable. Wednesday weekly Zoom session with me. Open Q&A, technique deep-dive, occasional surprise guest.
+
+Your trial converts on day 8 at $39/month. As a Founder, your $39 rate stays locked even when the public price goes up. Cancel anytime in 2 clicks, no questions asked, no commitment.
+
+
+OPEN THE COMMUNITY
+__FRONTEND_URL__/community
+
+Move of the Week post is at the top of the feed.
 
 
 Pavle

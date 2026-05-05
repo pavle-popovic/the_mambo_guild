@@ -20,7 +20,7 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <ul>
     <li>Founder Diamond locked in</li>
-    <li>$39/month for the lifetime of your subscription</li>
+    <li>$39/month, locked at this rate (cancel anytime in 2 clicks, no questions asked)</li>
     <li>Full Vault, Skill Tree, Stage, Roundtable</li>
 </ul>
 
@@ -52,7 +52,7 @@ At 18:00 UTC today the Founder Diamond closes for good. This is the final email.
 IF YOU START YOUR 7-DAY FREE TRIAL BEFORE THEN
 ----------------------------------------------
 - Founder Diamond locked in
-- $39/month for the lifetime of your subscription
+- $39/month, locked at this rate (cancel anytime in 2 clicks, no questions asked)
 - Full Vault, Skill Tree, Stage, Roundtable
 
 

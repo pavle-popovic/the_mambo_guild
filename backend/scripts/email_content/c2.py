@@ -20,7 +20,7 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <p>The Move of the Week challenge in the community wraps up Saturday with the first winner. If you want to jump in, record your version of the move and post it on The Stage before then.</p>
 
-<p>Your trial converts on day 8 at $39/month. As a Founder, that price is locked in for the lifetime of your subscription. Cancel anytime in 2 clicks if it is not for you.</p>
+<p>Your trial converts on day 8 at $39/month. As a Founder, your $39 rate stays locked even when the public price goes up. Cancel anytime in 2 clicks, no questions asked, no commitment.</p>
 
 <div class="cta-wrap">
     <a href="__FRONTEND_URL__/community" class="cta">Open the community</a>
@@ -43,7 +43,7 @@ If you have not yet, three things worth trying before the trial ends:
 
 The Move of the Week challenge in the community wraps up Saturday with the first winner. If you want to jump in, record your version of the move and post it on The Stage before then.
 
-Your trial converts on day 8 at $39/month. As a Founder, that price is locked in for the lifetime of your subscription. Cancel anytime in 2 clicks if it is not for you.
+Your trial converts on day 8 at $39/month. As a Founder, your $39 rate stays locked even when the public price goes up. Cancel anytime in 2 clicks, no questions asked, no commitment.
 
 
 OPEN THE COMMUNITY
