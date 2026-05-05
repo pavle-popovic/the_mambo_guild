@@ -758,6 +758,24 @@ async def stripe_webhook(
         "vip": SubscriptionTier.PERFORMER,
     }
 
+    # Single source of truth for Stripe sub status -> our DB enum. Used by
+    # both customer.subscription.{created,updated} and invoice.payment_succeeded
+    # so a $0 trial invoice can no longer overwrite status=trialing -> active.
+    # Default is configurable: INCOMPLETE for sub-mirror handlers (conservative),
+    # ACTIVE for invoice.payment_succeeded (don't lock out a paying user on a
+    # status string Stripe later added).
+    def _db_status_from_stripe(
+        stripe_status: str,
+        default: SubscriptionStatus = SubscriptionStatus.INCOMPLETE,
+    ) -> SubscriptionStatus:
+        return {
+            "trialing":   SubscriptionStatus.TRIALING,
+            "active":     SubscriptionStatus.ACTIVE,
+            "past_due":   SubscriptionStatus.PAST_DUE,
+            "canceled":   SubscriptionStatus.CANCELED,
+            "incomplete": SubscriptionStatus.INCOMPLETE,
+        }.get(stripe_status, default)
+
     def _resolve_tier_from_items(items_data: list) -> SubscriptionTier:
         if not items_data:
             return SubscriptionTier.ROOKIE
@@ -792,14 +810,7 @@ async def stripe_webhook(
             datetime.fromtimestamp(period_end_ts, tz=timezone.utc) if period_end_ts else None
         )
 
-        status_mapping = {
-            "trialing": SubscriptionStatus.TRIALING,
-            "active": SubscriptionStatus.ACTIVE,
-            "past_due": SubscriptionStatus.PAST_DUE,
-            "canceled": SubscriptionStatus.CANCELED,
-            "incomplete": SubscriptionStatus.INCOMPLETE,
-        }
-        db_status = status_mapping.get(stripe_status, SubscriptionStatus.INCOMPLETE)
+        db_status = _db_status_from_stripe(stripe_status)
 
         db_subscription = db.query(Subscription).filter(
             Subscription.stripe_customer_id == customer_id
@@ -1046,7 +1057,13 @@ async def stripe_webhook(
 
                 if db_subscription:
                     db_subscription.stripe_subscription_id = stripe_subscription.id
-                    db_subscription.status = SubscriptionStatus.ACTIVE
+                    # Mirror Stripe's actual status. Stripe fires
+                    # invoice.payment_succeeded for the $0 trial invoice too,
+                    # which would otherwise overwrite trialing -> active and
+                    # leak Performer-only feature flags to trial users.
+                    db_subscription.status = _db_status_from_stripe(
+                        stripe_subscription.status, default=SubscriptionStatus.ACTIVE
+                    )
                     db_subscription.tier = tier
                     db_subscription.current_period_end = period_end_dt
                     db.commit()
@@ -1091,11 +1108,14 @@ async def stripe_webhook(
                             existing = db.query(Subscription).filter(
                                 Subscription.user_id == user_uuid
                             ).first()
+                            mirrored_status = _db_status_from_stripe(
+                                stripe_subscription.status, default=SubscriptionStatus.ACTIVE
+                            )
                             if existing:
                                 # Update the existing row rather than minting a duplicate.
                                 existing.stripe_customer_id = customer_id
                                 existing.stripe_subscription_id = stripe_subscription.id
-                                existing.status = SubscriptionStatus.ACTIVE
+                                existing.status = mirrored_status
                                 existing.tier = tier
                                 existing.current_period_end = period_end_dt
                                 db.commit()
@@ -1107,7 +1127,7 @@ async def stripe_webhook(
                                     user_id=user_uuid,
                                     stripe_customer_id=customer_id,
                                     stripe_subscription_id=stripe_subscription.id,
-                                    status=SubscriptionStatus.ACTIVE,
+                                    status=mirrored_status,
                                     tier=tier,
                                     current_period_end=period_end_dt,
                                 )
