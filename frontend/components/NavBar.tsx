@@ -535,10 +535,12 @@ export default function NavBar({ user }: NavBarProps) {
                   </>
                 ) : (
                   <>
-                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="mx-4 mt-2 py-3 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black rounded-full text-center font-bold shadow-lg shadow-[0_0_20px_rgba(252,226,5,0.4)] ring-2 ring-amber-400/50">
+                    <Link href="/register" onClick={() => setIsMobileMenuOpen(false)} className="mx-4 mt-2 py-3 bg-[linear-gradient(135deg,#FCE205_0%,#D4AF37_100%)] text-black rounded-full text-center font-bold shadow-lg shadow-[0_0_20px_rgba(252,226,5,0.4)] ring-2 ring-amber-400/50">
+                      {t('signup')}
+                    </Link>
+                    <Link href="/login" onClick={() => setIsMobileMenuOpen(false)} className="mx-4 mt-1 py-2 text-center text-sm text-gray-300 hover:text-white transition">
                       {t('login')}
                     </Link>
-
                   </>
                 )}
               </div>

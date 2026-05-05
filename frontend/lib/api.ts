@@ -467,7 +467,7 @@ class ApiClient {
     });
   }
 
-  async getProfile() {
+  async getProfile(opts: { forceRefresh?: boolean } = {}) {
     return this.request<{
       id: string;
       first_name: string;
@@ -504,7 +504,7 @@ class ApiClient {
         reactions_received: number;
         solutions_accepted: number;
       } | null;
-    }>("/api/auth/me");
+    }>("/api/auth/me", { forceRefresh: opts.forceRefresh });
   }
 
   // Course endpoints

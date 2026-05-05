@@ -35,12 +35,12 @@ def send_password_reset_email(email: str, reset_token: str) -> bool:
     
     try:
         reset_url = f"{settings.FRONTEND_URL}/reset-password?token={reset_token}"
-        
+
         # Use configured FROM_EMAIL
         from_email = settings.FROM_EMAIL
-        
+
         result = resend.Emails.send({
-            "from": from_email,
+            "from": f"The Mambo Guild <{from_email}>",
             "to": [email],
             "subject": "Reset Your Password - The Mambo Guild",
             "html": f"""
@@ -99,7 +99,7 @@ def send_trial_collapsed_email(email: str) -> bool:
         pricing_url = f"{settings.FRONTEND_URL}/pricing"
 
         result = resend.Emails.send({
-            "from": from_email,
+            "from": f"The Mambo Guild <{from_email}>",
             "to": [email],
             "subject": "About your free trial - The Mambo Guild",
             "html": f"""
@@ -162,7 +162,7 @@ def send_email_verification_email(email: str, verification_token: str) -> bool:
         ttl_hours = settings.EMAIL_VERIFICATION_EXPIRE_HOURS
 
         result = resend.Emails.send({
-            "from": from_email,
+            "from": f"The Mambo Guild <{from_email}>",
             "to": [email],
             "subject": "Verify your email - The Mambo Guild",
             "html": f"""
@@ -221,7 +221,7 @@ def send_coaching_feedback_email(student_email: str, student_name: str, feedback
         view_url = f"{settings.FRONTEND_URL}/guild-master?tab=coaching"
 
         result = resend.Emails.send({
-            "from": from_email,
+            "from": f"The Mambo Guild <{from_email}>",
             "to": [student_email],
             "subject": "Your video feedback is ready",
             "html": f"""
@@ -352,7 +352,7 @@ def send_announcement_email(email: str, name: str, subject: str, message: str) -
         safe_name = escape(name)
 
         result = resend.Emails.send({
-            "from": from_email,
+            "from": f"The Mambo Guild <{from_email}>",
             "to": [email],
             "subject": subject,
             "html": f"""
@@ -487,7 +487,7 @@ def send_bug_report_email(
         reply_to = reporter_email if reporter_email else from_email
 
         result = resend.Emails.send({
-            "from": from_email,
+            "from": f"The Mambo Guild <{from_email}>",
             "to": [support_email],
             "reply_to": reply_to,
             "subject": f"[Bug Report] {' '.join(message.split())[:60]}{'...' if len(message) > 60 else ''}",
@@ -559,7 +559,7 @@ def send_ambassador_application_email(
         safe_ip = escape(client_ip)
 
         result = resend.Emails.send({
-            "from": from_email,
+            "from": f"The Mambo Guild <{from_email}>",
             "to": [to_email],
             "reply_to": applicant_email,
             "subject": f"[Ambassador] {applicant_name} wants to represent the Guild",
@@ -626,7 +626,7 @@ def send_review_email(
         stars = "★" * clamped_rating + "☆" * (5 - clamped_rating)
 
         result = resend.Emails.send({
-            "from": from_email,
+            "from": f"The Mambo Guild <{from_email}>",
             "to": [to_email],
             "reply_to": reviewer_email,
             "subject": f"[Review] {clamped_rating}/5 from {reviewer_name}",
@@ -795,11 +795,11 @@ def send_waitlist_welcome_email(email: str, username: str, referral_link: str) -
     Welcome email sent to every new account creation (manual /register,
     /waitlist signup, OAuth callback for first-time Google users).
 
-    Structure: brief intro -> 8 free YouTube classes -> bridge ("if you
-    enjoy these, you'll love what's inside") -> what's inside -> trial
-    CTA. Leads with free value so the email reads as a gift, not a
-    sales pitch, then bridges naturally from free content to the paid
-    Guild offering.
+    Structure: brief intro -> The Vault (lead with what's inside) ->
+    softer "if you want to see me teach first" YouTube link to the
+    Pachanga Basic -> 5h Pachanga course teaser -> trial CTA. The
+    YouTube link is positioned as an optional pre-check rather than
+    the main reward, so the trial CTA stays the strongest call.
 
     Args:
         email: User's email address
@@ -834,28 +834,11 @@ My name is Pavle Popovic. I am a professional dancer and have spent the past 10 
 I hold certifications in Learning Experience Design and Gamification and applied those principles to the curriculum so you are not just memorising steps, you are actually learning to dance.
 
 
-8 FREE CLASSES, ON ME
----------------------
-Before anything else, here are 8 of my favourite free classes. Pick one, dance it, and see how I teach:
-
-- Salsa Bodymovement Musicality (La Gripe): https://www.youtube.com/watch?v=Ol54zPvVpx0
-- 14 Salsa Moves Ep. 2: https://www.youtube.com/watch?v=-Y4By7n2KCQ
-- Pachanga Fundamentals: https://www.youtube.com/watch?v=A12yU-b2O_s
-- Rankankan Choreography: https://www.youtube.com/watch?v=57-zwVE1VXI
-- 14 Salsa Moves Ep. 1: https://www.youtube.com/watch?v=5u_56JspFX8
-- Salsa Romantica: https://www.youtube.com/watch?v=wcDocNANEVY
-- Afro Mambo Fusion: https://www.youtube.com/watch?v=RIMp6J02Th0
-- Pachanga Module 11 (The Kick Tap Chuck): https://www.youtube.com/watch?v=ER1CMXeoAao
-
-
-IF YOU ENJOY THESE, YOU WILL LOVE WHAT IS INSIDE
-------------------------------------------------
-Same teaching, ten times the depth, structured into a real curriculum, with the tools to actually drill it.
-
 THE VAULT
+---------
 - 500+ lessons, beginner to pro
-- Three full Mambo courses and a complete Pachanga course
-- A full course on Salsa History and a full course on Effective Training Science
+- 3 full Salsa courses from total beginner to total pro
+- A full Salsa History course, a full Effective Training Science course
 - New choreography every two weeks, guest teachers
 
 THE SKILL TREE
@@ -866,6 +849,20 @@ Post your progress videos, ask questions, get feedback. Climb the leaderboard, e
 
 THE VIDEO PLAYER
 Mirrored view, back view, captions in 16 languages, 0.25x to 2x speed, frame-by-frame, A/B loop.
+
+
+ONE FREE CLASS ON YOUTUBE
+-------------------------
+A gift from me: the Pachanga Basic breakdown, on YouTube.
+https://www.youtube.com/watch?v=A12yU-b2O_s
+
+
+THE FULL PACHANGA COURSE IS WAITING INSIDE
+------------------------------------------
+That is one lesson. The full 5-hour Pachanga course is inside the trial:
+- All Pachanga technique, culture, and history
+- 20+ completely different moves, broken down step by step
+- A full Pachanga choreography to Smooth Criminal by Michael Jackson
 
 
 START MY 7-DAY FREE TRIAL
@@ -945,25 +942,25 @@ To unsubscribe, reply to pavlepopovic@themamboguild.com with "Unsubscribe".
                     <p>My name is <strong>Pavle Popovic</strong>. I am a professional dancer and have spent the past 10 years on the craft of training and how people actually learn to dance.</p>
                     <p>I built The Mambo Guild because the salsa school I wanted as a student did not exist. Most online classes lack structure, so students plateau and quit. I hold certifications in Learning Experience Design and Gamification and applied those principles to the curriculum so you are not just memorising steps, you are actually <em>learning to dance</em>.</p>
 
-                    <h2>8 free classes, on me</h2>
-                    <p>Before anything else, here are 8 of my favourite free classes. Pick one, dance it, and see how I teach:</p>
-                    <ul>
-                        <li><a href="https://www.youtube.com/watch?v=Ol54zPvVpx0" class="link">Salsa Bodymovement Musicality (La Gripe)</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=-Y4By7n2KCQ" class="link">14 Salsa Moves Ep. 2</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">Pachanga Fundamentals</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=57-zwVE1VXI" class="link">Rankankan Choreography</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=5u_56JspFX8" class="link">14 Salsa Moves Ep. 1</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=wcDocNANEVY" class="link">Salsa Romantica</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=RIMp6J02Th0" class="link">Afro Mambo Fusion</a></li>
-                        <li><a href="https://www.youtube.com/watch?v=ER1CMXeoAao" class="link">Pachanga Module 11 (The Kick Tap Chuck)</a></li>
-                    </ul>
-
-                    <h2>If you enjoy these, you will love what is inside</h2>
-                    <p>Same teaching, ten times the depth, structured into a real curriculum, with the tools to actually drill it.</p>
-                    <p><strong>The Vault.</strong> 500+ lessons, beginner to pro. Three full Mambo courses, a complete Pachanga course, a full course on Salsa History, and a full course on Effective Training Science. New choreography every two weeks, plus guest teachers.</p>
+                    <h2>The Vault</h2>
+                    <p><strong>500+ lessons</strong>, beginner to pro. 3 full Salsa courses from total beginner to total pro, a full Salsa History course, a full Effective Training Science course. New choreography every two weeks, plus guest teachers.</p>
                     <p><strong>The Skill Tree.</strong> A clear visual path from your first basic step to advanced choreo. Every lesson unlocks the next, so you always know what to drill next.</p>
                     <p><strong>The Stage and the Lab.</strong> Post your progress videos, ask questions, get feedback. Climb the leaderboard, earn 38 badges from Bronze to Diamond.</p>
                     <p><strong>The Video Player.</strong> Mirrored view, back view, captions in 16 languages, 0.25x to 2x speed, frame-by-frame, A/B loop.</p>
+
+                    <h2>One free class on YouTube</h2>
+                    <p>A gift from me: the Pachanga Basic breakdown, on YouTube.</p>
+                    <ul>
+                        <li><a href="https://www.youtube.com/watch?v=A12yU-b2O_s" class="link">The Pachanga Basic (Breakdown)</a></li>
+                    </ul>
+
+                    <h2>The full Pachanga course is waiting inside</h2>
+                    <p>That is one lesson. The full 5-hour Pachanga course is inside the trial:</p>
+                    <ul>
+                        <li>All Pachanga technique, culture, and history</li>
+                        <li>20+ completely different moves, broken down step by step</li>
+                        <li>A full Pachanga choreography to <strong>Smooth Criminal</strong> by Michael Jackson</li>
+                    </ul>
 
                     <div class="cta-wrap">
                         <a href="{pricing_url}" class="cta">Start my 7-day free trial</a>

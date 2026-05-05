@@ -12,8 +12,6 @@
  *   - "I already verified" -> re-fetch /me, navigate to /pricing if
  *     is_verified flipped to true (covers users who clicked the link
  *     in another tab)
- *   - Browse free content first (skip verification for now; the trial
- *     CTA on /pricing will surface the verify-email modal later)
  *
  * OAuth signups skip this page entirely — they're auto-verified by the
  * provider and the OAuth callback redirects them straight to /courses.
@@ -24,7 +22,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import NavBar from "@/components/NavBar";
 import { apiClient } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
@@ -60,12 +57,14 @@ export default function VerifyEmailSentPage() {
     setStatusMsg("");
     setStatusKind("");
     try {
-      await refreshUser();
-      // refreshUser writes into context; read the freshest profile via a
-      // direct call so we make the routing decision without a stale-
-      // closure problem. (Same pattern as EmailVerificationModal.)
-      const profile = await apiClient.getProfile();
+      // Bypass the 30s GET cache in apiClient — without forceRefresh, a
+      // user who clicks this once before verifying gets is_verified=false
+      // cached, then clicking again after verifying still reads the cached
+      // false and silently re-shows "not yet verified".
+      const profile = await apiClient.getProfile({ forceRefresh: true });
       if (profile.is_verified) {
+        // Sync AuthContext from the now-fresh cache before navigating.
+        await refreshUser();
         router.push("/pricing");
       } else {
         setStatusKind("error");
@@ -116,7 +115,7 @@ export default function VerifyEmailSentPage() {
             </div>
           )}
 
-          <div className="flex flex-col gap-3 mb-4">
+          <div className="flex flex-col gap-3">
             <button
               onClick={handleAlreadyVerified}
               disabled={refreshing}
@@ -132,13 +131,6 @@ export default function VerifyEmailSentPage() {
               {resending ? t("resending") : t("resendButton")}
             </button>
           </div>
-
-          <Link
-            href="/courses"
-            className="text-sm text-gray-500 hover:text-mambo-text transition underline-offset-4 hover:underline"
-          >
-            {t("browseFreeCta")}
-          </Link>
         </div>
       </div>
     </div>
