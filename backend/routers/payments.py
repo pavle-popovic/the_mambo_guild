@@ -962,18 +962,24 @@ async def stripe_webhook(
                     )
                     db.rollback()
 
-                # Fire StartTrial to Meta CAPI. $0 value but predicted_ltv
-                # tells the bidder to treat this as potential $39/mo revenue.
+                # Fire StartTrial to Meta CAPI. Send the tier's first-period
+                # price as `value` so Meta's value-based bidder can distinguish
+                # $39 (Advanced) from $59 (Performer) trials — sending 0 for
+                # all trials trips Meta's "all events same price" warning and
+                # tanks ROAS optimization.
                 try:
+                    trial_value = (
+                        59.0 if tier == SubscriptionTier.PERFORMER else 39.0
+                    )
                     track_event(
                         db=db,
                         event_name="StartTrial",
                         user_id=db_subscription.user_id,
-                        value=0.0,
+                        value=trial_value,
                         currency="USD",
                         properties={
                             "tier": tier.value,
-                            "predicted_ltv": 59.0 if tier == SubscriptionTier.PERFORMER else 39.0,
+                            "predicted_ltv": trial_value,
                             "stripe_subscription_id": stripe_sub_id,
                         },
                         request=request,

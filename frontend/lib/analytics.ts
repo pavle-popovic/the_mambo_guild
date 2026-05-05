@@ -8,6 +8,8 @@
  * client-side fbq pixel call pairs with the authoritative server event.
  */
 
+import { readFbp, readFbc } from "@/lib/fbclid";
+
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
@@ -59,6 +61,11 @@ export function track(eventName: string, options: TrackOptions = {}): TrackedEve
   }
 
   // POST the same event to the backend so CAPI gets the server-side copy.
+  // _fbp / _fbc are set by Meta Pixel JS on the frontend domain and don't
+  // cross to the backend's domain via cookies. Read them and ship them in
+  // the body so anonymous CAPI events still carry Meta's deterministic
+  // match identifiers (otherwise events arrive with only IP+UA — Meta's
+  // EMQ tanks and Pixel↔CAPI dedup gets fuzzy).
   const payload = {
     event_id: eventId,
     event_name: eventName,
@@ -67,6 +74,8 @@ export function track(eventName: string, options: TrackOptions = {}): TrackedEve
     properties: properties ?? {},
     anonymous_id: anonymousId,
     page_url: typeof window !== "undefined" ? window.location.href : undefined,
+    fbp: typeof window !== "undefined" ? (readFbp() ?? undefined) : undefined,
+    fbc: typeof window !== "undefined" ? (readFbc() ?? undefined) : undefined,
   };
 
   const url = `${API_BASE_URL}/api/analytics/track`;

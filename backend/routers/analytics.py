@@ -64,6 +64,8 @@ def track(
         background_tasks=background_tasks,
         event_id=payload.event_id,
         page_url=payload.page_url,
+        fbp_override=payload.fbp,
+        fbc_override=payload.fbc,
     )
 
     return TrackEventResponse(event_id=payload.event_id)

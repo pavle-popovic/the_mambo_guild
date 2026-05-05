@@ -14,6 +14,12 @@ class TrackEventRequest(BaseModel):
     properties: dict[str, Any] = Field(default_factory=dict)
     page_url: Optional[str] = Field(default=None, max_length=500)
     anonymous_id: Optional[str] = Field(default=None, max_length=64)
+    # Meta browser/click cookies forwarded explicitly because they're scoped
+    # to the frontend domain and don't reach the cross-origin backend via
+    # the cookie jar. Generous bounds prevent abuse-via-huge-strings; both
+    # are opaque IDs Meta validates server-side.
+    fbp: Optional[str] = Field(default=None, max_length=128)
+    fbc: Optional[str] = Field(default=None, max_length=256)
 
 
 class TrackEventResponse(BaseModel):

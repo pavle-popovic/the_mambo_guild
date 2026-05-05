@@ -21,6 +21,7 @@ from typing import Any, Mapping, Optional
 from fastapi import BackgroundTasks, Request
 from sqlalchemy.orm import Session
 
+from config import settings
 from models.analytics import UserEvent
 from models.user import User, UserProfile
 from utils.request import client_ip as extract_client_ip
@@ -114,9 +115,15 @@ def track_event(
 
     resolved_page_url = page_url
     if resolved_page_url is None and request is not None:
-        # Browser-initiated events send the real page URL via Origin/Referer.
-        # Fall back to request.url for server-fired events.
-        resolved_page_url = referrer or str(request.url)
+        # Browser-initiated events send the real page URL via the explicit
+        # `page_url` arg. Fall back to Referer for server-handled but
+        # browser-originated requests. For server-fired events (Stripe
+        # webhooks) neither is set — use FRONTEND_URL so Meta doesn't see
+        # the backend's internal URL as the event_source_url (kills
+        # URL-based attribution and Pixel↔CAPI matching).
+        resolved_page_url = referrer
+    if resolved_page_url is None:
+        resolved_page_url = settings.FRONTEND_URL
 
     row = UserEvent(
         event_id=event_id,
