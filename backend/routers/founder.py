@@ -2,7 +2,7 @@
 Founder Diamond — public read-only status endpoint.
 
 Returns ONLY the public-knowledge fields: the cap (300, marketing fact),
-the deadline (May 6 18:00 UTC, marketing fact), and a binary `expired`
+the deadline (May 7 06:00 UTC = Wed 8am Rome, marketing fact), and a binary `expired`
 flag. The live `claimed` / `remaining` counts are deliberately NOT
 returned — leaking the running tally undercuts the scarcity messaging
 ("only 300!" lands harder when the prospect doesn't know that ~270 of

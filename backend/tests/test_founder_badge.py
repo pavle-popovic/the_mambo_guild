@@ -37,7 +37,8 @@ def test_service_imports_and_constants():
     assert svc.FOUNDER_CAP == 300
     # Deadline must be the exact spec'd UTC instant. Drift here would
     # silently extend or shorten the claim window.
-    assert svc.FOUNDER_DEADLINE == datetime(2026, 5, 6, 18, 0, 0, tzinfo=timezone.utc)
+    # Deadline extended on 2026-05-06 to give US audiences the rest of their day.
+    assert svc.FOUNDER_DEADLINE == datetime(2026, 5, 7, 6, 0, 0, tzinfo=timezone.utc)
     assert callable(svc.try_claim)
     assert callable(svc.get_status)
 

@@ -22,7 +22,7 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <p>Just hit reply. No template, no form, no rating scale. I read every single email myself and the answers shape what I build next.</p>
 
-<p>That is it. No CTA, no link to click. Just thanks for being here in week one.</p>
+<p>Thank you for being here, I sincerely appreciate the support.</p>
 
 <p style="margin-top: 24px;">Pavle</p>
 """
@@ -37,7 +37,7 @@ If you are loving something, tell me which lesson clicked. If you are stuck, tel
 
 Just hit reply. No template, no form, no rating scale. I read every single email myself and the answers shape what I build next.
 
-That is it. No CTA, no link to click. Just thanks for being here in week one.
+Thank you for being here, I sincerely appreciate the support.
 
 Pavle
 """

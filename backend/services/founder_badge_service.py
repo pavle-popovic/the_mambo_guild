@@ -5,7 +5,7 @@ Rule: a Founder Diamond seat is claimable iff
   (a) the user originally came from the waitlist
       (UserProfile.was_waitlister = TRUE)
   (b) the current time is < FOUNDER_DEADLINE
-      (2026-05-06 18:00:00 UTC)
+      (2026-05-07 06:00:00 UTC = Wed May 7 08:00 Rome / CEST)
   (c) fewer than FOUNDER_CAP (300) seats have been claimed
   (d) the user has not already claimed a seat
 
@@ -39,7 +39,7 @@ FOUNDER_CAP = 300
 # Hard deadline. Anything strictly before this UTC instant qualifies;
 # anything at or after is rejected. Stored as aware UTC so comparisons
 # with `datetime.now(timezone.utc)` are unambiguous.
-FOUNDER_DEADLINE = datetime(2026, 5, 6, 18, 0, 0, tzinfo=timezone.utc)
+FOUNDER_DEADLINE = datetime(2026, 5, 7, 6, 0, 0, tzinfo=timezone.utc)
 # Constant key for the pg advisory lock that serialises the
 # count-then-insert window. Picked to not collide with the Guild Master
 # seat lock (734829_1) or the per-user checkout locks.
