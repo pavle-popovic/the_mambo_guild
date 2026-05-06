@@ -117,13 +117,19 @@ _PENDING_CHECKOUT_TTL = timedelta(minutes=30)
 
 # Per-user retry cooldown for /create-checkout. If the same user clicks
 # Subscribe again within this window we 409 to prevent spawning a parallel
-# Checkout Session against the same Stripe customer. Kept tight (5 min) so
-# real users whose first Checkout tab hung (network drop, browser back-button,
-# expired session URL) can simply click again and self-heal — instead of
-# emailing support saying "I'm stuck for 30 minutes." The Stripe-side dedup
-# (idempotency_key + expires_at=30min) catches any duplicate session that
-# would slip through.
-_CHECKOUT_RETRY_COOLDOWN = timedelta(minutes=5)
+# Checkout Session against the same Stripe customer. Kept very tight (30s)
+# so real users whose first Checkout tab hung (network drop, closed mobile
+# tab, expired session URL) can simply click again instead of waiting out
+# the cooldown and emailing support. 30s is enough to absorb the actual
+# race condition (rapid double-click within ~100-500ms) while letting any
+# legitimate retry through. The proper fix — reuse the existing open
+# Stripe Checkout Session URL on retry instead of creating a parallel one
+# — is tracked in memory/project_checkout_session_reuse.md and should
+# replace this cooldown entirely. Until then, this 30s window leaves a
+# small theoretical race where two parallel session creations could happen,
+# but Stripe's 30-min session expiry + per-user advisory lock contain the
+# blast radius.
+_CHECKOUT_RETRY_COOLDOWN = timedelta(seconds=30)
 
 
 def _lock_user_for_checkout(db: Session, user_id) -> None:
