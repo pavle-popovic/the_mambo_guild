@@ -215,8 +215,11 @@ def capture_first_touch(
     elif fbclid and not profile.fbc:
         # Browser may have been blocked from setting _fbc — synthesise it
         # per Meta's canonical format so CAPI still has the click ID.
-        ts = int(datetime.now(timezone.utc).timestamp())
-        profile.fbc = f"fb.1.{ts}.{fbclid}"
+        # Meta's spec: timestamp segment is MILLISECONDS, not seconds.
+        # Older revisions of this function used seconds; the legacy rows
+        # are normalised at CAPI dispatch via utils.meta_user_data.normalize_fbc.
+        ts_ms = int(datetime.now(timezone.utc).timestamp() * 1000)
+        profile.fbc = f"fb.1.{ts_ms}.{fbclid}"
         changed = True
 
     if utm and not profile.first_touch_utm:

@@ -4,9 +4,15 @@
  * The Meta Pixel normally sets `_fbc` itself from `?fbclid=…`. This module is
  * a belt-and-braces backup for the case where Pixel JS is blocked (ad-block,
  * tracking protection) but the URL param still survives. We write the cookie
- * in Meta's canonical format (`fb.1.{unixSeconds}.{fbclid}`) with a 1-year
- * expiry so CAPI still has the click ID when the user converts hours or
- * days later.
+ * in Meta's canonical format (`fb.1.{unixMilliseconds}.{fbclid}`) with a
+ * 1-year expiry so CAPI still has the click ID when the user converts hours
+ * or days later.
+ *
+ * Spec note: the timestamp segment MUST be milliseconds. Meta's CAPI
+ * diagnostics flag any fbc whose timestamp can be interpreted as before
+ * the click ID was created (which is what happens when seconds-based
+ * timestamps are interpreted as ms). Mismatch tanks Event Match Quality
+ * and ad-spend optimization.
  */
 
 const ONE_YEAR_SECONDS = 60 * 60 * 24 * 365;
@@ -37,7 +43,9 @@ export function captureFbclid(): void {
   const existing = readCookie("_fbc");
   if (existing && existing.includes(fbclid)) return;
 
-  const ts = Math.floor(Date.now() / 1000);
+  // Meta's _fbc spec requires the timestamp in MILLISECONDS, not seconds.
+  // Date.now() already returns ms — do NOT divide by 1000.
+  const ts = Date.now();
   writeCookie("_fbc", `fb.1.${ts}.${fbclid}`, ONE_YEAR_SECONDS);
 }
 

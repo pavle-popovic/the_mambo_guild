@@ -49,6 +49,51 @@ def hash_external_id(user_id: Optional[str]) -> Optional[str]:
     return _hash(user_id)
 
 
+# Boundary between a Unix-seconds timestamp and a Unix-milliseconds timestamp.
+# 10^11 = year 5138 if interpreted as ms, year 1973 if interpreted as seconds.
+# Anything below this MUST be a seconds value that needs scaling up to ms.
+_FBC_TS_MS_THRESHOLD = 10**11
+
+
+def normalize_fbc(fbc: Optional[str]) -> Optional[str]:
+    """Coerce the timestamp segment of an _fbc string to MILLISECONDS.
+
+    Meta's _fbc canonical format is ``fb.{subdomainIndex}.{creationTimeMs}.{fbclid}``
+    where ``creationTimeMs`` is Unix time in MILLISECONDS. Older revisions of
+    this codebase (and Meta's own pixel JS in some configurations) wrote
+    seconds-based timestamps, which Meta's CAPI diagnostics flag as
+    ``creationTime invalid (before click ID created)`` because the value is
+    interpreted as ms and lands in the early 1970s.
+
+    This helper is applied only at CAPI dispatch — it never mutates stored
+    state. Legacy rows in ``user_profiles.fbc`` and currently-live ``_fbc``
+    cookies in user browsers stay untouched; only what we send to Meta is
+    normalized. Forward writes already use ms.
+
+    Behavior:
+      - None / empty input        -> returned unchanged
+      - Malformed (not 4 segments) -> returned unchanged (Meta will reject cleanly)
+      - Non-integer timestamp      -> returned unchanged
+      - Seconds-magnitude timestamp -> scaled by 1000 to ms
+      - Already-ms timestamp        -> returned unchanged
+    """
+    if not fbc:
+        return fbc
+    parts = fbc.split(".")
+    if len(parts) != 4 or parts[0] != "fb":
+        return fbc
+    try:
+        ts = int(parts[2])
+    except (ValueError, TypeError):
+        return fbc
+    if ts <= 0:
+        return fbc
+    if ts < _FBC_TS_MS_THRESHOLD:
+        ts *= 1000
+        return f"{parts[0]}.{parts[1]}.{ts}.{parts[3]}"
+    return fbc
+
+
 def build_user_data(
     *,
     email: Optional[str],
@@ -86,7 +131,12 @@ def build_user_data(
         out["client_user_agent"] = user_agent
     if fbp:
         out["fbp"] = fbp
+    # fbc is normalized to milliseconds at dispatch — see normalize_fbc().
+    # Legacy seconds-based values from older code paths get fixed up
+    # transparently here without touching stored state.
     if fbc:
-        out["fbc"] = fbc
+        normalized = normalize_fbc(fbc)
+        if normalized:
+            out["fbc"] = normalized
 
     return out
