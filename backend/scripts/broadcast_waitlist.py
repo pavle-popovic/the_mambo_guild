@@ -135,6 +135,14 @@ SKIP_EMAILS = {
     "m_puentener@gmx.net",
     "jubarjlb@gmail.com",
     "oportasov@aol.com",
+    "asierramirezblanco@gmail.com",
+    "stacey_topal@yahoo.gr",
+    "rulito426.hd31@gmail.com",
+    "dodo207@hotmail.com",
+    # Unsubscribed during the day-6 broadcast (May 6)
+    "deac_s@yahoo.com",
+    # Active "no" — started + cancelled trial today, do not re-pitch the badge
+    "repcakjozef@gmail.com",
     # GDPR Article 17 deletion request, fulfilled — see scripts/gdpr_deletion_log.txt
     "hakanceylan899@gmail.com",
     # Disposable / nonsense addresses

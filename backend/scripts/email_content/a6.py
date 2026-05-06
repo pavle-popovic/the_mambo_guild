@@ -21,6 +21,8 @@ BODY_HTML = """<p>Hi __USERNAME__,</p>
 
 <p>The Founder Badge closes overnight. After that, the badge is gone for good. <strong>This is the final email.</strong></p>
 
+<p>I pushed the cutoff a few hours later than originally planned so my US and Latin America members get a full day to act. Equal shot for everyone, regardless of timezone.</p>
+
 <p>The exact cutoff is <strong>Wednesday May 7 at 06:00 UTC</strong>, which is:</p>
 <ul>
     <li><strong>8am Rome</strong> (Wed morning)</li>
@@ -57,6 +59,8 @@ BODY_TEXT = """Hi __USERNAME__,
 YOU HAVE THE END OF THE DAY.
 
 The Founder Badge closes overnight. After that, the badge is gone for good. This is the final email.
+
+I pushed the cutoff a few hours later than originally planned so my US and Latin America members get a full day to act. Equal shot for everyone, regardless of timezone.
 
 The exact cutoff is Wednesday May 7 at 06:00 UTC, which is:
 - 8am Rome (Wed morning)
