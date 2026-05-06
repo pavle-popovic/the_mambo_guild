@@ -6,7 +6,7 @@ email mid-trial is the fastest way to spike cancellations; this is
 the opposite — pure listening posture.
 """
 
-SEGMENT = "C"
+SEGMENT = "CD"
 SEND_AT_UTC = "2026-05-06T13:00:00Z"
 
 SUBJECT = "How did you find the Guild so far?"
