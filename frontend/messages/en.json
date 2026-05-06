@@ -1217,7 +1217,7 @@
     "learnBlog": "Blog"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "Free",
     "rookieDescription": "Forever. No credit card.",
     "rookieFeature": "ChaChaCha Bruno Mars Choreography",
@@ -1918,5 +1918,13 @@
     "ctaBody": "Open the community and post your first clip or question.",
     "ctaPrimary": "Open Community",
     "ctaSecondary": "Visit the Shop"
+  },
+  "startTrial": {
+    "loadingTitle": "Setting up your free trial...",
+    "loadingSubtitle": "One moment.",
+    "errorTitle": "Something went wrong",
+    "errorBody": "We couldn't start your trial. Try again or view pricing.",
+    "tryAgain": "Try again",
+    "viewPricing": "View pricing"
   }
 }

@@ -352,7 +352,8 @@ function PricingPageContent() {
                         {t("rookieName")}
                       </span>
                     </div>
-                    <div className="text-4xl font-bold mb-2 text-mambo-text">{t("rookiePrice")}</div>
+                    {/* Spacer instead of "$0/Free" — anchoring a zero price next to $39 hurts perceived value of the paid tiers, especially on mobile where the columns stack vertically. NBSP keeps the row height aligned with Pro/Performer. */}
+                    <div className="text-4xl font-bold mb-2 text-mambo-text" aria-hidden="true">{" "}</div>
                     <div className="text-sm text-gray-500 mb-8">{t("rookieDescription")}</div>
 
                     <ul className="text-left space-y-4 mb-8 flex-1">

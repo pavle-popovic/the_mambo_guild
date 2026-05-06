@@ -1217,7 +1217,7 @@
     "learnBlog": "블로그"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "무료",
     "rookieDescription": "영구 무료. 신용카드 필요 없음.",
     "rookieFeature": "ChaChaCha Bruno Mars 안무",
@@ -1919,5 +1919,13 @@
     "ctaBody": "커뮤니티를 열고 첫 클립이나 질문을 올려보세요.",
     "ctaPrimary": "커뮤니티 열기",
     "ctaSecondary": "샵 방문하기"
+  },
+  "startTrial": {
+    "loadingTitle": "무료 체험을 준비 중입니다...",
+    "loadingSubtitle": "잠시만 기다려 주세요.",
+    "errorTitle": "문제가 발생했습니다",
+    "errorBody": "체험을 시작할 수 없습니다. 다시 시도하거나 가격을 확인하세요.",
+    "tryAgain": "다시 시도",
+    "viewPricing": "가격 보기"
   }
 }

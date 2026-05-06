@@ -1217,7 +1217,7 @@
     "learnBlog": "Blog"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "Ücretsiz",
     "rookieDescription": "Sonsuza dek. Kredi kartı yok.",
     "rookieFeature": "ChaChaCha Bruno Mars Koreografisi",
@@ -1919,5 +1919,13 @@
     "ctaBody": "Topluluğu aç ve ilk klibini ya da sorunu paylaş.",
     "ctaPrimary": "Topluluğu Aç",
     "ctaSecondary": "Mağazayı Ziyaret Et"
+  },
+  "startTrial": {
+    "loadingTitle": "Ücretsiz denemeniz hazırlanıyor...",
+    "loadingSubtitle": "Bir dakika.",
+    "errorTitle": "Bir şeyler ters gitti",
+    "errorBody": "Denemenizi başlatamadık. Tekrar deneyin veya fiyatları görüntüleyin.",
+    "tryAgain": "Tekrar dene",
+    "viewPricing": "Fiyatları görüntüle"
   }
 }

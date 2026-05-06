@@ -1217,7 +1217,7 @@
     "learnBlog": "Blog"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "Δωρεάν",
     "rookieDescription": "Για πάντα. Χωρίς κάρτα.",
     "rookieFeature": "Χορογραφία ChaChaCha Bruno Mars",
@@ -1919,5 +1919,13 @@
     "ctaBody": "Άνοιξε την κοινότητα και ανέβασε το πρώτο σου κλιπ ή ερώτηση.",
     "ctaPrimary": "Άνοιξε την Κοινότητα",
     "ctaSecondary": "Επισκέψου το Κατάστημα"
+  },
+  "startTrial": {
+    "loadingTitle": "Προετοιμασία της δωρεάν δοκιμής σας...",
+    "loadingSubtitle": "Μια στιγμή.",
+    "errorTitle": "Κάτι πήγε στραβά",
+    "errorBody": "Δεν ήταν δυνατή η έναρξη της δοκιμής. Δοκιμάστε ξανά ή δείτε τις τιμές.",
+    "tryAgain": "Προσπαθήστε ξανά",
+    "viewPricing": "Προβολή τιμών"
   }
 }

@@ -1217,7 +1217,7 @@
     "learnBlog": "Blog"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "Gratis",
     "rookieDescription": "Per sempre. Nessuna carta di credito.",
     "rookieFeature": "Coreografia ChaChaCha Bruno Mars",
@@ -1919,5 +1919,13 @@
     "ctaBody": "Apri la comunità e pubblica il tuo primo clip o la tua prima domanda.",
     "ctaPrimary": "Apri la Comunità",
     "ctaSecondary": "Visita il Negozio"
+  },
+  "startTrial": {
+    "loadingTitle": "Preparazione della tua prova gratuita...",
+    "loadingSubtitle": "Un momento.",
+    "errorTitle": "Qualcosa è andato storto",
+    "errorBody": "Non siamo riusciti ad avviare la tua prova. Riprova o consulta i prezzi.",
+    "tryAgain": "Riprova",
+    "viewPricing": "Vedi prezzi"
   }
 }

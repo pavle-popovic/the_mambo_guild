@@ -1217,7 +1217,7 @@
     "learnBlog": "Blog"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "Gratis",
     "rookieDescription": "Voor altijd. Geen creditcard nodig.",
     "rookieFeature": "ChaChaCha Bruno Mars Choreografie",
@@ -1919,5 +1919,13 @@
     "ctaBody": "Open de community en plaats je eerste clip of vraag.",
     "ctaPrimary": "Open Community",
     "ctaSecondary": "Bezoek de Winkel"
+  },
+  "startTrial": {
+    "loadingTitle": "Je gratis proefperiode wordt voorbereid...",
+    "loadingSubtitle": "Een moment.",
+    "errorTitle": "Er ging iets mis",
+    "errorBody": "We konden je proefperiode niet starten. Probeer het opnieuw of bekijk de prijzen.",
+    "tryAgain": "Opnieuw proberen",
+    "viewPricing": "Prijzen bekijken"
   }
 }

@@ -1217,7 +1217,7 @@
     "learnBlog": "博客"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "免费",
     "rookieDescription": "永久免费。无需信用卡。",
     "rookieFeature": "Bruno Mars ChaChaCha 编舞",
@@ -1919,5 +1919,13 @@
     "ctaBody": "打开社区，发布你的第一条片段或问题。",
     "ctaPrimary": "打开社区",
     "ctaSecondary": "前往商店"
+  },
+  "startTrial": {
+    "loadingTitle": "正在准备您的免费试用...",
+    "loadingSubtitle": "请稍候。",
+    "errorTitle": "出了点问题",
+    "errorBody": "无法启动您的试用。请重试或查看价格。",
+    "tryAgain": "重试",
+    "viewPricing": "查看价格"
   }
 }

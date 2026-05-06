@@ -20,7 +20,12 @@ export default function NewHero() {
     const unsubscribedCtaLabel = user?.has_used_trial
         ? tPricing("proSubscribeNoTrial")
         : t("cta");
-    const unsubscribedCtaHref = user ? "/pricing" : "/register";
+    // Logged-in trial-eligible users go DIRECT to Stripe via /start-trial
+    // (one redirect to checkout, no /pricing detour). Logged-out users keep
+    // the existing /register flow so cold ad clicks still hit the signup form
+    // first — /start-trial only saves clicks for users who already have an
+    // account.
+    const unsubscribedCtaHref = user ? "/start-trial" : "/register";
     const bulletPoints = [
         t("bulletNoPartner"),
         t("bulletLanguages"),

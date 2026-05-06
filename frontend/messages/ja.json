@@ -1217,7 +1217,7 @@
     "learnBlog": "ブログ"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "無料",
     "rookieDescription": "ずっと無料。クレジットカード不要。",
     "rookieFeature": "ChaChaCha Bruno Marsコレオグラフィ",
@@ -1919,5 +1919,13 @@
     "ctaBody": "コミュニティを開いて、最初のクリップか質問を投稿しましょう。",
     "ctaPrimary": "コミュニティを開く",
     "ctaSecondary": "ショップへ"
+  },
+  "startTrial": {
+    "loadingTitle": "無料トライアルを準備しています...",
+    "loadingSubtitle": "少々お待ちください。",
+    "errorTitle": "問題が発生しました",
+    "errorBody": "トライアルを開始できませんでした。もう一度お試しいただくか、料金をご確認ください。",
+    "tryAgain": "再試行",
+    "viewPricing": "料金を見る"
   }
 }

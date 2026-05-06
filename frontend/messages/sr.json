@@ -1217,7 +1217,7 @@
     "learnBlog": "Блог"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "Бесплатно",
     "rookieDescription": "Заувек. Без кредитне картице.",
     "rookieFeature": "ChaChaCha Bruno Mars кореографија",
@@ -1919,5 +1919,13 @@
     "ctaBody": "Отвори заједницу и постави први снимак или питање.",
     "ctaPrimary": "Отвори Заједницу",
     "ctaSecondary": "Посети Продавницу"
+  },
+  "startTrial": {
+    "loadingTitle": "Припрема Ваше бесплатне пробне верзије...",
+    "loadingSubtitle": "Тренутак.",
+    "errorTitle": "Нешто је пошло наопако",
+    "errorBody": "Нисмо могли да покренемо Вашу пробну верзију. Покушајте поново или погледајте цене.",
+    "tryAgain": "Покушајте поново",
+    "viewPricing": "Погледајте цене"
   }
 }

@@ -1217,7 +1217,7 @@
     "learnBlog": "المدونة"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "مجاناً",
     "rookieDescription": "للأبد. بدون بطاقة ائتمان.",
     "rookieFeature": "كوريغرافيا ChaChaCha Bruno Mars",
@@ -1919,5 +1919,13 @@
     "ctaBody": "افتح المجتمع وانشر أول مقطع أو سؤال.",
     "ctaPrimary": "افتح المجتمع",
     "ctaSecondary": "زر المتجر"
+  },
+  "startTrial": {
+    "loadingTitle": "جارٍ تجهيز نسختك التجريبية المجانية...",
+    "loadingSubtitle": "لحظة من فضلك.",
+    "errorTitle": "حدث خطأ ما",
+    "errorBody": "تعذّر بدء النسخة التجريبية. حاول مرة أخرى أو اطّلع على الأسعار.",
+    "tryAgain": "حاول مرة أخرى",
+    "viewPricing": "عرض الأسعار"
   }
 }

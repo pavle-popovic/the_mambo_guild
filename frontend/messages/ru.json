@@ -1217,7 +1217,7 @@
     "learnBlog": "Блог"
   },
   "pricingPage": {
-    "rookieName": "Rookie",
+    "rookieName": "Basic",
     "rookiePrice": "Бесплатно",
     "rookieDescription": "Навсегда. Без карты.",
     "rookieFeature": "Хореография ChaChaCha Bruno Mars",
@@ -1919,5 +1919,13 @@
     "ctaBody": "Открой сообщество и опубликуй первый клип или вопрос.",
     "ctaPrimary": "Открыть сообщество",
     "ctaSecondary": "Зайти в магазин"
+  },
+  "startTrial": {
+    "loadingTitle": "Готовим ваш бесплатный пробный период...",
+    "loadingSubtitle": "Один момент.",
+    "errorTitle": "Что-то пошло не так",
+    "errorBody": "Не удалось начать ваш пробный период. Попробуйте ещё раз или посмотрите тарифы.",
+    "tryAgain": "Попробовать снова",
+    "viewPricing": "Посмотреть тарифы"
   }
 }
